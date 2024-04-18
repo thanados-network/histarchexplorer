@@ -3,7 +3,7 @@
 <head>
   <link rel="stylesheet" href="/static/css/styles.css">
   <link rel="stylesheet"
-        href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
+        href="/static/node_modules/bootstrap/dist/css/bootstrap.css">
 
   <script
     src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -12,19 +12,16 @@
   <title>Histarchexplorer</title>
 </head>
 <body>
-
+<header class="container-fluid">
+  {% include 'navbar.html' %}
+</header>
 <main>
-  <header class="header container">
-    {% include 'navbar.html' %}
-  </header>
-  <div class="content">
-    <div class="row">
-      <div class="col-6">
-        <h1 class="display-2">Histarchexplorer</h1>
-      </div>
-    </div>
+  <div class="container" style="padding-top: 80px;">
+    {% block content %}{% endblock %}
   </div>
 </main>
+<footer>
 
+</footer>
 </body>
 </html>
