@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Any
 
 from flask import Flask, Response, session, request
@@ -27,8 +26,7 @@ def inject_conf_var() -> dict[str, Any]:
             'language',
             request.accept_languages.best_match(
                 app.config['LANGUAGES'].keys())),
-        'NAVBAR_ELEMENTS': app.config['NAVBAR_ELEMENTS'],
-    }
+        'NAVBAR_ELEMENTS': app.config['NAVBAR_ELEMENTS']}
 
 
 @app.after_request
