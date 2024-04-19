@@ -1,0 +1,37 @@
+@use '../util'as *;
+
+// Define styles for different breakpoints
+.navbar-toggler {
+  // Default positioning
+}
+
+@include breakpoint-down('small') {
+  .navbar-toggler {
+    // Define styles for screens smaller than 640px
+    // Adjust positioning as per your requirements
+  }
+}
+
+@include breakpoint('medium') {
+  .navbar-toggler {
+    position: absolute;
+    top: rem(45);
+    right: rem(150);
+    // Define styles for screens larger than or equal to 640px
+    // Adjust positioning as per your requirements
+  }
+}
+
+@include breakpoint('large') {
+  .navbar-toggler {
+    // Define styles for screens larger than or equal to 1150px
+    // Adjust positioning as per your requirements
+  }
+}
+
+@include breakpoint('xlarge') {
+  .navbar-toggler {
+    // Define styles for screens larger than or equal to 1400px
+    // Adjust positioning as per your requirements
+  }
+}
