@@ -1,0 +1,56 @@
+@use '../util'as *;
+
+.navbar-nav {
+  // flex-wrap: nowrap; /* Prevent wrapping of navbar items */
+  //overflow-x: auto; /* Enable horizontal scrolling for overflow */
+  white-space: nowrap; /* Prevent text wrapping */
+
+
+}
+
+.container-fluid //navbar container
+{
+max-height: 80px
+}
+
+
+@media (max-width: 992px) {
+  .container-fluid {
+    max-height: none; /* Reset max-height for smaller screens */
+  }
+}
+
+.navbar-brand img {
+  fill: var(--icon-color); /* This will apply the color to the SVG image - does not work yet*/
+}
+
+.navbar-nav {
+  .nav-link {
+    position: relative;
+    // Set transparent border by default
+    border-bottom: 2px solid transparent;
+
+    &:hover {
+      // Change border color on hover
+      border-color: var(--border-color);
+      transition: border-color 0.3s ease;
+      transform: scaleX(1.01); // Scale the border width on hover
+    }
+
+  }
+
+  &.active {
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      width: rem(50);
+      left: 50%; // Adjust to center the border under the text
+      transform: translateX(-50%); // Center the border horizontally
+      height: 2px;
+      background-color: #151515;
+    }
+  }
+}
+
+

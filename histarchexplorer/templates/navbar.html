@@ -9,7 +9,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% for nav_item in NAVBAR_ELEMENTS %}
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{{ url_for(nav_item) }}">{{ nav_item }}</a>
+                    <a class="nav-link active" aria-current="page" href="{{ url_for(nav_item) }}">{{ nav_item | upper }}</a>
                 </li>
                 {% endfor %}
             </ul>
