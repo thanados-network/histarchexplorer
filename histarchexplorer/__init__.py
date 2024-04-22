@@ -8,7 +8,9 @@ app.config.from_object('config.default')
 app.config.from_pyfile('production.py')
 babel = Babel(app)
 
+# pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer import views
+
 
 @babel.localeselector
 def get_locale() -> str:
@@ -26,8 +28,7 @@ def inject_conf_var() -> dict[str, Any]:
             'language',
             request.accept_languages.best_match(
                 app.config['LANGUAGES'].keys())),
-        'NAVBAR_ELEMENTS': app.config['NAVBAR_ELEMENTS'],
-    }
+        'NAVBAR_ELEMENTS': app.config['NAVBAR_ELEMENTS']}
 
 
 @app.after_request
