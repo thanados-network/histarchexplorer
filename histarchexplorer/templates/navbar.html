@@ -9,7 +9,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% for nav_item in NAVBAR_ELEMENTS %}
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" title="{{ nav_item['title']}}" href="{{ url_for(nav_item['original'])}}">{{ nav_item[session['language']] | upper }}</a>
+                    <a class="nav-link {% if nav_item['original'] == current_page %}active{% endif %}"  aria-current="page" title="{{ nav_item['title']}}" href="{{ url_for(nav_item['original'])}}">{{ nav_item[session['language']] | upper }}</a>
                 </li>
                 {% endfor %}
             </ul>
