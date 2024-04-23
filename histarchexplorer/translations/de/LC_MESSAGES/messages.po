@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-04-19 13:51+0200\n"
+"POT-Creation-Date: 2024-04-23 12:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: de\n"
@@ -18,15 +18,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: __init__.py:30
+#: __init__.py:31
 msgid "entities"
 msgstr "Entitäten"
 
-#: __init__.py:30
+#: __init__.py:31
+msgid "browse/select/find all entities"
+msgstr "Entitäten durchsuchen/auswählen/finden"
+
+#: __init__.py:32
+msgid "search"
+msgstr "Suche"
+
+#: __init__.py:32
+msgid "detailed search"
+msgstr "detaillierte Suche"
+
+#: __init__.py:33
 msgid "about"
 msgstr "Über"
 
-#: __init__.py:30
-msgid "search"
-msgstr "Suche"
+#: __init__.py:33
+msgid "about the project"
+msgstr "über das Projekt"
 

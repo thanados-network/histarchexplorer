@@ -28,9 +28,9 @@ def inject_conf_var() -> dict[str, Any]:
             'language',
             request.accept_languages.best_match(
                 app.config['LANGUAGES'].keys())),
-        'NAVBAR_ELEMENTS': [{'original': 'entities', session['language']: _('entities')},
-                            {'original': 'search', session['language']: _('search')},
-                            {'original': 'about', session['language']: _('about')}],
+        'NAVBAR_ELEMENTS': [{'original': 'entities', session['language']: _('entities'), 'title': _('browse/select/find all entities')},
+                            {'original': 'search', session['language']: _('search'), 'title': _('detailed search')},
+                            {'original': 'about', session['language']: _('about'), 'title': _('about the project')}],
     }
 
 
