@@ -11,6 +11,7 @@ def index():
 def entities():
     return render_template('entities.html', current_page='entities')
 
+
 @app.route('/search')
 def search():
     return render_template('search.html', current_page='search')
