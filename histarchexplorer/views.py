@@ -1,4 +1,6 @@
-from flask import render_template
+from typing import Optional
+
+from flask import Response, redirect, render_template, request, session
 
 from runserver import app
 
@@ -20,3 +22,9 @@ def search():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+
+@app.route('/language=<language>')
+def set_language(language: Optional[str] = None) -> Response:
+    session['language'] = language
+    return redirect(request.referrer)
