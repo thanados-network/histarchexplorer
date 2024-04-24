@@ -20,13 +20,8 @@ def get_locale() -> str:
 
 @app.route('/language/<language>')
 def set_language(language: str) -> Response:
-    if language in app.config['LANGUAGES']:
-        session['language'] = language
-    if request.referrer is not None:
-        return redirect(request.referrer)
-    else:
-        # If referrer is None, redirect to some default page
-        return redirect('/')
+    session['language'] = language
+    return redirect(request.referrer)
 
 @app.context_processor
 def inject_conf_var() -> dict[str, Any]:
