@@ -8,6 +8,7 @@ from histarchexplorer import app
 _('entities')
 _('search')
 _('about')
+_('test')
 
 
 @app.context_processor
@@ -15,5 +16,7 @@ def inject_menu() -> dict[str, Any]:
     navbar = [
         {'entities': _('browse/select/find all entities')},
         {'search': _('detailed search')},
-        {'about': _('about the project')}]
+        {'about': _('about the project')},
+        {'test': _('look at what is possible')},
+    ]
     return {'navbar': navbar}
