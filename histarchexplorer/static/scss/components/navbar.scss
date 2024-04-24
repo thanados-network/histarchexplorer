@@ -1,13 +1,46 @@
 .navbar-brand {
     width: 266px;
-    height: 96px;
-    margin-left: 1.5rem;
+    height: 80px;
+    margin-left: 1rem;
     background-size: cover;
-    background-image: url('../images/logos/logo_266x96.png');
+    background-image: url('../images/logos/logo_266x80.png');
 
     @media (max-width: 768px) {
         width: 36px;
-        background-image: url('../images/logos/logo_36x96.png');
+        background-image: url('../images/logos/logo_36x80.png');
     }
 }
+
+.navbar-nav {
+  .nav-link {
+    position: relative;
+    // Set transparent border by default
+    border-bottom: 2px solid transparent;
+
+    &:hover {
+      // Change border color on hover
+      border-color: var(--border-color);
+      transition: border-color 0.3s ease;
+      transform: scaleX(1.01); // Scale the border width on hover
+    }
+
+  }
+
+  &.active {
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      width: 50px;
+      left: 50%; // Adjust to center the border under the text
+      transform: translateX(-50%); // Center the border horizontally
+      height: 2px;
+      background-color: #151515;
+    }
+  }
+}
+
+
+
+
 
