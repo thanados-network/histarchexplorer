@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+{% block content %}
+<ul>
+  {% for entity in entities %}
+    <li><a href="{{ url_for('test_entity', id_=entity.id) }}">{{ entity.name }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -29,13 +29,20 @@ def about() -> str:
 
 @app.route('/test')
 def test() -> str:
-    return render_template('api.html')
+    return render_template('test/test.html')
 
 
-@app.route('/api/entity/<int:id_>')
+@app.route('/test/entity/<int:id_>')
 def test_entity(id_: int) -> str:
     entity = Entity.get_entity(id_)
-    return render_template('entity.html', entity=entity)
+    return render_template('test/entity.html', entity=entity)
+
+
+@app.route('/test/system_class/<class_>')
+def test_system_class(class_: str) -> str:
+    return render_template(
+        'test/system_class.html',
+        entities=Entity.get_by_system_class(class_))
 
 
 @app.route('/language=<language>')

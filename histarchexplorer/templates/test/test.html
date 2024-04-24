@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+  <ul>
+    <li>
+      <a href="{{ url_for('test_entity', id_=50505) }}">
+        Get one entity with ID (e.g. 50505)
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('test_system_class', class_='person') }}">
+        Get all entities of a system class, e.g. Person
+      </a>
+    </li>
+  </ul>
+
+{% endblock %}

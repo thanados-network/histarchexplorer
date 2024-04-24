@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from histarchexplorer.api.api import get_entity
+from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.model.depiction import Depiction
 from histarchexplorer.model.relation import Relation
 from histarchexplorer.model.types import Types
@@ -44,7 +44,12 @@ class Entity:
 
     @staticmethod
     def get_entity(id_: int):
-        return Entity(get_entity(id_))
+        return Entity(ApiAccess.get_entity(id_))
+
+    @staticmethod
+    def get_by_system_class(class_: str):
+        return [
+            Entity(entity) for entity in ApiAccess.get_by_system_class(class_)]
 
     @staticmethod
     def get_alias(data: list[dict[str, str]]) -> str:
