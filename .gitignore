@@ -51,4 +51,3 @@ dmypy.json
 # Project specific files
 /histarchexplorer/static/node_modules/
 /histarchexplorer/static/package-lock.json
-/histarchexplorer/static/css/main.css*
