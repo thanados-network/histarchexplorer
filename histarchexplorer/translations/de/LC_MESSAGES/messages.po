@@ -7,42 +7,42 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-04-23 12:12+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2024-04-24 13:24+0200\n"
+"PO-Revision-Date: 2024-04-24 13:23+0200\n"
+"Last-Translator: \n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.10.3\n"
 
-#: __init__.py:31
+#: util.py:12
+msgid "browse/select/find all entities"
+msgstr ""
+
+#: util.py:12
 msgid "entities"
 msgstr "Entitäten"
 
-#: __init__.py:31
-msgid "browse/select/find all entities"
-msgstr "Entitäten durchsuchen/auswählen/finden"
+#: util.py:13
+msgid "detailed search"
+msgstr "Detaillierte Suche"
 
-#: __init__.py:32
+#: util.py:13
 msgid "search"
 msgstr "Suche"
 
-#: __init__.py:32
-msgid "detailed search"
-msgstr "detaillierte Suche"
+#: util.py:14
+msgid "about the project"
+msgstr "Über das Projekt"
 
-#: __init__.py:33
+#: util.py:14
 msgid "about"
 msgstr "Über"
 
-#: __init__.py:33
-msgid "about the project"
-msgstr "über das Projekt"
-
 #: templates/navbar.html:3
 msgid "home"
-msgstr "Startseite"
+msgstr "Home"
 
