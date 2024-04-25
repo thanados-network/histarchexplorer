@@ -1,0 +1,44 @@
+:root {
+  --font-inter: "Inter", sans-serif;
+}
+
+body {
+  font-family: var(--font-inter);
+}
+
+.navbar-brand {
+  height: 80px;
+  align-content: center;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+}
+.navbar-brand #logo {
+  max-width: 260px;
+}
+@media (max-width: 576px) {
+  .navbar-brand {
+    margin-right: 0;
+    margin-left: 0;
+  }
+}
+
+.navbar-nav .nav-link-hover {
+  border-bottom: 2px solid transparent;
+}
+.navbar-nav .nav-link-hover:hover {
+  border-color: unset;
+  transition: border-color 0.3s ease;
+  transform: scaleX(1.01);
+}
+.navbar-nav.active:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 2px;
+  background-color: #151515;
+}
+
+/*# sourceMappingURL=main.css.map */
