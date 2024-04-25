@@ -7,16 +7,18 @@ body {
 }
 
 .navbar-brand {
-  width: 266px;
   height: 80px;
-  margin-left: 1rem;
-  background-size: cover;
-  background-image: url("../images/logos/logo_266x80.png");
+  align-content: center;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
 }
-@media (max-width: 768px) {
+.navbar-brand #logo {
+  max-width: 260px;
+}
+@media (max-width: 576px) {
   .navbar-brand {
-    width: 36px;
-    background-image: url("../images/logos/logo_36x80.png");
+    margin-right: 0;
+    margin-left: 0;
   }
 }
 
@@ -24,7 +26,7 @@ body {
   border-bottom: 2px solid transparent;
 }
 .navbar-nav .nav-link-hover:hover {
-  border-color: var(--border-color);
+  border-color: unset;
   transition: border-color 0.3s ease;
   transform: scaleX(1.01);
 }
@@ -37,10 +39,6 @@ body {
   transform: translateX(-50%);
   height: 2px;
   background-color: #151515;
-}
-
-.navbar .mode-switch {
-  order: 2;
 }
 
 /*# sourceMappingURL=main.css.map */
