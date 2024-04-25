@@ -41,4 +41,20 @@ body {
   background-color: #151515;
 }
 
+.project-card {
+  background: lightgrey;
+  border-radius: 10px;
+  margin: 2rem 0 2rem 0;
+  padding: 2rem 2rem 3.5rem 2rem;
+  font-color: black;
+}
+
+.team-card {
+  background: lightgrey;
+  border-radius: 10px;
+  margin: 2rem 0 2rem 0;
+  padding: 2rem 2rem 3.5rem 2rem;
+  font-color: black;
+}
+
 /*# sourceMappingURL=main.css.map */
