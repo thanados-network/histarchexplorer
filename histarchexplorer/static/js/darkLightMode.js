@@ -34,7 +34,6 @@ function setTheme(mode = 'auto') {
 
 // Function to handle system mode change
 function systemModeChange() {
-    console.log('Theme change detected');
     const mode = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
     setTheme(mode);
 }
