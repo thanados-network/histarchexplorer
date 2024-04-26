@@ -1,7 +1,11 @@
 from typing import Any
 
-from flask import Flask, Response, session, request
+import psycopg2.extras
+
+from flask import Flask, g,  Response, session, request
 from flask_babel import Babel
+
+from psycopg2.extensions import connection
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
@@ -9,8 +13,22 @@ app.config.from_pyfile('production.py')
 babel = Babel(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
-from histarchexplorer import util, views
+from histarchexplorer.views import views, login
+from histarchexplorer.utils import util
 
+def connect() -> connection:
+    try:
+        connection_ = psycopg2.connect(
+            database=app.config['DATABASE_NAME'],
+            user=app.config['DATABASE_USER'],
+            password=app.config['DATABASE_PASS'],
+            port=app.config['DATABASE_PORT'],
+            host=app.config['DATABASE_HOST'])
+        connection_.autocommit = True
+        return connection_
+    except Exception as e:  # pragma: no cover
+        print("Database connection error.")
+        raise Exception(e)
 
 @babel.localeselector
 def get_locale() -> str:
@@ -18,6 +36,11 @@ def get_locale() -> str:
         return session['language']
     return request.accept_languages.best_match(app.config['LANGUAGES']) or 'en'
 
+@app.before_request
+def before_request() -> None:
+    g.db = connect()
+    g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
+    session['language'] = get_locale()
 
 @app.context_processor
 def inject_conf_var() -> dict[str, Any]:

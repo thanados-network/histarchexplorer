@@ -1,6 +1,7 @@
 from typing import Optional
 
 from flask import redirect, render_template, request, session
+from flask_login import login_required
 from werkzeug import Response
 
 from histarchexplorer import app
@@ -15,17 +16,17 @@ def index() -> str:
 
 @app.route('/entities')
 def entities() -> str:
-    return render_template('entities.html')
+    return render_template('entities.html', current_page='entities')
 
 
 @app.route('/search')
 def search() -> str:
-    return render_template('search.html')
+    return render_template('search.html', current_page='search')
 
 
 @app.route('/about')
 def about() -> str:
-    return render_template('about.html')
+    return render_template('about.html', current_page='about')
 
 
 @app.route('/test')
@@ -52,3 +53,8 @@ def test_system_class(class_: str) -> str:
 def set_language(language: Optional[str] = None) -> Response:
     session['language'] = language
     return redirect(request.referrer)
+
+@app.route('/admin')
+@login_required
+def admin() -> str:
+    return render_template("/admin.html")

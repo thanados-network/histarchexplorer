@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+<div class="container-fluid mt-5 p-3">
+    <h4 class="pb-2">Login</h4>
+    <form method="post">
+        {{ form.csrf_token }}
+        <div class="input-group mb-3">
+            <span class="input-group-text">{{ _('username').title() }}:</span>
+            {{ form.username(class_='required, form-control') }}
+        </div>
+        <div class="input-group">
+            <span class="input-group-text">{{ _('password').title() }}:</span>
+            {{ form.password(class_='required, form-control') }}
+            {{ form.save(class_='btn btn-secondary') }}
+        </div>
+
+    </form>
+    <h4>{{ error_html|safe }}</h4>
+</div>
+
+
+
+
+{% endblock %}

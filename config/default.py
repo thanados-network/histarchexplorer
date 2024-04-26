@@ -4,6 +4,12 @@ LANGUAGES = {'de': 'Deutsch', 'en': 'English'}
 DEBUG = True
 SECRET_KEY = 'secretkey'
 
+DATABASE_NAME = 'openatlas_thanados'
+DATABASE_USER = 'openatlas'
+DATABASE_HOST = 'localhost'
+DATABASE_PORT = 5432
+DATABASE_PASS = 'CHANGE ME'
+
 # Security
 SESSION_COOKIE_SECURE = False
 REMEMBER_COOKIE_SECURE = True
