@@ -42,9 +42,9 @@ body {
 }
 
 .project-card, .team-card {
-  padding-top: 1rem;
+  padding: 1rem 1rem;
   border-radius: 10px;
-  margin: 2rem 0;
+  margin-top: 2rem 0;
 }
 
 .team-card {
@@ -57,6 +57,13 @@ body {
 .team-card__member {
   font-size: 1.8em;
   padding-top: 0.5rem;
+}
+
+.sponsor-card, .legal {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  background: var(bs-light);
+  color: black;
 }
 
 /*# sourceMappingURL=main.css.map */

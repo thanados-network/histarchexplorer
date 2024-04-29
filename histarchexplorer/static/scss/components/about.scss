@@ -1,7 +1,7 @@
-.project-card, .team-card {
-  padding-top: 1rem;
+.project-card, .team-card, {
+  padding: 1rem 1rem;
   border-radius: 10px;
-  margin: 2rem 0;
+  margin-top: 2rem 0;
 }
 
 .team-card {
@@ -18,3 +18,9 @@
 
   }
 }
+
+.sponsor-card, .legal{
+  margin-top: 2rem;
+  padding-top: 1rem;
+  background: var(bs-light);
+  color: black;}
