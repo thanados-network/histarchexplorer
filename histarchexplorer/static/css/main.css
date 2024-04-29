@@ -67,7 +67,13 @@ body {
   margin-bottom: 0;
 }
 
-.sponsor-card, .legal {
+.legal-card {
+  padding: 1rem 1rem;
+  border-radius: 10px;
+  margin-top: 2rem;
+}
+
+.sponsor-card {
   margin-top: 2rem;
   padding-top: 1rem;
 }
