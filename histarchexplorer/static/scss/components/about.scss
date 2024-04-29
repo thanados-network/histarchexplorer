@@ -7,8 +7,12 @@
 .team-card {
   background: lightgrey;
   color: black;
-}
 
-.team-card .col-lg-4 {
-  padding-top: 1rem;
+  .col-lg-4 {
+    padding-top: 1rem;
+  }
+
+  &__member {
+    font-size: 1.8em; /* Equivalent to the font size of h3 */
+  }
 }

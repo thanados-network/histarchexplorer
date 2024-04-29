@@ -51,9 +51,11 @@ body {
   background: lightgrey;
   color: black;
 }
-
 .team-card .col-lg-4 {
   padding-top: 1rem;
+}
+.team-card__member {
+  font-size: 1.8em; /* Equivalent to the font size of h3 */
 }
 
 /*# sourceMappingURL=main.css.map */
