@@ -1,7 +1,9 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
         <a class="navbar-brand" title="{{ _('home') }}"
-           href="{{ url_for('index') }}"><img id="logo" src="/static/images/logos/logo_mode_light.svg"></a>
+           href="{{ url_for('index') }}">
+          <img id="logo" src="/static/images/logos/logo_mode_light.svg">
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target=".navbar-collapse"
                 aria-controls=".navbar-collapse" aria-expanded="false"
@@ -13,7 +15,7 @@
                 {% for nav_item in navbar %}
                     {% for category, title in nav_item.items() %}
                         <li class="nav-item">
-                            <a class="nav-link nav-link-hover {% if category == current_page %}active{% endif %}" aria-current="page"
+                            <a class="nav-link nav-link-hover {% if category == request.endpoint %}active{% endif %}" aria-current="page"
                                title="{{ title }}"
                                href="{{ url_for(category) }}">{{ _(category) | upper }}
                             </a>

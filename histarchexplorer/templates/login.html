@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
 
-
 <div class="container-fluid mt-5 p-3">
     <h4 class="pb-2">Login</h4>
     <form method="post">
@@ -15,12 +14,8 @@
             {{ form.password(class_='required, form-control') }}
             {{ form.save(class_='btn btn-secondary') }}
         </div>
-
     </form>
     <h4>{{ error_html|safe }}</h4>
 </div>
-
-
-
 
 {% endblock %}

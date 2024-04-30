@@ -18,18 +18,18 @@ def index() -> str:
 
 
 @app.route('/entities')
-def entities() -> str:
-    return render_template('entities.html', current_page='entities')
+def entities():
+    return render_template('entities.html')
 
 
 @app.route('/search')
-def search() -> str:
-    return render_template('search.html', current_page='search')
+def search():
+    return render_template('search.html')
 
 
 @app.route('/about')
-def about() -> str:
-    return render_template('about.html', current_page='about')
+def about():
+    return render_template('about.html')
 
 
 @app.route('/test')
@@ -76,6 +76,7 @@ def test_system_class(class_: str) -> str:
 def set_language(language: Optional[str] = None) -> Response:
     session['language'] = language
     return redirect(request.referrer)
+
 
 
 @app.route('/admin')

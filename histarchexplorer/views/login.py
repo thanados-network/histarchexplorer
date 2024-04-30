@@ -2,7 +2,8 @@
 
 from bcrypt import hashpw
 from flask import flash, render_template, request, url_for
-from flask_login import LoginManager, current_user, login_required, login_user, logout_user
+from flask_login import (
+    LoginManager, current_user, login_required, login_user, logout_user)
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
@@ -22,7 +23,9 @@ def load_user(user_id):
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', [InputRequired()], render_kw={'autofocus': True})
+    username = StringField(
+        'Username', [InputRequired()],
+        render_kw={'autofocus': True})
     password = PasswordField('Password', [InputRequired()])
     show_passwords = BooleanField('show password')
     save = SubmitField('login')
@@ -36,11 +39,14 @@ def login():
     if form.validate_on_submit():
         user = UserMapper.get_by_username(request.form['username'])
         if user:
-            hash_ = hashpw(request.form['password'].encode('utf-8'), user.password.encode('utf-8'))
+            hash_ = hashpw(
+                request.form['password'].encode('utf-8'),
+                user.password.encode('utf-8'))
             if hash_ == user.password.encode('utf-8'):
                 if user.active:
                     login_user(user)
-                    return redirect(request.args.get('next') or url_for('index'))
+                    return redirect(
+                        request.args.get('next') or url_for('index'))
                 else:  # pragma: no cover
                     flash('error inactive', 'error')
             else:  # pragma: no cover
@@ -59,3 +65,9 @@ def login():
 def logout():
     logout_user()
     return redirect('/')
+
+
+@app.route('/admin')
+@login_required
+def admin() -> str:
+    return render_template("/admin.html")
