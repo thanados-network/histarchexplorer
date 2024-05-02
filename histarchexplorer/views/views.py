@@ -30,7 +30,7 @@ def about():
     result = g.cursor.fetchone()
     project = result.name
     description = result.description
-    return render_template('about.html', project = project, description = description)
+    return render_template('about.html', project=project, description=description)
 
 
 @app.route('/language=<language>')
