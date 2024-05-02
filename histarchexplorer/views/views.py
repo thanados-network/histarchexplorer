@@ -1,6 +1,6 @@
 from typing import Optional
 
-from flask import Response, redirect, render_template, request, session
+from flask import Response, redirect, render_template, request, session, g
 
 from runserver import app
 
@@ -22,7 +22,15 @@ def search():
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    sql = """
+        SELECT name, description FROM tng.config WHERE config_class = '1'
+    """
+
+    g.cursor.execute(sql)
+    result = g.cursor.fetchone()
+    project = result.name
+    description = result.description
+    return render_template('about.html', project = project, description = description)
 
 
 @app.route('/language=<language>')
