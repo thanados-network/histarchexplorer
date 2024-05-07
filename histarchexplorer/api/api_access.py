@@ -44,6 +44,18 @@ class ApiAccess:
             timeout=30).json()['results']
 
     @staticmethod
+    def linked_entities_by_properties_recursive(
+            id_: int,
+            parser: Parser) -> list[dict[str, Any]]:
+        url = (f"{app.config['API_URL']}"
+               f"/linked_entities_by_properties_recursive/")
+        return requests.get(
+            f"{url}{id_}",
+            params=parser.__dict__,
+            proxies=PROXIES,
+            timeout=30).json()['results']
+
+    @staticmethod
     def get_subunits(
             id_: int,
             parser: Parser) -> list[dict[str, Any]]:

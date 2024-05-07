@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, request
 
 from histarchexplorer import app
 from histarchexplorer.api.api_access import ApiAccess
@@ -16,6 +16,13 @@ def test_entity(id_: int) -> str:
     parser = Parser()
     entity = Entity.get_entity(id_, parser)
     return render_template('test/entity.html', entity=entity)
+
+
+@app.route('/test/linked_entities_by_properties_recursive/<int:id_>')
+def test_linked_entities_by_properties_recursive(id_: int) -> str:
+    parser = Parser(properties=request.args.get('properties'), limit=0)
+    entities = Entity.linked_entities_by_properties_recursive(id_, parser)
+    return render_template('test/list_entities.html', entities=entities)
 
 
 @app.route('/test/subunit/<int:id_>')

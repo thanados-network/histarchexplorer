@@ -93,6 +93,11 @@ class Entity:
                 ApiAccess.get_by_system_class(class_, parser)]
 
     @staticmethod
+    def linked_entities_by_properties_recursive(id_: int, parser: Parser):
+        return [Entity(entity) for entity in
+                ApiAccess.linked_entities_by_properties_recursive(id_, parser)]
+
+    @staticmethod
     def get_alias(data: list[dict[str, str]]) -> str:
         return ', '.join(map(str, [alias['alias'] for alias in data])) \
             if data else ''

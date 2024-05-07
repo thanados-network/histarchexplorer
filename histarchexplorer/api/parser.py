@@ -27,6 +27,7 @@ class Parser:
     geometry: list[str] = None
     image_size: str = None
     file_id: int = None
+    properties: list[str] = None
 
     def __setattr__(self, name, value):
         if (name in self.__annotations__ and
