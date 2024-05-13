@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -11,25 +12,28 @@ class Parser:
     system_classes: list[str] = None
     type_id: list[int] = None
     show: list[str] = None
-    download: bool = None
-    count: bool = None
-    locale: str = None
-    sort: str = None
-    column: str = None
-    limit: int = None
+    download: bool = False
+    count: bool = False
+    locale: str = 'en'
+    sort: str = 'asc'
+    column: str = 'name'
+    limit: int = 0
     first: int = None
     last: int = None
     page: int = None
-    export: str = None
-    format: str = None
+    export: str = False
+    format: str = 'lpx'
     relation_type: int = None
-    centroid: bool = None
-    geometry: list[str] = None
-    image_size: str = None
+    centroid: bool = False
+    geometry: list[str]= None
+    image_size: str = ''
     file_id: int = None
     properties: list[str] = None
 
-    def __setattr__(self, name: str, value: str | list[str]) -> None:
+    def __setattr__(
+            self,
+            name: str,
+            value: Optional[str | list[str]] = None) -> None:
         if (name in self.__annotations__ and
                 isinstance(getattr(self, name), list)):
             if getattr(self, name) is None:

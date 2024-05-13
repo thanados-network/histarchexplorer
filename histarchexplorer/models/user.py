@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for
 # licensing information
-from typing import Any, Optional
+from typing import Optional
 
 from flask import g
 from flask_login import UserMixin
@@ -30,14 +30,14 @@ class UserMapper:
         LEFT JOIN web.group r ON u.group_id = r.id """
 
     @staticmethod
-    def get_by_id(user_id: int) -> User:
+    def get_by_id(user_id: int) -> Optional[User]:
         g.cursor.execute(
             UserMapper.sql + 'WHERE u.id = %(id)s;',
             {'id': user_id})
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
-    def get_by_username(username: str) -> User:
+    def get_by_username(username: str) -> Optional[User]:
         sql = UserMapper.sql + (
             'WHERE LOWER(u.username) = LOWER(%(''username)s);')
         g.cursor.execute(sql, {'username': username})

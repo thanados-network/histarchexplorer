@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.parser import Parser
