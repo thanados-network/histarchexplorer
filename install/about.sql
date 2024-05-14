@@ -78,6 +78,32 @@ INSERT INTO tng.config_properties (name) VALUES ('has affiliation');
 INSERT INTO tng.config_properties (name) VALUES ('has translation');
 
 INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('Max Mustermann', (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('John Doe', (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('Jane Doe', (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('principial investigator', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('main coordinator', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('project researcher', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('software developer', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('design & programming', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('archaeologist', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('anthropologist', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('data acquisition', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('historian', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('sponsor', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('partner', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, 'https://example.exampe');
+
+
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('THANADOS', (SELECT id from tng.config_classes WHERE name = 'main_project'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('RELIC', (SELECT id from tng.config_classes WHERE name = 'main_project'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('REPLICO', (SELECT id from tng.config_classes WHERE name = 'main_project'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('NHM', (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('University of Vienna', (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('Austrian Centre for Digital Humanities & Cultural Heritage', (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
+
+
 
 
 
