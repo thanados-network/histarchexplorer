@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 
 from bcrypt import hashpw
-from flask import flash, render_template, request, url_for
+from flask import flash, render_template, request, url_for, abort
 from flask_login import (
     LoginManager, current_user, login_required, login_user, logout_user)
 from flask_wtf import FlaskForm
@@ -67,7 +67,3 @@ def logout():
     return redirect('/')
 
 
-@app.route('/admin')
-@login_required
-def admin() -> str:
-    return render_template("/admin.html")
