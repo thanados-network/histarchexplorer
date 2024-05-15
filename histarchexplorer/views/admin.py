@@ -31,6 +31,31 @@ def admin() -> str:
         if row.name in ['role']:
             roles.append(row.id)
 
-    filters = {'projects': projects, 'persons': persons, 'institutions': institutions, 'roles': roles} #dictionary
-    print (filters)
-    return render_template("/admin.html", config_data=config_data, filters=filters)
+    tabs = [
+        {
+            'id': 'nav-project-tab',
+            'label': 'projects',
+            'target': 'nav-project',
+            'filter': projects  # Assuming projects is defined in your Flask route function
+        },
+        {
+            'id': 'nav-persons-tab',
+            'label': 'persons',
+            'target': 'nav-persons',
+            'filter': persons  # Assuming persons is defined in your Flask route function
+        },
+        {
+            'id': 'nav-institutions-tab',
+            'label': 'institutions',
+            'target': 'nav-institutions',
+            'filter': institutions  # Assuming institutions is defined in your Flask route function
+        },
+        {
+            'id': 'nav-attributes-tab',
+            'label': 'attributes',
+            'target': 'nav-attributes',
+            'filter': roles  # Assuming roles is defined in your Flask route function
+        }
+    ]
+
+    return render_template("/admin.html", config_data=config_data, tabs=tabs)

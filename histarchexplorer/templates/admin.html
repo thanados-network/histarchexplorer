@@ -1,62 +1,51 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="container">
-    <div class="py-5 en">
-        <nav>
-            <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                <button class="nav-link active" id="nav-project-tab" data-bs-toggle="tab" data-bs-target="#nav-project"
-                        type="button" role="tab" aria-controls="nav-project" aria-selected="true">{{ _('projects')
-                    |upper }}
-                </button>
-                <button class="nav-link" id="nav-persons-tab" data-bs-toggle="tab" data-bs-target="#nav-persons"
-                        type="button" role="tab" aria-controls="nav-persons" aria-selected="false">{{ _('persons')
-                    |upper }}
-                </button>
-                <button class="nav-link" id="nav-institutions-tab" data-bs-toggle="tab"
-                        data-bs-target="#nav-institutions"
-                        type="button" role="tab" aria-controls="nav-institutions" aria-selected="false">{{
-                    _('institutions') |upper }}
-                </button>
-                <button class="nav-link" id="nav-attributes-tab" data-bs-toggle="tab" data-bs-target="#nav-attributes"
-                        type="button" role="tab" aria-controls="nav-attributes" aria-selected="false">{{ _('attributes')
-                    |upper }}
-                </button>
-            </div>
-        </nav>
-        <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-project" role="tabpanel" aria-labelledby="nav-project-tab"
-                 tabindex="0">
-                {% for entry in config_data %}
-                    {% if entry.config_class in filters.projects %}
-                        <p>{{entry.name}}</p>
-                    {% endif %}
-                {% endfor %}
-            </div>
-            <div class="tab-pane fade" id="nav-persons" role="tabpanel" aria-labelledby="nav-persons-tab" tabindex="0">
-                  {% for entry in config_data %}
-                    {% if entry.config_class in filters.persons %}
-                        <p>{{entry.name}}</p>
-                    {% endif %}
-                {% endfor %}
-            </div>
-            <div class="tab-pane fade" id="nav-institutions" role="tabpanel" aria-labelledby="nav-institutions-tab"
-                 tabindex="0">
-                {% for entry in config_data %}
-                    {% if entry.config_class in filters.institutions %}
-                        <p>{{entry.name}}</p>
-                    {% endif %}
-                {% endfor %}
-            </div>
-            <div class="tab-pane fade" id="nav-attributes" role="tabpanel" aria-labelledby="nav-attributes-tab"
-                 tabindex="0">
-                {% for entry in config_data %}
-                    {% if entry.config_class in filters.roles %}
-                        <p>{{entry.name}}</p>
-                    {% endif %}
-                {% endfor %}
-            </div>
+<div class="container py-5 en">
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            {% for tab in tabs %}
+            <button class="nav-link{% if loop.first %} active{% endif %}" id="{{ tab.id }}" data-bs-toggle="tab"
+                    data-bs-target="#{{ tab.target }}"
+                    type="button" role="tab" aria-controls="{{ tab.target }}"
+                    aria-selected="{{ 'true' if loop.first else 'false' }}">
+                {{ tab.label | upper }}
+            </button>
+            {% endfor %}
         </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+        {% for tab in tabs %}
+        <div class="tab-pane fade{% if loop.first %} show active{% endif %}" id="{{ tab.target }}" role="tabpanel"
+             aria-labelledby="{{ tab.id }}"
+             tabindex="0">
+            <div class="accordion" id="{{tab.label}}accordion">
+                {% for entry in config_data %}
+                {% if entry.config_class in tab.filter %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#{{entry.id}}" aria-expanded="true" aria-controls="{{entry.id}}">
+                            {{entry.name}}
+                        </button>
+                    </h2>
+                    <div id="{{entry.id}}" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <strong>This is the first item's accordion body.</strong> It is shown by default, until the
+                            collapse plugin adds the appropriate classes that we use to style each element. These
+                            classes control the overall appearance, as well as the showing and hiding via CSS
+                            transitions. You can modify any of this with custom CSS or overriding our default variables.
+                            It's also worth noting that just about any HTML can go within the
+                            <code>.accordion-body</code>, though the transition does limit overflow.
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}
