@@ -1,57 +1,62 @@
 {% extends "layout.html" %}
 {% block content %}
 
-    <div class="container">
-        <div class="py-5 en">
-            <div class="accordion" id="adminAccordion">
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#flush-collapseOne" aria-expanded="false"
-                                aria-controls="flush-collapseOne">
-                            Title
-                        </button>
-                    </h2>
-                    <div id="flush-collapseOne" class="accordion-collapse collapse">
-                        <div class="accordion-body">Placeholder content for this accordion, which is intended to
-                            demonstrate the <code>.accordion-flush</code> class. This is the first item's accordion
-                            body.
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#flush-collapseTwo" aria-expanded="false"
-                                aria-controls="flush-collapseTwo">
-                            Accordion Item #2
-                        </button>
-                    </h2>
-                    <div id="flush-collapseTwo" class="accordion-collapse collapse">
-                        <div class="accordion-body">Placeholder content for this accordion, which is intended to
-                            demonstrate the <code>.accordion-flush</code> class. This is the second item's accordion
-                            body. Let's imagine this being filled with some actual content.
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#flush-collapseThree" aria-expanded="false"
-                                aria-controls="flush-collapseThree">
-                            Accordion Item #3
-                        </button>
-                    </h2>
-                    <div id="flush-collapseThree" class="accordion-collapse collapse">
-                        <div class="accordion-body">Placeholder content for this accordion, which is intended to
-                            demonstrate the <code>.accordion-flush</code> class. This is the third item's accordion
-                            body. Nothing more exciting happening here in terms of content, but just filling up the
-                            space to make it look, at least at first glance, a bit more representative of how this would
-                            look in a real-world application.
-                        </div>
-                    </div>
-                </div>
+<div class="container">
+    <div class="py-5 en">
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <button class="nav-link active" id="nav-project-tab" data-bs-toggle="tab" data-bs-target="#nav-project"
+                        type="button" role="tab" aria-controls="nav-project" aria-selected="true">{{ _('projects')
+                    |upper }}
+                </button>
+                <button class="nav-link" id="nav-persons-tab" data-bs-toggle="tab" data-bs-target="#nav-persons"
+                        type="button" role="tab" aria-controls="nav-persons" aria-selected="false">{{ _('persons')
+                    |upper }}
+                </button>
+                <button class="nav-link" id="nav-institutions-tab" data-bs-toggle="tab"
+                        data-bs-target="#nav-institutions"
+                        type="button" role="tab" aria-controls="nav-institutions" aria-selected="false">{{
+                    _('institutions') |upper }}
+                </button>
+                <button class="nav-link" id="nav-attributes-tab" data-bs-toggle="tab" data-bs-target="#nav-attributes"
+                        type="button" role="tab" aria-controls="nav-attributes" aria-selected="false">{{ _('attributes')
+                    |upper }}
+                </button>
+            </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-project" role="tabpanel" aria-labelledby="nav-project-tab"
+                 tabindex="0">
+                {% for entry in config_data %}
+                    {% if entry.config_class in filters.projects %}
+                        <p>{{entry.name}}</p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="tab-pane fade" id="nav-persons" role="tabpanel" aria-labelledby="nav-persons-tab" tabindex="0">
+                  {% for entry in config_data %}
+                    {% if entry.config_class in filters.persons %}
+                        <p>{{entry.name}}</p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="tab-pane fade" id="nav-institutions" role="tabpanel" aria-labelledby="nav-institutions-tab"
+                 tabindex="0">
+                {% for entry in config_data %}
+                    {% if entry.config_class in filters.institutions %}
+                        <p>{{entry.name}}</p>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="tab-pane fade" id="nav-attributes" role="tabpanel" aria-labelledby="nav-attributes-tab"
+                 tabindex="0">
+                {% for entry in config_data %}
+                    {% if entry.config_class in filters.roles %}
+                        <p>{{entry.name}}</p>
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
     </div>
+</div>
 {% endblock %}
