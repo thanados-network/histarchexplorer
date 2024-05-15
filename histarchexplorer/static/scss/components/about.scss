@@ -1,5 +1,5 @@
 .team-card {
-    padding: 1rem 1rem;
+    padding: 1.5rem 1.5rem;
   border-radius: 10px;
   background: var(--light-card);
   color: black;
@@ -23,7 +23,8 @@
 }
 
  .sponsor-container {
-  padding-top: 1rem;
+    padding-top: 1rem;
+
     .row {
         position: relative;
 
@@ -51,8 +52,10 @@
             display: none;
         }
     }
+
+    // Styles for sponsor links
+    a {
+        color: grey; /* Set the color to grey */
+        text-decoration: underline; /* Add underline */
+    }
 }
-
-
-
-
