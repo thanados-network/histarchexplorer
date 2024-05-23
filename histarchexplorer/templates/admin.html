@@ -6,8 +6,7 @@
         <div class="nav nav-tabs" id="nav-tab" role="tablist">
             {% for tab in tabs %}
             <button class="nav-link{% if loop.first %} active{% endif %}" id="{{ tab.id }}" data-bs-toggle="tab"
-                    data-bs-target="#{{ tab.target }}"
-                    type="button" role="tab" aria-controls="{{ tab.target }}"
+                    data-bs-target="#{{ tab.target }}" type="button" role="tab" aria-controls="{{ tab.target }}"
                     aria-selected="{{ 'true' if loop.first else 'false' }}">
                 {{ tab.label | upper }}
             </button>
@@ -18,7 +17,7 @@
         {% for tab in tabs %}
         <div class="tab-pane fade{% if loop.first %} show active{% endif %}" id="{{ tab.target }}" role="tabpanel"
              aria-labelledby="{{ tab.id }}" tabindex="0">
-             <button type="+" class="btn btn-primary"> + </button>
+            <button type="+" class="btn btn-primary"> +</button>
             <div class="accordion" id="{{tab.label}}accordion">
                 {% for entry in config_data %}
                 {% if entry.config_class in tab.filter %}
@@ -35,13 +34,38 @@
                                 <input type="hidden" name="config_id" value="{{entry.id}}">
                                 <div class="mb-3">
                                     <label for="InputDescription{{entry.id}}" class="form-label">Description</label>
-                                    <input type="text" class="form-control" id="InputDescription{{entry.id}}" name="description" aria-describedby="descriptionHelp{{entry.id}}" value="{{entry.description or ''}}" required>
-                                    <div id="descriptionHelp{{entry.id}}" class="form-text">Description of the project will be displayed in the "ABOUT" section of the webpage.</div>
+                                    <input type="text" class="form-control" id="InputDescription{{entry.id}}"
+                                           name="description" aria-describedby="descriptionHelp{{entry.id}}"
+                                           value="{{entry.description or ''}}" required>
+                                    <div id="descriptionHelp{{entry.id}}" class="form-text">Description of the project
+                                        will be displayed in the "ABOUT" section of the webpage.
+                                    </div>
                                 </div>
+
+                            <!-- Flash messages block -->
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                            <div class="flash-messages">
+                                {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">
+                                    {{ message }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% endwith %}
                                 <button type="submit" class="btn btn-primary">Submit</button>
-                                <button type="button" class="btn btn-secondary" id="editButton{{entry.id}}" {% if not entry.description %}disabled{% endif %}>Edit</button>
+                                <button type="button" class="btn btn-secondary" id="editButton{{entry.id}}" {% if not
+                                        entry.description %}disabled{% endif %}>Edit
+                                </button>
                             </form>
-                            <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+
+                            <strong>This is the first item's accordion body.</strong> It is shown by default, until
+                            the collapse plugin adds the appropriate classes that we use to style each element. These
+                            classes control the overall appearance, as well as the showing and hiding via CSS
+                            transitions. You can modify any of this with custom CSS or overriding our default variables.
+                            It's also worth noting that just about any HTML can go within the
+                            <code>.accordion-body</code>, though the transition does limit overflow.
                         </div>
                     </div>
                 </div>
@@ -53,7 +77,7 @@
     </div>
 </div>
 
-<script>
+<!--<script>
     document.querySelectorAll('.projectForm').forEach(form => {
         var descriptionInput = form.querySelector('input[id^="InputDescription"]');
         var editButton = form.querySelector('button[id^="editButton"]');
@@ -67,7 +91,7 @@
         });
 
         form.addEventListener('submit', function(event) {
-            event.preventDefault();  // Prevent the default form submission
+            event.preventDefault(); // Prevent the default form submission
 
             if (descriptionInput.value.trim() !== '') {
                 // Handle the form submission using fetch or AJAX
@@ -83,6 +107,6 @@
             }
         });
     });
-</script>
+</script>-->
 
 {% endblock %}

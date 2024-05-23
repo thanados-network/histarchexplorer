@@ -11,13 +11,13 @@ def admin() -> str:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
-    g.cursor.execute('SELECT* FROM tng.config ORDER BY name')
+    g.cursor.execute('SELECT * FROM tng.config ORDER BY name')
     config_data = g.cursor.fetchall()
 
-    g.cursor.execute('SELECT* FROM tng.config_classes')
+    g.cursor.execute('SELECT * FROM tng.config_classes')
     config_classes = g.cursor.fetchall()
 
-    projects = [] #array/list
+    projects = []  #array/list
     persons = []
     institutions = []
     roles = []
@@ -60,7 +60,7 @@ def admin() -> str:
 
     return render_template("/admin.html", config_data=config_data, tabs=tabs)
 
-@app.route('/add_description', methods=['POST'])
+@app.route('/add_description', methods=['POST', 'GET'])
 @login_required
 def add_description():
     if current_user.group not in ['admin', 'manager']:
