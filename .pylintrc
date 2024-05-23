@@ -12,4 +12,4 @@ max-locals=20        # default=10 (too-many-locals)
 max-statements=80    # default=50 (too-many-statements)
 
 [FORMAT]
-max-line-length=79
+max-line-length=100

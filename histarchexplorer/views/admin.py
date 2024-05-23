@@ -1,3 +1,5 @@
+from typing import Optional
+
 from flask import render_template, abort, g, request, redirect, url_for, flash
 from flask_login import (
     current_user, login_required)
@@ -5,9 +7,11 @@ from flask_login import (
 from histarchexplorer import app
 
 
-@app.route('/admin')
+@app.route('/admin/')
+@app.route('/admin/<tab>')
+@app.route('/admin/<int:tab>/<int:entry>')
 @login_required
-def admin() -> str:
+def admin(tab: Optional[str] = None, entry: Optional[int] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
@@ -17,7 +21,7 @@ def admin() -> str:
     g.cursor.execute('SELECT * FROM tng.config_classes')
     config_classes = g.cursor.fetchall()
 
-    projects = []  #array/list
+    projects = []  # array/list
     persons = []
     institutions = []
     roles = []
@@ -36,29 +40,29 @@ def admin() -> str:
             'id': 'nav-project-tab',
             'label': 'projects',
             'target': 'nav-project',
-            'filter': projects  # Assuming projects is defined in your Flask route function
+            'filter': projects
         },
         {
             'id': 'nav-persons-tab',
             'label': 'persons',
             'target': 'nav-persons',
-            'filter': persons  # Assuming persons is defined in your Flask route function
+            'filter': persons
         },
         {
             'id': 'nav-institutions-tab',
             'label': 'institutions',
             'target': 'nav-institutions',
-            'filter': institutions  # Assuming institutions is defined in your Flask route function
+            'filter': institutions
         },
         {
             'id': 'nav-attributes-tab',
             'label': 'attributes',
             'target': 'nav-attributes',
-            'filter': roles  # Assuming roles is defined in your Flask route function
+            'filter': roles
         }
     ]
-
     return render_template("/admin.html", config_data=config_data, tabs=tabs)
+
 
 @app.route('/add_description', methods=['POST', 'GET'])
 @login_required
