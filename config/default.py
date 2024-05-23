@@ -14,3 +14,6 @@ DATABASE_PASS = 'CHANGE ME'
 SESSION_COOKIE_SECURE = False
 REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
+
+API_URL = 'https://thanados.openatlas.eu/api/'  # Todo: move to instance
+API_PROXY = ''

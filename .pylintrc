@@ -1,5 +1,5 @@
 [MASTER]
-ignore=histarchexplorer.wsgi
+ignore=openatlas.wsgi
 disable=C0111, broad-except, duplicate-code
 good-names=bc, e, ex, f, i, id, ip, j, js, k, l, Run, rv, to, x, y, _
 
