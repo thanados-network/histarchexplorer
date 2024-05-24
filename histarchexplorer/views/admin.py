@@ -9,9 +9,9 @@ from histarchexplorer import app
 
 @app.route('/admin/')
 @app.route('/admin/<tab>')
-@app.route('/admin/<int:tab>/<int:entry>')
+@app.route('/admin/<tab>/<entry>')
 @login_required
-def admin(tab: Optional[str] = None, entry: Optional[int] = None) -> str:
+def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
@@ -61,7 +61,8 @@ def admin(tab: Optional[str] = None, entry: Optional[int] = None) -> str:
             'filter': roles
         }
     ]
-    return render_template("/admin.html", config_data=config_data, tabs=tabs)
+
+    return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry)
 
 
 @app.route('/add_description', methods=['POST', 'GET'])

@@ -5,7 +5,7 @@
     <nav>
         <div class="nav nav-tabs" id="nav-tab" role="tablist">
             {% for tab in tabs %}
-            <button class="nav-link{% if loop.first %} active{% endif %}" id="{{ tab.id }}" data-bs-toggle="tab"
+            <button class="nav-link{% if loop.first and not activetab %} active{% endif %} {% if activetab == tab.target %} active {% endif %}" id="{{ tab.id }}" data-bs-toggle="tab"
                     data-bs-target="#{{ tab.target }}" type="button" role="tab" aria-controls="{{ tab.target }}"
                     aria-selected="{{ 'true' if loop.first else 'false' }}">
                 {{ tab.label | upper }}
@@ -15,7 +15,7 @@
     </nav>
     <div class="tab-content" id="nav-tabContent">
         {% for tab in tabs %}
-        <div class="tab-pane fade{% if loop.first %} show active{% endif %}" id="{{ tab.target }}" role="tabpanel"
+        <div class="tab-pane fade{% if loop.first and not activetab %} show active{% endif %} {% if activetab == tab.target %} show active {% endif %}" id="{{ tab.target }}" role="tabpanel"
              aria-labelledby="{{ tab.id }}" tabindex="0">
             <button type="+" class="btn btn-primary"> +</button>
             <div class="accordion" id="{{tab.label}}accordion">
@@ -23,12 +23,12 @@
                 {% if entry.config_class in tab.filter %}
                 <div class="accordion-item">
                     <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#{{ tab.target }}{{entry.id}}" aria-expanded="true" aria-controls="{{ tab.target }}{{entry.id}}">
+                        <button class="accordion-button {% if activeentry != tab.target + entry.id|string  %}collapsed{% endif %}" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#{{ tab.target }}{{entry.id}}" aria-expanded="{{ ((tab.target + entry.id|string == activeentry)|string)|lower }}" aria-controls="{{ tab.target }}{{entry.id}}">
                             {{entry.name}}
                         </button>
                     </h2>
-                    <div id="{{ tab.target }}{{entry.id}}" class="accordion-collapse collapse">
+                    <div id="{{ tab.target }}{{entry.id}}" class="accordion-collapse collapse {% if activeentry == tab.target + entry.id|string  %} show {% endif %}" data-bs-parent="#{{ tab.label }}accordion">
                         <div class="accordion-body">
                             <form method="POST" action="{{ url_for('add_description') }}" class="projectForm">
                                 <input type="hidden" name="config_id" value="{{entry.id}}">
