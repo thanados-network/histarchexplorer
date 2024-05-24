@@ -21,7 +21,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     g.cursor.execute('SELECT * FROM tng.config_classes')
     config_classes = g.cursor.fetchall()
 
-    projects = []  # array/list
+    projects = []
     persons = []
     institutions = []
     roles = []
@@ -78,7 +78,7 @@ def add_description():
 
     if not description:
         flash('Description is required!', 'danger')
-        return redirect(url_for('admin'))
+        return redirect('/admin/' + current_tab + '/' + current_entry)
 
     try:
         g.cursor.execute('UPDATE tng.config SET description = %s WHERE id = %s', (description, config_id))
