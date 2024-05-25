@@ -99,7 +99,7 @@ def add_description():
     update_field('description', description, 'description')
     update_field('project name', project_name, 'name')
     update_field('address', address, 'address')
-    update_field('email', mail, 'mail')
+    update_field('email', mail, 'email')
     update_field('website', website, 'website')
     update_field('orcid-id', orcid, 'orcid')
 
