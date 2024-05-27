@@ -38,101 +38,102 @@
                          data-bs-parent="#{{ tab.label }}accordion">
                         <div class="accordion-body">
                             <form method="POST" action="{{ url_for('add_description') }}" class="projectForm"
-                                  id="form{{entry.id}}">
-                                <input type="hidden" name="config_id" value="{{entry.id}}">
-                                <input type="hidden" name="current_tab" value="{{tab.target}}">
-                                <input type="hidden" name="current_entry" value="{{tab.target + entry.id|string}}">
+                                  needs-validation
+                            " id="form{{entry.id}}" novalidate>
+                            <input type="hidden" name="config_id" value="{{entry.id}}">
+                            <input type="hidden" name="current_tab" value="{{tab.target}}">
+                            <input type="hidden" name="current_entry" value="{{tab.target + entry.id|string}}">
 
-                                <div class="row g-3 needs-validation" novalidate>
-                                    <div class="col-md-4">
-                                        <label for="InputProjectName{{entry.id}}" class="form-label">Project
-                                            Name</label>
-                                        <input type="text" class="form-control" id="InputProjectName{{entry.id}}"
-                                               name="projectName" value="{{entry.name or ''}}"
-                                               aria-describedby="projectNameHelp{{entry.id}}" disabled>
-                                        <div id="projectNameHelp{{entry.id}}" class="form-text"></div>
-                                        <div class="invalid-feedback">Please provide a project name.</div>
-                                    </div>
+                            <div class="row g-3 needs-validation" novalidate>
+                                <div class="col-md-4">
+                                    <label for="InputProjectName{{entry.id}}" class="form-label">Project
+                                        Name</label>
+                                    <input type="text" class="form-control" id="InputProjectName{{entry.id}}"
+                                           name="projectName" value="{{entry.name or ''}}"
+                                           aria-describedby="projectNameHelp{{entry.id}}" disabled>
+                                    <div id="projectNameHelp{{entry.id}}" class="form-text"></div>
+                                    <div class="invalid-feedback">Please provide a project name.</div>
+                                </div>
 
-                                    <div class="mb-3">
-                                        <label for="InputDescription{{entry.id}}" class="form-label">Description</label>
-                                        <textarea class="form-control" id="InputDescription{{entry.id}}"
-                                                  name="description" aria-describedby="descriptionHelp{{entry.id}}"
-                                                  disabled>{{entry.description or ''}}</textarea>
-                                        <div id="descriptionHelp{{entry.id}}" class="form-text">Description of the
-                                            project will be displayed in the "ABOUT" section of the webpage.
-                                        </div>
-                                    </div>
-
-                                    <!-- Flash messages block -->
-                                    {% with messages = get_flashed_messages(with_categories=true) %}
-                                    {% if messages %}
-                                    <div class="flash-messages">
-                                        {% for category, message in messages %}
-                                        {% if category in ["success", "danger"] %}
-                                        <div class="alert alert-{{ category }}">
-                                            {{ message }}
-                                        </div>
-                                        {% endif %}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                    {% endwith %}
-
-                                    <div class="col-md-6">
-                                        <label for="InputAddress{{entry.id}}" class="form-label">Address</label>
-                                        <textarea class="form-control" id="InputAddress{{entry.id}}" name="address"
-                                                  aria-describedby="addressHelp{{entry.id}}" disabled>{{entry.address or ''}}</textarea>
-                                        <div id="addressHelp{{entry.id}}" class="form-text"></div>
-                                        <div class="invalid-feedback">Please provide an address.</div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label for="InputMail{{entry.id}}" class="form-label">E-mail</label>
-                                        <input type="text" class="form-control" id="InputMail{{entry.id}}" name="mail"
-                                               value="{{entry.mail or ''}}" aria-describedby="mailHelp{{entry.id}}"
-                                               disabled>
-                                        <div id="mailHelp{{entry.id}}" class="form-text"></div>
-                                        <div class="invalid-feedback">Please provide an email-address.</div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="InputWebsite{{entry.id}}" class="form-label">Website</label>
-                                        <input type="url" class="form-control" id="InputWebsite{{entry.id}}"
-                                               name="website" value="{{entry.website or ''}}"
-                                               aria-describedby="websiteHelp{{entry.id}}" disabled>
-                                        <div id="websiteHelp{{entry.id}}" class="form-text"></div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label for="InputOrcid{{entry.id}}" class="form-label">ORCID ID</label>
-                                        <input type="text" class="form-control" id="InputOrcid{{entry.id}}" name="orcid"
-                                               value="{{entry.orcid or ''}}" aria-describedby="orcidHelp{{entry.id}}"
-                                               disabled>
-                                        <div id="orcidHelp{{entry.id}}" class="form-text"></div>
-
-                                        <!-- Edit Button -->
-                                        <button type="button" class="btn btn-primary" id='edit{{entry.id}}'
-                                                onclick="enableEdit({{entry.id}})">Edit
-                                        </button>
-
-                                        <!-- Delete Button -->
-                                        <button type="button" class="btn btn-primary" id='delete{{entry.id}}'
-                                                value="{{entry.id}}">Delete
-                                        </button>
-
-                                        <!-- Save Button (Initially hidden) -->
-                                        <button type="submit" class="btn btn-primary d-none" id='save{{entry.id}}'
-                                                value="{{entry.id}}">Save
-                                        </button>
-
-                                        <!-- Cancel Button (Initially hidden) -->
-                                        <button type="button" class="btn btn-primary d-none" id='cancel{{entry.id}}'
-                                                onclick="cancelEdit({{entry.id}})">Cancel
-                                        </button>
-
+                                <div class="mb-3">
+                                    <label for="InputDescription{{entry.id}}" class="form-label">Description</label>
+                                    <textarea class="form-control" id="InputDescription{{entry.id}}"
+                                              name="description" aria-describedby="descriptionHelp{{entry.id}}"
+                                              disabled>{{entry.description or ''}}</textarea>
+                                    <div id="descriptionHelp{{entry.id}}" class="form-text">Description of the
+                                        project will be displayed in the "ABOUT" section of the webpage.
                                     </div>
                                 </div>
+
+                                <!-- Flash messages block -->
+                                {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                <div class="flash-messages">
+                                    {% for category, message in messages %}
+                                    {% if category in ["success", "danger"] %}
+                                    <div class="alert alert-{{ category }}">
+                                        {{ message }}
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                {% endwith %}
+
+                                <div class="col-md-6">
+                                    <label for="InputAddress{{entry.id}}" class="form-label">Address</label>
+                                    <textarea class="form-control" id="InputAddress{{entry.id}}" name="address"
+                                              aria-describedby="addressHelp{{entry.id}}" disabled>{{entry.address or ''}}</textarea>
+                                    <div id="addressHelp{{entry.id}}" class="form-text"></div>
+                                    <div class="invalid-feedback">Please provide an address.</div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="InputMail{{entry.id}}" class="form-label">E-mail</label>
+                                    <input type="text" class="form-control" id="InputMail{{entry.id}}" name="mail"
+                                           value="{{entry.mail or ''}}" aria-describedby="mailHelp{{entry.id}}"
+                                           disabled>
+                                    <div id="mailHelp{{entry.id}}" class="form-text"></div>
+                                    <div class="invalid-feedback">Please provide an email-address.</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="InputWebsite{{entry.id}}" class="form-label">Website</label>
+                                    <input type="url" class="form-control" id="InputWebsite{{entry.id}}"
+                                           name="website" value="{{entry.website or ''}}"
+                                           aria-describedby="websiteHelp{{entry.id}}" disabled>
+                                    <div id="websiteHelp{{entry.id}}" class="form-text"></div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="InputOrcid{{entry.id}}" class="form-label">ORCID ID</label>
+                                    <input type="text" class="form-control" id="InputOrcid{{entry.id}}" name="orcid"
+                                           value="{{entry.orcid or ''}}" aria-describedby="orcidHelp{{entry.id}}"
+                                           disabled>
+                                    <div id="orcidHelp{{entry.id}}" class="form-text"></div>
+                                </div>
+                            </div>
+                            <!-- Edit Button -->
+                            <button type="button" class="btn btn-primary" id='edit{{entry.id}}'
+                                    onclick="enableEdit({{entry.id}})">Edit
+                            </button>
+
+                            <!-- Delete Button -->
+                            <button type="button" class="btn btn-primary" id='delete{{entry.id}}'
+                                    value="{{entry.id}}">Delete
+                            </button>
+
+                            <!-- Save Button (Initially hidden) -->
+                            <button type="submit" class="btn btn-primary d-none" id='save{{entry.id}}'
+                                    value="{{entry.id}}">Save
+                            </button>
+
+                            <!-- Cancel Button (Initially hidden) -->
+                            <button type="button" class="btn btn-primary d-none" id='cancel{{entry.id}}'
+                                    onclick="cancelEdit({{entry.id}})">Cancel
+                            </button>
+
+
                             </form>
                         </div>
                     </div>
@@ -179,6 +180,8 @@
         document.getElementById('save' + entryId).classList.add('d-none');
         document.getElementById('cancel' + entryId).classList.add('d-none');
     }
+
+
 </script>
 
 {% endblock %}
