@@ -91,7 +91,7 @@
                                 </div>
 
                                 <div class="col-md-4">
-                                    <label for="InputOrcid{{entry.id}}" class="form-label">ORCID ID</label>
+                                    <label for="InputOrcid{{entry.id}}" class="form-label">ORCID-ID</label>
                                     <input type="text" class="form-control" id="InputOrcid{{entry.id}}" name="orcid"
                                            value="{{entry.orcid_id or ''}}" aria-describedby="orcidHelp{{entry.id}}"
                                            disabled>
@@ -106,8 +106,8 @@
                             </button>
 
                             <!-- Delete Button -->
-                            <button type="button" class="btn btn-primary" id='delete{{entry.id}}'
-                                    value="{{entry.id}}">Delete
+                            <button type="button" class="btn btn-danger" id='delete{{entry.id}}'
+                                    value="{{entry.id}}" onclick="confirmDelete()">Delete
                             </button>
 
                             <!-- Save Button (Initially hidden) -->
@@ -134,9 +134,6 @@
                                 </div>
                                 {% endif %}
                                 {% endwith %}
-
-
-
                             </form>
                         </div>
                     </div>
@@ -182,6 +179,22 @@
         document.getElementById('delete' + entryId).classList.remove('d-none');
         document.getElementById('save' + entryId).classList.add('d-none');
         document.getElementById('cancel' + entryId).classList.add('d-none');
+    }
+
+    function confirmDelete() {
+        if (confirm("Are you sure you want to delete the database entry?")) {
+            // Code to delete the entries
+            // You can make an AJAX request to the server to delete the entries here
+            // For demonstration purposes, let's assume a function called deleteEntries() is responsible for deleting the entries
+            deleteEntries();
+        }
+    }
+
+    function deleteEntries() {
+        // Your code to delete the entries from the database
+        // This function should handle the actual deletion of entries
+        // You can use AJAX to send a request to the server to delete the entries
+        // Once the entries are deleted, you can perform any necessary UI updates
     }
 
 

@@ -100,7 +100,7 @@ def add_description():
         ('address', address, 'address'),
         ('email', mail, 'email'),
         ('website', website, 'website'),
-        ('orcid_id', orcid, 'orcid_id')
+        ('orcid-id', orcid, 'orcid_id')
     ]:
         if field_value:
             previous_value = get_previous_value(column_name)
