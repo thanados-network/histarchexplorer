@@ -29,7 +29,7 @@
                                 type="button" data-bs-toggle="collapse"
                                 data-bs-target="#{{ tab.target }}{{entry.id}}"
                                 aria-expanded="{{ ((tab.target + entry.id|string == activeentry)|string)|lower }}"
-                                aria-controls="{{ tab.target }}{{entry.id}}">
+                                aria-controls="{{ tab.target }}{{entry.id }}">
                             {{entry.name}}
                         </button>
                     </h2>
@@ -37,12 +37,13 @@
                          class="accordion-collapse collapse {% if activeentry == tab.target + entry.id|string  %} show {% endif %}"
                          data-bs-parent="#{{ tab.label }}accordion">
                         <div class="accordion-body">
-                            <form method="POST" action="{{ url_for('add_description') }}" class="projectForm"id="form{{entry.id}}">
+                            <form method="POST" action="{{ url_for('add_description') }}" class="projectForm"
+                                  id="form{{entry.id}}">
                                 <input type="hidden" name="config_id" value="{{entry.id}}">
                                 <input type="hidden" name="current_tab" value="{{tab.target}}">
                                 <input type="hidden" name="current_entry" value="{{tab.target + entry.id|string}}">
 
-                                <form class="row g-3 needs-validation" novalidate>
+                                <div class="row g-3 needs-validation" novalidate>
                                     <div class="col-md-4">
                                         <label for="InputProjectName{{entry.id}}" class="form-label">Project
                                             Name</label>
@@ -50,9 +51,7 @@
                                                name="projectName" value="{{entry.name or ''}}"
                                                aria-describedby="projectNameHelp{{entry.id}}" disabled>
                                         <div id="projectNameHelp{{entry.id}}" class="form-text"></div>
-                                        <div class="invalid-feedback">
-                                            Please provide a project name.
-                                        </div>
+                                        <div class="invalid-feedback">Please provide a project name.</div>
                                     </div>
 
                                     <div class="mb-3">
@@ -61,8 +60,7 @@
                                                   name="description" aria-describedby="descriptionHelp{{entry.id}}"
                                                   disabled>{{entry.description or ''}}</textarea>
                                         <div id="descriptionHelp{{entry.id}}" class="form-text">Description of the
-                                            project
-                                            will be displayed in the "ABOUT" section of the webpage.
+                                            project will be displayed in the "ABOUT" section of the webpage.
                                         </div>
                                     </div>
 
@@ -80,26 +78,6 @@
                                     </div>
                                     {% endif %}
                                     {% endwith %}
-                                    <!-- Edit Button -->
-                                    <button type="button" class="btn btn-primary" id='edit{{entry.id}}'
-                                            onclick="enableEdit({{entry.id}})">Edit
-                                    </button>
-
-                                    <!-- Delete Button -->
-                                    <button type="button" class="btn btn-primary" id='delete{{entry.id}}'
-                                            value="{{entry.id}}">Delete
-                                    </button>
-
-                                    <!-- Save Button (Initially hidden) -->
-                                    <button type="submit" class="btn btn-primary d-none" id='save{{entry.id}}'
-                                            value="{{entry.id}}">Save
-                                    </button>
-
-                                    <!-- Cancel Button (Initially hidden) -->
-                                    <button type="button" class="btn btn-primary d-none" id='cancel{{entry.id}}'
-                                            value="{{entry.id}}">Cancel
-                                    </button>
-
 
                                     <div class="col-md-6">
                                         <label for="InputAddress{{entry.id}}" class="form-label">Address</label>
@@ -112,7 +90,7 @@
                                     <div class="col-md-4">
                                         <label for="InputMail{{entry.id}}" class="form-label">E-mail</label>
                                         <input type="text" class="form-control" id="InputMail{{entry.id}}" name="mail"
-                                               value="{{entry.mail or ''}}" aria-describedby=" nameHelp{{entry.id}}"
+                                               value="{{entry.mail or ''}}" aria-describedby="mailHelp{{entry.id}}"
                                                disabled>
                                         <div id="mailHelp{{entry.id}}" class="form-text"></div>
                                         <div class="invalid-feedback">Please provide an email-address.</div>
@@ -121,19 +99,40 @@
                                     <div class="col-md-6">
                                         <label for="InputWebsite{{entry.id}}" class="form-label">Website</label>
                                         <input type="url" class="form-control" id="InputWebsite{{entry.id}}"
-                                               name="website" value="{{entry.website or ''}}" aria-describedby="
-                                               websiteHelp{{entry.id}}" disabled>
+                                               name="website" value="{{entry.website or ''}}"
+                                               aria-describedby="websiteHelp{{entry.id}}" disabled>
                                         <div id="websiteHelp{{entry.id}}" class="form-text"></div>
                                     </div>
 
                                     <div class="col-md-4">
                                         <label for="InputOrcid{{entry.id}}" class="form-label">ORCID ID</label>
                                         <input type="text" class="form-control" id="InputOrcid{{entry.id}}" name="orcid"
-                                               value="{{entry.orcid or ''}}"
-                                               aria-describedby=" orcidHelp{{entry.id}}" disabled>
+                                               value="{{entry.orcid or ''}}" aria-describedby="orcidHelp{{entry.id}}"
+                                               disabled>
                                         <div id="orcidHelp{{entry.id}}" class="form-text"></div>
+
+                                        <!-- Edit Button -->
+                                        <button type="button" class="btn btn-primary" id='edit{{entry.id}}'
+                                                onclick="enableEdit({{entry.id}})">Edit
+                                        </button>
+
+                                        <!-- Delete Button -->
+                                        <button type="button" class="btn btn-primary" id='delete{{entry.id}}'
+                                                value="{{entry.id}}">Delete
+                                        </button>
+
+                                        <!-- Save Button (Initially hidden) -->
+                                        <button type="submit" class="btn btn-primary d-none" id='save{{entry.id}}'
+                                                value="{{entry.id}}">Save
+                                        </button>
+
+                                        <!-- Cancel Button (Initially hidden) -->
+                                        <button type="button" class="btn btn-primary d-none" id='cancel{{entry.id}}'
+                                                onclick="cancelEdit({{entry.id}})">Cancel
+                                        </button>
+
                                     </div>
-                                </form>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -147,53 +146,39 @@
 </div>
 
 <script>
-    // Function to enable editing
     function enableEdit(entryId) {
         var form = document.getElementById('form' + entryId);
         var fields = form.querySelectorAll('input, textarea');
+
+        // Store current values to restore them if editing is canceled
         fields.forEach(function(field) {
+            field.dataset.originalValue = field.value;
             field.removeAttribute('disabled');
         });
 
-        // Show Save and Cancel buttons, hide Edit button
+        // Show Save and Cancel buttons, hide Edit and Delete buttons
         document.getElementById('edit' + entryId).classList.add('d-none');
         document.getElementById('delete' + entryId).classList.add('d-none');
         document.getElementById('save' + entryId).classList.remove('d-none');
         document.getElementById('cancel' + entryId).classList.remove('d-none');
     }
+
+    function cancelEdit(entryId) {
+        var form = document.getElementById('form' + entryId);
+        var fields = form.querySelectorAll('input, textarea');
+
+        // Restore original values and disable the fields again
+        fields.forEach(function(field) {
+            field.value = field.dataset.originalValue;
+            field.setAttribute('disabled', 'disabled');
+        });
+
+        // Show Edit and Delete buttons, hide Save and Cancel buttons
+        document.getElementById('edit' + entryId).classList.remove('d-none');
+        document.getElementById('delete' + entryId).classList.remove('d-none');
+        document.getElementById('save' + entryId).classList.add('d-none');
+        document.getElementById('cancel' + entryId).classList.add('d-none');
+    }
 </script>
-
-
-<!--<script>
-    document.querySelectorAll('.projectForm').forEach(form => {
-        var descriptionInput = form.querySelector('input[id^="InputDescription"]');
-        var editButton = form.querySelector('button[id^="editButton"]');
-
-        descriptionInput.addEventListener('input', function() {
-            if (descriptionInput.value.trim() !== '') {
-                editButton.disabled = false;
-            } else {
-                editButton.disabled = true;
-            }
-        });
-
-        form.addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the default form submission
-
-            if (descriptionInput.value.trim() !== '') {
-                // Handle the form submission using fetch or AJAX
-                fetch(this.action, {
-                    method: 'POST',
-                    body: new FormData(this)
-                }).then(response => response.text()).then(result => {
-                    // You can handle the response here if needed
-                    console.log(result);
-                }).catch(error => {
-                    console.error('Error:', error);
-                });
-            }
-        });
-    });
-</script>-->
 
 {% endblock %}
