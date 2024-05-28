@@ -33,7 +33,7 @@
     }
 
      function confirmDelete(entryId) {
-        if (confirm("Are you sure you want to delete the database entry?")) {
+        if (confirm("Are you sure you want to delete the database entry? This deletes the entry PERMANENTLY from the database.")) {
             deleteEntry(entryId);
         }
     }
