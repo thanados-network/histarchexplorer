@@ -64,6 +64,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 @app.route('/admin/add_entry', methods=['POST'])
 @login_required
 def add_entry():
+    if current_user.group not in ['admin', 'manager']:
+        abort(403)
+
     original_tab_label = request.form.get(
         'tab')  # Get the tab label from the form with the 'nav-' prefix - to determine the config class of the entry being added based on the tab from which the form was submitted
     print("Received tab label:", original_tab_label)
@@ -79,7 +82,7 @@ def add_entry():
 
     # Dictionary to classify the type of entry being added
     config_class_map = {
-        'projects': 1,
+        'projects': 1, #option for config_class=2 project vs 1=main_project?
         'persons': 3,
         'institutions': 5,
         'attributes': 4
@@ -90,8 +93,8 @@ def add_entry():
     try:
         # Get the config class corresponding to the tab label
         tab_config_class = config_class_map.get(tab_label)
-        if tab_config_class is None:
-            raise ValueError('Invalid tab label')
+        #if tab_config_class is None:
+        #   raise ValueError('Invalid tab label')
 
         # Insert the entry into the database
         g.cursor.execute('''
