@@ -75,6 +75,7 @@
                                                         </div>
                                                     </div>
 
+                                                {% if tab.target in ['nav-projects', 'nav-attributes'] %}
                                                     <div class="mb-3">
                                                         <label for="InputDescription{{ entry.id }}" class="form-label">Description</label>
                                                         <textarea class="form-control"
@@ -88,7 +89,9 @@
                                                             webpage.
                                                         </div>
                                                     </div>
+                                                 {% endif %}
 
+                                                    {% if tab.target == 'nav-institutions' %}
                                                     <div class="col-md-6">
                                                         <label for="InputAddress{{ entry.id }}"
                                                                class="form-label">Address</label>
@@ -99,7 +102,9 @@
                                                         <div id="addressHelp{{ entry.id }}" class="form-text"></div>
                                                         <div class="invalid-feedback">Please provide an address.</div>
                                                     </div>
+                                                    {% endif %}
 
+                                                    {% if tab.target in ['nav-institutions', 'nav-persons'] %}
                                                     <div class="col-md-4">
                                                         <label for="InputMail{{ entry.id }}"
                                                                class="form-label">E-mail</label>
@@ -113,7 +118,9 @@
                                                         <div class="invalid-feedback">Please provide an email-address.
                                                         </div>
                                                     </div>
+                                                    {% endif%}
 
+                                                  {% if tab.target in ['nav-projects', 'nav-institutions'] %}
                                                     <div class="col-md-6">
                                                         <label for="InputWebsite{{ entry.id }}"
                                                                class="form-label">Website</label>
@@ -123,7 +130,9 @@
                                                                aria-describedby="websiteHelp{{ entry.id }}" disabled>
                                                         <div id="websiteHelp{{ entry.id }}" class="form-text"></div>
                                                     </div>
+                                                 {% endif%}
 
+                                                    {% if tab.target == 'nav-persons' %}
                                                     <div class="col-md-4">
                                                         <label for="InputOrcid{{ entry.id }}"
                                                                class="form-label">ORCID-ID</label>
@@ -134,7 +143,9 @@
                                                                disabled>
                                                         <div id="orcidHelp{{ entry.id }}" class="form-text"></div>
                                                     </div>
+                                                    {% endif %}
                                                 </div>
+
 
 
                                                 <!-- Edit Button -->

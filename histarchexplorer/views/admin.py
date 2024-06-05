@@ -111,8 +111,9 @@ def add_entry():
                ''', (name, description, address, mail, website, orcid, tab_config_class))
         new_entry_id = g.cursor.fetchone()[0]
         flash('Entry added successfully!', 'success')
-        except Exception as e:
-        flash(f'Error adding entry! {name}: {str(e)}', 'danger')
+
+    except Exception as e:
+        flash(f'Error adding entry {name}: {str(e)}', 'danger')
 
     return redirect(f'/admin/{current_tab}/{current_tab}{new_entry_id}')
 
