@@ -125,7 +125,8 @@ def delete_entry(tab: Optional[str] = None, id: Optional[int] = None) -> str:
         abort(403)
 
     g.cursor.execute('DELETE FROM tng.config WHERE id = %(id)s', {'id': int(id)})
-    return redirect('/admin/' + tab)
+    flash('Entry deleted successfully!', 'success')
+    return redirect(url_for('admin') + tab)
 
 
 @app.route('/edit_entry', methods=['POST', 'GET'])

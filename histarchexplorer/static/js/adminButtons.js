@@ -24,3 +24,6 @@ function changeEdit(entryId, enabled) {
     toggleButtons(entryId, enabled);
 }
 
+
+function addEntry(category){
+console.log(category.toString())};

@@ -184,7 +184,7 @@
                             {% endif %}
                         {% endfor %}
                     </div>
-                    <button class="btn btn-primary m-2 float-end" onclick="addEntry({{ tab.target }})">Add entry
+                    <button class="btn btn-primary m-2 float-end" onclick="addEntry('{{ tab.target|string }}')">Add entry
                     </button>
                 </div>
             {% endfor %}
