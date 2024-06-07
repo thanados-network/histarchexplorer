@@ -26,7 +26,16 @@ function changeEdit(entryId, enabled) {
 
 
 function addEntry(category){
-console.log(category.toString())};
+ console.log(category)
+
+    hiddenField = document.getElementById('currentTab')
+    hiddenField.value = category.replace('nav-','')
+    console.log(hiddenField.value)
+
+
+const modal = new bootstrap.Modal(document.getElementById('addEntryModal'));
+    modal.show();
+}
 
 
 function deleteEntry(id, name, tab) {
