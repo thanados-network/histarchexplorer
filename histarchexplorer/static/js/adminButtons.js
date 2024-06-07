@@ -25,40 +25,16 @@ function changeEdit(entryId, enabled) {
 }
 
 
-function addEntry(category){
- console.log(category)
+function addEntry(category) {
+    const hiddenField = document.getElementById('currentTab');
+    const sanitizedCategory = category.replace('nav-', '');
+    hiddenField.value = sanitizedCategory;
 
-    hiddenField = document.getElementById('currentTab')
-    hiddenField.value = category.replace('nav-','')
-    console.log(hiddenField.value)
+    const classToShow = `${sanitizedCategory}-show`;
 
-    //associate category with classes (map)
-    const categoryClasses = {
-        'projects': ['projects-show'],
-        'institutions': ['institution-show'],
-        'persons': ['persons-show']
-    };
+    document.querySelectorAll('.modal-input').forEach(el => el.classList.add('d-none'));
+    document.querySelectorAll(`.${classToShow}`).forEach(el => el.classList.remove('d-none'));
 
-    const allClasses = ['projects-show', 'institution-show', 'persons-show']; //all classes that can be toggled
-    allClasses.forEach(cls => {
-        document.querySelectorAll('.' + cls).forEach(el => el.classList.add('d-none'));
-    }); // iterate over allclasses and add d-none to each element that has this class - hide all elements
-
-    (categoryClasses[hiddenField.value] || []).forEach(cls => {
-        document.querySelectorAll('.' + cls).forEach(el => el.classList.remove('d-none'));
-    }); //use hiddenField. value to get current category and retrieve the associated classes; remove d-none for each element that matches
-
-
-const modal = new bootstrap.Modal(document.getElementById('addEntryModal'));
+    const modal = new bootstrap.Modal(document.getElementById('addEntryModal'));
     modal.show();
 }
-
-
-function deleteEntry(id, name, tab) {
-       console.log('delete?')
-       deleteName = document.getElementById('deleteName')
-       deleteName.innerHTML = name
-       confirmedDelete = document.getElementById('confirmedDelete')
-       const deleteUrl = "{{ url_for('admin') }}delete_entry/" + id + "/" + tab
-       confirmedDelete.setAttribute("href", deleteUrl)
-        }

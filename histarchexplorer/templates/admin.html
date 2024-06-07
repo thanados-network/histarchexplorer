@@ -232,21 +232,21 @@
                                 <textarea class="form-control" id="InputDescriptionModal" name="description"></textarea>
                                 <div class="invalid-feedback">Please provide a description.</div>
                             </div>
-                            <div class="col-md-6 institution-show persons-show">
+                            <div class="col-md-6 institution-show persons-show modal-input">
                                 <label for="InputAddressModal" class="form-label">Address</label>
                                 <textarea class="form-control" id="InputAddressModal" name="address"></textarea>
                                 <div class="invalid-feedback">Please provide an address.</div>
                             </div>
-                            <div class="col-md-4 institution-show persons-show projects-show">
+                            <div class="col-md-4 institutions-show persons-show projects-show modal-input">
                                 <label for="InputMailModal" class="form-label">E-mail</label>
                                 <input type="email" class="form-control" id="InputMailModal" name="mail">
                                 <div class="invalid-feedback">Please provide an email address.</div>
                             </div>
-                            <div class="col-md-6 institution-show projects-show">
+                            <div class="col-md-6 institution-show projects-show modal-input">
                                 <label for="InputWebsiteModal" class="form-label">Website</label>
                                 <input type="url" class="form-control" id="InputWebsiteModal" name="website">
                             </div>
-                            <div class="col-md-4 persons-show">
+                            <div class="col-md-4 persons-show modal-input">
                                 <label for="InputOrcidModal" class="form-label">ORCID-ID</label>
                                 <input type="text" class="form-control" id="InputOrcidModal" name="orcid">
                             </div>
@@ -258,6 +258,16 @@
         </div>
     </div>
 
+    <script>
+    function deleteEntry(id, name, tab) {
+       console.log('delete?')
+       deleteName = document.getElementById('deleteName')
+       deleteName.innerHTML = name
+       confirmedDelete = document.getElementById('confirmedDelete')
+       const deleteUrl = "{{ url_for('admin') }}delete_entry/" + id + "/" + tab
+       confirmedDelete.setAttribute("href", deleteUrl)
+        }
+    </script>
 
     <script src="{{ url_for('static', filename='js/adminButtons.js') }}"></script>
 {% endblock %}

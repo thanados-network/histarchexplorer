@@ -69,12 +69,8 @@ def add_entry():
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
-    original_tab_label = request.form.get(
-        'tab')  # Get the tab label from the form with the 'nav-' prefix - to determine the config class of the entry being added based on the tab from which the form was submitted
-    print("Received tab label:", original_tab_label)
-    tab_label = original_tab_label.replace('nav-', '')  # Remove 'nav-' prefix from the tab label
-
-    current_tab = request.form.get('current_tab')
+    category = request.form.get('category')
+    current_tab = 'nav-' + category
     name = request.form.get('name')
     description = request.form.get('description')
     address = request.form.get('address')
@@ -90,11 +86,9 @@ def add_entry():
         'attributes': 4
     }
 
-    new_entry_id = None  # Initialize new_entry_id to None
-
     try:
         # Get the config class corresponding to the tab label
-        tab_config_class = config_class_map.get(tab_label)
+        tab_config_class = config_class_map.get(category)
 
         # Insert the entry into the database
         g.cursor.execute('''
@@ -111,11 +105,12 @@ def add_entry():
                ''', (name, description, address, mail, website, orcid, tab_config_class))
         new_entry_id = g.cursor.fetchone()[0]
         flash('Entry added successfully!', 'success')
-
+        return redirect(url_for('admin') + current_tab + '/' + current_tab + str(new_entry_id))
     except Exception as e:
         flash(f'Error adding entry {name}: {str(e)}', 'danger')
+        return redirect(url_for('admin') + current_tab)
 
-    return redirect(f'/admin/{current_tab}/{current_tab}{new_entry_id}')
+    return redirect(url_for('admin') + current_tab)
 
 
 @app.route('/admin/delete_entry/<id>/<tab>')
