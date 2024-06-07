@@ -35,7 +35,10 @@ CREATE TABLE IF NOT EXISTS tng.config_properties
 (
     id          SERIAL PRIMARY KEY,
     name        TEXT,
-    description TEXT
+    name_inv    TEXT,
+    description TEXT,
+    domain      INT,
+    range       INT
 );
 
 ALTER TABLE tng.config
