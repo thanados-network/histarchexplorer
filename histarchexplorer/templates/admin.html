@@ -260,15 +260,6 @@
         </div>
     </div>
 
-    <script>
-        function deleteEntry(id, name, tab) {
-            console.log('delete?')
-            deleteName = document.getElementById('deleteName')
-            deleteName.innerHTML = name
-            confirmedDelete = document.getElementById('confirmedDelete')
-            const deleteUrl = "{{ url_for('admin') }}delete_entry/" + id + "/" + tab
-            confirmedDelete.setAttribute("href", deleteUrl)
-        }
-    </script>
+
     <script src="{{ url_for('static', filename='js/adminButtons.js') }}"></script>
 {% endblock %}

@@ -27,3 +27,13 @@ function changeEdit(entryId, enabled) {
 
 function addEntry(category){
 console.log(category.toString())};
+
+
+function deleteEntry(id, name, tab) {
+       console.log('delete?')
+       deleteName = document.getElementById('deleteName')
+       deleteName.innerHTML = name
+       confirmedDelete = document.getElementById('confirmedDelete')
+       const deleteUrl = "{{ url_for('admin') }}delete_entry/" + id + "/" + tab
+       confirmedDelete.setAttribute("href", deleteUrl)
+        }
