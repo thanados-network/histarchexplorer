@@ -60,7 +60,24 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         }
     ]
 
-    return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry)
+    # Fetch linked entries
+    g.cursor.execute("""
+        SELECT 
+    l.id AS link_id, 
+    s.name AS start_name, 
+    e.name AS end_name, 
+    cp.name AS config_property, 
+    r.name AS role
+FROM tng.links l
+JOIN tng.config s ON l.domain_id = s.id
+JOIN tng.config e ON l.range_id = e.id
+JOIN tng.config_properties cp ON l.property = cp.id
+LEFT JOIN tng.config r ON l.attribute = r.id
+    """)
+    links_data = g.cursor.fetchall()
+
+    return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry,
+                           links_data=links_data)
 
 
 @app.route('/admin/add_entry', methods=['POST'])
