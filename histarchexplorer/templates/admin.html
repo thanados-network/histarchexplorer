@@ -181,36 +181,30 @@
                             <h5>Linked Entries:</h5>
                             <ul>
                                 {% for link in links_data %}
-                                {% if link.start_name == entry.name or link.end_name == entry.name %}
+                                {% if link.start_name == entry.name or link.end_name == entry.name or link.role == entry.name %}
+
                                 <li>
-                                    <div class="row">
-                                        <div class="col">
-                                            <select class="form-select" aria-label="Disabled select example" disabled>
-                                                <option selected>{{ link.start_name }}</option>
-                                            </select>
-                                        </div>
-                                        <div class="col">
-                                            <select class="form-select" aria-label="Disabled select example" disabled>
-                                                <option selected>{{ link.config_property }}</option>
-                                            </select>
-                                        </div>
-                                        <div class="col">
-                                            <select class="form-select" aria-label="Disabled select example" disabled>
-                                                <option selected>{{ link.end_name }}</option>
-                                            </select>
-                                        </div>
+                                    <div class="d-flex">
+                                        <select class="form-select linked-select me-2" aria-label="Disabled select example" disabled>
+                                            <option selected>{{ link.start_name }}</option>
+                                        </select>
+                                        <select class="form-select linked-select me-2" aria-label="Disabled select example" disabled>
+                                            <option selected>{{ link.config_property }}</option>
+                                        </select>
+                                        <select class="form-select linked-select me-2" aria-label="Disabled select example" disabled>
+                                            <option selected>{{ link.end_name }}</option>
+                                        </select>
                                         {% if link.role %}
-                                        <div class="col">
-                                            <select class="form-select" aria-label="Disabled select example" disabled>
-                                                <option selected>{{ link.role }}</option>
-                                            </select>
-                                        </div>
+                                        <select class="form-select linked-select me-2" aria-label="Disabled select example" disabled>
+                                            <option selected>{{ link.role }}</option>
+                                        </select>
                                         {% endif %}
                                     </div>
                                 </li>
                                 {% endif %}
                                 {% endfor %}
                             </ul>
+
                         </div>
                     </div>
                 </div>

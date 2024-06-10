@@ -118,5 +118,8 @@ body {
     background: var(--footer-bg-dark);
   }
 }
+.linked-select {
+  width: 200px;
+}
 
 /*# sourceMappingURL=main.css.map */
