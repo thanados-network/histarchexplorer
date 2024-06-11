@@ -157,7 +157,7 @@
                                             onclick="changeEdit({{ entry.id }}, true)">Edit
                                     </button>
 
-                                    <!-- Delete Button -->
+                                    <!-- Delete Entry Button -->
                                     <button type="button" class="btn btn-danger"
                                             id='delete{{ entry.id }}'
                                             value="{{ entry.id }}"
@@ -219,6 +219,15 @@
                                             <option selected>{{ link.role }}</option>
                                         </select>
                                         {% endif %}
+                                        <!-- Delete Link Button -->
+                                        <button class="btn btn-danger"
+                                            id='delete{{ link.id }}'
+                                            value="{{ link.id }}"
+                                            onclick="deleteLink('{{ link.link_id }}', '{{ tab.id }}', '{{ link.start_name }}', '{{ link.config_property }}', '{{ link.end_name }}')"
+
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal">Delete
+                                    </button>
+
                                     </div>
                                 </li>
                                 {% endif %}
@@ -247,7 +256,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure to delete <span id="deleteName"></span></p>
+                <p>Are you sure you want to delete <span id="deleteName"></span>?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -314,6 +323,20 @@
        const deleteUrl = "{{ url_for('admin') }}delete_entry/" + id + "/" + tab
        confirmedDelete.setAttribute("href", deleteUrl)
         }
+</script>
+
+
+<script>
+    function deleteLink(linkId, tab, startName, configProperty, endName) {
+    const deleteName = document.getElementById('deleteName');
+    deleteName.textContent = "the link: " + startName + " - " + configProperty + " - " + endName + "?";
+    const confirmedDelete = document.getElementById('confirmedDelete');
+    const deleteUrl = `{{ url_for('admin') }}delete_link/${linkId}/${tab}`;
+    confirmedDelete.setAttribute("href", deleteUrl);
+    const myModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    myModal.show();
+}
+
 </script>
 
 <script src="{{ url_for('static', filename='js/adminButtons.js') }}"></script>
