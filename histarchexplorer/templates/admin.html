@@ -181,21 +181,41 @@
                             <h5>Linked Entries:</h5>
                             <ul>
                                 {% for link in links_data %}
-                                {% if link.start_name == entry.name or link.end_name == entry.name or link.role == entry.name %}
-
+                                {% if link.start_name == entry.name or link.end_name == entry.name or link.role ==
+                                entry.name %}
                                 <li>
                                     <div class="d-flex">
-                                        <select class="form-select linked-select me-2" aria-label="Disabled select example" disabled>
-                                            <option selected>{{ link.start_name }}</option>
-                                        </select>
-                                        <select class="form-select linked-select me-2" aria-label="Disabled select example" disabled>
-                                            <option selected>{{ link.config_property }}</option>
-                                        </select>
-                                        <select class="form-select linked-select me-2" aria-label="Disabled select example" disabled>
+                                        {% if tab.target == 'nav-persons' or tab.target == 'nav-institutions'%}
+                                        <select class="form-select linked-select me-2"
+                                                aria-label="Disabled end_name" disabled>
                                             <option selected>{{ link.end_name }}</option>
                                         </select>
+                                        <select class="form-select linked-select me-2"
+                                                aria-label="Disabled inverse property" disabled>
+                                            <option selected>{{ link.config_property_inv }}
+                                            </option>
+                                        </select>
+                                        <select class="form-select linked-select me-2"
+                                                aria-label="Disabled start_name" disabled>
+                                            <option selected>{{ link.start_name }}</option>
+                                        </select>
+                                        {% else %}
+                                        <select class="form-select linked-select me-2"
+                                                aria-label="Disabled start_name" disabled>
+                                            <option selected>{{ link.start_name }}</option>
+                                        </select>
+                                        <select class="form-select linked-select me-2"
+                                                aria-label="Disabled property" disabled>
+                                            <option selected>{{ link.config_property }}</option>
+                                        </select>
+                                        <select class="form-select linked-select me-2"
+                                                aria-label="Disabled end_name" disabled>
+                                            <option selected>{{ link.end_name }}</option>
+                                        </select>
+                                        {% endif %}
                                         {% if link.role %}
-                                        <select class="form-select linked-select me-2" aria-label="Disabled select example" disabled>
+                                        <select class="form-select linked-select me-2"
+                                                aria-label="Disabled role/attribute" disabled>
                                             <option selected>{{ link.role }}</option>
                                         </select>
                                         {% endif %}

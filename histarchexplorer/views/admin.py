@@ -63,16 +63,17 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     # Fetch linked entries
     g.cursor.execute("""
         SELECT 
-    l.id AS link_id, 
-    s.name AS start_name, 
-    e.name AS end_name, 
-    cp.name AS config_property, 
-    r.name AS role
-FROM tng.links l
-JOIN tng.config s ON l.domain_id = s.id
-JOIN tng.config e ON l.range_id = e.id
-JOIN tng.config_properties cp ON l.property = cp.id
-LEFT JOIN tng.config r ON l.attribute = r.id
+            l.id AS link_id, 
+            s.name AS start_name, 
+            e.name AS end_name, 
+            cp.name AS config_property, 
+            cp.name_inv AS config_property_inv, 
+            r.name AS role
+        FROM tng.links l
+        JOIN tng.config s ON l.domain_id = s.id
+        JOIN tng.config e ON l.range_id = e.id
+        JOIN tng.config_properties cp ON l.property = cp.id
+        LEFT JOIN tng.config r ON l.attribute = r.id
     """)
     links_data = g.cursor.fetchall()
 
