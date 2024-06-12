@@ -76,9 +76,9 @@ INSERT INTO tng.config_classes (name) VALUES ('role');
 INSERT INTO tng.config_classes (name) VALUES ('institution');
 INSERT INTO tng.config_classes (name) VALUES ('language_code');
 
-INSERT INTO tng.config_properties (name) VALUES ('has member');
-INSERT INTO tng.config_properties (name) VALUES ('has affiliation');
-INSERT INTO tng.config_properties (name) VALUES ('has translation');
+INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has member', 'is member of', 2, 3);
+INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has affiliation', 'is affiliation of', 3, 5);
+INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has translation', 'has translation', NULL, NULL);
 
 INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('Max Mustermann', (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
 INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('John Doe', (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, 'example@example.exampe', 'https://example.exampe');
