@@ -168,7 +168,7 @@ def delete_link(link_id: Optional[int] = None, tab: Optional[str] = None) -> str
 
     g.cursor.execute('DELETE FROM tng.links WHERE id = %(link_id)s', {'link_id': int(link_id)})
     flash('Link deleted successfully!', 'success')
-    return redirect(url_for('admin') + current_tab + '/' + current_entry)
+    return redirect(url_for('admin') + tab)
 
 
 # Add Links

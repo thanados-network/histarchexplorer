@@ -108,6 +108,14 @@ INSERT INTO tng.config (name, config_class, description, address, email, website
 
 
 
+INSERT INTO tng.links (domain_id,range_id,property,"attribute") VALUES
+	 (52,57,2,NULL),
+	 (53,57,2,NULL),
+	 (41,35,1,NULL),
+	 (41,56,1,NULL),
+	 (53,112,2,NULL),
+	 (52,112,2,NULL),
+	 (35,112,2,72);
 
 
 

@@ -223,8 +223,7 @@
                                         <button class="btn btn-danger"
                                                 id='delete{{ link.id }}'
                                                 value="{{ link.id }}"
-                                                onclick="deleteLink('{{ link.link_id }}', '{{ tab.id }}', '{{ link.start_name }}', '{{ link.config_property }}', '{{ link.end_name }}')"
-
+                                                onclick="deleteLink('{{ link.link_id }}', '{{ tab.id }}', '{{ link.start_name }}', '{{ link.config_property }}', '{{ link.end_name }}', '{{entry.id}}', '{{ tab.target }}')"
                                                 data-bs-toggle="modal" data-bs-target="#deleteModal">Delete
                                         </button>
 
@@ -403,10 +402,10 @@
 </script>
 
 <script>
-    function deleteLink(linkId, tab, startName, configProperty, endName, currentTab, currentEntry) {
-    const deleteName = document.getElementById('deleteName');
+    function deleteLink(linkId, tab, startName, configProperty, endName) {
+    deleteName = document.getElementById('deleteName');
     deleteName.textContent = "the link: " + startName + " - " + configProperty + " - " + endName + "?";
-    const confirmedDelete = document.getElementById('confirmedDelete');
+    confirmedDelete = document.getElementById('confirmedDelete');
     const deleteUrl = `{{ url_for('admin') }}delete_link/${linkId}/${tab}`;
     confirmedDelete.setAttribute("href", deleteUrl);
     const myModal = new bootstrap.Modal(document.getElementById('deleteModal'));
