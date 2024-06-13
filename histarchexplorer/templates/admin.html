@@ -216,7 +216,7 @@
                                                             {% endif %}
                                                         {% endfor %}
                                                     </select>
-                                                    <select class="form-select me-2" aria-label="Select node" disabled>
+                                                    <select class="form-select me-2 connection-select" aria-label="Select node" disabled>
                                                         <option selected>Select node</option>
                                                         {% for row in config_data %}
                                                             <option class="config-class-{{ row.config_class }} d-none"
@@ -225,7 +225,7 @@
                                                             </option>
                                                         {% endfor %}
                                                     </select>
-                                                    <select class="form-select me-2" aria-label="Select role" disabled>
+                                                    <select class="form-select me-2 connection-select" aria-label="Select role" disabled>
                                                         <option selected>Select role</option>
                                                         {% for row in config_data %}
                                                             {% if row.config_class == 4 %}
@@ -345,6 +345,22 @@
 
     <script>
         const connectionSelects = document.querySelectorAll('.connection-select');
+
+        //prototype
+        const connectionSelects = document.querySelectorAll('.connection-select');
+
+        connectionSelects.forEach(selectConnection => {
+
+
+            selectConnection.addEventListener('change', function () {
+                const isEnabled = selectConnection.selectedIndex !== 0; // check if anything is selected
+                selectConnection.nextElementSibling.disabled = !isEnabled; // enable/disable the selectNode dropdown
+                selectConnection.previousElementSibling.disabled = isEnabled; // enable/disable the selectNode dropdown
+
+        });
+        });
+        //flkajsdöl
+
 
         connectionSelects.forEach(selectConnection => {
             const selectNode = selectConnection.nextElementSibling; // next sibling = select node dropdown
