@@ -2,352 +2,364 @@
 {% block content %}
 
 
-<div class="container py-5 en">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div class="flash-messages mt-5 mb-5">
-        {% for category, message in messages %}
-        {% if category in ["success", "danger"] %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"
-                    aria-label="Close"></button>
-        </div>
-        {% endif %}
-        {% endfor %}
-    </div>
-    {% endif %}
-    {% endwith %}
-    <nav>
-        <div class="nav nav-pills mb-2" id="nav-tab" role="tablist">
-            {% for tab in tabs %}
-            <button class="nav-link{% if loop.first and not activetab %} active{% endif %} {% if activetab == tab.target %} active {% endif %}"
-                    id="{{ tab.id }}" data-bs-toggle="tab"
-                    data-bs-target="#{{ tab.target }}" type="button" role="tab" aria-controls="{{ tab.target }}"
-                    aria-selected="{{ 'true' if loop.first else 'false' }}">
-                {{ tab.label | upper }}
-            </button>
-            {% endfor %}
-        </div>
-    </nav>
-    <div class="tab-content" id="nav-tabContent">
-        {% for tab in tabs %}
-        <div class="tab-pane fade{% if loop.first and not activetab %} show active{% endif %} {% if activetab == tab.target %} show active {% endif %}"
-             id="{{ tab.target }}" role="tabpanel"
-             aria-labelledby="{{ tab.id }}" tabindex="0">
-            <div class="accordion" id="{{ tab.label }}accordion">
-                {% for entry in config_data %}
-                {% if entry.config_class in tab.filter %}
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button {% if activeentry != tab.target + entry.id|string %}collapsed{% endif %}"
-                                type="button" data-bs-toggle="collapse"
-                                data-bs-target="#{{ tab.target }}{{ entry.id }}"
-                                aria-expanded="{{ ((tab.target + entry.id|string == activeentry)|string)|lower }}"
-                                aria-controls="{{ tab.target }}{{ entry.id }}">
-                            {{ entry.name }}
-                        </button>
-                    </h2>
-                    <div id="{{ tab.target }}{{ entry.id }}"
-                         class="accordion-collapse collapse {% if activeentry == tab.target + entry.id|string %} show {% endif %}"
-                         data-bs-parent="#{{ tab.label }}accordion">
-                        <div class="accordion-body">
-                            <form method="POST" action="{{ url_for('edit_entry') }}"
-                                  class="projectForm needs-validation" id="form{{ entry.id }}"
-                                  novalidate>
-                                <input type="hidden" name="config_id" value="{{ entry.id }}">
-                                <input type="hidden" name="current_tab" value="{{ tab.target }}">
-                                <input type="hidden" name="current_entry"
-                                       value="{{ tab.target + entry.id|string }}">
-
-                                <div class="row g-3 needs-validation" novalidate>
-                                    <div class="col-md-4">
-                                        <label for="InputName{{ entry.id }}" class="form-label">
-                                            Name</label>
-                                        <input type="text" class="form-control"
-                                               id="InputName{{ entry.id }}"
-                                               name="name" value="{{ entry.name or '' }}"
-                                               aria-describedby="NameHelp{{ entry.id }}"
-                                               disabled required>
-                                        <div id="NameHelp{{ entry.id }}" class="form-text"></div>
-                                        <div class="invalid-feedback">Please provide a project name.
-                                        </div>
-                                    </div>
-
-                                    {% if tab.target in ['nav-projects', 'nav-attributes'] %}
-                                    <div class="mb-3">
-                                        <label for="InputDescription{{ entry.id }}"
-                                               class="form-label">Description</label>
-                                        <textarea class="form-control"
-                                                  id="InputDescription{{ entry.id }}"
-                                                  name="description"
-                                                  aria-describedby="descriptionHelp{{ entry.id }}"
-                                                  disabled>{{ entry.description or '' }}</textarea>
-                                        <div id="descriptionHelp{{ entry.id }}" class="form-text">
-                                            Description of the
-                                            project will be displayed in the "ABOUT" section of the
-                                            webpage.
-                                        </div>
-                                    </div>
-                                    {% endif %}
-
-                                    {% if tab.target == 'nav-institutions' %}
-                                    <div class="col-md-6">
-                                        <label for="InputAddress{{ entry.id }}"
-                                               class="form-label">Address</label>
-                                        <textarea class="form-control"
-                                                  id="InputAddress{{ entry.id }}"
-                                                  name="address"
-                                                  aria-describedby="addressHelp{{ entry.id }}"
-                                                  disabled>{{ entry.address or '' }}</textarea>
-                                        <div id="addressHelp{{ entry.id }}" class="form-text"></div>
-                                        <div class="invalid-feedback">Please provide an address.
-                                        </div>
-                                    </div>
-                                    {% endif %}
-
-                                    {% if tab.target in ['nav-institutions', 'nav-persons'] %}
-                                    <div class="col-md-4">
-                                        <label for="InputMail{{ entry.id }}"
-                                               class="form-label">E-mail</label>
-                                        <input type="text" class="form-control"
-                                               id="InputMail{{ entry.id }}"
-                                               name="mail"
-                                               value="{{ entry.email or '' }}"
-                                               aria-describedby="mailHelp{{ entry.id }}"
-                                               disabled>
-                                        <div id="mailHelp{{ entry.id }}" class="form-text"></div>
-                                        <div class="invalid-feedback">Please provide an
-                                            email-address.
-                                        </div>
-                                    </div>
-                                    {% endif %}
-
-                                    {% if tab.target in ['nav-projects', 'nav-institutions'] %}
-                                    <div class="col-md-6">
-                                        <label for="InputWebsite{{ entry.id }}"
-                                               class="form-label">Website</label>
-                                        <input type="url" class="form-control"
-                                               id="InputWebsite{{ entry.id }}"
-                                               name="website" value="{{ entry.website or '' }}"
-                                               aria-describedby="websiteHelp{{ entry.id }}"
-                                               disabled>
-                                        <div id="websiteHelp{{ entry.id }}" class="form-text"></div>
-                                    </div>
-                                    {% endif %}
-
-                                    {% if tab.target == 'nav-persons' %}
-                                    <div class="col-md-4">
-                                        <label for="InputOrcid{{ entry.id }}"
-                                               class="form-label">ORCID-ID</label>
-                                        <input type="text" class="form-control"
-                                               id="InputOrcid{{ entry.id }}" name="orcid"
-                                               value="{{ entry.orcid_id or '' }}"
-                                               aria-describedby="orcidHelp{{ entry.id }}"
-                                               disabled>
-                                        <div id="orcidHelp{{ entry.id }}" class="form-text"></div>
-                                    </div>
-                                    {% endif %}
-                                </div>
-
-
-                                <div class="mt-3 text-end"><!-- Edit Button -->
-                                    <button type="button" class="btn btn-primary"
-                                            id='edit{{ entry.id }}'
-                                            onclick="changeEdit({{ entry.id }}, true)">Edit
-                                    </button>
-
-                                    <!-- Delete Entry Button -->
-                                    <button type="button" class="btn btn-danger"
-                                            id='delete{{ entry.id }}'
-                                            value="{{ entry.id }}"
-                                            onclick="deleteEntry({{ entry.id }}, '{{ entry.name }}', '{{ tab.target }}')"
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal">Delete
-                                    </button>
-
-                                    <button type="button" class="btn btn-secondary d-none"
-                                            id='cancel{{ entry.id }}'
-                                            onclick="changeEdit({{ entry.id }}, false)">Cancel
-                                    </button>
-
-                                    <button type="submit" class="btn btn-primary d-none"
-                                            id='save{{ entry.id }}'
-                                            value="{{ entry.id }}">Save
-                                    </button>
-
-                                </div>
-                            </form>
-                            {% if tab.id != 4 %}
-                            <hr>
-                            <h5>Connections:</h5>
-
-                            {% for link in links_data %}
-                            {% if link.start_id == entry.id %}
-                            <div class="d-flex mb-2">
-                                <input type="text" class="form-control me-2" disabled
-                                       value="{{ link.config_property }}">
-                                <input type="text" class="form-control me-2" disabled
-                                       value="{{ link.end_name }}">
-                                <input type="text" class="form-control me-2" disabled
-                                       value="{{ link.role }}">
-                                <button class="btn btn-danger"
-                                        id='delete{{ link.id }}'
-                                        onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name }}', '{{ link.config_property }}', '{{ link.end_name }}', '{{ tab.target }}', '{{ tab.target + entry.id|string }}', )"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteModal"
-                                        style="min-width: 75px">Delete
-                                </button>
-
+    <div class="container py-5 en">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages mt-5 mb-5">
+                    {% for category, message in messages %}
+                        {% if category in ["success", "danger"] %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
                             </div>
-                            {% endif %}
-                            {% endfor %}
-                            <!-- Add Link Select Elements -->
-                            <div class="d-flex mb-2">
-                                <select class="form-select me-2 connection-select" aria-label="Select connection">
-                                    <option selected>Select connection</option>
-                                    {% for row in config_properties %}
-                                    {% if tab.id == row.domain %}
-                                    <option class={{ row.direction }} data-id="{{ row.id }}" data-direction="{{ row.direction }}" data-entry="{{ entry.id }}" value="{{ row.range }}">{{
-                                        row.name }}
-                                    </option>
-                                    {% endif %}
-                                    {% endfor %}
-                                </select>
-                                <select class="form-select me-2" aria-label="Select node" disabled>
-                                    <option selected>Select node</option>
-                                    {% for row in config_data %}
-                                    <option class="config-class-{{ row.config_class }} d-none"
-                                            data-classId="{{ row.id }}" value="{{ row.id }}">{{ row.name }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                                <select class="form-select me-2" aria-label="Select role" disabled>
-                                    <option selected>Select role</option>
-                                    {% for row in config_data %}
-                                    {% if row.config_class == 4 %}
-                                    <option value="{{ row.id }}">{{ row.name }}</option>
-                                    {% endif %}
-                                    {% endfor %}
-                                </select>
-                                <button class="btn btn-primary" style="min-width: 75px" disabled>Save
-                                </button>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
-                {% endif %}
+            {% endif %}
+        {% endwith %}
+        <nav>
+            <div class="nav nav-pills mb-2" id="nav-tab" role="tablist">
+                {% for tab in tabs %}
+                    <button class="nav-link{% if loop.first and not activetab %} active{% endif %} {% if activetab == tab.target %} active {% endif %}"
+                            id="{{ tab.id }}" data-bs-toggle="tab"
+                            data-bs-target="#{{ tab.target }}" type="button" role="tab" aria-controls="{{ tab.target }}"
+                            aria-selected="{{ 'true' if loop.first else 'false' }}">
+                        {{ tab.label | upper }}
+                    </button>
                 {% endfor %}
             </div>
-            <button class="btn btn-primary m-2 float-end" onclick="addEntry('{{ tab.target|string }}')">Add
-                entry
-            </button>
-        </div>
-        {% endfor %}
-    </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+            {% for tab in tabs %}
+                <div class="tab-pane fade{% if loop.first and not activetab %} show active{% endif %} {% if activetab == tab.target %} show active {% endif %}"
+                     id="{{ tab.target }}" role="tabpanel"
+                     aria-labelledby="{{ tab.id }}" tabindex="0">
+                    <div class="accordion" id="{{ tab.label }}accordion">
+                        {% for entry in config_data %}
+                            {% if entry.config_class in tab.filter %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button {% if activeentry != tab.target + entry.id|string %}collapsed{% endif %}"
+                                                type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#{{ tab.target }}{{ entry.id }}"
+                                                aria-expanded="{{ ((tab.target + entry.id|string == activeentry)|string)|lower }}"
+                                                aria-controls="{{ tab.target }}{{ entry.id }}">
+                                            {{ entry.name }}
+                                        </button>
+                                    </h2>
+                                    <div id="{{ tab.target }}{{ entry.id }}"
+                                         class="accordion-collapse collapse {% if activeentry == tab.target + entry.id|string %} show {% endif %}"
+                                         data-bs-parent="#{{ tab.label }}accordion">
+                                        <div class="accordion-body">
+                                            <form method="POST" action="{{ url_for('edit_entry') }}"
+                                                  class="projectForm needs-validation" id="form{{ entry.id }}"
+                                                  novalidate>
+                                                <input type="hidden" name="config_id" value="{{ entry.id }}">
+                                                <input type="hidden" name="current_tab" value="{{ tab.target }}">
+                                                <input type="hidden" name="current_entry"
+                                                       value="{{ tab.target + entry.id|string }}">
 
-</div>
+                                                <div class="row g-3 needs-validation" novalidate>
+                                                    <div class="col-md-4">
+                                                        <label for="InputName{{ entry.id }}" class="form-label">
+                                                            Name</label>
+                                                        <input type="text" class="form-control"
+                                                               id="InputName{{ entry.id }}"
+                                                               name="name" value="{{ entry.name or '' }}"
+                                                               aria-describedby="NameHelp{{ entry.id }}"
+                                                               disabled required>
+                                                        <div id="NameHelp{{ entry.id }}" class="form-text"></div>
+                                                        <div class="invalid-feedback">Please provide a project name.
+                                                        </div>
+                                                    </div>
 
-<div class="modal" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Delete</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete <span id="deleteName"></span>?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a id="confirmedDelete" type="button" href="#" class="btn btn-primary">Confirm Delete</a>
-            </div>
-        </div>
-    </div>
-</div>
+                                                    {% if tab.target in ['nav-projects', 'nav-attributes'] %}
+                                                        <div class="mb-3">
+                                                            <label for="InputDescription{{ entry.id }}"
+                                                                   class="form-label">Description</label>
+                                                            <textarea class="form-control"
+                                                                      id="InputDescription{{ entry.id }}"
+                                                                      name="description"
+                                                                      aria-describedby="descriptionHelp{{ entry.id }}"
+                                                                      disabled>{{ entry.description or '' }}</textarea>
+                                                            <div id="descriptionHelp{{ entry.id }}" class="form-text">
+                                                                Description of the
+                                                                project will be displayed in the "ABOUT" section of the
+                                                                webpage.
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
 
-<!-- Modal for Add Entry Form -->
-<div class="modal fade" id="addEntryModal" tabindex="-1" aria-labelledby="addEntryModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addEntryModalLabel">Add Entry</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="{{ url_for('add_entry') }}" class="needs-validation" novalidate>
-                    <input type="hidden" name="category" id="currentTab">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label for="InputNameModal" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="InputNameModal" name="name" required>
-                            <div class="invalid-feedback">Please provide a name.</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="InputDescriptionModal" class="form-label">Description</label>
-                            <textarea class="form-control" id="InputDescriptionModal" name="description"></textarea>
-                            <div class="invalid-feedback">Please provide a description.</div>
-                        </div>
-                        <div class="col-md-6 institution-show persons-show modal-input">
-                            <label for="InputAddressModal" class="form-label">Address</label>
-                            <textarea class="form-control" id="InputAddressModal" name="address"></textarea>
-                            <div class="invalid-feedback">Please provide an address.</div>
-                        </div>
-                        <div class="col-md-4 institutions-show persons-show projects-show modal-input">
-                            <label for="InputMailModal" class="form-label">E-mail</label>
-                            <input type="email" class="form-control" id="InputMailModal" name="mail">
-                            <div class="invalid-feedback">Please provide an email address.</div>
-                        </div>
-                        <div class="col-md-6 institution-show projects-show modal-input">
-                            <label for="InputWebsiteModal" class="form-label">Website</label>
-                            <input type="url" class="form-control" id="InputWebsiteModal" name="website">
-                        </div>
-                        <div class="col-md-4 persons-show modal-input">
-                            <label for="InputOrcidModal" class="form-label">ORCID-ID</label>
-                            <input type="text" class="form-control" id="InputOrcidModal" name="orcid">
-                        </div>
+                                                    {% if tab.target == 'nav-institutions' %}
+                                                        <div class="col-md-6">
+                                                            <label for="InputAddress{{ entry.id }}"
+                                                                   class="form-label">Address</label>
+                                                            <textarea class="form-control"
+                                                                      id="InputAddress{{ entry.id }}"
+                                                                      name="address"
+                                                                      aria-describedby="addressHelp{{ entry.id }}"
+                                                                      disabled>{{ entry.address or '' }}</textarea>
+                                                            <div id="addressHelp{{ entry.id }}" class="form-text"></div>
+                                                            <div class="invalid-feedback">Please provide an address.
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+
+                                                    {% if tab.target in ['nav-institutions', 'nav-persons'] %}
+                                                        <div class="col-md-4">
+                                                            <label for="InputMail{{ entry.id }}"
+                                                                   class="form-label">E-mail</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="InputMail{{ entry.id }}"
+                                                                   name="mail"
+                                                                   value="{{ entry.email or '' }}"
+                                                                   aria-describedby="mailHelp{{ entry.id }}"
+                                                                   disabled>
+                                                            <div id="mailHelp{{ entry.id }}" class="form-text"></div>
+                                                            <div class="invalid-feedback">Please provide an
+                                                                email-address.
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+
+                                                    {% if tab.target in ['nav-projects', 'nav-institutions'] %}
+                                                        <div class="col-md-6">
+                                                            <label for="InputWebsite{{ entry.id }}"
+                                                                   class="form-label">Website</label>
+                                                            <input type="url" class="form-control"
+                                                                   id="InputWebsite{{ entry.id }}"
+                                                                   name="website" value="{{ entry.website or '' }}"
+                                                                   aria-describedby="websiteHelp{{ entry.id }}"
+                                                                   disabled>
+                                                            <div id="websiteHelp{{ entry.id }}" class="form-text"></div>
+                                                        </div>
+                                                    {% endif %}
+
+                                                    {% if tab.target == 'nav-persons' %}
+                                                        <div class="col-md-4">
+                                                            <label for="InputOrcid{{ entry.id }}"
+                                                                   class="form-label">ORCID-ID</label>
+                                                            <input type="text" class="form-control"
+                                                                   id="InputOrcid{{ entry.id }}" name="orcid"
+                                                                   value="{{ entry.orcid_id or '' }}"
+                                                                   aria-describedby="orcidHelp{{ entry.id }}"
+                                                                   disabled>
+                                                            <div id="orcidHelp{{ entry.id }}" class="form-text"></div>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+
+
+                                                <div class="mt-3 text-end"><!-- Edit Button -->
+                                                    <button type="button" class="btn btn-primary"
+                                                            id='edit{{ entry.id }}'
+                                                            onclick="changeEdit({{ entry.id }}, true)">Edit
+                                                    </button>
+
+                                                    <!-- Delete Entry Button -->
+                                                    <button type="button" class="btn btn-danger"
+                                                            id='delete{{ entry.id }}'
+                                                            value="{{ entry.id }}"
+                                                            onclick="deleteEntry({{ entry.id }}, '{{ entry.name }}', '{{ tab.target }}')"
+                                                            data-bs-toggle="modal" data-bs-target="#deleteModal">Delete
+                                                    </button>
+
+                                                    <button type="button" class="btn btn-secondary d-none"
+                                                            id='cancel{{ entry.id }}'
+                                                            onclick="changeEdit({{ entry.id }}, false)">Cancel
+                                                    </button>
+
+                                                    <button type="submit" class="btn btn-primary d-none"
+                                                            id='save{{ entry.id }}'
+                                                            value="{{ entry.id }}">Save
+                                                    </button>
+
+                                                </div>
+                                            </form>
+                                            {% if tab.id != 4 %}
+                                                <hr>
+                                                <h5>Connections:</h5>
+
+                                                {% for link in links_data %}
+                                                    {% if link.start_id == entry.id %}
+                                                        <div class="d-flex mb-2">
+                                                            <input type="text" class="form-control me-2" disabled
+                                                                   value="{{ link.config_property }}">
+                                                            <input type="text" class="form-control me-2" disabled
+                                                                   value="{{ link.end_name }}">
+                                                            <input type="text" class="form-control me-2" disabled
+                                                                   value="{{ link.role }}">
+                                                            <button class="btn btn-danger"
+                                                                    id='delete{{ link.id }}'
+                                                                    onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name }}', '{{ link.config_property }}', '{{ link.end_name }}', '{{ tab.target }}', '{{ tab.target + entry.id|string }}', )"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#deleteModal"
+                                                                    style="min-width: 75px">Delete
+                                                            </button>
+
+                                                        </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <!-- Add Link Select Elements -->
+                                                <div class="d-flex mb-2">
+                                                    <select class="form-select me-2 connection-select"
+                                                            aria-label="Select connection">
+                                                        <option selected>Select connection</option>
+                                                        {% for row in config_properties %}
+                                                            {% if tab.id == row.domain %}
+                                                                <option class={{ row.direction }} data-id="{{ row.id }}"
+                                                                        data-direction="{{ row.direction }}"
+                                                                        data-entry="{{ entry.id }}"
+                                                                        value="{{ row.range }}">{{ row.name }}
+                                                                </option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                    <select class="form-select me-2" aria-label="Select node" disabled>
+                                                        <option selected>Select node</option>
+                                                        {% for row in config_data %}
+                                                            <option class="config-class-{{ row.config_class }} d-none"
+                                                                    data-classId="{{ row.id }}"
+                                                                    value="{{ row.id }}">{{ row.name }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <select class="form-select me-2" aria-label="Select role" disabled>
+                                                        <option selected>Select role</option>
+                                                        {% for row in config_data %}
+                                                            {% if row.config_class == 4 %}
+                                                                <option value="{{ row.id }}">{{ row.name }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                    <button class="btn btn-primary" style="min-width: 75px" disabled>
+                                                        Save
+                                                    </button>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                     </div>
-                    <button type="submit" class="btn btn-primary">Add Entry</button>
-                </form>
+                    <button class="btn btn-primary m-2 float-end" onclick="addEntry('{{ tab.target|string }}')">Add
+                        entry
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <div class="modal" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete <span id="deleteName"></span>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a id="confirmedDelete" type="button" href="#" class="btn btn-primary">Confirm Delete</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    function deleteEntry(id, name, tab) {
-        console.log('delete?')
-        deleteName = document.getElementById('deleteName')
-        deleteName.innerHTML = name
-        confirmedDelete = document.getElementById('confirmedDelete')
-        const deleteUrl = `{{ url_for('admin') }}delete_entry/${id}/${tab}`
-        confirmedDelete.setAttribute("href", deleteUrl)
-    }
-</script>
+    <!-- Modal for Add Entry Form -->
+    <div class="modal fade" id="addEntryModal" tabindex="-1" aria-labelledby="addEntryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addEntryModalLabel">Add Entry</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('add_entry') }}" class="needs-validation" novalidate>
+                        <input type="hidden" name="category" id="currentTab">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="InputNameModal" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="InputNameModal" name="name" required>
+                                <div class="invalid-feedback">Please provide a name.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="InputDescriptionModal" class="form-label">Description</label>
+                                <textarea class="form-control" id="InputDescriptionModal" name="description"></textarea>
+                                <div class="invalid-feedback">Please provide a description.</div>
+                            </div>
+                            <div class="col-md-6 institution-show persons-show modal-input">
+                                <label for="InputAddressModal" class="form-label">Address</label>
+                                <textarea class="form-control" id="InputAddressModal" name="address"></textarea>
+                                <div class="invalid-feedback">Please provide an address.</div>
+                            </div>
+                            <div class="col-md-4 institutions-show persons-show projects-show modal-input">
+                                <label for="InputMailModal" class="form-label">E-mail</label>
+                                <input type="email" class="form-control" id="InputMailModal" name="mail">
+                                <div class="invalid-feedback">Please provide an email address.</div>
+                            </div>
+                            <div class="col-md-6 institution-show projects-show modal-input">
+                                <label for="InputWebsiteModal" class="form-label">Website</label>
+                                <input type="url" class="form-control" id="InputWebsiteModal" name="website">
+                            </div>
+                            <div class="col-md-4 persons-show modal-input">
+                                <label for="InputOrcidModal" class="form-label">ORCID-ID</label>
+                                <input type="text" class="form-control" id="InputOrcidModal" name="orcid">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Entry</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<script>
-    function deleteLink(linkId, startName, configProperty, endName, tab, entry) {
-        deleteName = document.getElementById('deleteName');
-        deleteName.textContent = "the link: " + startName + " - " + configProperty + " - " + endName + "?";
-        confirmedDelete = document.getElementById('confirmedDelete');
-        const deleteUrl = `{{ url_for('admin') }}delete_link/${linkId}/${tab}/${entry}`;
-        confirmedDelete.setAttribute("href", deleteUrl);
-        const myModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        myModal.show();
-    }
+    <script>
+        function deleteEntry(id, name, tab) {
+            console.log('delete?')
+            deleteName = document.getElementById('deleteName')
+            deleteName.innerHTML = name
+            confirmedDelete = document.getElementById('confirmedDelete')
+            const deleteUrl = `{{ url_for('admin') }}delete_entry/${id}/${tab}`
+            confirmedDelete.setAttribute("href", deleteUrl)
+        }
+    </script>
 
-</script>
+    <script>
+        function deleteLink(linkId, startName, configProperty, endName, tab, entry) {
+            deleteName = document.getElementById('deleteName');
+            deleteName.textContent = "the link: " + startName + " - " + configProperty + " - " + endName + "?";
+            confirmedDelete = document.getElementById('confirmedDelete');
+            const deleteUrl = `{{ url_for('admin') }}delete_link/${linkId}/${tab}/${entry}`;
+            confirmedDelete.setAttribute("href", deleteUrl);
+            const myModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            myModal.show();
+        }
 
-<script>
+    </script>
+
+    <script>
         const connectionSelects = document.querySelectorAll('.connection-select');
 
         connectionSelects.forEach(selectConnection => {
             const selectNode = selectConnection.nextElementSibling; // next sibling = select node dropdown
+            selectNode.addEventListener('change', function () {
+                const nodeIsEnabled = selectNode.selectedIndex !== 0;
+                selectConnection.disabled = nodeIsEnabled
+                const selectAttr = selectNode.nextElementSibling
+                selectAttr.disabled = !nodeIsEnabled
+            })
 
             selectConnection.addEventListener('change', function () {
                 const selectedOption = selectConnection.options[selectConnection.selectedIndex];
                 const isEnabled = selectConnection.selectedIndex !== 0; // check if anything is selected
                 selectNode.disabled = !isEnabled; // enable/disable the selectNode dropdown
+
 
                 // get and print data attributes from selected option
                 const id = selectedOption.dataset.id;
@@ -358,28 +370,22 @@
                 console.log(`config_properties-id: ${id}, direction: ${direction}, range: ${range}, entryID: ${entry}`);
 
 
-            // Filter options in selectNode - based on range
+                // Filter options in selectNode - based on range
                 const configClassToShow = `config-class-${range}`;
 
                 // Iterate over options in selectNode and turn off an dnon
                 Array.from(selectNode.options).forEach(option => {
-                    const optionConfigClass = option.classList[0]; // assuming only one class
-                    if (range === '' || optionConfigClass === configClassToShow) {
-                        option.classList.toggle('d-none');
+                    // assuming only one class
+                    if (option.classList.contains(configClassToShow)) {
+                        option.classList.remove('d-none');
+                    } else {
+                        option.classList.add('d-none');
                     }
                 });
-
-                // Reset selectNode to default if nothing is selected in connectionSelect
-                if (!isEnabled) {
-                    Array.from(selectNode.options).forEach(option => {
-                        option.classList.remove('d-none'); // Show all options
-                    });
-                }
             });
 
         });
-    ;
-</script>
+    </script>
 
-<script src="{{ url_for('static', filename='js/adminButtons.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/adminButtons.js') }}"></script>
 {% endblock %}
