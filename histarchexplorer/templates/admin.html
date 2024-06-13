@@ -203,20 +203,21 @@
                                                 {% endfor %}
                                                 <!-- Add Link Select Elements -->
                                                 <div class="d-flex mb-2">
-                                                    <select class="form-select me-2 connection-select"
+                                                    <select class="link-type form-select me-2 connection-select"
                                                             aria-label="Select connection">
                                                         <option selected>Select connection</option>
                                                         {% for row in config_properties %}
                                                             {% if tab.id == row.domain %}
-                                                                <option class={{ row.direction }} data-id="{{ row.id }}"
+                                                                <option data-range="{{ row.range }}"
                                                                         data-direction="{{ row.direction }}"
                                                                         data-entry="{{ entry.id }}"
-                                                                        value="{{ row.range }}">{{ row.name }}
+                                                                        value="{{ row.id }}">{{ row.name }}
                                                                 </option>
                                                             {% endif %}
                                                         {% endfor %}
                                                     </select>
-                                                    <select class="form-select me-2 connection-select" aria-label="Select node" disabled>
+                                                    <select class="link-target form-select me-2 connection-select"
+                                                            aria-label="Select node" disabled>
                                                         <option selected>Select node</option>
                                                         {% for row in config_data %}
                                                             <option class="config-class-{{ row.config_class }} d-none"
@@ -225,7 +226,8 @@
                                                             </option>
                                                         {% endfor %}
                                                     </select>
-                                                    <select class="form-select me-2 connection-select" aria-label="Select role" disabled>
+                                                    <select class="link-role form-select me-2 connection-select"
+                                                            aria-label="Select role" disabled>
                                                         <option selected>Select role</option>
                                                         {% for row in config_data %}
                                                             {% if row.config_class == 4 %}
@@ -233,7 +235,9 @@
                                                             {% endif %}
                                                         {% endfor %}
                                                     </select>
-                                                    <button class="btn btn-primary" style="min-width: 75px" disabled>
+                                                    <button data-domain="" data-range="" data-property=""
+                                                            data-direction="" data-role="" class="btn btn-primary"
+                                                            style="min-width: 75px" disabled>
                                                         Save
                                                     </button>
                                                 </div>
@@ -345,62 +349,55 @@
 
     <script>
         const connectionSelects = document.querySelectorAll('.connection-select');
-
-        //prototype
-        const connectionSelects = document.querySelectorAll('.connection-select');
-
         connectionSelects.forEach(selectConnection => {
+                selectConnection.addEventListener('change', function () {
+                        const isEnabled = selectConnection.selectedIndex !== 0;
+                        if (selectConnection.nextElementSibling !== null) {
+                            selectConnection.nextElementSibling.disabled = !isEnabled;
+                        }
+                        if (selectConnection.previousElementSibling !== null) {
+                            selectConnection.previousElementSibling.disabled = isEnabled;
+                        }
 
-
-            selectConnection.addEventListener('change', function () {
-                const isEnabled = selectConnection.selectedIndex !== 0; // check if anything is selected
-                selectConnection.nextElementSibling.disabled = !isEnabled; // enable/disable the selectNode dropdown
-                selectConnection.previousElementSibling.disabled = isEnabled; // enable/disable the selectNode dropdown
-
-        });
-        });
-        //flkajsdöl
-
-
-        connectionSelects.forEach(selectConnection => {
-            const selectNode = selectConnection.nextElementSibling; // next sibling = select node dropdown
-            selectNode.addEventListener('change', function () {
-                const nodeIsEnabled = selectNode.selectedIndex !== 0;
-                selectConnection.disabled = nodeIsEnabled
-                const selectAttr = selectNode.nextElementSibling
-                selectAttr.disabled = !nodeIsEnabled
-            })
-
-            selectConnection.addEventListener('change', function () {
-                const selectedOption = selectConnection.options[selectConnection.selectedIndex];
-                const isEnabled = selectConnection.selectedIndex !== 0; // check if anything is selected
-                selectNode.disabled = !isEnabled; // enable/disable the selectNode dropdown
-
-
-                // get and print data attributes from selected option
-                const id = selectedOption.dataset.id;
-                const direction = selectedOption.dataset.direction;
-                const entry = selectedOption.dataset.entry;
-                const range = selectedOption.value;
-
-                console.log(`config_properties-id: ${id}, direction: ${direction}, range: ${range}, entryID: ${entry}`);
-
-
-                // Filter options in selectNode - based on range
-                const configClassToShow = `config-class-${range}`;
-
-                // Iterate over options in selectNode and turn off an dnon
-                Array.from(selectNode.options).forEach(option => {
-                    // assuming only one class
-                    if (option.classList.contains(configClassToShow)) {
-                        option.classList.remove('d-none');
-                    } else {
-                        option.classList.add('d-none');
+                        const saveButton = selectConnection.parentNode.lastElementChild
+                        const optionData = selectConnection.options[selectConnection.selectedIndex];
+                        setSaveValues(selectConnection.classList, saveButton, optionData, selectConnection)
                     }
-                });
-            });
+                )
+            }
+        );
 
-        });
+        function setSaveValues(classList_, saveButton, info, thisElement) {
+
+            if (classList_.contains('link-type')) {
+                saveButton.setAttribute('data-domain', info.getAttribute('data-entry'))
+                saveButton.setAttribute('data-direction', info.getAttribute('data-direction'))
+                saveButton.setAttribute('data-property', info.value)
+
+
+                const selectNode = thisElement.nextElementSibling; // next sibling = select node dropdown
+                const configClassToShow = `config-class-${info.getAttribute('data-range')}`;
+
+                    Array.from(selectNode.options).forEach((option, i) => {
+
+                        if (option.classList.contains(configClassToShow) || i === 0) {
+                            option.classList.remove('d-none');
+                        } else {
+                            option.classList.add('d-none');
+                        }
+                    });
+
+
+            }
+            if (classList_.contains('link-target')) {
+                saveButton.setAttribute('data-range', info.value)
+            }
+            if (classList_.contains('link-role')) {
+                saveButton.setAttribute('data-role', info.value)
+            }
+        }
+
+
     </script>
 
     <script src="{{ url_for('static', filename='js/adminButtons.js') }}"></script>
