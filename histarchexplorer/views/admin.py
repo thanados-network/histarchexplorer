@@ -25,19 +25,11 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         SELECT id, name_inv, range,domain, 'inverse' AS direction FROM tng.config_properties''')
     config_properties = g.cursor.fetchall()
 
-    g.cursor.execute("SELECT id, name FROM tng.config WHERE config_class IN (5)")  # Adjust query for institutions
-    institutions_data = g.cursor.fetchall()
-
-    g.cursor.execute("SELECT id, name FROM tng.config WHERE config_class IN (3)")  # Adjust query for persons
-    persons_data = g.cursor.fetchall()
-
-    g.cursor.execute("SELECT id, name FROM tng.config WHERE config_class IN (4)")  # Adjust query for roles
-    roles_data = g.cursor.fetchall()
-
     projects = []
     persons = []
     institutions = []
     roles = []
+
     for row in config_classes:
         if row.name in ['project', 'main_project']:
             projects.append(row.id)
@@ -54,7 +46,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             'label': 'projects',
             'target': 'nav-projects',
             'filter': projects,
-            'id': 2
+            'id': 1
 
         },
         {
@@ -62,25 +54,24 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             'label': 'persons',
             'target': 'nav-persons',
             'filter': persons,
-            'id': 3
+            'id': 2
         },
         {
             'id': 'nav-institutions-tab',
             'label': 'institutions',
             'target': 'nav-institutions',
             'filter': institutions,
-            'id': 5
+            'id': 4
         },
         {
             'id': 'nav-attributes-tab',
             'label': 'attributes',
             'target': 'nav-attributes',
             'filter': roles,
-            'id': 4
+            'id': 3
         }
     ]
 
-    # Fetch linked entries
     g.cursor.execute("""
                SELECT l.id     AS link_id,
        s.id     AS start_id,
@@ -117,9 +108,7 @@ FROM tng.links l
     links_data = g.cursor.fetchall()
 
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry,
-                           links_data=links_data, config_properties=config_properties, institutions_data=institutions_data,
-                           persons_data=persons_data,
-                           roles_data=roles_data)
+                           links_data=links_data, config_properties=config_properties)
 
 
 @app.route('/admin/add_entry', methods=['POST'])
@@ -137,19 +126,16 @@ def add_entry():
     website = request.form.get('website')
     orcid = request.form.get('orcid')
 
-    # Dictionary to classify the type of entry being added
     config_class_map = {
         'projects': 1,  # option for config_class=2 project vs 1=main_project?
-        'persons': 3,
-        'institutions': 5,
-        'attributes': 4
+        'persons': 2,
+        'institutions': 4,
+        'attributes': 3
     }
 
     try:
-        # Get the config class corresponding to the tab label
         tab_config_class = config_class_map.get(category)
 
-        # Insert the entry into the database
         g.cursor.execute('''
                    INSERT INTO tng.config (name, description, address, email, website, orcid_id, config_class)
                    VALUES (
@@ -162,9 +148,12 @@ def add_entry():
                     %s
                 ) RETURNING id
                ''', (name, description, address, mail, website, orcid, tab_config_class))
+
         new_entry_id = g.cursor.fetchone()[0]
+
         flash('Entry added successfully!', 'success')
         return redirect(url_for('admin') + current_tab + '/' + current_tab + str(new_entry_id))
+
     except Exception as e:
         flash(f'Error adding entry {name}: {str(e)}', 'danger')
         return redirect(url_for('admin') + current_tab)
@@ -183,7 +172,6 @@ def delete_entry(tab: Optional[str] = None, id: Optional[int] = None) -> str:
     return redirect(url_for('admin') + tab)
 
 
-# Delete Links
 @app.route('/admin/delete_link/<link_id>/<tab>/<entry>')
 @login_required
 def delete_link(link_id: Optional[int] = None, tab: Optional[str] = None, entry: Optional[str] = None) -> str:
@@ -195,7 +183,6 @@ def delete_link(link_id: Optional[int] = None, tab: Optional[str] = None, entry:
     return redirect(url_for('admin') + tab + '/' + entry)
 
 
-# Add Links
 @app.route('/admin/add_link/<domain>/<range>/<prop>/<role>/<tab>/<entry>', methods=['GET', 'POST'])
 @login_required
 def add_link(domain: Optional[int] = None, range: Optional[int] = None, prop: Optional[int] = None, role: Optional[int] = None, tab: Optional[str] = None, entry: Optional[str] = None) -> str:
