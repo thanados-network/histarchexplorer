@@ -6,12 +6,6 @@ body {
   font-family: var(--font-inter);
 }
 
-:root {
-  --light-card: hsl(0, 0%, 85%);
-  --footer-bg-dark: hsl(228, 14%, 21%);
-  --card-bg: var(--light-card);
-}
-
 .navbar-brand {
   height: 80px;
   align-content: center;
