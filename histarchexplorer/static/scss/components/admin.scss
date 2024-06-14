@@ -1,10 +1,5 @@
-$nav-pills-link-active-bg: #58a269;
-$nav-pills-link-active-color: #fff;
-$nav-link-color: darken(#58a269, 5%);
-$nav-link-hover-color: darken(#58a269, 30%);
-$btn-primary-bg: #58a269;
-$btn-primary-border: #58a269;
-$btn-primary-hover-bg: darken(#58a269, 5%);
-$btn-primary-hover-border: darken(#58a269, 5%);
-
-@import "/home/laldrian/PycharmProjects/histarchexplorer/histarchexplorer/static/node_modules/bootstrap/scss/bootstrap.scss";
+.button-card {
+  display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}

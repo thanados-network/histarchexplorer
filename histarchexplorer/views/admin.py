@@ -25,13 +25,16 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         SELECT id, name_inv, range,domain, 'inverse' AS direction FROM tng.config_properties''')
     config_properties = g.cursor.fetchall()
 
+    mainproject = []
     projects = []
     persons = []
     institutions = []
     roles = []
 
     for row in config_classes:
-        if row.name in ['project', 'main_project']:
+        if row.name in ['main-project']:
+            mainproject.append(row.id)
+        if row.name in ['project']:
             projects.append(row.id)
         if row.name in ['person']:
             persons.append(row.id)
@@ -41,6 +44,14 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             roles.append(row.id)
 
     tabs = [
+        {
+            'id': 'nav-main-project-tab',
+            'label': 'main-project',
+            'target': 'nav-main-project',
+            'filter': mainproject,
+            'id': 0
+
+        },
         {
             'id': 'nav-projects-tab',
             'label': 'projects',
@@ -130,7 +141,8 @@ def add_entry():
         'projects': 1,  # option for config_class=2 project vs 1=main_project?
         'persons': 2,
         'institutions': 4,
-        'attributes': 3
+        'attributes': 3,
+        'main-project': 5
     }
 
     try:
@@ -315,6 +327,7 @@ def reset():
         INSERT INTO tng.config_classes (name) VALUES ('person');
         INSERT INTO tng.config_classes (name) VALUES ('role');
         INSERT INTO tng.config_classes (name) VALUES ('institution');
+        INSERT INTO tng.config_classes (name) VALUES ('main-project');
         INSERT INTO tng.config_classes (name) VALUES ('language_code');
         
         INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has member', 'is member of', (SELECT id FROM tng.config_classes WHERE name = 'project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
