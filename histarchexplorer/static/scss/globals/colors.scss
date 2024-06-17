@@ -2,8 +2,19 @@
 --light-card: hsl(0, 0%, 85%);
 --footer-bg-dark: hsl(228, 14%, 21%);
 
+--counters-bg-light: hsl(208, 34%, 60%);
+--counters-bg-dark: hsl(208, 24%, 44%);
+
 --card-bg: var(--light-card);
 
 --logo-height: 228px;
 --navbar-height: 80px;
+}
+
+body.light {
+--counters-bg: var(--counters-bg-light);
+}
+
+body.dark {
+  --counters-bg: var(--counters-bg-dark);
 }

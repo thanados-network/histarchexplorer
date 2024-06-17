@@ -1,0 +1,10 @@
+@use '../globals' as *;
+
+#counters {
+  position: fixed;
+  bottom: rem(100);
+  left: 0;
+  right: 0;
+  background-color: var(--counters-bg-light);
+  z-index: 2;
+}
