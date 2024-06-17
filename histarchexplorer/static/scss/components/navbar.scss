@@ -1,5 +1,7 @@
+$navbar-height: 80px;
+
 .navbar-brand {
-  height: 80px;
+  height: $navbar-height;
   align-content: center;
   margin-left: 1.5rem;
   margin-right: 1.5rem;

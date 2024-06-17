@@ -2,13 +2,13 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    min-height: var(--logo-height);
+    max-height: var(--logo-height);
     //background: grey;
 }
 
 .footerimg{
 padding: 1rem;}
-
-
 
 .footer {
   background: transparent;

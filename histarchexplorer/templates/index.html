@@ -1,5 +1,23 @@
 {% extends "layout.html" %}
-{% block content %}
 
-    hello index
+{% block content %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-qz6H0r+PpZt4ZcLpNl3MTExBeY0Q/JtqioQK+M51xK4="
+      crossorigin=""/>
+
+<!-- Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
+<!-- Custom JavaScript -->
+<script defer src="{{ url_for('static', filename='js/map.js') }}"></script>
+
+<main class="container-fluid" style="display: flex; flex-direction: column; height: 100vh;">
+    <div id="map" style="flex: 1;"></div>
+</main>
+
+{% include 'footer.html' %}
+
 {% endblock %}
