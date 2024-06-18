@@ -11,13 +11,7 @@
 }
 
 .footer {
-  background: transparent;
+  background: var(--footer-bg);
 }
 
-// Media query to target dark mode
-@media (prefers-color-scheme: dark) {
-  .footer {
-    background: var(--footer-bg-dark);
-  }
-}
 

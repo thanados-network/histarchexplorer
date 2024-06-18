@@ -1,21 +1,24 @@
 :root {
---light-card: hsl(0, 0%, 85%);
---footer-bg-dark: hsl(228, 14%, 21%);
+  --light-card: hsl(0, 0%, 85%);
+  --footer-bg-light: transparent;
+  --footer-bg-dark: hsl(0, 0%, 31%);
 
---counters-bg-light: hsl(208, 34%, 60%);
---counters-bg-dark: hsl(208, 24%, 44%);
+  --counters-bg-light: hsl(208, 34%, 60%);
+  --counters-bg-dark: hsl(208, 24%, 44%);
 
---card-bg: var(--light-card);
+  --card-bg: var(--light-card);
 
---logo-height: 132px;
---navbar-height: 96px;
+  --logo-height: 132px;
+  --navbar-height: 96px;
 }
 
 
 body.light {
---counters-bg: var(--counters-bg-light);
+  --counters-bg: var(--counters-bg-light);
+  --footer-bg: var(--footer-bg-light);
 }
 
 body.dark {
   --counters-bg: var(--counters-bg-dark);
+  --footer-bg: var(--footer-bg-dark);
 }
