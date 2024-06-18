@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function initializeMap() {
 
         // Initialize the map
-        var map = L.map('map').setView([47.5162, 14.5501], 7);
+        var map = L.map('map', {zoomControl: false,}).setView([47.5162, 14.5501], 7);
 
         // Define OSM_HOT tile layer
         var OpenStreetMap_HOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
