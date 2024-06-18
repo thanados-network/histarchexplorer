@@ -10,3 +10,8 @@
 .no-gutter {
   padding: 0
 }
+
+.map-gray .leaflet-map-pane > .leaflet-pane:not(.leaflet-marker-pane) {
+-webkit-filter: grayscale(100%);
+filter: grayscale(100%);
+}
