@@ -18,31 +18,47 @@
     <div id="map" style="flex: 1;"></div>
 
     <div id="counters" class="row text-center pt-3">
-    <div class="col-6 col-sm">
-      <h4 class="statistic-counter">563</h4>
-      <p>Places</p>
+        <div class="col-6 col-sm">
+            <h4 class="statistic-counter">563</h4>
+            <p>Places</p>
+        </div>
+        <div class="col-6 col-sm">
+            <h4 class="statistic-counter">5363</h4>
+            <p>Actors</p>
+        </div>
+        <div class="col-6 col-sm">
+            <h4 class="statistic-counter">5643</h4>
+            <p>Events</p>
+        </div>
+        <div class="col-6 col-sm">
+            <h4 class="statistic-counter">11555</h4>
+            <p>Artifacts</p>
+        </div>
+        <div class="col-6 col-sm">
+            <h4 class="statistic-counter">6169</h4>
+            <p>Sources</p>
+        </div>
     </div>
-    <div class="col-6 col-sm">
-      <h4 class="statistic-counter">5363</h4>
-      <p>Actors</p>
-    </div>
-    <div class="col-6 col-sm">
-      <h4 class="statistic-counter">5643</h4>
-      <p>Events</p>
-    </div>
-    <div class="col-6 col-sm">
-      <h4 class="statistic-counter">11555</h4>
-      <p>Artifacts</p>
-    </div>
-    <div class="col-6 col-sm">
-      <h4 class="statistic-counter">6169</h4>
-      <p>Sources</p>
-    </div>
-  </div>
 </main>
 
 {% include 'footer.html' %}
 
-<div id="other-content">
+<div id="other-content" >
+
+<div class="row legal">
+        <div class="col-md-6 legal-card">
+            <h4>{{ _('Other COntent') |upper }}</h4>
+            <p>{{ _('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus mauris dolor, elementum in augue at, fermentum facilisis felis. Donec vitae mauris consectetur, tincidunt urna eget, sagittis mauris. Morbi quis fringilla mi. Ut lectus libero, pellentesque placerat leo non, feugiat imperdiet nisi. Nam sit amet vulputate libero. Aenean gravida nunc rhoncus eros imperdiet gravida. Maecenas rutrum tortor nec nulla auctor tempus. Etiam in est sapien. Praesent a pulvinar felis. In molestie, risus vitae rutrum facilisis, erat purus rutrum eros, ut consequat metus quam a urna. Ut ac massa vitae felis tincidunt iaculis. Phasellus fermentum in nunc dignissim lacinia. Nulla efficitur porta fringilla. Ut varius sed ipsum id fermentum.') }}</p>
+        </div>
+        <div class="col-md-6 team-card">
+            <span class="en" style="display: block;">
+          <h4>{{ _('Important Stuff') |upper }}</h4>
+          {{ _('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus mauris dolor, elementum in augue at, fermentum facilisis felis. Donec vitae mauris consectetur, tincidunt urna eget, sagittis mauris. Morbi quis fringilla mi. Ut lectus libero, pellentesque placerat leo non, feugiat imperdiet nisi. Nam sit amet vulputate libero. Aenean gravida nunc rhoncus eros imperdiet gravida. Maecenas rutrum tortor nec nulla auctor tempus. Etiam in est sapien. Praesent a pulvinar felis. In molestie, risus vitae rutrum facilisis, erat purus rutrum eros, ut consequat metus quam a urna. Ut ac massa vitae felis tincidunt iaculis. Phasellus fermentum in nunc dignissim lacinia. Nulla efficitur porta fringilla. Ut varius sed ipsum id fermentum.') }}
+        </span>
+        </div>
+    </div>
+</div>
+</div>
+
 
 {% endblock %}
