@@ -4,7 +4,7 @@
   --counters-bg-light: hsl(208, 34%, 60%);
   --counters-bg-dark: hsl(208, 24%, 44%);
   --card-bg: var(--light-card);
-  --logo-height: 228px;
+  --logo-height: 132px;
   --navbar-height: 96px;
 }
 
@@ -145,7 +145,7 @@ body {
   bottom: var(--logo-height);
   left: 0;
   right: 0;
-  background-color: var(--counters-bg-light);
+  background-color: var(--counters-bg);
   position: fixed;
   z-index: 2;
 }
