@@ -25,6 +25,10 @@ function setTheme(mode = 'auto') {
     document.getElementById(modeToUse).classList.add('d-none');
     document.getElementById(modeNotChosen).classList.remove('d-none');
 
+    // Update body class based on selected theme
+    document.body.classList.remove('light', 'dark');
+    document.body.classList.add(modeToUse);
+
     const logo = document.getElementById('logo');
     if (logo) {
         const logoSrc = `/static/images/logos/logo_mode_${modeToUse}.svg`;
