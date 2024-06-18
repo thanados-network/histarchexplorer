@@ -12,6 +12,6 @@
 }
 
 .map-gray .leaflet-map-pane > .leaflet-pane:not(.leaflet-marker-pane) {
--webkit-filter: grayscale(100%);
-filter: grayscale(100%);
+-webkit-filter: grayscale(100%) opacity(0.9);
+filter: grayscale(100%) opacity(0.9);
 }
