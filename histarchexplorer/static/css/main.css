@@ -1,4 +1,25 @@
 :root {
+  --light-card: hsl(0, 0%, 85%);
+  --footer-bg-light: transparent;
+  --footer-bg-dark: hsl(0, 0%, 31%);
+  --counters-bg-light: hsla(208, 34%, 60%, 0.75);
+  --counters-bg-dark: hsla(208, 24%, 44%, 0.74);
+  --card-bg: var(--light-card);
+  --logo-height: 132px;
+  --navbar-height: 96px;
+}
+
+body.light {
+  --counters-bg: var(--counters-bg-light);
+  --footer-bg: var(--footer-bg-light);
+}
+
+body.dark {
+  --counters-bg: var(--counters-bg-dark);
+  --footer-bg: var(--footer-bg-dark);
+}
+
+:root {
   --font-inter: "Inter", sans-serif;
 }
 
@@ -6,10 +27,8 @@ body {
   font-family: var(--font-inter);
 }
 
-:root {
-  --light-card: hsl(0, 0%, 85%);
-  --footer-bg-dark: hsl(228, 14%, 21%);
-  --card-bg: var(--light-card);
+.maxscreen-footer-nav {
+  height: calc(100vh - var(--navbar-height) - var(--logo-height));
 }
 
 .navbar-brand {
@@ -45,58 +64,6 @@ body {
   transform: translateX(-50%);
   height: 2px;
   background-color: #151515;
-}
-
-.team-card {
-  padding: 1.5rem 1.5rem;
-  border-radius: 10px;
-  background: var(--light-card);
-  color: black;
-}
-.team-card .col-lg-4 {
-  padding-top: 2rem;
-}
-.team-card__member {
-  font-size: 1.8em;
-  padding-top: 0.5rem;
-}
-.team-card p {
-  margin-bottom: 0;
-}
-
-.legal-card {
-  padding: 1rem 1rem;
-  border-radius: 10px;
-}
-
-.sponsor-container {
-  padding-top: 1rem;
-}
-.sponsor-container .row {
-  position: relative;
-}
-.sponsor-container .row > div {
-  padding: 1.5rem;
-  text-align: left;
-  position: relative;
-  overflow: hidden;
-}
-.sponsor-container .row > div::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  right: 0;
-  width: 1px;
-  height: calc(100% - 4rem);
-  background-color: grey;
-}
-.sponsor-container .row > div:last-child::before {
-  display: none;
-}
-.sponsor-container a {
-  color: grey; /* Set the color to grey */
-  text-decoration: underline; /* Add underline */
 }
 
 .footercontent {
