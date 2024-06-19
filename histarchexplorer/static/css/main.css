@@ -143,6 +143,12 @@ body {
 #map {
   width: 100%;
   height: 100%;
+  display: none;
+}
+
+#index-image {
+  width: 100%;
+  height: 100%;
 }
 
 .map-gray .leaflet-map-pane > .leaflet-pane:not(.leaflet-marker-pane) {
