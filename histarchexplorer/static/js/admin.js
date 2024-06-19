@@ -151,3 +151,17 @@ function saveLinkValues(button) {
 
 
 
+document.addEventListener('DOMContentLoaded', function () {
+        var accordionContainer = document.getElementById('mapsAccordion');
+
+        new Sortable(accordionContainer, {
+            animation: 150,
+            handle: '.accordion-button', // Specify the handle for sorting
+            onEnd: function (evt) {
+                // This function runs when sorting is done
+                var items = Array.from(accordionContainer.getElementsByClassName('accordion-item'));
+                console.log('New order:', items.map(item => item.id));
+                // Optional: Save the new order in localStorage or any other storage
+            }
+        });
+    });

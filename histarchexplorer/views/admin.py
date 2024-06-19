@@ -16,6 +16,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     g.cursor.execute('SELECT * FROM tng.config ORDER BY name')
     config_data = g.cursor.fetchall()
 
+    g.cursor.execute('SELECT * FROM tng.maps ORDER BY name')
+    map_data = g.cursor.fetchall()
+
     g.cursor.execute('SELECT * FROM tng.config_classes')
     config_classes = g.cursor.fetchall()
 
@@ -49,7 +52,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             'label': 'main-project',
             'target': 'nav-main-project',
             'filter': mainproject,
-            'id': 0
+            'id': 5
 
         },
         {
@@ -119,7 +122,7 @@ FROM tng.links l
     links_data = g.cursor.fetchall()
 
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry,
-                           links_data=links_data, config_properties=config_properties)
+                           links_data=links_data, config_properties=config_properties, maps=map_data)
 
 
 @app.route('/admin/add_entry', methods=['POST'])
@@ -147,6 +150,10 @@ def add_entry():
 
     try:
         tab_config_class = config_class_map.get(category)
+        if tab_config_class:
+            flash(f'Error adding entry {name}: Only one main project allowed', 'danger')
+            return redirect(url_for('admin') + current_tab)
+
 
         g.cursor.execute('''
                    INSERT INTO tng.config (name, description, address, email, website, orcid_id, config_class)
@@ -178,6 +185,13 @@ def add_entry():
 def delete_entry(tab: Optional[str] = None, id: Optional[int] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
+
+    g.cursor.execute(f'SELECT config_class FROM tng.config WHERE id = {id}')
+    result = g.cursor.fetchone()
+    if result.config_class == 5:
+        flash('Main Project cannot be deleted', 'danger')
+        return redirect(url_for('admin') + tab)
+
 
     g.cursor.execute('DELETE FROM tng.config WHERE id = %(id)s', {'id': int(id)})
     flash('Entry deleted successfully!', 'success')
@@ -255,6 +269,16 @@ def reset():
         DROP SCHEMA IF EXISTS tng CASCADE;
         CREATE SCHEMA IF NOT EXISTS tng;
         
+        CREATE TABLE IF NOT EXISTS tng.maps
+        (
+            id           SERIAL PRIMARY KEY,
+            name         TEXT,
+            display_name TEXT,
+            tilestring   TEXT
+        );
+        
+        INSERT INTO tng.maps (name, display_name, tilestring) VALUES ('OpenStreetMap', 'Open Street Map', 'L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: "&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors"});');
+        
         CREATE TABLE IF NOT EXISTS tng.config
         (
             id           SERIAL PRIMARY KEY,
@@ -266,6 +290,8 @@ def reset():
             orcid_id     TEXT,
             image        TEXT,
             website      TEXT,
+            legal_notice TEXT,
+            imprint      TEXT,
             language     TEXT DEFAULT 'en'
         );
         
@@ -333,6 +359,9 @@ def reset():
         INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has member', 'is member of', (SELECT id FROM tng.config_classes WHERE name = 'project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
         INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has affiliation', 'is affiliation of', (SELECT id FROM tng.config_classes WHERE name = 'person'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
         INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has translation', 'has translation', NULL, NULL);
+        INSERT INTO tng.config_properties (name, name_inv, domain, range) VALUES ('has core member', 'is core member of', (SELECT id FROM tng.config_classes WHERE name = 'main-project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
+        
+        INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('Main Project', (SELECT id from tng.config_classes WHERE name = 'main-project'), NULL, NULL, NULL, NULL);
         
         INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('Stefan Eichert', (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, NULL, NULL);
         INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('Lisa Aldrian', (SELECT id from tng.config_classes WHERE name = 'person'), NULL, NULL, NULL, NULL);
@@ -350,7 +379,6 @@ def reset():
         
         INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('sponsor', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, 'https://example.exampe');
         INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('partner', (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, 'https://example.exampe');
-        
         
         INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('THANADOS', (SELECT id from tng.config_classes WHERE name = 'project'), NULL, NULL, NULL, NULL);
         INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('RELIC', (SELECT id from tng.config_classes WHERE name = 'project'), NULL, NULL, NULL, NULL);

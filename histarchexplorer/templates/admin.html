@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
     <div class="container py-5 en">
         <h3>{{ _('Admin options') |upper }} <span class="text-body-secondary"> | DB Interface</span></h3>
@@ -11,6 +11,105 @@
                 <div class="button-card">
                     <button id="resetButton" class="btn btn-danger">Reset</button>
                 </div>
+            </div>
+        </div>
+
+        <div class="card mt-5 mb-5">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('Maps') |upper }}</h5>
+
+                <div class="accordion" id="mapsAccordion">
+                    {% for map in maps %}
+
+                        <div class="accordion-item" id="mapItem-{{ map.id }}" data-id="{{ map.id }}">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed"
+                                        type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#map{{ map.id }}"
+                                        aria-expanded="false"
+                                        aria-controls="map{{ map.id }}">
+                                    {{ map.display_name }}
+                                </button>
+                            </h2>
+                            <div id="map{{ map.id }}"
+                                 class="accordion-collapse collapse"
+                                 data-bs-parent="#mapsAccordion">
+                                <div class="accordion-body">
+                                    <form method="POST" action="{{ url_for('edit_entry') }}"
+                                          class="projectForm needs-validation" id="form{{ map.id }}"
+                                          novalidate>
+                                        <input type="hidden" name="map_id" value="{{ map.id }}">
+                                        <div class="row needs-validation">
+                                            <div class="col-md-6">
+                                                <label for="InputName{{ map.id }}" class="form-label">
+                                                    Name</label>
+                                                <input type="text" class="form-control"
+                                                       id="InputName{{ map.id }}"
+                                                       name="name" value="{{ map.name or '' }}"
+                                                       aria-describedby="NameHelp{{ map.id }}"
+                                                       disabled required>
+                                                <div class="invalid-feedback">Please provide a name.
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="InputDispName{{ map.id }}" class="form-label">
+                                                    Display Name</label>
+                                                <input type="text" class="form-control"
+                                                       id="InputDispName{{ map.id }}"
+                                                       name="displayname" value="{{ map.display_name or '' }}"
+                                                       aria-describedby="DispNameHelp{{ map.id }}"
+                                                       disabled required>
+                                                <div class="invalid-feedback">Please provide a name.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-4">
+                                            <div class="col-12">
+                                                <label for="InputDescription{{ map.id }}"
+                                                       class="form-label">Leaflet Tile Layer String</label>
+                                                <textarea class="form-control"
+                                                          id="InputDescription{{ map.id }}"
+                                                          name="description"
+                                                          aria-describedby="descriptionHelp{{ map.id }}"
+                                                          disabled>{{ map.tilestring or '' }}</textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-3 text-end">
+                                            <button type="button" class="btn btn-primary"
+                                                    id='edit{{ map.id }}'
+                                                    onclick="changeEdit({{ map.id }}, true)">Edit
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-danger"
+                                                    id='delete{{ map.id }}'
+                                                    value="{{ map.id }}"
+                                                    onclick="deleteEntry({{ map.id }}, '{{ map.name }}')"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal">Delete
+                                            </button>
+                                            <button type="button" class="btn btn-secondary d-none"
+                                                    id='cancel{{ map.id }}'
+                                                    onclick="changeEdit({{ map.id }}, false)">Cancel
+                                            </button>
+
+                                            <button type="submit" class="btn btn-primary d-none"
+                                                    id='save{{ map.id }}'
+                                                    value="{{ map.id }}">Save
+                                            </button>
+
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    {% endfor %}
+                </div>
+                <button class="btn btn-primary m-2 float-end"
+                        onclick="addEntry('map')">
+                    Add entry
+                </button>
             </div>
         </div>
 
@@ -80,8 +179,8 @@
                                                         <input type="hidden" name="current_entry"
                                                                value="{{ tab.target + entry.id|string }}">
 
-                                                        <div class="row g-3 needs-validation">
-                                                            <div class="col-md-4">
+                                                        <div class="row needs-validation">
+                                                            <div class="col-md-6">
                                                                 <label for="InputName{{ entry.id }}" class="form-label">
                                                                     Name</label>
                                                                 <input type="text" class="form-control"
@@ -93,20 +192,19 @@
                                                                 </div>
                                                             </div>
 
-                                                            {% if tab.target in ['nav-projects', 'nav-attributes'] %}
-                                                                <div class="mb-3">
-                                                                    <label for="InputDescription{{ entry.id }}"
-                                                                           class="form-label">Description</label>
-                                                                    <textarea class="form-control"
-                                                                              id="InputDescription{{ entry.id }}"
-                                                                              name="description"
-                                                                              aria-describedby="descriptionHelp{{ entry.id }}"
-                                                                              disabled>{{ entry.description or '' }}</textarea>
-                                                                </div>
-                                                            {% endif %}
-
+                                                            <div class="col-md-6">
+                                                                <label for="InputDescription{{ entry.id }}"
+                                                                       class="form-label">Description</label>
+                                                                <textarea class="form-control"
+                                                                          id="InputDescription{{ entry.id }}"
+                                                                          name="description"
+                                                                          aria-describedby="descriptionHelp{{ entry.id }}"
+                                                                          disabled>{{ entry.description or '' }}</textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row needs-validation mt-4">
                                                             {% if tab.target == 'nav-institutions' %}
-                                                                <div class="col-md-6">
+                                                                <div class="col-lg col-md-12">
                                                                     <label for="InputAddress{{ entry.id }}"
                                                                            class="form-label">Address</label>
                                                                     <textarea class="form-control"
@@ -121,7 +219,7 @@
                                                             {% endif %}
 
                                                             {% if tab.target in ['nav-institutions', 'nav-persons'] %}
-                                                                <div class="col-md-4">
+                                                                <div class="col-lg col-md-12">
                                                                     <label for="InputMail{{ entry.id }}"
                                                                            class="form-label">E-mail</label>
                                                                     <input type="email" class="form-control"
@@ -136,8 +234,8 @@
                                                                 </div>
                                                             {% endif %}
 
-                                                            {% if tab.target in ['nav-projects', 'nav-institutions'] %}
-                                                                <div class="col-md-6">
+                                                            {% if tab.target in ['nav-main-project', 'nav-projects', 'nav-institutions'] %}
+                                                                <div class="col-lg col-md-12">
                                                                     <label for="InputWebsite{{ entry.id }}"
                                                                            class="form-label">Website</label>
                                                                     <input type="url" class="form-control"
@@ -153,7 +251,7 @@
                                                             {% endif %}
 
                                                             {% if tab.target == 'nav-persons' %}
-                                                                <div class="col-md-4">
+                                                                <div class="col-lg col-md-12">
                                                                     <label for="InputOrcid{{ entry.id }}"
                                                                            class="form-label">ORCID-ID</label>
                                                                     <input type="text" class="form-control"
@@ -165,21 +263,43 @@
                                                             {% endif %}
                                                         </div>
 
+                                                        {% if tab.target == 'nav-main-project' %}
+                                                            <div class="row needs-validation mt-4">
+                                                                <div class="col-md-6">
+                                                                    <label for="Imprint{{ entry.id }}"
+                                                                           class="form-label">Imprint</label>
+                                                                    <textarea class="form-control"
+                                                                              id="Imprint{{ entry.id }}" name="imprint"
+                                                                              aria-describedby="imprint{{ entry.id }}"
+                                                                              disabled>{{ entry.imprint or '' }}</textarea>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label for="legalNotice{{ entry.id }}"
+                                                                           class="form-label">Legal Notice</label>
+                                                                    <textarea class="form-control"
+                                                                              id="legalNotice{{ entry.id }}"
+                                                                              name="legalnotice"
+                                                                              aria-describedby="legalnotice{{ entry.id }}"
+                                                                              disabled>{{ entry.legal_notice or '' }}</textarea>
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
+
+
 
                                                         <div class="mt-3 text-end">
                                                             <button type="button" class="btn btn-primary"
                                                                     id='edit{{ entry.id }}'
                                                                     onclick="changeEdit({{ entry.id }}, true)">Edit
                                                             </button>
-
-                                                            <button type="button" class="btn btn-danger"
+                                                            <button type="button"
+                                                                    class="btn btn-danger{% if tab.id == 5 %} d-none-at-all{% endif %}"
                                                                     id='delete{{ entry.id }}'
                                                                     value="{{ entry.id }}"
                                                                     onclick="deleteEntry({{ entry.id }}, '{{ entry.name }}', '{{ tab.target }}')"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#deleteModal">Delete
                                                             </button>
-
                                                             <button type="button" class="btn btn-secondary d-none"
                                                                     id='cancel{{ entry.id }}'
                                                                     onclick="changeEdit({{ entry.id }}, false)">Cancel
@@ -270,10 +390,12 @@
                                     {% endif %}
                                 {% endfor %}
                             </div>
-                            <button class="btn btn-primary m-2 float-end" onclick="addEntry('{{ tab.target|string }}')">
-                                Add
-                                entry
-                            </button>
+                            {% if tab.id != 5 %}
+                                <button class="btn btn-primary m-2 float-end"
+                                        onclick="addEntry('{{ tab.target|string }}')">
+                                    Add entry
+                                </button>
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>
@@ -310,40 +432,54 @@
                         <div class="modal-body">
                             <form method="POST" action="{{ url_for('add_entry') }}" class="needs-validation" novalidate>
                                 <input type="hidden" name="category" id="currentTab">
-                                <div class="row g-3">
-                                    <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-lg">
                                         <label for="InputNameModal" class="form-label">Name</label>
                                         <input type="text" class="form-control" id="InputNameModal" name="name"
                                                required>
                                         <div class="invalid-feedback">Please provide a name.</div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-lg">
                                         <label for="InputDescriptionModal" class="form-label">Description</label>
                                         <textarea class="form-control" id="InputDescriptionModal"
                                                   name="description"></textarea>
                                     </div>
-                                    <div class="col-md-6 institutions-show persons-show modal-input">
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg institutions-show persons-show modal-input">
                                         <label for="InputAddressModal" class="form-label">Address</label>
                                         <textarea class="form-control" id="InputAddressModal" name="address"></textarea>
                                     </div>
-                                    <div class="col-md-4 institutions-show persons-show projects-show modal-input">
+                                    <div class="col-lg institutions-show persons-show projects-show modal-input">
                                         <label for="InputMailModal" class="form-label">E-mail</label>
                                         <input type="email" class="form-control" id="InputMailModal" name="mail">
                                         <div class="invalid-feedback">Please provide a valid
                                             email-address: someone@somemail.com
                                         </div>
                                     </div>
-                                    <div class="col-md-6 institutions-show projects-show modal-input">
+                                    <div class="col-lg institutions-show projects-show modal-input">
                                         <label for="InputWebsiteModal" class="form-label">Website</label>
                                         <input type="url" class="form-control" id="InputWebsiteModal" name="website">
                                         <div class="invalid-feedback">Please provide a valid
                                             website url: https://someurl.com
                                         </div>
                                     </div>
-                                    <div class="col-md-4 persons-show modal-input">
+                                    <div class="col-lg persons-show modal-input">
                                         <label for="InputOrcidModal" class="form-label">ORCID-ID</label>
                                         <input type="text" class="form-control" id="InputOrcidModal" name="orcid">
                                     </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg main-project-show modal-input">
+                                        <label for="InputImprintModal" class="form-label">Imprint</label>
+                                        <textarea class="form-control" id="InputImprintModal" name="imprint"></textarea>
+                                    </div>
+                                    <div class="col-lg main-project-show modal-input">
+                                        <label for="InputLegalNoticeModal" class="form-label">Legal Notice</label>
+                                        <textarea class="form-control" id="InputLegalNoticeModal"
+                                                  name="legalnotice"></textarea>
+                                    </div>
+
                                 </div>
                                 <div class="mt-3 text-end">
                                     <button type="submit" class="btn btn-primary">Add Entry</button>
