@@ -1,17 +1,14 @@
 .footercontent {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  max-height: var(--logo-height);
+  justify-content: space-around;
+  min-height: var(--logo-height);
+  background: var(--footer-bg);
   //background: grey;
 }
 
 .footerimg {
   padding: 1rem;
-}
-
-.footer {
-  background: var(--footer-bg);
 }
 
 

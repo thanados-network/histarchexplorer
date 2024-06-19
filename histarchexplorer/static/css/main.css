@@ -2,8 +2,8 @@
   --light-card: hsl(0, 0%, 85%);
   --footer-bg-light: transparent;
   --footer-bg-dark: hsl(0, 0%, 31%);
-  --counters-bg-light: hsl(208, 34%, 60%);
-  --counters-bg-dark: hsl(208, 24%, 44%);
+  --counters-bg-light: hsla(208, 34%, 60%, 0.75);
+  --counters-bg-dark: hsla(208, 24%, 44%, 0.74);
   --card-bg: var(--light-card);
   --logo-height: 132px;
   --navbar-height: 96px;
@@ -121,16 +121,13 @@ body {
 .footercontent {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  max-height: var(--logo-height);
+  justify-content: space-around;
+  min-height: var(--logo-height);
+  background: var(--footer-bg);
 }
 
 .footerimg {
   padding: 1rem;
-}
-
-.footer {
-  background: var(--footer-bg);
 }
 
 .button-card {
@@ -139,27 +136,13 @@ body {
   justify-content: space-between;
 }
 
-#counters {
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--counters-bg);
-  position: absolute;
-  z-index: 2;
-}
-
-#home-map {
-  height: calc(100vh - var(--logo-height) - var(--navbar-height));
-  position: relative;
+#index-container {
+  height: calc(100vh - var(--logo-height) - var(--navbar-height) - 95px);
 }
 
 #map {
-  position: relative;
-  z-index: 1;
-}
-
-.no-gutter {
-  padding: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .map-gray .leaflet-map-pane > .leaflet-pane:not(.leaflet-marker-pane) {
@@ -167,9 +150,10 @@ body {
   filter: grayscale(100%) opacity(0.9);
 }
 
-#other-content {
-  overflow-y: auto; /* Enable vertical scrolling */
-  padding: 70px;
+#counters {
+  background-color: var(--counters-bg);
+  min-height: 95px;
+  max-width: 100vw;
 }
 
 /*# sourceMappingURL=main.css.map */

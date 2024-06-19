@@ -1,15 +1,10 @@
-#home-map {
-  height: calc(100vh - var(--logo-height) - var(--navbar-height));
-  position: relative;
+#index-container{
+  height: calc(100vh - var(--logo-height) - var(--navbar-height) - 95px);
 }
 
 #map{
-  position: relative;
-  z-index: 1;
-}
-
-.no-gutter {
-  padding: 0
+  width: 100%;
+  height: 100%;
 }
 
 .map-gray .leaflet-map-pane > .leaflet-pane:not(.leaflet-marker-pane) {
@@ -17,7 +12,13 @@
 filter: grayscale(100%) opacity(0.9);
 }
 
-#other-content {
-    overflow-y: auto; /* Enable vertical scrolling */
-    padding: 70px;
+
+#counters{
+  background-color: var(--counters-bg);
+  min-height: 95px;
+  max-width: 100vw;
+}
+
+#other-content{
+
 }

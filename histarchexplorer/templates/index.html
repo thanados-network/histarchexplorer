@@ -2,22 +2,22 @@
 
 {% block content %}
 <!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-qz6H0r+PpZt4ZcLpNl3MTExBeY0Q/JtqioQK+M51xK4="
-      crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <!-- Leaflet JavaScript -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <!-- Custom JavaScript -->
-<script defer src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 
-<main class="container-fluid no-gutter map-gray" id="home-map" style="display: flex; flex-direction: column;">
-    <div id="map" style="flex: 1;"></div>
+<div id="index-container">
+    <div id="map" class="map-gray"></div>
+    <div id="index-image"></div>
 
-    <div id="counters" class="row text-center pt-3">
+</div>
+
+<div id="counters" class="text-center pt-3">
+    <div  class="row gx-0">
         <div class="col-6 col-sm">
             <h4 class="statistic-counter">563</h4>
             <p>Places</p>
@@ -39,26 +39,9 @@
             <p>Sources</p>
         </div>
     </div>
-</main>
+</div>
 
 {% include 'footer.html' %}
-
-<div id="other-content" >
-
-<div class="row legal">
-        <div class="col-md-6 legal-card">
-            <h4>{{ _('Other COntent') |upper }}</h4>
-            <p>{{ _('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus mauris dolor, elementum in augue at, fermentum facilisis felis. Donec vitae mauris consectetur, tincidunt urna eget, sagittis mauris. Morbi quis fringilla mi. Ut lectus libero, pellentesque placerat leo non, feugiat imperdiet nisi. Nam sit amet vulputate libero. Aenean gravida nunc rhoncus eros imperdiet gravida. Maecenas rutrum tortor nec nulla auctor tempus. Etiam in est sapien. Praesent a pulvinar felis. In molestie, risus vitae rutrum facilisis, erat purus rutrum eros, ut consequat metus quam a urna. Ut ac massa vitae felis tincidunt iaculis. Phasellus fermentum in nunc dignissim lacinia. Nulla efficitur porta fringilla. Ut varius sed ipsum id fermentum.') }}</p>
-        </div>
-        <div class="col-md-6 team-card">
-            <span class="en" style="display: block;">
-          <h4>{{ _('Important Stuff') |upper }}</h4>
-          {{ _('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus mauris dolor, elementum in augue at, fermentum facilisis felis. Donec vitae mauris consectetur, tincidunt urna eget, sagittis mauris. Morbi quis fringilla mi. Ut lectus libero, pellentesque placerat leo non, feugiat imperdiet nisi. Nam sit amet vulputate libero. Aenean gravida nunc rhoncus eros imperdiet gravida. Maecenas rutrum tortor nec nulla auctor tempus. Etiam in est sapien. Praesent a pulvinar felis. In molestie, risus vitae rutrum facilisis, erat purus rutrum eros, ut consequat metus quam a urna. Ut ac massa vitae felis tincidunt iaculis. Phasellus fermentum in nunc dignissim lacinia. Nulla efficitur porta fringilla. Ut varius sed ipsum id fermentum.') }}
-        </span>
-        </div>
-    </div>
-</div>
-</div>
 
 
 {% endblock %}
