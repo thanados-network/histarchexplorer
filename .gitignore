@@ -47,3 +47,6 @@ dmypy.json
 # Project specific files
 **/node_modules
 node_modules/
+
+**/css/main.css
+**/main.css.map
