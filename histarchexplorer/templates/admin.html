@@ -40,7 +40,7 @@
                                           novalidate>
                                         <input type="hidden" name="map_id" value="{{ map.id }}">
                                         <div class="row needs-validation">
-                                            <div class="col-md-6">
+                                            <div class="col-md-5">
                                                 <label for="InputName{{ map.id }}" class="form-label">
                                                     Name</label>
                                                 <input type="text" class="form-control"
@@ -51,7 +51,7 @@
                                                 <div class="invalid-feedback">Please provide a name.
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
+                                            <div class="col-md-5">
                                                 <label for="InputDispName{{ map.id }}" class="form-label">
                                                     Display Name</label>
                                                 <input type="text" class="form-control"
@@ -60,6 +60,17 @@
                                                        aria-describedby="DispNameHelp{{ map.id }}"
                                                        disabled required>
                                                 <div class="invalid-feedback">Please provide a name.
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label for="InputOrder{{ map.id }}" class="form-label">
+                                                    Order</label>
+                                                <input type="text" class="form-control"
+                                                       id="InputOrder{{ map.id }}"
+                                                       name="inputorder" value="{{ map.order_nr }}"
+                                                       aria-describedby="MapOrder{{ map.id }}"
+                                                       disabled required>
+                                                <div class="invalid-feedback">Please provide an order.
                                                 </div>
                                             </div>
                                         </div>

@@ -274,10 +274,12 @@ def reset():
             id           SERIAL PRIMARY KEY,
             name         TEXT,
             display_name TEXT,
-            tilestring   TEXT
+            tilestring   TEXT,
+            order_nr        INT   
         );
         
-        INSERT INTO tng.maps (name, display_name, tilestring) VALUES ('OpenStreetMap', 'Open Street Map', 'L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: "&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors"});');
+        INSERT INTO tng.maps (name, display_name, tilestring, order_nr) 
+            VALUES ('OpenStreetMap', 'Open Street Map', 'L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: "&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors"});', 1);
         
         CREATE TABLE IF NOT EXISTS tng.config
         (
