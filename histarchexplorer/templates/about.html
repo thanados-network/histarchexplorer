@@ -20,7 +20,7 @@
                 </div>
                  <ul class="list-unstyled">
                     {% for role in person.roles %}
-                    <li>{{ role }}</li>
+                    <li>{{ role |capitalize_first}}</li>
                     {% endfor %}
                 </ul>
             </div>
