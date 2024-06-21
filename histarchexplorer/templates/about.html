@@ -1,4 +1,32 @@
 {% extends "layout.html" %}
 {% block content %}
+ <h1>{{ project.name }}</h1>
+    <p>{{ project.description }}</p>
+
+    <h2>Legal Notice</h2>
+    <p>{{ project.legal_notice }}</p>
+
+    <h2>Imprint</h2>
+    <p>{{ project.imprint }}</p>
+
+    <h2>Institutions</h2>
+    <ul>
+        {% for institution in institutions %}
+            <li>
+                <strong>{{ institution.name }}</strong><br>
+                <a href="{{ institution.url }}">{{ institution.url }}</a><br>
+                <p>{{ institution.description }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Team</h2>
+    <ul>
+        {% for person in persons %}
+            <li>
+                <strong>{{ person.name }}</strong> - {{ person.role }}
+            </li>
+        {% endfor %}
+    </ul>
 {% include 'footer.html' %}
 {% endblock %}
