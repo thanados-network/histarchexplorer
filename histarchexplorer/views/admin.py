@@ -150,7 +150,7 @@ def add_entry():
 
     try:
         tab_config_class = config_class_map.get(category)
-        if tab_config_class:
+        if tab_config_class == 5:
             flash(f'Error adding entry {name}: Only one main project allowed', 'danger')
             return redirect(url_for('admin') + current_tab)
 

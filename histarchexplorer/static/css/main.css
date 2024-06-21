@@ -66,6 +66,58 @@ body {
   background-color: #151515;
 }
 
+.team-card {
+  padding: 1.5rem 1.5rem;
+  border-radius: 10px;
+  background: var(--light-card);
+  color: black;
+}
+.team-card .col-lg-4 {
+  padding-top: 2rem;
+}
+.team-card__member {
+  font-size: 1.8em;
+  padding-top: 0.5rem;
+}
+.team-card p {
+  margin-bottom: 0;
+}
+
+.legal-card {
+  padding: 1rem 1rem;
+  border-radius: 10px;
+}
+
+.sponsor-container {
+  padding-top: 1rem;
+}
+.sponsor-container .row {
+  position: relative;
+}
+.sponsor-container .row > div {
+  padding: 1.5rem;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+.sponsor-container .row > div::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 0;
+  width: 1px;
+  height: calc(100% - 4rem);
+  background-color: grey;
+}
+.sponsor-container .row > div:last-child::before {
+  display: none;
+}
+.sponsor-container a {
+  color: grey; /* Set the color to grey */
+  text-decoration: underline; /* Add underline */
+}
+
 .footercontent {
   display: flex;
   flex-wrap: wrap;

@@ -42,7 +42,7 @@ def about() -> str:
         })
 
     persons_sql = """
-        SELECT p.name, r.name AS role
+        SELECT p.name, r.name AS role, p.image
         FROM tng.links l
         JOIN tng.config p ON l.range_id = p.id
         JOIN tng.config_properties cp ON l.property = cp.id
@@ -60,7 +60,8 @@ def about() -> str:
     for row in persons_result:
         persons.append({
             'name': row[0],
-            'role': row[1]
+            'role': row[1],
+            'image': row[2]
         })
 
     return render_template('about.html', project=project, institutions=institutions, persons=persons)
