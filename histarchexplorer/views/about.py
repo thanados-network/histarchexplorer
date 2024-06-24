@@ -20,6 +20,7 @@ def about() -> str:
     g.cursor.execute(project_sql)
     project_result = g.cursor.fetchone()
 
+
     project = {
         'name': project_result[0],
         'description': project_result[1],
@@ -28,11 +29,11 @@ def about() -> str:
     }
 
     institutions_sql = """
-        SELECT c.name, c.address, c.website, r.name AS role
+        SELECT c.name, c.address, c.website, role.name AS role
         FROM tng.links l
         JOIN tng.config c ON l.range_id = c.id
-        LEFT JOIN tng.config r ON l.attribute = r.id AND r.config_class = '3'
-        WHERE l.domain_id = (SELECT id FROM tng.config WHERE config_class = '5')
+        LEFT JOIN tng.config role ON l.attribute = role.id AND role.config_class = '3' --role name & config class
+        WHERE l.domain_id = (SELECT id FROM tng.config WHERE config_class = '5') -- only links concerning main-project
         AND c.config_class = '4'
     """
 
