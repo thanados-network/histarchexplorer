@@ -77,4 +77,12 @@ def about() -> str:
 
     persons_list = list(persons.values())
 
+    # Sort the persons_list - main coordinator and principal investigator first
+    def prioritize_roles(person):
+        roles_priority = {"main coordinator": 0, "principal investigator": 1}
+        priority = min((roles_priority.get(role, 99) for role in person['roles']), default=99)
+        return priority
+
+    persons_list.sort(key=prioritize_roles)
+
     return render_template('about.html', project=project, institutions=institutions, persons=persons_list)
