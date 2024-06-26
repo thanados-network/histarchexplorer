@@ -234,6 +234,8 @@ def edit_entry():
     mail = request.form.get('mail')
     website = request.form.get('website')
     orcid = request.form.get('orcid')
+    legal_note = request.form.get('legalnotice')
+    imprint = request.form.get('imprint')
 
     editsql = """
         UPDATE  tng.config SET 
@@ -242,7 +244,9 @@ def edit_entry():
             address = NULLIF(%(address)s, ''),
             email = NULLIF(%(email)s, ''),
             website = NULLIF(%(website)s, ''),
-            orcid_id = NULLIF(%(orcid_id)s, '')
+            orcid_id = NULLIF(%(orcid_id)s, ''),
+            legal_notice = NULLIF(%(legal_note)s, ''),
+            imprint = NULLIF(%(imprint)s, '')
         WHERE  id = %(id)s
     """
     try:
@@ -250,7 +254,7 @@ def edit_entry():
         result = g.cursor.fetchone()
         if result:
             g.cursor.execute(editsql, {'description': description, 'name': name, 'address': address, 'email': mail,
-                                       'website': website, 'orcid_id': orcid, 'id': config_id})
+                                       'website': website, 'orcid_id': orcid, 'id': config_id, 'legal_note': legal_note, 'imprint': imprint})
             flash(f'"{name}" updated successfully', 'success')
         else:
             flash(f'Error updating {name}', 'danger')

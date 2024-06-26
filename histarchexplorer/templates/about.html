@@ -7,7 +7,6 @@
         </p>
     </div>
     <div class="team-card">
-        <!-- Principal Investigators - 3 Columns  -->
         <div class="row">
             <h2>TEAM <span class="text-body-secondary"> | ABOUT US</h2>
             {% for person in persons %}
@@ -49,7 +48,8 @@
             <div class="col-md-5 team-card">
             <span class="en" style="display: block;">
           <h4>{{ _('Imprint') |upper }}</h4>
-                <p>{{project.imprint | safe}}</p>
+                <p>{{ project.imprint | replace("\n", "<br>") | safe }}</p>
+
         </span>
             </div>
         </div>
