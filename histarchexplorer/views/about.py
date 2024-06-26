@@ -52,15 +52,14 @@ def about() -> str:
         })
 
     persons_sql = """
-        SELECT p.name, r.name AS role, p.image
-        FROM tng.links l
-        JOIN tng.config p ON l.range_id = p.id
-        JOIN tng.config_properties cp ON l.property = cp.id
-        JOIN tng.config r ON l.attribute = r.id
-        WHERE l.domain_id = (SELECT id FROM tng.config WHERE config_class = '5')
-        AND p.config_class = '2'
-        AND cp.id = 4 
-        AND r.config_class = '3' 
+SELECT p.name, p.image, COALESCE(b.name, '') AS role
+FROM tng.links l
+JOIN tng.config p ON l.range_id = p.id
+JOIN tng.config_properties cp ON l.property = cp.id
+LEFT JOIN tng.config b ON l.attribute = b.id AND b.config_class = '3'
+WHERE l.domain_id = (SELECT id FROM tng.config WHERE config_class = '5')
+AND p.config_class = '2'
+AND cp.id = 4;
     """
 
     g.cursor.execute(persons_sql)
@@ -69,13 +68,14 @@ def about() -> str:
     persons = {}
     for row in persons_result:
         person_name = row[0]
+        print(row[0])
         if person_name not in persons:
             persons[person_name] = {
                 'name': row[0],
                 'roles': [],
-                'image': row[2]
+                'image': row[1]
             }
-        persons[person_name]['roles'].append(row[1])
+        persons[person_name]['roles'].append(row[2])
 
     persons_list = list(persons.values())
 
