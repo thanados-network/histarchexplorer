@@ -9,29 +9,9 @@
     <div class="team-card">
         <div class="row">
             <h2>TEAM <span class="text-body-secondary"> | ABOUT US</h2>
-            <!-- Main Coordinators and Principal Investigators -->
+            <!-- Team Members -->
             <div class="row">
                 {% for person in persons %}
-                {% if 'main coordinator' in person.roles or 'principal investigator' in person.roles %}
-                <div class="col-lg-4 text-center">
-                    <img class="rounded-circle"
-                         src="{{ person.image if person.image else '/static/images/team/cool_dude2.jpg' }}"
-                         alt="{{ person.name }}'s Foto" width="140" height="140">
-                    <div class="team-card__member">
-                        <p>{{ person.name }}</p>
-                    </div>
-                    <ul class="list-unstyled">
-                        <li>{{ person.roles[0] | capitalize_first }}</li>
-                        {# Display first role found #}
-                    </ul>
-                </div>
-                {% endif %}
-                {% endfor %}
-            </div>
-            <!-- Other Team Members -->
-            <div class="row">
-                {% for person in persons %}
-                {% if 'main coordinator' not in person.roles and 'principal investigator' not in person.roles %}
                 <div class="col-lg-4 text-center">
                     <img class="rounded-circle"
                          src="{{ person.image if person.image else '/static/images/team/cool_dude2.jpg' }}"
@@ -45,7 +25,6 @@
                         {% endfor %}
                     </ul>
                 </div>
-                {% endif %}
                 {% endfor %}
             </div>
 
