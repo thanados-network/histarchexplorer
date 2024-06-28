@@ -27,7 +27,7 @@
   padding-top: 1rem;
 
   .row {
-    > .col-sm-3 {
+    > .col-md-3 {
       img {
         max-width: 100%;
         height: auto;
@@ -60,7 +60,7 @@
         display: none;
       }
 
-      @media (max-width: 575px) {
+      @media (max-width: 767px) {
         &::before {
           display: none;
         }

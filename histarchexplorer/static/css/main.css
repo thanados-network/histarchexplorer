@@ -93,12 +93,12 @@ body {
 .sponsor-container {
   padding-top: 1rem;
 }
-.sponsor-container .row > .col-sm-3 img {
+.sponsor-container .row > .col-md-3 img {
   max-width: 100%;
   height: auto;
   transition: transform 0.3s ease;
 }
-.sponsor-container .row > .col-sm-3 img:hover {
+.sponsor-container .row > .col-md-3 img:hover {
   transform: scale(0.9);
 }
 .sponsor-container .row > div {
@@ -120,7 +120,7 @@ body {
 .sponsor-container .row > div:nth-child(4n)::before {
   display: none;
 }
-@media (max-width: 575px) {
+@media (max-width: 767px) {
   .sponsor-container .row > div {
     border-bottom: 1px solid grey;
   }

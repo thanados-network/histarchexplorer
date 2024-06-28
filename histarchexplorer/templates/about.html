@@ -47,11 +47,11 @@
         <h2>{{ _('Sponsors')|upper }} <span class="text-body-secondary"> | {{ _('Cooperations')|upper }}</span></h2>
         <div class="row">
             {% for institution in institutions %}
-            <div class="col-sm-3 text-center">
-                <h6 class="pt-3 text-decoration-underline">{{ institution.role | upper }}</h6>
+            <div class="col-md-3 text-center">
+                <h6 class="pt-3 fst-italic">{{ institution.role | upper }}</h6>
                 {% if institution.image %}
                 <a href="{{ institution.website }}" target="_blank">
-                    <img src="{{ institution.image }}" alt="{{ institution.name }}'s Logo">
+                    <img class="mt-2" src="{{ institution.image }}" alt="{{ institution.name }}'s Logo">
                 </a>
                 <h6 class="pt-3 text-body-secondary">{{ institution.name }}</h6>
                 {% else %}
