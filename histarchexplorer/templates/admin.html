@@ -21,7 +21,7 @@
             <div class="accordion" id="mapsAccordion">
                 {% for map in maps %}
 
-                <div class="accordion-item" id="mapItem-{{ map.id }}" data-id="{{ map.id }}">
+                <div class="accordion-item" id="mapItem-{{ map.id }}" data-id="{{ map.id }}" data-order="{{ map.sortorder }}">
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed"
                                 type="button" data-bs-toggle="collapse"
@@ -67,7 +67,7 @@
                                             Order</label>
                                         <input type="text" class="form-control"
                                                id="InputOrder{{ map.id }}"
-                                               name="inputorder" value="{{ map.order_nr }}"
+                                               name="inputorder" value="{{ map.sortorder }}"
                                                aria-describedby="MapOrder{{ map.id }}"
                                                disabled required>
                                         <div class="invalid-feedback">Please provide an order.
@@ -95,13 +95,13 @@
                                             class="btn btn-danger"
                                             id='deleteMap{{ map.id }}'
                                             value="{{ map.id }}"
-                                            onclick="deleteEntry({{ map.id }}, '{{ map.name }}')"
+                                            onclick="deleteMap({{ map.id }}, '{{ map.name }}')"
                                             data-bs-toggle="modal"
                                             data-bs-target="#deleteModal">Delete
                                     </button>
                                     <button type="button" class="btn btn-secondary d-none"
                                             id='cancelMap{{ map.id }}'
-                                            onclick="changeEdit({{ map.id }}, false)">Cancel
+                                            onclick="changeMap({{ map.id }}, false)">Cancel
                                     </button>
 
                                     <button type="submit" class="btn btn-primary d-none"

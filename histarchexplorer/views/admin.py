@@ -18,7 +18,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     g.cursor.execute('SELECT * FROM tng.config ORDER BY name')
     config_data = g.cursor.fetchall()
 
-    g.cursor.execute('SELECT * FROM tng.maps ORDER BY name')
+    g.cursor.execute('SELECT * FROM tng.maps ORDER BY sortorder')
     map_data = g.cursor.fetchall()
 
     g.cursor.execute('SELECT * FROM tng.config_classes')
@@ -286,10 +286,10 @@ def reset():
             name         TEXT,
             display_name TEXT,
             tilestring   TEXT,
-            order_nr        INT   
+            sortorder     INT   
         );
         
-        INSERT INTO tng.maps (name, display_name, tilestring, order_nr) 
+        INSERT INTO tng.maps (name, display_name, tilestring, sortorder) 
             VALUES ('OpenStreetMap', 'Open Street Map', 'L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: "&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors"});', 1);
         
         CREATE TABLE IF NOT EXISTS tng.config
@@ -416,10 +416,11 @@ def sortlinks() -> str:
 
     data = request.get_json()
     criteria = data['criteria']
+    table = data['table']
 
     print(criteria)
     for row in criteria:
         print(row['order'])
-        g.cursor.execute('UPDATE tng.links SET sortorder = %(order)s  WHERE id = %(id)s',
-                         {'id': row['id'], 'order': row['order']})
+        g.cursor.execute(f'UPDATE tng.{table} SET sortorder = %(order)s  WHERE id = %(id)s',
+                         {'id': row['id'], 'order': row['order'], 'table':table})
     return jsonify({'status': 'ok'})

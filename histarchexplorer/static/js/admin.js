@@ -150,56 +150,57 @@ function saveLinkValues(button) {
 }
 
 
-document.addEventListener('DOMContentLoaded', function () {
-    var accordionContainer = document.getElementById('mapsAccordion');
+const accordionContainer = document.getElementById('mapsAccordion');
+new Sortable(accordionContainer, {
+    animation: 150,
+    handle: '.accordion-button', // Specify the handle for sorting
+    onEnd: function (evt) {
+        // This function runs when sorting is done
+        var items = Array.from(accordionContainer.getElementsByClassName('accordion-item'));
+       items.forEach((item, index) => {
+            item.setAttribute("data-order", index + 1);
+        });
 
-    new Sortable(accordionContainer, {
-        animation: 150,
-        handle: '.accordion-button', // Specify the handle for sorting
-        onEnd: function (evt) {
-            // This function runs when sorting is done
-            var items = Array.from(accordionContainer.getElementsByClassName('accordion-item'));
-            console.log('New order:', items.map(item => item.id));
-            // Optional: Save the new order in localStorage or any other storage
-        }
-    });
-
-
-    let linksSort = document.getElementById('nav-main-project-links');
-    console.log(linksSort)
-    let sortedItems= [];
-
-    new Sortable(linksSort, {
-        animation: 150,
-        handle: '.d-flex', // Specify the handle for sorting
-        onEnd: function (evt) {
-            const items = Array.from(linksSort.getElementsByClassName('d-flex'));
-             // Update order attribute based on visual sorting
-            items.forEach((item, index) => {
-                item.setAttribute("data-order", index + 1);
-            });
-
-            // Map items to array of objects with order and id
-            sortedItems = items.map(item => ({
-                order: item.getAttribute("data-order"),
-                id: item.getAttribute("data-id")
-            }));
-
-            console.log('New order:', sortedItems);
-            saveSortOrder(sortedItems)
-
-        }
-    });
-
+        // Map items to array of objects with order and id
+        let sortedItems = items.map(item => ({
+            order: item.getAttribute("data-order"),
+            id: item.getAttribute("data-id")
+        }));
+        saveSortOrder(sortedItems, 'maps')
+    }
 });
 
-function saveSortOrder(items) {
+
+const linksSort = document.getElementById('nav-main-project-links');
+let sortedItems = [];
+
+new Sortable(linksSort, {
+    animation: 150,
+    handle: '.d-flex', // Specify the handle for sorting
+    onEnd: function (evt) {
+        const items = Array.from(linksSort.getElementsByClassName('d-flex'));
+        // Update order attribute based on visual sorting
+        items.forEach((item, index) => {
+            item.setAttribute("data-order", index + 1);
+        });
+
+        // Map items to array of objects with order and id
+        let sortedItems = items.map(item => ({
+            order: item.getAttribute("data-order"),
+            id: item.getAttribute("data-id")
+        }));
+        saveSortOrder(sortedItems, 'links')
+    }
+});
+
+
+function saveSortOrder(items, table) {
     fetch('/sortlinks', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ criteria: items }),
+        body: JSON.stringify({criteria: items, table: table}),
     })
 }
 
