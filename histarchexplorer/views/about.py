@@ -52,11 +52,13 @@ def about() -> str:
         })
 
     persons_sql = """
-SELECT p.name, p.image, COALESCE(b.name, '') AS role
+SELECT p.name, p.image, COALESCE(b.name, '') AS role, COALESCE(a.name, '') AS affiliation, COALESCE(a.website, '') AS website
 FROM tng.links l
 JOIN tng.config p ON l.range_id = p.id
 JOIN tng.config_properties cp ON l.property = cp.id
 LEFT JOIN tng.config b ON l.attribute = b.id AND b.config_class = '3'
+LEFT JOIN tng.links la ON la.domain_id = p.id AND la.property = 2
+LEFT JOIN tng.config a ON la.range_id = a.id
 WHERE l.domain_id = (SELECT id FROM tng.config WHERE config_class = '5')
 AND p.config_class = '2'
 AND cp.id = 4
@@ -74,7 +76,9 @@ ORDER BY l.sortorder, l.id;
             persons[person_name] = {
                 'name': row[0],
                 'roles': [],
-                'image': row[1]
+                'image': row[1],
+                'affiliation': row[3],
+                'website': row[4]
             }
         persons[person_name]['roles'].append(row[2])
 

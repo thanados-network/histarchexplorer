@@ -3,7 +3,7 @@
 <div class="container">
     <div class="py-5">
         <h2>{{ _('Project') |upper }} <span class="text-body-secondary"> | {{project.name|upper}}</span></h2>
-        <p class = "mt-2"> {{project.description | replace("\n", "<br>") | safe }}
+        <p class="mt-2"> {{project.description | replace("\n", "<br>") | safe }}
         </p>
     </div>
     <div class="team-card">
@@ -23,6 +23,11 @@
                         {% for role in person.roles %}
                         <li>{{ role | capitalize_first }}</li>
                         {% endfor %}
+                        {% if person.affiliation %}
+                        <p>
+                            <a href="{{ person.website }}" target="_blank">{{ person.affiliation }}</a>
+                        </p>
+                        {% endif %}
                     </ul>
                 </div>
                 {% endfor %}
