@@ -270,6 +270,52 @@ def edit_entry():
     return redirect(url_for('admin') + current_tab + '/' + current_entry)
 
 
+
+@app.route('/edit_map', methods=['POST'])
+@login_required
+def edit_map():
+    if current_user.group not in ['admin', 'manager']:
+        abort(403)
+
+    name = request.form.get('name')
+    display_name = request.form.get('display_name')
+    order = request.form.get('order')
+    tilestring = request.form.get('tilestring')
+    current_tab = request.form.get('current_tab')
+    map_id = request.form.get('map_id')  # Assuming map_id is passed in the form
+
+    editsql = """
+        UPDATE tng.map SET
+            name = NULLIF(%(name)s, ''),
+            display_name = NULLIF(%(display_name)s, ''),
+            `order` = NULLIF(%(order)s, ''),  -- `order` is a reserved keyword, so use backticks
+            tilestring = NULLIF(%(tilestring)s, ''),
+            current_tab = NULLIF(%(current_tab)s, '')
+        WHERE id = %(map_id)s
+    """
+
+    try:
+        g.cursor.execute('SELECT id FROM tng.map WHERE id = %(map_id)s', {'map_id': map_id})
+        result = g.cursor.fetchone()
+        if result:
+            g.cursor.execute(editsql, {
+                'name': name,
+                'display_name': display_name,
+                'order': order,
+                'tilestring': tilestring,
+                'current_tab': current_tab,
+                'map_id': map_id
+            })
+            flash(f'Map updated successfully', 'success')
+        else:
+            flash(f'Error updating map {map_id}', 'danger')
+    except Exception as e:
+        flash(f'Error updating map {map_id}: {str(e)}', 'danger')
+
+    return redirect(url_for('admin') + current_tab + '/' + name)
+
+
+
 @app.route('/reset')
 @login_required
 def reset():

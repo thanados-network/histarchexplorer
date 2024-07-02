@@ -20,12 +20,26 @@ function toggleButtons(entryId, isEditing) {
     });
 }
 
+function toggleMapButtons(mapId, isEditing) {
+    ['editMap', 'deleteMap', 'saveMap', 'cancelMap'].forEach(action => {
+        document.getElementById(`${action}${mapId}`).classList.toggle(
+            'd-none',
+            action === 'editMap' || action === 'deleteMap' ? isEditing : !isEditing
+        );
+    });
+}
+
 function changeEdit(entryId, enabled) {
     const form = document.getElementById(`form${entryId}`);
     toggleFields(form, enabled);
     toggleButtons(entryId, enabled);
 }
 
+function editMap(mapId, enabled) {
+    const form = document.getElementById(`mapForm${mapId}`);
+    toggleFields(form, enabled);
+    toggleMapButtons(mapId, enabled);
+}
 
 function addEntry(category) {
     const hiddenField = document.getElementById('currentTab');
