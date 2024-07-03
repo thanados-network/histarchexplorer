@@ -125,9 +125,14 @@ FROM tng.links l
          ORDER BY sortorder
     """)
     links_data = g.cursor.fetchall()
+    map_id = request.args.get('map_id')
+
+    if map_id:
+        g.cursor.execute('SELECT * FROM tng.maps WHERE id = %s', (map_id,))
+        map_data = g.cursor.fetchone()
 
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry,
-                           links_data=links_data, config_properties=config_properties, maps=map_data)
+                           links_data=links_data, config_properties=config_properties, maps=map_data, map=map)
 
 
 @app.route('/admin/add_entry', methods=['POST'])
@@ -310,6 +315,35 @@ def edit_map():
     except Exception as e:
         flash(f'Error updating map {map_id}: {str(e)}', 'danger')
 
+    return redirect(url_for('admin'))
+
+@app.route('/admin/add_map', methods=['POST'])
+@login_required
+def add_map():
+    if current_user.group not in ['admin', 'manager']:
+        abort(403)
+
+    name = request.form.get('name')
+    displayname = request.form.get('displayname')
+    inputorder = request.form.get('inputorder')
+    description = request.form.get('description')
+
+    try:
+        g.cursor.execute('''
+            INSERT INTO tng.maps (name, display_name, sortorder, tilestring)
+            VALUES (%s, %s, %s, %s) RETURNING id
+        ''', (name, displayname, inputorder, description))
+
+        new_map_id = g.cursor.fetchone()[0]
+
+        flash('Map added successfully!', 'success')
+        return redirect(url_for('admin') + '/maps/' + str(new_map_id))
+
+    except Exception as e:
+        flash(f'Error adding map {name}: {str(e)}', 'danger')
+        return redirect(url_for('admin') + '/maps')
+
+    # This line should not be reached due to the redirects in try and except blocks
     return redirect(url_for('admin'))
 
 

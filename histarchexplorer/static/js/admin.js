@@ -41,6 +41,11 @@ function editMap(mapId, enabled) {
     toggleMapButtons(mapId, enabled);
 }
 
+function addMap() {
+    const modal = new bootstrap.Modal(document.getElementById('addMapModal'));
+    modal.show();
+}
+
 function addEntry(category) {
     const hiddenField = document.getElementById('currentTab');
     hiddenField.value = category.replace('nav-', '');

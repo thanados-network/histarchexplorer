@@ -118,7 +118,7 @@
                 {% endfor %}
             </div>
             <button class="btn btn-primary m-2 float-end"
-                    onclick="addEntry('map')">
+                    onclick="addMap('map')">
                 Add entry
             </button>
         </div>
@@ -435,6 +435,50 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal for Add Map Form -->
+<div class="modal fade" id="addMapModal" tabindex="-1" aria-labelledby="addMapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addMapModalLabel">Add Map</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('add_map') }}" class="needs-validation" novalidate>
+                    <input type="hidden" name="map_id" value="{{ map.id }}">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label for="InputName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="InputName" name="name" required>
+                            <div class="invalid-feedback">Please provide a name.</div>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="InputDispName" class="form-label">Display Name</label>
+                            <input type="text" class="form-control" id="InputDispName" name="displayname" required>
+                            <div class="invalid-feedback">Please provide a display name.</div>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="InputOrder" class="form-label">Order</label>
+                            <input type="text" class="form-control" id="InputOrder" name="inputorder" required>
+                            <div class="invalid-feedback">Please provide an order.</div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <label for="InputDescription" class="form-label">Leaflet Tile Layer String</label>
+                            <textarea class="form-control" id="InputDescription" name="description"></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <button type="submit" class="btn btn-primary">Add Map</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
         <!-- Modal for Add Entry Form -->
         <div class="modal fade" id="addEntryModal" tabindex="-1" aria-labelledby="addEntryModalLabel"
