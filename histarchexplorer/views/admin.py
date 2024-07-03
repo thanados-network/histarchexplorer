@@ -309,11 +309,11 @@ def edit_map():
                 'tilestring': tilestring,
                 'map_id': map_id
             })
-            flash(f'Map updated successfully', 'success')
+            flash(f'Map updated successfully', 'map success')
         else:
-            flash(f'Error updating map {map_id}', 'danger')
+            flash(f'Error updating map {map_id}', 'map danger')
     except Exception as e:
-        flash(f'Error updating map {map_id}: {str(e)}', 'danger')
+        flash(f'Error updating map {map_id}: {str(e)}', 'map danger')
 
     return redirect(url_for('admin'))
 
@@ -336,11 +336,11 @@ def add_map():
 
         new_map_id = g.cursor.fetchone()[0]
 
-        flash('Map added successfully!', 'success')
+        flash('Map added successfully!', 'map success')
         return redirect(url_for('admin') + '/maps/' + str(new_map_id))
 
     except Exception as e:
-        flash(f'Error adding map {name}: {str(e)}', 'danger')
+        flash(f'Error adding map {name}: {str(e)}', 'map danger')
         return redirect(url_for('admin') + '/maps')
 
     # This line should not be reached due to the redirects in try and except blocks
