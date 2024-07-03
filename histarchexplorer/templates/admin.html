@@ -445,6 +445,7 @@
 
         </div>
 
+
         <div class="modal" id="deleteModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -578,7 +579,26 @@
             </div>
         </div>
     </div>
+
+    <form method="POST" action="/process_selection">
+        <div class="card mt-5 mb-5">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('Index Page Options') | upper }}</h5>
+                <div class="form-group">
+                    <label for="selection">Select Map Background</label>
+                    <select class="form-control" id="selectMap" name="selection">
+                        <option value="default_image">Default Image</option>
+                        {% for map in maps %}
+                        <option value="{{ map.id }}">{{ map.display_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary m-2 float-end">Submit</button>
+            </div>
+        </div>
+    </form>
 </div>
+
 
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
