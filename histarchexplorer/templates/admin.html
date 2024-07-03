@@ -589,7 +589,7 @@
                     <select class="form-control" id="selectMap" name="selection">
                         <option value="default_image">Default Image</option>
                         {% for map in maps %}
-                        <option value="{{ map.id }}">{{ map.display_name }}</option>
+                        <option value="{{ map.id }}" data-tilestring="{{ map.tilestring }}">{{ map.display_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
