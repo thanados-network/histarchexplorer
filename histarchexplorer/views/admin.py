@@ -376,12 +376,15 @@ def choose_index_bg():
     if selected_map_id == 'default_image':
         selected_map = default_image
     else:
-        selected_map = next((map.tilestring for map in maps if map.id == selected_map_id), None)
-        if not selected_map:
+        try:
+            selected_map_id_int = int(selected_map_id)
+            selected_map = next((map.tilestring for map in maps if map.id == selected_map_id_int), None)
+            if not selected_map:
+                selected_map = default_image
+        except ValueError:
             selected_map = default_image
 
     session['selected_map'] = selected_map
-    print(f"Selected Map ID: {selected_map_id}")
 
     return redirect(url_for('index'))
 

@@ -1,12 +1,25 @@
-const map = L.map('map', {
-    zoom: 13,
-    zoomControl: false,
-    scrollWheelZoom: false,
-    doubleClickZoom: false,
-    dragging: false,
-    tap: false
-}).setView([47.5162, 14.5501], 7);
+function renderMap(selected_map) {
+    const default_image = '/../static/images/index_map_bg/Blank_map_of_Europe_central_network.png';
+    const mapContainer = document.getElementById('map');
+    const indexImageContainer = document.getElementById('index-image');
 
-const Esri_WorldGrayCanvas = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {});
+    if (!selected_map || selected_map === default_image) {
+        mapContainer.style.display = 'none';
+        indexImageContainer.style.display = 'block';
+    } else {
+        const map = L.map('map', {
+            zoom: 13,
+            zoomControl: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            dragging: false,
+            tap: false
+        }).setView([47.5162, 14.5501], 7);
 
-Esri_WorldGrayCanvas.addTo(map);
+        const tileLayer = L.tileLayer(selected_map, {});
+        tileLayer.addTo(map);
+
+        mapContainer.style.display = 'block';
+        indexImageContainer.style.display = 'none';
+    }
+}

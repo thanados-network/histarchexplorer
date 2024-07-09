@@ -10,7 +10,7 @@ from histarchexplorer import app
 @app.route('/')
 def index():
     default_image = '/../static/images/index_map_bg/Blank_map_of_Europe_central_network.png'
-    selected_map = session.get('selected_map', default_image)
+    selected_map = session.get('selected_map')
 
     g.cursor.execute('SELECT id, display_name, tilestring FROM tng.maps ORDER BY sortorder')
     maps = g.cursor.fetchall()

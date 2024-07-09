@@ -7,7 +7,6 @@
 <!-- Leaflet JavaScript -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-
 <div id="index-container">
     <div id="index-image"></div>
     <div id="map" class="map-gray"></div>
@@ -42,4 +41,10 @@
 
 <!-- Custom JavaScript -->
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script type="text/javascript"  >
+    document.addEventListener("DOMContentLoaded", function() {
+        const selected_map = '{{ selected_map }}'
+        renderMap(selected_map)
+    })
+</script>
 {% endblock %}
