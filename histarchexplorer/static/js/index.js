@@ -7,6 +7,10 @@ function renderMap(selected_map) {
         mapContainer.style.display = 'none';
         indexImageContainer.style.display = 'block';
     } else {
+        // Ensure the map container is displayed before initializing the map
+        mapContainer.style.display = 'block';
+        indexImageContainer.style.display = 'none';
+
         const map = L.map('map', {
             zoom: 13,
             zoomControl: false,
@@ -19,7 +23,6 @@ function renderMap(selected_map) {
         const chosenMap = L.tileLayer(selected_map);
         chosenMap.addTo(map);
 
-        mapContainer.style.display = 'block';
-        indexImageContainer.style.display = 'none';
+            map.invalidateSize();
     }
 }
