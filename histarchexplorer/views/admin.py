@@ -131,8 +131,19 @@ FROM tng.links l
         g.cursor.execute('SELECT * FROM tng.maps WHERE id = %s', (map_id,))
         map_data = g.cursor.fetchone()
 
+    g.cursor.execute('SELECT index_img, index_map, img_map FROM tng.settings LIMIT 1' )
+    data = g.cursor.fetchone()
+    settings = {}
+    settings['img'] = data.index_img
+    settings['map'] = data.index_map
+    settings['img_map'] = data.img_map
+    if data.img_map == 'image':
+        settings['not_sel'] = 'map'
+    else:
+        settings['not_sel'] = 'image'
+
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry,
-                           links_data=links_data, config_properties=config_properties, maps=map_data, map=map)
+                           links_data=links_data, config_properties=config_properties, maps=map_data, map=map, settings=settings)
 
 
 @app.route('/admin/add_entry', methods=['POST'])
@@ -366,27 +377,14 @@ def delete_map(map_id: int) -> str:
 
 @app.route('/choose_indexBg', methods=['POST'])
 def choose_index_bg():
-    default_image = '/../static/images/index_map_bg/Blank_map_of_Europe_central_network.png'
-    selected_map_id = request.form.get('mapSelection')
+    g.cursor.execute('DELETE FROM tng.settings')
 
-    # Fetch maps from database
-    g.cursor.execute('SELECT id, display_name, tilestring FROM tng.maps ORDER BY sortorder')
-    maps = g.cursor.fetchall()
+    map_id = request.form.get('mapselection')
+    default_img = request.form.get('default_img')
+    map_img = request.form.get('imgmap')
 
-    if selected_map_id == 'default_image':
-        selected_map = default_image
-    else:
-        try:
-            selected_map_id_int = int(selected_map_id)
-            selected_map = next((map.tilestring for map in maps if map.id == selected_map_id_int), None)
-            if not selected_map:
-                selected_map = default_image
-        except ValueError:
-            selected_map = default_image
-
-    session['selected_map'] = selected_map
-
-    return redirect(url_for('index'))
+    g.cursor.execute(f'INSERT INTO tng.settings (index_map, index_img, img_map) VALUES ({map_id}, \'{default_img}\', \'{map_img}\')')
+    return redirect(url_for('admin'))
 
 
 
@@ -522,6 +520,20 @@ def reset():
         INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('NHM', (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, NULL);
         INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('University of Vienna', (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, NULL);
         INSERT INTO tng.config (name, config_class, description, address, email, website) VALUES ('Austrian Centre for Digital Humanities & Cultural Heritage', (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, NULL);
+        
+        CREATE TABLE IF NOT EXISTS tng.settings
+        (
+            id        SERIAL PRIMARY KEY,
+            index_img TEXT,
+            index_map INT,
+            img_map   TEXT
+        );
+
+        INSERT INTO tng.settings (index_img, index_map, img_map)
+        VALUES ('/static/images/index_map_bg/Blank_map_of_Europe_central_network.png',
+                1,
+                'image')
+        
     ''')
 
     return redirect(url_for('admin'))

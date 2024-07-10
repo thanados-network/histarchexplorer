@@ -9,17 +9,13 @@ from histarchexplorer import app
 
 @app.route('/')
 def index():
-    default_image = '/../static/images/index_map_bg/Blank_map_of_Europe_central_network.png'
-    selected_map = session.get('selected_map')
+    g.cursor.execute('SELECT index_img, index_map, img_map FROM tng.settings LIMIT 1')
+    data = g.cursor.fetchone()
 
-    g.cursor.execute('SELECT id, display_name, tilestring FROM tng.maps ORDER BY sortorder')
-    maps = g.cursor.fetchall()
+    g.cursor.execute(f'SELECT tilestring FROM tng.maps WHERE id={data.index_map}')
+    map = g.cursor.fetchone()
 
-    print(f"default_image: {default_image}")
-    print(f"selected_map: {selected_map}")
-    print(f"maps: {maps}")
-
-    return render_template('index.html', default_image=default_image, selected_map=selected_map, maps=maps)
+    return render_template('index.html', map=map.tilestring, img=data.index_img, img_map=data.img_map)
 
 @app.route('/entities')
 def entities() -> str:

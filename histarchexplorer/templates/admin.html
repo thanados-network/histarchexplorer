@@ -1,604 +1,616 @@
 {% extends "layout.html" %}
 {% block content %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
-<div class="container py-5 en">
-    <h3>{{ _('Admin options') |upper }} <span class="text-body-secondary"> | DB Interface</span></h3>
+    <div class="container py-5 en">
+        <h3>{{ _('Admin options') |upper }} <span class="text-body-secondary"> | DB Interface</span></h3>
 
-    <div class="card mt-5 mb-5">
-        <div class="card-body">
-            <h5 class="card-title">{{ _('Tools') |upper }}</h5>
-            <div class="button-card">
-                <button id="resetButton" class="btn btn-danger">Reset</button>
+        <div class="card mt-5 mb-5">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('Tools') |upper }}</h5>
+                <div class="button-card">
+                    <button id="resetButton" class="btn btn-danger">Reset</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="card mt-5 mb-5">
-        <div class="card-body">
-            <h5 class="card-title">{{ _('Maps') |upper }}</h5>
-            {% with map_success_messages = get_flashed_messages(category_filter=["map success"], with_categories=true)
-            %}
-            {% if map_success_messages %}
-            <div class="flash-messages mt-5 mb-5">
-                {% for category, message in map_success_messages %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="card mt-5 mb-5">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('Maps') |upper }}</h5>
+                {% with map_success_messages = get_flashed_messages(category_filter=["map success"], with_categories=true) %}
+                    {% if map_success_messages %}
+                        <div class="flash-messages mt-5 mb-5">
+                            {% for category, message in map_success_messages %}
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                            aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                {% with map_error_messages = get_flashed_messages(category_filter=["map danger"], with_categories=true) %}
+                    {% if map_error_messages %}
+                        <div class="flash-messages mt-5 mb-5">
+                            {% for category, message in map_error_messages %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                            aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <div class="accordion" id="mapsAccordion">
+                    {% for map in maps %}
+
+                        <div class="accordion-item" id="mapItem-{{ map.id }}" data-id="{{ map.id }}"
+                             data-order="{{ map.sortorder }}">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed"
+                                        type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#map{{ map.id }}"
+                                        aria-expanded="false"
+                                        aria-controls="map{{ map.id }}">
+                                    {{ map.display_name }}
+                                </button>
+                            </h2>
+                            <div id="map{{ map.id }}"
+                                 class="accordion-collapse collapse"
+                                 data-bs-parent="#mapsAccordion">
+                                <div class="accordion-body">
+                                    <form method="POST" action="{{ url_for('edit_map') }}"
+                                          class="projectForm needs-validation" id="mapForm{{ map.id }}"
+                                          novalidate>
+                                        <input type="hidden" name="map_id" value="{{ map.id }}">
+                                        <div class="row needs-validation">
+                                            <div class="col-md-6">
+                                                <label for="InputName{{ map.id }}" class="form-label">
+                                                    Name</label>
+                                                <input type="text" class="form-control"
+                                                       id="InputName{{ map.id }}"
+                                                       name="name" value="{{ map.name or '' }}"
+                                                       aria-describedby="NameHelp{{ map.id }}"
+                                                       disabled required>
+                                                <div class="invalid-feedback">Please provide a name.
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="InputDispName{{ map.id }}" class="form-label">
+                                                    Display Name</label>
+                                                <input type="text" class="form-control"
+                                                       id="InputDispName{{ map.id }}"
+                                                       name="displayname" value="{{ map.display_name or '' }}"
+                                                       aria-describedby="DispNameHelp{{ map.id }}"
+                                                       disabled required>
+                                                <div class="invalid-feedback">Please provide a name.
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 d-none">
+                                                <label for="InputOrder{{ map.id }}" class="form-label">
+                                                    Order</label>
+                                                <input type="text" class="form-control"
+                                                       id="InputOrder{{ map.id }}"
+                                                       name="inputorder" value="{{ map.sortorder }}"
+                                                       aria-describedby="MapOrder{{ map.id }}"
+                                                       disabled required>
+                                                <div class="invalid-feedback">Please provide an order.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-4">
+                                            <div class="col-12">
+                                                <label for="InputDescription{{ map.id }}"
+                                                       class="form-label">Leaflet Tile Layer String</label>
+                                                <textarea class="form-control"
+                                                          id="InputDescription{{ map.id }}"
+                                                          name="description"
+                                                          aria-describedby="descriptionHelp{{ map.id }}"
+                                                          disabled>{{ map.tilestring or '' }}</textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-3 text-end">
+                                            <button type="button" class="btn btn-primary"
+                                                    id='editMap{{ map.id }}'
+                                                    onclick="editMap({{ map.id }}, true)">Edit
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-danger"
+                                                    id='deleteMap{{ map.id }}'
+                                                    value="{{ map.id }}"
+                                                    onclick="deleteMap({{ map.id }}, '{{ map.name }}')"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal">Delete
+                                            </button>
+                                            <button type="button" class="btn btn-secondary d-none"
+                                                    id='cancelMap{{ map.id }}'
+                                                    onclick="editMap({{ map.id }}, false)">Cancel
+                                            </button>
+
+                                            <button type="submit" class="btn btn-primary d-none"
+                                                    id='saveMap{{ map.id }}'
+                                                    value="{{ map.id }}">Save
+                                            </button>
+
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    {% endfor %}
                 </div>
-                {% endfor %}
+                <button class="btn btn-primary m-2 float-end"
+                        onclick="addMap('map')">
+                    Add entry
+                </button>
             </div>
-            {% endif %}
-            {% endwith %}
+        </div>
 
-            {% with map_error_messages = get_flashed_messages(category_filter=["map danger"], with_categories=true) %}
-            {% if map_error_messages %}
-            <div class="flash-messages mt-5 mb-5">
-                {% for category, message in map_error_messages %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+        <div class="card mt-5 mb-5">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('About Section content') |upper }}</h5>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-messages mt-5 mb-5">
+                            {% for category, message in messages %}
+                                {% if category in ["success", "danger"] %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+
+                <nav>
+                    <div class="nav nav-pills mt-3 mb-2" id="nav-tab" role="tablist">
+                        {% for tab in tabs %}
+                            <button class="nav-link{% if loop.first and not activetab %} active{% endif %} {% if activetab == tab.target %} active {% endif %}"
+                                    id="{{ tab.id }}" data-bs-toggle="tab"
+                                    data-bs-target="#{{ tab.target }}" type="button" role="tab"
+                                    aria-controls="{{ tab.target }}"
+                                    aria-selected="{{ 'true' if loop.first else 'false' }}">
+                                {{ tab.label | upper }}
+                            </button>
+                        {% endfor %}
+                    </div>
+                </nav>
+                <div class="tab-content" id="nav-tabContent">
+                    {% for tab in tabs %}
+                        <div class="tab-pane fade{% if loop.first and not activetab %} show active{% endif %} {% if activetab == tab.target %} show active {% endif %}"
+                             id="{{ tab.target }}" role="tabpanel"
+                             aria-labelledby="{{ tab.id }}" tabindex="0">
+                            <div class="accordion" id="{{ tab.label }}accordion">
+                                {% for entry in config_data %}
+                                    {% if entry.config_class in tab.filter %}
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button {% if activeentry != tab.target + entry.id|string %}collapsed{% endif %}"
+                                                        type="button" data-bs-toggle="collapse"
+                                                        data-bs-target="#{{ tab.target }}{{ entry.id }}"
+                                                        aria-expanded="{{ ((tab.target + entry.id|string == activeentry)|string)|lower }}"
+                                                        aria-controls="{{ tab.target }}{{ entry.id }}">
+                                                    {{ entry.name }}
+                                                </button>
+                                            </h2>
+                                            <div id="{{ tab.target }}{{ entry.id }}"
+                                                 class="accordion-collapse collapse {% if activeentry == tab.target + entry.id|string %} show {% endif %}"
+                                                 data-bs-parent="#{{ tab.label }}accordion">
+                                                <div class="accordion-body">
+                                                    <form method="POST" action="{{ url_for('edit_entry') }}"
+                                                          class="projectForm needs-validation" id="form{{ entry.id }}"
+                                                          novalidate>
+                                                        <input type="hidden" name="config_id" value="{{ entry.id }}">
+                                                        <input type="hidden" name="current_tab"
+                                                               value="{{ tab.target }}">
+                                                        <input type="hidden" name="current_entry"
+                                                               value="{{ tab.target + entry.id|string }}">
+
+                                                        <div class="row needs-validation">
+                                                            <div class="col-md-6">
+                                                                <label for="InputName{{ entry.id }}" class="form-label">
+                                                                    Name</label>
+                                                                <input type="text" class="form-control"
+                                                                       id="InputName{{ entry.id }}"
+                                                                       name="name" value="{{ entry.name or '' }}"
+                                                                       aria-describedby="NameHelp{{ entry.id }}"
+                                                                       disabled required>
+                                                                <div class="invalid-feedback">Please provide a name.
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <label for="InputDescription{{ entry.id }}"
+                                                                       class="form-label">Description</label>
+                                                                <textarea class="form-control"
+                                                                          id="InputDescription{{ entry.id }}"
+                                                                          name="description"
+                                                                          aria-describedby="descriptionHelp{{ entry.id }}"
+                                                                          disabled>{{ entry.description or '' }}</textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row needs-validation mt-4">
+                                                            {% if tab.target == 'nav-institutions' %}
+                                                                <div class="col-lg col-md-12">
+                                                                    <label for="InputAddress{{ entry.id }}"
+                                                                           class="form-label">Address</label>
+                                                                    <textarea class="form-control"
+                                                                              id="InputAddress{{ entry.id }}"
+                                                                              name="address"
+                                                                              aria-describedby="addressHelp{{ entry.id }}"
+                                                                              disabled>{{ entry.address or '' }}</textarea>
+                                                                    <div class="invalid-feedback">Please provide an
+                                                                        address.
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
+
+                                                            {% if tab.target in ['nav-institutions', 'nav-persons'] %}
+                                                                <div class="col-lg col-md-12">
+                                                                    <label for="InputMail{{ entry.id }}"
+                                                                           class="form-label">E-mail</label>
+                                                                    <input type="email" class="form-control"
+                                                                           id="InputMail{{ entry.id }}"
+                                                                           name="mail"
+                                                                           value="{{ entry.email or '' }}"
+                                                                           aria-describedby="mailHelp{{ entry.id }}"
+                                                                           disabled>
+                                                                    <div class="invalid-feedback">Please provide a valid
+                                                                        email-address: someone@somemail.com
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
+
+                                                            {% if tab.target in ['nav-main-project', 'nav-projects', 'nav-institutions'] %}
+                                                                <div class="col-lg col-md-12">
+                                                                    <label for="InputWebsite{{ entry.id }}"
+                                                                           class="form-label">Website</label>
+                                                                    <input type="url" class="form-control"
+                                                                           id="InputWebsite{{ entry.id }}"
+                                                                           name="website"
+                                                                           value="{{ entry.website or '' }}"
+                                                                           aria-describedby="websiteHelp{{ entry.id }}"
+                                                                           disabled>
+                                                                    <div class="invalid-feedback">Please provide a valid
+                                                                        website url: https://someurl.com
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
+
+                                                            {% if tab.target == 'nav-persons' %}
+                                                                <div class="col-lg col-md-12">
+                                                                    <label for="InputOrcid{{ entry.id }}"
+                                                                           class="form-label">ORCID-ID</label>
+                                                                    <input type="text" class="form-control"
+                                                                           id="InputOrcid{{ entry.id }}" name="orcid"
+                                                                           value="{{ entry.orcid_id or '' }}"
+                                                                           aria-describedby="orcidHelp{{ entry.id }}"
+                                                                           disabled>
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+
+                                                        {% if tab.target == 'nav-main-project' %}
+                                                            <div class="row needs-validation mt-4">
+                                                                <div class="col-md-6">
+                                                                    <label for="Imprint{{ entry.id }}"
+                                                                           class="form-label">Imprint</label>
+                                                                    <textarea class="form-control"
+                                                                              id="Imprint{{ entry.id }}" name="imprint"
+                                                                              aria-describedby="imprint{{ entry.id }}"
+                                                                              disabled>{{ entry.imprint or '' }}</textarea>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <label for="legalNotice{{ entry.id }}"
+                                                                           class="form-label">Legal Notice</label>
+                                                                    <textarea class="form-control"
+                                                                              id="legalNotice{{ entry.id }}"
+                                                                              name="legalnotice"
+                                                                              aria-describedby="legalnotice{{ entry.id }}"
+                                                                              disabled>{{ entry.legal_notice or '' }}</textarea>
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
+
+
+                                                        <div class="mt-3 text-end">
+                                                            <button type="button" class="btn btn-primary"
+                                                                    id='edit{{ entry.id }}'
+                                                                    onclick="changeEdit({{ entry.id }}, true)">Edit
+                                                            </button>
+                                                            <button type="button"
+                                                                    class="btn btn-danger{% if tab.id == 5 %} d-none-at-all{% endif %}"
+                                                                    id='delete{{ entry.id }}'
+                                                                    value="{{ entry.id }}"
+                                                                    onclick="deleteEntry({{ entry.id }}, '{{ entry.name }}', '{{ tab.target }}')"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#deleteModal">Delete
+                                                            </button>
+                                                            <button type="button" class="btn btn-secondary d-none"
+                                                                    id='cancel{{ entry.id }}'
+                                                                    onclick="changeEdit({{ entry.id }}, false)">Cancel
+                                                            </button>
+
+                                                            <button type="submit" class="btn btn-primary d-none"
+                                                                    id='save{{ entry.id }}'
+                                                                    value="{{ entry.id }}">Save
+                                                            </button>
+
+                                                        </div>
+                                                    </form>
+
+                                                    {% if tab.id != 3 %}
+                                                        <hr>
+                                                        <div id="{{ tab.target }}-links">
+                                                            {% for link in links_data %}
+                                                                {% if link.start_id == entry.id %}
+
+                                                                    <div class="d-flex mb-2"
+                                                                         data-order="{{ link.sortorder }}"
+                                                                         data-id="{{ link.link_id }}">
+                                                                        <i title="moveUpDown"
+                                                                           class="bi bi-arrow-down-up mt-2 me-2"></i>
+                                                                        <input type="text" class="form-control me-2"
+                                                                               disabled
+                                                                               value="{{ link.config_property }}">
+                                                                        <input type="text" class="form-control me-2"
+                                                                               disabled
+                                                                               value="{{ link.end_name }}">
+                                                                        <input type="text" class="form-control me-2"
+                                                                               disabled
+                                                                               value="{{ link.role }}">
+                                                                        <button class="btn btn-danger"
+                                                                                id='delete{{ link.id }}'
+                                                                                onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name }}', '{{ link.config_property }}', '{{ link.end_name }}', '{{ tab.target }}', '{{ tab.target + entry.id|string }}', )"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#deleteModal"
+                                                                                style="min-width: 75px">Delete
+                                                                        </button>
+                                                                    </div>
+
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </div>
+
+
+                                                        <div class="d-flex mb-2">
+                                                            <select class="link-type form-select me-2 connection-select ms-4"
+                                                                    aria-label="Select connection">
+                                                                <option selected>Select connection</option>
+                                                                {% for row in config_properties %}
+                                                                    {% if tab.id == row.domain %}
+                                                                        <option data-range="{{ row.range }}"
+                                                                                data-direction="{{ row.direction }}"
+                                                                                data-entry="{{ entry.id }}"
+                                                                                value="{{ row.id }}">{{ row.name }}
+                                                                        </option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                            <select class="link-target form-select me-2 connection-select"
+                                                                    aria-label="Select node" disabled>
+                                                                <option selected>Select node</option>
+                                                                {% for row in config_data %}
+                                                                    <option class="config-class-{{ row.config_class }} d-none"
+                                                                            data-classId="{{ row.id }}"
+                                                                            value="{{ row.id }}">{{ row.name }}
+                                                                    </option>
+                                                                {% endfor %}
+                                                            </select>
+                                                            <select class="link-role form-select me-2 connection-select"
+                                                                    aria-label="Select role" disabled>
+                                                                <option selected>Select role</option>
+                                                                <option value="0">not specified</option>
+                                                                {% for row in config_data %}
+                                                                    {% if row.config_class == 3 %}
+                                                                        <option value="{{ row.id }}">{{ row.name }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                            <button data-domain="" data-range="" data-property=""
+                                                                    data-direction="" data-role=""
+                                                                    data-tab="{{ tab.target }}"
+                                                                    data-entry="{{ tab.target }}{{ entry.id }}"
+                                                                    class="btn btn-primary"
+                                                                    onclick="saveLinkValues(this)"
+                                                                    style="min-width: 75px" disabled>
+                                                                Save
+                                                            </button>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% if tab.id != 5 %}
+                                <button class="btn btn-primary m-2 float-end"
+                                        onclick="addEntry('{{ tab.target|string }}')">
+                                    Add entry
+                                </button>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+
             </div>
-            {% endif %}
-            {% endwith %}
 
-            <div class="accordion" id="mapsAccordion">
-                {% for map in maps %}
 
-                <div class="accordion-item" id="mapItem-{{ map.id }}" data-id="{{ map.id }}"
-                     data-order="{{ map.sortorder }}">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed"
-                                type="button" data-bs-toggle="collapse"
-                                data-bs-target="#map{{ map.id }}"
-                                aria-expanded="false"
-                                aria-controls="map{{ map.id }}">
-                            {{ map.display_name }}
-                        </button>
-                    </h2>
-                    <div id="map{{ map.id }}"
-                         class="accordion-collapse collapse"
-                         data-bs-parent="#mapsAccordion">
-                        <div class="accordion-body">
-                            <form method="POST" action="{{ url_for('edit_map') }}"
-                                  class="projectForm needs-validation" id="mapForm{{ map.id }}"
-                                  novalidate>
+            <div class="modal" id="deleteModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirm Delete</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete "<span id="deleteName"></span>"?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <a id="confirmedDelete" type="button" href="#" class="btn btn-primary">Confirm Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal for Add Map Form -->
+            <div class="modal fade" id="addMapModal" tabindex="-1" aria-labelledby="addMapModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addMapModalLabel">Add Map</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="{{ url_for('add_map') }}" class="needs-validation" novalidate>
                                 <input type="hidden" name="map_id" value="{{ map.id }}">
-                                <div class="row needs-validation">
-                                    <div class="col-md-5">
-                                        <label for="InputName{{ map.id }}" class="form-label">
-                                            Name</label>
-                                        <input type="text" class="form-control"
-                                               id="InputName{{ map.id }}"
-                                               name="name" value="{{ map.name or '' }}"
-                                               aria-describedby="NameHelp{{ map.id }}"
-                                               disabled required>
-                                        <div class="invalid-feedback">Please provide a name.
-                                        </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="InputName" class="form-label">Name</label>
+                                        <input type="text" class="form-control" id="InputName" name="name" required>
+                                        <div class="invalid-feedback">Please provide a name.</div>
                                     </div>
-                                    <div class="col-md-5">
-                                        <label for="InputDispName{{ map.id }}" class="form-label">
-                                            Display Name</label>
-                                        <input type="text" class="form-control"
-                                               id="InputDispName{{ map.id }}"
-                                               name="displayname" value="{{ map.display_name or '' }}"
-                                               aria-describedby="DispNameHelp{{ map.id }}"
-                                               disabled required>
-                                        <div class="invalid-feedback">Please provide a name.
-                                        </div>
+                                    <div class="col-md-6">
+                                        <label for="InputDispName" class="form-label">Display Name</label>
+                                        <input type="text" class="form-control" id="InputDispName" name="displayname"
+                                               required>
+                                        <div class="invalid-feedback">Please provide a display name.</div>
                                     </div>
-                                    <div class="col-md-2">
-                                        <label for="InputOrder{{ map.id }}" class="form-label">
-                                            Order</label>
-                                        <input type="text" class="form-control"
-                                               id="InputOrder{{ map.id }}"
-                                               name="inputorder" value="{{ map.sortorder }}"
-                                               aria-describedby="MapOrder{{ map.id }}"
-                                               disabled required>
-                                        <div class="invalid-feedback">Please provide an order.
-                                        </div>
+                                    <div class="col-md-2 d-none">
+                                        <label for="InputOrder" class="form-label">Order</label>
+                                        <input type="text" class="form-control" id="InputOrder" name="inputorder"
+                                               value="{{ maps|length  + 1 }}" required>
+                                        <div class="invalid-feedback">Please provide an order.</div>
                                     </div>
                                 </div>
                                 <div class="row mt-4">
                                     <div class="col-12">
-                                        <label for="InputDescription{{ map.id }}"
-                                               class="form-label">Leaflet Tile Layer String</label>
-                                        <textarea class="form-control"
-                                                  id="InputDescription{{ map.id }}"
-                                                  name="description"
-                                                  aria-describedby="descriptionHelp{{ map.id }}"
-                                                  disabled>{{ map.tilestring or '' }}</textarea>
+                                        <label for="InputDescription" class="form-label">Leaflet Tile Layer
+                                            String</label>
+                                        <textarea class="form-control" id="InputDescription"
+                                                  name="description"></textarea>
                                     </div>
                                 </div>
-
                                 <div class="mt-3 text-end">
-                                    <button type="button" class="btn btn-primary"
-                                            id='editMap{{ map.id }}'
-                                            onclick="editMap({{ map.id }}, true)">Edit
-                                    </button>
-                                    <button type="button"
-                                            class="btn btn-danger"
-                                            id='deleteMap{{ map.id }}'
-                                            value="{{ map.id }}"
-                                            onclick="deleteMap({{ map.id }}, '{{ map.name }}')"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#deleteModal">Delete
-                                    </button>
-                                    <button type="button" class="btn btn-secondary d-none"
-                                            id='cancelMap{{ map.id }}'
-                                            onclick="editMap({{ map.id }}, false)">Cancel
-                                    </button>
-
-                                    <button type="submit" class="btn btn-primary d-none"
-                                            id='saveMap{{ map.id }}'
-                                            value="{{ map.id }}">Save
-                                    </button>
-
+                                    <button type="submit" class="btn btn-primary">Add Map</button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
-
-                {% endfor %}
             </div>
-            <button class="btn btn-primary m-2 float-end"
-                    onclick="addMap('map')">
-                Add entry
-            </button>
-        </div>
-    </div>
 
 
-    <div class="card mt-5 mb-5">
-        <div class="card-body">
-            <h5 class="card-title">{{ _('About Section content') |upper }}</h5>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            <div class="flash-messages mt-5 mb-5">
-                {% for category, message in messages %}
-                {% if category in ["success", "danger"] %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"
-                            aria-label="Close"></button>
-                </div>
-                {% endif %}
-                {% endfor %}
-            </div>
-            {% endif %}
-            {% endwith %}
-
-
-            <nav>
-                <div class="nav nav-pills mt-3 mb-2" id="nav-tab" role="tablist">
-                    {% for tab in tabs %}
-                    <button class="nav-link{% if loop.first and not activetab %} active{% endif %} {% if activetab == tab.target %} active {% endif %}"
-                            id="{{ tab.id }}" data-bs-toggle="tab"
-                            data-bs-target="#{{ tab.target }}" type="button" role="tab"
-                            aria-controls="{{ tab.target }}"
-                            aria-selected="{{ 'true' if loop.first else 'false' }}">
-                        {{ tab.label | upper }}
-                    </button>
-                    {% endfor %}
-                </div>
-            </nav>
-            <div class="tab-content" id="nav-tabContent">
-                {% for tab in tabs %}
-                <div class="tab-pane fade{% if loop.first and not activetab %} show active{% endif %} {% if activetab == tab.target %} show active {% endif %}"
-                     id="{{ tab.target }}" role="tabpanel"
-                     aria-labelledby="{{ tab.id }}" tabindex="0">
-                    <div class="accordion" id="{{ tab.label }}accordion">
-                        {% for entry in config_data %}
-                        {% if entry.config_class in tab.filter %}
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button {% if activeentry != tab.target + entry.id|string %}collapsed{% endif %}"
-                                        type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#{{ tab.target }}{{ entry.id }}"
-                                        aria-expanded="{{ ((tab.target + entry.id|string == activeentry)|string)|lower }}"
-                                        aria-controls="{{ tab.target }}{{ entry.id }}">
-                                    {{ entry.name }}
-                                </button>
-                            </h2>
-                            <div id="{{ tab.target }}{{ entry.id }}"
-                                 class="accordion-collapse collapse {% if activeentry == tab.target + entry.id|string %} show {% endif %}"
-                                 data-bs-parent="#{{ tab.label }}accordion">
-                                <div class="accordion-body">
-                                    <form method="POST" action="{{ url_for('edit_entry') }}"
-                                          class="projectForm needs-validation" id="form{{ entry.id }}"
-                                          novalidate>
-                                        <input type="hidden" name="config_id" value="{{ entry.id }}">
-                                        <input type="hidden" name="current_tab"
-                                               value="{{ tab.target }}">
-                                        <input type="hidden" name="current_entry"
-                                               value="{{ tab.target + entry.id|string }}">
-
-                                        <div class="row needs-validation">
-                                            <div class="col-md-6">
-                                                <label for="InputName{{ entry.id }}" class="form-label">
-                                                    Name</label>
-                                                <input type="text" class="form-control"
-                                                       id="InputName{{ entry.id }}"
-                                                       name="name" value="{{ entry.name or '' }}"
-                                                       aria-describedby="NameHelp{{ entry.id }}"
-                                                       disabled required>
-                                                <div class="invalid-feedback">Please provide a name.
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <label for="InputDescription{{ entry.id }}"
-                                                       class="form-label">Description</label>
-                                                <textarea class="form-control"
-                                                          id="InputDescription{{ entry.id }}"
-                                                          name="description"
-                                                          aria-describedby="descriptionHelp{{ entry.id }}"
-                                                          disabled>{{ entry.description or '' }}</textarea>
-                                            </div>
-                                        </div>
-                                        <div class="row needs-validation mt-4">
-                                            {% if tab.target == 'nav-institutions' %}
-                                            <div class="col-lg col-md-12">
-                                                <label for="InputAddress{{ entry.id }}"
-                                                       class="form-label">Address</label>
-                                                <textarea class="form-control"
-                                                          id="InputAddress{{ entry.id }}"
-                                                          name="address"
-                                                          aria-describedby="addressHelp{{ entry.id }}"
-                                                          disabled>{{ entry.address or '' }}</textarea>
-                                                <div class="invalid-feedback">Please provide an
-                                                    address.
-                                                </div>
-                                            </div>
-                                            {% endif %}
-
-                                            {% if tab.target in ['nav-institutions', 'nav-persons'] %}
-                                            <div class="col-lg col-md-12">
-                                                <label for="InputMail{{ entry.id }}"
-                                                       class="form-label">E-mail</label>
-                                                <input type="email" class="form-control"
-                                                       id="InputMail{{ entry.id }}"
-                                                       name="mail"
-                                                       value="{{ entry.email or '' }}"
-                                                       aria-describedby="mailHelp{{ entry.id }}"
-                                                       disabled>
-                                                <div class="invalid-feedback">Please provide a valid
-                                                    email-address: someone@somemail.com
-                                                </div>
-                                            </div>
-                                            {% endif %}
-
-                                            {% if tab.target in ['nav-main-project', 'nav-projects', 'nav-institutions']
-                                            %}
-                                            <div class="col-lg col-md-12">
-                                                <label for="InputWebsite{{ entry.id }}"
-                                                       class="form-label">Website</label>
-                                                <input type="url" class="form-control"
-                                                       id="InputWebsite{{ entry.id }}"
-                                                       name="website"
-                                                       value="{{ entry.website or '' }}"
-                                                       aria-describedby="websiteHelp{{ entry.id }}"
-                                                       disabled>
-                                                <div class="invalid-feedback">Please provide a valid
-                                                    website url: https://someurl.com
-                                                </div>
-                                            </div>
-                                            {% endif %}
-
-                                            {% if tab.target == 'nav-persons' %}
-                                            <div class="col-lg col-md-12">
-                                                <label for="InputOrcid{{ entry.id }}"
-                                                       class="form-label">ORCID-ID</label>
-                                                <input type="text" class="form-control"
-                                                       id="InputOrcid{{ entry.id }}" name="orcid"
-                                                       value="{{ entry.orcid_id or '' }}"
-                                                       aria-describedby="orcidHelp{{ entry.id }}"
-                                                       disabled>
-                                            </div>
-                                            {% endif %}
-                                        </div>
-
-                                        {% if tab.target == 'nav-main-project' %}
-                                        <div class="row needs-validation mt-4">
-                                            <div class="col-md-6">
-                                                <label for="Imprint{{ entry.id }}"
-                                                       class="form-label">Imprint</label>
-                                                <textarea class="form-control"
-                                                          id="Imprint{{ entry.id }}" name="imprint"
-                                                          aria-describedby="imprint{{ entry.id }}"
-                                                          disabled>{{ entry.imprint or '' }}</textarea>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="legalNotice{{ entry.id }}"
-                                                       class="form-label">Legal Notice</label>
-                                                <textarea class="form-control"
-                                                          id="legalNotice{{ entry.id }}"
-                                                          name="legalnotice"
-                                                          aria-describedby="legalnotice{{ entry.id }}"
-                                                          disabled>{{ entry.legal_notice or '' }}</textarea>
-                                            </div>
-                                        </div>
-                                        {% endif %}
-
-
-                                        <div class="mt-3 text-end">
-                                            <button type="button" class="btn btn-primary"
-                                                    id='edit{{ entry.id }}'
-                                                    onclick="changeEdit({{ entry.id }}, true)">Edit
-                                            </button>
-                                            <button type="button"
-                                                    class="btn btn-danger{% if tab.id == 5 %} d-none-at-all{% endif %}"
-                                                    id='delete{{ entry.id }}'
-                                                    value="{{ entry.id }}"
-                                                    onclick="deleteEntry({{ entry.id }}, '{{ entry.name }}', '{{ tab.target }}')"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#deleteModal">Delete
-                                            </button>
-                                            <button type="button" class="btn btn-secondary d-none"
-                                                    id='cancel{{ entry.id }}'
-                                                    onclick="changeEdit({{ entry.id }}, false)">Cancel
-                                            </button>
-
-                                            <button type="submit" class="btn btn-primary d-none"
-                                                    id='save{{ entry.id }}'
-                                                    value="{{ entry.id }}">Save
-                                            </button>
-
-                                        </div>
-                                    </form>
-
-                                    {% if tab.id != 3 %}
-                                    <hr>
-                                    <div id="{{tab.target}}-links">
-                                        {% for link in links_data %}
-                                        {% if link.start_id == entry.id %}
-
-                                        <div class="d-flex mb-2" data-order="{{link.sortorder}}"
-                                             data-id="{{link.link_id}}">
-                                            <i title="moveUpDown" class="bi bi-arrow-down-up mt-2 me-2"></i>
-                                            <input type="text" class="form-control me-2"
-                                                   disabled
-                                                   value="{{ link.config_property }}">
-                                            <input type="text" class="form-control me-2"
-                                                   disabled
-                                                   value="{{ link.end_name }}">
-                                            <input type="text" class="form-control me-2"
-                                                   disabled
-                                                   value="{{ link.role }}">
-                                            <button class="btn btn-danger"
-                                                    id='delete{{ link.id }}'
-                                                    onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name }}', '{{ link.config_property }}', '{{ link.end_name }}', '{{ tab.target }}', '{{ tab.target + entry.id|string }}', )"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#deleteModal"
-                                                    style="min-width: 75px">Delete
-                                            </button>
-                                        </div>
-
-                                        {% endif %}
-                                        {% endfor %}
-                                    </div>
-
-
-                                    <div class="d-flex mb-2">
-                                        <select class="link-type form-select me-2 connection-select ms-4"
-                                                aria-label="Select connection">
-                                            <option selected>Select connection</option>
-                                            {% for row in config_properties %}
-                                            {% if tab.id == row.domain %}
-                                            <option data-range="{{ row.range }}"
-                                                    data-direction="{{ row.direction }}"
-                                                    data-entry="{{ entry.id }}"
-                                                    value="{{ row.id }}">{{ row.name }}
-                                            </option>
-                                            {% endif %}
-                                            {% endfor %}
-                                        </select>
-                                        <select class="link-target form-select me-2 connection-select"
-                                                aria-label="Select node" disabled>
-                                            <option selected>Select node</option>
-                                            {% for row in config_data %}
-                                            <option class="config-class-{{ row.config_class }} d-none"
-                                                    data-classId="{{ row.id }}"
-                                                    value="{{ row.id }}">{{ row.name }}
-                                            </option>
-                                            {% endfor %}
-                                        </select>
-                                        <select class="link-role form-select me-2 connection-select"
-                                                aria-label="Select role" disabled>
-                                            <option selected>Select role</option>
-                                            <option value="0">not specified</option>
-                                            {% for row in config_data %}
-                                            {% if row.config_class == 3 %}
-                                            <option value="{{ row.id }}">{{ row.name }}</option>
-                                            {% endif %}
-                                            {% endfor %}
-                                        </select>
-                                        <button data-domain="" data-range="" data-property=""
-                                                data-direction="" data-role=""
-                                                data-tab="{{ tab.target }}"
-                                                data-entry="{{ tab.target }}{{ entry.id }}"
-                                                class="btn btn-primary"
-                                                onclick="saveLinkValues(this)"
-                                                style="min-width: 75px" disabled>
-                                            Save
-                                        </button>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
+            <!-- Modal for Add Entry Form -->
+            <div class="modal fade" id="addEntryModal" tabindex="-1" aria-labelledby="addEntryModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addEntryModalLabel">Add Entry</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        {% endif %}
-                        {% endfor %}
-                    </div>
-                    {% if tab.id != 5 %}
-                    <button class="btn btn-primary m-2 float-end"
-                            onclick="addEntry('{{ tab.target|string }}')">
-                        Add entry
-                    </button>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-
-        </div>
-
-
-        <div class="modal" id="deleteModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Confirm Delete</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Are you sure you want to delete "<span id="deleteName"></span>"?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <a id="confirmedDelete" type="button" href="#" class="btn btn-primary">Confirm Delete</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal for Add Map Form -->
-        <div class="modal fade" id="addMapModal" tabindex="-1" aria-labelledby="addMapModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addMapModalLabel">Add Map</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="POST" action="{{ url_for('add_map') }}" class="needs-validation" novalidate>
-                            <input type="hidden" name="map_id" value="{{ map.id }}">
-                            <div class="row">
-                                <div class="col-md-5">
-                                    <label for="InputName" class="form-label">Name</label>
-                                    <input type="text" class="form-control" id="InputName" name="name" required>
-                                    <div class="invalid-feedback">Please provide a name.</div>
-                                </div>
-                                <div class="col-md-5">
-                                    <label for="InputDispName" class="form-label">Display Name</label>
-                                    <input type="text" class="form-control" id="InputDispName" name="displayname"
-                                           required>
-                                    <div class="invalid-feedback">Please provide a display name.</div>
-                                </div>
-                                <div class="col-md-2">
-                                    <label for="InputOrder" class="form-label">Order</label>
-                                    <input type="text" class="form-control" id="InputOrder" name="inputorder" required>
-                                    <div class="invalid-feedback">Please provide an order.</div>
-                                </div>
-                            </div>
-                            <div class="row mt-4">
-                                <div class="col-12">
-                                    <label for="InputDescription" class="form-label">Leaflet Tile Layer String</label>
-                                    <textarea class="form-control" id="InputDescription" name="description"></textarea>
-                                </div>
-                            </div>
-                            <div class="mt-3 text-end">
-                                <button type="submit" class="btn btn-primary">Add Map</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <!-- Modal for Add Entry Form -->
-        <div class="modal fade" id="addEntryModal" tabindex="-1" aria-labelledby="addEntryModalLabel"
-             aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addEntryModalLabel">Add Entry</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form method="POST" action="{{ url_for('add_entry') }}" class="needs-validation" novalidate>
-                            <input type="hidden" name="category" id="currentTab">
-                            <div class="row">
-                                <div class="col-lg">
-                                    <label for="InputNameModal" class="form-label">Name</label>
-                                    <input type="text" class="form-control" id="InputNameModal" name="name"
-                                           required>
-                                    <div class="invalid-feedback">Please provide a name.</div>
-                                </div>
-                                <div class="col-lg">
-                                    <label for="InputDescriptionModal" class="form-label">Description</label>
-                                    <textarea class="form-control" id="InputDescriptionModal"
-                                              name="description"></textarea>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg institutions-show persons-show modal-input">
-                                    <label for="InputAddressModal" class="form-label">Address</label>
-                                    <textarea class="form-control" id="InputAddressModal" name="address"></textarea>
-                                </div>
-                                <div class="col-lg institutions-show persons-show projects-show modal-input">
-                                    <label for="InputMailModal" class="form-label">E-mail</label>
-                                    <input type="email" class="form-control" id="InputMailModal" name="mail">
-                                    <div class="invalid-feedback">Please provide a valid
-                                        email-address: someone@somemail.com
+                        <div class="modal-body">
+                            <form method="POST" action="{{ url_for('add_entry') }}" class="needs-validation" novalidate>
+                                <input type="hidden" name="category" id="currentTab">
+                                <div class="row">
+                                    <div class="col-lg">
+                                        <label for="InputNameModal" class="form-label">Name</label>
+                                        <input type="text" class="form-control" id="InputNameModal" name="name"
+                                               required>
+                                        <div class="invalid-feedback">Please provide a name.</div>
+                                    </div>
+                                    <div class="col-lg">
+                                        <label for="InputDescriptionModal" class="form-label">Description</label>
+                                        <textarea class="form-control" id="InputDescriptionModal"
+                                                  name="description"></textarea>
                                     </div>
                                 </div>
-                                <div class="col-lg institutions-show projects-show modal-input">
-                                    <label for="InputWebsiteModal" class="form-label">Website</label>
-                                    <input type="url" class="form-control" id="InputWebsiteModal" name="website">
-                                    <div class="invalid-feedback">Please provide a valid
-                                        website url: https://someurl.com
+                                <div class="row">
+                                    <div class="col-lg institutions-show persons-show modal-input">
+                                        <label for="InputAddressModal" class="form-label">Address</label>
+                                        <textarea class="form-control" id="InputAddressModal" name="address"></textarea>
+                                    </div>
+                                    <div class="col-lg institutions-show persons-show projects-show modal-input">
+                                        <label for="InputMailModal" class="form-label">E-mail</label>
+                                        <input type="email" class="form-control" id="InputMailModal" name="mail">
+                                        <div class="invalid-feedback">Please provide a valid
+                                            email-address: someone@somemail.com
+                                        </div>
+                                    </div>
+                                    <div class="col-lg institutions-show projects-show modal-input">
+                                        <label for="InputWebsiteModal" class="form-label">Website</label>
+                                        <input type="url" class="form-control" id="InputWebsiteModal" name="website">
+                                        <div class="invalid-feedback">Please provide a valid
+                                            website url: https://someurl.com
+                                        </div>
+                                    </div>
+                                    <div class="col-lg persons-show modal-input">
+                                        <label for="InputOrcidModal" class="form-label">ORCID-ID</label>
+                                        <input type="text" class="form-control" id="InputOrcidModal" name="orcid">
                                     </div>
                                 </div>
-                                <div class="col-lg persons-show modal-input">
-                                    <label for="InputOrcidModal" class="form-label">ORCID-ID</label>
-                                    <input type="text" class="form-control" id="InputOrcidModal" name="orcid">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg main-project-show modal-input">
-                                    <label for="InputImprintModal" class="form-label">Imprint</label>
-                                    <textarea class="form-control" id="InputImprintModal" name="imprint"></textarea>
-                                </div>
-                                <div class="col-lg main-project-show modal-input">
-                                    <label for="InputLegalNoticeModal" class="form-label">Legal Notice</label>
-                                    <textarea class="form-control" id="InputLegalNoticeModal"
-                                              name="legalnotice"></textarea>
-                                </div>
+                                <div class="row">
+                                    <div class="col-lg main-project-show modal-input">
+                                        <label for="InputImprintModal" class="form-label">Imprint</label>
+                                        <textarea class="form-control" id="InputImprintModal" name="imprint"></textarea>
+                                    </div>
+                                    <div class="col-lg main-project-show modal-input">
+                                        <label for="InputLegalNoticeModal" class="form-label">Legal Notice</label>
+                                        <textarea class="form-control" id="InputLegalNoticeModal"
+                                                  name="legalnotice"></textarea>
+                                    </div>
 
-                            </div>
-                            <div class="mt-3 text-end">
-                                <button type="submit" class="btn btn-primary">Add Entry</button>
-                            </div>
-                        </form>
+                                </div>
+                                <div class="mt-3 text-end">
+                                    <button type="submit" class="btn btn-primary">Add Entry</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <form method="POST" action="/choose_indexBg">
+            <div class="card mt-5 mb-5">
+                <div class="card-body">
+                    <h5 class="card-title">{{ _('Index Page Options') | upper }}</h5>
+                    <div class="form-group">
+                        <label for="selectMap">Select Map Background</label>
+                        <select class="form-control" id="selectMap" name="mapselection">
+                            {% for map in maps %}
+                                <option {% if map.id == settings.map %} selected {% endif %} value="{{ map.id }}"
+                                        data-tilestring="{{ map.tilestring }}">{{ map.display_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="defaultImg" class="form-label">Default Image</label>
+                        <input type="text" class="form-control" id="defaultImg" name="default_img" value="{{ settings.img }}">
+                        <select class="form-control" id="ImgMap" name="imgmap">
+                            <option selected value="{{ settings.img_map }}">{{ settings.img_map|capitalize_first }}</option>
+                            <option value="{{ settings.not_sel }}">{{ settings.not_sel|capitalize_first }}</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary m-2 float-end">Submit</button>
+                </div>
+            </div>
+        </form>
     </div>
 
-    <form method="POST" action="/choose_indexBg">
-        <div class="card mt-5 mb-5">
-            <div class="card-body">
-                <h5 class="card-title">{{ _('Index Page Options') | upper }}</h5>
-                <div class="form-group">
-                    <label for="selectMap">Select Map Background</label>
-                    <select class="form-control" id="selectMap" name="mapSelection">
-                        <option value="default_image">Default Image</option>
-                        {% for map in maps %}
-                        <option value="{{ map.id }}" data-tilestring="{{ map.tilestring }}">{{ map.display_name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary m-2 float-end">Submit</button>
-            </div>
-        </div>
-    </form>
-</div>
 
-
-<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}

@@ -1,50 +1,48 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- Leaflet JavaScript -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const chosenMap = {{ map|safe }}
+        const imgString = '{{ img|safe }}'
+        const imgOrMap = '{{ img_map|safe }}'
+    </script>
 
-<div id="index-container">
-    <div id="index-image"></div>
-    <div id="map" class="map-gray"></div>
-</div>
+    <div id="index-container">
+        <div id="index-image"></div>
+        <div id="map" class="map-gray"></div>
+    </div>
 
-<div id="counters" class="text-center pt-3">
-    <div class="row gx-0">
-        <div class="col-6 col-sm">
-            <h5 class="statistic-counter">563</h5>
-            <p>Places</p>
-        </div>
-        <div class="col-6 col-sm">
-            <h5 class="statistic-counter">5363</h5>
-            <p>Actors</p>
-        </div>
-        <div class="col-6 col-sm">
-            <h5 class="statistic-counter">5643</h5>
-            <p>Events</p>
-        </div>
-        <div class="col-6 col-sm">
-            <h5 class="statistic-counter">11555</h5>
-            <p>Artifacts</p>
-        </div>
-        <div class="col-6 col-sm">
-            <h5 class="statistic-counter">6169</h5>
-            <p>Sources</p>
+    <div id="counters" class="text-center pt-3">
+        <div class="row gx-0">
+            <div class="col-6 col-sm">
+                <h5 class="statistic-counter">563</h5>
+                <p>Places</p>
+            </div>
+            <div class="col-6 col-sm">
+                <h5 class="statistic-counter">5363</h5>
+                <p>Actors</p>
+            </div>
+            <div class="col-6 col-sm">
+                <h5 class="statistic-counter">5643</h5>
+                <p>Events</p>
+            </div>
+            <div class="col-6 col-sm">
+                <h5 class="statistic-counter">11555</h5>
+                <p>Artifacts</p>
+            </div>
+            <div class="col-6 col-sm">
+                <h5 class="statistic-counter">6169</h5>
+                <p>Sources</p>
+            </div>
         </div>
     </div>
-</div>
 
-{% include 'footer.html' %}
+    {% include 'footer.html' %}
 
-<!-- Custom JavaScript -->
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
-<script type="text/javascript"  >
-    document.addEventListener("DOMContentLoaded", function() {
-        const selected_map = '{{ selected_map }}'
-        renderMap(selected_map)
-    })
-</script>
+
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+
 {% endblock %}
