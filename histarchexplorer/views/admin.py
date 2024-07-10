@@ -131,19 +131,21 @@ FROM tng.links l
         g.cursor.execute('SELECT * FROM tng.maps WHERE id = %s', (map_id,))
         map_data = g.cursor.fetchone()
 
-    g.cursor.execute('SELECT index_img, index_map, img_map FROM tng.settings LIMIT 1' )
+    g.cursor.execute('SELECT index_img, index_map, img_map, greyscale FROM tng.settings LIMIT 1')
     data = g.cursor.fetchone()
     settings = {}
     settings['img'] = data.index_img
     settings['map'] = data.index_map
     settings['img_map'] = data.img_map
+    settings['greyscale'] = data.greyscale
     if data.img_map == 'image':
         settings['not_sel'] = 'map'
     else:
         settings['not_sel'] = 'image'
 
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry,
-                           links_data=links_data, config_properties=config_properties, maps=map_data, map=map, settings=settings)
+                           links_data=links_data, config_properties=config_properties, maps=map_data, map=map,
+                           settings=settings)
 
 
 @app.route('/admin/add_entry', methods=['POST'])
@@ -382,10 +384,13 @@ def choose_index_bg():
     map_id = request.form.get('mapselection')
     default_img = request.form.get('default_img')
     map_img = request.form.get('imgmap')
+    greyscale = request.form.get('greyscale') == 'on'
 
-    g.cursor.execute(f'INSERT INTO tng.settings (index_map, index_img, img_map) VALUES ({map_id}, \'{default_img}\', \'{map_img}\')')
+    g.cursor.execute(
+        'INSERT INTO tng.settings (index_map, index_img, img_map, greyscale) VALUES (%s, %s, %s, %s)',
+        (map_id, default_img, map_img, greyscale)
+    )
     return redirect(url_for('admin'))
-
 
 
 @app.route('/reset')
@@ -526,13 +531,14 @@ def reset():
             id        SERIAL PRIMARY KEY,
             index_img TEXT,
             index_map INT,
-            img_map   TEXT
+            img_map   TEXT,
+            greyscale   BOOLEAN
         );
 
-        INSERT INTO tng.settings (index_img, index_map, img_map)
+        INSERT INTO tng.settings (index_img, index_map, img_map, greyscale)
         VALUES ('/static/images/index_map_bg/Blank_map_of_Europe_central_network.png',
                 1,
-                'image')
+                'image', TRUE)
         
     ''')
 
