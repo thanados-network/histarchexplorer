@@ -10,9 +10,10 @@
         const imgOrMap = '{{ img_map|safe }}'
     </script>
 
+
     <div id="index-container">
         <div id="index-image"></div>
-        <div id="map" class="map-gray"></div>
+        <div id="map" class="{% if greyscale %}map-gray{% endif %}"></div>
     </div>
 
     <div id="counters" class="text-center pt-3">

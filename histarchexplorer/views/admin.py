@@ -143,6 +143,8 @@ FROM tng.links l
     else:
         settings['not_sel'] = 'image'
 
+    print(settings)
+
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry,
                            links_data=links_data, config_properties=config_properties, maps=map_data, map=map,
                            settings=settings)
