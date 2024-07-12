@@ -164,6 +164,7 @@ def add_entry():
     mail = request.form.get('mail')
     website = request.form.get('website')
     orcid = request.form.get('orcid')
+    image = request.form.get('image')
 
     config_class_map = {
         'projects': 1,  # option for config_class=2 project vs 1=main_project?
@@ -180,8 +181,9 @@ def add_entry():
             return redirect(url_for('admin') + current_tab)
 
         g.cursor.execute('''
-                   INSERT INTO tng.config (name, description, address, email, website, orcid_id, config_class)
+                   INSERT INTO tng.config (name, description, address, email, website, orcid_id, config_class, image)
                    VALUES (
+                    NULLIF(%s, ''),
                     NULLIF(%s, ''),
                     NULLIF(%s, ''),
                     NULLIF(%s, ''),
@@ -190,7 +192,7 @@ def add_entry():
                     NULLIF(%s, ''),
                     %s
                 ) RETURNING id
-               ''', (name, description, address, mail, website, orcid, tab_config_class))
+               ''', (name, description, address, mail, website, orcid, tab_config_class, image))
 
         new_entry_id = g.cursor.fetchone()[0]
 
