@@ -275,6 +275,10 @@
                                                 <label for="InputImage" class="form-label">Image URL</label>
                                                 <input type="text" class="form-control" id="InputImage" name="image"
                                                        value="{{ entry.image or '' }}" disabled>
+                                                {% if entry.image %}
+                                                <img class="mt-2" src="{{ entry.image }}" alt="{{ entry.name }}'s Logo">
+                                                {% endif %}
+                                                </a>
                                             </div>
                                             {% endif %}
 
