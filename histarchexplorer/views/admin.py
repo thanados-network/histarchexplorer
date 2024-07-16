@@ -150,6 +150,8 @@ FROM tng.links l
     else:
         settings['not_sel'] = 'image'
 
+    print(settings)
+
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry,
                            links_data=links_data, config_properties=config_properties, maps=map_data, map=map,
                            settings=settings)
@@ -172,6 +174,7 @@ def add_entry():
     mail = request.form.get('mail')
     website = request.form.get('website')
     orcid = request.form.get('orcid')
+    image = request.form.get('image')
 
     config_class_map = {
         'projects': 1,  # option for config_class=2 project vs 1=main_project?
@@ -188,8 +191,9 @@ def add_entry():
             return redirect(url_for('admin') + current_tab)
 
         g.cursor.execute('''
-                   INSERT INTO tng.config (name, description, address, email, website, orcid_id, config_class)
+                   INSERT INTO tng.config (name, description, address, email, website, orcid_id, config_class, image)
                    VALUES (
+                    NULLIF(%s, ''),
                     NULLIF(%s, ''),
                     NULLIF(%s, ''),
                     NULLIF(%s, ''),
@@ -198,7 +202,7 @@ def add_entry():
                     NULLIF(%s, ''),
                     %s
                 ) RETURNING id
-               ''', (name, description, address, mail, website, orcid, tab_config_class))
+               ''', (name, description, address, mail, website, orcid, tab_config_class, image))
 
         new_entry_id = g.cursor.fetchone()[0]
 
@@ -269,6 +273,7 @@ def edit_entry():
     orcid = request.form.get('orcid')
     legal_note = request.form.get('legalnotice')
     imprint = request.form.get('imprint')
+    image = request.form.get('image')
 
     editsql = """
         UPDATE  tng.config SET 
@@ -279,7 +284,8 @@ def edit_entry():
             website = NULLIF(%(website)s, ''),
             orcid_id = NULLIF(%(orcid_id)s, ''),
             legal_notice = NULLIF(%(legal_note)s, ''),
-            imprint = NULLIF(%(imprint)s, '')
+            imprint = NULLIF(%(imprint)s, ''),
+            image = NULLIF(%(image)s, '')
         WHERE  id = %(id)s
     """
     try:
@@ -288,7 +294,7 @@ def edit_entry():
         if result:
             g.cursor.execute(editsql, {'description': description, 'name': name, 'address': address, 'email': mail,
                                        'website': website, 'orcid_id': orcid, 'id': config_id, 'legal_note': legal_note,
-                                       'imprint': imprint})
+                                       'imprint': imprint, 'image': image})
             flash(f'"{name}" updated successfully', 'success')
         else:
             flash(f'Error updating {name}', 'danger')
