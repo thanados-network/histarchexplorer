@@ -8,8 +8,32 @@
     <div class="card mt-5 mb-5">
         <div class="card-body">
             <h5 class="card-title">{{ _('Tools') |upper }}</h5>
-            <div class="button-card">
-                <button id="resetButton" class="btn btn-danger">Reset</button>
+            <div class="d-flex justify-content-start align-items-start">
+                <div class="button-card me-3">
+                    <button id="resetButton" class="btn btn-danger">Reset</button>
+                </div>
+                <form method="post" action="{{ url_for('select_entities') }}">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="entityDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            Select Entities
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="entityDropdown">
+                            {% for class_name in entities %}
+                            <li>
+                                <div class="form-check ms-1">
+                                    <input class="form-check-input" type="checkbox" name="selected_entities"
+                                           value="{{ class_name }}" id="flexCheck{{ loop.index }}">
+                                    <label class="form-check-label" for="flexCheck{{ loop.index }}">
+                                        {{ class_name }}
+                                    </label>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Save Selection</button>
+                </form>
             </div>
         </div>
     </div>
@@ -317,7 +341,8 @@
                                                        placeholder="Please provide a square image"
                                                        value="{{ entry.image or '' }}" disabled>
                                                 {% if entry.image %}
-                                                <img class="mt-2" src="{{ entry.image }}" alt="{{ entry.name }}'s Logo" width="140" height="140">
+                                                <img class="mt-2" src="{{ entry.image }}" alt="{{ entry.name }}'s Logo"
+                                                     width="140" height="140">
                                                 {% endif %}
                                                 </a>
                                             </div>
@@ -568,7 +593,8 @@
                                     <label for="InputAddressModal" class="form-label">Address</label>
                                     <textarea class="form-control" id="InputAddressModal" name="address"></textarea>
                                     <label for="InputImageModal" class="form-label">Image URL</label>
-                                    <input type="text" class="form-control" id="InputImageModal" name="image"  placeholder="Please provide a square image for team members and a logo with a height of 68px for institutions">
+                                    <input type="text" class="form-control" id="InputImageModal" name="image"
+                                           placeholder="Please provide a square image for team members and a logo with a height of 68px for institutions">
                                 </div>
                             </div>
 
@@ -613,46 +639,46 @@
     </div>
 
 
-<form method="POST" action="/choose_indexBg">
-    <div class="card mt-5 mb-5">
-        <div class="card-body">
-            <h5 class="card-title">{{ _('Index Page Options') | upper }}</h5>
+    <form method="POST" action="/choose_indexBg">
+        <div class="card mt-5 mb-5">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('Index Page Options') | upper }}</h5>
 
-            <div class="form-check form-switch mt-3 mb-3">
-                <input class="form-check-input" type="checkbox" id="greyscaleSwitch" name="greyscale" {% if
-                       settings.greyscale %} checked {% endif %}>
-                <label class="form-check-label" for="greyscaleSwitch">Greyscale</label>
+                <div class="form-check form-switch mt-3 mb-3">
+                    <input class="form-check-input" type="checkbox" id="greyscaleSwitch" name="greyscale" {% if
+                           settings.greyscale %} checked {% endif %}>
+                    <label class="form-check-label" for="greyscaleSwitch">Greyscale</label>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label for="selectMap" class="form-label">Select Map Background</label>
+                        <select class="form-control" id="selectMap" name="mapselection">
+                            {% for map in maps %}
+                            <option {% if map.id== settings.map %} selected {% endif %} value="{{ map.id }}"
+                                    data-tilestring="{{ map.tilestring }}">{{ map.display_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="defaultImg" class="form-label">Define Default Background Image</label>
+                        <input type="text" class="form-control" id="defaultImg" name="default_img"
+                               value="{{ settings.img }}">
+                    </div>
+
+                    <div class="col-md-3 mt-3">
+                        <select class="form-control" id="ImgMap" name="imgmap">
+                            <option selected value="{{ settings.img_map }}">{{ settings.img_map|capitalize_first }}
+                            </option>
+                            <option value="{{ settings.not_sel }}">{{ settings.not_sel|capitalize_first }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary m-2 float-end">Save</button>
             </div>
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label for="selectMap" class="form-label">Select Map Background</label>
-                    <select class="form-control" id="selectMap" name="mapselection">
-                        {% for map in maps %}
-                        <option {% if map.id== settings.map %} selected {% endif %} value="{{ map.id }}"
-                                data-tilestring="{{ map.tilestring }}">{{ map.display_name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label for="defaultImg" class="form-label">Define Default Background Image</label>
-                    <input type="text" class="form-control" id="defaultImg" name="default_img"
-                           value="{{ settings.img }}">
-                </div>
-
-                <div class="col-md-3 mt-3">
-                    <select class="form-control" id="ImgMap" name="imgmap">
-                        <option selected value="{{ settings.img_map }}">{{ settings.img_map|capitalize_first }}
-                        </option>
-                        <option value="{{ settings.not_sel }}">{{ settings.not_sel|capitalize_first }}</option>
-                    </select>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary m-2 float-end">Save</button>
         </div>
-    </div>
-</form>
+    </form>
 </div>
 </div>
 

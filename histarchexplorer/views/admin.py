@@ -143,11 +143,18 @@ FROM tng.links l
     else:
         settings['not_sel'] = 'image'
 
-    print(settings)
+    g.cursor.execute('''
+           SELECT openatlas_class_name, COUNT(*) as count
+           FROM tng.entity
+           GROUP BY openatlas_class_name
+           ORDER BY count DESC
+       ''')
+    entities = g.cursor.fetchall()
+    entities_dict = {entity[0]: entity[1] for entity in entities}
 
     return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry,
                            links_data=links_data, config_properties=config_properties, maps=map_data, map=map,
-                           settings=settings)
+                           settings=settings, entities=entities_dict)
 
 
 @app.route('/admin/add_entry', methods=['POST'])
@@ -398,6 +405,25 @@ def choose_index_bg():
         (map_id, default_img, map_img, greyscale)
     )
     return redirect(url_for('admin'))
+
+
+@app.route('/admin/select_entities', methods=['GET', 'POST'])
+def select_entities() -> str:
+
+        g.cursor.execute('''
+            SELECT openatlas_class_name, COUNT(*) as count
+            FROM tng.entity
+            GROUP BY openatlas_class_name
+            ORDER BY count DESC
+        ''')
+
+        entities = g.cursor.fetchall()
+        entities_dict = {entity[0]: entity[1] for entity in entities}
+
+
+        return render_template('admin.html', entities=entities_dict, selected_entities=selected_entities)
+
+
 
 
 @app.route('/reset')
