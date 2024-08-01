@@ -31,17 +31,19 @@
                                     >
 
                                     <label class="form-check-label" for="flexCheck{{ loop.index }}">
-                                        {{ category }}  {% if entities[category] %} ({{entities[category] }}) {% else %} (0) {% endif %}
+                                        {{ category }} {% if entities[category] %} ({{entities[category] }}) {% else %}
+                                        (0) {% endif %}
                                     </label>
                                 </div>
                             </li>
                             {% endfor %}
                             {% endfor %}
 
-
+                            <button type="submit" class="btn btn-primary mt-3">Save Selection</button>
                         </ul>
+
                     </div>
-                    <button type="submit" class="btn btn-primary mt-3">Save Selection</button>
+
                 </form>
             </div>
         </div>
