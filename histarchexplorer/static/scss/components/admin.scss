@@ -7,3 +7,11 @@
 .d-none-at-all {
   display: none !important;
 }
+
+.dropdown-menu-columns {
+  column-count: 2;
+  li {
+    width: max-content;
+    padding-right: 1rem;
+  }
+}

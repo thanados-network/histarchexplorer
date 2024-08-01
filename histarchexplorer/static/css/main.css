@@ -167,6 +167,14 @@ body {
   display: none !important;
 }
 
+.dropdown-menu-columns {
+  column-count: 2;
+}
+.dropdown-menu-columns li {
+  width: max-content;
+  padding-right: 1rem;
+}
+
 #index-container {
   height: calc(100vh - var(--logo-height) - var(--navbar-height) - 95px);
 }
