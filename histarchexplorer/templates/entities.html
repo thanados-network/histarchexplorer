@@ -1,5 +1,25 @@
 {% extends "layout.html" %}
 {% block content %}
 
-    hello ennts
+<div class="container">
+    <div class="row mt-5">
+        {% for view_class, details in view_classes.items() %}
+        <div class="col-lg-4 col-md-6">
+            <div id=" {{ view_class | lower }}-card" class="entity-card entity-card--{{ view_class | lower }}">
+                <div class="entity-card__icon">
+                    <img src="/static/images/entity_icons/{{ view_class | lower }}_550.png" alt="{{ class_name }}">
+                </div>
+                <div class="entity-card__label">{{ view_class }}</div>
+                <div class="entity-card__description">Lorem ipsum dolor sit amet consectetur. Risus malesuada feugiat
+                    sit
+                    integer non.
+                    Nisl blandit at scelerisque id arcu nisi nisl lacus.
+                </div>
+                <div class="entity-card__count">{{details['count']}} entities</div>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
 {% endblock %}

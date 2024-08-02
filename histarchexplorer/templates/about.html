@@ -50,10 +50,9 @@
             <div class="col-md-3 text-center">
                 <h6 class="pt-3 fst-italic">{{ institution.role | upper }}</h6>
                 {% if institution.image %}
-                <a href="{{ institution.website }}" target="_blank">
-                    <img class="mt-2" src="{{ institution.image }}" alt="{{ institution.name }}'s Logo">
+                <a href="{{ institution.website if institution.website }}" target="_blank">
+                    <img class="mt-2" src="{{ institution.image if institution.image }}" alt="{{ institution.name }}'s Logo">
                 </a>
-                <h6 class="pt-3 text-body-secondary">{{ institution.name }}</h6>
                 {% else %}
                 <h5 class="py-3">{{ institution.name }}</h5>
                 <a href="{{ institution.website }}" target="_blank">Website</a>

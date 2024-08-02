@@ -5,14 +5,49 @@
     <div class="container py-5 en">
         <h3>{{ _('admin options') |upper }} <span class="text-body-secondary"> | {{ _('DB Interface') }}</span></h3>
 
-        <div class="card mt-5 mb-5">
-            <div class="card-body">
-                <h5 class="card-title">{{ _('tools') |upper }}</h5>
-                <div class="button-card">
-                    <button id="resetButton" class="btn btn-danger">{{ _('Reset') }}</button>
+    <div class="card mt-5 mb-5">
+        <div class="card-body">
+            <h5 class="card-title">{{ _('Tools') |upper }}</h5>
+            <div class="d-flex justify-content-start align-items-start">
+                <div class="button-card me-3">
+                    <button id="resetButton" class="btn btn-danger">Reset</button>
                 </div>
+                <form method="post" action="{{ url_for('select_entities') }}">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="entityDropdown"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            Select Entities
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-columns" aria-labelledby="entityDropdown">
+
+                            {% for view_class in view_classes %}
+                            <li><h6 class="dropdown-header">{{view_class |upper}}</h6></li>
+                            {% for category in (view_classes[view_class]): %}
+                            <li>
+                                <div class="form-check ms-3">
+                                    <input class="form-check-input" type="checkbox" name="selected_entities"
+                                           value="{{ category }}" id="flexCheck{{ loop.index }}"
+                                           {% if category in shown_entities %}checked{% endif %}
+                                    >
+
+                                    <label class="form-check-label" for="flexCheck{{ loop.index }}">
+                                        {{ category }} {% if entities[category] %} ({{entities[category] }}) {% else %}
+                                        (0) {% endif %}
+                                    </label>
+                                </div>
+                            </li>
+                            {% endfor %}
+                            {% endfor %}
+
+                            <button type="submit" class="btn btn-primary mt-3">Save Selection</button>
+                        </ul>
+
+                    </div>
+
+                </form>
             </div>
         </div>
+    </div>
 
         <div class="card mt-5 mb-5">
             <div class="card-body">
@@ -219,7 +254,7 @@
                                                                value="{{ tab.target + entry.id|string }}">
 
                                                         <div class="row needs-validation">
-                                                            <div class="col-md-6">
+                                                            <div class="col-md-4">
                                                                 <label for="InputName{{ entry.id }}" class="form-label">
                                                                     {{ _('name')|capitalize_first }}
                                                                     {% if not entry.name[CURRENT_LANGUAGE] %} ({{ entry.name.display.language|upper }}) {% endif %}</label>
@@ -237,7 +272,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="col-md-6">
+                                                            <div class="col-md-8">
                                                                 <label for="InputDescription{{ entry.id }}"
                                                                        class="form-label">
                                                                     {{ _('description')|capitalize_first }}
@@ -288,6 +323,17 @@
                                                                                 "{{ AVAILABLE_LANGUAGES[CURRENT_LANGUAGE] }}".
                                                                             </div>{% endif %}{% endif %}
                                                                     <div class="invalid-feedback">{{ _('Please provide an address') }}.
+                                                </div>
+                                                <div class="col-lg col-md-12 mt-4">
+                                                    <label for="InputImage" class="form-label">Image URL</label>
+                                                    <input type="text" class="form-control" id="InputImage" name="image"
+                                                           placeholder="Please provide a logo with 68px height"
+                                                           value="{{ entry.image or '' }}" disabled>
+                                                    {% if entry.image %}
+                                                    <img class="mt-2" src="{{ entry.image }}"
+                                                         alt="{{ entry.name }}'s Logo">
+                                                    {% endif %}
+                                                    </a>
                                                                     </div>
                                                                 </div>
                                                             {% endif %}
@@ -332,7 +378,17 @@
                                                                            aria-describedby="orcidHelp{{ entry.id }}"
                                                                            disabled>
                                                                 </div>
-                                                            {% endif %}
+                                                            <div class="col-lg col-md-4">
+                                                <label for="InputImage" class="form-label">Image URL</label>
+                                                <input type="text" class="form-control" id="InputImage" name="image"
+                                                       placeholder="Please provide a square image"
+                                                       value="{{ entry.image or '' }}" disabled>
+                                                {% if entry.image %}
+                                                <img class="mt-2" src="{{ entry.image }}" alt="{{ entry.name }}'s Logo"
+                                                     width="140" height="140">
+                                                {% endif %}
+                                                </a>
+                                            </div>{% endif %}
                                                         </div>
 
                                                         {% if tab.target == 'nav-main-project' %}
@@ -613,7 +669,11 @@
                                         <label for="InputAddressModal"
                                                class="form-label">{{ _('address')|capitalize_first }}</label>
                                         <textarea class="form-control" id="InputAddressModal" name="address"></textarea>
-                                    </div>
+                                    <label for="InputImageModal" class="form-label">Image URL</label>
+                                    <input type="text" class="form-control" id="InputImageModal" name="image"
+                                           placeholder="Please provide a square image for team members and a logo with a height of 68px for institutions">
+                                </div>
+                            </div>
                                     <div class="col-lg institutions-show persons-show projects-show modal-input">
                                         <label for="InputMailModal"
                                                class="form-label">{{ _('e-mail')|capitalize_first }}</label>
@@ -648,14 +708,14 @@
                                 </div>
                                 <div class="mt-3 text-end">
                                     <button type="submit"
-                                            class="btn btn-primary">{{ _('add entry')|capitalize_first }}</button>
+                                            class="btn btn-primary m-2">{{ _('add entry')|capitalize_first }}</button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+
 
         <form method="POST" action="/choose_indexBg">
             <div class="card mt-5 mb-5">

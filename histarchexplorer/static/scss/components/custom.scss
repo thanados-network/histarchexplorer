@@ -1,0 +1,31 @@
+@import '../../node_modules/bootstrap/scss/mixins';
+
+$nav-link-color: #559f55;
+$nav-pills-link-active-bg: #559f55;
+
+@import '../../node_modules/bootstrap/scss/bootstrap';
+
+$btn-bg: #559f55;
+
+.btn-primary {
+  background-color: $btn-bg;
+  color: white;
+  border-color: darken($btn-bg, 2%);
+
+  &:hover {
+    background-color: darken($btn-bg, 10%);
+    border-color: darken($btn-bg, 15%);
+  }
+}
+
+$bs-nav-link-hover-color: darken($btn-bg, 20%);
+.nav-link:hover, .nav-link:focus {
+  color: $bs-nav-link-hover-color;
+}
+
+
+$accordion-active-color: lighten($btn-bg, 20%);
+$accordion-active-bg: lighten($btn-bg, 20%);
+.accordion-button:not(.collapsed) {
+  background-color: $accordion-active-bg;
+}

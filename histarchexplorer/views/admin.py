@@ -211,9 +211,28 @@ FROM tng.links l
     else:
         settings['not_sel'] = 'image'
 
-    return render_template("/admin.html", config_data=entities, tabs=tabs, activetab=tab, activeentry=entry,
-                           links_data=links_list, config_properties=config_list, maps=map_data, map=map,
-                           settings=settings, entities=entities)
+
+    g.cursor.execute('''
+           SELECT openatlas_class_name, COUNT(openatlas_class_name) as count
+           FROM model.entity
+           GROUP BY openatlas_class_name
+           ORDER BY count DESC
+       ''')
+    entities = g.cursor.fetchall()
+    entities_dict = {entity[0]: entity[1] for entity in entities if entity[0] not in app.config['CLASSES_TO_SKIP']}
+
+    g.cursor.execute('''
+        SELECT shown_entities from tng.settings LIMIT 1''')
+    shown_entities = (g.cursor.fetchone()).shown_entities
+    print(entities_dict)
+
+    view_classes = app.config['VIEW_CLASSES']
+
+
+    return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry,
+                           links_data=links_data, config_properties=config_properties, maps=map_data, map=map,
+                           settings=settings, entities=entities_dict, shown_entities=shown_entities, view_classes=view_classes)
+
 
 
 @app.route('/admin/add_entry', methods=['POST'])
@@ -235,6 +254,7 @@ def add_entry():
     orcid = request.form.get('orcid')
     legal_notice = request.form.get('legalnotice')
     imprint = request.form.get('imprint')
+    image = request.form.get('image')
 
     config_class_map = {
         'projects': 1,  # option for config_class=2 project vs 1=main_project?
@@ -251,15 +271,16 @@ def add_entry():
             return redirect(url_for('admin') + current_tab)
 
         g.cursor.execute('''
-                   INSERT INTO tng.config (name, email, website, orcid_id, config_class)
+                   INSERT INTO tng.config (name, email, website, orcid_id, image, config_class)
                    VALUES (
                     '{"de": "Stefan Eichert", "en": "Stefan Eichert"}'::jsonb,
                     NULLIF(%s, ''),
                     NULLIF(%s, ''),
                     NULLIF(%s, ''),
+                    NULLIF(%s, ''),
                     %s
                 ) RETURNING id
-               ''', (mail, website, orcid, tab_config_class))
+               ''', (mail, website, orcid, image, tab_config_class))
 
         new_entry_id = g.cursor.fetchone()[0]
         config_id = new_entry_id
@@ -344,19 +365,21 @@ def edit_entry():
     orcid = request.form.get('orcid')
     legal_notice = request.form.get('legalnotice')
     imprint = request.form.get('imprint')
+    image = request.form.get('image')
 
     editsql = """
         UPDATE  tng.config SET 
             email = NULLIF(%(email)s, ''),
             website = NULLIF(%(website)s, ''),
-            orcid_id = NULLIF(%(orcid_id)s, '')            
+            orcid_id = NULLIF(%(orcid_id)s, ''),
+            image = NULLIF(%(image)s, '')            
         WHERE  id = %(id)s;
     """
     try:
         g.cursor.execute('SELECT id FROM tng.config WHERE id = %(id)s', {'id': int(config_id)})
         result = g.cursor.fetchone()
         if result:
-            g.cursor.execute(editsql, {'email': mail, 'website': website, 'orcid_id': orcid, 'id': config_id})
+            g.cursor.execute(editsql, {'email': mail, 'website': website, 'orcid_id': orcid, 'id': config_id, 'image': image})
             flash(f'"{name}" updated successfully', 'success')
         else:
             flash(f'Error updating {name}', 'danger')
@@ -477,6 +500,20 @@ def choose_index_bg():
         (map_id, default_img, map_img, greyscale)
     )
     return redirect(url_for('admin'))
+
+
+@app.route('/admin/select_entities', methods=['GET', 'POST'])
+def select_entities() -> str:
+    if request.method == 'POST':
+        selected_entities = request.form.getlist('selected_entities')
+
+        selected_entities_str = json.dumps(selected_entities)
+
+        g.cursor.execute('UPDATE tng.settings SET shown_entities = %s::JSONB', (selected_entities_str,))
+
+
+
+        return redirect(url_for('admin'))
 
 
 @app.route('/reset')
@@ -667,7 +704,8 @@ def reset():
             index_img TEXT,
             index_map INT,
             img_map   TEXT,
-            greyscale   BOOLEAN
+            greyscale   BOOLEAN,
+            shown_entities  JSONB
         );
 
         INSERT INTO tng.settings (index_img, index_map, img_map, greyscale)
