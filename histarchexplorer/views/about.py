@@ -1,6 +1,6 @@
 from flask import render_template, g
 from histarchexplorer import app
-from typing import Dict, Any, Tuple
+from histarchexplorer.utils import helpers
 
 
 def capitalize_first(value: str) -> str:
@@ -24,10 +24,10 @@ def about() -> str:
     project_result = g.cursor.fetchone()
 
     project = {
-        'name': project_result[0],
-        'description': project_result[1],
-        'legal_notice': project_result[2],
-        'imprint': project_result[3]
+        'name': (helpers.get_translation(project_result[0]))['label'],
+        'description': (helpers.get_translation(project_result[1]))['label'],
+        'legal_notice': (helpers.get_translation(project_result[2]))['label'],
+        'imprint': (helpers.get_translation(project_result[3]))['label']
     }
 
     institutions_sql = """
@@ -47,18 +47,16 @@ def about() -> str:
     institutions = []
     for row in institutions_result:
         institutions.append({
-            'name': row[0],
-            'address': row[1] if row[1] else " ",
+            'name': (helpers.get_translation(row[0]))['label'],
+            'address': (helpers.get_translation(row[1]))['label'] if row[1] else " ",
             'website': row[2],
-            'role': row[4] if row[4] else "No role",
+            'role': (helpers.get_translation(row[4]))['label'] if row[4] else "No role",
             'image': row[3]
         })
 
-        for institution in institutions:
-            print(f"Name: {institution['name']}, Image: {institution['image']}")
 
     persons_sql = """
-SELECT p.name, p.image, COALESCE(b.name, '') AS role, COALESCE(a.name, '') AS affiliation, COALESCE(a.website, '') AS website, COALESCE(p.email, '') AS email
+SELECT p.name, p.image, b.name AS role, a.name AS affiliation, COALESCE(a.website, '') AS website, COALESCE(p.email, '') AS email
 FROM tng.links l
 JOIN tng.config p ON l.range_id = p.id
 JOIN tng.config_properties cp ON l.property = cp.id
@@ -76,18 +74,18 @@ ORDER BY l.sortorder, l.id;
 
     persons = {}
     for row in persons_result:
-        person_name = row[0]
+        person_name = (helpers.get_translation(row[0]))['label']
         print(row[0])
         if person_name not in persons:
             persons[person_name] = {
-                'name': row[0],
+                'name': (helpers.get_translation(row[0]))['label'],
                 'roles': [] ,
                 'image': row[1],
-                'affiliation': row[3],
+                'affiliation': (helpers.get_translation(row[3]))['label'],
                 'website': row[4],
                 'email': row[5]
             }
-        persons[person_name]['roles'].append(row[2])
+        persons[person_name]['roles'].append((helpers.get_translation(row[2]))['label'])
 
     persons_list = list(persons.values())
 

@@ -6,6 +6,8 @@ from flask_login import current_user, login_required
 from flask_babel import lazy_gettext as _
 
 from histarchexplorer import app
+from histarchexplorer.utils import helpers
+
 
 
 def update_jsonb_column(column_name, value, language, config_id):
@@ -39,15 +41,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     preferred_lan = app.config['PREFERRED_LANGUAGE']
 
-    def get_translation(item):
-        for key in item:
-            if key == language:
-                return {'language':key, 'label':item[key]}
-        for key in item:
-            if key == preferred_lan:
-                return {'language':key, 'label':item[key]}
-        return { 'language': next(iter(item)), 'label': item[next(iter(item))]}
-
+    
     g.cursor.execute(f"SELECT * FROM tng.config ORDER BY (name->>'{language}')")
     config_data = g.cursor.fetchall()
 
@@ -60,7 +54,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             if getattr(item, column):
                 for key, value in getattr(item, column).items():
                     entity[column][key] = value
-                entity[column]['display'] = get_translation(entity[column])
+                entity[column]['display'] = helpers.get_translation(entity[column])
 
         entities.append(entity)
 
@@ -82,7 +76,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
 
     for row in config_list:
-        row['name'] = get_translation(row['name'])
+        row['name'] = helpers.get_translation(row['name'])
 
     mainproject = []
     projects = []
@@ -187,10 +181,10 @@ FROM tng.links l
 
 
     for row in links_list:
-        row['start_name'] = get_translation(row['start_name'])
-        row['end_name'] = get_translation(row['end_name'])
-        row['config_property'] = get_translation(row['config_property'])
-        row['role'] = get_translation(row['role'])
+        row['start_name'] = helpers.get_translation(row['start_name'])
+        row['end_name'] = helpers.get_translation(row['end_name'])
+        row['config_property'] = helpers.get_translation(row['config_property'])
+        row['role'] = helpers.get_translation(row['role'])
 
 
     map_id = request.args.get('map_id')
@@ -218,8 +212,8 @@ FROM tng.links l
            GROUP BY openatlas_class_name
            ORDER BY count DESC
        ''')
-    entities = g.cursor.fetchall()
-    entities_dict = {entity[0]: entity[1] for entity in entities if entity[0] not in app.config['CLASSES_TO_SKIP']}
+    class_items = g.cursor.fetchall()
+    entities_dict = {entity[0]: entity[1] for entity in class_items if entity[0] not in app.config['CLASSES_TO_SKIP']}
 
     g.cursor.execute('''
         SELECT shown_entities from tng.settings LIMIT 1''')
@@ -227,11 +221,11 @@ FROM tng.links l
     print(entities_dict)
 
     view_classes = app.config['VIEW_CLASSES']
+    print(links_list)
 
-
-    return render_template("/admin.html", config_data=config_data, tabs=tabs, activetab=tab, activeentry=entry,
-                           links_data=links_data, config_properties=config_properties, maps=map_data, map=map,
-                           settings=settings, entities=entities_dict, shown_entities=shown_entities, view_classes=view_classes)
+    return render_template("/admin.html", config_data=entities, entities=entities, tabs=tabs, activetab=tab, activeentry=entry,
+                           links_data=links_list, config_properties=config_list, maps=map_data, map=map,
+                           settings=settings, class_items=entities_dict, shown_entities=shown_entities, view_classes=view_classes)
 
 
 
@@ -488,7 +482,7 @@ def delete_map(map_id: int) -> str:
 
 @app.route('/choose_indexBg', methods=['POST'])
 def choose_index_bg():
-    g.cursor.execute('DELETE FROM tng.settings')
+
 
     map_id = request.form.get('mapselection')
     default_img = request.form.get('default_img')
@@ -496,7 +490,7 @@ def choose_index_bg():
     greyscale = request.form.get('greyscale') == 'on'
 
     g.cursor.execute(
-        'INSERT INTO tng.settings (index_map, index_img, img_map, greyscale) VALUES (%s, %s, %s, %s)',
+        'UPDATE tng.settings SET (index_map, index_img, img_map, greyscale) = (%s, %s, %s, %s) WHERE ID = (SELECT ID FROM tng.settings LIMIT 1)',
         (map_id, default_img, map_img, greyscale)
     )
     return redirect(url_for('admin'))
@@ -616,23 +610,24 @@ def reset():
         INSERT INTO tng.config_classes (name) VALUES ('language_code');
         
         INSERT INTO tng.config_properties (name, name_inv, domain, range)
-            VALUES ('{"de": "hat Mitglied", "en": "has member"}'::jsonb, '{"de": "ist Mitglied von", "en": "is member of"}'::jsonb, 
-                    (SELECT id FROM tng.config_classes WHERE name = 'project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
-            
-            INSERT INTO tng.config_properties (name, name_inv, domain, range)
-            VALUES ('{"de": "hat Zugehörigkeit", "en": "has affiliation"}'::jsonb, '{"de": "ist Zugehörigkeit von", "en": "is affiliation of"}'::jsonb, 
-                    (SELECT id FROM tng.config_classes WHERE name = 'person'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
-            
-            INSERT INTO tng.config_properties (name, name_inv, domain, range)
-            VALUES ('{"de": "hat Übersetzung", "en": "has translation"}'::jsonb, '{"de": "hat Übersetzung", "en": "has translation"}'::jsonb, NULL, NULL);
-            
-            INSERT INTO tng.config_properties (name, name_inv, domain, range)
-            VALUES ('{"de": "hat Kernmitglied", "en": "has core member"}'::jsonb, '{"de": "ist Kernmitglied von", "en": "is core member of"}'::jsonb, 
-                    (SELECT id FROM tng.config_classes WHERE name = 'main-project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
-            
-            INSERT INTO tng.config_properties (name, name_inv, domain, range)
-            VALUES ('{"de": "hat Kerninstitution", "en": "has core institution"}'::jsonb, '{"de": "ist Kerninstitution von", "en": "is core institution of"}'::jsonb, 
-                    (SELECT id FROM tng.config_classes WHERE name = 'main-project'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
+        VALUES ('{"de": "hat Mitglied", "en": "has member"}'::jsonb, '{"de": "ist Mitglied von", "en": "is member of"}'::jsonb, 
+                (SELECT id FROM tng.config_classes WHERE name = 'project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
+        
+        INSERT INTO tng.config_properties (name, name_inv, domain, range)
+        VALUES ('{"de": "hat Zugehörigkeit", "en": "has affiliation"}'::jsonb, '{"de": "ist Zugehörigkeit von", "en": "is affiliation of"}'::jsonb, 
+                (SELECT id FROM tng.config_classes WHERE name = 'person'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
+        
+        INSERT INTO tng.config_properties (name, name_inv, domain, range)
+        VALUES ('{"de": "hat Kernmitglied", "en": "has core member"}'::jsonb, '{"de": "ist Kernmitglied von", "en": "is core member of"}'::jsonb, 
+                (SELECT id FROM tng.config_classes WHERE name = 'main-project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
+        
+        INSERT INTO tng.config_properties (name, name_inv, domain, range)
+        VALUES ('{"de": "hat Kerninstitution", "en": "has core institution"}'::jsonb, '{"de": "ist Kerninstitution von", "en": "is core institution of"}'::jsonb, 
+                (SELECT id FROM tng.config_classes WHERE name = 'main-project'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
+
+        INSERT INTO tng.config_properties (name, name_inv, domain, range)
+        VALUES ('{"de": "hat Institution", "en": "has institution"}'::jsonb, '{"de": "ist Institution von", "en": "is institution of"}'::jsonb, 
+                (SELECT id FROM tng.config_classes WHERE name = 'project'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
         
         INSERT INTO tng.config (name, config_class, description, address, email, website)
         VALUES ('{"de": "Hauptprojekt", "en": "Main Project"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'main-project'), NULL, NULL, NULL, NULL);
@@ -708,10 +703,10 @@ def reset():
             shown_entities  JSONB
         );
 
-        INSERT INTO tng.settings (index_img, index_map, img_map, greyscale)
+        INSERT INTO tng.settings (index_img, index_map, img_map, greyscale, shown_entities)
         VALUES ('/static/images/index_map_bg/Blank_map_of_Europe_central_network.png',
                 1,
-                'image', TRUE)
+                'image', TRUE, '[]'::JSONB)
         
     ''')
 

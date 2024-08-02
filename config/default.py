@@ -28,5 +28,5 @@ VIEW_CLASSES = {
             'production'),
     'places': ('place',),
     'sources': ('source', 'bibliography', 'external_reference', 'edition'),
-    'files': ('file', 'katzen')
+    'files': ('file',)
 }
