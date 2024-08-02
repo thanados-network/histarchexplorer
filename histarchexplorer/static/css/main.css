@@ -12055,28 +12055,19 @@ textarea.form-control-lg {
 .btn-primary {
   background-color: #559f55;
   color: white;
-  border-color: #437e43;
+  border-color: #519851;
 }
 .btn-primary:hover {
   background-color: #437e43;
   border-color: #3a6d3a;
 }
 
-.my-custom-button {
-  --bs-btn-color: white;
-  --bs-btn-bg: #559f55;
-  --bs-btn-border-color: #437e43;
-  --bs-btn-hover-color: #000;
-  --bs-btn-hover-bg: #488748;
-  --bs-btn-hover-border-color: #366536;
-  --bs-btn-focus-shadow-rgb: 95, 145, 95;
-  --bs-btn-active-color: #fff;
-  --bs-btn-active-bg: #447f44;
-  --bs-btn-active-border-color: #325f32;
-  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-  --bs-btn-disabled-color: #000;
-  --bs-btn-disabled-bg: #559f55;
-  --bs-btn-disabled-border-color: #437e43;
+.nav-link:hover, .nav-link:focus {
+  color: #315d31;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #94c694;
 }
 
 .entity-cards {

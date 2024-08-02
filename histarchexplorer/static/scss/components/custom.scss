@@ -1,12 +1,7 @@
 @import '../../node_modules/bootstrap/scss/mixins';
+
 $nav-link-color: #559f55;
 $nav-pills-link-active-bg: #559f55;
-
-.accordion-button:not(.collapsed) {
-$accordion-active-color: #559f55;
-$accordion-active-bg: #559f55;}
-
-
 
 @import '../../node_modules/bootstrap/scss/bootstrap';
 
@@ -15,7 +10,7 @@ $btn-bg: #559f55;
 .btn-primary {
   background-color: $btn-bg;
   color: white;
-  border-color: darken($btn-bg, 10%);
+  border-color: darken($btn-bg, 2%);
 
   &:hover {
     background-color: darken($btn-bg, 10%);
@@ -23,7 +18,14 @@ $btn-bg: #559f55;
   }
 }
 
+$bs-nav-link-hover-color: darken($btn-bg, 20%);
+.nav-link:hover, .nav-link:focus {
+  color: $bs-nav-link-hover-color;
+}
 
-.my-custom-button {
-  @include button-variant(#559f55, darken(#559f55, 10%), white);
+
+$accordion-active-color: lighten($btn-bg, 20%);
+$accordion-active-bg: lighten($btn-bg, 20%);
+.accordion-button:not(.collapsed) {
+  background-color: $accordion-active-bg;
 }
