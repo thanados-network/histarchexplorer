@@ -23,12 +23,15 @@ def about() -> str:
         for column_name, column_value in zip(column_names, object_data):
             if column_value:
                 object[column_name] = column_value
-        print(object)
+        print("build_object:", object)
 
     def build_connections(id):
         g.cursor.execute('SELECT range_id, property, attribute FROM tng.links WHERE domain_id = %s', (id,))
+        connections = g.cursor.fetchall()
+        print("build_connections:", connections)
 
     build_object(1)
+    build_connections(1)
 
     g.cursor.execute('SELECT name, description, legal_notice, imprint FROM tng.config WHERE id = 1')
     project_result = g.cursor.fetchone()
@@ -81,7 +84,7 @@ ORDER BY l.sortorder, l.id;
 
     g.cursor.execute(persons_sql)
     persons_result = g.cursor.fetchall()
-    print(persons_result)
+    print("Persons:", persons_result)
 
     persons = {}
     for row in persons_result:
@@ -99,6 +102,6 @@ ORDER BY l.sortorder, l.id;
         persons[person_name]['roles'].append((helpers.get_translation(row[2]))['label'])
 
     persons_list = list(persons.values())
-    print(persons_list)
+    print("Person list:", persons_list)
 
     return render_template('about.html', project=project, institutions=institutions, persons=persons_list)
