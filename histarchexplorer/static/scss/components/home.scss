@@ -2,23 +2,23 @@
   height: calc(100vh - var(--logo-height) - var(--navbar-height) - 95px);
 }
 
-#map {
-  width: 100%;
-  height: 100%;
-  display: none;
-}
-
-.map-gray .leaflet-map-pane > .leaflet-pane:not(.leaflet-marker-pane) {
-  -webkit-filter: grayscale(100%) opacity(0.9);
-  filter: grayscale(100%) opacity(0.9);
-}
-
 #counters {
   background-color: var(--counters-bg);
   min-height: 95px;
   max-width: 100vw;
 }
 
+#map {
+  width: 100%;
+  height: 100%;
+  display: none;
+  z-index: 0;
+}
+
+.map-gray .leaflet-map-pane > .leaflet-pane:not(.leaflet-marker-pane) {
+  -webkit-filter: grayscale(100%) opacity(0.9);
+  filter: grayscale(100%) opacity(0.9);
+}
 #index-image {
   width: 100%;
   height: 100%;
