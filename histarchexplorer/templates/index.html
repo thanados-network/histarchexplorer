@@ -1,49 +1,36 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <script>
-        const chosenMap = {{ map|safe }}
-        const imgString = '{{ img|safe }}'
-        const imgOrMap = '{{ img_map|safe }}'
-    </script>
+<script>
+    const chosenMap = {{map | safe}}
+    const imgString = '{{ img|safe }}'
+    const imgOrMap = '{{ img_map|safe }}'
+</script>
 
 
-    <div id="index-container">
-        <div id="index-image"></div>
-        <div id="map" class="{% if greyscale %}map-gray{% endif %}"></div>
-    </div>
+<div id="index-container">
+    <div id="index-image"></div>
+    <div id="map" class="{% if greyscale %}map-gray{% endif %}"></div>
+</div>
 
-    <div id="counters" class="text-center pt-3">
-        <div class="row gx-0">
-            <div class="col-6 col-sm">
-                <h5 class="statistic-counter">563</h5>
-                <p>Places</p>
-            </div>
-            <div class="col-6 col-sm">
-                <h5 class="statistic-counter">5363</h5>
-                <p>Actors</p>
-            </div>
-            <div class="col-6 col-sm">
-                <h5 class="statistic-counter">5643</h5>
-                <p>Events</p>
-            </div>
-            <div class="col-6 col-sm">
-                <h5 class="statistic-counter">11555</h5>
-                <p>Artifacts</p>
-            </div>
-            <div class="col-6 col-sm">
-                <h5 class="statistic-counter">6169</h5>
-                <p>Sources</p>
-            </div>
+<div id="counters" class="text-center pt-3">
+    <div class="row gx-0">
+        {% for view_class, details in view_classes.items() %}
+        <div class="col-6 col-sm">
+            <h5 class="statistic-counter">{{ details['count'] }}</h5>
+            <p>{{view_class | capitalize_first}}</p>
         </div>
+        {% endfor %}
     </div>
+</div>
 
-    {% include 'footer.html' %}
+
+{% include 'footer.html' %}
 
 
-    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 
 {% endblock %}

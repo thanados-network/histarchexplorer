@@ -5,6 +5,7 @@ from werkzeug import Response
 from flask import Response, redirect, render_template, request, session, g
 
 from histarchexplorer import app
+from histarchexplorer.utils import cerberos
 
 
 @app.route('/')
@@ -15,7 +16,11 @@ def index():
     g.cursor.execute(f'SELECT tilestring FROM tng.maps WHERE id={data.index_map}')
     map = g.cursor.fetchone()
 
-    return render_template('index.html', map=map.tilestring, img=data.index_img, img_map=data.img_map, greyscale=data.greyscale)
+    view_classes = cerberos.gatekeeper()
+
+
+
+    return render_template('index.html', map=map.tilestring, img=data.index_img, img_map=data.img_map, greyscale=data.greyscale, view_classes=view_classes, viewcount=len(view_classes.keys()))
 
 
 
