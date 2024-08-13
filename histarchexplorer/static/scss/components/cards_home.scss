@@ -1,0 +1,161 @@
+@use '../globals'as *;
+
+.background-container {
+  position: relative;
+}
+
+
+.cards_home {
+  position: fixed;
+  bottom: rem(170);
+  //top: calc(100% - rem(530));
+  left: 0;
+  z-index: auto;
+  display: none; // Initially hide the cards_home section
+}
+
+#counters:hover ~ .cards_home,
+.cards_home:hover {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: rem(1);
+  padding-left: rem(2);
+  // Adjust grid template columns for large screens
+  @include breakpoint(large) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  // Adjust grid template columns for medium screens
+  @include breakpoint(medium) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.card_home {
+  overflow: hidden;
+  background: var(--card-bg);
+  color: var(--text-color2);
+  text-align: center;
+  padding: rem(20);
+  border-radius: rem(5);
+  transition: backbround 150ms ease-in-out;
+  cursor: pointer;
+
+
+  &--places {
+    border-top: rem(5) solid var(--limegreen);
+
+  }
+
+  &--actors {
+    border-top: rem(5) solid var(--pink);
+
+  }
+
+  &--events {
+    border-top: rem(5) solid var(--blue);
+
+  }
+
+  &--artifacts {
+    border-top: rem(5) solid var(--light-orange);
+
+  }
+
+  &--sources {
+    border-top: rem(5) solid var(--reddish-brown);
+
+  }
+
+  &--references {
+    border-top: rem(5) solid var(--dark-greyblue);
+
+  }
+
+
+  &__icon {
+    img {
+      max-width: 70%; /* Set the width of the image */
+      height: auto;
+    }
+
+    &--places {
+
+
+    }
+
+    &--actors {
+
+    }
+
+    &--events {
+
+    }
+
+    &--artifacts {
+
+    }
+
+    &--sources {
+
+    }
+
+  }
+
+  &__top {
+
+  }
+
+
+  &__label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: rem (20);
+    font-weight: 600;
+    margin-bottom: rem(15);
+    text-transform: uppercase;
+    color: var(--text-color2);
+    letter-spacing: rem(1);
+  }
+
+  &--places {
+
+  }
+
+  &--actors {
+
+  }
+
+  &--events {
+
+  }
+
+  &--artifacts {
+
+  }
+
+  &--sources {
+
+  }
+
+  &__description {
+    color: var(--text-color1);
+    font-weight: 300;
+    text-align: justify;
+
+    // Adjust font size for medium screens
+    @include breakpoint-down(large) {
+      @include breakpoint(medium) {
+        font-size: rem(14); // Set your desired font size
+      }
+    }
+  }
+
+  &__count {
+    color: var(--dark-text);
+    font-size: rem(12);
+    margin-top: rem(20);
+  }
+
+}
+
