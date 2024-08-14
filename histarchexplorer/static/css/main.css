@@ -12168,11 +12168,12 @@ textarea.form-control-lg {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   width: 100%;
-  gap: 0.03125rem;
   align-items: center;
   align-self: auto;
   position: absolute;
   bottom: 227px;
+  background: rgba(255, 255, 255, 0.65);
+  margin: 0;
 }
 
 /*# sourceMappingURL=main.css.map */
