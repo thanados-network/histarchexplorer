@@ -18,6 +18,11 @@
   margin: 0;
   // Adjust grid template columns for large screens
 
+  @include breakpoint-down('mini') {
+    grid-template-columns: 1fr;
+    margin-left: 0;
+    margin-right: 0;}
+
   }
 
 

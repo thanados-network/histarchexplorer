@@ -12105,7 +12105,7 @@ textarea.form-control-lg {
   transition: backbround 150ms ease-in-out;
   cursor: pointer;
 }
-@media (max-width: 31.188em) {
+@media (max-width: 36em) {
   .entity-card {
     margin-left: 0;
     margin-right: 0;
@@ -12174,6 +12174,14 @@ textarea.form-control-lg {
   bottom: 227px;
   background: rgba(255, 255, 255, 0.65);
   margin: 0;
+}
+@media (max-width: 36em) {
+  #counters:hover ~ .cards_home,
+  .cards_home:hover {
+    grid-template-columns: 1fr;
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 
 /*# sourceMappingURL=main.css.map */
