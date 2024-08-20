@@ -12158,7 +12158,6 @@ textarea.form-control-lg {
 }
 
 .cards_home {
-  bottom: 14.1875rem;
   z-index: auto;
   display: none;
 }
@@ -12171,6 +12170,7 @@ textarea.form-control-lg {
   align-items: center;
   align-self: auto;
   position: absolute;
+  bottom: 14.1875rem;
   overflow-y: auto;
   max-height: 80vh;
   background: rgba(255, 255, 255, 0.65);
