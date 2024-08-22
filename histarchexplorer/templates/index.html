@@ -19,7 +19,7 @@
 <div id="counters" class="text-center pt-3">
     <div class="row gx-0">
         {% for view_class, details in view_classes.items() %}
-        <div class="col-lg col-md-4 col-sm-6">
+        <div class="col-lg col-md-4">
             <h5 class="statistic-counter">{{ details['count'] }}</h5>
             <p>{{view_class | capitalize_first}}</p>
         </div>
