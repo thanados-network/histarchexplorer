@@ -27,9 +27,4 @@
     grid-template-columns: repeat(1, minmax(135px, 1fr));
   }
 
-  @include breakpoint-down('mini') {
-    grid-template-columns: 1fr;
-    margin-left: 0;
-    margin-right: 0;
-  }
 }
