@@ -1,11 +1,28 @@
 #index-container {
   height: calc(100vh - var(--logo-height) - var(--navbar-height) - 95px);
-}
 
+  @media (max-width: 47.9375em) {
+    height: calc(100vh - 95px);
+  }
+
+}
+.button-container {
+  position: absolute;
+  top: 92%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  width: 100%;
+  text-align: center;
+}
 #counters {
   background-color: var(--counters-bg);
   min-height: 95px;
   max-width: 100vw;
+
+  @media (max-width: 47.9375em) {
+    display: none;
+  }
 }
 
 #map {
@@ -19,6 +36,7 @@
   -webkit-filter: grayscale(100%) opacity(0.9);
   filter: grayscale(100%) opacity(0.9);
 }
+
 #index-image {
   width: 100%;
   height: 100%;
@@ -28,4 +46,19 @@
   background-size: cover;
   background-position: center;
   max-height: 100%;
+}
+
+#entities_mobile {
+  display: none;
+  background-color: rgba(85, 159, 85);
+  color: white;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: opacity 0.3s ease;
+
+  @media (max-width: 47.9375em) {
+    display: inline-block;
+  }
 }

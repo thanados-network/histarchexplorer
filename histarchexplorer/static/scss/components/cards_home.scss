@@ -23,8 +23,10 @@
   @media (max-width: 61.9375em) {
     grid-template-columns: repeat(3, minmax(135px, 1fr));
   }
-@media (max-width: 47.9375em) {
-    grid-template-columns: repeat(1, minmax(135px, 1fr));
-  }
+  @media (max-width: 47.9375em) {
+      grid-template-columns: 1fr;
+      position: sticky;
+      overflow-y: auto;
+    }
 
 }
