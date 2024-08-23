@@ -9,6 +9,8 @@
   --card-hover: var(--light-card-hover);
   --counters-bg-light: hsla(208, 34%, 60%, 0.75);
   --counters-bg-dark: hsla(208, 24%, 44%, 0.74);
+  --light-text1: hsl(0, 0%, 0%);
+  --light-text2: hsl(230, 17%, 14%);
   --logo-height: 132px;
   --navbar-height: 96px;
   --limegreen: hsl(163, 72%, 41%);
@@ -18,6 +20,10 @@
   --pink: hsl(329, 70%, 58%);
   --reddish-brown: hsl(349, 19%, 29%);
   --dark-greyblue: hsl(232, 19%, 15%);
+  --text-color1: var(--light-text2);
+  --text-color2: var(--light-text1);
+  --card-bg: var(--light-card);
+  --card-hover: var(--light-card-hover);
 }
 
 body.light {
@@ -178,22 +184,45 @@ body {
 #index-container {
   height: calc(100vh - var(--logo-height) - var(--navbar-height) - 95px);
 }
-
-#map {
-  width: 100%;
-  height: 100%;
-  display: none;
+@media (max-width: 47.9375em) {
+  #index-container {
+    height: calc(100vh - 95px);
+  }
 }
 
-.map-gray .leaflet-map-pane > .leaflet-pane:not(.leaflet-marker-pane) {
-  -webkit-filter: grayscale(100%) opacity(0.9);
-  filter: grayscale(100%) opacity(0.9);
+.button-container {
+  position: absolute;
+  top: 92%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  width: 100%;
+  text-align: center;
 }
 
 #counters {
   background-color: var(--counters-bg);
   min-height: 95px;
   max-width: 100vw;
+}
+@media (max-width: 47.9375em) {
+  #counters {
+    display: none;
+    pointer-events: none;
+    visibility: hidden;
+  }
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  display: none;
+  z-index: 0;
+}
+
+.map-gray .leaflet-map-pane > .leaflet-pane:not(.leaflet-marker-pane) {
+  -webkit-filter: grayscale(100%) opacity(0.9);
+  filter: grayscale(100%) opacity(0.9);
 }
 
 #index-image {
@@ -12088,17 +12117,16 @@ textarea.form-control-lg {
 
 .entity-card {
   position: relative;
-  overflow: hidden;
-  margin: 1.25rem;
+  margin: 1vw;
   background: var(--card-bg);
   color: var(--text-color2);
   text-align: center;
   padding: 1.25rem;
   border-radius: 0.3125rem;
-  transition: backbround 150ms ease-in-out;
+  transition: background 150ms ease-in-out;
   cursor: pointer;
 }
-@media (max-width: 31.188em) {
+@media (max-width: 35.9375em) {
   .entity-card {
     margin-left: 0;
     margin-right: 0;

@@ -384,6 +384,7 @@ def edit_entry():
     update_jsonb_column('description', description, language, config_id)
     update_jsonb_column('imprint', imprint, language, config_id)
     update_jsonb_column('legal_notice', legal_notice, language, config_id)
+    update_jsonb_column('name', name, language, config_id)
 
 
 
