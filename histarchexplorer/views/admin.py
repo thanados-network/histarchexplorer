@@ -332,7 +332,7 @@ def add_link(domain: Optional[int] = None, range: Optional[int] = None, prop: Op
     if current_user.group not in ['admin', 'manager']:
         abort(403)
     g.cursor.execute(
-        f'INSERT INTO tng.links (domain_id, range_id, property, attribute) VALUES ({domain}, {range}, {prop}, NULLIF({role}, 0))')
+        f'INSERT INTO tng.links (domain_id, range_id, property, attribute, sortorder) VALUES ({domain}, {range}, {prop}, NULLIF({role}, 0), COALESCE((SELECT (sortorder + 1) FROM tng.links WHERE sortorder IS NOT NULL ORDER BY sortorder DESC LIMIT 1),1))')
     flash('Link added successfully', 'success')
     return redirect(url_for('admin') + tab + '/' + entry)
 
