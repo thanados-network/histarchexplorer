@@ -12191,6 +12191,7 @@ textarea.form-control-lg {
   bottom: 14.1875rem;
   background: rgba(255, 255, 255, 0.65);
   margin: 0;
+  pointer-events: none; /* Disable pointer events initially */
 }
 @media (max-width: 61.9375em) {
   .cards_home {
@@ -12204,6 +12205,7 @@ textarea.form-control-lg {
     top: 100vh;
     overflow-y: auto;
     opacity: 1;
+    pointer-events: auto; /* Enable pointer events on small screens */
   }
 }
 
@@ -12212,6 +12214,7 @@ textarea.form-control-lg {
   #mobileAnchor:hover ~ .cards_home,
   .cards_home:hover {
     opacity: 1;
+    pointer-events: auto; /* Enable pointer events when visible */
   }
 }
 #entities_mobile {
