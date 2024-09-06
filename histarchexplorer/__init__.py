@@ -13,7 +13,7 @@ app.config.from_pyfile('production.py')
 babel = Babel(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
-from histarchexplorer.views import admin, login, test_entity, views, about, entities
+from histarchexplorer.views import admin, login, test_entity, views, about, entities, landing
 from histarchexplorer.utils import view_util
 
 def connect() -> connection:
