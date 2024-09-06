@@ -15,7 +15,7 @@
                 </div>
                 <div class="col-md-4 column" id="col2">
                     <span class="column-label">DESCRIPTION</span>
-                    <!-- API loaded content -->
+                    {{ entity.description}}
                 </div>
                 <div class="col-md-4 column" id="col3">
                     <span class="column-label">LOCATION</span>
@@ -37,12 +37,14 @@
                 <div class="entity-card__icon">
                     <img src="/static/images/entity_icons/places_550.png" alt="Places">
                 </div>
-                <div class="entity-card__label">Name of entity</div>
+                <div class="entity-card__label">{{ entity.name }}</div>
 
-                <div class="entity-type"> Type of entity</div>
-                <div class="entity-date"> Date of entity</div>
-
-
+                <div class="entity-type">
+                    {% for type in entity.types %}
+                        <p class="fw-bold">{{ type.label }}</p>
+                    {% endfor %}
+                </div>
+                <div class="entity-date"> {{  entity.begin }} - {{ entity.end }}</div>
             </div>
         </div>
     </div>
