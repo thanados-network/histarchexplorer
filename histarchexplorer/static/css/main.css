@@ -12234,7 +12234,7 @@ textarea.form-control-lg {
   font-size: 3.5rem;
 }
 
-.column {
+#content-columns .column {
   height: calc(100vh - var(--logo-height) - var(--navbar-height) - 95px);
   color: black;
 }
@@ -12260,7 +12260,21 @@ textarea.form-control-lg {
 .sidebar {
   background-color: var(--card-bg);
   height: calc(100vh - var(--logo-height) - var(--navbar-height));
-  color: white;
+  color: black;
+  text-align: center;
+}
+
+.sidebar-content {
+  margin-top: 3rem;
+}
+
+.entity-type,
+.entity-date {
+  font-size: 1.2rem;
+}
+
+.entity-type {
+  margin-top: 3rem;
 }
 
 /*# sourceMappingURL=main.css.map */
