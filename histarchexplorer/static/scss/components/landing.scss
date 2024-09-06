@@ -1,0 +1,28 @@
+.column {
+  height: calc(100vh - var(--logo-height) - var(--navbar-height) - 95px);
+  color: black;
+}
+
+#col1 {
+  background-color: #ff5733;
+}
+
+#col2 {
+  background-color: #33ff57;
+}
+
+#col3 {
+  background-color: #1f3497;
+}
+
+.bottom-bar {
+  background-color: var(--counters-bg);
+  min-height: 95px;
+  max-width: 100vw;
+}
+
+.sidebar {
+  background-color: var(--card-bg);
+  height: calc(100vh - var(--logo-height) - var(--navbar-height) );
+  color: white;
+}

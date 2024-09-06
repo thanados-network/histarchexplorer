@@ -12181,7 +12181,6 @@ textarea.form-control-lg {
 
 .cards_home {
   opacity: 0;
-  transition: opacity 0.5s ease-in-out;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   width: 100%;
@@ -12218,7 +12217,8 @@ textarea.form-control-lg {
   }
 }
 #entities_mobile {
-  display: none;
+  visibility: hidden;
+  opacity: 0;
   color: rgba(0, 0, 0, 0.7);
   text-decoration: none;
   padding: 10px 15px;
@@ -12232,6 +12232,35 @@ textarea.form-control-lg {
 }
 #entities_mobile .bi-arrow-down-circle-fill {
   font-size: 3.5rem;
+}
+
+.column {
+  height: calc(100vh - var(--logo-height) - var(--navbar-height) - 95px);
+  color: black;
+}
+
+#col1 {
+  background-color: #ff5733;
+}
+
+#col2 {
+  background-color: #33ff57;
+}
+
+#col3 {
+  background-color: #1f3497;
+}
+
+.bottom-bar {
+  background-color: var(--counters-bg);
+  min-height: 95px;
+  max-width: 100vw;
+}
+
+.sidebar {
+  background-color: var(--card-bg);
+  height: calc(100vh - var(--logo-height) - var(--navbar-height));
+  color: white;
 }
 
 /*# sourceMappingURL=main.css.map */
