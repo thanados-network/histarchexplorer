@@ -3,29 +3,111 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 sidebar" id="sidebar">
+                <div class="sidebar-content">
+                    <div class="entity-card__icon">
+                        <img src="/static/images/entity_icons/places_550.png" alt="Places">
+                    </div>
+                    <div class="entity-card__label">{{ entity.name }}</div>
+                    <div class="entity-country">
+                        {% for type in entity.types %}
+                            {% if type.hierarchy == 'Country' %}
+                                <p>{{ type.label }}</p>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
 
-    <div class="grid">
+                    <div class="entity-type">
+                        {% if entity.types and entity.types[0] %}
+                            <p>{{ entity.types[0].label | upper }}</p>
+                        {% endif %}
+                    </div>
 
-        <div class="item">
-            <div class="item-content">
-                <!-- Safe zone, enter your custom markup -->
-                This can be anything.
-                <!-- Safe zone ends -->
-            </div>
-        </div>
+                    <div class="entity-date">
+                        {% if entity.begin_from and entity.end_to %}
+                            AD {{ entity.begin_from.split('.')[-1] }} - {{ entity.end_to.split('.')[-1] }}
+                        {% elif entity.begin_from %}
+                            AD {{ entity.begin_from.split('.')[-1] }}
+                        {% elif entity.end_to %}
+                            AD {{ entity.end_to.split('.')[-1] }}
+                        {% endif %}
 
-        <div class="item">
-            <div class="item-content">
-                <!-- Safe zone, enter your custom markup -->
-                <div class="my-custom-content">
-                    Yippee!
+                        {% for type in entity.types %}
+                            {% if type.root == 'Chronology' %}
+                                {{ type.label or 'No date available' }}
+                            {% endif %}
+                        {% endfor %}
+
+                    </div>
+
+                    <div class="btn-group-vertical" id="entity-link-buttons" role="group"
+                         aria-label="Vertical button group">
+                        <button type="button" class="btn btn-outline-secondary">ACTORS</button>
+                        <button type="button" class="btn btn-outline-secondary">ITEMS</button>
+                        <button type="button" class="btn btn-outline-secondary">EVENTS</button>
+                        <button type="button" class="btn btn-outline-secondary">FILES</button>
+                        <button type="button" class="btn btn-outline-secondary">SOURCES</button>
+                    </div>
                 </div>
-                <!-- Safe zone ends -->
+            </div>
+
+            <!-- Main content area (md-10) -->
+            <div class="col-md-10">
+                <div class="grid">
+                    <div class="item">
+                        <div class="item-content">
+                            {% if entity.depictions %}
+                                {% for depiction in entity.depictions %}
+                                    <div class="main-image">
+                                        <img src="{{ depiction.url }}" alt="{{ depiction.title }}"/>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-content">
+                            <div class="my-custom-content">
+                                <span class="column-label">DESCRIPTION</span>
+                                <p>{{ entity.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-content">
+                            <div class="my-custom-content">
+                                {% for type in entity.types %}
+                                    {% if type.hierarchy == 'Country' %}
+                                        <p>{{ type.label }}</p>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="item-content">
+                            <div class="subentities">
+                                <ul>
+                                    {% set linked_entities = relations.places | selectattr('relation_type', 'equalto', 'crm:P46_is_composed_of') | list %}
+                                    {% for linked_entity in linked_entities %}
+                                        <li>
+                                            <a href="{{ linked_entity.relation_to }}">{{ linked_entity.label }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
     </div>
 
     <script src="https://cdn.jsdelivr.net/gh/haltu/muuri@0.9.5/dist/muuri.min.js"></script>
- <script src="{{ url_for('static', filename='js/entity_landing.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/entity_landing.js') }}"></script>
 {% endblock %}
