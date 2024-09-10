@@ -48,3 +48,34 @@
   width: 100%;
   height: 100%;
 }
+
+//Sidebar
+.sidebar {
+  background-color: var(--card-bg);
+  height: calc(100vh - var(--navbar-height) );
+  color: black;
+  text-align: center;
+}
+
+.sidebar-content {
+  margin-top: 2rem;
+}
+.entity-country{
+  margin-top: 1rem;
+}
+
+ .entity-type,
+  .entity-date {
+    font-size: 1.2rem;
+  }
+
+  .entity-type {
+    margin-top: 3rem;
+  }
+
+.btn-group-vertical .btn {
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+        }
+        .btn-group-vertical .btn:last-child {
+            margin-bottom: 0;}
