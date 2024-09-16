@@ -12259,7 +12259,6 @@ textarea.form-control-lg {
     width: calc(100% - 10px);
   }
 }
-/*mediaqoery ab gewisser breite 2, dann 1 - ab 776*/
 .item-content {
   padding: 1rem;
   display: flex;
@@ -12343,20 +12342,28 @@ textarea.form-control-lg {
 
 .entity-type,
 .entity-date {
-  font-size: 1.2rem;
+  font-size: 1.2em;
 }
 
+@media (max-width: 992px) {
+  .entity-type,
+  .entity-date {
+    font-size: 1em;
+  }
+}
 .entity-type {
   margin-top: 3rem;
 }
 
-.btn-group-vertical .btn {
-  margin-top: 3rem;
-  margin-bottom: 1rem;
+#entity-link-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.btn-group-vertical .btn:last-child {
-  margin-bottom: 0;
+#entity-link-buttons button {
+  margin-top: 1.5rem;
+  width: auto;
 }
 
 /*# sourceMappingURL=main.css.map */
