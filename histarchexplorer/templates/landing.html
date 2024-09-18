@@ -127,22 +127,35 @@
                     {% endif %}
 
 
-                    <!-- does not work -->
-                    {% for reference in references %}
-                        {% if reference.relation_system_class == 'external_reference' %}
-                            <div class="item">
-                                <div class="item-content">
-                                    <div class="muuri-references">
-                                        <p class="reference-label">External Reference: {{ reference.label }}</p>
-                                        <p class="reference-link">
-                                            <a href="{{ reference.relation_to }}"
-                                               target="_blank">{{ reference.relation_to }}</a>
-                                        </p>
-                                    </div>
-                                </div>
+                    <!-- external references -->
+                    <div class="item">
+                        <div class="item-content">
+                            <div class="muuri-references">
+                                <p class="reference-label">External References:</p>
+                                {% for reference in entity.relations['references'] %}
+                                    <p class="reference-link">
+                                        <a href="{{ reference.relation_to }}"
+                                           target="_blank">{{ reference.relation_to }}</a>
+                                    </p>
+                                {% endfor %}
                             </div>
-                        {% endif %}
-                    {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Bibliography Tile -->
+                    <div class="item">
+                        <div class="item-content">
+                            <div class="muuri-bibliography">
+                                <p class="bibliography-label">Bibliography:</p>
+                                {% for bib in entity.relations['bibliography'] %}
+                                    <p class="bibliography-entry">
+                                        <a href="{{ bib.relation_to }}" target="_blank">{{ bib.label }}</a>
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
 
                 </div>
             </div>
