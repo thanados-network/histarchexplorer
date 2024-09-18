@@ -54,6 +54,7 @@
             <!-- Main content area - MUURI Tiles -->
             <div class="col-md-10">
                 <div class="grid">
+
                     <!-- First image -->
                     {% if entity.depictions %}
                         <div class="item">
@@ -124,6 +125,25 @@
                             </div>
                         {% endfor %}
                     {% endif %}
+
+
+                    <!-- does not work -->
+                    {% for reference in references %}
+                        {% if reference.relation_system_class == 'external_reference' %}
+                            <div class="item">
+                                <div class="item-content">
+                                    <div class="muuri-references">
+                                        <p class="reference-label">External Reference: {{ reference.label }}</p>
+                                        <p class="reference-link">
+                                            <a href="{{ reference.relation_to }}"
+                                               target="_blank">{{ reference.relation_to }}</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
                 </div>
             </div>
         </div>

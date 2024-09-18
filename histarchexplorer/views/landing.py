@@ -9,12 +9,16 @@ from histarchexplorer.models.entity import Entity
 def landing(id_: int) -> str:
     parser = Parser()
     entity = Entity.get_entity(id_, parser)
-    print(entity.types)
-    print(entity.begin)
-    print(entity.end)
-    print(entity.relations)
-    print(entity.relation_class)
+
+    print("Types:", entity.types)
+    #print("Begin:", entity.begin)
+    #print("End:", entity.end)
+    print("Relations:", entity.relations)
+    print("Relation Class:", entity.relation_class)
+
+
     if entity.depictions is None:
         entity.depictions = []
+
 
     return render_template('landing.html', entity=entity, relations=entity.relations)
