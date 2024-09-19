@@ -127,11 +127,11 @@
                     {% endif %}
 
 
-                    <!-- external references -->
-                    <div class="item">
+                    <!-- External references -->
+                    <div class="item wide-item">
                         <div class="item-content">
                             <div class="muuri-references">
-                                <p class="reference-label">External References:</p>
+                                <span class="tile-label">EXTERNAL REFERENCES</span>
                                 {% for reference in entity.relations['references'] %}
                                     <p class="reference-link">
                                         <a href="{{ reference.relation_to }}"

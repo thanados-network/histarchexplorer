@@ -12246,7 +12246,7 @@ textarea.form-control-lg {
   z-index: 1;
   background: #ece6e6;
   color: #060606;
-  overflow: hidden; /* Prevents content from overflowing the container */
+  overflow: hidden;
 }
 
 @media (max-width: 992px) {
@@ -12256,6 +12256,20 @@ textarea.form-control-lg {
 }
 @media (max-width: 766px) {
   .item {
+    width: calc(100% - 10px);
+  }
+}
+.wide-item {
+  width: calc(100% - 30px);
+}
+
+@media (max-width: 992px) {
+  .wide-item {
+    width: calc(100% - 20px);
+  }
+}
+@media (max-width: 766px) {
+  .wide-item {
     width: calc(100% - 10px);
   }
 }
