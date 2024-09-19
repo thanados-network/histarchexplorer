@@ -12,11 +12,13 @@
                     </div>
                     <div class="entity-card__label">{{ entity.name }}</div>
                     <div class="entity-country">
-                        {% for type in entity.types %}
-                            {% if type.hierarchy == 'Country' %}
-                                <p>{{ type.label }}</p>
-                            {% endif %}
-                        {% endfor %}
+                        {% if entity.types %}
+                            {% for type in entity.types %}
+                                {% if type.hierarchy == 'Country' %}
+                                    <p>{{ type.label }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
                     </div>
 
                     <div class="entity-type">
@@ -34,12 +36,13 @@
                             AD {{ entity.end_to.split('.')[-1] }}
                         {% endif %}
 
-                        {% for type in entity.types %}
-                            {% if type.root == 'Chronology' %}
+                         {% if entity.types %}
+                            {% for type in entity.types %}
+                                {% if type.root == 'Chronology' %}
                                 {{ type.label or 'No date available' }}
-                            {% endif %}
-                        {% endfor %}
-
+                                {% endif %}
+                             {% endfor %}
+                        {% endif %}
                     </div>
 
                     <div id="entity-link-buttons">
@@ -97,10 +100,10 @@
                             <div class="item-content">
                                 <div class="subentities">
                                     <p class="tile-label">RELATED ENTITIES</p>
-                                        {% for type_, list_ in subunits.items() %}
-                                            <p>{{ type_ }} ({{ list_ | length }})</p>
+                                    {% for type_, list_ in subunits.items() %}
+                                        <p>{{ type_ }} ({{ list_ | length }})</p>
 
-                                        {% endfor %}
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>

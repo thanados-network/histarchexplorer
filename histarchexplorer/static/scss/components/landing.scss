@@ -58,6 +58,7 @@
 .item-content {
   width: auto;
   height: auto;
+  overflow: hidden;
 }
 
 .tile-label {
@@ -70,10 +71,27 @@
 .muuri-description {
   p {
     max-height: 700px;
-    overflow: auto;
     margin-top: 1.5rem;
+
+    // These are technically the same, but use both
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+
+    // This is for IE
+    -ms-word-break: break-all;
+    // Dangerous in WebKit as it breaks words anywhere
+    word-break: break-all;
+    // Better alternative (non-standard)
+    word-break: break-word;
+
+    // Adds hyphens where words break, if supported (No Blink)
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
   }
 }
+
 
 .location {
   width: 26vw;
@@ -115,7 +133,6 @@
     margin-top: 1.5rem;
   }
 }
-
 
 
 //Sidebar
