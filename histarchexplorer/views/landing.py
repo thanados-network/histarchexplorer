@@ -12,12 +12,16 @@ def landing(id_: int) -> str:
     parser = Parser()
     entity = Entity.get_entity(id_, parser)
     subunits_dict = defaultdict(list)
+    feature_dict = defaultdict(list)
+    strati_dict = defaultdict(list)
+    artifact_dict = defaultdict(list)
+    remains_dict = defaultdict(list)
     if entity.system_class.lower() in [
-            "artifact",
-            "feature",
-            "human_remains",
-            "place",
-            "stratigraphic_unit"]:
+        "artifact",
+        "feature",
+        "human_remains",
+        "place",
+        "stratigraphic_unit"]:
         subunit_parser = Parser(
             properties=['P46'],
             limit=0,
@@ -28,8 +32,18 @@ def landing(id_: int) -> str:
         for subunit in subunits:
             for type_ in subunit.types:
                 subunits_dict[type_.type_hierarchy[0]['label']].append(subunit)
+                print(type_.type_hierarchy[0]['label'])
+                match type_.type_hierarchy[0]['label']:
+                    case 'Feature':
+                        feature_dict[type_.label].append(subunit)
+                    case 'Stratigraphic unit':
+                        strati_dict[type_.label].append(subunit)
+                    case 'Artifact':
+                        artifact_dict[type_.label].append(subunit)
+                    case 'Human remains':
+                        remains_dict[type_.label].append(subunit)
 
-
+        # print(subunits_dict['Feature'])
 
     # print("Types:", entity.types)
     # print("Begin:", entity.begin)
@@ -43,4 +57,8 @@ def landing(id_: int) -> str:
         'landing.html',
         entity=entity,
         relations=entity.relations,
-        subunits=subunits_dict or None)
+        subunits=subunits_dict or None,
+        features=feature_dict or None,
+        strati=strati_dict or None,
+        artifact=artifact_dict or None,
+        remains=remains_dict or None)

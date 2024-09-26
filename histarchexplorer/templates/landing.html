@@ -2,7 +2,6 @@
 {% block content %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2 sidebar" id="sidebar">
@@ -36,12 +35,12 @@
                             AD {{ entity.end_to.split('.')[-1] }}
                         {% endif %}
 
-                         {% if entity.types %}
+                        {% if entity.types %}
                             {% for type in entity.types %}
                                 {% if type.root == 'Chronology' %}
-                                {{ type.label or 'No date available' }}
+                                    {{ type.label or 'No date available' }}
                                 {% endif %}
-                             {% endfor %}
+                            {% endfor %}
                         {% endif %}
                     </div>
 
@@ -100,10 +99,21 @@
                             <div class="item-content">
                                 <div class="subentities">
                                     <p class="tile-label">RELATED ENTITIES</p>
-                                    {% for type_, list_ in subunits.items() %}
-                                        <p>{{ type_ }} ({{ list_ | length }})</p>
-
+                                    {% for feature, list_ in features.items() %}
+                                        <p>{{ feature }} ({{ list_ | length }})</p>
                                     {% endfor %}
+                                    {% for feature, list_ in strati.items() %}
+                                        <p>{{ feature }} ({{ list_ | length }})</p>
+                                    {% endfor %}
+                                    {% for feature, list_ in artifact.items() %}
+                                        <p>{{ feature }} ({{ list_ | length }})</p>
+                                    {% endfor %}
+                                    {% for feature, list_ in remains.items() %}
+                                        <p>{{ feature }} ({{ list_ | length }})</p>
+                                    {% endfor %}
+                                    {#                                    {% for type_, list_ in subunits.items() %}#}
+                                    {#                                        <p>{{ type_ }} ({{ list_ | length }})</p>#}
+                                    {#                                    {% endfor %}#}
                                 </div>
                             </div>
                         </div>
@@ -127,19 +137,21 @@
 
 
                     <!-- External references -->
-                    <div class="item wide-item">
-                        <div class="item-content">
-                            <div class="muuri-references">
-                                <span class="tile-label">EXTERNAL REFERENCES</span>
-                                {% for reference in entity.relations['references'] %}
-                                    <p class="reference-link">
-                                        <a href="{{ reference.relation_to }}"
-                                           target="_blank">{{ reference.relation_to }}</a>
-                                    </p>
-                                {% endfor %}
+                    {% if reference %}
+                        <div class="item wide-item">
+                            <div class="item-content">
+                                <div class="muuri-references">
+                                    <span class="tile-label">EXTERNAL REFERENCES</span>
+                                    {% for reference in entity.relations['references'] %}
+                                        <p class="reference-link">
+                                            <a href="{{ reference.relation_to }}"
+                                               target="_blank">{{ reference.relation_to }}</a>
+                                        </p>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
 
 
                 </div>
