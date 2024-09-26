@@ -12244,7 +12244,7 @@ textarea.form-control-lg {
   width: calc((100% - 30px) / 3);
   margin: 5px;
   z-index: 1;
-  background: #ece6e6;
+  background: rgba(249, 246, 246, 0.4);
   color: #060606;
   overflow: hidden;
 }

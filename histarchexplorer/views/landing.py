@@ -57,8 +57,9 @@ def landing(id_: int) -> str:
         'landing.html',
         entity=entity,
         relations=entity.relations,
-        subunits=subunits_dict or None,
-        features=feature_dict or None,
-        strati=strati_dict or None,
-        artifact=artifact_dict or None,
-        remains=remains_dict or None)
+        subunits=subunits_dict or {},
+        features=feature_dict or {},
+        strati=strati_dict or {},
+        artifact=artifact_dict or {},
+        remains=remains_dict or {}
+    )
