@@ -7,7 +7,7 @@
             <div class="col-md-2 sidebar" id="sidebar">
                 <div class="sidebar-content">
                     <div class="entity-card__icon">
-                         <img src="/static/images/entity_icons/{{ view_class | lower }}s_550.png" alt="{{ class_name }}">
+                        <img src="/static/images/entity_icons/{{ view_class | lower }}s_550.png" alt="{{ class_name }}">
                     </div>
                     <div class="entity-card__label">{{ entity.name }}</div>
                     <div class="entity-country">
@@ -22,18 +22,14 @@
 
                     <div class="entity-type">
                         {% if entity.types and entity.types[0] %}
-                            <p>{{ entity.types[0].label | upper }}</p>
+                            {% if entity.system_class in entity.types[0].root %}
+                                <p>{{ entity.types[0].label | upper }}</p>
+                            {% endif %}
                         {% endif %}
                     </div>
 
                     <div class="entity-date">
-                        {% if entity.begin_from and entity.end_to %}
-                            AD {{ entity.begin_from.split('.')[-1] }} - {{ entity.end_to.split('.')[-1] }}
-                        {% elif entity.begin_from %}
-                            AD {{ entity.begin_from.split('.')[-1] }}
-                        {% elif entity.end_to %}
-                            AD {{ entity.end_to.split('.')[-1] }}
-                        {% endif %}
+                        <p>{{ entity.formated_date  }}</p>
 
                         {% if entity.types %}
                             {% for type in entity.types %}
@@ -83,7 +79,8 @@
                         </div>
                     {% endif %}
 
-                    <!-- Map Location - ADD PIN! -->
+                    <!-- Map Location -->
+                    <!-- Todo: Add Pin! -->
                     <div class="item">
                         <div class="item-content">
                             <div class="location">

@@ -6,7 +6,7 @@ from histarchexplorer.models.depiction import Depiction
 from histarchexplorer.models.relation import Relation
 from histarchexplorer.models.types import Types
 from histarchexplorer.models.util import format_date, split_date_string, \
-    uc_first
+    uc_first, date_template_format
 
 
 class Entity:
@@ -43,6 +43,7 @@ class Entity:
                 data['when']['timespans'][0]['end']['latest'])
             self.begin = format_date(self.begin_from, self.begin_to)
             self.end = format_date(self.end_from, self.end_to)
+            self.formated_date = date_template_format(self.begin, self.end)
 
     def __repr__(self) -> str:
         return str(self.__dict__)

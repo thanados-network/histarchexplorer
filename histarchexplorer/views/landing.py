@@ -34,7 +34,7 @@ def landing(id_: int) -> str:
         for subunit in subunits:
             for type_ in subunit.types:
                 subunits_dict[type_.type_hierarchy[0]['label']].append(subunit)
-                print(type_.type_hierarchy[0]['label'])
+              #  print(type_.type_hierarchy[0]['label'])
                 match type_.type_hierarchy[0]['label']:
                     case 'Feature':
                         feature_dict[type_.label].append(subunit)
@@ -47,6 +47,7 @@ def landing(id_: int) -> str:
 
         # print(subunits_dict['Feature'])
 
+    print (entity.view_class)
     # print("Types:", entity.types)
     # print("Begin:", entity.begin)
     # print("End:", entity.end)
