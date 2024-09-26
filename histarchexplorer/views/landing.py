@@ -11,6 +11,8 @@ from histarchexplorer.models.entity import Entity
 def landing(id_: int) -> str:
     parser = Parser()
     entity = Entity.get_entity(id_, parser)
+
+
     subunits_dict = defaultdict(list)
     feature_dict = defaultdict(list)
     strati_dict = defaultdict(list)
@@ -56,6 +58,7 @@ def landing(id_: int) -> str:
     return render_template(
         'landing.html',
         entity=entity,
+        view_class=entity.view_class,
         relations=entity.relations,
         subunits=subunits_dict or {},
         features=feature_dict or {},

@@ -16,6 +16,7 @@ class Entity:
         self.name = data['properties']['title']
         self.description = self.get_description(data['descriptions'])
         self.system_class = uc_first(data['systemClass'].replace('_', ' '))
+        self.view_class = uc_first(data['viewClass'].replace('_', ' '))
         self.types = self.get_types(data['types']) if 'types' in data else None
         self.alias = self.get_alias(data['names']) if 'names' in data else None
         self.relation_class = self.get_relation_class(data['relations']) if data.get('relations') else None
