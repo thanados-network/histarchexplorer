@@ -176,5 +176,10 @@
 
 #entity-link-buttons button {
   margin-top: 1.5rem;
-  width: auto;
+  width: 70%;
+  padding-right: 0.2rem;
+  padding-left: 0.2rem;
+  font-size: 1rem;
+  overflow: hidden; // Hide content that overflows the button boundary
+  text-overflow: ellipsis;
 }
