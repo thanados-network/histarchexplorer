@@ -67,7 +67,7 @@
 
                     <!-- Description -->
                     {% if entity.description %}
-                         <div class="{{ entity.description_class }}">
+                        <div class="{{ entity.description_class }}">
                             <div class="item-content">
                                 <div class="muuri-description">
                                     <span class="tile-label">DESCRIPTION</span>
@@ -135,15 +135,31 @@
 
 
                     <!-- External references -->
-                    {% if entity.relations['references'] %}
+                    {% if entity.relations['external_references'] %}
                         <div class="item item-wide">
                             <div class="item-content">
                                 <div class="muuri-references">
                                     <span class="tile-label">EXTERNAL REFERENCES</span>
-                                    {% for reference in entity.relations['references'] %}
+                                    {% for reference in entity.relations['external_references'] %}
                                         <p class="reference-link">
                                             <a href="{{ reference.relation_to }}"
                                                target="_blank">{{ reference.relation_to }}</a>
+                                        </p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Bibliography -->
+                    {% if entity.relations['bibliography'] %}
+                        <div class="item item-wide">
+                            <div class="item-content">
+                                <div class="muuri-references">
+                                    <span class="tile-label">BIBLIOGRAPHY</span>
+                                    {% for bibliography in entity.relations['bibliography'] %}
+                                        <p class="reference-link">
+                                            {{ bibliography.relation_to }}
                                         </p>
                                     {% endfor %}
                                 </div>

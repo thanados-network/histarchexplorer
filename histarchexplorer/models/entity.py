@@ -69,8 +69,14 @@ class Entity:
                         'administrative_unit', []).append(relation)
                 case 'artifact' | 'human_remains':
                     relation_dict.setdefault('artifacts', []).append(relation)
-                case 'bibliography' | 'edition' | 'external_reference':
-                    relation_dict.setdefault('references', []).append(relation)
+
+                case 'bibliography':
+                    relation_dict.setdefault('bibliography', []).append(relation)
+                case 'external_reference':
+                    relation_dict.setdefault('external_references', []).append(relation)
+                case 'edition' :
+                    relation_dict.setdefault('editions', []).append(relation)
+
                 case 'acquisition' | 'activity' | \
                      'event' | 'move' | 'production':
                     relation_dict.setdefault('events', []).append(relation)
