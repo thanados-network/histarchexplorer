@@ -6,6 +6,8 @@
   --dark-card-hover: hsl(230, 19%, 36%);
   --footer-bg-light: transparent;
   --footer-bg-dark: hsl(0, 0%, 31%);
+  --light-muuri-tile: hsl(0, 20%, 97%, 0.3);
+  --dark-muuri-tile: hsla(0, 0%, 49%, 0.3);
   --card-hover: var(--light-card-hover);
   --counters-bg-light: hsla(208, 34%, 60%, 0.75);
   --counters-bg-dark: hsla(208, 24%, 44%, 0.74);
@@ -24,6 +26,7 @@
   --text-color2: var(--light-text1);
   --card-bg: var(--light-card);
   --card-hover: var(--light-card-hover);
+  --muuri-tile: var(--light-muuri-tile) ;
 }
 
 body.light {
@@ -31,6 +34,7 @@ body.light {
   --footer-bg: var(--footer-bg-light);
   --card-bg: var(--light-card);
   --card-hover: var(--light-card-hover);
+  --muuri-tile: var(--light-muuri-tile) ;
 }
 
 body.dark {
@@ -38,6 +42,7 @@ body.dark {
   --footer-bg: var(--footer-bg-dark);
   --card-bg: var(--dark-card);
   --card-hover: var(--dark-card-hover);
+  --muuri-tile: var(--dark-muuri-tile) ;
 }
 
 :root {
@@ -12244,6 +12249,7 @@ textarea.form-control-lg {
   position: absolute;
   width: calc((100% - 30px) / 3);
   z-index: 1;
+  background: var(--muuri-tile);
   overflow: hidden;
 }
 
