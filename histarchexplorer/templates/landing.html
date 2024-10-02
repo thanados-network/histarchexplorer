@@ -66,15 +66,16 @@
                     {% endif %}
 
                     <!-- Map Location -->
-                    <!-- Todo: Add Pin! -->
-                    <div class="item">
-                        <div class="item-content">
-                            <div class="location">
-                                <span class="tile-label">LOCATION</span>
-                                <div id="muuri-map"></div>
+                    {% if entity.geometry %}
+                        <div class="item">
+                            <div class="item-content">
+                                <div class="location">
+                                    <span class="tile-label">LOCATION</span>
+                                    <div id="muuri-map"></div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
 
 
                     <!-- First image -->
@@ -146,7 +147,7 @@
                                         {% for bibliography in entity.relations['bibliography'] %}
                                             <p class="bi bi-book reference-link">
                                                 <a href="{{ bibliography.relation_to }}"
-                                                   target="_blank">{{ bibliography.related_entity.description or bibliography.label}} {{ bibliography.relation_description }}</a>
+                                                   target="_blank">{{ bibliography.related_entity.description or bibliography.label }} {{ bibliography.relation_description }}</a>
                                             </p>
                                         {% endfor %}
                                     {% endif %}
@@ -156,7 +157,7 @@
                                         {% for edition in entity.relations['edition'] %}
                                             <p class="bi bi-book-half reference-link">
                                                 <a href="{{ edition.relation_to }}"
-                                                   target="_blank">{{ edition.related_entity.description or edition.label}} {{ edition.relation_description }}</a>
+                                                   target="_blank">{{ edition.related_entity.description or edition.label }} {{ edition.relation_description }}</a>
                                             </p>
                                         {% endfor %}
                                     {% endif %}
@@ -166,7 +167,7 @@
                                         {% for reference in entity.relations['external_references'] %}
                                             <p class="bi bi-box-arrow-up-right reference-link">
                                                 <a href="{{ reference.relation_to }}"
-                                                   target="_blank">{{ reference.related_entity.description or reference.label}}</a>
+                                                   target="_blank">{{ reference.related_entity.description or reference.label }}</a>
                                             </p>
                                         {% endfor %}
                                     {% endif %}
@@ -179,6 +180,12 @@
         </div>
     </div>
 
+    <script>
+        const gisData = {%  if entity.geometry %}{{ entity.geometry | safe }}{% else %}null
+        {% endif %}
+        const entityName = '{{ entity.name | safe }}'
+    </script>
     <script src="https://cdn.jsdelivr.net/gh/haltu/muuri@0.9.5/dist/muuri.min.js"></script>
     <script src="{{ url_for('static', filename='js/entity_landing.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/map_landing.js') }}"></script>
 {% endblock %}

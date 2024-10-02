@@ -59,6 +59,7 @@ def landing(id_: int) -> str:
     # print("End:", entity.end)
     # print("Relations:", entity.relations)
     # print("Relation Class:", entity.relation_class)
+    print(entity.geometry)
 
     if entity.depictions is None:
         entity.depictions = []
