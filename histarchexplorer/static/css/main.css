@@ -12308,6 +12308,7 @@ textarea.form-control-lg {
   height: auto;
   display: block;
   margin: 0 auto;
+  position: relative;
 }
 
 .tile-label {
@@ -12339,6 +12340,32 @@ textarea.form-control-lg {
   margin-top: 1.5rem;
   height: 700px;
   width: 100%;
+}
+
+.map-wrapper {
+  position: relative;
+}
+
+.location:hover #fullscreen-button {
+  opacity: 1;
+}
+
+#fullscreen-button {
+  position: absolute;
+  top: 1rem;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  border: none;
+  z-index: 1000;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: ease-in 0.3s;
+}
+#fullscreen-button i {
+  font-size: 1.2rem;
 }
 
 .subentities {
