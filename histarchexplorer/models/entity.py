@@ -16,9 +16,9 @@ class Entity:
         self.name = data['properties']['title']
         self.description = self.get_description(data['descriptions'])
         self.system_class = uc_first(data['systemClass'].replace('_', ' '))
-        self.view_class = uc_first(data['viewClass'].replace('_', ' '))
-        self.types = self.get_types(data['types']) if 'types' in data else None
-        self.alias = self.get_alias(data['names']) if 'names' in data else None
+        self.view_class = uc_first(data['viewClass'].replace('_', ' ')) if data.get('viewClass') else None
+        self.types = self.get_types(data['types']) if data.get('types') else None
+        self.alias = self.get_alias(data['names']) if data.get('names') else None
         self.relation_class = self.get_relation_class(data['relations']) if data.get('relations') else None
         self.relations = self.get_relations() if self.relation_class else None
         self.depictions = self.get_depiction(data['depictions']) \
@@ -62,6 +62,7 @@ class Entity:
                 case 'source_translation':
                     (relation_dict.setdefault('source_translations', [])
                      .append(relation))
+
                 case 'place' | 'feature' | 'stratigraphic_unit':
                     relation_dict.setdefault('places', []).append(relation)
                 case 'administrative_unit':
@@ -94,6 +95,11 @@ class Entity:
     @staticmethod
     def get_entity(id_: int, parser: Parser):
         return Entity(ApiAccess.get_entity(id_, parser))
+
+    @staticmethod
+    def get_entities_linked_to_entity(id_: int, parser: Parser):
+        return [Entity(entity) for entity in
+                ApiAccess.get_entities_linked_to_entity(id_, parser)]
 
     @staticmethod
     def get_by_system_class(class_: str, parser: Parser):

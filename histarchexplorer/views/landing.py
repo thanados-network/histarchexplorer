@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from flask import render_template, g
+from flask import render_template
 
 from histarchexplorer import app
 from histarchexplorer.api.parser import Parser
@@ -11,6 +11,12 @@ from histarchexplorer.models.entity import Entity
 def landing(id_: int) -> str:
     parser = Parser()
     entity = Entity.get_entity(id_, parser)
+    linked_entities = Entity.get_entities_linked_to_entity(id_, parser)
+    for relation in entity.relations.values():
+        for r in relation:
+            for e_ in linked_entities:
+                if int(e_.id) == int(r.relation_to_id):
+                    r.set_related_entity(e_)
 
     subunits_dict = defaultdict(list)
     feature_dict = defaultdict(list)
@@ -28,12 +34,13 @@ def landing(id_: int) -> str:
             limit=0,
             format='lpx',
             show=['types'])
-        subunits = Entity.get_linked_entities_by_properties_recursive(entity.id, subunit_parser)
+        subunits = Entity.get_linked_entities_by_properties_recursive(
+            entity.id, subunit_parser)
 
         for subunit in subunits:
             for type_ in subunit.types:
                 subunits_dict[type_.type_hierarchy[0]['label']].append(subunit)
-              #  print(type_.type_hierarchy[0]['label'])
+                #  print(type_.type_hierarchy[0]['label'])
                 match type_.type_hierarchy[0]['label']:
                     case 'Feature':
                         feature_dict[type_.label].append(subunit)
@@ -46,7 +53,7 @@ def landing(id_: int) -> str:
 
         # print(subunits_dict['Feature'])
 
-    print (entity.view_class)
+    # print(entity.view_class)
     # print("Types:", entity.types)
     # print("Begin:", entity.begin)
     # print("End:", entity.end)
@@ -56,7 +63,7 @@ def landing(id_: int) -> str:
     if entity.depictions is None:
         entity.depictions = []
 
-    #Description 2/3 column or 1/3 column
+    # Description 2/3 column or 1/3 column
     if entity.description and len(entity.description) > 500:
         entity.description_class = "item-middle"
     else:

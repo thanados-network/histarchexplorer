@@ -19,6 +19,7 @@ class Relation:
         self.end_to = None
         self.begin = None
         self.end = None
+        self.related_entity = None
         if 'when' in data:
             self.begin_from = split_date_string(
                 data['when']['timespans'][0]['start']['earliest'])
@@ -33,3 +34,6 @@ class Relation:
 
     def __repr__(self) -> str:
         return str(self.__dict__)
+
+    def set_related_entity(self, entity) -> None:
+        self.related_entity = entity

@@ -146,7 +146,17 @@
                                         {% for bibliography in entity.relations['bibliography'] %}
                                             <p class="bi bi-book reference-link">
                                                 <a href="{{ bibliography.relation_to }}"
-                                                   target="_blank">{{ bibliography.label }}</a>
+                                                   target="_blank">{{ bibliography.related_entity.description or bibliography.label}} {{ bibliography.relation_description }}</a>
+                                            </p>
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    <!-- Edition -->
+                                    {% if entity.relations['edition'] %}
+                                        {% for edition in entity.relations['edition'] %}
+                                            <p class="bi bi-book-half reference-link">
+                                                <a href="{{ edition.relation_to }}"
+                                                   target="_blank">{{ edition.related_entity.description or edition.label}} {{ edition.relation_description }}</a>
                                             </p>
                                         {% endfor %}
                                     {% endif %}
@@ -156,7 +166,7 @@
                                         {% for reference in entity.relations['external_references'] %}
                                             <p class="bi bi-box-arrow-up-right reference-link">
                                                 <a href="{{ reference.relation_to }}"
-                                                   target="_blank">{{ reference.label }}</a>
+                                                   target="_blank">{{ reference.related_entity.description or reference.label}}</a>
                                             </p>
                                         {% endfor %}
                                     {% endif %}
