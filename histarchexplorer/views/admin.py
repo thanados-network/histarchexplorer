@@ -1,9 +1,9 @@
 import json
-from typing import Optional
+from typing import Any, Optional
 
 from flask import (render_template, abort, g, request, redirect, url_for,
                    flash, \
-    jsonify, session)
+                   jsonify, session)
 from flask_login import current_user, login_required
 from flask_babel import lazy_gettext as _
 from werkzeug import Response
@@ -14,7 +14,11 @@ from histarchexplorer.database.settings import get_map_data, get_shown_entities
 from histarchexplorer.utils import helpers
 
 
-def update_jsonb_column(column_name, value, language, config_id):
+def update_jsonb_column(
+        column_name: str,
+        value: str,
+        language: str,
+        config_id: str) -> None:
     if value != '':
         value_to_be_inserted_json = json.dumps(value)
         update_query = f"""
@@ -240,24 +244,24 @@ FROM tng.links l
 
 @app.route('/admin/add_entry', methods=['POST'])
 @login_required
-def add_entry():
+def add_entry() -> Response:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
     language = session.get(
         'language',
         request.accept_languages.best_match(
             app.config['LANGUAGES'].keys()))
-    category = request.form.get('category')
+    category = request.form.get('category') or ''
     current_tab = 'nav-' + category
-    description = request.form.get('description')
-    name = request.form.get('name')
-    address = request.form.get('address')
-    mail = request.form.get('mail')
-    website = request.form.get('website')
-    orcid = request.form.get('orcid')
-    legal_notice = request.form.get('legalnotice')
-    imprint = request.form.get('imprint')
-    image = request.form.get('image')
+    description = request.form.get('description') or ''
+    name = request.form.get('name') or ''
+    address = request.form.get('address') or ''
+    mail = request.form.get('mail') or ''
+    website = request.form.get('website') or ''
+    orcid = request.form.get('orcid') or ''
+    legal_notice = request.form.get('legalnotice') or ''
+    imprint = request.form.get('imprint') or ''
+    image = request.form.get('image') or ''
 
     config_class_map = {
         'projects': 1,  # option for config_class=2 project vs 1=main_project?
@@ -305,23 +309,25 @@ def add_entry():
         flash(f'Error adding entry {name}: {str(e)}', 'danger')
         return redirect(url_for('admin') + current_tab)
 
-    return redirect(url_for('admin') + current_tab)
+    # return redirect(url_for('admin') + current_tab)
 
 
 @app.route('/admin/delete_entry/<id>/<tab>')
 @login_required
-def delete_entry(tab: Optional[str] = None, id: Optional[int] = None) -> str:
+def delete_entry(
+        tab: Optional[str] = None,
+        id_: Optional[int] = None) -> Response:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
-    g.cursor.execute(f'SELECT config_class FROM tng.config WHERE id = {id}')
+    g.cursor.execute(f'SELECT config_class FROM tng.config WHERE id = {id_}')
     result = g.cursor.fetchone()
     if result.config_class == 5:
         flash('Main Project cannot be deleted', 'danger')
         return redirect(url_for('admin') + tab)
 
     g.cursor.execute('DELETE FROM tng.config WHERE id = %(id)s',
-                     {'id': int(id)})
+                     {'id': int(id_)})
     flash('Entry deleted successfully!', 'success')
     return redirect(url_for('admin') + tab)
 
@@ -342,15 +348,18 @@ def delete_link(link_id: Optional[int] = None, tab: Optional[str] = None,
 @app.route('/admin/add_link/<domain>/<range>/<prop>/<role>/<tab>/<entry>',
            methods=['GET', 'POST'])
 @login_required
-def add_link(domain: Optional[int] = None, range: Optional[int] = None,
-             prop: Optional[int] = None,
-             role: Optional[int] = None, tab: Optional[str] = None,
-             entry: Optional[str] = None) -> str:
+def add_link(
+        domain: Optional[int] = None,
+        range_: Optional[int] = None,
+        prop: Optional[int] = None,
+        role: Optional[int] = None,
+        tab: Optional[str] = None,
+        entry: Optional[str] = None) -> Response:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
     g.cursor.execute(
         f'INSERT INTO tng.links (domain_id, range_id, property, attribute) '
-        f'VALUES ({domain}, {range}, {prop}, NULLIF({role}, 0))')
+        f'VALUES ({domain}, {range_}, {prop}, NULLIF({role}, 0))')
     flash('Link added successfully', 'success')
     return redirect(url_for('admin') + tab + '/' + entry)
 
@@ -421,7 +430,7 @@ def edit_map():
     sortorder = request.form.get('inputorder') if request.form.get(
         'inputorder') else ''
     tilestring = request.form.get('description')
-    current_tab = request.form.get('current_tab')
+    # current_tab = request.form.get('current_tab')
     map_id = request.form.get('map_id')
 
     editsql = """
@@ -446,7 +455,7 @@ def edit_map():
                 'tilestring': tilestring,
                 'map_id': map_id
             })
-            flash(f'Map updated successfully', 'map success')
+            flash('Map updated successfully', 'map success')
         else:
             flash(f'Error updating map {map_id}', 'map danger')
     except Exception as e:

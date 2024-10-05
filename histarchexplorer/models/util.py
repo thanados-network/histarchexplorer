@@ -5,7 +5,7 @@ def uc_first(string: str) -> str:
     return str(string)[0].upper() + str(string)[1:] if string else ''
 
 
-def split_date_string(data: Optional[str]) -> Optional[str]:
+def split_date_string(data: Optional[str]) -> str:
     date = ''
     if data:
         date = '.'.join(map(str, data.split('T')[0].split('-')[::-1]))
@@ -19,8 +19,8 @@ def check_timespan_date(date_from: str, date_to: str) -> bool:
 
 
 def format_date(
-        date_from: Optional[str],
-        date_to: Optional[str]) -> Optional[str]:
+        date_from: str,
+        date_to: str) -> Optional[str]:
     # Check if date is BC and remove leading '-'
     bc_date_from = '-' in date_from
     bc_date_to = '-' in date_to
@@ -48,7 +48,7 @@ def format_date(
     return date
 
 
-def date_template_format(begin: str, end: str) -> str:
+def date_template_format(begin: Optional[str], end: Optional[str]) -> str:
     if begin and end:
         date = f'{begin} - {end}'
     elif begin:

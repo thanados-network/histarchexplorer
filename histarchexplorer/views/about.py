@@ -15,7 +15,7 @@ app.jinja_env.filters['capitalize_first'] = capitalize_first
 @app.route('/about')
 def about() -> str:
 
-    def build_object(id_: int):
+    def build_object(id_: int) -> None:
         g.cursor.execute('SELECT * FROM tng.config WHERE id = %s', (id_,))
         object_data = g.cursor.fetchone()
         object_ = {}
@@ -25,7 +25,7 @@ def about() -> str:
                 object_[column_name] = column_value
         print("build_object:", object_)
 
-    def build_connections(id_:int):
+    def build_connections(id_: int) -> None:
         g.cursor.execute(
             'SELECT '
             'range_id, '

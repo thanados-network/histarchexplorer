@@ -19,7 +19,7 @@ def get_shown_entities() -> Any:
     return g.cursor.fetchone().shown_entities
 
 def get_main_image_table() -> dict[int, int]:
-    main_image = defaultdict()
+    main_image = {}
     g.cursor.execute(
         'SELECT '
         '   entity_id,'

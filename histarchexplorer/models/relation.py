@@ -1,5 +1,6 @@
-from typing import Any
+from typing import Any, Optional
 
+from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.util import format_date, split_date_string
 
 
@@ -19,7 +20,7 @@ class Relation:
         self.end_to = None
         self.begin = None
         self.end = None
-        self.related_entity = None
+        self.related_entity: Optional[Entity] = None
         if 'when' in data:
             self.begin_from = split_date_string(
                 data['when']['timespans'][0]['start']['earliest'])
@@ -35,5 +36,5 @@ class Relation:
     def __repr__(self) -> str:
         return str(self.__dict__)
 
-    def set_related_entity(self, entity) -> None:
+    def set_related_entity(self, entity: Entity) -> None:
         self.related_entity = entity

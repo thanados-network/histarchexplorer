@@ -29,8 +29,7 @@ def connect() -> connection:
         connection_.autocommit = True
         return connection_
     except Exception as e:  # pragma: no cover
-        print("Database connection error.")
-        raise Exception(e)
+        raise Exception("Database connection error.") from e
 
 
 @babel.localeselector

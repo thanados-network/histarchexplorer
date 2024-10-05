@@ -1,13 +1,13 @@
 # Created by Alexander Watzinger and others. Please see README.md for
 # licensing information
-from typing import Optional
+from typing import Any, Optional
 
 from flask import g
 from flask_login import UserMixin
 
 
 class User(UserMixin):
-    def __init__(self, row=None) -> None:
+    def __init__(self, row: Optional[Any] = None) -> None:
         self.id = None
         self.username = None
         if not row:

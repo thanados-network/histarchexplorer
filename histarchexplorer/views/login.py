@@ -1,3 +1,5 @@
+from typing import Optional
+
 from bcrypt import hashpw
 from flask import flash, render_template, request, url_for
 from flask_login import (
@@ -17,7 +19,7 @@ login_manager.login_view = 'login'
 
 
 @login_manager.user_loader
-def load_user(user_id: int) -> UserMapper:
+def load_user(user_id: int) -> Optional[UserMapper]:
     return UserMapper.get_by_id(user_id)
 
 

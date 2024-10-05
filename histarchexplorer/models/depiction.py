@@ -18,7 +18,7 @@ class Depiction:
     def __repr__(self) -> str:
         return str(self.__dict__)
 
-    def check_if_main_image(self):
+    def check_if_main_image(self) -> bool:
         if g.main_images.get(self.entity_id):
             if g.main_images.get(self.entity_id) == self.id_:
                 return True

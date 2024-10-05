@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any, Optional
 
 from histarchexplorer.api.api_access import ApiAccess
@@ -74,10 +76,12 @@ class Entity:
                     relation_dict.setdefault('artifacts', []).append(relation)
 
                 case 'bibliography':
-                    relation_dict.setdefault('bibliography', []).append(relation)
+                    relation_dict.setdefault('bibliography', []).append(
+                        relation)
                 case 'external_reference':
-                    relation_dict.setdefault('external_references', []).append(relation)
-                case 'edition' :
+                    relation_dict.setdefault('external_references', []).append(
+                        relation)
+                case 'edition':
                     relation_dict.setdefault('editions', []).append(relation)
 
                 case 'acquisition' | 'activity' | \
@@ -89,9 +93,8 @@ class Entity:
                     relation_dict.setdefault('others', []).append(relation)
         return relation_dict
 
-
-    def get_relation_class(self) -> list[Optional[Relation]]:
-        relation =  []
+    def get_relation_class(self) -> list[Relation]:
+        relation = []
         if relations := self.data.get('relations'):
             relation = [Relation(relation) for relation in relations]
         return relation
@@ -111,31 +114,28 @@ class Entity:
             return [Depiction(depiction, self.id) for depiction in depictions]
         return []
 
-
     @staticmethod
-    def get_entity(id_: int, parser: Parser):
+    def get_entity(id_: int, parser: Parser) -> Entity:
         return Entity(ApiAccess.get_entity(id_, parser))
 
     @staticmethod
-    def get_entities_linked_to_entity(id_: int, parser: Parser):
+    def get_entities_linked_to_entity(
+            id_: int,
+            parser: Parser) -> list[Entity]:
         return [Entity(entity) for entity in
                 ApiAccess.get_entities_linked_to_entity(id_, parser)]
 
     @staticmethod
-    def get_by_system_class(class_: str, parser: Parser):
+    def get_by_system_class(class_: str, parser: Parser) -> list[Entity]:
         return [Entity(entity) for entity in
                 ApiAccess.get_by_system_class(class_, parser)]
 
     @staticmethod
-    def get_linked_entities_by_properties_recursive(id_: int, parser: Parser):
+    def get_linked_entities_by_properties_recursive(
+            id_: int,
+            parser: Parser) -> list[Entity]:
         return [Entity(entity) for entity in
                 ApiAccess.linked_entities_by_properties_recursive(id_, parser)]
-
-
-
-
-
-
 
     @staticmethod
     def get_description(data: list[dict[str, Any]]) -> Optional[list[str]]:
