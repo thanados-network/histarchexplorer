@@ -1,39 +1,23 @@
 import json
-from typing import Any, Optional
+from typing import Optional
 
-from flask import (render_template, abort, g, request, redirect, url_for,
-                   flash, \
-                   jsonify, session)
+from flask import (
+    render_template, abort, g, request, redirect, url_for,
+    flash, jsonify, session)
 from flask_login import current_user, login_required
 from flask_babel import lazy_gettext as _
 from werkzeug import Response
 
 from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
-from histarchexplorer.database.settings import get_map_data, get_shown_entities
+from histarchexplorer.database.config import (
+    get_config_data, update_jsonb_column)
+from histarchexplorer.database.config_classes import get_config_classes
+from histarchexplorer.database.config_properties import get_config_properties
+from histarchexplorer.database.map import get_base_map, get_base_map_by_id
+from histarchexplorer.database.settings import (
+    get_map_settings, get_shown_entities)
 from histarchexplorer.utils import helpers
-
-
-def update_jsonb_column(
-        column_name: str,
-        value: str,
-        language: str,
-        config_id: str) -> None:
-    if value != '':
-        value_to_be_inserted_json = json.dumps(value)
-        update_query = f"""
-            UPDATE tng.config
-            SET {column_name} = jsonb_set(COALESCE({column_name}, '{{}}'), 
-            '{{{language}}}', '{value_to_be_inserted_json}', true)
-            WHERE id = {int(config_id)}
-        """
-    else:
-        update_query = f"""
-            UPDATE tng.config
-            SET {column_name} = COALESCE({column_name}, '{{}}') - '{language}'
-            WHERE id = {int(config_id)}
-        """
-    g.cursor.execute(update_query)
 
 
 @app.route('/admin/')
@@ -44,19 +28,13 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
+    # Todo:
     language = session.get(
         'language',
-        request.accept_languages.best_match(
-            app.config['LANGUAGES'].keys()))
-
-    preferred_lan = app.config['PREFERRED_LANGUAGE']
-
-    g.cursor.execute(
-        f"SELECT * FROM tng.config ORDER BY (name->>'{language}')")
-    config_data = g.cursor.fetchall()
+        request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
 
     entities = []
-    for item in config_data:
+    for item in get_config_data(language):
         entity = {'id': item.id, 'config_class': item.config_class,
                   'website': item.website, 'email': item.email,
                   'orcid_id': item.orcid_id, 'image': item.image}
@@ -72,22 +50,11 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
         entities.append(entity)
 
-    g.cursor.execute('SELECT * FROM tng.maps ORDER BY sortorder')
-    map_data = g.cursor.fetchall()
+    config_classes = get_config_classes()
 
-    g.cursor.execute('SELECT * FROM tng.config_classes')
-    config_classes = g.cursor.fetchall()
-
-    g.cursor.execute('''
-        SELECT id, name, domain, range, 'direct' AS direction  FROM 
-        tng.config_properties
-        UNION ALL
-        SELECT id, name_inv, range,domain, 'inverse' AS direction FROM 
-        tng.config_properties''')
-    config_properties = g.cursor.fetchall()
-
+    # todo: this will be obsolete if we change to dict instead to named tuples
+    config_properties = get_config_properties()
     colnames = [desc[0] for desc in g.cursor.description]
-
     config_list = [dict(zip(colnames, row)) for row in config_properties]
 
     for row in config_list:
@@ -201,22 +168,18 @@ FROM tng.links l
             row['config_property'])
         row['role'] = helpers.get_translation(row['role'])
 
-    map_id = request.args.get('map_id')
+    map_data = get_base_map()
+    if map_id := request.args.get('map_id'):
+        # Todo: int(map_id) can create problems. Find use case.
+        map_data = get_base_map_by_id(int(map_id))
 
-    if map_id:
-        g.cursor.execute('SELECT * FROM tng.maps WHERE id = %s', (map_id,))
-        map_data = g.cursor.fetchone()
-
-    data = get_map_data()
+    map_settings = get_map_settings()
     settings = {
-        'img': data.index_img,
-        'map': data.index_map,
-        'img_map': data.img_map,
-        'greyscale': data.greyscale}
-    if data.img_map == 'image':
-        settings['not_sel'] = 'map'
-    else:
-        settings['not_sel'] = 'image'
+        'img': map_settings.index_img,
+        'map': map_settings.index_map,
+        'img_map': map_settings.img_map,
+        'greyscale': map_settings.greyscale,
+        'not_sel': 'map' if map_settings.img_map == 'image' else 'image'}
 
     class_items = get_entities_count_by_case_study()
     entities_dict = {k: v for k, v in class_items.items() if
@@ -334,8 +297,10 @@ def delete_entry(
 
 @app.route('/admin/delete_link/<link_id>/<tab>/<entry>')
 @login_required
-def delete_link(link_id: Optional[int] = None, tab: Optional[str] = None,
-                entry: Optional[str] = None) -> str:
+def delete_link(
+        link_id: Optional[int] = None,
+        tab: Optional[str] = None,
+        entry: Optional[str] = None) -> Response:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 

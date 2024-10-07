@@ -4,15 +4,15 @@ from flask import redirect, render_template, request, session
 from werkzeug import Response
 
 from histarchexplorer import app
-from histarchexplorer.database.map import get_map_server
-from histarchexplorer.database.settings import get_map_data
+from histarchexplorer.database.map import get_map_tilestring
+from histarchexplorer.database.settings import get_map_settings
 from histarchexplorer.utils.cerberos import get_view_class_count
 
 
 @app.route('/')
 def index() -> str:
-    map_data = get_map_data()
-    map_ = get_map_server(map_data)
+    map_data = get_map_settings()
+    map_ = get_map_tilestring(map_data)
 
     view_classes = get_view_class_count()
 

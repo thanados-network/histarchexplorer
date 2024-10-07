@@ -3,7 +3,7 @@ from typing import Any
 from flask import g
 
 
-def get_map_data() -> Any:
+def get_map_settings() -> Any:
     g.cursor.execute(
         'SELECT index_img, index_map, img_map, greyscale '
         'FROM tng.settings '
