@@ -206,8 +206,7 @@ def add_entry() -> Response:
         abort(403)
     language = session.get(
         'language',
-        request.accept_languages.best_match(
-            app.config['LANGUAGES'].keys()))
+        request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
     category = request.form.get('category') or ''
     current_tab = 'nav-' + category
     description = request.form.get('description') or ''
@@ -271,9 +270,7 @@ def add_entry() -> Response:
 
 @app.route('/admin/delete_entry/<id>/<tab>')
 @login_required
-def delete_entry(
-        tab: Optional[str] = None,
-        id_: Optional[int] = None) -> Response:
+def delete_entry(tab: str, id_: int) -> Response:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
@@ -291,10 +288,7 @@ def delete_entry(
 
 @app.route('/admin/delete_link/<link_id>/<tab>/<entry>')
 @login_required
-def delete_link(
-        link_id: Optional[int] = None,
-        tab: Optional[str] = None,
-        entry: Optional[str] = None) -> Response:
+def delete_link(link_id: int,  tab: str, entry: str) -> Response:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
@@ -308,12 +302,12 @@ def delete_link(
            methods=['GET', 'POST'])
 @login_required
 def add_link(
-        domain: Optional[int] = None,
-        range_: Optional[int] = None,
-        prop: Optional[int] = None,
-        role: Optional[int] = None,
-        tab: Optional[str] = None,
-        entry: Optional[str] = None) -> Response:
+        domain: int,
+        range_: int,
+        prop: int,
+        role: int,
+        tab: str,
+        entry: str) -> Response:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
     g.cursor.execute(
@@ -325,7 +319,7 @@ def add_link(
 
 @app.route('/edit_entry', methods=['POST', 'GET'])
 @login_required
-def edit_entry():
+def edit_entry() -> Response:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
@@ -334,18 +328,18 @@ def edit_entry():
         request.accept_languages.best_match(
             app.config['LANGUAGES'].keys()))
 
-    description = request.form.get('description')
-    config_id = request.form.get('config_id')
-    current_tab = request.form.get('current_tab')
-    current_entry = request.form.get('current_entry')
-    name = request.form.get('name')
-    address = request.form.get('address')
-    mail = request.form.get('mail')
-    website = request.form.get('website')
-    orcid = request.form.get('orcid')
-    legal_notice = request.form.get('legalnotice')
-    imprint = request.form.get('imprint')
-    image = request.form.get('image')
+    description = request.form.get('description') or ''
+    config_id = request.form.get('config_id') or ''
+    current_tab = request.form.get('current_tab') or ''
+    current_entry = request.form.get('current_entry') or ''
+    name = request.form.get('name') or ''
+    address = request.form.get('address') or ''
+    mail = request.form.get('mail') or ''
+    website = request.form.get('website') or ''
+    orcid = request.form.get('orcid') or ''
+    legal_notice = request.form.get('legalnotice') or ''
+    imprint = request.form.get('imprint') or ''
+    image = request.form.get('image') or ''
 
     editsql = """
         UPDATE  tng.config SET 
@@ -380,14 +374,13 @@ def edit_entry():
 
 @app.route('/edit_map', methods=['POST'])
 @login_required
-def edit_map():
+def edit_map() -> Response:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
     name = request.form.get('name')
     display_name = request.form.get('displayname')
-    sortorder = request.form.get('inputorder') if request.form.get(
-        'inputorder') else ''
+    sortorder = request.form.get('inputorder') or ''
     tilestring = request.form.get('description')
     # current_tab = request.form.get('current_tab')
     map_id = request.form.get('map_id')
@@ -425,7 +418,7 @@ def edit_map():
 
 @app.route('/admin/add_map', methods=['POST'])
 @login_required
-def add_map():
+def add_map() -> Response:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
@@ -449,12 +442,12 @@ def add_map():
         flash(f'Error adding map {name}: {str(e)}', 'map danger')
         return redirect(url_for('admin') + '/maps')
 
-    return redirect(url_for('admin'))
+    # return redirect(url_for('admin'))
 
 
 @app.route('/admin/delete_map/<int:map_id>')
 @login_required
-def delete_map(map_id: int) -> str:
+def delete_map(map_id: int) -> Response:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
@@ -469,7 +462,7 @@ def delete_map(map_id: int) -> str:
 
 
 @app.route('/choose_indexBg', methods=['POST'])
-def choose_index_bg():
+def choose_index_bg() -> Response:
     map_id = request.form.get('mapselection')
     default_img = request.form.get('default_img')
     map_img = request.form.get('imgmap')
@@ -498,7 +491,7 @@ def select_entities() -> Response:
 
 @app.route('/reset')
 @login_required
-def reset():
+def reset() -> Response:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
@@ -787,19 +780,19 @@ def reset():
     return redirect(url_for('admin'))
 
 
-@app.route('/sortlinks', methods=['POST'])
-def sort_links() -> Response:
-    # @login_required
-    # def reset_():
-    #     if current_user.group not in ['admin', 'manager']:
-    #         abort(403)
-
-    data = request.get_json()
-    criteria = data['criteria']
-    table = data['table']
-
-    for row in criteria:
-        g.cursor.execute(
-            f'UPDATE tng.{table} SET sortorder = %(order)s  WHERE id = %(id)s',
-            {'id': row['id'], 'order': row['order'], 'table': table})
-    return jsonify({'status': 'ok'})
+# @app.route('/sortlinks', methods=['POST'])
+# def sort_links() -> Response:
+#     @login_required
+#     def reset_():
+#         if current_user.group not in ['admin', 'manager']:
+#             abort(403)
+#
+#     data = request.get_json()
+#     criteria = data['criteria']
+#     table = data['table']
+#
+#     for row in criteria:
+#         g.cursor.execute(
+#             f'UPDATE tng.{table} SET sortorder = %(order)s  WHERE id = %(id)s',
+#             {'id': row['id'], 'order': row['order'], 'table': table})
+#     return jsonify({'status': 'ok'})

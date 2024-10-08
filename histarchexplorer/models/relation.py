@@ -36,6 +36,3 @@ class Relation:
 
     def __repr__(self) -> str:
         return str(self.__dict__)
-
-    def set_related_entity(self, entity) -> None:
-        self.related_entity = entity
