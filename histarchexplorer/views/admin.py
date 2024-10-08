@@ -28,7 +28,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
 
-    # Todo:
+    # todo: this will be obsolete if we change to dict instead to named tuples
     language = session.get(
         'language',
         request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
@@ -50,8 +50,6 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
         entities.append(entity)
 
-    config_classes = get_config_classes()
-
     # todo: this will be obsolete if we change to dict instead to named tuples
     config_properties = get_config_properties()
     colnames = [desc[0] for desc in g.cursor.description]
@@ -66,7 +64,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     institutions = []
     roles = []
 
-    for row in config_classes:
+    for row in get_config_classes():
         if row.name in ['main-project']:
             mainproject.append(row.id)
         if row.name in ['project']:
@@ -80,7 +78,6 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     tabs = [
         {
-            'id': 'nav-main-project-tab',
             'label': _('main-project'),
             'target': 'nav-main-project',
             'filter': mainproject,
@@ -88,7 +85,6 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
         },
         {
-            'id': 'nav-projects-tab',
             'label': _('projects'),
             'target': 'nav-projects',
             'filter': projects,
@@ -96,27 +92,25 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
         },
         {
-            'id': 'nav-persons-tab',
             'label': _('persons'),
             'target': 'nav-persons',
             'filter': persons,
             'id': 2
         },
         {
-            'id': 'nav-institutions-tab',
             'label': _('institutions'),
             'target': 'nav-institutions',
             'filter': institutions,
             'id': 4
         },
         {
-            'id': 'nav-attributes-tab',
             'label': _('attributes'),
             'target': 'nav-attributes',
             'filter': roles,
             'id': 3
         }
     ]
+    print(tabs)
 
     g.cursor.execute("""
                SELECT l.id     AS link_id, 
@@ -310,7 +304,7 @@ def delete_link(
     return redirect(url_for('admin') + tab + '/' + entry)
 
 
-@app.route('/admin/add_link/<domain>/<range>/<prop>/<role>/<tab>/<entry>',
+@app.route('/admin/add_link/<domain>/<range_>/<prop>/<role>/<tab>/<entry>',
            methods=['GET', 'POST'])
 @login_required
 def add_link(
@@ -490,7 +484,7 @@ def choose_index_bg():
 
 
 @app.route('/admin/select_entities', methods=['GET', 'POST'])
-def select_entities() -> str:
+def select_entities() -> Response:
     if request.method == 'POST':
         selected_entities = request.form.getlist('selected_entities')
 
@@ -499,7 +493,7 @@ def select_entities() -> str:
         g.cursor.execute('UPDATE tng.settings SET shown_entities = %s::JSONB',
                          (selected_entities_str,))
 
-        return redirect(url_for('admin'))
+    return redirect(url_for('admin'))
 
 
 @app.route('/reset')
@@ -795,10 +789,10 @@ def reset():
 
 @app.route('/sortlinks', methods=['POST'])
 def sort_links() -> Response:
-    @login_required
-    def reset():
-        if current_user.group not in ['admin', 'manager']:
-            abort(403)
+    # @login_required
+    # def reset_():
+    #     if current_user.group not in ['admin', 'manager']:
+    #         abort(403)
 
     data = request.get_json()
     criteria = data['criteria']
