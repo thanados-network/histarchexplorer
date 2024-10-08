@@ -7,16 +7,16 @@ from histarchexplorer.api.parser import Parser
 from histarchexplorer.models.entity import Entity
 
 
-@app.route('/entity/<id_>')
+@app.route('/entity/<int:id_>')
 def landing(id_: int) -> str:
-    parser = Parser()
-    entity = Entity.get_entity(id_, parser)
-    linked_entities = Entity.get_entities_linked_to_entity(id_, parser)
-    for relation in entity.relations.values():
-        for rel in relation:
-            for relation_entity in linked_entities:
-                if int(relation_entity.id) == int(rel.relation_to_id):
-                    rel.related_entity = relation_entity
+    parser = Parser(
+        properties=['P46', 'P67'],
+        limit=0,
+        format='lpx')
+
+    entities = Entity.get_linked_entities_by_properties_recursive(
+        id_,
+        parser)
 
     subunits_dict = defaultdict(list)
     feature_dict = defaultdict(list)
@@ -24,24 +24,33 @@ def landing(id_: int) -> str:
     artifact_dict = defaultdict(list)
     remains_dict = defaultdict(list)
     places_dict = defaultdict(list)
-    if entity.system_class.lower() in [
+
+    main_entity = None
+    for entity in entities:
+        if entity.id == id_:
+            main_entity = entity
+
+
+    for relation in main_entity.relations.values():
+        for rel in relation:
+            for relation_entity in entities:
+                if int(relation_entity.id) == int(rel.relation_to_id):
+                    rel.related_entity = relation_entity
+
+
+    if main_entity.system_class.lower() in [
         "artifact",
         "feature",
-        "human_remains",
+        "human remains",
         "place",
-        "stratigraphic_unit"]:
-        subunit_parser = Parser(
-            properties=['P46'],
-            limit=0,
-            format='lpx',
-            show=['types'])
-        subunits = Entity.get_linked_entities_by_properties_recursive(
-            entity.id, subunit_parser)
+        "stratigraphic unit"]:
 
-        for subunit in subunits:
+        for subunit in entities:
+            if not subunit.types:
+                continue
             for type_ in subunit.types:
                 subunits_dict[type_.type_hierarchy[0]['label']].append(subunit)
-                #  print(type_.type_hierarchy[0]['label'])
+
                 match type_.type_hierarchy[0]['label']:
                     case 'Feature':
                         feature_dict[type_.label].append(subunit)
@@ -62,22 +71,22 @@ def landing(id_: int) -> str:
     # print("End:", entity.end)
     # print("Relations:", entity.relations)
     # print("Relation Class:", entity.relation_class)
-    print(entity.geometry)
+    print(main_entity.geometry)
 
     # Description 2/3 column or 1/3 column
-    if entity.description and len(entity.description) > 500:
-        entity.description_class = "item-middle"
+    if main_entity.description and len(main_entity.description) > 500:
+        main_entity.description_class = "item-middle"
     else:
-        entity.description_class = "item"
-
+        main_entity.description_class = "item"
     return render_template(
         'landing.html',
-        entity=entity,
-        view_class=entity.view_class,
-        relations=entity.relations,
+        entity=main_entity,
+        view_class=main_entity.view_class,
+        relations=main_entity.relations,
         subunits=subunits_dict or {},
         features=feature_dict or {},
         strati=strati_dict or {},
         artifact=artifact_dict or {},
-        remains=remains_dict or {}
+        remains=remains_dict or {},
+        places=places_dict or {}
     )
