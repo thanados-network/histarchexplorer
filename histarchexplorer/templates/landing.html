@@ -89,25 +89,17 @@
 
 
           <!-- First image -->
-          {% if entity.depictions %}
-            {% for depiction in entity.depictions %}
+          {% if main_image %}
               <div class="item">
                 <div class="item-content">
                   <div class="muuri-images">
                     <div class="image">
-
-                      {% if depiction.main_image %}
-                        <img src="{{ depiction.url }}"
-                             alt="{{ depiction.title }}"/>
-                      {% else %}
-                        <img src="{{ entity.depictions[0].url }}"
-                             alt="{{ entity.depictions[0].title }}"/>
-                      {% endif %}
+                        <img src="{{ main_image.url }}"
+                             alt="{{ main_image.title }}"/>
                     </div>
                   </div>
                 </div>
               </div>
-            {% endfor %}
           {% endif %}
 
           <!-- Related entities -->
@@ -141,8 +133,8 @@
 
 
           <!-- All other images -->
-          {% if entity.depictions|length > 1 %}
-            {% for depiction in entity.depictions %}
+          {% if images %}
+            {% for depiction in images %}
               {% if not depiction.main_image %}
                 <div class="item">
                   <div class="item-content">

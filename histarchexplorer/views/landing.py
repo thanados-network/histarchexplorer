@@ -73,6 +73,19 @@ def landing(id_: int) -> str:
     # print("Relation Class:", entity.relation_class)
     print(main_entity.geometry)
 
+    main_image= None
+    images=[]
+
+    for image in main_entity.depictions:
+        if image.main_image:
+            main_image =image
+            continue
+        images.append(image)
+    if not main_image:
+        main_image = images[0]
+        del images[0]
+
+
     # Description 2/3 column or 1/3 column
     if main_entity.description and len(main_entity.description) > 500:
         main_entity.description_class = "item-middle"
@@ -88,5 +101,7 @@ def landing(id_: int) -> str:
         strati=strati_dict or {},
         artifact=artifact_dict or {},
         remains=remains_dict or {},
-        places=places_dict or {}
+        places=places_dict or {},
+        main_image=main_image,
+        images=images
     )
