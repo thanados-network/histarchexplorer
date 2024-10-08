@@ -24,7 +24,7 @@ def test_linked_entities_by_properties_recursive(id_: int) -> str:
         properties=[request.args.get('properties')],
         limit=0,
         format='lpx')
-    entities = Entity.linked_entities_by_properties_recursive(id_, parser)
+    entities = Entity.get_linked_entities_by_properties_recursive(id_, parser)
     return render_template('test/list_entities.html', entities=entities)
 
 

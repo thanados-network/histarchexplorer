@@ -16,7 +16,7 @@ SESSION_COOKIE_SECURE = False
 REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
-API_URL = 'https://thanados.openatlas.eu/api/'  # Todo: move to instance
+API_URL = 'https://thanados.openatlas.eu/api/'
 API_PROXY = ''
 OPENATLAS_CASE_STUDY_IDS: list[int] = []
 
@@ -25,10 +25,10 @@ CLASSES_TO_SKIP = [
     'source_translation', 'type_tools', 'reference_system']
 
 VIEW_CLASSES = {
-    'actors': ('person','group'),
+    'actors': ('person', 'group'),
     'items': ('artifact', 'human_remains'),
     'events': ('acquisition', 'event', 'activity', 'creation', 'move',
-            'production', 'modification'),
+               'production', 'modification'),
     'places': ('place', 'stratigraphic_unit', 'feature'),
     'sources': ('source', 'bibliography', 'external_reference', 'edition'),
     'files': ('file',)

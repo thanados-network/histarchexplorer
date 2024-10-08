@@ -1,19 +1,19 @@
 # Created by Alexander Watzinger and others. Please see README.md for
 # licensing information
-from typing import Optional
+from typing import Any, Optional
 
 from flask import g
 from flask_login import UserMixin
 
 
 class User(UserMixin):
-    def __init__(self, row=None) -> None:
+    def __init__(self, row: Optional[Any] = None) -> None:
         self.id = None
         self.username = None
         if not row:
             return
         self.id = row.id
-        self.active = True if row.active == 1 else False
+        self.active = row.active == 1
         self.username = row.username
         self.password = row.password
         self.group = row.group_name
@@ -24,7 +24,8 @@ class UserMapper:
         SELECT 
             u.id, u.username, u.password, u.active, u.real_name, u.info,
             u.created, u.modified, u.login_last_success, u.login_last_failure, 
-            u.login_failed_count, u.password_reset_code, u.password_reset_date, 
+            u.login_failed_count, u.password_reset_code, 
+            u.password_reset_date, 
             u.email, r.name as group_name, u.unsubscribe_code
         FROM web."user" u
         LEFT JOIN web.group r ON u.group_id = r.id """

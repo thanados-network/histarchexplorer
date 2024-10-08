@@ -1,7 +1,8 @@
 from flask import request, session
 from histarchexplorer import app
 
-def get_translation(item):
+
+def get_translation(item: dict[str, str]) -> dict[str, str]:
     print(item)
     language = session.get(
         'language',

@@ -3,30 +3,31 @@ from histarchexplorer import app
 from histarchexplorer.utils import helpers
 
 
-def capitalize_first(value: str) -> str:
-    if not value:
-        return ''
-    return value[0].upper() + value[1:]
 
 
-app.jinja_env.filters['capitalize_first'] = capitalize_first
 
 
 @app.route('/about')
 def about() -> str:
 
-    def build_object(id):
-        g.cursor.execute('SELECT * FROM tng.config WHERE id = %s', (id,))
+    def build_object(id_: int) -> None:
+        g.cursor.execute('SELECT * FROM tng.config WHERE id = %s', (id_,))
         object_data = g.cursor.fetchone()
-        object = {}
+        object_ = {}
         column_names = [description[0] for description in g.cursor.description]
         for column_name, column_value in zip(column_names, object_data):
             if column_value:
-                object[column_name] = column_value
-        print("build_object:", object)
+                object_[column_name] = column_value
+        print("build_object:", object_)
 
-    def build_connections(id):
-        g.cursor.execute('SELECT range_id, property, attribute FROM tng.links WHERE domain_id = %s', (id,))
+    def build_connections(id_: int) -> None:
+        g.cursor.execute(
+            'SELECT '
+            'range_id, '
+            'property, '
+            'attribute '
+            'FROM tng.links '
+            'WHERE domain_id = %s', (id_,))
         connections = g.cursor.fetchall()
         print("build_connections:", connections)
 
@@ -104,4 +105,8 @@ ORDER BY l.sortorder, l.id;
     persons_list = list(persons.values())
     print("Person list:", persons_list)
 
-    return render_template('about.html', project=project, institutions=institutions, persons=persons_list)
+    return render_template(
+        'about.html',
+        project=project,
+        institutions=institutions,
+        persons=persons_list)

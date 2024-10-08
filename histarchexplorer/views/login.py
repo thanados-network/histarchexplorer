@@ -1,8 +1,7 @@
-# Created by Alexander Watzinger and others.
-# Please see README.md for licensing information
+from typing import Optional
 
 from bcrypt import hashpw
-from flask import flash, render_template, request, url_for, abort
+from flask import flash, render_template, request, url_for
 from flask_login import (
     LoginManager, current_user, login_required, login_user, logout_user)
 from flask_wtf import FlaskForm
@@ -20,7 +19,7 @@ login_manager.login_view = 'login'
 
 
 @login_manager.user_loader
-def load_user(user_id: int) -> UserMapper:
+def load_user(user_id: int) -> Optional[UserMapper]:
     return UserMapper.get_by_id(user_id)
 
 
@@ -49,8 +48,7 @@ def login() -> str | Response:
                     login_user(user)
                     return redirect(
                         request.args.get('next') or url_for('index'))
-                else:  # pragma: no cover
-                    flash('error inactive', 'error')
+                flash('error inactive', 'error')
             else:  # pragma: no cover
                 flash('error wrong password', 'error')
         else:
@@ -67,5 +65,3 @@ def login() -> str | Response:
 def logout() -> Response:
     logout_user()
     return redirect('/')
-
-

@@ -1,86 +1,227 @@
-#content-columns .column {
-  height: calc(100vh - var(--navbar-height) - 95px);
-  color: black;
-}
-
-.column-label {
-  font-size: 1.3em;
-  font-weight: bold;
-  position: relative;
-  top: 2rem;
-}
-
-#col1 {
-  background-color: #F5F5F5;
+.grid {
   position: relative;
 }
 
-.main-image {
-  margin-top: 2rem;
-  width: 90%;
-}
+.item {
 
-.main-image img {
-  width: 100%;
-  height: auto;
   display: block;
+  margin: 5px;
+  position: absolute;
+  width: calc((100% - 30px) / 3);
+  z-index: 1;
+  background: var(--muuri-tile);
+  //color: #060606;
+  overflow: hidden;
 }
 
-
-#col2 {
-  background-color: #F5F5F5;
-  p{
-    margin-top: 2rem;
+@media (max-width: 992px) { // Below col-md breakpoint
+  .item {
+    width: calc((100% - 20px) / 2); // 2 tiles
   }
 }
 
-#col3 {
-  background-color: #F5F5F5;
+@media (max-width: 766px) { // Mobile
+  .item {
+    width: calc(100% - 10px); // 1 tile
+  }
 }
 
-.bottom-bar {
-  background-color: var(--counters-bg);
-  min-height: 95px;
-  max-width: 100vw;
+.item-middle {
+  width: calc(((100%) / 3) * 2); //2 tiles width
+}
+
+@media (max-width: 992px) { // two tiles
+  .item-middle {
+    width: calc(100% - 20px);
+  }
+}
+
+@media (max-width: 766px) { // one tile
+  .item-middle {
+    width: calc(100% - 10px);
+  }
+}
+
+.item-wide {
+  width: calc(100% - 30px); // full width of three tiles
+}
+
+@media (max-width: 992px) { // two tiles
+  .item-wide {
+    width: calc(100% - 20px);
+  }
+}
+
+@media (max-width: 766px) { // one tile
+  .item-wide {
+    width: calc(100% - 10px);
+  }
+}
+
+
+.item-content {
+  padding: 1rem;
   display: flex;
-  justify-content: center;
   align-items: center;
+  width: auto;
+  height: auto;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
-#entity_media {
-  color: rgba(0, 0, 0, 0.7);
-  text-decoration: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  font-size: 50px;
+
+.image img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  position: relative;
 }
+
+
+.tile-label {
+  font-size: 1.3em;
+  font-weight: bold;
+  position: relative;
+  top: 0.5rem;
+}
+
+.muuri-description {
+  p {
+    max-height: 700px;
+    margin-top: 1.5rem;
+
+    // These are technically the same, but use both
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+
+    // This is for IE
+    -ms-word-break: break-all;
+    // Dangerous in WebKit as it breaks words anywhere
+    word-break: break-all;
+    // Better alternative (non-standard)
+    word-break: break-word;
+
+    // Adds hyphens where words break, if supported (No Blink)
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+  }
+}
+
+.location {
+  width: 100%;
+}
+
+
+#muuri-map {
+  margin-top: 1.5rem;
+  height: 700px;
+  width: 100%;
+}
+
+.map-wrapper {
+  position: relative;
+}
+
+.location:hover #fullscreen-button {
+    opacity: 1;
+}
+
+#fullscreen-button {
+  position: absolute;
+  top: 1rem;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  border: none;
+  z-index: 1000;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: ease-in 0.3s;
+
+
+
+  // Icon styling
+  i {
+    font-size: 1.2rem;
+  }
+}
+
+.subentities {
+  height: 700px;
+}
+
+.item.muuri-item-dragging {
+  z-index: 3;
+}
+
+.item.muuri-item-releasing {
+  z-index: 2;
+}
+
+.item.muuri-item-hidden {
+  z-index: 0;
+}
+
+.muuri-references {
+  p {
+    max-height: 700px;
+    overflow: auto;
+    margin-top: 1.5rem;
+  }
+}
+
 
 //Sidebar
 .sidebar {
   background-color: var(--card-bg);
-  height: calc(100vh - var(--navbar-height) );
+  height: calc(100vh - var(--navbar-height));
   color: black;
   text-align: center;
 }
 
+
 .sidebar-content {
   margin-top: 2rem;
 }
-.entity-country{
+
+.entity-country {
   margin-top: 1rem;
 }
 
- .entity-type,
+.entity-type,
+.entity-date {
+  font-size: 1.2em;
+}
+
+@media (max-width: 992px) {
+  .entity-type,
   .entity-date {
-    font-size: 1.2rem;
+    font-size: 1em;
   }
+}
 
-  .entity-type {
-    margin-top: 3rem;
-  }
+.entity-type {
+  margin-top: 3rem;
+}
 
-.btn-group-vertical .btn {
-            margin-top: 3rem;
-            margin-bottom: 1rem;
-        }
-        .btn-group-vertical .btn:last-child {
-            margin-bottom: 0;}
+#entity-link-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#entity-link-buttons button {
+  margin-top: 1.5rem;
+  width: 70%;
+  padding-right: 0.2rem;
+  padding-left: 0.2rem;
+  font-size: 1rem;
+  overflow: hidden; // Hide content that overflows the button boundary
+  text-overflow: ellipsis;
+}

@@ -28,7 +28,7 @@ class Parser:
     geometry: list[str] = None
     image_size: str = ''
     file_id: int = None
-    properties: list[str] = None
+    properties: list[Optional[str]] = None
 
     def __setattr__(
             self,
