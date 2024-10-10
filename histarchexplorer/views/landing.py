@@ -86,7 +86,7 @@ def landing(id_: int) -> str:
             main_image =image
             continue
         images.append(image)
-    if not main_image:
+    if not main_image and images:
         main_image = images[0]
         del images[0]
 
