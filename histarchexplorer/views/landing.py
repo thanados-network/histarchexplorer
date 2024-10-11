@@ -17,7 +17,7 @@ def landing(id_: int) -> str:
     entities = Entity.get_linked_entities_by_properties_recursive(
         id_,
         parser)
-
+#remove types, adminitrative units, appelations etc.
     subunits_dict = defaultdict(list)
     feature_dict = defaultdict(list)
     strati_dict = defaultdict(list)
@@ -77,6 +77,8 @@ def landing(id_: int) -> str:
     # print("Relation Class:", entity.relation_class)
     #print(main_entity.geometry)
     print(type(super_entity))
+    print(main_entity.system_class)
+    #print(subunit)
 
     main_image= None
     images=[]
@@ -98,6 +100,12 @@ def landing(id_: int) -> str:
         main_entity.description_class = "item-middle"
     else:
         main_entity.description_class = "item"
+
+    case_study = None
+    for type_ in main_entity.types:
+        if type_.root == "Case Study":
+            case_study = type_
+
     return render_template(
         'landing.html',
         entity=main_entity,

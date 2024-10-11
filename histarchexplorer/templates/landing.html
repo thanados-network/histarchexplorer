@@ -11,13 +11,11 @@
                         <p> {{ super_entity.data.properties.title }} </p>
                     {% endif %}
                     <div class="entity-card__icon">
-                        <img
-                                src="{% if system_class.lower() in ['feature', 'stratigraphic unit'] %}
+                        <img src="{% if system_class.lower() in ['feature', 'stratigraphic unit'] %}
                 /static/images/entity_icons/places_550.png
               {% else %}
                 /static/images/entity_icons/{{ system_class | lower }}s_550.png
-              {% endif %}"
-                                alt="{{ system_class }}">
+              {% endif %}" alt="{{ system_class }}">
                     </div>
 
                     <div class="entity-card__label">{{ entity.name }}</div>
@@ -52,11 +50,20 @@
                     </div>
 
                     <div id="entity-link-buttons">
-                        {% for key in entity.relations %}
+                        {% for key in relations %}
+                            {% if not key == 'others' %}
                             <button type="button"
                                     class="btn btn-outline-secondary btn-lg">{{ key|capitalize_first }}</button>
+                            {% endif %}
                         {% endfor %}
                     </div>
+
+                <div class="entity-class">
+                    <p> </p>
+                    <p>Case Study: FANCYCS</p>
+                    <p>{{ system_class }}</p>
+                </div>
+
                 </div>
             </div>
 

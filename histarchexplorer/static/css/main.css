@@ -12420,6 +12420,10 @@ textarea.form-control-lg {
   margin-top: 3rem;
 }
 
+.entity-class {
+  color: grey;
+}
+
 #entity-link-buttons {
   display: flex;
   flex-direction: column;

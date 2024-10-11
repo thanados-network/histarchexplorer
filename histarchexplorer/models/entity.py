@@ -56,11 +56,6 @@ class Entity:
         relation_dict: dict[str, Any] = {}
         for relation in self.relation_class:
             match relation.relation_system_class:
-                case 'file' | 'appellation' | \
-                     'object_location' | 'reference_system':
-                    continue
-                case 'type':
-                    relation_dict.setdefault('types', []).append(relation)
                 case 'source':
                     relation_dict.setdefault('sources', []).append(relation)
                 case 'source_translation':
@@ -69,9 +64,6 @@ class Entity:
 
                 case 'place' | 'feature' | 'stratigraphic_unit':
                     relation_dict.setdefault('places', []).append(relation)
-                case 'administrative_unit':
-                    relation_dict.setdefault(
-                        'administrative_unit', []).append(relation)
                 case 'artifact' | 'human_remains':
                     relation_dict.setdefault('artifacts', []).append(relation)
 
