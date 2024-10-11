@@ -134,6 +134,7 @@
                 <div class="subentities">
                   <p class="tile-label text-uppercase">Related Entities</p>
                   {% for key, type_ in related_entities.items() %}
+                    {% if type_ %}
                     <h5>{{ key }}</h5>
                     <ul>
                       {% for type_label, list_ in type_.items() %}
@@ -147,6 +148,7 @@
                         </li>
                       {% endfor %}
                     </ul>
+                    {% endif %}
                   {% endfor %}
 
                 </div>
