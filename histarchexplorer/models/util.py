@@ -31,7 +31,7 @@ def format_date(
 
     date = ''
     if date_from and date_to:
-        if check_timespan_date(date_from, date_to):
+        if check_timespan_date(date_from, date_to) or date_from == date_to:
             date = (date_from.split('.')[2]).lstrip('0')
             date = f"{date} {'BC' if bc_date_from else 'AD'}"
         else:
