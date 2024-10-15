@@ -12372,6 +12372,10 @@ textarea.form-control-lg {
   height: 700px;
 }
 
+.no-bullets {
+  list-style: none;
+}
+
 .item.muuri-item-dragging {
   z-index: 3;
 }

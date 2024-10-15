@@ -111,10 +111,10 @@
   }
 }
 
+//Map-Style
 .location {
   width: 100%;
 }
-
 
 #muuri-map {
   margin-top: 1.5rem;
@@ -152,8 +152,13 @@
   }
 }
 
+//Related Entities/Subentities
 .subentities {
   height: 700px;
+}
+
+.no-bullets {
+  list-style: none;
 }
 
 .item.muuri-item-dragging {
