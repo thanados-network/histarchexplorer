@@ -11,7 +11,6 @@ var map = L.map('muuri-map', {
 L.control.scale().addTo(map);
 
 
-
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
@@ -28,3 +27,19 @@ if (gisData) {
         }
     }).addTo(map);
 }
+
+// Expand button
+document.getElementById('expand-button').addEventListener('click', function () {
+    const mapContainer = document.querySelector('.map-wrapper');
+
+    console.log("Button clicked");
+
+    // Toggle fullscreen class
+    mapContainer.classList.toggle('expanded-map');
+    console.log("Class toggled:", mapContainer.classList.contains('expanded-map'));
+
+    // Invalidate map size so that it properly adjusts
+    setTimeout(function () {
+        map.invalidateSize();
+    }, 300); //delay to ensure SCSS is applied before resizing the map
+});

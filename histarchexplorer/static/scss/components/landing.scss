@@ -126,11 +126,11 @@
   position: relative;
 }
 
-.location:hover #fullscreen-button {
+.location:hover #expand-button {
     opacity: 1;
 }
 
-#fullscreen-button {
+#expand-button {
   position: absolute;
   top: 1rem;
   right: 10px;
@@ -141,8 +141,21 @@
   padding: 0.5rem;
   border-radius: 4px;
   opacity: 0;
-  pointer-events: none;
+  //pointer-events: none;
   transition: ease-in 0.3s;
+
+  /* Expanded-map - col-md-10 */
+.expanded-map {
+  width: 100% !important;
+  height: calc(100vh - 96px);
+  position: relative;
+  z-index: 1001;
+}
+
+/* Hide fullscreen button when expanded */
+//.expanded-map .location:hover #fullscreen-button {
+//  opacity: 0;
+//}
 
 
 
