@@ -28,18 +28,31 @@ if (gisData) {
     }).addTo(map);
 }
 
-// Expand button
+// Expand Map
 const expandButton = document.getElementById('expand-button');
 const mapContainer = document.querySelector('.map-wrapper');
+//const superMapContainer = document.querySelector('.item-content');
+const itemContainer = document.querySelector('.item');
 const muuriMap = document.getElementById('muuri-map');
 
- expandButton.addEventListener('click', event => {
+expandButton.addEventListener('click', event => {
     setTimeout(() => {
         muuriMap.classList.toggle('expanded-map');
         mapContainer.classList.toggle('expanded-map');
+        //superMapContainer.classList.toggle('expanded-map');
+        itemContainer.classList.remove('item');
 
-        // Invalidate the map size to adjust for the new dimensions
+        // hide other tiles
+        document.querySelectorAll('.item, .item-content').forEach(item => {
+            if (!item.contains(muuriMap)){
+                item.classList.toggle('hidden');
+            }
+        });
+
+        // adjust for new size
         map.invalidateSize();
         grid.refreshItems().layout();
     }, 300);
+
+
 });

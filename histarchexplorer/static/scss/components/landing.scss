@@ -2,15 +2,29 @@
   position: relative;
 }
 
+.hidden {
+  display: none !important;
+}
+
+/* Expanded-map - col-md-10 */
+.expanded-map {
+  width: calc(100vw - 23%);
+  height: calc(100vh - 96px);
+  padding: 0rem;
+}
+
+/* Hide fullscreen button when expanded */
+//.expanded-map .location:hover #fullscreen-button {
+//  opacity: 0;
+//}
+
 .item {
 
   display: block;
   margin: 5px;
   position: absolute;
   width: calc((100% - 30px) / 3);
-  z-index: 1;
   background: var(--muuri-tile);
-  //color: #060606;
   overflow: hidden;
 }
 
@@ -63,7 +77,6 @@
   margin: 5px;
   position: absolute;
   width: calc((100% - 30px) / 3);
-  z-index: 1;
   background: var(--muuri-tile);
   overflow: hidden;
   max-height: fit-content;
@@ -155,19 +168,6 @@
   //pointer-events: none;
   transition: ease-in 0.3s;
 
-  /* Expanded-map - col-md-10 */
-  .expanded-map #muuri-map {
-    width: 1000px;
-    height: calc(100vh - 96px);
-    // position: relative;
-    // z-index: 1001;
-  }
-
-  /* Hide fullscreen button when expanded */
-  //.expanded-map .location:hover #fullscreen-button {
-  //  opacity: 0;
-  //}
-
 
   // Icon styling
   i {
@@ -188,6 +188,7 @@
   font-size: 1em;
   font-weight: lighter;
 }
+
 .item.muuri-item-dragging {
   z-index: 3;
 }

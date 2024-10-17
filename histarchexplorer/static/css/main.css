@@ -12243,12 +12243,23 @@ textarea.form-control-lg {
   position: relative;
 }
 
+.hidden {
+  display: none !important;
+}
+
+/* Expanded-map - col-md-10 */
+.expanded-map {
+  width: calc(100vw - 23%);
+  height: calc(100vh - 96px);
+  padding: 0rem;
+}
+
+/* Hide fullscreen button when expanded */
 .item {
   display: block;
   margin: 5px;
   position: absolute;
   width: calc((100% - 30px) / 3);
-  z-index: 1;
   background: var(--muuri-tile);
   overflow: hidden;
 }
@@ -12296,7 +12307,6 @@ textarea.form-control-lg {
   margin: 5px;
   position: absolute;
   width: calc((100% - 30px) / 3);
-  z-index: 1;
   background: var(--muuri-tile);
   overflow: hidden;
   max-height: fit-content;
@@ -12373,12 +12383,6 @@ textarea.form-control-lg {
   border-radius: 4px;
   opacity: 0;
   transition: ease-in 0.3s;
-  /* Expanded-map - col-md-10 */
-  /* Hide fullscreen button when expanded */
-}
-#expand-button .expanded-map #muuri-map {
-  width: 1000px;
-  height: calc(100vh - 96px);
 }
 #expand-button i {
   font-size: 1.2rem;

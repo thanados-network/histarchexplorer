@@ -6,7 +6,7 @@ let grid = new Muuri('.grid');
 window.onload = function () {
     setTimeout(() => {
         grid.refreshItems().layout();
-    }, 500);
+    }, 300);
 };
 
 
