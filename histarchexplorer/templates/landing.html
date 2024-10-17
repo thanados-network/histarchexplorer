@@ -19,13 +19,17 @@
                         {% if entity.system_class.lower() in ['group', 'person'] and main_image %}
                             <img src="{{ main_image.url }}" alt="{{ entity.name }}"/>
                         {% else %}
-                            <img src="{% if system_class.lower() in ['feature', 'stratigraphic unit'] %}
-            /static/images/entity_icons/places_550.png
-        {% else %}
-            /static/images/entity_icons/{{ system_class | lower }}s_550.png
-        {% endif %}" alt="{{ system_class }}">
+                            {% if system_class.lower() in ['feature', 'stratigraphic unit'] %}
+                                <img src="/static/images/entity_icons/places_550.png" alt="{{ system_class }}">
+                            {% elif system_class.lower() in ['move', 'acquisition', 'modification', 'activity'] %}
+                                <img src="/static/images/entity_icons/events_550.png" alt="{{ system_class }}">
+                            {% else %}
+                                <img src="/static/images/entity_icons/{{ system_class | lower }}s_550.png"
+                                     alt="{{ system_class }}">
+                            {% endif %}
                         {% endif %}
                     </div>
+
 
                     <div class="entity-card__label">{{ entity.name }}</div>
                     <div class="entity-country">

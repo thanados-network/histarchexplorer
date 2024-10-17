@@ -1,23 +1,25 @@
+//Muuri-general
 .grid {
   position: relative;
 }
 
-.hidden {
+.item.muuri-item-dragging {
+  z-index: 3;
+}
+
+.item.muuri-item-releasing {
+  z-index: 2;
+}
+
+.item.muuri-item-hidden {
+  z-index: 0;
+}
+
+.hidden {//leave at this position!
   display: none !important;
 }
 
-/* Expanded-map - col-md-10 */
-.expanded-map {
-  width: calc(100vw - 23%);
-  height: calc(100vh - 120px);
-  padding: 0rem;
-}
-
-/* Hide fullscreen button when expanded */
-//.expanded-map .location:hover #fullscreen-button {
-//  opacity: 0;
-//}
-
+//**Muuri-tiles**
 .item {
 
   display: block;
@@ -82,7 +84,6 @@
   max-height: fit-content;
 }
 
-
 .item-content {
   padding: 1rem;
   display: flex;
@@ -135,6 +136,21 @@
   }
 }
 
+//Related Entities/Subentities
+.subentities {
+  max-height: 700px;
+}
+
+.no-bullets {
+  list-style: none;
+}
+
+.entity-list {
+  font-size: 1em;
+  font-weight: lighter;
+}
+
+
 //Map-Style
 .location {
   width: 100%;
@@ -169,40 +185,14 @@
   //pointer-events: none;
   transition: ease-in 0.3s;
 
-
-  // Icon styling
-  i {
-    font-size: 1.2rem;
-  }
+.expanded-map {
+  width: calc(100vw - 22.9%);
+  height: calc(100vh - 120px);
+  padding: 0rem;
 }
 
-//Related Entities/Subentities
-.subentities {
-  max-height: 700px;
-}
-
-.no-bullets {
-  list-style: none;
-}
-
-.entity-list {
-  font-size: 1em;
-  font-weight: lighter;
-}
-
-.item.muuri-item-dragging {
-  z-index: 3;
-}
-
-.item.muuri-item-releasing {
-  z-index: 2;
-}
-
-.item.muuri-item-hidden {
-  z-index: 0;
-}
-
-.muuri-references {
+//References/Bib
+  .muuri-references {
   p {
     max-height: 700px;
     overflow: auto;
@@ -210,6 +200,11 @@
   }
 }
 
+// Icon styling
+  i {
+    font-size: 1.2rem;
+  }
+}
 
 //Sidebar
 .sidebar {
