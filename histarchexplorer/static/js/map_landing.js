@@ -38,9 +38,9 @@ expandButton.addEventListener('click', event => {
         muuriMap.classList.toggle('expanded-map');
         mapContainer.classList.toggle('expanded-map');
 
-        const locationTile = document.querySelector('.map-wrapper').closest('.item');
+        const locationTile = document.querySelector('.map-wrapper').parentElement;
         if (locationTile) {
-            locationTile.classList.remove('item');
+            locationTile.classList.toggle('item'); // Toggle the 'item' class
         }
         document.querySelectorAll('.item, .item-content').forEach(item => {
             if (!item.contains(muuriMap)) {
