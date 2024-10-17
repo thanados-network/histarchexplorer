@@ -31,8 +31,6 @@ if (gisData) {
 // Expand Map
 const expandButton = document.getElementById('expand-button');
 const mapContainer = document.querySelector('.map-wrapper');
-//const superMapContainer = document.querySelector('.item-content');
-const itemContainer = document.querySelector('.item');
 const muuriMap = document.getElementById('muuri-map');
 
 expandButton.addEventListener('click', event => {
