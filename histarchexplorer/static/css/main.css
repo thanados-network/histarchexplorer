@@ -12250,7 +12250,7 @@ textarea.form-control-lg {
 /* Expanded-map - col-md-10 */
 .expanded-map {
   width: calc(100vw - 23%);
-  height: calc(100vh - 96px);
+  height: calc(100vh - 120px);
   padding: 0rem;
 }
 
@@ -12355,11 +12355,12 @@ textarea.form-control-lg {
 
 .location {
   width: 100%;
+  height: calc(100vh - 152px);
 }
 
 #muuri-map {
   margin-top: 1.5rem;
-  height: 700px;
+  height: 100%;
   width: 100%;
 }
 
