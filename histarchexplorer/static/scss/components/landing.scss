@@ -15,7 +15,7 @@
   z-index: 0;
 }
 
-.hidden {//leave at this position!
+.hidden { //leave at this position!
   display: none !important;
 }
 
@@ -184,22 +184,22 @@
   opacity: 0;
   transition: ease-in 0.3s;
 
-.expanded-map {
-  width: calc(100vw - 22.9%);
-  height: calc(100vh - 120px);
-  padding: 0rem;
-}
-
-//References/Bib
-  .muuri-references {
-  p {
-    max-height: 700px;
-    overflow: auto;
-    margin-top: 1.5rem;
+  .expanded-map {
+    width: calc(100vw - 22.9%);
+    height: calc(100vh - 120px);
+    padding: 0rem;
   }
-}
 
-// Icon styling
+  //References/Bib
+  .muuri-references {
+    p {
+      max-height: 700px;
+      overflow: auto;
+      margin-top: 1.5rem;
+    }
+  }
+
+  // Icon styling
   i {
     font-size: 1.2rem;
   }

@@ -195,10 +195,10 @@
                                 <div class="muuri-references">
 
                                     <!-- Bibliography -->
-                                    {% if entity.relations['bibliography'] %}
+                                    {% if entity.relations['bibliography'] or entity.relations['external_references'] %}
                                         <span class="tile-label">REFERENCES</span>
                                         {% for bibliography in entity.relations['bibliography'] %}
-                                            <p class="bi bi-book reference-link">
+                                            <p class="bi bi-book reference-link mt-4">
                                                 <a href="{{ bibliography.relation_to }}"
                                                    target="_blank">{{ bibliography.related_entity.description or bibliography.label }} {{ bibliography.relation_description }}</a>
                                             </p>
