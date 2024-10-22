@@ -52,7 +52,7 @@ expandButton.addEventListener('click', event => {
         //Expand-Shrink Button
         if (muuriMap.classList.contains('expanded-map')) {
             expandButton.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
-        //Enable map zoom etc
+            //Enable map zoom etc
             map.scrollWheelZoom.enable();
             map.doubleClickZoom.enable();
             map.touchZoom.enable();
@@ -67,6 +67,13 @@ expandButton.addEventListener('click', event => {
             map.touchZoom.disable();
             map.boxZoom.disable();
             map.dragging.disable();
+
+            //Recenter when returning to small layout
+            if (gisData) {
+                map.fitBounds(L.geoJSON(gisData).getBounds(), {
+                    maxZoom: 13
+                });
+            }
         }
 
         // adjust for new size
