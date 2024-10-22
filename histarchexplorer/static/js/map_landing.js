@@ -49,6 +49,12 @@ expandButton.addEventListener('click', event => {
                 item.classList.toggle('hidden');
             }
         });
+    //Expand-Shrink Button
+        if (muuriMap.classList.contains('expanded-map')) {
+            expandButton.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
+        } else {
+            expandButton.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';
+        }
 
         // adjust for new size
         map.invalidateSize();
