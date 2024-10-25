@@ -83,7 +83,7 @@ def landing(id_: int) -> str:
     # print("End:", entity.end)
     # print("Relations:", entity.relations)
     # print("Relation Class:", entity.relation_class)
-    #print(main_entity.geometry)
+    # print(main_entity.geometry)
     # print(type(super_entity))
     # print(main_entity.system_class)
     # print(subunit)
@@ -92,13 +92,13 @@ def landing(id_: int) -> str:
     images = []
 
     for image in main_entity.depictions:
-        #print(image.main_image)
+        # print(image.main_image)
         if image.main_image:
             main_image = image
             continue
         images.append(image)
-    #print("Main Image:", main_entity.depictions)
-    #print("Main Image:", main_image)
+    # print("Main Image:", main_entity.depictions)
+    # print("Main Image:", main_image)
     if not main_image and images:
         main_image = images[0]
         del images[0]
@@ -121,7 +121,7 @@ def landing(id_: int) -> str:
             if type_.root == "Case Study":
                 case_study.append(type_)
 
-    #beginof what the fuck are you doing?#
+    # beginof what the fuck are you doing?#
     type_divisions = app.config['TYPE_DIVISIONS']
     categorized_types = {key: [] for key in type_divisions.keys()}
     categorized_types['properties'] = []
@@ -144,7 +144,11 @@ def landing(id_: int) -> str:
         for key, division_ids in type_divisions.items():
             if is_type_in_division(type_item, division_ids):
                 print(f"Categorizing {type_item.label} under {key}")
-                categorized_types[key].append(type_item.label)
+                categorized_types[key].append({
+                    'label': type_item.label,
+                    'value': getattr(type_item, 'value', None),
+                    'unit': getattr(type_item, 'unit', None)
+                })
                 found = True
                 break
         if not found:
@@ -153,19 +157,19 @@ def landing(id_: int) -> str:
 
     print("Categorized Types:", categorized_types)
 
-    #endof what the fuck are you doing?#
+    # endof what the fuck are you doing?#
 
     return render_template(
-    'landing.html',
-    entity=main_entity,
-    view_class=main_entity.view_class,
-    system_class=main_entity.system_class,
-    relations=main_entity.relations,
-    subunits=subunits_dict or {},
-    related_entities=related_entities,
-    main_image=main_image,
-    images=images,
-    super_entity=super_entity,
-    case_study=case_study,
-    standard_types=app.config['STANDARD_TYPES'],
-)
+        'landing.html',
+        entity=main_entity,
+        view_class=main_entity.view_class,
+        system_class=main_entity.system_class,
+        relations=main_entity.relations,
+        subunits=subunits_dict or {},
+        related_entities=related_entities,
+        main_image=main_image,
+        images=images,
+        super_entity=super_entity,
+        case_study=case_study,
+        standard_types=app.config['STANDARD_TYPES'],
+    )
