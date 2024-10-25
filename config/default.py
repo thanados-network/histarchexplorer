@@ -33,3 +33,16 @@ VIEW_CLASSES = {
     'sources': ('source', 'bibliography', 'external_reference', 'edition'),
     'files': ('file',)
 }
+
+STANDARD_TYPES = (
+'Source', 'Event', 'Actor function', 'Involvement', 'Bibliography', 'Edition', 'License', 'External reference',
+'Source translation', 'Actor relation', 'Human remains', 'Artifact', 'Place', 'Feature', 'Stratigraphic unit')
+
+TYPE_DIVISIONS = {
+    'dimensions': (15678,),
+    'anthropology': (218963,),
+    'material': (21160,),
+    'age': (22277, 117198,),
+    'burial characteristics': (213223,)
+
+}

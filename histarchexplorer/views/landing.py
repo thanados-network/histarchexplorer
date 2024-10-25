@@ -24,6 +24,11 @@ def landing(id_: int) -> str:
         if entity.id == id_:
             main_entity = entity
 
+    print("System class:", main_entity.system_class)
+    print("View class:", main_entity.view_class)
+    print("type:", main_entity.types)
+    print("main_entity:", main_entity)
+
     for relation in main_entity.relations.values():
         for rel in relation:
             for relation_entity in entities:
@@ -50,7 +55,6 @@ def landing(id_: int) -> str:
         for subunit in entities:
             if not subunit.types:
                 continue  # macht mit nächster entity weiter; check also break
-
 
             for type_ in subunit.types:
                 subunits_dict[type_.type_hierarchy[0]['label']].append(subunit)
@@ -79,7 +83,7 @@ def landing(id_: int) -> str:
     # print("End:", entity.end)
     # print("Relations:", entity.relations)
     # print("Relation Class:", entity.relation_class)
-    # print(main_entity.geometry)
+    #print(main_entity.geometry)
     # print(type(super_entity))
     # print(main_entity.system_class)
     # print(subunit)
@@ -88,18 +92,16 @@ def landing(id_: int) -> str:
     images = []
 
     for image in main_entity.depictions:
-        print(image.main_image)
+        #print(image.main_image)
         if image.main_image:
             main_image = image
             continue
         images.append(image)
-    print("Main Image:", main_entity.depictions)
-    print("Main Image:", main_image)
+    #print("Main Image:", main_entity.depictions)
+    #print("Main Image:", main_image)
     if not main_image and images:
         main_image = images[0]
         del images[0]
-
-
 
     if not main_entity.geometry and super_entity and super_entity.geometry:
         main_entity.geometry = super_entity.geometry
@@ -119,16 +121,51 @@ def landing(id_: int) -> str:
             if type_.root == "Case Study":
                 case_study.append(type_)
 
+    #beginof what the fuck are you doing?#
+    type_divisions = app.config['TYPE_DIVISIONS']
+    categorized_types = {key: [] for key in type_divisions.keys()}
+    categorized_types['properties'] = []
+
+    def extract_id(identifier):
+        return identifier.split('/')[-1]
+
+    def is_type_in_division(type_item, division_ids):
+        for type_hierarchy_item in type_item.type_hierarchy:
+            hierarchy_id = extract_id(type_hierarchy_item['identifier'])
+            print(f"Checking if {hierarchy_id} is in {division_ids}")
+            if int(hierarchy_id) in division_ids:
+                print(f"Yes: {hierarchy_id} is in {division_ids}")
+                return True
+        return False
+
+    for type_item in main_entity.types:
+        print(f"Processing type: {type_item.label} with ID: {type_item.id}")
+        found = False
+        for key, division_ids in type_divisions.items():
+            if is_type_in_division(type_item, division_ids):
+                print(f"Categorizing {type_item.label} under {key}")
+                categorized_types[key].append(type_item.label)
+                found = True
+                break
+        if not found:
+            print(f"{type_item.label} does not match any division, --> properties")
+            categorized_types['properties'].append(type_item.label)
+
+    print("Categorized Types:", categorized_types)
+
+    #endof what the fuck are you doing?#
+
     return render_template(
-        'landing.html',
-        entity=main_entity,
-        view_class=main_entity.view_class,
-        system_class=main_entity.system_class,
-        relations=main_entity.relations,
-        subunits=subunits_dict or {},
-        related_entities=related_entities,
-        main_image=main_image,
-        images=images,
-        super_entity=super_entity,
-        case_study=case_study
-    )
+    'landing.html',
+    entity=main_entity,
+    view_class=main_entity.view_class,
+    system_class=main_entity.system_class,
+    relations=main_entity.relations,
+    subunits=subunits_dict or {},
+    related_entities=related_entities,
+    main_image=main_image,
+    images=images,
+    super_entity=super_entity,
+    case_study=case_study,
+    standard_types=app.config['STANDARD_TYPES'],
+)
