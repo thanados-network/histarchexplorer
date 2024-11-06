@@ -151,7 +151,7 @@ def landing(id_: int) -> str:
                 if key in value_type_categories:
                     #only add for value_types
                     type_info['value'] = getattr(type_item, 'value', None)
-                    type_info['value'] = getattr(type_item, 'unit', None)
+                    type_info['unit'] = getattr(type_item, 'unit', None)
 
                 categorized_types[key].append(type_info)
                 found = True
