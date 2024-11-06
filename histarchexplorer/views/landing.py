@@ -123,13 +123,13 @@ def landing(id_: int) -> str:
 
     # beginof what the fuck are you doing?#
     type_divisions = app.config['TYPE_DIVISIONS']
-    categorized_types = {key: [] for key in type_divisions.keys()}
-    categorized_types['properties'] = []
+    categorized_types = {key: [] for key in type_divisions.keys()} #empty dict with each key from type_div
+    categorized_types['properties'] = [] #+ properties for all other
 
     def extract_id(identifier):
         return identifier.split('/')[-1]
 
-    def is_type_in_division(type_item, division_ids):
+    def is_type_in_division(type_item, division_ids): #check if type belongs to category
         for type_hierarchy_item in type_item.type_hierarchy:
             hierarchy_id = extract_id(type_hierarchy_item['identifier'])
             print(f"Checking if {hierarchy_id} is in {division_ids}")
@@ -138,17 +138,22 @@ def landing(id_: int) -> str:
                 return True
         return False
 
+    value_type_categories = ['dimensions']
     for type_item in main_entity.types:
         print(f"Processing type: {type_item.label} with ID: {type_item.id}")
         found = False
         for key, division_ids in type_divisions.items():
             if is_type_in_division(type_item, division_ids):
                 print(f"Categorizing {type_item.label} under {key}")
-                categorized_types[key].append({
-                    'label': type_item.label,
-                    'value': getattr(type_item, 'value', None),
-                    'unit': getattr(type_item, 'unit', None)
-                })
+
+                # conditionally include value and unit
+                type_info = {'label': type_item.label}
+                if key in value_type_categories:
+                    #only add for value_types
+                    type_info['value'] = getattr(type_item, 'value', None)
+                    type_info['value'] = getattr(type_item, 'unit', None)
+
+                categorized_types[key].append(type_info)
                 found = True
                 break
         if not found:
