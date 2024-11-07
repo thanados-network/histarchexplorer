@@ -138,7 +138,6 @@ def landing(id_: int) -> str:
                 return True
         return False
 
-    value_type_categories = ['dimensions']
     for type_item in main_entity.types:
         print(f"Processing type: {type_item.label} with ID: {type_item.id}")
         found = False
@@ -148,21 +147,34 @@ def landing(id_: int) -> str:
 
                 # conditionally include value and unit
                 type_info = {'label': type_item.label}
-                if key in value_type_categories:
-                    #only add for value_types
-                    type_info['value'] = getattr(type_item, 'value', None)
-                    type_info['unit'] = getattr(type_item, 'unit', None)
+                type_info['value'] = getattr(type_item, 'value', None)
+                type_info['unit'] = getattr(type_item, 'unit', None)
 
                 categorized_types[key].append(type_info)
                 found = True
                 break
         if not found:
             print(f"{type_item.label} does not match any division, --> properties")
-            categorized_types['properties'].append(type_item.label)
+
+            categorized_types['properties'].append(type_item)
 
     print("Categorized Types:", categorized_types)
 
     # endof what the fuck are you doing?#
+
+    # Find the parent entity
+    parent_entity = None
+    for relation in main_entity.relations.values():
+        for rel in relation:
+            if super_entity and rel.relation_to_id == super_entity.id:
+                break
+            if rel.relation_type == 'crm:P46i_forms_part_of':
+                parent_entity = rel
+                break
+        if parent_entity:
+            break
+
+
 
     return render_template(
         'landing.html',
@@ -175,6 +187,7 @@ def landing(id_: int) -> str:
         main_image=main_image,
         images=images,
         super_entity=super_entity,
+        parent_entity=parent_entity,
         case_study=case_study,
         standard_types=app.config['STANDARD_TYPES'],
         categorized_types=categorized_types
