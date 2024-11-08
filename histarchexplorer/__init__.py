@@ -46,7 +46,7 @@ def create_icon(css_class: str) -> str:
     return f'<i class="{css_class}"></i>'
 
 
-def create_svg_icon(file_name: str) -> str:
+def create_image_icon(file_name: str) -> str:
     filepath = url_for("static", filename="images/entity_icons/")
     return (f'<img src="{filepath + file_name}" '
             f'width="16" height="16" alt="{file_name}"/>')
@@ -55,11 +55,11 @@ def create_svg_icon(file_name: str) -> str:
 def get_type_icons() -> dict[int, str]:
     type_icons = app.config['TYPE_ICONS']
     icons = {}
-    for svg, ids in type_icons['svg'].items():
-        svg_tag = create_svg_icon(svg)
+    for image, ids in type_icons['images'].items():
+        image_tag = create_image_icon(image)
         for id_ in ids:
-            icons[id_] = svg_tag
-    for icon, ids in type_icons['icon'].items():
+            icons[id_] = image_tag
+    for icon, ids in type_icons['css_icon_class'].items():
         icon_tag = create_icon(icon)
         for id_ in ids:
             icons[id_] = icon_tag

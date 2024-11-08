@@ -49,9 +49,11 @@ TYPE_DIVISIONS = {
 }
 
 TYPE_ICONS = {
-    'svg': {
-        'grave.svg': [26204]},
-    'icon': {
+    'images': {
+        'grave.svg': [26204],
+    },
+    'css_icon_class': {
         'bi bi-geo-alt-fill': [22378, 73],
         'bi bi-house-door': [26197],
-        'bi bi-geo-yelp': [13362]}}
+        'bi bi-geo-yelp': [13362]
+    }}
