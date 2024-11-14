@@ -18,6 +18,7 @@ class Entity:
         self.id = int(self.data['@id'].rsplit('/', 1)[-1])
         self.name = self.data['properties']['title']
         self.description = self.get_description(self.data['descriptions'])
+        self.description_class = self.get_description_class()
         self.system_class = uc_first(
             self.data['systemClass'].replace('_', ' '))
         self.view_class = uc_first(
@@ -164,3 +165,8 @@ class Entity:
             if type_.root in app.config['STANDARD_TYPES']:
                 return type_
         return None
+
+    def get_description_class(self) -> None:
+        self.description_class = "item"
+        if self.description and len(self.description) > 500:
+            self.description_class = "item-middle"

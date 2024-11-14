@@ -28,13 +28,13 @@
                             {% if entity.system_class.lower() in ['group', 'person'] and main_image %}
                                 <img src="{{ main_image.url }}" alt="{{ entity.name }}"/>
                             {% else %}
-                                {% if system_class.lower() in ['feature', 'stratigraphic unit'] %}
-                                    <img src="/static/images/entity_icons/place.png" alt="{{ system_class }}">
-                                {% elif system_class.lower() in ['move', 'acquisition', 'modification', 'activity'] %}
-                                    <img src="/static/images/entity_icons/event.png" alt="{{ system_class }}">
+                                {% if entity.system_class.lower() in ['feature', 'stratigraphic unit'] %}
+                                    <img src="/static/images/entity_icons/place.png" alt="{{ entity.system_class }}">
+                                {% elif entity.system_class.lower() in ['move', 'acquisition', 'modification', 'activity'] %}
+                                    <img src="/static/images/entity_icons/event.png" alt="{{ entity.system_class }}">
                                 {% else %}
-                                    <img src="/static/images/entity_icons/{{ system_class | lower }}.png"
-                                         alt="{{ system_class }}">
+                                    <img src="/static/images/entity_icons/{{ entity.system_class | lower }}.png"
+                                         alt="{{ entity.system_class }}">
                                 {% endif %}
                             {% endif %}
                         </div>
@@ -82,7 +82,7 @@
                     <div class="entity-class">
                         <p></p>
                         {% if case_study|length > 1 %}
-                            <p>Case Studie:</p>
+                            <p>Case Studies:</p>
                         {% else %}
                             <p>Case Study:</p>
                         {% endif %}
@@ -91,7 +91,7 @@
                                 {% if loop.index > 1 %}| {% endif %}{{ case.label }}
                             {% endfor %}
                         </p>
-                        <p>Type: {{ system_class }}</p>
+                        <p>Type: {{ entity.system_class }}</p>
                     </div>
 
                 </div>
