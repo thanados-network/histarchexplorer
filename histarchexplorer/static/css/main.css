@@ -12431,6 +12431,7 @@ textarea.form-control-lg {
 
 .sidebar-content {
   margin-top: 2rem;
+  align-items: center;
 }
 
 .super-entity {
@@ -12480,6 +12481,27 @@ textarea.form-control-lg {
   font-size: 1rem;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.main-entity-ellipse {
+  height: 80px;
+  width: 150px;
+  border-radius: 50%;
+  border-color: grey;
+}
+
+.hierarchy-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.line {
+  background-color: grey;
+  height: 20px;
+  width: 1px;
+  margin: 5px 0;
 }
 
 /*# sourceMappingURL=main.css.map */

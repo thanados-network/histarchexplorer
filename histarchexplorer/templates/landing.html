@@ -6,17 +6,22 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2 sidebar" id="sidebar">
-                <div class="sidebar-content d-flex flex-column">
+                <div class="sidebar-content flex-column">
                     {% if ancestor_entities %}
-                        {% for entity in ancestor_entities %}
-                            <button type="button" class="btn btn-outline-secondary rounded-5 mb-2">
-                                <a href="{{ url_for('landing', id_=entity.id) }}"
-                                   class="nude-link text-decoration-none fs-6">
-                                    {{ entity.standard_type.icon | safe }}
-                                    {{ entity.name }}
-                                </a>
-                            </button>
-                        {% endfor %}
+                        <ul class="list-unstyled">
+                            {% for entity in ancestor_entities %}
+                                <li class="hierarchy-button">
+                                    <button type="button" class="btn btn-outline-secondary rounded-5 mb-2">
+                                        <a href="{{ url_for('landing', id_=entity.id) }}"
+                                           class="nude-link text-decoration-none fs-6">
+                                            {{ entity.standard_type.icon | safe }}
+                                            {{ entity.name }}
+                                        </a>
+                                    </button>
+                                 <div class="line"></div>
+                                </li>
+                            {% endfor %}
+                        </ul>
                     {% endif %}
                     <button type="button" class="btn btn-light rounded-5">
                         <div class="entity-card__icon">
@@ -145,7 +150,6 @@
                     <div class="item">
                         <div class="item-content">
                             <div id="svg-tree"></div>
-                            HERE SHOULD BE THE HIERARCHY_NAV THINGY
                             </p>
                             </figure>
                         </div>
