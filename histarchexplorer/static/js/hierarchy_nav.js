@@ -49,19 +49,24 @@ const hierachy = {
 
 const options = {
     contentKey: 'data',
-    nodeWidth: 150,
-    nodeHeight: 100,
+    nodeWidth: 100,
+    nodeHeight: 70,
     fontColor: '#fff',
     borderColor: '#333',
     childrenSpacing: 50,
     siblingSpacing: 20,
     direction: 'top',
     enableExpandCollapse: true,
-    nodeTemplate: (content) =>
-        `<div style='display: flex; flex-direction: column; gap: 10px; justify-content: center; align-items: center; height: 100%;'>
-          <img style='width: 50px; height: 50px; border-radius: 50%;' src='${content.imageURL}' alt='' />
-          <div style="font-weight: bold; font-family: Arial; font-size: 14px">${content.name}</div>
-         </div>`,
+    nodeTemplate: (content) => {
+        // Calculate dynamic font size based on node width (scale between 10px and 16px)
+        const fontSize = Math.max(10, Math.min(16, options.nodeWidth * 0.1));
+
+        return `
+        <div style='display: flex; flex-direction: column; gap: 10px; justify-content: center; align-items: center; height: 100%;'>
+            <img style='width: 30px; height: 30px; border-radius: 50%;' src='${content.imageURL}' alt='' />
+            <div style="font-weight: bold; font-family: Arial; font-size: ${fontSize}px">${content.name}</div>
+        </div>`;
+    },
     canvasStyle: 'background: #f6f6f6;',
     enableToolbar: true,
 };

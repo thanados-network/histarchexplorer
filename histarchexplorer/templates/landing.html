@@ -6,17 +6,22 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2 sidebar" id="sidebar">
-                <div class="sidebar-content d-flex flex-column">
+                <div class="sidebar-content flex-column">
                     {% if ancestor_entities %}
-                        {% for entity in ancestor_entities %}
-                            <button type="button" class="btn btn-outline-secondary rounded-5 mb-2">
-                                <a href="{{ url_for('landing', id_=entity.id) }}"
-                                   class="nude-link text-decoration-none fs-6">
-                                    {{ entity.standard_type.icon | safe }}
-                                    {{ entity.name }}
-                                </a>
-                            </button>
-                        {% endfor %}
+                        <ul class="list-unstyled">
+                            {% for entity in ancestor_entities %}
+                                <li class="hierarchy-button">
+                                    <button type="button" class="btn btn-outline-secondary rounded-5">
+                                        <a href="{{ url_for('landing', id_=entity.id) }}"
+                                           class="nude-link text-decoration-none">
+                                            {{ entity.standard_type.icon | safe }}
+                                            {{ entity.name }}
+                                        </a>
+                                    </button>
+                                    <div class="line"></div>
+                                </li>
+                            {% endfor %}
+                        </ul>
                     {% endif %}
                     <button type="button" class="btn btn-light rounded-5">
                         <div class="entity-card__icon">
@@ -66,17 +71,18 @@
                         {% endif %}
                     </div>
 
-                    <div id="entity-link-buttons">
+                    <!--  <div id="entity-link-buttons">
                         {% for key, type_ in related_entities.items() %}
                             <button type="button"
-                                    class="btn btn-outline-secondary btn-lg">{{ key|replace('_', ' ')|capitalize_first }}</button>
+                                    class="btn btn-outline-secondary btn-lg">
+                        {{ key|replace('_', ' ')|capitalize_first }}</button>
                         {% endfor %}
-                    </div>
+                    </div> -->
 
                     <div class="entity-class">
                         <p></p>
                         {% if case_study|length > 1 %}
-                            <p>Case Studies:</p>
+                            <p>Case Studie:</p>
                         {% else %}
                             <p>Case Study:</p>
                         {% endif %}
@@ -85,7 +91,7 @@
                                 {% if loop.index > 1 %}| {% endif %}{{ case.label }}
                             {% endfor %}
                         </p>
-                        <p>Hierarchy: {{ system_class }}</p>
+                        <p>Type: {{ system_class }}</p>
                     </div>
 
                 </div>
@@ -142,16 +148,20 @@
                         </div>
                     {% endif %}
 
-                    <div class="item">
-                        <div class="item-content">
-                            <div id="svg-tree"></div>
-                            HERE SHOULD BE THE HIERARCHY_NAV THINGY
-                            </p>
-                            </figure>
-                        </div>
-                    </div>
-
                     <!-- Types -->
+
+                    <!--{% if subunits %}
+                        <div class="item">
+                            <div class="item-content">
+                                <div class="subentities">
+                                    <p class="tile-label">SUBUNITS?</p>
+                                    {% for type_, list_ in subunits.items() %}
+                                        <p>{{ type_ }} ({{ list_ | length }})</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}-->
 
                     <!-- Related entities -->
                     {% if related_entities %}
