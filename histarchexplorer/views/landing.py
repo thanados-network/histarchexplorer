@@ -25,9 +25,9 @@ def landing(id_: int) -> str:
             main_entity = entity
 
     print("System class:", main_entity.system_class)
-    print("View class:", main_entity.view_class)
-    print("type:", main_entity.types)
-    print("main_entity:", main_entity)
+   # print("View class:", main_entity.view_class)
+  #  print("type:", main_entity.types)
+  #  print("main_entity:", main_entity)
 
     # establish connection between main_entity and related entities
     for relation in main_entity.relations.values():
@@ -86,7 +86,7 @@ def landing(id_: int) -> str:
     # print("Relation Class:", entity.relation_class)
     # print(main_entity.geometry)
     # print(type(super_entity))
-    # print(main_entity.system_class)
+    print(main_entity.system_class)
     # print(subunit)
 
     main_image = None
@@ -137,18 +137,18 @@ def landing(id_: int) -> str:
             division_ids_):  # check if type belongs to category
         for type_hierarchy_item in type_item_.type_hierarchy:
             hierarchy_id = extract_id(type_hierarchy_item['identifier'])
-            print(f"Checking if {hierarchy_id} is in {division_ids_}")
+          #  print(f"Checking if {hierarchy_id} is in {division_ids_}")
             if int(hierarchy_id) in division_ids_:
-                print(f"Yes: {hierarchy_id} is in {division_ids_}")
+            #    print(f"Yes: {hierarchy_id} is in {division_ids_}")
                 return True
         return False
 
     for type_item in main_entity.types:
-        print(f"Processing type: {type_item.label} with ID: {type_item.id}")
+       # print(f"Processing type: {type_item.label} with ID: {type_item.id}")
         found = False
         for key, division_ids in type_divisions.items():
             if is_type_in_division(type_item, division_ids):
-                print(f"Categorizing {type_item.label} under {key}")
+              #  print(f"Categorizing {type_item.label} under {key}")
 
                 # conditionally include value and unit
                 type_info = {
@@ -160,13 +160,13 @@ def landing(id_: int) -> str:
                 found = True
                 break
         if not found:
-            print(
-                f"{type_item.label} does not match any division, "
-                f"--> properties")
+           # print(
+               # f"{type_item.label} does not match any division, "
+              #  f"--> properties")
 
             categorized_types['properties'].append(type_item)
 
-    print("Categorized Types:", categorized_types)
+   # print("Categorized Types:", categorized_types)
 
     # Find ancestor entities
     ancestor_entities = []
