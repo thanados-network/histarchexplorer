@@ -12,9 +12,21 @@
     justify-content: center;
 }
 
+
+.hierarchy-button {
+    button {
+        transition: transform 0.2s ease-in-out;
+
+        &:hover {
+            transform: scale(1.2);
+        }
+    }
+}
+
+
 .line {
     background-color: grey;
-    height: 20px;
+    height: 15px;
     width: 1px;
     margin: 5px 0;
 }

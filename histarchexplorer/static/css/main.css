@@ -12440,7 +12440,7 @@ textarea.form-control-lg {
 
 .nude-link {
   color: inherit;
-  font-weight: inherit;
+  font-size: small;
 }
 
 .entity-country {
@@ -12497,9 +12497,16 @@ textarea.form-control-lg {
   justify-content: center;
 }
 
+.hierarchy-button button {
+  transition: transform 0.2s ease-in-out;
+}
+.hierarchy-button button:hover {
+  transform: scale(1.2);
+}
+
 .line {
   background-color: grey;
-  height: 20px;
+  height: 15px;
   width: 1px;
   margin: 5px 0;
 }

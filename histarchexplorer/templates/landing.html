@@ -11,9 +11,9 @@
                         <ul class="list-unstyled">
                             {% for entity in ancestor_entities %}
                                 <li class="hierarchy-button">
-                                    <button type="button" class="btn btn-outline-secondary rounded-5 mb-2">
+                                    <button type="button" class="btn btn-outline-secondary rounded-5">
                                         <a href="{{ url_for('landing', id_=entity.id) }}"
-                                           class="nude-link text-decoration-none fs-6">
+                                           class="nude-link text-decoration-none">
                                             {{ entity.standard_type.icon | safe }}
                                             {{ entity.name }}
                                         </a>
@@ -71,17 +71,17 @@
                         {% endif %}
                     </div>
 
-                    <div id="entity-link-buttons">
+                   <!--  <div id="entity-link-buttons">
                         {% for key, type_ in related_entities.items() %}
                             <button type="button"
                                     class="btn btn-outline-secondary btn-lg">{{ key|replace('_', ' ')|capitalize_first }}</button>
                         {% endfor %}
-                    </div>
+                    </div> -->
 
                     <div class="entity-class">
                         <p></p>
                         {% if case_study|length > 1 %}
-                            <p>Case Studies:</p>
+                            <p>Case Studie:</p>
                         {% else %}
                             <p>Case Study:</p>
                         {% endif %}
@@ -90,7 +90,7 @@
                                 {% if loop.index > 1 %}| {% endif %}{{ case.label }}
                             {% endfor %}
                         </p>
-                        <p>Hierarchy: {{ system_class }}</p>
+                        <p>Type: {{ system_class }}</p>
                     </div>
 
                 </div>
@@ -146,14 +146,6 @@
                             </div>
                         </div>
                     {% endif %}
-
-                    <div class="item">
-                        <div class="item-content">
-                            <div id="svg-tree"></div>
-                            </p>
-                            </figure>
-                        </div>
-                    </div>
 
                     <!-- Types -->
 
