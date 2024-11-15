@@ -21,7 +21,7 @@ def test_entity(id_: int) -> str:
 @app.route('/test/linked_entities_by_properties_recursive/<int:id_>')
 def test_linked_entities_by_properties_recursive(id_: int) -> str:
     parser = Parser(
-        properties=[request.args.get('properties')],
+        properties=[request.args.get('properties') or ''],
         limit=0,
         format='lpx')
     entities = Entity.get_linked_entities_by_properties_recursive(id_, parser)

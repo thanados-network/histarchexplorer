@@ -49,11 +49,6 @@ class ApiAccess:
             parser: Parser) -> list[dict[str, Any]]:
         url = (f"{app.config['API_URL']}"
                f"/linked_entities_by_properties_recursive/")
-        print(requests.get(
-            f"{url}{id_}",
-            params=parser.__dict__,
-            proxies=PROXIES,
-            timeout=30).url)
         return requests.get(
             f"{url}{id_}",
             params=parser.__dict__,

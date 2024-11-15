@@ -6,6 +6,7 @@ from flask import render_template
 from histarchexplorer import app
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.models.entity import Entity
+from histarchexplorer.models.types import Types
 
 
 @app.route('/entity/<int:id_>')
@@ -118,12 +119,11 @@ def add_entity_object_to_relation(
 
 
 def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
-    main_entity = None
     for entity in entities:
         if entity.id == id_:
-            main_entity = entity
-            break
-    return main_entity
+            return entity
+    raise ValueError(f"Entity with id {id_} not found.")
+
 
 
 def get_related_entities(
@@ -176,17 +176,18 @@ def get_ancestor_entities(
 def get_categorized_types(main_entity: Entity) -> dict[str, Any]:
     # Types Division - Categories + Rest
     type_divisions = app.config['TYPE_DIVISIONS']
-    categorized_types = {key: [] for key in
-                         type_divisions.keys()}  # empty dict with each key
+    # empty dict with each key
+    categorized_types: dict[str, Any] = {
+        key: [] for key in type_divisions.keys()}
     # from type_div
     categorized_types['properties'] = []  # + properties for all other
 
-    def extract_id(identifier):
+    def extract_id(identifier: str) -> str:
         return identifier.split('/')[-1]
 
     def is_type_in_division(
-            type_item_,
-            division_ids_):  # check if type belongs to category
+            type_item_: Types,
+            division_ids_: list[int]) -> bool:  # check if type belongs to category
         for type_hierarchy_item in type_item_.type_hierarchy:
             hierarchy_id = extract_id(type_hierarchy_item['identifier'])
             #  print(f"Checking if {hierarchy_id} is in {division_ids_}")
