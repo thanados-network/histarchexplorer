@@ -42,15 +42,16 @@ def landing(id_: int) -> str:
             main_image = image
             continue
         images.append(image)
+        print(images)
     if not main_image and images:
         main_image = images[0]
         del images[0]
 
-    print("System class:", main_entity.system_class)
+    #print("System class:", main_entity.system_class)
     # print("View class:", main_entity.view_class)
     # print("type:", main_entity.types)
     # print("main_entity:", main_entity)
-    print("ANCESTOR ENTITIES:", [entity.name for entity in ancestor_entities])
+    #print("ANCESTOR ENTITIES:", [entity.name for entity in ancestor_entities])
     # print(subunits_dict['Feature'])
 
     # print(entity.view_class)
@@ -61,11 +62,13 @@ def landing(id_: int) -> str:
     # print("Relation Class:", entity.relation_class)
     # print(main_entity.geometry)
     # print(type(super_entity))
-    print(main_entity.system_class)
+    #print(main_entity.system_class)
     # print(subunit)
     # print("Categorized Types:", categorized_types)
 
-    print([rel.related_entity.name for rel in main_entity.subunits])
+   # print([rel.related_entity.name for rel in main_entity.subunits])
+
+
     return render_template(
         'landing.html',
         entity=main_entity,

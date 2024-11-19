@@ -12366,6 +12366,11 @@ textarea.form-control-lg {
   hyphens: auto;
 }
 
+.badge.bg-secondary.text-wrap {
+  font-size: 1.1 rem;
+  line-height: 1.5;
+}
+
 .subentities {
   max-height: 700px;
 }

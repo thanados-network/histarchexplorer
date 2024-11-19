@@ -51,8 +51,7 @@
                                 <i class="bi bi-diagram-3"></i>
                                 <span class="nude-link">
                                     {{ entity.subunits | length }}
-                                    {{ "Subentity" if entity.subunits | length == 1 else "Subentities" }}
-                                </span>
+                                    {{ "Subentity" if entity.subunits | length == 1 else "Subentities" }}</span>
                         </div>
                         </button>
                     {% endif %}
@@ -216,13 +215,15 @@
                                     <div class="item-content">
                                         <div class="categorized-types">
                                             <p class="tile-label text-uppercase">{{ category }}</p>
-                                            <ul>
+                                            <ul class="no-bullets">
                                                 {% for type in types %}
                                                     <li>
-                                                        <strong>{{ type.label }}</strong>
-                                                        {% if type.value and type.unit %}
-                                                            : {{ type.value }} {{ type.unit }}
-                                                        {% endif %}
+                                                        <span class="badge bg-dark-subtle text-wrap">
+                                                            <strong>{{ type.label }}</strong>
+                                                            {% if type.value and type.unit %}
+                                                                : {{ type.value }} {{ type.unit }}
+                                                            {% endif %}
+                                                        </span>
                                                     </li>
                                                 {% endfor %}
                                             </ul>
@@ -235,6 +236,7 @@
 
 
 
+
                     <!-- All other images -->
                     {% if images %}
                         {% for depiction in images %}
@@ -243,8 +245,12 @@
                                     <div class="item-content item-content-full">
                                         <div class="muuri-images">
                                             <div class="image">
-                                                <img src="{{ depiction.url }}"
-                                                     alt="{{ depiction.title }}"/>
+                                                {% if depiction.iiif_image_url %}
+                                                    <img src="{{ depiction.iiif_image_url }}"
+                                                         alt="{{ depiction.title }}"/>
+                                                {% else %}
+                                                    <img src="{{ depiction.url }}" alt="{{ depiction.title }}"/>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
