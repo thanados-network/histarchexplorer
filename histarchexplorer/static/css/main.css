@@ -12329,6 +12329,10 @@ textarea.form-control-lg {
   height: 100%;
 }
 
+.item-content-full {
+  padding: 0;
+}
+
 .image img {
   max-width: 100%;
   height: auto;
@@ -12341,7 +12345,6 @@ textarea.form-control-lg {
   font-size: 1.3em;
   font-weight: bold;
   position: relative;
-  top: 0.5rem;
 }
 
 .muuri-description p {
@@ -12377,7 +12380,6 @@ textarea.form-control-lg {
 }
 
 #muuri-map {
-  margin-top: 1.5rem;
   height: 100%;
   width: 100%;
 }
@@ -12484,10 +12486,8 @@ textarea.form-control-lg {
 }
 
 .main-entity-ellipse {
-  height: 80px;
-  width: 150px;
-  border-radius: 50%;
-  border-color: grey;
+  border: 1px solid black;
+  border-radius: 50px;
 }
 
 .hierarchy-button {
@@ -12496,7 +12496,6 @@ textarea.form-control-lg {
   align-items: center;
   justify-content: center;
 }
-
 .hierarchy-button button {
   transition: transform 0.2s ease-in-out;
 }
