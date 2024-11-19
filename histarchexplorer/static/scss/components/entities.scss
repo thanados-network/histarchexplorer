@@ -30,7 +30,8 @@
 
   @include breakpoint-down('mini') {
     margin-left: 0;
-    margin-right: 0;}
+    margin-right: 0;
+  }
 
 
   &:hover {
@@ -68,7 +69,6 @@
     border-top: rem(5) solid var(--dark-greyblue);
 
   }
-
 
 
   &__icon {
@@ -115,7 +115,12 @@
     text-transform: uppercase;
     color: var(--text-color2);
     letter-spacing: rem(1);
+
+    @media (max-width: 992px) and (min-width: 768px) {
+      font-size: rem(18);
+    }
   }
+
 
   &--places {
 
@@ -150,4 +155,5 @@
   }
 
 }
+
 

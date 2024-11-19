@@ -12174,6 +12174,11 @@ textarea.form-control-lg {
   color: var(--text-color2);
   letter-spacing: 0.0625rem;
 }
+@media (max-width: 992px) and (min-width: 768px) {
+  .entity-card__label {
+    font-size: 1.125rem;
+  }
+}
 .entity-card__description {
   color: var(--text-color1);
   font-weight: 300;
@@ -12420,8 +12425,9 @@ textarea.form-control-lg {
 }
 
 .entity-card__icon img {
-  max-width: 50%;
+  max-width: 100%;
   height: auto;
+  margin-bottom: 1rem;
 }
 
 .sidebar {
@@ -12465,7 +12471,7 @@ textarea.form-control-lg {
 }
 
 .entity-class {
-  color: dimgrey;
+  color: #3f3f3f;
   font-weight: lighter;
 }
 
@@ -12486,8 +12492,9 @@ textarea.form-control-lg {
 }
 
 .main-entity-ellipse {
-  border: 1px solid black;
   border-radius: 50px;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding-bottom: 0.3125rem;
 }
 
 .hierarchy-button {

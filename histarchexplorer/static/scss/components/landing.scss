@@ -1,3 +1,5 @@
+@use '../globals'as *;
+
 //Muuri-general
 .grid {
   position: relative;
@@ -115,6 +117,8 @@
   position: relative;
 }
 
+
+
 .muuri-description {
   p {
     max-height: 700px;
@@ -209,8 +213,9 @@
 }
 
 .entity-card__icon img {
-  max-width: 50%;
+  max-width: 100%;
   height: auto;
+  margin-bottom: 1rem;
 }
 
 //Sidebar
@@ -256,9 +261,10 @@
 }
 
 .entity-class {
-  color: dimgrey;
+  color: #3f3f3f;
   font-weight: lighter;
 }
+
 
 #entity-link-buttons {
   display: flex;
