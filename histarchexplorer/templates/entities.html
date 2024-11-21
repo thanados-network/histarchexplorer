@@ -8,7 +8,7 @@
         <div class="col-lg-4 col-md-6">
             <div id=" {{ view_class | lower }}-card" class="entity-card entity-card--{{ view_class | lower }}">
                 <div class="entity-card__icon">
-                    <img src="/static/images/entity_icons/{{ view_class | lower }}_550.png" alt="{{ class_name }}">
+                    <img src="/static/images/entity_icons/{{ view_class[:-1] | lower }}.png" alt="{{ view_class }}">
                 </div>
                 <div class="entity-card__label">{{ view_class }}</div>
                 <div class="entity-card__description">
