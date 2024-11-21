@@ -60,6 +60,28 @@
   }
 }
 
+.item-half {
+  display: block;
+  margin: 5px;
+  position: absolute;
+  width: calc(((100% - 30px) / 3) / 2);
+  background: var(--muuri-tile);
+  overflow: hidden;
+  border-radius: 7.5px;
+}
+
+@media (max-width: 992px) { // Below col-md breakpoint
+  .item-half {
+    width: calc(((100% - 20px) / 2) / 2); // Half of two tiles
+  }
+}
+
+@media (max-width: 766px) { // Mobile
+  .item-half {
+    width: calc((100% - 10px) / 2); // Half of one tile
+  }
+}
+
 .item-wide {
   width: calc(100% - 30px); // full width of three tiles
 }

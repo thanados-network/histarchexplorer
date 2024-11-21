@@ -240,8 +240,9 @@
                     <!-- All other images -->
                     {% if images %}
                         {% for depiction in images %}
+                            {% set total_images = images|length %}
                             {% if not depiction.main_image %}
-                                <div class="item">
+                                <div class="{% if total_images >1 %}item-half {% else %}item{% endif %}">
                                     <div class="item-content item-content-full">
                                         <div class="muuri-images">
                                             <div class="image">

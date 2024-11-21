@@ -47,6 +47,8 @@ def landing(id_: int) -> str:
         main_image = images[0]
         del images[0]
 
+    total_images = len([img for img in images if not img.main_image])
+
     #print("System class:", main_entity.system_class)
     # print("View class:", main_entity.view_class)
     # print("type:", main_entity.types)
@@ -74,6 +76,7 @@ def landing(id_: int) -> str:
         entity=main_entity,
         related_entities=related_entities,
         main_image=main_image,
+        total_images=total_images,
         images=images,
         ancestor_entities=ancestor_entities,
         case_study=case_study,
@@ -93,7 +96,7 @@ def get_parser_for_landing(id_: int) -> Parser:
              'Production' | 'Modification':
             properties = [
                 'P67', 'P11', 'P14', 'P22', 'P23', 'P25', 'P7',
-                'P26', 'P27', 'P24', 'P31', 'P25', '108', 'P9',
+                'P26', 'P27', 'P24', 'P31', 'P25', 'P108', 'P9',
                 'P134']
         case 'Bibliography' | 'Edition' | 'External reference':
             properties = ['P67']
