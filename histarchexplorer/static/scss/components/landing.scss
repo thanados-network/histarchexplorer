@@ -254,10 +254,13 @@
   background-color: var(--card-bg);
   margin-top: - var(--navbar-height);
   height: calc(100vh - var(--navbar-height));
-  overflow-y: auto;
   color: black;
   text-align: center;
-}
+
+
+  @media (max-width: 766px) {
+    position: static;
+    height: auto;}}
 
 .sidebar-content {
   margin-top: 2rem;
@@ -290,7 +293,7 @@
 }
 
 .entity-type {
-  margin-top: 3rem;
+  margin-top: 2rem;
 }
 
 .entity-class {
@@ -318,4 +321,9 @@
 .main-content {
   margin-left: 16.6667%;
   overflow-y: auto;
+
+  @media (max-width: 766px) {
+    margin-left: 0;
+    overflow-y: visible;
+  }
 }

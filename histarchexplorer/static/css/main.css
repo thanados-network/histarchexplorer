@@ -12461,9 +12461,14 @@ textarea.form-control-lg {
   background-color: var(--card-bg);
   margin-top: -var(--navbar-height);
   height: calc(100vh - var(--navbar-height));
-  overflow-y: auto;
   color: black;
   text-align: center;
+}
+@media (max-width: 766px) {
+  .sidebar {
+    position: static;
+    height: auto;
+  }
 }
 
 .sidebar-content {
@@ -12496,7 +12501,7 @@ textarea.form-control-lg {
   }
 }
 .entity-type {
-  margin-top: 3rem;
+  margin-top: 2rem;
 }
 
 .entity-class {
@@ -12523,6 +12528,12 @@ textarea.form-control-lg {
 .main-content {
   margin-left: 16.6667%;
   overflow-y: auto;
+}
+@media (max-width: 766px) {
+  .main-content {
+    margin-left: 0;
+    overflow-y: visible;
+  }
 }
 
 .main-entity-ellipse {
