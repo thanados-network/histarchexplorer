@@ -263,7 +263,6 @@
 
   @media (max-width: 766px) {
     position: static;
-    height: auto;
   }
 }
 
@@ -271,7 +270,7 @@
   height: calc(100vh - var(--navbar-height));
   margin-top: 2rem;
   align-items: center;
-}
+  }
 
 .super-entity {
   font-weight: lighter;

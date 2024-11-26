@@ -12470,7 +12470,6 @@ textarea.form-control-lg {
 @media (max-width: 766px) {
   .sidebar {
     position: static;
-    height: auto;
   }
 }
 
@@ -12544,6 +12543,41 @@ textarea.form-control-lg {
   border-radius: 50px;
   background-color: rgba(255, 255, 255, 0.5);
   padding-bottom: 0.3125rem;
+  border-top: 0.3125rem solid transparent;
+  border-bottom: 0.3125rem solid transparent;
+}
+@media (min-width: 1921px) or (max-width: 769px) {
+  .main-entity-ellipse {
+    max-width: 70%;
+    display: grid;
+    align-content: center;
+    align-items: center;
+    align-self: center;
+  }
+}
+.main-entity-ellipse--places {
+  border-top-color: var(--limegreen);
+  border-bottom-color: var(--limegreen);
+}
+.main-entity-ellipse--actors {
+  border-top-color: var(--pink);
+  border-bottom-color: var(--pink);
+}
+.main-entity-ellipse--events {
+  border-top-color: var(--blue);
+  border-bottom-color: var(--blue);
+}
+.main-entity-ellipse--items {
+  border-top-color: var(--light-orange);
+  border-bottom-color: var(--light-orange);
+}
+.main-entity-ellipse--sources {
+  border-top-color: var(--reddish-brown);
+  border-bottom-color: var(--reddish-brown);
+}
+.main-entity-ellipse--files {
+  border-top-color: var(--dark-greyblue);
+  border-bottom-color: var(--dark-greyblue);
 }
 
 .hierarchy-button {
