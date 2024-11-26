@@ -12457,9 +12457,12 @@ textarea.form-control-lg {
 }
 
 .sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   position: fixed;
   background-color: var(--card-bg);
-  margin-top: -var(--navbar-height);
   height: calc(100vh - var(--navbar-height));
   color: black;
   text-align: center;
@@ -12472,6 +12475,7 @@ textarea.form-control-lg {
 }
 
 .sidebar-content {
+  height: calc(100vh - var(--navbar-height));
   margin-top: 2rem;
   align-items: center;
 }
