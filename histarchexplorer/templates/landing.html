@@ -11,7 +11,7 @@
                         {% for entity in ancestor_entities %}
                             <div class="hierarchy-button">
                                 <button type="button"
-                                        class="btn btn-outline-secondary rounded-5">
+                                        class="btn btn-whitish rounded-5">
                                     <a href="{{ url_for('landing', id_=entity.id) }}"
                                        class="nude-link text-decoration-none">
                                         {{ entity.standard_type.icon | safe }}
@@ -60,6 +60,24 @@
                                 {% endif %}
                             </div>
                             <div class="entity-card__label">{{ entity.name }}</div>
+                           <div class="entity-type ">
+                        {% if entity.standard_type %}
+                            <p>{{ entity.standard_type.label | upper }}</p>
+                        {% endif %}
+                    </div>
+
+
+                    <div class="entity-date">
+                        <p>{{ entity.formated_date }}</p>
+
+                        {% if entity.types %}
+                            {% for type in entity.types %}
+                                {% if type.root == 'Chronology' %}
+                                    <p>{{ type.label or 'No date available' }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
                         </div>
                     {% endif %}
 
@@ -67,8 +85,7 @@
                     {% if entity.subunits %}
                         <div class="hierarchy-button">
                             <div class="line"></div>
-                            <button type="button" class="btn btn-outline-secondary rounded-5"
-                                    disabled>
+                            <button type="button" class="btn btn-whitish rounded-5">
                                 <i class="bi bi-diagram-3"></i>
                                 <span class="nude-link">
                                     {{ entity.subunits | length }}
@@ -90,24 +107,8 @@
                     </div>
                     </button>
 
-                    <div class="entity-type">
-                        {% if entity.standard_type %}
-                            <p>{{ entity.standard_type.label | upper }}</p>
-                        {% endif %}
-                    </div>
 
 
-                    <div class="entity-date">
-                        <p>{{ entity.formated_date }}</p>
-
-                        {% if entity.types %}
-                            {% for type in entity.types %}
-                                {% if type.root == 'Chronology' %}
-                                    <p>{{ type.label or 'No date available' }}</p>
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    </div>
 
                     <!--  <div id="entity-link-buttons">
                         {% for key, type_ in related_entities.items() %}

@@ -73,7 +73,7 @@
   --bs-btn-hover-bg: #6c757d;
   --bs-btn-hover-border-color: #6c757d;
   --bs-btn-focus-shadow-rgb: 108, 117, 125;
-  --bs-btn-active-bg: rgba(255, 255, 255, 0.5);
+  --bs-btn-active-bg: rgba(255, 255, 255, 0.6);
   --bs-btn-active-bg: #6c757d;
   --bs-btn-active-border-color: #6c757d;
   --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
@@ -81,6 +81,17 @@
   --bs-btn-disabled-bg: transparent;
   --bs-btn-disabled-border-color: #6c757d;
   --bs-gradient: none;
+}
+
+.btn-whitish {
+  background-color: rgba(255, 255, 255, 0.6);
+  border: none;
+  box-shadow: none;
+}
+
+.btn-whitish:hover {
+  background-color: rgba(255, 255, 255, 1); /* Slightly less transparent on hover */
+  color: #000; /* Adjust hover color if necessary */
 }
 
 
