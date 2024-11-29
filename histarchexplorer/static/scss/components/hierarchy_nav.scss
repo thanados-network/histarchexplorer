@@ -90,10 +90,16 @@
 }
 
 .btn-whitish:hover {
-  background-color: rgba(255, 255, 255, 1); /* Slightly less transparent on hover */
-  color: #000; /* Adjust hover color if necessary */
+  background-color: rgba(255, 255, 255, 1);
+  color: #000;
 }
 
+.btn-whitish:disabled,
+.btn-whitish[disabled] {
+  background-color: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  opacity: 0.6;
+}
 
 .line {
   background-color: grey;

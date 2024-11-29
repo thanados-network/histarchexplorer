@@ -23,7 +23,7 @@
                         {% endfor %}
                     {% endif %}
 
-                {% set system_class_map = {
+                    {% set system_class_map = {
                     'place': 'places',
                     'feature': 'places',
                     'stratigraphic unit': 'places',
@@ -60,24 +60,24 @@
                                 {% endif %}
                             </div>
                             <div class="entity-card__label mb-0">{{ entity.name }}</div>
-                           <div class="entity-type ">
-                        {% if entity.standard_type %}
-                            <p>{{ entity.standard_type.label | upper }}</p>
-                        {% endif %}
-                    </div>
-
-
-                    <div class="entity-date">
-                        <p>{{ entity.formated_date }}</p>
-
-                        {% if entity.types %}
-                            {% for type in entity.types %}
-                                {% if type.root == 'Chronology' %}
-                                    <p>{{ type.label or 'No date available' }}</p>
+                            <div class="entity-type ">
+                                {% if entity.standard_type %}
+                                    <p>{{ entity.standard_type.label | upper }}</p>
                                 {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    </div>
+                            </div>
+
+
+                            <div class="entity-date">
+                                <p>{{ entity.formated_date }}</p>
+
+                                {% if entity.types %}
+                                    {% for type in entity.types %}
+                                        {% if type.root == 'Chronology' %}
+                                            <p>{{ type.label or 'No date available' }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
                         </div>
                     {% endif %}
 
@@ -85,7 +85,7 @@
                     {% if entity.subunits %}
                         <div class="hierarchy-button">
                             <div class="line"></div>
-                            <button type="button" class="btn btn-whitish rounded-5">
+                            <button type="button" class="btn btn-whitish rounded-5" disabled>
                                 <i class="bi bi-diagram-3"></i>
                                 <span class="nude-link">
                                     {{ entity.subunits | length }}
@@ -106,8 +106,6 @@
                         {% endif %}
                     </div>
                     </button>
-
-
 
 
                     <!--  <div id="entity-link-buttons">
@@ -221,20 +219,14 @@
                                     <div class="item-content">
                                         <div class="categorized-types">
                                             <p class="tile-label text-uppercase">{{ category }}</p>
-                                            <ul class="no-bullets">
-                                                {% for type in types %}
-                                                    <li>
-                                                        <span
-                                                                class="badge bg-dark-subtle text-wrap">
-                                                            <strong>{{ type.label }}</strong>
-                                                            {% if type.value and type.unit %}
-                                                                : {{ type.value }}
-                                                                {{ type.unit }}
-                                                            {% endif %}
-                                                        </span>
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
+                                            {% for type in types %}
+                                                <div class="badge bg-dark-subtle text-wrap mb-1">
+                                                    <h6>{{ type.label }}
+                                                        {% if type.value and type.unit %}: {{ type.value }}
+                                                            {{ type.unit }}</h6>
+                                                        {% endif %}
+                                                </div>
+                                            {% endfor %}
                                         </div>
                                     </div>
                                 </div>
