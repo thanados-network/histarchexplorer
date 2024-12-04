@@ -225,24 +225,34 @@
                     {% if categorized_types %}
                         <div class="item">
 
-                                <div class="item-content">
+                            <div class="item-content">
                                 <span class="tile-label">ATTRIBUTES</span>
-                                    <div class="categorized-types">
-                                        {% for category, types in categorized_types.items() %}
-                                            {% if types %}
-                                                <p class="tile-sub-label text-uppercase mt-3">{{ category }}</p>
-                                                {% for type in types %}
-                                                    <div class="badge bg-dark-subtle text-wrap m-1">
-                                                       <h6 class="m-0 text-center">{{ type.label }}
-                                                            {% if type.value and type.unit %}: {{ type.value }}
-                                                                {{ type.unit }}</h6>
-                                                            {% endif %}
-                                                    </div>
-                                                {% endfor %}
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>
+                                <div class="categorized-types">
+                                    {% for category, types in categorized_types.items() %}
+                                        {% if types %}
+                                            <p class="tile-sub-label text-uppercase mt-3"> {% set icon = types[0].icon %}
+                                                {% if icon %}
+                                                    {% if icon.endswith('.svg') %}
+                                                        <img src="{{ url_for('static', filename='entity-icons/' ~ icon) }}"
+                                                             alt="{{ category }} icon" class="me-2"
+                                                             style="width: 20px; height: auto;">
+                                                    {% else %}
+                                                        <i class="{{ icon }} me-2"></i>
+                                                    {% endif %}
+                                                {% endif %}
+                                                {{ category }}</p>
+                                            {% for type in types %}
+                                                <div class="badge bg-dark-subtle text-wrap m-1">
+                                                    <h6 class="m-0 text-center">{{ type.label }}
+                                                        {% if type.value and type.unit %}: {{ type.value }}
+                                                            {{ type.unit }}</h6>
+                                                        {% endif %}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
+                            </div>
                         </div>
                     {% endif %}
 

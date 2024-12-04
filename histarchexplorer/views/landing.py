@@ -183,6 +183,7 @@ def get_ancestor_entities(
 def get_categorized_types(main_entity: Entity) -> dict[str, Any]:
     # Types Division - Categories + Rest
     type_divisions = app.config['TYPE_DIVISIONS']
+    type_icons = app.config['TYPE_ICONS']
     # empty dict with each key
     categorized_types: dict[str, Any] = {
         key: [] for key in type_divisions.keys()}
@@ -204,6 +205,13 @@ def get_categorized_types(main_entity: Entity) -> dict[str, Any]:
                 return True
         return False
 
+    def get_icon_for_category(category_key: str) -> str:
+        # find icon for the category from TYPE_ICONS
+        for icon_class, ids in type_icons['css_icon_class'].items():
+            if type_divisions.get(category_key, [None])[0] in ids:
+                return icon_class
+        return None
+
     for type_item in main_entity.types:
         # print(f"Processing type: {type_item.label} with ID: {type_item.id}")
         found = False
@@ -215,7 +223,9 @@ def get_categorized_types(main_entity: Entity) -> dict[str, Any]:
                 type_info = {
                     'label': type_item.label,
                     'value': getattr(type_item, 'value', None),
-                    'unit': getattr(type_item, 'unit', None)}
+                    'unit': getattr(type_item, 'unit', None),
+                    'icon': get_icon_for_category(key)
+                }
 
                 categorized_types[key].append(type_info)
                 found = True

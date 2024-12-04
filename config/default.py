@@ -53,9 +53,13 @@ TYPE_DIVISIONS = {
 TYPE_ICONS = {
     'images': {
         'grave.svg': [26204, 26205, 26208, 26206, 26207, 219910, 174459, 198713 ],
+        'bone.svg': [218963, 213216, 119444, 119334], # Anthroplogy
     },
     'css_icon_class': {
         'bi bi-geo-alt-fill': [22378, 73],
         'bi bi-house-door': [26197],
-        'bi bi-geo-yelp': [13362]
+        'bi bi-geo-yelp': [13362],
+        'bi bi-rulers': [15678],  # Dimensions
+        'bi bi-calendar-range': [22277, 117198],  # Age
+        #'bi bi-person-arms-up': [218963, 213216, 119444, 119334], # Anthroplogy
     }}
