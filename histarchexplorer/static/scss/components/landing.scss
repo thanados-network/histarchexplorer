@@ -174,7 +174,7 @@
 
 
 //Related Entities/Subentities
-.subentities {
+.related-entities {
   max-height: 700px;
 }
 
@@ -268,7 +268,7 @@
 
 .sidebar-content {
   height: calc(100vh - var(--navbar-height));
-  margin-top: 2rem;
+  padding: 1rem;
   align-items: center;
   }
 

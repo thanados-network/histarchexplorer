@@ -60,7 +60,7 @@ def landing(id_: int) -> str:
     # print("Types:", entity.types)
     # print("Begin:", entity.begin)
     # print("End:", entity.end)
-    # print("Relations:", entity.relations)
+    print("Relations:", main_entity.relations)
     # print("Relation Class:", entity.relation_class)
     # print(main_entity.geometry)
     # print(type(super_entity))
@@ -68,7 +68,6 @@ def landing(id_: int) -> str:
     # print(subunit)
     # print("Categorized Types:", categorized_types)
 
-   # print([rel.related_entity.name for rel in main_entity.subunits])
 
     return render_template(
         'landing.html',
