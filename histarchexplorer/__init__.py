@@ -52,8 +52,8 @@ def create_image_icon(file_name: str) -> str:
             f'width="16" height="16" alt="{file_name}"/>')
 
 
-def get_type_icons() -> dict[int, str]:
-    type_icons = app.config['TYPE_ICONS']
+def get_sidebar_icons() -> dict[int, str]:
+    type_icons = app.config['SIDEBAR_ICONS']
     icons = {}
     for image, ids in type_icons['images'].items():
         image_tag = create_image_icon(image)
@@ -68,11 +68,17 @@ def get_type_icons() -> dict[int, str]:
 
 
 def get_type_divisions():
-    divisions = {}
-    for label, ids_ in app.config['TYPE_DIVISIONS'].items():
-        for id_ in ids_:
-            divisions[id_] = label
-    return divisions
+    out = {}
+    for label, value in app.config['TYPE_DIVISIONS'].items():
+        icon = ''
+        if value['icon']:
+            if value['icon'][0] == 'img':
+                icon = create_image_icon(value['icon'][1])
+            if value['icon'][0] == 'css':
+                icon = create_icon(value['icon'][1])
+        for id_ in value['ids']:
+            out[id_] = {'label': label, 'icon': icon}
+    return out
 
 @app.before_request
 def before_request() -> None:
@@ -81,7 +87,7 @@ def before_request() -> None:
     session['language'] = get_locale()
     g.main_images = get_main_image_table()
     app.jinja_env.filters['capitalize_first'] = capitalize_first
-    g.type_icons = get_type_icons()
+    g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
 
 def capitalize_first(value: str) -> str:

@@ -12,7 +12,8 @@ from histarchexplorer.models.types import Types
 def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
     divisions = defaultdict(list)
     for type_ in main_entity.types:
-        divisions[type_.division].append(type_)
+        divisions[type_.division['label']].append({
+            'type': type_, 'icon': type_.division['icon']})
     return divisions
 
 
@@ -48,32 +49,32 @@ def landing(id_: int) -> str:
             main_image = image
             continue
         images.append(image)
-      #  print(images)
+    #  print(images)
     if not main_image and images:
         main_image = images[0]
         del images[0]
 
     total_images = len([img for img in images if not img.main_image])
 
-    #print("System class:", main_entity.system_class)
+    # print("System class:", main_entity.system_class)
     # print("View class:", main_entity.view_class)
     # print("type:", main_entity.types)
     # print("main_entity:", main_entity)
-    #print("ANCESTOR ENTITIES:", [entity.name for entity in ancestor_entities])
+    # print("ANCESTOR ENTITIES:", [entity.name for entity in
+    # ancestor_entities])
     # print(subunits_dict['Feature'])
 
     # print(entity.view_class)
     # print("Types:", entity.types)
     # print("Begin:", entity.begin)
     # print("End:", entity.end)
-    #print("Relations:", main_entity.relations)
+    # print("Relations:", main_entity.relations)
     # print("Relation Class:", entity.relation_class)
     # print(main_entity.geometry)
     # print(type(super_entity))
-    #print("System Class:",main_entity.system_class)
+    # print("System Class:",main_entity.system_class)
     # print(subunit)
     # print("Categorized Types:", categorized_types)
-
 
     return render_template(
         'landing.html',
@@ -84,7 +85,7 @@ def landing(id_: int) -> str:
         images=images,
         ancestor_entities=ancestor_entities,
         case_study=case_study,
-        categorized_types = categorized_types(main_entity)
+        categorized_types=categorized_types(main_entity)
     )
 
 
@@ -157,9 +158,6 @@ def get_related_entities(
     return related_entities
 
 
-
-
-
 def get_ancestor_entities(
         main_entity: Entity,
         entities: list[Entity]) -> list[Entity]:
@@ -184,4 +182,3 @@ def get_ancestor_entities(
             break
     ancestor_entities.reverse()
     return ancestor_entities
-

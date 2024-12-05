@@ -42,24 +42,33 @@ STANDARD_TYPES = [
     'Place', 'Feature', 'Stratigraphic unit']
 
 TYPE_DIVISIONS = {
-    'dimensions': [15678],
-    'anthropology': [218963, 213216, 119444, 119334],
-    'material': [21160],
-    'age': [22277, 117198],
-    'burial characteristics': [213223],
-    'grave characteristics': [218839]
+    'dimensions': {
+        'ids': [15678],
+        'icon': ('css', 'bi bi-rulers')},
+    'anthropology': {
+        'ids': [218963, 213216, 119444, 119334],
+        'icon': ('img', 'bone.svg')},
+    'material':  {
+        'ids': [21160],
+        'icon': None},
+    'age': {
+        'ids': [22277, 117198],
+        'icon': ('css', 'bi bi-calendar-range')},
+    'burial characteristics': {
+        'ids': [213223],
+        'icon': None},
+    'grave characteristics': {
+        'ids': [218839],
+        'icon': None}
 }
 
-TYPE_ICONS = {
+SIDEBAR_ICONS = {
     'images': {
         'grave.svg': [26204, 26205, 26208, 26206, 26207, 219910, 174459, 198713 ],
-        'bone.svg': [218963, 213216, 119444, 119334], # Anthroplogy
     },
     'css_icon_class': {
         'bi bi-geo-alt-fill': [22378, 73],
         'bi bi-house-door': [26197],
         'bi bi-geo-yelp': [13362],
-        'bi bi-rulers': [15678],  # Dimensions
-        'bi bi-calendar-range': [22277, 117198],  # Age
         #'bi bi-person-arms-up': [218963, 213216, 119444, 119334], # Anthroplogy
     }}

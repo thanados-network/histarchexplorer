@@ -21,16 +21,16 @@ class Types:
         return str(self.__dict__)
 
     def get_icon(self) -> str:
-        icon = g.type_icons.get(int(self.id))
+        icon = g.sidebar_icons.get(int(self.id))
         if not icon:
             for type_ in self.type_hierarchy:
                 type_id = int(type_['identifier'].rsplit('/', 1)[-1])
-                if g.type_icons.get(type_id):
-                    icon = g.type_icons.get(type_id)
+                if g.sidebar_icons.get(type_id):
+                    icon = g.sidebar_icons.get(type_id)
                     break
-        return icon or g.type_icons.get('other')
+        return icon or g.sidebar_icons.get('other')
 
-    def get_divisions(self):
+    def get_divisions(self) -> dict[str, str]:
         division = g.type_divisions.get(int(self.id))
         if not division:
             for type_ in self.type_hierarchy:
@@ -38,5 +38,5 @@ class Types:
                 if g.type_divisions.get(type_id):
                     division = g.type_divisions.get(type_id)
                     break
-        return division or g.type_divisions.get('other')
+        return division or {'label': 'other', 'icon': ''}
 
