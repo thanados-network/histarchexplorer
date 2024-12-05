@@ -110,7 +110,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             'id': 3
         }
     ]
-    print(tabs)
+    #print(tabs)
 
     g.cursor.execute("""
                SELECT l.id     AS link_id, 

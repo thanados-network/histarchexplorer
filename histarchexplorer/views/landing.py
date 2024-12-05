@@ -9,6 +9,13 @@ from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.types import Types
 
 
+def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
+    divisions = defaultdict(list)
+    for type_ in main_entity.types:
+        divisions[type_.division].append(type_)
+    return divisions
+
+
 @app.route('/entity/<int:id_>')
 def landing(id_: int) -> str:
     entities = Entity.get_linked_entities_by_properties_recursive(
@@ -19,7 +26,6 @@ def landing(id_: int) -> str:
     add_entity_object_to_relation(main_entity, entities)
     related_entities = get_related_entities(main_entity, entities)
     ancestor_entities = get_ancestor_entities(main_entity, entities)
-    categorized_types = get_categorized_types(main_entity)
     super_entity = ancestor_entities[0] if ancestor_entities else None
 
     if not main_entity.geometry and super_entity and super_entity.geometry:
@@ -42,7 +48,7 @@ def landing(id_: int) -> str:
             main_image = image
             continue
         images.append(image)
-        print(images)
+      #  print(images)
     if not main_image and images:
         main_image = images[0]
         del images[0]
@@ -60,11 +66,11 @@ def landing(id_: int) -> str:
     # print("Types:", entity.types)
     # print("Begin:", entity.begin)
     # print("End:", entity.end)
-    print("Relations:", main_entity.relations)
+    #print("Relations:", main_entity.relations)
     # print("Relation Class:", entity.relation_class)
     # print(main_entity.geometry)
     # print(type(super_entity))
-    print("System Class:",main_entity.system_class)
+    #print("System Class:",main_entity.system_class)
     # print(subunit)
     # print("Categorized Types:", categorized_types)
 
@@ -78,7 +84,7 @@ def landing(id_: int) -> str:
         images=images,
         ancestor_entities=ancestor_entities,
         case_study=case_study,
-        categorized_types=categorized_types,
+        categorized_types = categorized_types(main_entity)
     )
 
 
@@ -179,61 +185,3 @@ def get_ancestor_entities(
     ancestor_entities.reverse()
     return ancestor_entities
 
-
-def get_categorized_types(main_entity: Entity) -> dict[str, Any]:
-    # Types Division - Categories + Rest
-    type_divisions = app.config['TYPE_DIVISIONS']
-    type_icons = app.config['TYPE_ICONS']
-    # empty dict with each key
-    categorized_types: dict[str, Any] = {
-        key: [] for key in type_divisions.keys()}
-    # from type_div
-    categorized_types['properties'] = []  # + properties for all other
-
-    def extract_id(identifier: str) -> str:
-        return identifier.split('/')[-1]
-
-    def is_type_in_division(
-            type_item_: Types,
-            division_ids_: list[
-                int]) -> bool:  # check if type belongs to category
-        for type_hierarchy_item in type_item_.type_hierarchy:
-            hierarchy_id = extract_id(type_hierarchy_item['identifier'])
-            #  print(f"Checking if {hierarchy_id} is in {division_ids_}")
-            if int(hierarchy_id) in division_ids_:
-                #    print(f"Yes: {hierarchy_id} is in {division_ids_}")
-                return True
-        return False
-
-    def get_icon_for_category(category_key: str) -> str:
-        # find icon for the category from TYPE_ICONS
-        for icon_class, ids in type_icons['css_icon_class'].items():
-            if type_divisions.get(category_key, [None])[0] in ids:
-                return icon_class
-        return None
-
-    for type_item in main_entity.types:
-        # print(f"Processing type: {type_item.label} with ID: {type_item.id}")
-        found = False
-        for key, division_ids in type_divisions.items():
-            if is_type_in_division(type_item, division_ids):
-                #  print(f"Categorizing {type_item.label} under {key}")
-
-                # conditionally include value and unit
-                type_info = {
-                    'label': type_item.label,
-                    'value': getattr(type_item, 'value', None),
-                    'unit': getattr(type_item, 'unit', None),
-                    'icon': get_icon_for_category(key)
-                }
-
-                categorized_types[key].append(type_info)
-                found = True
-                break
-        if not found:
-            # print(
-            # f"{type_item.label} does not match any division, "
-            #  f"--> properties")
-
-            categorized_types['properties'].append(type_item)
-    return categorized_types

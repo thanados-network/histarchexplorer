@@ -67,6 +67,13 @@ def get_type_icons() -> dict[int, str]:
     return icons
 
 
+def get_type_divisions():
+    divisions = {}
+    for label, ids_ in app.config['TYPE_DIVISIONS'].items():
+        for id_ in ids_:
+            divisions[id_] = label
+    return divisions
+
 @app.before_request
 def before_request() -> None:
     g.db = connect()
@@ -75,7 +82,7 @@ def before_request() -> None:
     g.main_images = get_main_image_table()
     app.jinja_env.filters['capitalize_first'] = capitalize_first
     g.type_icons = get_type_icons()
-
+    g.type_divisions = get_type_divisions()
 
 def capitalize_first(value: str) -> str:
     if not value:

@@ -18,7 +18,7 @@ def about() -> str:
         for column_name, column_value in zip(column_names, object_data):
             if column_value:
                 object_[column_name] = column_value
-        print("build_object:", object_)
+        #print("build_object:", object_)
 
     def build_connections(id_: int) -> None:
         g.cursor.execute(
@@ -29,7 +29,7 @@ def about() -> str:
             'FROM tng.links '
             'WHERE domain_id = %s', (id_,))
         connections = g.cursor.fetchall()
-        print("build_connections:", connections)
+        #print("build_connections:", connections)
 
     build_object(1)
     build_connections(1)
@@ -85,12 +85,12 @@ ORDER BY l.sortorder, l.id;
 
     g.cursor.execute(persons_sql)
     persons_result = g.cursor.fetchall()
-    print("Persons:", persons_result)
+    #print("Persons:", persons_result)
 
     persons = {}
     for row in persons_result:
         person_name = (helpers.get_translation(row[0]))['label']
-        print(row[0])
+        #print(row[0])
         if person_name not in persons:
             persons[person_name] = {
                 'name': (helpers.get_translation(row[0]))['label'],
@@ -103,7 +103,7 @@ ORDER BY l.sortorder, l.id;
         persons[person_name]['roles'].append((helpers.get_translation(row[2]))['label'])
 
     persons_list = list(persons.values())
-    print("Person list:", persons_list)
+   # print("Person list:", persons_list)
 
     return render_template(
         'about.html',
