@@ -48,7 +48,7 @@ TYPE_DIVISIONS = {
     'anthropology': {
         'ids': [218963, 213216, 119444, 119334],
         'icon': ('img', 'bone.svg')},
-    'material':  {
+    'material': {
         'ids': [21160],
         'icon': ('img', 'material.svg')},
     'age': {
@@ -59,16 +59,20 @@ TYPE_DIVISIONS = {
         'icon': None},
     'grave characteristics': {
         'ids': [218839],
-        'icon': ('img', 'grave.svg')}
+        'icon': ('img', 'grave.svg')},
+    'position of find in grave': {
+        'ids': [23440],
+        'icon': ('css', 'bi bi-crosshair')},
 }
 
+
 SIDEBAR_ICONS = {
-    'images': {
-        'grave.svg': [26204, 26205, 26208, 26206, 26207, 219910, 174459, 198713 ],
-    },
-    'css_icon_class': {
-        'bi bi-geo-alt-fill': [22378, 73],
-        'bi bi-house-door': [26197],
-        'bi bi-geo-yelp': [13362],
-        #'bi bi-person-arms-up': [218963, 213216, 119444, 119334], # Anthroplogy
-    }}
+'images': {
+    'grave.svg': [26204, 26205, 26208, 26206, 26207, 219910, 174459, 198713],
+},
+'css_icon_class': {
+    'bi bi-geo-alt-fill': [22378, 73],
+    'bi bi-house-door': [26197],
+    'bi bi-geo-yelp': [13362],
+    # 'bi bi-person-arms-up': [218963, 213216, 119444, 119334], # Anthroplogy
+}}

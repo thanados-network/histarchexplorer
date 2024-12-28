@@ -38,5 +38,6 @@ class Types:
                 if g.type_divisions.get(type_id):
                     division = g.type_divisions.get(type_id)
                     break
+
         return division or {'label': 'other', 'icon': ''}
 

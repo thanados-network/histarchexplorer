@@ -53,6 +53,7 @@ def landing(id_: int) -> str:
     if not main_image and images:
         main_image = images[0]
         del images[0]
+        print("Depictions:",main_entity.depictions)
 
     total_images = len([img for img in images if not img.main_image])
 

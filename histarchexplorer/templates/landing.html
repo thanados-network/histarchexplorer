@@ -178,71 +178,56 @@
                             <div class="item-content item-content-full">
                                 <div class="muuri-images">
                                     <div class="image">
-                                        <img src="{{ main_image.url }}"
-                                             alt="{{ main_image.title }}"/>
+                                        {% if main_image.iiif_base_path %}
+                                            <img src="{{ main_image.iiif_base_path }}/full/max/0/default.jpg"
+                                                 alt="{{ main_image.title }}">
+                                        {% else %}
+                                            <img src="{{ main_image.url }}"
+                                                 alt="{{ main_image.title }}">
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     {% endif %}
 
-                    <!-- Related Entities -->
+                    <!-- Other Related Entities -->
                     {% if related_entities %}
                         {% for key, type_ in related_entities.items() %}
-                            {% if type_ %}
-                                {% if key == "Bibliography" or key == "External reference" %}
-                                    <div class="item item-wide">
-                                        <div class="item-content">
-                                            <div class="muuri-references">
-                                                <p class="tile-label text-uppercase">{{ key }}</p>
-                                                <ul class="no-bullets">
-                                                    {% for entity in type_.values() %}
-                                                        {% for item in entity %}
-                                                            <li>
-                                                                <a href="{{ url_for('landing', id_=item.id) }}">
-                                                                    {{ item.name }}
-                                                                </a>
-                                                            </li>
-                                                        {% endfor %}
-                                                    {% endfor %}
-                                                </ul>
-                                            </div>
+                            {% if type_ and key not in ["Bibliography", "External reference"] %}
+                                <div class="item">
+                                    <div class="item-content">
+                                        <div class="related-entities">
+                                            <p class="tile-label text-uppercase">{{ key }}</p>
+                                            <ul class="no-bullets">
+                                                {% for type_label, list_ in type_.items() %}
+                                                    <li>
+                                                        {% if list_ | length == 1 %}
+                                                            {{ type_label }} (1):
+                                                            <a href="{{ url_for('landing', id_=list_[0].id) }}">
+                                                                {{ list_[0].name }}
+                                                            </a>
+                                                        {% else %}
+                                                            {{ type_label }}
+                                                            (<a tabindex="0" class="popover-link"
+                                                                role="button"
+                                                                data-bs-toggle="popover"
+                                                                data-bs-trigger="focus"
+                                                                data-bs-title="{{ type_label }} ({{ list_ | length }})"
+                                                                data-bs-content="<ul>{% for entity in list_ %}<li><a href={{ url_for('landing', id_=entity.id) }}>{{ entity.name }}</a></li>{% endfor %}</ul>">
+                                                            {{ list_ | length }}
+                                                        </a>)
+                                                        {% endif %}
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
                                         </div>
                                     </div>
-                                {% else %}
-                                    <div class="item">
-                                        <div class="item-content">
-                                            <div class="related-entities">
-                                                <p class="tile-label text-uppercase">{{ key }}</p>
-                                                <ul class="no-bullets">
-                                                    {% for type_label, list_ in type_.items() %}
-                                                        <li>
-                                                            {% if list_ | length == 1 %}
-                                                                {{ type_label }} (1):
-                                                                <a href="{{ url_for('landing', id_=list_[0].id) }}">
-                                                                    {{ list_[0].name }}
-                                                                </a>
-                                                            {% else %}
-                                                                {{ type_label }}
-                                                                (<a tabindex="0" class="popover-link"
-                                                                    role="button"
-                                                                    data-bs-toggle="popover"
-                                                                    data-bs-trigger="focus"
-                                                                    data-bs-title="{{ type_label }} ({{ list_ | length }})"
-                                                                    data-bs-content="<ul>{% for entity in list_ %}<li><a href={{ url_for('landing', id_=entity.id) }}>{{ entity.name }}</a></li>{% endfor %}</ul>">
-                                                                {{ list_ | length }}
-                                                            </a>)
-                                                            {% endif %}
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endif %}
+                                </div>
                             {% endif %}
                         {% endfor %}
                     {% endif %}
+
 
 
 
@@ -299,54 +284,36 @@
                     {% endif %}
 
 
-
-                    <!-- External references and Bibliography -->
-                    {% if entity.relations['external_references'] or entity.relations['bibliography'] %}
+                    <!-- Bibliography and External References -->
+                    {% if related_entities %}
                         <div class="item item-wide">
                             <div class="item-content">
                                 <div class="muuri-references">
-
-                                    <!-- Bibliography -->
-                                    {% if entity.relations['bibliography'] or entity.relations['external_references'] %}
-                                        <span class="tile-label">REFERENCES</span>
-                                        {% for bibliography in entity.relations['bibliography'] %}
-                                            <p class="bi bi-book reference-link mt-4">
-                                                <a href="{{ bibliography.relation_to }}"
-                                                   target="_blank">{{ bibliography.related_entity.description or bibliography.label }} {{ bibliography.relation_description }}</a>
-                                            </p>
+                                    <p class="tile-label text-uppercase">References</p>
+                                    <ul class="no-bullets">
+                                        {% for key, type_ in related_entities.items() %}
+                                            {% if key == "Bibliography" or key == "External reference" %}
+                                                {% for entity in type_.values() %}
+                                                    {% for item in entity %}
+                                                        <li>
+                                                            {% if key == "Bibliography" %}
+                                                                <i class="bi bi-book"></i>
+                                                            {% elif key == "External reference" %}
+                                                                <i class="bi bi-box-arrow-up-right"></i>
+                                                            {% endif %}
+                                                            <a href="{{ url_for('landing', id_=item.id) }}">
+                                                                {{ item.name }}
+                                                            </a>
+                                                        </li>
+                                                    {% endfor %}
+                                                {% endfor %}
+                                            {% endif %}
                                         {% endfor %}
-                                    {% endif %}
-
-                                    <!-- Edition -->
-                                    {% if entity.relations['edition'] %}
-                                        {% for edition in entity.relations['edition'] %}
-                                            <p class="bi bi-book-half reference-link">
-                                                <a href="{{ edition.relation_to }}"
-                                                   target="_blank">{{ edition.related_entity.description or edition.label }} {{ edition.relation_description }}</a>
-                                            </p>
-                                        {% endfor %}
-                                    {% endif %}
-
-                                    <!-- External References -->
-                                    {% if entity.relations['external_references'] %}
-                                        {% for reference in entity.relations['external_references'] %}
-                                            <p class="bi bi-box-arrow-up-right reference-link">
-                                                <a href="{{ reference.relation_to }}"
-                                                   target="_blank">{{ reference.related_entity.description or reference.label }}</a>
-                                            </p>
-                                        {% endfor %}
-                                    {% endif %}
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     {% endif %}
-
-
-                    <div class="item item-wide">
-                        <div class="item-content">
-                            <p>BLABLABKA</p>
-                        </div>
-                    </div>
 
                 </div>
             </div>

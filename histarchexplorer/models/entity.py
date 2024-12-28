@@ -94,7 +94,9 @@ class Entity:
 
     def get_standard_type(self) -> Optional[Types]:
         for type_ in self.types:
+            type_.root_id = (int(type_.type_hierarchy[0]['identifier'].rsplit('/', 1)[-1]))
             if type_.root in app.config['STANDARD_TYPES']:
+                print(type_)
                 return type_
         return None
 

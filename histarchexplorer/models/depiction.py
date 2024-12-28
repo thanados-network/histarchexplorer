@@ -21,6 +21,8 @@ class Depiction:
         self.main_image = self.check_if_main_image()
 
 
+
+
     def __repr__(self) -> str:
         return str(self.__dict__)
 
