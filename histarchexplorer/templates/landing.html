@@ -191,46 +191,7 @@
                         </div>
                     {% endif %}
 
-                    <!-- Other Related Entities -->
-                    {% if related_entities %}
-                        {% for key, type_ in related_entities.items() %}
-                            {% if type_ and key not in ["Bibliography", "External reference"] %}
-                                <div class="item">
-                                    <div class="item-content">
-                                        <div class="related-entities">
-                                            <p class="tile-label text-uppercase">{{ key }}</p>
-                                            <ul class="no-bullets">
-                                                {% for type_label, list_ in type_.items() %}
-                                                    <li>
-                                                        {% if list_ | length == 1 %}
-                                                            {{ type_label }} (1):
-                                                            <a href="{{ url_for('landing', id_=list_[0].id) }}">
-                                                                {{ list_[0].name }}
-                                                            </a>
-                                                        {% else %}
-                                                            {{ type_label }}
-                                                            (<a tabindex="0" class="popover-link"
-                                                                role="button"
-                                                                data-bs-toggle="popover"
-                                                                data-bs-trigger="focus"
-                                                                data-bs-title="{{ type_label }} ({{ list_ | length }})"
-                                                                data-bs-content="<ul>{% for entity in list_ %}<li><a href={{ url_for('landing', id_=entity.id) }}>{{ entity.name }}</a></li>{% endfor %}</ul>">
-                                                            {{ list_ | length }}
-                                                        </a>)
-                                                        {% endif %}
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
-
-
-
-
+                    <!-- Attributes -->
                     {% if categorized_types %}
                         <div class="item">
                             <div class="item-content">
@@ -255,6 +216,55 @@
                             </div>
                         </div>
                     {% endif %}
+
+                    <!-- Other Related Entities -->
+                    {% if related_entities %}
+                        {% for key, type_ in related_entities.items() %}
+                            {% if type_ and key not in ["Bibliography", "External reference"] %}
+                                <div class="item">
+                                    <div class="item-content">
+                                        <div class="related-entities">
+                                            <p class="tile-label text-uppercase">{{ key }}</p>
+                                            <ul class="no-bullets">
+                                                {% for type_label, list_ in type_.items() %}
+                                                    <li>
+                                                        {% if list_ | length == 1 %}
+                                                            {{ type_label }}
+                                                            <span class="badge rounded-pill"
+                                                                  style="background-color: lightgrey; color: white;">
+                                                                {{ list_ | length }}
+                                                             </span>:
+                                                            <a href="{{ url_for('landing', id_=list_[0].id) }}">
+                                                                {{ list_[0].name }}
+                                                            </a>
+                                                        {% else %}
+                                                            {{ type_label }}
+                                                            <span
+                                                                    tabindex="0"
+                                                                    class="badge rounded-pill popover-link"
+                                                                    role="button"
+                                                                    style="background-color: lightgrey; color: white;"
+                                                                    data-bs-toggle="popover"
+                                                                    data-bs-trigger="focus"
+                                                                    data-bs-title="{{ type_label }} ({{ list_ | length }})"
+                                                                    data-bs-content="<ul>{% for entity in list_ %}<li><a href={{ url_for('landing', id_=entity.id) }}>{{ entity.name }}</a></li>{% endfor %}</ul>">
+                                            {{ list_ | length }}
+                                        </span>
+                                                        {% endif %}
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+
+
+
+
 
 
 
