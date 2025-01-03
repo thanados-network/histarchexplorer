@@ -1,29 +1,29 @@
 {% extends "layout.html" %}
 {% block content %}
-    <link rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-2 sidebar" id="sidebar">
-                <div class="sidebar-content flex-column">
-                    {% if ancestor_entities %}
-                        {% for entity in ancestor_entities %}
-                            <div class="hierarchy-button">
-                                <button type="button"
-                                        class="btn btn-whitish rounded-5">
-                                    <a href="{{ url_for('landing', id_=entity.id) }}"
-                                       class="nude-link text-decoration-none">
-                                        {{ entity.standard_type.icon | safe }}
-                                        {{ entity.name }}
-                                    </a>
-                                </button>
-                                <div class="line"></div>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-2 sidebar" id="sidebar">
+        <div class="sidebar-content flex-column">
+          {% if ancestor_entities %}
+            {% for entity in ancestor_entities %}
+              <div class="hierarchy-button">
+                <button type="button"
+                        class="btn btn-whitish rounded-5">
+                  <a href="{{ url_for('landing', id_=entity.id) }}"
+                     class="nude-link text-decoration-none">
+                    {{ entity.standard_type.icon | safe }}
+                    {{ entity.name }}
+                  </a>
+                </button>
+                <div class="line"></div>
+              </div>
+            {% endfor %}
+          {% endif %}
 
-                    {% set system_class_map = {
+          {% set system_class_map = {
                     'place': 'places',
                     'feature': 'places',
                     'stratigraphic unit': 'places',
@@ -39,77 +39,77 @@
                     'file': 'files'
                 } %}
 
-                    {% if entity.system_class.lower() in ['group', 'person'] and main_image %}
-                        <div class="entity-card__icon">
-                            <img src="{{ main_image.url }}" alt="{{ entity.name }}"/>
-                        </div>
-                        <div class="entity-card__label">{{ entity.name }}</div>
-                    {% else %}
-                        <div
-                                class="main-entity-ellipse main-entity-ellipse--{{ system_class_map.get(entity.system_class.lower(), '') }}">
-                            <div class="entity-card__icon">
-                                {% if entity.system_class.lower() in ['feature', 'stratigraphic unit'] %}
-                                    <img src="/static/images/entity_icons/place.png"
-                                         alt="{{ entity.system_class }}">
-                                {% elif entity.system_class.lower() in ['move', 'acquisition', 'modification', 'activity'] %}
-                                    <img src="/static/images/entity_icons/event.png"
-                                         alt="{{ entity.system_class }}">
-                                {% else %}
-                                    <img
-                                            src="/static/images/entity_icons/{{ entity.system_class | lower }}.png"
-                                            alt="{{ entity.system_class }}">
-                                {% endif %}
-                            </div>
-                            <div class="entity-card__label mb-0">{{ entity.name }}</div>
-                            <div class="entity-type ">
-                                {% if entity.standard_type %}
-                                    <p>{{ entity.standard_type.label | upper }}</p>
-                                {% endif %}
-                            </div>
+          {% if entity.system_class.lower() in ['group', 'person'] and main_image %}
+            <div class="entity-card__icon">
+              <img src="{{ main_image.url }}" alt="{{ entity.name }}"/>
+            </div>
+            <div class="entity-card__label">{{ entity.name }}</div>
+          {% else %}
+            <div
+                class="main-entity-ellipse main-entity-ellipse--{{ system_class_map.get(entity.system_class.lower(), '') }}">
+              <div class="entity-card__icon">
+                {% if entity.system_class.lower() in ['feature', 'stratigraphic unit'] %}
+                  <img src="/static/images/entity_icons/place.png"
+                       alt="{{ entity.system_class }}">
+                {% elif entity.system_class.lower() in ['move', 'acquisition', 'modification', 'activity'] %}
+                  <img src="/static/images/entity_icons/event.png"
+                       alt="{{ entity.system_class }}">
+                {% else %}
+                  <img
+                      src="/static/images/entity_icons/{{ entity.system_class | lower }}.png"
+                      alt="{{ entity.system_class }}">
+                {% endif %}
+              </div>
+              <div class="entity-card__label mb-0">{{ entity.name }}</div>
+              <div class="entity-type ">
+                {% if entity.standard_type %}
+                  <p>{{ entity.standard_type.label | upper }}</p>
+                {% endif %}
+              </div>
 
 
-                            <div class="entity-date">
-                                <p>{{ entity.formated_date }}</p>
+              <div class="entity-date">
+                <p>{{ entity.formated_date }}</p>
 
-                                {% if entity.types %}
-                                    {% for type in entity.types %}
-                                        {% if type.root == 'Chronology' %}
-                                            <p>{{ type.label or 'No date available' }}</p>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-                        </div>
+                {% if entity.types %}
+                  {% for type in entity.types %}
+                    {% if type.root == 'Chronology' %}
+                      <p>{{ type.label or 'No date available' }}</p>
                     {% endif %}
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
 
-                    <!--  Subunits button -->
-                    {% if entity.subunits %}
-                        <div class="hierarchy-button">
-                            <div class="line"></div>
-                            <button type="button" class="btn btn-whitish rounded-5" disabled>
-                                <i class="bi bi-diagram-3"></i>
-                                <span class="nude-link">
+          <!--  Subunits button -->
+          {% if entity.subunits %}
+            <div class="hierarchy-button">
+              <div class="line"></div>
+              <button type="button" class="btn btn-whitish rounded-5" disabled>
+                <i class="bi bi-diagram-3"></i>
+                <span class="nude-link">
                                     {{ entity.subunits | length }}
-                                    {{ "Subentity" if entity.subunits | length == 1 else "Subentities" }}</span>
+                  {{ "Subentity" if entity.subunits | length == 1 else "Subentities" }}</span>
 
-                            </button>
-                        </div>
-                    {% endif %}
-
-
-                    <div class="entity-country">
-                        {% if entity.types %}
-                            {% for type in entity.types %}
-                                {% if type.hierarchy == 'Country' %}
-                                    <p>{{ type.label }}</p>
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                    </button>
+              </button>
+            </div>
+          {% endif %}
 
 
-                    <!--  related entity buttons <div id="entity-link-buttons">
+          <div class="entity-country">
+            {% if entity.types %}
+              {% for type in entity.types %}
+                {% if type.hierarchy == 'Country' %}
+                  <p>{{ type.label }}</p>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </div>
+          </button>
+
+
+          <!--  related entity buttons <div id="entity-link-buttons">
                         {% for key, type_ in related_entities.items() %}
                             <button type="button"
                                     class="btn btn-outline-secondary btn-lg">
@@ -117,149 +117,138 @@
                         {% endfor %}
                     </div> -->
 
-                    <div class="entity-class">
-                        <p></p>
-                        {% if case_study|length > 1 %}
-                            <p>Case Studies:</p>
-                        {% else %}
-                            <p>Case Study:</p>
-                        {% endif %}
-                        <p>
-                            {% for case in case_study %}
-                                {% if loop.index > 1 %}| {% endif %}{{ case.label }}
-                            {% endfor %}
-                        </p>
-                        <p>Type: {{ entity.system_class }}</p>
-                    </div>
+          <div class="entity-class">
+            <p></p>
+            {% if case_study|length > 1 %}
+              <p>Case Studies:</p>
+            {% else %}
+              <p>Case Study:</p>
+            {% endif %}
+            <p>
+              {% for case in case_study %}
+                {% if loop.index > 1 %}| {% endif %}{{ case.label }}
+              {% endfor %}
+            </p>
+            <p>Type: {{ entity.system_class }}</p>
+          </div>
 
+        </div>
+      </div>
+
+
+      <!-- Main content area - MUURI Tiles -->
+      <div class="col-md-10 g-0 main-content">
+        <div class="grid">
+
+
+          <!-- Map Location -->
+          {% if entity.geometry %}
+            <div class="item">
+              <div class="map-wrapper">
+                <div class="item-content item-content-full">
+                  <div class="location">
+                    <div id="muuri-map"></div>
+                    <button id="expand-button"
+                            class="btn btn-light btn-sm">
+                      <i class="bi bi-arrows-fullscreen"></i>
+                    </button>
+                  </div>
                 </div>
+              </div>
             </div>
 
+          {% endif %}
 
-            <!-- Main content area - MUURI Tiles -->
-            <div class="col-md-10 g-0 main-content">
-                <div class="grid">
+          <!-- Description -->
+          {% if entity.description %}
+            <div class="{{ entity.description_class }}">
+              <div class="item-content">
+                <div class="muuri-description">
+                  <span class="tile-label">DESCRIPTION</span>
+                  <p>{{ entity.description }}</p>
+                </div>
+              </div>
+            </div>
 
+          {% endif %}
 
-                    <!-- Map Location -->
-                    {% if entity.geometry %}
-                        <div class="item">
-                            <div class="map-wrapper">
-                                <div class="item-content item-content-full">
-                                    <div class="location">
-                                        <div id="muuri-map"></div>
-                                        <button id="expand-button"
-                                                class="btn btn-light btn-sm">
-                                            <i class="bi bi-arrows-fullscreen"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
+          <!-- First image -->
+          {% if main_image and (entity.system_class.lower() not in ['actor', 'person']) %}
+            <div class="item">
+              <div class="item-content item-content-full">
+                <div class="muuri-images">
+                  <div class="image">
+                    {% if main_image.iiif_base_path %}
+                      <img src="{{ main_image.iiif_base_path }}/full/max/0/default.jpg"
+                           alt="{{ main_image.title }}">
+                    {% else %}
+                      <img src="{{ main_image.url }}"
+                           alt="{{ main_image.title }}">
                     {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
 
-                    <!-- Description -->
-                    {% if entity.description %}
-                        <div class="{{ entity.description_class }}">
-                            <div class="item-content">
-                                <div class="muuri-description">
-                                    <span class="tile-label">DESCRIPTION</span>
-                                    <p>{{ entity.description }}</p>
-                                </div>
-                            </div>
-                        </div>
+          <!-- Attributes -->
+          {% if categorized_types %}
+            <div class="item">
+              <div class="item-content">
+                <span class="tile-label">ATTRIBUTES</span>
+                <div class="categorized-types">
+                  {% for label, value in categorized_types.items() %}
+                    <p class="tile-sub-label text-uppercase mt-3">
+                      {{ value[0]['icon'] | safe }} {{ label }}</p>
+                    {% for type in value %}
+                      <div class="badge bg-dark-subtle text-wrap m-1">
+                        <h6 class="m-0 text-center">
+                          {{ type['type'].label }}
+                          {% if type['type'].value and type['type'].unit %}:
+                            {{ type['type'].value }}
+                            {{ type['type'].unit }}
+                          {% endif %}
+                        </h6>
+                      </div>
+                    {% endfor %}
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
 
-                    {% endif %}
-
-                    <!-- First image -->
-                    {% if main_image and (entity.system_class.lower() not in ['actor', 'person']) %}
-                        <div class="item">
-                            <div class="item-content item-content-full">
-                                <div class="muuri-images">
-                                    <div class="image">
-                                        {% if main_image.iiif_base_path %}
-                                            <img src="{{ main_image.iiif_base_path }}/full/max/0/default.jpg"
-                                                 alt="{{ main_image.title }}">
-                                        {% else %}
-                                            <img src="{{ main_image.url }}"
-                                                 alt="{{ main_image.title }}">
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-
-                    <!-- Attributes -->
-                    {% if categorized_types %}
-                        <div class="item">
-                            <div class="item-content">
-                                <span class="tile-label">ATTRIBUTES</span>
-                                <div class="categorized-types">
-                                    {% for label, value in categorized_types.items() %}
-                                        <p class="tile-sub-label text-uppercase mt-3">
-                                            {{ value[0]['icon'] | safe }} {{ label }}</p>
-                                        {% for type in value %}
-                                            <div class="badge bg-dark-subtle text-wrap m-1">
-                                                <h6 class="m-0 text-center">
-                                                    {{ type['type'].label }}
-                                                    {% if type['type'].value and type['type'].unit %}:
-                                                        {{ type['type'].value }}
-                                                        {{ type['type'].unit }}
-                                                    {% endif %}
-                                                </h6>
-                                            </div>
-                                        {% endfor %}
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-
-                    <!-- Other Related Entities -->
-                    {% if related_entities %}
-                        {% for key, type_ in related_entities.items() %}
-                            {% if type_ and key not in ["Bibliography", "External reference"] %}
-                                <div class="item">
-                                    <div class="item-content">
-                                        <div class="related-entities">
-                                            <p class="tile-label text-uppercase">{{ key }}</p>
-                                            <ul class="no-bullets">
-                                                {% for type_label, list_ in type_.items() %}
-                                                    <li>
-                                                        {% if list_ | length == 1 %}
-                                                            {{ type_label }}
-                                                            <span class="badge rounded-pill"
-                                                                  style="background-color: lightgrey; color: white;">
-                                                                {{ list_ | length }}
-                                                             </span>:
-                                                            <a href="{{ url_for('landing', id_=list_[0].id) }}">
-                                                                {{ list_[0].name }}
-                                                            </a>
-                                                        {% else %}
-                                                            {{ type_label }}
-                                                            <span
-                                                                    tabindex="0"
-                                                                    class="badge rounded-pill popover-link"
-                                                                    role="button"
-                                                                    style="background-color: lightgrey; color: white;"
-                                                                    data-bs-toggle="popover"
-                                                                    data-bs-trigger="focus"
-                                                                    data-bs-title="{{ type_label }} ({{ list_ | length }})"
-                                                                    data-bs-content="<ul>{% for entity in list_ %}<li><a href={{ url_for('landing', id_=entity.id) }}>{{ entity.name }}</a></li>{% endfor %}</ul>">
+          <!-- Other Related Entities -->
+          {% if related_entities %}
+            {% for key, type_ in related_entities.items() %}
+              {% if type_ and key not in ["Bibliography", "External reference"] %}
+                <div class="item">
+                  <div class="item-content">
+                    <div class="related-entities">
+                      <p class="tile-label text-uppercase">{{ key }}</p>
+                      <ul class="no-bullets">
+                        {% for type_label, list_ in type_.items() %}
+                          <li>
+                              {{ type_label }}
+                              <span
+                                  tabindex="0"
+                                  class="badge rounded-pill popover-link"
+                                  role="button"
+                                  style="background-color: lightgrey; color: white;"
+                                  data-bs-toggle="popover"
+                                  data-bs-trigger="focus"
+                                  data-bs-title="{{ type_label }} ({{ list_ | length }})"
+                                  data-bs-content="<ul>{% for entity in list_ %}<li><a href={{ url_for('landing', id_=entity.id) }}>{{ entity.name }}</a></li>{% endfor %}</ul>">
                                             {{ list_ | length }}
                                         </span>
-                                                        {% endif %}
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
+                          </li>
                         {% endfor %}
-                    {% endif %}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
 
 
 
@@ -269,84 +258,132 @@
 
 
 
-                    <!-- All other images -->
-                    {% if images %}
-                        {% for depiction in images %}
-                            {% set total_images = images|length %}
-                            {% if not depiction.main_image %}
-                                <div
-                                        class="{% if total_images >1 %}item-half {% else %}item{% endif %}">
-                                    <div class="item-content item-content-full">
-                                        <div class="image">
-                                            {% if depiction.iiif_base_path %}
-                                                <img
-                                                        src="{{ depiction.iiif_base_path }}/full/max/0/default.jpg"
-                                                        alt="{{ depiction.title }}"/>
-                                            {% else %}
-                                                <img src="{{ depiction.url }}"
-                                                     alt="{{ depiction.title }}"/>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
+          <!-- All other images -->
+          {% if images %}
+            {% for depiction in images %}
+              {% set total_images = images|length %}
+              {% if not depiction.main_image %}
+                <div
+                    class="{% if total_images >1 %}item-half {% else %}item{% endif %}">
+                  <div class="item-content item-content-full">
+                    <div class="image">
+                      {% if depiction.iiif_base_path %}
+                        <img
+                            src="{{ depiction.iiif_base_path }}/full/max/0/default.jpg"
+                            alt="{{ depiction.title }}"
+                        />
+
+                      {% else %}
+                        <img src="{{ depiction.url }}"
+                             alt="{{ depiction.title }}"/>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
 
 
-                    <!-- Bibliography and External References -->
-                    {% if related_entities %}
-                        <div class="item item-wide">
-                            <div class="item-content">
-                                <div class="muuri-references">
-                                    <p class="tile-label text-uppercase">References</p>
-                                    <ul class="no-bullets">
-                                        {% for key, type_ in related_entities.items() %}
-                                            {% if key == "Bibliography" or key == "External reference" %}
-                                                {% for entity in type_.values() %}
-                                                    {% for item in entity %}
-                                                        <li>
-                                                            {% if key == "Bibliography" %}
-                                                                <i class="bi bi-book"></i>
-                                                            {% elif key == "External reference" %}
-                                                                <i class="bi bi-box-arrow-up-right"></i>
-                                                            {% endif %}
-                                                            <a href="{{ url_for('landing', id_=item.id) }}">
-                                                                {{ item.name }}
-                                                            </a>
-                                                        </li>
-                                                    {% endfor %}
-                                                {% endfor %}
-                                            {% endif %}
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
+          <div class="item item-wide">
+            <div class="item-content">
+              <div id="iiif-viewer" class="iiif-viewer-container" style="height: 500px; width: 100%;">
+                  <script src="/static/node_modules/mirador/dist/mirador.min.js"></script>
+                  <script>
+                      const config = {
+                          "id": "iiif-viewer",
+                          "layout": "1x1",
+                          "mainMenuSettings": {
+                              "show": false
+                          },
+                          "workspaceControlPanel": {
+                              "enabled": false
+                          },
+                          "window": {
+                              "allowClose": false,
+                              "defaultSideBarPanel": 'attribution',
+                              "sideBarOpenByDefault": false,
+                              "forceDrawAnnotations": true,
+                              "highlightAllAnnotations": true,
 
+                          },
+                          "workspace": {
+                              "type": "{{ "mosaic" if entity.depictions|length < 9 else 'elastic' }}"
+                          },
+                          "language": "{{ session.language }}",
+                          "availableLanguages": {
+                              "de": "Deutsch",
+                              "en": "English",
+                              "fr": "Français"
+                          },
+                          "windows": [
+                              {% for depiction in entity.depictions %}
+                                  {% if depiction.iiif_manifest %}
+                                    {"loadedManifest": "{{ depiction.iiif_manifest }}"},
+                                  {% endif %}
+                              {% endfor %}
+                          ]
+                      };
+                      Mirador.viewer(config);
+                  </script>
                 </div>
             </div>
+          </div>
+
+
+          <!-- Bibliography and External References -->
+          {% if related_entities %}
+            <div class="item item-wide">
+              <div class="item-content">
+                <div class="muuri-references">
+                  <p class="tile-label text-uppercase">References</p>
+                  <ul class="no-bullets">
+                    {% for key, type_ in related_entities.items() %}
+                      {% if key == "Bibliography" or key == "External reference" %}
+                        {% for entity in type_.values() %}
+                          {% for item in entity %}
+                            <li>
+                              {% if key == "Bibliography" %}
+                                <i class="bi bi-book"></i>
+                              {% elif key == "External reference" %}
+                                <i class="bi bi-box-arrow-up-right"></i>
+                              {% endif %}
+                              <a href="{{ url_for('landing', id_=item.id) }}">
+                                {{ item.name }}
+                              </a>
+                            </li>
+                          {% endfor %}
+                        {% endfor %}
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
         </div>
+      </div>
     </div>
+  </div>
 
-    <script>
+  <script>
 
-        const gisData = {%  if entity.geometry %}{{ entity.geometry | safe }}{% else %}null
-        {% endif %}
-        const entityName = '{{ entity.name | safe }}'
-        const popover = new bootstrap.Popover('.popover-dismiss', {
-            trigger: 'focus'
-        })
-    </script>
-    <script
-            src="https://cdn.jsdelivr.net/gh/haltu/muuri@0.9.5/dist/muuri.min.js"></script>
-    <script
-            src="{{ url_for('static', filename='js/entity_landing.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/map_landing.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apextree"></script>
-    <script
-            src="{{ url_for('static', filename='js/hierarchy_nav.js') }}"></script>
+      const gisData = {%  if entity.geometry %}{{ entity.geometry | safe }}{% else %}null
+      {% endif %}
+      const entityName = '{{ entity.name | safe }}'
+      const popover = new bootstrap.Popover('.popover-dismiss', {
+          trigger: 'focus'
+      })
+  </script>
+  <script
+      src="https://cdn.jsdelivr.net/gh/haltu/muuri@0.9.5/dist/muuri.min.js"></script>
+  <script
+      src="{{ url_for('static', filename='js/entity_landing.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/map_landing.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apextree"></script>
+  <script
+      src="{{ url_for('static', filename='js/hierarchy_nav.js') }}"></script>
 
 
 

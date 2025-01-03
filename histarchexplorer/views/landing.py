@@ -22,6 +22,7 @@ def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
     return sorted_divisions
 
 
+
 @app.route('/entity/<int:id_>')
 def landing(id_: int) -> str:
     entities = Entity.get_linked_entities_by_properties_recursive(
