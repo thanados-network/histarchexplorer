@@ -196,3 +196,8 @@ def get_ancestor_entities(
             break
     ancestor_entities.reverse()
     return ancestor_entities
+
+@app.route('/file/<int:entity_id>')
+def view_file(entity_id: int):
+    entity = Entity.get_entity(entity_id)
+    return render_template("iiif.html", entity=entity)

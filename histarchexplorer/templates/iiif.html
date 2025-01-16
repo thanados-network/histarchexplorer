@@ -1,25 +1,25 @@
-<div class="row">
-  <div id="viewer" style="width: 50%;"></div>
+<div id="iiif-viewer" class="iiif-viewer-container" style="height: 500px; width: 100%;">
   <script src="/static/node_modules/mirador/dist/mirador.min.js"></script>
   <script>
       const config = {
-          "id": "viewer",
+          "id": "iiif-viewer",
           "layout": "1x1",
           "mainMenuSettings": {
-              "show": true
+              "show": false
           },
           "workspaceControlPanel": {
-              "enabled": true
+              "enabled": false
           },
           "window": {
               "allowClose": false,
               "defaultSideBarPanel": 'attribution',
-              "sideBarOpenByDefault": true,
+              "sideBarOpenByDefault": false,
               "forceDrawAnnotations": true,
-              "highlightAllAnnotations": true
+              "highlightAllAnnotations": true,
+
           },
           "workspace": {
-              "type": "{{ "mosaic" if manifests|length < 9 else 'elastic' }}"
+              "type": "{{ "mosaic" if entity.depictions|length < 9 else 'elastic' }}"
           },
           "language": "{{ session.language }}",
           "availableLanguages": {
@@ -28,8 +28,10 @@
               "fr": "Français"
           },
           "windows": [
-              {% for manifest in manifests %}
-                  {"loadedManifest": "{{ manifest }}"},
+              {% for depiction in entity.depictions %}
+                  {% if depiction.iiif_manifest %}
+                      {"loadedManifest": "{{ depiction.iiif_manifest }}"},
+                  {% endif %}
               {% endfor %}
           ]
       };
