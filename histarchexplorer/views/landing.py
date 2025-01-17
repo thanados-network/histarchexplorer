@@ -197,18 +197,44 @@ def get_ancestor_entities(
     ancestor_entities.reverse()
     return ancestor_entities
 
+
 @app.route('/file/<int:depiction_id>')
 def view_file(depiction_id: int):
     parser = Parser(show=['None'])
 
-    main_entity = Entity.get_entity(depiction_id, parser)
+    # Get the main entity to which the depiction belongs
+    entity = Entity.get_entity(depiction_id, parser)
 
-    depiction = next((d for d in main_entity.depictions if d.id_ == depiction_id), None)
+    if not entity:
+        return "Entity not found.", 404
 
-    if not depiction or not depiction.iiif_manifest:
+    print(f"Entity details: {vars(entity)}")
+
+    # Look through the depictions of the entity and find the matching depiction
+    requested_depiction = None
+    for dep in entity.depictions:
+        if dep['id_'] == depiction_id:
+            requested_depiction = dep
+            break
+
+    if not requested_depiction:
+        return "Depiction not found in entity depictions.", 404
+
+    # Check if the depiction has a IIIF manifest
+    if not requested_depiction.get('iiif_manifest'):
+        print(f"Depiction ID {depiction_id} does not have a IIIF manifest.")
         return "No IIIF manifest available for this depiction.", 404
 
+    print(f"Depiction ID {depiction_id} has IIIF manifest: {requested_depiction['iiif_manifest']}")
+
+    # Retrieve the IIIF manifest and base path for the depiction
+    iiif_manifest = requested_depiction['iiif_manifest']
+    iiif_base_path = requested_depiction['iiif_base_path']
+
+    # Pass the necessary details to the template for rendering
     return render_template(
         "iiif.html",
-        depiction=depiction,
+        iiif_manifest=iiif_manifest,
+        iiif_base_path=iiif_base_path,
+        depiction=requested_depiction
     )
