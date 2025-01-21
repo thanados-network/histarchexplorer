@@ -22,7 +22,6 @@ def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
     return sorted_divisions
 
 
-
 @app.route('/entity/<int:id_>')
 def landing(id_: int) -> str:
     entities = Entity.get_linked_entities_by_properties_recursive(
@@ -90,7 +89,7 @@ def landing(id_: int) -> str:
     return render_template(
         'landing.html',
         entity=main_entity,
-        related_entities = related_entities or {},
+        related_entities=related_entities or {},
         main_image=main_image,
         total_images=total_images,
         images=initial_images,
@@ -171,7 +170,6 @@ def get_related_entities(
     print(related_entities.keys())
 
 
-
 def get_ancestor_entities(
         main_entity: Entity,
         entities: list[Entity]) -> list[Entity]:
@@ -198,43 +196,29 @@ def get_ancestor_entities(
     return ancestor_entities
 
 
+def get_depiction_by_id(depiction_id: int, entities: list[Entity]):
+    depiction = None
+    for entity in entities:
+        for dep in entity.depictions:
+            if dep.id_ == depiction_id:
+                depiction = dep
+                break
+    return depiction
+
 @app.route('/file/<int:depiction_id>')
 def view_file(depiction_id: int):
-    parser = Parser(show=['None'])
+    entities = Entity.get_linked_entities_by_properties_recursive(
+        depiction_id,
+        get_parser_for_landing(depiction_id)
+    )
 
-    # Get the main entity to which the depiction belongs
-    entity = Entity.get_entity(depiction_id, parser)
+    depiction = get_depiction_by_id(depiction_id, entities)
 
-    if not entity:
-        return "Entity not found.", 404
+    if not depiction or not depiction.iiif_manifest:
+        return " no depiction or no IIIF manifest "
 
-    print(f"Entity details: {vars(entity)}")
-
-    # Look through the depictions of the entity and find the matching depiction
-    requested_depiction = None
-    for dep in entity.depictions:
-        if dep['id_'] == depiction_id:
-            requested_depiction = dep
-            break
-
-    if not requested_depiction:
-        return "Depiction not found in entity depictions.", 404
-
-    # Check if the depiction has a IIIF manifest
-    if not requested_depiction.get('iiif_manifest'):
-        print(f"Depiction ID {depiction_id} does not have a IIIF manifest.")
-        return "No IIIF manifest available for this depiction.", 404
-
-    print(f"Depiction ID {depiction_id} has IIIF manifest: {requested_depiction['iiif_manifest']}")
-
-    # Retrieve the IIIF manifest and base path for the depiction
-    iiif_manifest = requested_depiction['iiif_manifest']
-    iiif_base_path = requested_depiction['iiif_base_path']
-
-    # Pass the necessary details to the template for rendering
     return render_template(
         "iiif.html",
-        iiif_manifest=iiif_manifest,
-        iiif_base_path=iiif_base_path,
-        depiction=requested_depiction
+        depiction=depiction,
     )
+

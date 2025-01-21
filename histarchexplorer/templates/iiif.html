@@ -28,11 +28,9 @@
               "fr": "Français"
           },
           "windows": [
-              {% for depiction in entity.depictions %}
-                  {% if depiction.iiif_manifest %}
-                      {"loadedManifest": "{{ depiction.iiif_manifest }}"},
-                  {% endif %}
-              {% endfor %}
+                {
+                    "loadedManifest": "{{ depiction.iiif_manifest }}"}
+
           ]
       };
       Mirador.viewer(config);
