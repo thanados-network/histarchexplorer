@@ -268,7 +268,7 @@
                               {% endif %}
                               <a href="{{ url_for('landing', id_=item.id) }}">
                                 {{ item.name }}
-                              </a>
+                              </a> {{ item.description }}
                             </li>
                           {% endfor %}
                         {% endfor %}
