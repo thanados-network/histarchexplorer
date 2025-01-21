@@ -261,15 +261,23 @@
                         {% for entity in type_.values() %}
                           {% for item in entity %}
                             <li>
-                              {% if key == "Bibliography" %}
-                                <i class="bi bi-book"></i>
-                              {% elif key == "External reference" %}
-                                <i class="bi bi-box-arrow-up-right"></i>
-                              {% endif %}
-                              <a href="{{ url_for('landing', id_=item.id) }}">
-                                {{ item.name }}
-                              </a> {{ item.description }}
+                              <div class="reference-content">
+                                <div class="reference-header">
+                                  {% if key == "Bibliography" %}
+                                    <i class="bi bi-book"></i>
+                                  {% elif key == "External reference" %}
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                  {% endif %}
+                                  <a href="{{ url_for('landing', id_=item.id) }}" class="reference-name">
+                                    {{ item.name }}
+                                  </a>
+                                </div>
+                                <p class="reference-description">
+                                  {{ item.description }}
+                                </p>
+                              </div>
                             </li>
+
                           {% endfor %}
                         {% endfor %}
                       {% endif %}
