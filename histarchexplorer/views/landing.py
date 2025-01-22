@@ -87,7 +87,7 @@ def landing(id_: int) -> str:
     # print("Categorized Types:", result)
 
     return render_template(
-        'landing.html',
+        'landing.html', page_name="landing",
         entity=main_entity,
         related_entities=related_entities or {},
         main_image=main_image,
