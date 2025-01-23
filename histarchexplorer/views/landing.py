@@ -222,3 +222,6 @@ def view_file(depiction_id: int):
         depiction=depiction,
     )
 
+@app.route('/test-offcanvas')
+def test_offcanvas():
+    return render_template('test_oc.html', page_name="test-offcanvas")

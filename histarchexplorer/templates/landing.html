@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
-  <!-- Offcanvas Sidebar -->
-<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
+<!-- Offcanvas Sidebar -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel" data-bs-backdrop="true">
   <div class="offcanvas-header">
     <h5 id="offcanvasSidebarLabel">Navigation</h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -10,23 +10,23 @@
     <!-- Vertical Nav Pills -->
     <ul class="nav flex-column nav-pills">
       <li class="nav-item">
-        <a class="nav-link active" href="{{ url_for('overview') }}">
-          <i class="bi bi-info"></i> Overview
-        </a>
+          <i class="bi bi-info fs-2"></i>
+          <span class="nav-text">Overview</span>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('map') }}">
-          <i class="bi bi-map"></i> Map
-        </a>
+
+          <i class="bi bi-map fs-2"></i>
+          <span class="nav-text">Map</span>
+
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('features') }}">
-          <i class="bi bi-columns-gap"></i> Features
-        </a>
+          <i class="bi bi-columns-gap fs-2"></i>
+          <span class="nav-text">Features</span>
       </li>
     </ul>
   </div>
 </div>
+
 
 {% block content %}
   <link rel="stylesheet"
@@ -331,17 +331,19 @@
           trigger: 'focus'
       })
   </script>
+  <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+          [...popoverTriggerList].map(el => new bootstrap.Popover(el, {html: true, sanitize: false}));
+      });
+  </script>
   <script
       src="https://cdn.jsdelivr.net/gh/haltu/muuri@0.9.5/dist/muuri.min.js"></script>
   <script
       src="{{ url_for('static', filename='js/entity_landing.js') }}"></script>
   <script src="{{ url_for('static', filename='js/map_landing.js') }}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/apextree"></script>
   <script
       src="{{ url_for('static', filename='js/hierarchy_nav.js') }}"></script>
-
-
-
 
 
 {% endblock %}

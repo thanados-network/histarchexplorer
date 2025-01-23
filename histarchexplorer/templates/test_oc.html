@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<button class="btn btn-outline-secondary" type="button"
+              data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar"
+              aria-controls="offcanvasSidebar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+<!-- Offcanvas Sidebar -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel" data-bs-backdrop="true">
+  <div class="offcanvas-header">
+    <h5 id="offcanvasSidebarLabel">Navigation</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <!-- Vertical Nav Pills -->
+    <ul class="nav flex-column nav-pills">
+      <li class="nav-item">
+          <i class="bi bi-info fs-2"></i>
+          <span class="nav-text">Overview</span>
+      </li>
+      <li class="nav-item">
+
+          <i class="bi bi-map fs-2"></i>
+          <span class="nav-text">Map</span>
+
+      </li>
+      <li class="nav-item">
+          <i class="bi bi-columns-gap fs-2"></i>
+          <span class="nav-text">Features</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+{% endblock %}

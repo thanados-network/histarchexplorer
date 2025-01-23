@@ -12711,4 +12711,19 @@ textarea.form-control-lg {
   margin: 5px 0;
 }
 
+#offcanvasSidebar .nav-pills .nav-item {
+  color: #6c757d;
+  background-color: transparent;
+  border: none;
+}
+
+#offcanvasSidebar .nav-pills .nav-item.active {
+  color: white;
+  background-color: #6c757d;
+}
+
+#offcanvasSidebar .nav-pills .nav-item:hover {
+  background-color: #f8f9fa;
+}
+
 /*# sourceMappingURL=main.css.map */
