@@ -1,38 +1,92 @@
 {% extends "layout.html" %}
 
 {% block content %}
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div id="sidebar" class="d-flex flex-column bg-light align-items-center">
+        <ul class="nav nav-pills flex-column text-center w-100">
+          <li class="nav-item">
+            <a href="#" class="nav-link d-flex align-items-center">
+              <i class="bi bi-grid-1x2-fill fs-5"></i> <span class="ms-2">Overview</span>
+            </a>
+          </li>
 
-<button class="btn btn-outline-secondary" type="button"
-              data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar"
-              aria-controls="offcanvasSidebar">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+          <a href="#" class="nav-link d-flex align-items-center">
+            <i class="bi bi-map fs-5"></i> <span class="ms-2">Map</span>
+          </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link d-flex align-items-center">
+              <i class="bi bi-pie-chart fs-5"></i> <span class="ms-2">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link d-flex align-items-center">
+              <i class="bi bi-table fs-5"></i> <span class="ms-2">Images</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link d-flex align-items-center">
+              <i class="bi bi-balloon fs-5"></i> <span class="ms-2">Events</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link d-flex align-items-center">
+              <i class="bi bi-people fs-5"></i> <span class="ms-2">Actors</span>
+            </a>
+          </li>
+        </ul>
+      </div>
 
-<!-- Offcanvas Sidebar -->
-<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel" data-bs-backdrop="true">
-  <div class="offcanvas-header">
-    <h5 id="offcanvasSidebarLabel">Navigation</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      <!-- Main content -->
+      <div class="col p-3 min-vh-100">
+        <h2>Here goes the Overview Content</h2>
+        <hr/>
+        <p>Imagine Muuri tiles</p>
+      </div>
+    </div>
   </div>
-  <div class="offcanvas-body">
-    <!-- Vertical Nav Pills -->
-    <ul class="nav flex-column nav-pills">
-      <li class="nav-item">
-          <i class="bi bi-info fs-2"></i>
-          <span class="nav-text">Overview</span>
-      </li>
-      <li class="nav-item">
 
-          <i class="bi bi-map fs-2"></i>
-          <span class="nav-text">Map</span>
+  <script>
+      // JavaScript to toggle sidebar expansion
+      document.getElementById('toggleSidebar').addEventListener('click', function () {
+          document.getElementById('sidebar').classList.toggle('expanded');
+      });
+  </script>
 
-      </li>
-      <li class="nav-item">
-          <i class="bi bi-columns-gap fs-2"></i>
-          <span class="nav-text">Features</span>
-      </li>
-    </ul>
-  </div>
-</div>
+  <style>
+      /* Sidebar styling */
+      #sidebar {
+          width: 60px;
+          transition: width 0.3s;
+      }
 
+      #sidebar.expanded {
+          width: 200px;
+      }
+
+      #sidebar .nav-link span {
+          display: none;
+          opacity: 0;
+          transition: opacity 0.3s;
+      }
+
+      #sidebar.expanded .nav-link span {
+          display: inline;
+          opacity: 1;
+      }
+
+      #sidebar .btn {
+          width: 100%;
+      }
+
+      #sidebar .nav-link {
+          justify-content: center;
+      }
+
+      #sidebar.expanded .nav-link {
+          justify-content: flex-start;
+      }
+  </style>
 {% endblock %}

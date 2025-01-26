@@ -12726,4 +12726,46 @@ textarea.form-control-lg {
   background-color: #f8f9fa;
 }
 
+@media (min-width: 768px) {
+  #offcanvasSidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+}
+@media (max-width: 576px) {
+  .offcanvas-body span {
+    display: none;
+  }
+}
+.navigation {
+  height: 100vh;
+  width: 80px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 1rem;
+}
+
+.navigation i {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.offcanvas-body a {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.offcanvas-body a i {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+}
+
 /*# sourceMappingURL=main.css.map */
