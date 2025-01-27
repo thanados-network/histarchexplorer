@@ -12208,6 +12208,11 @@ textarea.form-control-lg {
     font-size: 2.5rem;
   }
 }
+@media (min-width: 1921px) {
+  .entity-card__label {
+    font-size: 1.4rem;
+  }
+}
 .entity-card__description {
   color: var(--text-color1);
   font-weight: 300;
@@ -12624,7 +12629,7 @@ textarea.form-control-lg {
 }
 @media (min-width: 1921px) or (max-width: 769px) {
   .main-entity-ellipse {
-    max-width: 70%;
+    max-width: 90%;
     margin: auto;
     display: grid;
     align-content: center;
