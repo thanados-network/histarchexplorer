@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <div id="sidebar" class="d-flex flex-column bg-light align-items-center">
+
+      <div class="d-flex flex-column sidebar-content">
+        <ul class="nav nav-pills flex-column text-center w-100">
+          <li class="nav-item">
+            <a href="#" class="nav-link d-flex align-items-center">
+              <i class="bi bi-grid-1x2-fill fs-5"></i> <span class="ms-2">Overview</span>
+            </a>
+          </li>
+
+          <a href="#" class="nav-link d-flex align-items-center">
+            <i class="bi bi-map fs-5"></i> <span class="ms-2">Map</span>
+          </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link d-flex align-items-center">
+              <i class="bi bi-pie-chart fs-5"></i> <span class="ms-2">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link d-flex align-items-center">
+              <i class="bi bi-table fs-5"></i> <span class="ms-2">Images</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link d-flex align-items-center">
+              <i class="bi bi-balloon fs-5"></i> <span class="ms-2">Events</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link d-flex align-items-center">
+              <i class="bi bi-people fs-5"></i> <span class="ms-2">Actors</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div id="hierarchy" class="mt-4">
+      </div>
+
+      <!-- Main content -->
+      <div class="col p-3 min-vh-100">
+        <h2>Here goes the Overview Content</h2>
+        <hr/>
+      </div>
+    </div>
+  </div>
+
+  <script>
+      // JavaScript to toggle sidebar expansion
+      document.getElementById('toggleSidebar').addEventListener('click', function () {
+          document.getElementById('sidebar').classList.toggle('expanded');
+      });
+  </script>
+
+  <style>
+      /* Sidebar styling */
+      #sidebar {
+          width: 60px;
+          transition: width 0.3s;
+      }
+
+      #sidebar.expanded {
+          width: 200px;
+      }
+
+      #sidebar .nav-link span {
+          display: none;
+          opacity: 0;
+          transition: opacity 0.3s;
+      }
+
+      #sidebar.expanded .nav-link span {
+          display: inline;
+          opacity: 1;
+      }
+
+      #sidebar .btn {
+          width: 100%;
+      }
+
+      #sidebar .nav-link {
+          justify-content: center;
+      }
+
+      #sidebar.expanded .nav-link {
+          justify-content: flex-start;
+      }
+  </style>
+{% endblock %}

@@ -12716,6 +12716,11 @@ button.btn-whitish[disabled] {
   margin: 5px 0;
 }
 
+.hierarchy-item {
+  background-color: lightgrey;
+  padding: 2rem;
+}
+
 #offcanvasSidebar .nav-pills .nav-item {
   color: #6c757d;
   background-color: transparent;
