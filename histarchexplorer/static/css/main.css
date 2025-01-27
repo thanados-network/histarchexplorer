@@ -12778,4 +12778,15 @@ button.btn-whitish[disabled] {
   margin-right: 1rem;
 }
 
+#toggleSidebar {
+  color: black;
+  background: none;
+  border: none;
+  padding-left: 1rem;
+}
+
+#toggleSidebar i {
+  font-size: 1.5rem;
+}
+
 /*# sourceMappingURL=main.css.map */
