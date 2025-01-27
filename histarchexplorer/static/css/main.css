@@ -12691,19 +12691,19 @@ textarea.form-control-lg {
   --bs-gradient: none;
 }
 
-.btn-whitish {
+button.btn-whitish {
   background-color: rgba(255, 255, 255, 0.6);
   border: none;
   box-shadow: none;
 }
 
-.btn-whitish:hover {
+button.btn-whitish:hover {
   background-color: rgb(255, 255, 255);
   color: #000;
 }
 
-.btn-whitish:disabled,
-.btn-whitish[disabled] {
+button.btn-whitish:disabled,
+button.btn-whitish[disabled] {
   background-color: rgba(255, 255, 255, 0.6);
   pointer-events: none;
   opacity: 0.6;
