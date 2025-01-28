@@ -78,4 +78,18 @@
     overflow-x: hidden;
     transform: translateX(0);
   }
+ }
+
+  /* Sidebar icon, link style grey */
+.nav-link i {
+  color: grey ;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #007bff;
+  }
+}
+
+.nav-link {
+  color: inherit;
 }
