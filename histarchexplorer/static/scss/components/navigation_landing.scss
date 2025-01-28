@@ -1,7 +1,6 @@
-@use '../globals'as *;
+@use '../globals' as *;
 
 /* Sidebar toggle in Navbar */
-
 #toggleSidebar {
   color: black;
   background: none;
@@ -13,17 +12,23 @@
   font-size: 1.5rem;
 }
 
-
-/* Sidebar*/
+/* Sidebar */
 #nav-sidebar {
   width: 70px;
-  transition: width 0.3s;
-  background-color: var(--bs-navbar-color);
+  background-color: grey;
+  transition: width 0.3s ease;
+
+  /* Sticky for larger screens */
+  @media (min-width: 765px) {
+    position: sticky;
+    top: var(--navbar-height);
+    height: calc(100vh - var(--navbar-height));
+    overflow-y: auto;
+  }
 }
 
 #nav-sidebar.expanded {
   width: 150px;
-  height: 100vh;
 }
 
 #nav-sidebar .nav-link span {
@@ -37,7 +42,6 @@
   opacity: 1;
 }
 
-
 #nav-sidebar .btn {
   width: 100%;
 }
@@ -50,10 +54,11 @@
   justify-content: flex-start;
 }
 
+/* Responsive behavior for smaller screens */
 @media (max-width: 765px) {
   #nav-sidebar {
     position: fixed;
-    top: var(--navbar-height);
+    top: var(--navbar-height); /* Adjust based on your navbar height */
     left: 0;
     width: 0;
     height: 100vh;
@@ -65,8 +70,7 @@
   /* Sidebar shown when expanded */
   #nav-sidebar.expanded {
     width: 150px;
+    height: 100vh;
     transform: translateX(0);
   }
 }
-
-
