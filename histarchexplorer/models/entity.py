@@ -12,24 +12,43 @@ from histarchexplorer.models.util import format_date, split_date_string, \
     uc_first, date_template_format
 
 
+def get_alias(names) -> str:
+    if names:
+        return ', '.join(map(str, [a['alias'] for a in names]))
+    return ''
+
+
+def get_types(types) -> list[Types]:
+    if types:
+        return [Types(types) for types in types]
+    return []
+
+
+def get_relation_class(relations) -> list[Relation]:
+    relation = []
+    if relations:
+        relation = [Relation(relation) for relation in relations]
+    return relation
+
+
 class Entity:
     def __init__(self, json: dict[str, Any]) -> None:
-        self.data = json['features'][0]
-        self.id = int(self.data['@id'].rsplit('/', 1)[-1])
-        self.name = self.data['properties']['title']
-        self.description = self.get_description(self.data['descriptions'])
+        data = json['features'][0]
+        self.id = int(data['@id'].rsplit('/', 1)[-1])
+        self.name = data['properties']['title']
+        self.description = self.get_description(data['descriptions'])
         self.description_class = self.get_description_class()
         self.system_class = uc_first(
-            self.data['systemClass'].replace('_', ' '))
+            data['systemClass'].replace('_', ' '))
         self.view_class = uc_first(
-            self.data['viewClass'].replace('_', ' ')) \
-            if self.data.get('viewClass') else None
-        self.types = self.get_types()
+            data['viewClass'].replace('_', ' ')) \
+            if data.get('viewClass') else None
+        self.types = get_types(data.get('types'))
         self.standard_type = self.get_standard_type()
-        self.alias = self.get_alias()
-        self.relations =  self.get_relation_class()
-        self.depictions = self.get_depiction()
-        self.reference_systems = self.data.get('links')
+        self.alias = get_alias(data.get('names'))
+        self.relations = get_relation_class(data.get('relations'))
+        self.depictions = self.get_depiction(data.get('depictions'))
+        self.reference_systems = data.get('links')
         self.begin_from = None
         self.begin_to = None
         self.begin_comment = None
@@ -39,16 +58,16 @@ class Entity:
         self.end = None
         self.parent = self.get_parent()
         self.subunits = self.get_subunits()
-        self.geometry = self.handling_geometry(self.data)
-        if 'when' in self.data:
+        self.geometry = self.handling_geometry(data)
+        if 'when' in data:
             self.begin_from = split_date_string(
-                self.data['when']['timespans'][0]['start']['earliest'])
+                data['when']['timespans'][0]['start']['earliest'])
             self.begin_to = split_date_string(
-                self.data['when']['timespans'][0]['start']['latest'])
+                data['when']['timespans'][0]['start']['latest'])
             self.end_from = split_date_string(
-                self.data['when']['timespans'][0]['end']['earliest'])
+                data['when']['timespans'][0]['end']['earliest'])
             self.end_to = split_date_string(
-                self.data['when']['timespans'][0]['end']['latest'])
+                data['when']['timespans'][0]['end']['latest'])
             self.begin = format_date(self.begin_from, self.begin_to)
             self.end = format_date(self.end_from, self.end_to)
             self.formated_date = date_template_format(self.begin, self.end)
@@ -56,24 +75,8 @@ class Entity:
     def __repr__(self) -> str:
         return str(self.__dict__)
 
-    def get_relation_class(self) -> list[Relation]:
-        relation = []
-        if relations := self.data.get('relations'):
-            relation = [Relation(relation) for relation in relations]
-        return relation
-
-    def get_alias(self) -> str:
-        if names := self.data.get('names'):
-            return ', '.join(map(str, [a['alias'] for a in names]))
-        return ''
-
-    def get_types(self) -> list[Types]:
-        if self.data.get('types'):
-            return [Types(types) for types in self.data['types']]
-        return []
-
-    def get_depiction(self) -> list[Depiction]:
-        if depictions := self.data.get('depictions'):
+    def get_depiction(self, depictions) -> list[Depiction]:
+        if depictions:
             return [Depiction(depiction, self.id) for depiction in depictions]
         return []
 
@@ -94,9 +97,9 @@ class Entity:
 
     def get_standard_type(self) -> Optional[Types]:
         for type_ in self.types:
-            type_.root_id = (int(type_.type_hierarchy[0]['identifier'].rsplit('/', 1)[-1]))
+            type_.root_id = (
+                int(type_.type_hierarchy[0]['identifier'].rsplit('/', 1)[-1]))
             if type_.root in app.config['STANDARD_TYPES']:
-                print(type_)
                 return type_
         return None
 
@@ -118,6 +121,18 @@ class Entity:
                 subunit.append(relation)
         return subunit
 
+    def to_serializable(self: Any) -> Any:
+        if isinstance(self, list):
+            return [Entity.to_serializable(item) for item in self]
+        elif hasattr(self, "__dict__"):
+            return {
+                key: Entity.to_serializable(value)
+                for key, value in self.__dict__.items()}
+        elif isinstance(self, dict):
+            return {
+                key: Entity.to_serializable(value)
+                for key, value in self.items()}
+        return self
 
     @staticmethod
     def get_entity(id_: int, parser: Parser) -> Entity:
@@ -154,4 +169,3 @@ class Entity:
                 return geometry['geometries']
             return geometry
         return None
-

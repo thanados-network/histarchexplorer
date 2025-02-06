@@ -1,8 +1,11 @@
+import json
+
 from histarchexplorer import app
 from flask import render_template, abort
 
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.models.entity import Entity
+from histarchexplorer.utils.helpers import to_serializable
 
 sidebarelements = app.config['SIDEBAR_OPTIONS']
 valid_routes = {item['route'] for item in sidebarelements}
@@ -18,10 +21,11 @@ def entity(id_: int, tab_name="overview") -> str:
 
 
 @app.route('/getentity/<int:id_>/<tab_name>')
-def getentity(id_: int, tab_name=None) -> str:
+def getentity(id_: int, tab_name=None, json_serializable=None) -> str:
 
-    #entity = Entity.get_entity(id_, Parser())
-    data = {'entity': 'blabalbalba'}
+    entity = Entity.get_entity(id_, Parser())
+
+    data = {'entity': json.dumps(entity.to_serializable(), ensure_ascii=False, indent=4)}
 
     def get_general_data():
         #here we get data that needs to be loaded anyway
