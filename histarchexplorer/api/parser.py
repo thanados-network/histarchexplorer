@@ -24,7 +24,7 @@ class Parser:
     export: str = None
     format: str = 'lpx'
     relation_type: int = None
-    centroid: bool = False
+    centroid: bool = 'false'
     geometry: list[str] = None
     image_size: str = ''
     file_id: int = None
