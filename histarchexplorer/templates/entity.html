@@ -4,7 +4,7 @@
 
     <script>
         const tabsToLoad = {{ sidebarelements | sort(attribute='order') | map(attribute='route') | list | tojson }};
-        const entity = JSON.parse({{ entity_data.entity|tojson }})
+        const entityId = {{ entity_id }}
     </script>
 
     <div class="entity-container">
@@ -13,7 +13,7 @@
             <div id="nav-sidebar" class="col col-auto d-none d-md-flex flex-column bg-body-tertiary align-items-center">
                 <ul class="nav nav-pills flex-column text-center w-100">
                     {% for item in sidebarelements %}
-                        <li class="nav-item" role="presentation">
+                        <li class="nav-item d-none to-remove-{{ item.route }}" role="presentation">
                             <a href="#"
                                class="nav-link d-flex align-items-center {{ 'active' if active_tab == item.route else '' }}"
                                id="tab-{{ item.route }}" data-bs-toggle="tab"
@@ -25,6 +25,13 @@
                             </a>
                         </li>
                     {% endfor %}
+                    <li class="nav-item to-remove-spinner" role="presentation">
+                        <a href="#" title="loading"
+                           class="nav-link d-flex align-items-center"
+                           id="tab-spinner">
+                            <i class="spinner-border"></i>
+                        </a>
+                    </li>
                 </ul>
             </div>
 
@@ -33,7 +40,7 @@
             <div class="col flex-column grid">
                 <div class="entity-content">
                     {% for item in sidebarelements %}
-                        <div class="tab-pane fade {{ 'show active' if active_tab == item.route else '' }}"
+                        <div class="tab-pane fade d-none to-remove-{{ item.route }} {{ 'show active' if active_tab == item.route else '' }}"
                              id="tab-pane-{{ item.route }}" role="tabpanel" aria-labelledby="tab-{{ loop.index }}">
                             <div id="pane-content-{{ item.route }}">
                                 <div class="spinner-grow" style="width: 3rem; height: 3rem;" role="status">

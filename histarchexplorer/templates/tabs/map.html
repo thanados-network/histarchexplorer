@@ -1,7 +1,8 @@
-<link href="../../static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet" />
+<link href="../../static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"/>
 <script src="../../static/node_modules/maplibre-gl/dist/maplibre-gl.js"></script>
-<div id="mymap"></div>
+<div id="mymap">
+</div>
 
-<script> const mapData = JSON.parse({{ mapData|tojson }})</script>
+<script> const mapData = (JSON.parse({{ data|tojson }})).spatial</script>
 <script> console.log(mapData)</script>
 <script src="../../static/js/map.js"></script>

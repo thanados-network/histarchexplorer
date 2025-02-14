@@ -58,7 +58,7 @@ class Entity:
         self.end = None
         self.parent = self.get_parent()
         self.subunits = self.get_subunits()
-        self.geometry = self.handling_geometry(data)
+        self.geometry = data.get('geometry')
         if 'when' in data:
             self.begin_from = split_date_string(
                 data['when']['timespans'][0]['start']['earliest'])
