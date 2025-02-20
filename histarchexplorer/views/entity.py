@@ -156,7 +156,7 @@ def getentity(id_: int, tab_name=None) -> str:
             first_geom = get_first_geom(id_)
             id_to_fetch = get_root_id(id_)
             entities = Entity.get_linked_entities_by_properties_recursive(
-                id_to_fetch, Parser(show='geometry', properties='P46'))
+                id_to_fetch, Parser(show=['geometry'], properties=['P46']))
             features = {'type': 'FeatureCollection', 'features': []}
             for ent in entities:
                 property = {'id': ent.id, 'label': ent.name, 'class': ent.system_class}
@@ -177,7 +177,7 @@ def getentity(id_: int, tab_name=None) -> str:
     features = []
     if tab_name == 'feature': #@Bernhard- hier baue ich mir das zusammen. Irgendwie kommt mir vor da sind alle siblings und andere Gräber auch drin.
         entities = Entity.get_linked_entities_by_properties_recursive(
-            id_, Parser(properties='P46'))
+            id_, Parser(properties=['P46']))
         for ent in entities:
             features.append(ent)
 
