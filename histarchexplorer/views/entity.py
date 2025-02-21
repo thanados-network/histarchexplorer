@@ -177,9 +177,23 @@ def getentity(id_: int, tab_name=None) -> str:
     features = []
     if tab_name == 'feature':
         entities = Entity.get_linked_entities_by_properties_recursive(
-            id_, Parser(show=['when', 'types', 'names', 'depictions'], properties=['P46']))
-        print(id_)
-        print(entities)
+            id_, Parser(
+                show=['when', 'types', 'names', 'depictions', 'description', 'relations'],
+                properties=['P46'],
+                relation_type=['P46'],
+                column='id',
+                sort='asc',
+                search=[str({
+                    "entitySystemClass": [{
+                        "logicalOperator": "and",
+                        "operator": "notEqual",
+                        "values": ["place"]}]})]))
+        features = entities
+
+    if tab_name == 'features':
+        entities = Entity.get_entity(
+            id_, Parser(
+                show=['when', 'types', 'names', 'depictions', 'description', 'relations']))
         features = entities
 
     def get_file_data():

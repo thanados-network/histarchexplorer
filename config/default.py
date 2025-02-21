@@ -18,6 +18,7 @@ REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
 API_URL = 'https://thanados.openatlas.eu/api/'
+#API_URL = 'https://demo-dev.openatlas.eu/api/'
 API_PROXY = ''
 OPENATLAS_CASE_STUDY_IDS: list[int] = []
 

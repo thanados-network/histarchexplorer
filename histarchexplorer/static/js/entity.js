@@ -198,15 +198,26 @@ function setRightSidebarContent(content) {
 }
 
 // Toggle sidebar state
-function toggleRightSidebar(currentTab) {
+function toggleRightSidebar(currentTab, mode = 'toggle') {
     const rightSidebar = document.getElementById('right-sidebar');
     const root = document.documentElement;
 
     if (!rightSidebar || !rightSidebarcontent[currentTab]) return;
 
-    const isExpanded = rightSidebar.classList.toggle('right-expanded');
-    rightSidebarcontent[currentTab].opened = isExpanded;
+    let isExpanded = rightSidebar.classList.contains('right-expanded');
 
+    if (mode === 'open') {
+        isExpanded = true;
+        rightSidebar.classList.add('right-expanded');
+    } else if (mode === 'close') {
+        isExpanded = false;
+        rightSidebar.classList.remove('right-expanded');
+    } else {
+        isExpanded = !isExpanded;
+        rightSidebar.classList.toggle('right-expanded');
+    }
+
+    rightSidebarcontent[currentTab].opened = isExpanded;
     root.style.setProperty('--right-sidebar-width', isExpanded ? '600px' : '0px');
 }
 
@@ -230,10 +241,10 @@ document.querySelectorAll('#nav-sidebar .nav-link').forEach(button => {
 
         if (!shouldBeOpen && isCurrentlyOpen) {
             console.log(`Tab "${tabName}" should be closed but is open.`);
-            toggleRightSidebar(tabName);
+            toggleRightSidebar(tabName, 'toggle');
         } else if (shouldBeOpen && !isCurrentlyOpen) {
             console.log(`Tab "${tabName}" should be open but is closed.`);
-            toggleRightSidebar(tabName);
+            toggleRightSidebar(tabName, 'toogle');
         }
     });
 });

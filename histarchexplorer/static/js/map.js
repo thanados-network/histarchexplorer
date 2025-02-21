@@ -184,7 +184,22 @@ function setPointer(layers) {
     });
 }
 
-function setSidebarContent(id) {
+function setSidebarContent(id, mode = 'toggle') {
+    if (!rightSidebarcontent.map.opened) {
+                toggleRightSidebar('map', 'open');
+                rightSidebarcontent.map.opened = true
+            }
+    const startTime = performance.now(); // Start timing
+    const contentDiv = document.getElementById('right-sidebar');
+
+    // Show a centered Bootstrap spinner
+    contentDiv.innerHTML = `
+        <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+            <div class="spinner-border text-secondary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `;
 
     fetch(`/getentity/${id}/feature`)
         .then(response => {
@@ -194,11 +209,23 @@ function setSidebarContent(id) {
             return response.text(); // Get the HTML content
         })
         .then(html => {
-            document.getElementById('right-sidebar').innerHTML = html;
-            toggleRightSidebar('map')
+            const endTime = performance.now(); // End timing
+            const fetchTime = ((endTime - startTime) / 1000).toFixed(2); // Convert to seconds
+
+            // Append fetch time info to the HTML
+            const updatedHtml = html + `<p style="font-size: 12px; color: gray;">Loaded in ${fetchTime} s</p>`;
+
+            contentDiv.innerHTML = updatedHtml;
+
+
         })
-        .catch(error => console.error("Error loading right sidebar content:", error));
+        .catch(error => {
+            console.error("Error loading right sidebar content:", error);
+            contentDiv.innerHTML = `<p style="color: red; text-align: center;">Failed to load content.</p>`;
+        });
 }
+
+
 
 
 document.getElementById('tab-map').addEventListener('click', function (event) {
