@@ -31,7 +31,7 @@ def landing(id_: int) -> str:
 
     main_entity = get_main_entity(id_, entities)
     add_entity_object_to_relation(main_entity, entities)
-    #related_entities = get_related_entities(main_entity, entities)
+    related_entities = get_related_entities(main_entity, entities)
     ancestor_entities = get_ancestor_entities(main_entity, entities)
     super_entity = ancestor_entities[0] if ancestor_entities else None
 
@@ -90,7 +90,7 @@ def landing(id_: int) -> str:
     return render_template(
         'landing.html', page_name="landing",
         entity=main_entity,
-       # related_entities=related_entities or {},
+        related_entities=related_entities or {},
         main_image=main_image,
         total_images=total_images,
         images=initial_images,
