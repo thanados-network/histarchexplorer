@@ -1,0 +1,102 @@
+@use '../globals' as *;
+
+/* Sidebar toggle in Navbar */
+#toggleSidebar {
+  color: black;
+  background: none;
+  border: none;
+  padding-left: 1rem;
+}
+
+#toggleSidebar i {
+  font-size: 1.5rem;
+}
+
+/* Sidebar */
+:root {
+  --sidebar-width: 70px; /* Initial width */
+}
+
+#nav-sidebar {
+  width: var(--sidebar-width);
+  transition: width 0.3s ease;
+  color: var(--nav-sidebar);
+
+
+  /* Sticky for larger screens */
+  @media (min-width: 765px) {
+    position: sticky;
+    top: var(--navbar-height);
+    height: calc(100vh - var(--navbar-height));
+    overflow-y: auto;
+  }
+}
+
+#nav-sidebar.expanded {
+  width: 150px;
+  overflow-x: hidden;
+}
+
+#nav-sidebar .nav-link span {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#nav-sidebar.expanded .nav-link span {
+  display: inline;
+  opacity: 1;
+}
+
+#nav-sidebar .btn {
+  width: 100%;
+}
+
+#nav-sidebar .nav-link {
+  justify-content: flex-start;
+}
+
+#nav-sidebar.expanded .nav-link {
+  justify-content: flex-start;
+}
+
+
+@media (max-width: 765px) {
+  #nav-sidebar {
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    width: 0;
+    height: 100vh;
+    z-index: 300000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  /* Sidebar shown when expanded */
+  #nav-sidebar.expanded {
+    width: 150px;
+    height: 100vh;
+    overflow-x: hidden;
+    transform: translateX(0);
+  }
+}
+
+/* Sidebar icon, link style grey */
+.nav-link {
+  color: grey !important;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: black !important;
+
+    i {
+      color: black !important;
+    }
+  }
+
+  i {
+    color: grey;
+    transition: color 0.3s ease;
+  }
+}

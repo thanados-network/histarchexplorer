@@ -101,7 +101,7 @@
                 {% endif %}
               </div>
               <div class="entity-card__label mb-0">{{ entity.name }}</div>
-              <div class="entity-type mb-0 ">
+              <div class="entity-type ">
                 {% if entity.standard_type %}
                   <p>{{ entity.standard_type.label | upper }}</p>
                 {% endif %}
@@ -148,19 +148,6 @@
 
         </div>
 
-        <!-- Description -->
-        {% if entity.description %}
-          <div class="{{ entity.description_class }}">
-            <div class="item-content">
-              <div class="muuri-description">
-                <span class="tile-label">DESCRIPTION</span>
-                <p>{{ entity.description }}</p>
-              </div>
-            </div>
-          </div>
-
-        {% endif %}
-
         <!-- Map Location -->
         {% if entity.geometry %}
           <div class="item">
@@ -179,7 +166,18 @@
 
         {% endif %}
 
+        <!-- Description -->
+        {% if entity.description %}
+          <div class="{{ entity.description_class }}">
+            <div class="item-content">
+              <div class="muuri-description">
+                <span class="tile-label">DESCRIPTION</span>
+                <p>{{ entity.description }}</p>
+              </div>
+            </div>
+          </div>
 
+        {% endif %}
 
         <!-- First image -->
         {% if main_image and (entity.system_class.lower() not in ['actor', 'person']) %}
@@ -257,6 +255,39 @@
           {% endfor %}
         {% endif %}
 
+        <!-- Other Related Entities - to be able to check other entities more quickly -->
+        {% if related_entities %}
+          {% for key, type_ in related_entities.items() %}
+            {% if type_ and key not in ["Bibliography", "External reference"] %}
+              <div class="item">
+                <div class="item-content">
+                  <div class="related-entities">
+                    <p class="tile-label text-uppercase">{{ key }}</p>
+                    <ul class="no-bullets">
+                      {% for type_label, list_ in type_.items() %}
+                        <li>
+                          {{ type_label }}
+                          <span
+                              tabindex="0"
+                              class="badge rounded-pill popover-link"
+                              role="button"
+                              style="background-color: lightgrey; color: white;"
+                              data-bs-toggle="popover"
+                              data-bs-trigger="focus"
+                              data-bs-title="{{ type_label }} ({{ list_ | length }})"
+                              data-bs-content="<ul>{% for entity_ in list_ %}<li><a href={{ url_for('landing', id_=entity_.id) }}>{{ entity_.name }}</a></li>{% endfor %}</ul>">
+                                            {{ list_ | length }}
+                                        </span>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
 
         <!-- Bibliography and External References -->
         {% if related_entities %}
@@ -291,7 +322,7 @@
                                 {{ item.description }}
                                 {% for relation in item.relations %}
                                   {% if entity.id == relation.relation_to_id %}
-                                    {{ relation.relation_description }}
+                                     {{ relation.relation_description }}
                                   {% endif %}
                                 {% endfor %}
                               </p>
@@ -310,7 +341,6 @@
 
       </div>
     </div>
-  </div>
   </div>
 
   <script>

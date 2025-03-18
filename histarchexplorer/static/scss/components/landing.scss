@@ -26,7 +26,7 @@
   display: block;
   margin: 5px;
   position: absolute;
-  width: calc((100% - 30px) / 3);
+  width: calc((100vw - 45px - var(--sidebar-width)) / 3);
   background: var(--muuri-tile);
   overflow: hidden;
   border-radius: 7.5px;
@@ -34,13 +34,13 @@
 
 @media (max-width: 992px) { // Below col-md breakpoint
   .item {
-    width: calc((100% - 20px) / 2); // 2 tiles
+    width: calc((100vw - 40px - var(--sidebar-width)) / 2); // 2 tiles
   }
 }
 
 @media (max-width: 766px) { // Mobile
   .item {
-    width: calc(100% - 10px); // 1 tile
+    width: calc(100%); // 1 tile
     margin: 0px;
     padding: 0px;
   }
@@ -152,8 +152,9 @@
 
 
 .muuri-description {
+  max-height: calc(100vh - var(--navbar-height));
+
   p {
-    max-height: 700px;
     margin-top: 1.5rem;
 
     // These are technically the same, but use both
@@ -211,6 +212,7 @@
 
 .map-wrapper {
   position: relative;
+  heigth: 100%;
 }
 
 .location:hover #expand-button {
@@ -231,8 +233,8 @@
   transition: ease-in 0.3s;
 
   .expanded-map {
-    width: calc(100vw - 22.9%);
-    height: calc(100vh - 120px);
+    width: 100%;
+    height: calc(100vh - 96px);
     padding: 0rem;
   }
 
@@ -250,12 +252,17 @@
     font-size: 1.2rem;
   }
 }
+.entity-card__icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .entity-card__icon img {
-  max-width: 100%;
+  max-width: 60%; //ev. change here to extra card, so that on entity page this can stay on 80-100%
   height: auto;
-  margin-bottom: 1rem;
 }
+
 
 //Sidebar
 .sidebar {
@@ -269,10 +276,10 @@
   color: black;
   text-align: center;
 
-    @media (max-width: 766px) {
+  @media (max-width: 766px) {
     position: static;
     height: max-content;
-    overflow-y:visible;
+    overflow-y: visible;
   }
 
 }
@@ -285,9 +292,9 @@
   @media (max-width: 766px) {
     position: static;
     height: max-content;
-    overflow-y:visible;
+    overflow-y: visible;
   }
-  }
+}
 
 .super-entity {
   font-weight: lighter;
@@ -304,8 +311,12 @@
 
 .entity-type,
 .entity-date {
-  font-size: 1.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1em;
   color: black;
+
 }
 
 @media (max-width: 992px) {
@@ -317,6 +328,10 @@
 
 .entity-type {
   margin-top: 2rem;
+}
+
+.entity-type p {
+  margin-bottom: 0;
 }
 
 .entity-class {
@@ -351,4 +366,34 @@
     padding: 0;
     overflow-y: visible;
   }
+}
+
+
+.reference-content {
+  padding: 0;
+}
+
+.reference-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .bi {
+    font-size: 1.2rem;
+  }
+
+  .reference-name {
+    font-weight: bold;
+    color: #000;
+    text-decoration: none;
+  }
+}
+
+.reference-description {
+  font-size: 0.875rem;
+  font-weight: 300;
+  color: #555;
+  margin-left: 1.75rem;
+  margin-top: 0.25rem;
+  line-height: 1.4;
 }

@@ -2,6 +2,7 @@ from collections import defaultdict
 from typing import Any
 
 from flask import render_template
+from urllib.parse import urlparse
 
 from histarchexplorer import app
 from histarchexplorer.api.parser import Parser
@@ -20,7 +21,6 @@ def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
     ))
 
     return sorted_divisions
-
 
 
 @app.route('/entity/<int:id_>')
@@ -59,7 +59,7 @@ def landing(id_: int) -> str:
     if not main_image and images:
         main_image = images[0]
         del images[0]
-        print("Depictions:", main_entity.depictions)
+    #print("Depictions:", main_entity.depictions)
 
     total_images = len(images)
     initial_images = images[:3]  # Show only the first 3 images
@@ -88,9 +88,9 @@ def landing(id_: int) -> str:
     # print("Categorized Types:", result)
 
     return render_template(
-        'landing.html',
+        'landing.html', page_name="landing",
         entity=main_entity,
-        related_entities=related_entities,
+        related_entities=related_entities or {},
         main_image=main_image,
         total_images=total_images,
         images=initial_images,
@@ -168,7 +168,7 @@ def get_related_entities(
                     if label in app.config['STANDARD_TYPES']:
                         related_entities[label][type_.label].append(subunit)
     return related_entities
-    print(related_entities.keys())
+    #print(related_entities.keys())
 
 
 def get_ancestor_entities(
@@ -195,3 +195,38 @@ def get_ancestor_entities(
             break
     ancestor_entities.reverse()
     return ancestor_entities
+
+
+def get_depiction_by_id(depiction_id: int, entities: list[Entity]):
+    depiction = None
+    for entity in entities:
+        for dep in entity.depictions:
+            if dep.id_ == depiction_id:
+                depiction = dep
+                break
+    return depiction
+
+@app.route('/file/<int:depiction_id>')
+def view_file(depiction_id: int):
+    entities = Entity.get_linked_entities_by_properties_recursive(
+        depiction_id,
+        get_parser_for_landing(depiction_id)
+    )
+
+    depiction = get_depiction_by_id(depiction_id, entities)
+
+    if not depiction or not depiction.iiif_manifest:
+        return " no depiction or no IIIF manifest "
+
+    return render_template(
+        "iiif.html",
+        depiction=depiction,
+    )
+
+
+
+
+
+
+
+
