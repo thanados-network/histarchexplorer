@@ -599,38 +599,26 @@ def reset() -> Response:
         INSERT INTO tng.config_classes (name) VALUES ('language_code');
         
         INSERT INTO tng.config_properties (name, name_inv, domain, range)
-        VALUES ('{"de": "hat Mitglied", "en": "has member"}'::jsonb, '{"de": 
-        "ist Mitglied von", "en": "is member of"}'::jsonb, 
+        VALUES ('{"de": "hat Mitglied", "en": "has member"}'::jsonb, '{"de": "ist Mitglied von", "en": "is member of"}'::jsonb, 
                 (SELECT id FROM tng.config_classes WHERE name = 'project'), 
                 (SELECT id FROM tng.config_classes WHERE name = 'person'));
         
         INSERT INTO tng.config_properties (name, name_inv, domain, range)
-        VALUES ('{"de": "hat Zugehörigkeit", "en": "has 
-        affiliation"}'::jsonb, '{"de": "ist Zugehörigkeit von", "en": "is 
-        affiliation of"}'::jsonb, 
-                (SELECT id FROM tng.config_classes WHERE name = 'person'), 
-                (SELECT id FROM tng.config_classes WHERE name = 
-                'institution'));
+        VALUES ('{"de": "hat Zugehörigkeit", "en": "has affiliation"}'::jsonb, '{"de": "ist Zugehörigkeit von", "en": "is affiliation of"}'::jsonb, (SELECT id FROM tng.config_classes WHERE name = 'person'), (SELECT id FROM tng.config_classes WHERE name = 'institution'));
         
         INSERT INTO tng.config_properties (name, name_inv, domain, range)
-        VALUES ('{"de": "hat Kernmitglied", "en": "has core 
-        member"}'::jsonb, '{"de": "ist Kernmitglied von", "en": "is core 
-        member of"}'::jsonb, 
+        VALUES ('{"de": "hat Kernmitglied", "en": "has core member"}'::jsonb, '{"de": "ist Kernmitglied von", "en": "is core member of"}'::jsonb, 
                 (SELECT id FROM tng.config_classes WHERE name = 
-                'main-project'), (SELECT id FROM tng.config_classes WHERE 
-                name = 'person'));
+                'main-project'), (SELECT id FROM tng.config_classes WHERE name = 'person'));
         
         INSERT INTO tng.config_properties (name, name_inv, domain, range)
-        VALUES ('{"de": "hat Kerninstitution", "en": "has core 
-        institution"}'::jsonb, '{"de": "ist Kerninstitution von", "en": "is 
-        core institution of"}'::jsonb, 
+        VALUES ('{"de": "hat Kerninstitution", "en": "has core institution"}'::jsonb, '{"de": "ist Kerninstitution von", "en": "is core institution of"}'::jsonb, 
                 (SELECT id FROM tng.config_classes WHERE name = 
                 'main-project'), (SELECT id FROM tng.config_classes WHERE 
                 name = 'institution'));
 
         INSERT INTO tng.config_properties (name, name_inv, domain, range)
-        VALUES ('{"de": "hat Institution", "en": "has institution"}'::jsonb, 
-        '{"de": "ist Institution von", "en": "is institution of"}'::jsonb, 
+        VALUES ('{"de": "hat Institution", "en": "has institution"}'::jsonb, '{"de": "ist Institution von", "en": "is institution of"}'::jsonb, 
                 (SELECT id FROM tng.config_classes WHERE name = 'project'), 
                 (SELECT id FROM tng.config_classes WHERE name = 
                 'institution'));
@@ -661,15 +649,11 @@ def reset() -> Response:
         
         INSERT INTO tng.config (name, config_class, description, address, 
         email, website)
-        VALUES ('{"de": "Projektleitung", "en": "Principal 
-        Investigator"}'::jsonb, (SELECT id from tng.config_classes WHERE 
-        name = 'role'), NULL, NULL, NULL, NULL);
+        VALUES ('{"de": "Projektleitung", "en": "Principal Investigator"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
         
         INSERT INTO tng.config (name, config_class, description, address, 
         email, website)
-        VALUES ('{"de": "Hauptkoordinator", "en": "Main 
-        Coordinator"}'::jsonb, (SELECT id from tng.config_classes WHERE name 
-        = 'role'), NULL, NULL, NULL, NULL);
+        VALUES ('{"de": "Hauptkoordinator", "en": "Main Coordinator"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'role'), NULL, NULL, NULL, NULL);
         
         INSERT INTO tng.config (name, config_class, description, address, 
         email, website)
@@ -678,14 +662,12 @@ def reset() -> Response:
         
         INSERT INTO tng.config (name, config_class, description, address, 
         email, website)
-        VALUES ('{"de": "Softwareentwickler", "en": "Software 
-        Developer"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 
+        VALUES ('{"de": "Softwareentwickler", "en": "Software Developer"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 
         'role'), NULL, NULL, NULL, NULL);
         
         INSERT INTO tng.config (name, config_class, description, address, 
         email, website)
-        VALUES ('{"de": "Design & Programmierung", "en": "Design & 
-        Programming"}'::jsonb, (SELECT id from tng.config_classes WHERE name 
+        VALUES ('{"de": "Design & Programmierung", "en": "Design & Programming"}'::jsonb, (SELECT id from tng.config_classes WHERE name 
         = 'role'), NULL, NULL, NULL, NULL);
         
         INSERT INTO tng.config (name, config_class, description, address, 
@@ -741,20 +723,17 @@ def reset() -> Response:
         
         INSERT INTO tng.config (name, config_class, description, address, 
         email, website)
-        VALUES ('{"de": "NHM", "en": "NHM"}'::jsonb, (SELECT id from 
-        tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, 
+        VALUES ('{"de": "NHM", "en": "NHM"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 'institution'), NULL, NULL, NULL, 
         NULL);
         
         INSERT INTO tng.config (name, config_class, description, address, 
         email, website)
-        VALUES ('{"de": "Universität Wien", "en": "University of 
-        Vienna"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 
+        VALUES ('{"de": "Universität Wien", "en": "University of Vienna"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 
         'institution'), NULL, NULL, NULL, NULL);
         
         INSERT INTO tng.config (name, config_class, description, address, 
         email, website)
-        VALUES ('{"en": "Austrian Centre for Digital Humanities & Cultural 
-        Heritage"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 
+        VALUES ('{"en": "Austrian Centre for Digital Humanities & Cultural Heritage"}'::jsonb, (SELECT id from tng.config_classes WHERE name = 
         'institution'), NULL, NULL, NULL, NULL);
 
         
