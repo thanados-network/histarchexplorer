@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
+from flask import session
+
 from histarchexplorer import app
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.parser import Parser
@@ -27,7 +29,7 @@ class Entity:
         self.types = self.get_types()
         self.standard_type = self.get_standard_type()
         self.alias = self.get_alias()
-        self.relations =  self.get_relation_class()
+        self.relations = self.get_relation_class()
         self.depictions = self.get_depiction()
         self.reference_systems = self.data.get('links')
         self.begin_from = None
@@ -96,7 +98,7 @@ class Entity:
         for type_ in self.types:
             type_.root_id = (int(type_.type_hierarchy[0]['identifier'].rsplit('/', 1)[-1]))
             if type_.root in app.config['STANDARD_TYPES']:
-                print(type_)
+                # print(type_)
                 return type_
         return None
 
@@ -117,7 +119,6 @@ class Entity:
                 'crm:P107_has_current_or_former_member']:
                 subunit.append(relation)
         return subunit
-
 
     @staticmethod
     def get_entity(id_: int, parser: Parser) -> Entity:
@@ -143,8 +144,17 @@ class Entity:
                 ApiAccess.linked_entities_by_properties_recursive(id_, parser)]
 
     @staticmethod
-    def get_description(data: list[dict[str, Any]]) -> Optional[list[str]]:
-        return [i['value'] for i in data][0] if data else None
+    def get_description(data: list[dict[str, Any]]) -> str:
+        if not data or not data[0]['value']:
+            return ''
+        description = [i['value'] for i in data][0]
+        description = description.split('##German')
+        if len(description) > 1:
+            lang_dict = {
+                'en': description[0],
+                'de': description[1]}
+            description = lang_dict[session['language']]
+        return description
 
     @staticmethod
     def handling_geometry(
@@ -154,4 +164,3 @@ class Entity:
                 return geometry['geometries']
             return geometry
         return None
-
