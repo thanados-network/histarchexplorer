@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <h1>Hallo Welt</h1>
+    {% for i in liste %}
+        Number: <h2>{{ i }}</h2>
+    {% endfor %}
+{% include 'footer.html' %}
+{% endblock %}

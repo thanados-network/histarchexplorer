@@ -32,3 +32,11 @@ def search() -> str:
 def set_language(language: Optional[str] = None) -> Response:
     session['language'] = language
     return redirect(request.referrer)
+
+
+@app.route('/elias')
+def elias() -> str:
+    hello = []
+    for i in range(10):
+        hello.append(str(i))
+    return render_template('elias.html', liste=hello)
