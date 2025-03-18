@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
+from flask import session
+
 from histarchexplorer import app
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.parser import Parser
@@ -158,8 +160,17 @@ class Entity:
                 ApiAccess.linked_entities_by_properties_recursive(id_, parser)]
 
     @staticmethod
-    def get_description(data: list[dict[str, Any]]) -> Optional[list[str]]:
-        return [i['value'] for i in data][0] if data else None
+    def get_description(data: list[dict[str, Any]]) -> str:
+        if not data or not data[0]['value']:
+            return ''
+        description = [i['value'] for i in data][0]
+        description = description.split('##German')
+        if len(description) > 1:
+            lang_dict = {
+                'en': description[0],
+                'de': description[1]}
+            description = lang_dict[session['language']]
+        return description
 
     @staticmethod
     def handling_geometry(
