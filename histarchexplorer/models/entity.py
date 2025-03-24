@@ -4,6 +4,8 @@ from typing import Any, Optional
 
 from flask import session
 
+import re
+
 from histarchexplorer import app
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.parser import Parser
@@ -148,12 +150,20 @@ class Entity:
         if not data or not data[0]['value']:
             return ''
         description = [i['value'] for i in data][0]
+
+# ##en_##English text##_en## -> [('en', 'English text')]
+        matches = re.findall(r'##(\w+)_##(.*?)##_\1##', description, re.DOTALL)
+        if matches:
+            lang_dict = {lang: text.strip() for lang, text in matches}
+            return lang_dict.get(session['language'], description)
+
+
         description = description.split('##German')
         if len(description) > 1:
             lang_dict = {
                 'en': description[0],
                 'de': description[1]}
-            description = lang_dict[session['language']]
+            description = lang_dict.get(session['language'], description[0]) #fallback
         return description
 
     @staticmethod
