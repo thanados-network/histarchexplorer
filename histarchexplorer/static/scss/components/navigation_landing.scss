@@ -2,7 +2,6 @@
 
 /* Sidebar toggle in Navbar */
 #toggleSidebar {
-  color: black;
   background: none;
   border: none;
   padding-left: 1rem;
@@ -15,25 +14,38 @@
 /* Sidebar */
 :root {
   --sidebar-width: 70px; /* Initial width */
+  --right-sidebar-width: 0px;
 }
 
 #nav-sidebar {
   width: var(--sidebar-width);
   transition: width 0.3s ease;
   color: var(--nav-sidebar);
-
+  height: calc(100vh - var(--navbar-height));
 
   /* Sticky for larger screens */
   @media (min-width: 765px) {
-    position: sticky;
-    top: var(--navbar-height);
-    height: calc(100vh - var(--navbar-height));
     overflow-y: auto;
+    top: var(--navbar-height);
   }
+}
+
+#right-sidebar {
+  position: absolute;
+  right: 0;
+  width: var(--right-sidebar-width);
+  transition: width 0.3s ease;
+  height: calc(100vh - var(--navbar-height));
+  overflow-y: auto;
 }
 
 #nav-sidebar.expanded {
   width: 150px;
+  overflow-x: hidden;
+}
+
+#right-sidebar.right-expanded {
+  width: 600px;
   overflow-x: hidden;
 }
 
@@ -60,10 +72,30 @@
   justify-content: flex-start;
 }
 
+@media (max-width: 1199px) {
+  #right-sidebar {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    --right-sidebar-width: 0;
+    top: var(--navbar-height);
+    right: 0;
+    width: 0;
+    height: calc(100vh - var(--navbar-height));
+    z-index: 200000;
+    transition: width 0.3s ease;
+  }
+
+  #right-sidebar.right-expanded {
+    width: calc(100vw - var(--sidebar-width));
+    overflow-x: hidden;
+    transform: translateX(0);
+  }
+}
 
 @media (max-width: 765px) {
   #nav-sidebar {
-    position: fixed;
+    --sidebar-width: 0;
     top: var(--navbar-height);
     left: 0;
     width: 0;
@@ -80,7 +112,13 @@
     overflow-x: hidden;
     transform: translateX(0);
   }
+
+  #right-sidebar.right-expanded {
+    width: 100vw;
+  }
 }
+
+
 
 /* Sidebar icon, link style grey */
 .nav-link {

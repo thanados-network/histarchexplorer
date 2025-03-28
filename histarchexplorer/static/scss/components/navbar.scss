@@ -1,16 +1,22 @@
 $navbar-height: 80px;
 
+.nopointer {
+  cursor: default !important;
+}
+
 .navbar-brand {
   height: $navbar-height;
   align-content: center;
   margin-left: 1.5rem;
   margin-right: 1.5rem;
+
   #logo {
     max-width: 260px;
   }
-@media (max-width: 576px) {
-  margin-right: 0;
-  margin-left: 0;
+
+  @media (max-width: 576px) {
+    margin-right: 0;
+    margin-left: 0;
   }
 }
 
@@ -39,6 +45,14 @@ $navbar-height: 80px;
   }
 }
 
+main {
+  overflow: auto;
+  max-height: calc(100vh - var(--navbar-height));
+}
+
+body {
+  overflow: hidden;
+}
 
 
 

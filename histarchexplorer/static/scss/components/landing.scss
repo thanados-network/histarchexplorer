@@ -267,37 +267,7 @@
 }
 
 
-//Sidebar
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  background-color: var(--card-bg);
-  height: calc(100vh - var(--navbar-height));
-  color: black;
-  text-align: center;
 
-  @media (max-width: 766px) {
-    position: static;
-    height: max-content;
-    overflow-y: visible;
-  }
-
-}
-
-.sidebar-content {
-  height: calc(100vh - var(--navbar-height));
-  padding: 1rem;
-  align-items: center;
-
-  @media (max-width: 766px) {
-    position: static;
-    height: max-content;
-    overflow-y: visible;
-  }
-}
 
 .super-entity {
   font-weight: lighter;

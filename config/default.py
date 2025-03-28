@@ -18,6 +18,7 @@ REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
 API_URL = 'https://thanados.openatlas.eu/api/'
+#API_URL = 'https://demo-dev.openatlas.eu/api/'
 API_PROXY = ''
 OPENATLAS_CASE_STUDY_IDS: list[int] = []
 
@@ -80,3 +81,8 @@ SIDEBAR_ICONS = {
     'bi bi-geo-yelp': [13362],
     # 'bi bi-person-arms-up': [218963, 213216, 119444, 119334], # Anthroplogy
 }}
+
+SIDEBAR_OPTIONS = [
+    {'icon':'bi bi-info-circle', 'route':'overview', 'order': 1},
+    {'icon':'bi bi-map', 'route':'map', 'order': 2},
+]

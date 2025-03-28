@@ -1,0 +1,12 @@
+{# load js libraries and or css #}
+<link href="../../static/node_modules/mycoollibrary/library.css" rel="stylesheet"/>
+<script src="../../static/node_modules/mycoollibrary/library.js"></script>
+
+{# get data from the template rendering into js #}
+<script> const templateData = '{{ templateDataFromGetEntityRoute }}'</script>
+
+{#  html content goes here #}
+<div id="template-content"></div>
+
+{# here come your js scripts to be executed after the above #}
+<script src="../../static/js/template.js"></script>
