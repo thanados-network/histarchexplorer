@@ -147,6 +147,11 @@ def entity(id_: int, tab_name="overview") -> str:
 @app.route('/getentity/<int:id_>/<tab_name>')
 def getentity(id_: int, tab_name=None) -> str:
     data = {}
+    entities = Entity.get_linked_entities_by_properties_recursive(
+        id_,
+        get_parser_for_getentity(id_)
+    )
+    main_entity = get_main_entity(id_, entities)
 
     def get_entity():
         entity = Entity.get_entity(id_, Parser())
@@ -214,6 +219,7 @@ def getentity(id_: int, tab_name=None) -> str:
     elif tab_name == 'overview':
         data=get_entity()
         entity_object = get_entity_object()
+        #ancestor_entities = get_ancestor_entities()
     elif tab_name not in valid_routes:
         if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
@@ -222,5 +228,87 @@ def getentity(id_: int, tab_name=None) -> str:
     return render_template(
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
-        bla=entity_object,
+        entity=entity_object,
         features=features)
+
+def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
+    for entity in entities:
+        if entity.id == id_:
+            return entity
+    raise ValueError(f"Entity with id {id_} not found.")
+
+
+def get_related_entities(
+        main_entity: Entity,
+        entities: list[Entity]) -> dict[str, dict[str, list[Entity]]]:
+    related_entities: dict[str, Any] = defaultdict(lambda: defaultdict(list))
+    for subunit in entities:
+        if subunit.id == main_entity.id:
+            continue
+        match subunit.system_class:
+            case 'Group' | 'Person':
+                related_entities[subunit.system_class][subunit.name].append(
+                    subunit)
+            case _:
+                if not subunit.types:
+                    continue
+                for type_ in subunit.types:
+                    label = type_.type_hierarchy[0]['label']
+                    if label in app.config['STANDARD_TYPES']:
+                        related_entities[label][type_.label].append(subunit)
+    return related_entities
+    #print(related_entities.keys())
+
+
+def get_ancestor_entities(
+        main_entity: Entity,
+        entities: list[Entity]) -> list[Entity]:
+    ancestor_entities = []
+    current_entity = main_entity
+
+    while current_entity:
+        # If there is a parent, get the actual entity it points to
+        if current_entity.parent:
+            parent_entity = next(
+                (entity for entity in entities if
+                 entity.id == current_entity.parent.relation_to_id),
+                None
+            )
+            if parent_entity:
+                ancestor_entities.append(parent_entity)
+                current_entity = parent_entity  # Move up to the next level
+                # in hierarchy
+            else:
+                break  # Exit if no parent entity
+        else:
+            break
+    ancestor_entities.reverse()
+    return ancestor_entities
+
+def get_parser_for_getentity(id_: int) -> Parser:
+    simple_entity = Entity.get_entity(id_, Parser(show=['None']))
+    match simple_entity.system_class:
+        case 'Place' | 'Feature' | 'Stratigraphic unit':
+            properties = ['P46', 'P67']
+        case 'Human remains' | 'Artifact':
+            properties = ['P46', 'P67', 'P52']
+        case 'Source' | 'Source translation':
+            properties = ['P67', 'P73', 'P128']
+        case 'Event' | 'Acquisition' | 'Activity' | 'Creation' | 'Move' | \
+             'Production' | 'Modification':
+            properties = [
+                'P67', 'P11', 'P14', 'P22', 'P23', 'P25', 'P7',
+                'P26', 'P27', 'P24', 'P31', 'P25', 'P108', 'P9',
+                'P134']
+        case 'Bibliography' | 'Edition' | 'External reference':
+            properties = ['P67']
+        case 'Group' | 'Person':
+            properties = [
+                'OA7', 'OA8', 'OA9', 'P107', 'P74', 'P52', 'P11',
+                'P14', 'P22', 'P23', 'P25']
+        case _:
+            properties = []
+    return Parser(
+        properties=properties,
+        limit=0,
+        format='lpx')
