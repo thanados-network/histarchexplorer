@@ -27,36 +27,43 @@ def index() -> str:
 import requests
 from flask import render_template, request
 
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     results = []
     query = ''
+    category = 'all'
 
     if request.method == 'POST':
         query = request.form.get('query', '').strip()
-        if query:
-            # Update the URL to search across multiple system classes
-            url = f"https://thanados.openatlas.eu/api/search/all/{query}"  # Change from 'place' to 'all'
-            print(f"📡 Requesting: {url}")
-            try:
-                response = requests.get(url, timeout=10)
-                response.raise_for_status()
-                data = response.json()
-                results = data.get("results", [])
+        category = request.form.get('category', 'all').strip()
 
-                print("🧪 RAW API RESPONSE:")
-                print(results)
+        if category in app.config['VIEW_CLASSES']:
+            system_class = app.config['VIEW_CLASSES'][category][0]
+        else:
+            system_class = "all"
 
-                if not isinstance(results, list):
-                    print("⚠️ Unexpected format")
-                    results = []
-                else:
-                    print(f"✅ Found {len(results)} result(s)")
+        url = f"https://thanados.openatlas.eu/api/search/{system_class}/{query}"
+        print(f"📡 Requesting: {url}")
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            results = data.get("results", [])
+            if not isinstance(results, list):
+                results = []
+            print(f"✅ Found {len(results)} result(s)")
+        except Exception as e:
+            print(f"❌ Search failed: {e}")
 
-            except Exception as e:
-                print(f"❌ Search failed: {e}")
+    return render_template(
+        'search.html',
 
-    return render_template('search.html', results=results or [], query=query)
+        results=results,
+        query=query,
+        category=category)
+
+
 
 @app.route('/search_result/<int:entity_id>')
 def search_result_detail(entity_id: int):
@@ -91,14 +98,30 @@ def elias() -> str:
 from flask import jsonify, request
 import requests
 
+
 @app.route('/search_live')
 def search_live():
     query = request.args.get('q', '').strip()
-    if len(query) < 3:
-        return jsonify([])  # Return empty list for short queries
+    category = request.args.get('category', 'all').strip()
 
-    # Use "all" instead of "place" to search across everything
-    api_url = f"https://thanados.openatlas.eu/api/search/all/{query}"
+    if len(query) < 3:
+        return jsonify([])
+
+    VIEW_CLASSES = {
+        'actors': ('person', 'group'),
+        'items': ('artifact', 'human_remains'),
+        'events': ('acquisition', 'event', 'activity', 'creation', 'move',
+                   'production', 'modification'),
+        'places': ('place', 'stratigraphic_unit', 'feature'),
+        'sources': ('source', 'bibliography', 'external_reference', 'edition'),
+        'files': ('file',)
+    }
+    if category in app.config['VIEW_CLASSES']:
+        system_class = app.config['VIEW_CLASSES'][category][0]
+    else:
+        system_class = "all"
+
+    api_url = f"https://thanados.openatlas.eu/api/search/{system_class}/{query}"
     print(f"📡 LIVE Requesting: {api_url}")
     try:
         response = requests.get(api_url, timeout=10)
@@ -110,5 +133,6 @@ def search_live():
         print(f"✅ LIVE Found {len(results)} result(s)")
         return jsonify(results)
     except Exception as e:
-        print(f"❌ Live search failed: {e}")
+        print(f"❌ Live search error: {e}")
         return jsonify([]), 500
+
