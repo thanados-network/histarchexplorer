@@ -12291,8 +12291,9 @@ textarea.form-control-lg {
   font-size: 3.5rem;
 }
 
-.grid {
+.grid-overview {
   position: relative;
+  background: none;
 }
 
 .item.muuri-item-dragging {
