@@ -12293,7 +12293,7 @@ textarea.form-control-lg {
 
 .grid-overview {
   position: relative;
-  background: none;
+  height: calc(100vh - var(--navbar-height));
 }
 
 .item.muuri-item-dragging {

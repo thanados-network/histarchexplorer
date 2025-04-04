@@ -3,7 +3,7 @@
 //Muuri-general
 .grid-overview {
   position: relative;
-  background: none;
+  top: var(--navbar-height);
 }
 
 .item.muuri-item-dragging {
