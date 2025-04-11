@@ -1,4 +1,4 @@
-var map = L.map('muuri-map', {
+var overview_map = L.map('muuri-map', {
     center: [51.505, -0.09],
     zoom: 13,
     zoomControl: false,
@@ -11,16 +11,16 @@ var map = L.map('muuri-map', {
 
 document.getElementById('muuri-map').removeAttribute('tabindex');
 
-L.control.scale().addTo(map);
+L.control.scale().addTo(overview_map);
 
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+}).addTo(overview_map);
 
 if (gisData) {
-    L.geoJSON(gisData).addTo(map);
-    map.fitBounds(L.geoJSON(gisData).getBounds(), {
+    L.geoJSON(gisData).addTo(overview_map);
+    overview_map.fitBounds(L.geoJSON(gisData).getBounds(), {
         maxZoom: 13
     });
     var entityGeom = L.geoJSON(gisData, {
@@ -28,7 +28,7 @@ if (gisData) {
             console.log(feature)
             layer.bindPopup('<b>' + entityName + '</b><p><b>' + feature.title + '</b> ' + feature.description + '</p>');
         }
-    }).addTo(map);
+    }).addTo(overview_map);
 }
 
 // Expand Map
@@ -54,31 +54,31 @@ expandButton.addEventListener('click', event => {
         if (muuriMap.classList.contains('expanded-map')) {
             expandButton.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
             //Enable map zoom etc
-            map.scrollWheelZoom.enable();
-            map.doubleClickZoom.enable();
-            map.touchZoom.enable();
-            map.boxZoom.enable();
-            map.dragging.enable();
+            overview_map.scrollWheelZoom.enable();
+            overview_map.doubleClickZoom.enable();
+            overview_map.touchZoom.enable();
+            overview_map.boxZoom.enable();
+            overview_map.dragging.enable();
 
         } else {
             expandButton.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';
 
-            map.scrollWheelZoom.disable();
-            map.doubleClickZoom.disable();
-            map.touchZoom.disable();
-            map.boxZoom.disable();
-            map.dragging.disable();
+            overview_map.scrollWheelZoom.disable();
+            overview_map.doubleClickZoom.disable();
+            overview_map.touchZoom.disable();
+            overview_map.boxZoom.disable();
+            overview_map.dragging.disable();
 
             //Recenter when returning to small layout
             if (gisData) {
-                map.fitBounds(L.geoJSON(gisData).getBounds(), {
+                overview_map.fitBounds(L.geoJSON(gisData).getBounds(), {
                     maxZoom: 13
                 });
             }
         }
 
         // adjust for new size
-        map.invalidateSize();
+        overview_map.invalidateSize();
         grid.refreshItems().layout();
     }, 300);
 

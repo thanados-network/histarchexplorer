@@ -121,6 +121,21 @@ document.getElementById("overview-content").innerHTML =
     </div>
   </div>
 ` : ''}
+       
+       ${entity.geometry ? `
+  <div class="item">
+    <div class="map-wrapper">
+      <div class="item-content item-content-full">
+        <div class="location">
+          <div id="muuri-map"></div>
+          <button id="expand-button" class="btn btn-light btn-sm">
+            <i class="bi bi-arrows-fullscreen"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+` : ''}
 
        <div class="item item-half">
        <h1>3</h1>
@@ -135,8 +150,43 @@ document.getElementById("overview-content").innerHTML =
 
 `;
 
+document.addEventListener("DOMContentLoaded", function () {
+  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+  [...popoverTriggerList].forEach(el => new bootstrap.Popover(el, {
+    html: true,
+    sanitize: false
+  }));
+});
 
 
+// Muuri after html injection
+
+setTimeout(() => {
+  const gridElement = document.querySelector('.grid-muuri');
+  if (gridElement) {
+    const grid = new Muuri('.grid-muuri', {
+      layoutOnResize: true
+    });
+
+    window.addEventListener('resize', () => {
+      grid.refreshItems().layout();
+    });
+  }
 
 
+  const mapContainer = document.getElementById('muuri-map');
+  if (mapContainer && typeof L !== 'undefined' && gisData) {
+    const map = L.map('muuri-map').setView(
+      [gisData.coordinates[1], gisData.coordinates[0]], 13
+    );
 
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+    }).addTo(map);
+
+    L.marker([gisData.coordinates[1], gisData.coordinates[0]]).addTo(map)
+      .bindPopup(entityName)
+      .openPopup();
+  }
+
+}, 100);
