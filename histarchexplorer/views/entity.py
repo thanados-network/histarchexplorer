@@ -5,7 +5,6 @@ from flask import render_template, abort, jsonify, g
 
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.models.entity import Entity
-from histarchexplorer.views.landing import landing, categorized_types #was soll das tun? tut das was?
 from histarchexplorer.models.types import Types
 from collections import defaultdict
 
@@ -149,18 +148,23 @@ def entity(id_: int, tab_name="overview") -> str:
 @app.route('/getentity/<int:id_>/<tab_name>')
 def getentity(id_: int, tab_name=None) -> str:
     data = {}
-    entities = Entity.get_linked_entities_by_properties_recursive(
-        id_,
-        get_parser_for_getentity(id_)
-    )
-    main_entity = get_main_entity(id_, entities)
+    # entities = Entity.get_linked_entities_by_properties_recursive(
+    #     id_,
+    #     get_parser_for_getentity(id_)
+    # )
+    # main_entity = get_main_entity(id_, entities)
 
     def get_entity():
-        entity = Entity.get_entity(id_, Parser())
-        return {'entity': json.dumps(entity.to_serializable(), ensure_ascii=False, indent=4)}
-
-    def get_entity_object():
-        return Entity.get_entity(id_, Parser())
+        entity_ = Entity.get_entity(id_, Parser())
+        return {
+            'entity': json.dumps(
+                entity_.to_serializable(),
+                ensure_ascii=False,
+                indent=4),
+            'categorized_types': json.dumps(
+                categorized_types(entity_),
+                ensure_ascii=False,
+                indent=4)}
 
     def get_map_data():
         geom_there = check_p46_geoms(id_)
@@ -220,19 +224,16 @@ def getentity(id_: int, tab_name=None) -> str:
         data['spatial'] = map_data
     elif tab_name == 'overview':
         data=get_entity()
-        entity_object = get_entity_object()
+        #entity_object = get_entity_object()
         #ancestor_entities = get_ancestor_entities()
     elif tab_name not in valid_routes:
         if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
             abort(404)
-
     return render_template(
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
-        entity=entity_object,
-        features=features,
-        categorized_types=categorized_types(main_entity))
+        features=features)
 
 def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
     for entity in entities:
@@ -266,15 +267,14 @@ def get_ancestor_entities(main_entity: Entity, entities: list[Entity]) -> list[d
     ancestor_entities.reverse()
     return ancestor_entities
 
-
 def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
     divisions = defaultdict(list)
     for type_ in main_entity.types:
-        divisions[type_.division['label']].append({
-            'type': type_, 'icon': type_.division['icon']})
+        divisions[type_.division['label'].replace(' ', '_')].append({
+            'type': type_.to_serializable(), 'icon': type_.division['icon']})
     sorted_divisions = dict(sorted(
         divisions.items(),
-        key=lambda x: (x[0] == x[0] == 'case study', 'other',  x[0])
+        key=lambda x: (x[0] == x[0] == 'case_study', 'other',  x[0])
     ))
 
     return sorted_divisions

@@ -27,6 +27,8 @@ function getEntityIcon(entity) {
 }
 
 
+console.log('categorized_types:', categorized_types);
+
 document.getElementById("overview-content").innerHTML =
     `
      <div class="col flex-column grid-muuri">
@@ -97,12 +99,12 @@ document.getElementById("overview-content").innerHTML =
         </div>
        </div>
        
-       ${entity.categorized_types ? `
+       ${categorized_types ? `
   <div class="item-half">
     <div class="item-content">
       <span class="tile-label">ATTRIBUTES</span>
       <div class="categorized-types">
-        ${Object.entries(entity.categorized_types).map(([label, value]) => `
+        ${Object.entries(categorized_types).map(([label, value]) => `
           <p class="tile-sub-label text-uppercase mt-3">
             ${value[0].icon} ${label}
           </p>
