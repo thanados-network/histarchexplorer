@@ -192,3 +192,10 @@ setTimeout(() => {
   }
 
 }, 100);
+
+
+const expandButton = document.getElementById('expand-button');
+const tabName = 'map';
+expandButton.addEventListener('click', event => {
+    window.location.href = `/entity/${entityId}/${tabName}`;
+});
