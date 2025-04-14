@@ -194,8 +194,21 @@ setTimeout(() => {
 }, 100);
 
 
+function activateTab(tabName, skipPushState = false) {
+    const tabElement = document.querySelector(`#tab-${tabName}`);
+    if (tabElement) {
+        new bootstrap.Tab(tabElement).show();
+        if (!skipPushState) {
+            const newUrl = `/entity/${entityId}/${tabName}`;
+            if (window.location.pathname !== newUrl) {
+                history.pushState({tab: tabName}, '', newUrl);
+            }
+        }
+    }
+}
+
 const expandButton = document.getElementById('expand-button');
 const tabName = 'map';
 expandButton.addEventListener('click', event => {
-    window.location.href = `/entity/${entityId}/${tabName}`;
+    window.activateTab('map');
 });
