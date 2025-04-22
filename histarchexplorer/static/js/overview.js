@@ -1,4 +1,3 @@
-
 const systemClassMap = {
     'place': 'places',
     'feature': 'places',
@@ -153,43 +152,92 @@ document.getElementById("overview-content").innerHTML =
 `;
 
 document.addEventListener("DOMContentLoaded", function () {
-  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-  [...popoverTriggerList].forEach(el => new bootstrap.Popover(el, {
-    html: true,
-    sanitize: false
-  }));
+    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+    [...popoverTriggerList].forEach(el => new bootstrap.Popover(el, {
+        html: true,
+        sanitize: false
+    }));
 });
 
 
 // Muuri after html injection
+function initializeMuuri() {
+    const gridElement = document.querySelector('.grid-muuri');
+    if (!gridElement) return;
 
-setTimeout(() => {
-  const gridElement = document.querySelector('.grid-muuri');
-  if (gridElement) {
-    const grid = new Muuri('.grid-muuri', {
-      layoutOnResize: true
+    const grid = new Muuri(gridElement, {
+        layoutOnResize: true,
     });
 
-    window.addEventListener('resize', () => {
-      grid.refreshItems().layout();
+    window.muuriGrid = grid;
+
+    const container = gridElement.parentElement;
+
+    const resizeObserver = new ResizeObserver(() => {
+        forceMuuriLayout();
     });
-  }
+
+    if (container) {
+        resizeObserver.observe(container);
+    }
+
+    window.addEventListener('resize', forceMuuriLayout);
+}
+
+function forceMuuriLayout() {
+    if (window.muuriGrid) {
+        window.muuriGrid.synchronize();
+        window.muuriGrid.refreshItems();
+        window.muuriGrid.layout(true);
+    }
+}
+
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        forceMuuriLayout();
+    }, 300);
+});
+
+window.requestAnimationFrame(() => {
+    initializeMuuri();
+
+    function reLayoutMuuri() {
+  setTimeout(() => {
+    const gridEl = document.querySelector('.grid-muuri');
+    const gridInstance = gridEl?._gridInstance;
+    if (gridInstance) {
+      gridInstance.refreshItems().layout();
+    }
+  }, 300); // Allow CSS transitions to finish
+}
+
+const sidebarToggleBtn = document.querySelector('#toggleSidebar');
+    if (sidebarToggleBtn) {
+        sidebarToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('sidebar-collapsed');
+            reLayoutMuuri();
+        });
+    }
 
 
-  const mapContainer = document.getElementById('muuri-map');
-  if (mapContainer && typeof L !== 'undefined' && gisData) {
-    const map = L.map('muuri-map').setView(
-      [gisData.coordinates[1], gisData.coordinates[0]], 13
-    );
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-    }).addTo(map);
 
-    L.marker([gisData.coordinates[1], gisData.coordinates[0]]).addTo(map)
-      .bindPopup(entityName)
-      .openPopup();
-  }
+    const mapContainer = document.getElementById('muuri-map');
+    if (mapContainer && typeof L !== 'undefined' && gisData) {
+        const map = L.map('muuri-map').setView(
+            [gisData.coordinates[1], gisData.coordinates[0]], 13
+        );
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        L.marker([gisData.coordinates[1], gisData.coordinates[0]]).addTo(map)
+            .bindPopup(entityName)
+            .openPopup();
+    }
 
 }, 100);
 

@@ -12292,6 +12292,7 @@ textarea.form-control-lg {
 }
 
 .grid-muuri {
+  width: 100%;
   position: relative;
 }
 
@@ -12315,7 +12316,7 @@ textarea.form-control-lg {
   display: block;
   margin: 5px;
   position: absolute;
-  width: calc((100vw - 45px - var(--sidebar-width)) / 3);
+  width: calc((100% - 45px) / 3);
   background: var(--muuri-tile);
   overflow: hidden;
   border-radius: 7.5px;
@@ -12323,7 +12324,7 @@ textarea.form-control-lg {
 
 @media (max-width: 992px) {
   .item {
-    width: calc((100vw - 40px - var(--sidebar-width)) / 2);
+    width: calc((100% - 40px) / 2);
   }
 }
 @media (max-width: 766px) {
@@ -12582,7 +12583,6 @@ textarea.form-control-lg {
 }
 
 .main-content {
-  margin-left: 16.6667%;
   overflow-y: auto;
 }
 @media (max-width: 766px) {
