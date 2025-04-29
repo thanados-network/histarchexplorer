@@ -164,7 +164,8 @@ def getentity(id_: int, tab_name=None) -> str:
             'categorized_types': json.dumps(
                 categorized_types(entity_),
                 ensure_ascii=False,
-                indent=4)}
+                indent=4)
+        }
 
     def get_map_data():
         geom_there = check_p46_geoms(id_)
@@ -177,20 +178,29 @@ def getentity(id_: int, tab_name=None) -> str:
             for ent in entities:
                 property = {'id': ent.id, 'label': ent.name, 'class': ent.system_class}
                 if ent.id == first_geom and ent.system_class != 'Place':
-                    property = {'id': ent.id, 'label': ent.name, 'class': ent.system_class, 'main': True}
-
-                if ent.system_class in ['Feature', 'Place', 'Stratigraphic unit', 'Human remains',
-                                        'Artifact'] and ent.geometry:
+                    property['main'] = True
+                if ent.system_class in ['Feature', 'Place', 'Stratigraphic unit', 'Human remains', 'Artifact'] and ent.geometry:
                     features['features'].append({
                         'type': 'Feature',
                         'geometry': ent.geometry,
                         'properties': property,
                     })
             return features
-        else:
-            return {'type': 'FeatureCollection', 'features': []}
+        return {'type': 'FeatureCollection', 'features': []}
+
+    def serialize_image(image):
+        return {
+            "url": image.url,
+            "title": image.title,
+            "iiif_base_path": image.iiif_base_path
+        }
 
     features = []
+    main_image = None
+    initial_images = []
+    more_images = False
+    total_images = 0
+
     if tab_name == 'feature':
         entities = Entity.get_linked_entities_by_properties_recursive(
             id_, Parser(
@@ -203,37 +213,60 @@ def getentity(id_: int, tab_name=None) -> str:
                     "entitySystemClass": [{
                         "logicalOperator": "and",
                         "operator": "notEqual",
-                        "values": ["place"]}]})]))
+                        "values": ["place"]}]})]
+            )
+        )
         features = entities
 
-    if tab_name == 'features':
-        entities = Entity.get_entity(
+    elif tab_name == 'features':
+        features = Entity.get_entity(
             id_, Parser(
-                show=['when', 'types', 'names', 'depictions', 'description', 'relations']))
-        features = entities
+                show=['when', 'types', 'names', 'depictions', 'description', 'relations']
+            )
+        )
 
-    def get_file_data():
-        file_data = {}
-        return file_data
-    entity_object = None
-    if tab_name == 'map':
+    elif tab_name == 'map':
         map_data = get_map_data()
         if not map_data['features']:
             print('No spatial features found. Aborting with 404.')
             abort(404)
         data['spatial'] = map_data
+
     elif tab_name == 'overview':
-        data=get_entity()
-        #entity_object = get_entity_object()
-        #ancestor_entities = get_ancestor_entities()
+        data = get_entity()
+        entity_obj = Entity.get_entity(id_, Parser(show=['depictions']))
+        images = []
+
+        for image in entity_obj.depictions:
+            if image.main_image:
+                main_image = serialize_image(image)
+            else:
+                images.append(serialize_image(image))
+
+        if not main_image and images:
+            main_image = images.pop(0)
+
+        initial_images = images[:3]
+        more_images = len(images) > 3
+        total_images = len(images)
+
     elif tab_name not in valid_routes:
         if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
             abort(404)
+
     return render_template(
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
-        features=features)
+        features=features,
+        main_image=main_image,
+        initial_images=initial_images,
+        more_images=more_images,
+        total_images=total_images
+    )
+
+
+
 
 def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
     for entity in entities:
@@ -278,6 +311,8 @@ def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
     ))
 
     return sorted_divisions
+
+
 
 def get_parser_for_getentity(id_: int) -> Parser:
     simple_entity = Entity.get_entity(id_, Parser(show=['None']))

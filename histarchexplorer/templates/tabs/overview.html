@@ -13,6 +13,11 @@
 <script>
   console.log("Data:", {{ data | tojson | safe }});
 </script>
+ <script>
+  const main_image = {{ main_image | tojson | safe }};
+  const initial_images = {{ initial_images | tojson | safe }};
+  const more_images = {{ more_images | tojson | safe }};
+</script>
 
 
 <div id="overview-content"></div>

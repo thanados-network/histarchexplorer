@@ -127,6 +127,22 @@ document.getElementById("overview-content").innerHTML =
     </div>
   </div>
 ` : ''}
+       
+       ${main_image && !['actor', 'person'].includes(entity.system_class.toLowerCase()) ? `
+  <div class="item">
+    <div class="item-content item-content-full">
+      <div class="muuri-images">
+        <div class="image">
+          ${main_image.iiif_base_path ? `
+            <img src="${main_image.iiif_base_path}/full/max/0/default.jpg" alt="${main_image.title}" />
+          ` : `
+            <img src="${main_image.url}" alt="${main_image.title}" />
+          `}
+        </div>
+      </div>
+    </div>
+  </div>
+` : ''}
 
        <div class="item item-half">
        <h1>3</h1>
