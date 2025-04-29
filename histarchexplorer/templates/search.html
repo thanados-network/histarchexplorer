@@ -166,54 +166,53 @@
           display: block;
       }
 
-      #static-result-list li:hover {
-          background-color: #f0f0f0;
-          cursor: pointer;
-      }
-
-      #static-result-list li:hover {
-          background-color: #f0f0f0;
-          cursor: default; /* Normal cursor for the whole list item */
-      }
-
-      /* Make only the anchor clickable */
-      #static-result-list li a {
-          cursor: pointer; /* Only the anchor (clickable text) will have the pointer cursor */
-      }
-
-      /* Optional: Ensure the background color is applied on hover */
+      /* Default styles for the list items */
       #static-result-list li {
-          background-color: #f0f0f0; /* Optional, if you want the same hover effect for normal state */
-      }
-
-      #static-result-list li {
-          background-color: transparent; /* Ensures no gray background by default */
-          cursor: default; /* Normal cursor by default */
-      }
-
-      /* Apply background color and pointer cursor only when hovering */
-      #static-result-list li:hover {
-          background-color: #f0f0f0; /* Gray background on hover */
-      }
-
-      #static-result-list li a {
-          cursor: pointer; /* Pointer cursor only on the anchor (clickable text) */
-      }
-
-      /* Keep the background color default for live search results */
-      #live-results div {
           background-color: transparent; /* No gray background by default */
-          cursor: default; /* Normal cursor by default */
+          cursor: pointer; /* Make the entire list item look clickable */
       }
 
-      /* Apply background color and pointer cursor only when hovering */
-      #live-results div:hover {
+      /* Apply background color when hovering over the result */
+      #static-result-list li:hover {
           background-color: #f0f0f0; /* Gray background on hover */
       }
 
-      #live-results div a {
-          cursor: pointer; /* Pointer cursor only on the anchor (clickable text) */
+      /* Ensure the anchor tag takes up the full space of the list item */
+      #static-result-list li a {
+          display: block; /* Make the anchor a block-level element */
+          text-decoration: none; /* Remove the underline */
+          color: inherit; /* Inherit the text color */
       }
+
+      /* Optional: Ensure the cursor remains a pointer on hover */
+      #static-result-list li a:hover {
+          cursor: pointer; /* Pointer cursor only when hovering over the text */
+      }
+
+
+      /* Default styles for the live result items */
+#live-results div {
+    background-color: transparent; /* No gray background by default */
+    cursor: pointer; /* Make the entire div look clickable */
+}
+
+/* Apply background color when hovering over the live result */
+#live-results div:hover {
+    background-color: #f0f0f0; /* Gray background on hover */
+}
+
+/* Ensure the anchor tag takes up the full space of the div */
+#live-results a {
+    display: block; /* Make the anchor a block-level element */
+    text-decoration: none; /* Remove the underline */
+    color: inherit; /* Inherit the text color */
+}
+
+/* Optional: Ensure the cursor remains a pointer on hover */
+#live-results a:hover {
+    cursor: pointer; /* Pointer cursor when hovering over the anchor */
+}
+
 
       /* Ensure our container and wrappers allow free expansion */
       .relative-wrapper,
@@ -263,14 +262,15 @@
                   const li = document.createElement('li');
                   li.classList.add('mb-2');
                   li.innerHTML = `
-            <strong>
-              <a href="/entity/${result.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
-                ${result.name || 'Unnamed'}
-              </a>
-              (${result.system_class})
-            </strong><br>
-            ${result.description ? result.description.slice(0, 300) + '<br>' : ''}
-          `;
+    <a href="/entity/${result.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
+        <strong>
+          ${result.name || 'Unnamed'}
+        </strong>
+        (${result.system_class})
+        <br>
+        ${result.description ? result.description.slice(0, 300) + '<br>' : ''}
+    </a>
+`;
                   staticResultList.appendChild(li);
               }
               currentIndex += count;
@@ -332,15 +332,16 @@
                           liveResultsBox.innerHTML = `<p style="padding:8px; color:orange;">No live results found for "${query}".</p>`;
                       } else {
                           liveResultsBox.innerHTML = liveResults.map(r => `
-                <div class="p-2">
-                  <strong>
-                    <a href="/entity/${r.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
-                      ${r.name || 'Unnamed'}
-                    </a>
-                  </strong><br>
-                  <small>${r.description ? r.description.slice(0, 150) + '…' : ''}</small>
-                </div>
-              `).join('');
+    <a href="/entity/${r.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
+        <div class="p-2">
+            <strong>
+              ${r.name || 'Unnamed'}
+            </strong><br>
+            <small>${r.description ? r.description.slice(0, 150) + '…' : ''}</small>
+        </div>
+    </a>
+`).join('');
+
                       }
                   } catch (err) {
                       console.error("Live search error:", err);
