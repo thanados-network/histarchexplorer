@@ -143,6 +143,25 @@ document.getElementById("overview-content").innerHTML =
     </div>
   </div>
 ` : ''}
+       
+       ${images && images.length ? `
+  ${images.map((depiction, index) => !depiction.main_image ? `
+    <div class="${index < 3 ? 'item-half' : 'item'}">
+      <div class="item-content item-content-full">
+        <div class="image">
+          <a href="/view_file/${depiction.id_}">
+            <img
+              src="${depiction.iiif_base_path 
+                      ? `${depiction.iiif_base_path}/full/max/0/default.jpg` 
+                      : depiction.url}"
+              alt="${depiction.title}"
+            />
+          </a>
+        </div>
+      </div>
+    </div>
+  ` : '').join('')}
+` : ''}
 
        <div class="item item-half">
        <h1>3</h1>
