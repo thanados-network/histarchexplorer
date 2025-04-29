@@ -5,8 +5,8 @@
 
 
 .entity-content {
-  background-color: #a3baae;
-  max-height: calc(100vh - var(--navbar-height));
+  //background-color: #2fa769;
+  height: calc(100vh - var(--navbar-height));
   overflow-y: auto;
   width: calc(100vw - var(--sidebar-width));
   @media (max-width: 764px) {

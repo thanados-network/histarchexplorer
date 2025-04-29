@@ -37,8 +37,8 @@
 
 
             <!-- Main content area - MUURI Tiles -->
-            <div class="col flex-column grid">
-                <div class="entity-content bg-body-tertiary">
+            <div class="col flex-column">
+                <div class="entity-content">
                     {% for item in sidebar_elements %}
                         <div class="tab-pane fade d-none to-remove-{{ item.route }} {{ 'show active' if active_tab == item.route else '' }}"
                              id="tab-pane-{{ item.route }}" role="tabpanel" aria-labelledby="tab-{{ loop.index }}">

@@ -1,4 +1,3 @@
-
 const systemClassMap = {
     'place': 'places',
     'feature': 'places',
@@ -26,20 +25,15 @@ function getEntityIcon(entity) {
     }
 }
 
+
+console.log('categorized_types:', categorized_types);
+
 document.getElementById("overview-content").innerHTML =
     `
-<div><h1>TEST Blabla</h1></div>
-
- <div class="${entity.description_class}">
-    <div class="item-content">
-      <div class="muuri-description">
-        <span class="tile-label">DESCRIPTION</span>
-        <p>${entity.description}</p>
-      </div>
-    </div>
- </div>
-
- ${entity.ancestor_entities && entity.ancestor_entities.length > 0 ? `
+     <div class="col flex-column grid-muuri">
+      
+      <div class="item item-half hierarchy-item">
+       ${entity.ancestor_entities && entity.ancestor_entities.length > 0 ? `
         ${entity.ancestor_entities.map(ancestorEntity => `
             <div class="hierarchy-button">
                 <button type="button" class="btn btn-whitish rounded-5">
@@ -84,10 +78,146 @@ document.getElementById("overview-content").innerHTML =
             </button>
         </div>
     ` : ''}
+    </div>
+    
+      
+       <div class="${entity.description_class}">
+        <div class="item-content">
+          <div class="muuri-description">
+            <span class="tile-label">DESCRIPTION</span>
+            <p>${entity.description}</p>
+          </div>
+        </div>
+       </div>
+       
+       ${categorized_types ? `
+  <div class="item-half">
+    <div class="item-content">
+      <span class="tile-label">ATTRIBUTES</span>
+      <div class="categorized-types">
+        ${Object.entries(categorized_types).map(([label, value]) => `
+          <p class="tile-sub-label text-uppercase mt-3">
+            ${value[0].icon} ${label}
+          </p>
+          ${value.map(type => `
+            <div class="badge bg-dark-subtle text-wrap m-1">
+              <h6 class="m-0 text-center">
+                ${type.type.label}
+                ${type.type.value && type.type.unit ? `: ${type.type.value} ${type.type.unit}` : ''}
+              </h6>
+            </div>
+          `).join('')}
+        `).join('')}
+      </div>
+    </div>
+  </div>
+` : ''}
+       
+       ${entity.geometry ? `
+  <div class="item">
+    <div class="map-wrapper">
+      <div class="item-content item-content-full">
+        <div class="location">
+          <div id="muuri-map"></div>
+          <button id="expand-button" class="btn btn-light btn-sm">
+            <i class="bi bi-arrows-fullscreen"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+` : ''}
+
+       <div class="item item-half">
+       <h1>3</h1>
+       <p> Ja, was ist denn das?</p>
+       </div>
+       
+        <div class="item item-half">
+       <h1>4</h1>
+       <p> Ja, was ist denn das?</p>
+       </div>
+    </div>
+   
+       
+        <div class="item">
+        <h1>2</h1>
+        <p> 2. Muuri</p>
+       </div>
+
 `;
 
+document.addEventListener("DOMContentLoaded", function () {
+    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+    [...popoverTriggerList].forEach(el => new bootstrap.Popover(el, {
+        html: true,
+        sanitize: false
+    }));
+});
 
 
+// Muuri after html injection
+function initializeMuuri() {
+    const gridElement = document.querySelector('.grid-muuri');
+    if (!gridElement) return;
+
+    const grid = new Muuri(gridElement, { layoutOnResize: true });
+    window.muuriGrid = grid;
+
+    const container = gridElement.parentElement;
+    if (container) {
+        new ResizeObserver(forceMuuriLayout).observe(container);
+    }
+
+    window.addEventListener('resize', forceMuuriLayout);
+}
+
+function forceMuuriLayout() {
+    const grid = window.muuriGrid;
+    if (grid) {
+        grid.synchronize();
+        grid.refreshItems();
+        grid.layout(true);
+    }
+}
+
+window.requestAnimationFrame(() => {
+    initializeMuuri();
 
 
+    const mapContainer = document.getElementById('muuri-map');
+    if (mapContainer && typeof L !== 'undefined' && gisData) {
+        const map = L.map('muuri-map').setView(
+            [gisData.coordinates[1], gisData.coordinates[0]], 13
+        );
 
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        L.marker([gisData.coordinates[1], gisData.coordinates[0]]).addTo(map)
+            .bindPopup(entityName)
+            .openPopup();
+    }
+
+}, 100);
+
+
+function activateTab(tabName, skipPushState = false) {
+    const tabElement = document.querySelector(`#tab-${tabName}`);
+    if (tabElement) {
+        new bootstrap.Tab(tabElement).show();
+        if (!skipPushState) {
+            const newUrl = `/entity/${entityId}/${tabName}`;
+            if (window.location.pathname !== newUrl) {
+                history.pushState({tab: tabName}, '', newUrl);
+            }
+        }
+    }
+}
+
+const expandButton = document.getElementById('expand-button');
+const tabName = 'map';
+expandButton.addEventListener('click', event => {
+    window.activateTab('map');
+});

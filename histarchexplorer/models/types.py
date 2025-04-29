@@ -20,6 +20,19 @@ class Types:
     def __repr__(self) -> str:
         return str(self.__dict__)
 
+    def to_serializable(self: Any) -> Any:
+        if isinstance(self, list):
+            return [Types.to_serializable(item) for item in self]
+        elif hasattr(self, "__dict__"):
+            return {
+                key: Types.to_serializable(value)
+                for key, value in self.__dict__.items()}
+        elif isinstance(self, dict):
+            return {
+                key: Types.to_serializable(value)
+                for key, value in self.items()}
+        return self
+
     def get_icon(self) -> str:
         icon = g.sidebar_icons.get(int(self.id))
         if not icon:

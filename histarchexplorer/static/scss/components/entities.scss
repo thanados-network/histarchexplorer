@@ -1,5 +1,10 @@
 @use '../globals'as *;
 
+
+.content-container {
+  margin-top: var(--navbar-height);
+}
+
 .entity-cards {
   display: grid;
   grid-template-columns: 1fr;
@@ -123,13 +128,13 @@
     &__label {
       font-size: 2.5rem;
     }
-    }
+  }
 
-    @media (min-width: 1921px) {
+  @media (min-width: 1921px) {
     &__label {
       font-size: 1.4rem;
     }
-    }
+  }
 
 
   &--places {

@@ -47,7 +47,6 @@ $navbar-height: 80px;
 
 main {
   overflow: auto;
-  max-height: calc(100vh - var(--navbar-height));
 }
 
 body {

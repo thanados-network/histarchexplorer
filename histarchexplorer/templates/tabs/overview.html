@@ -1,4 +1,22 @@
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/gh/haltu/muuri@0.9.5/dist/muuri.min.js">
+</script>
+{#<script src="{{ url_for('static', filename='js/map_landing.js') }}"></script>#}
+
 <script> const entity = JSON.parse(JSON.parse({{ data|tojson }}).entity)</script>
+<script> const categorized_types = JSON.parse(JSON.parse({{ data|tojson }}).categorized_types)</script>
+<script> const gisData = entity.geometry ? entity.geometry : null</script>
+<script> const entityName = entity.name</script>
+<script>
+  console.log("Data:", {{ data | tojson | safe }});
+</script>
+
+
 <div id="overview-content"></div>
 <script src="../../static/js/overview.js"></script>
+
+
 

@@ -126,7 +126,6 @@ body {
 
 main {
   overflow: auto;
-  max-height: calc(100vh - var(--navbar-height));
 }
 
 body {
@@ -229,6 +228,7 @@ body {
 
 #index-container {
   height: calc(100vh - var(--logo-height) - var(--navbar-height) - 95px);
+  margin-top: var(--navbar-height);
 }
 @media (max-width: 47.9375em) {
   #index-container {
@@ -12145,6 +12145,10 @@ textarea.form-control-lg {
   background-color: #94c694;
 }
 
+.content-container {
+  margin-top: var(--navbar-height);
+}
+
 .entity-cards {
   display: grid;
   grid-template-columns: 1fr;
@@ -12291,7 +12295,8 @@ textarea.form-control-lg {
   font-size: 3.5rem;
 }
 
-.grid {
+.grid-muuri {
+  width: 100%;
   position: relative;
 }
 
@@ -12315,7 +12320,7 @@ textarea.form-control-lg {
   display: block;
   margin: 5px;
   position: absolute;
-  width: calc((100vw - 45px - var(--sidebar-width)) / 3);
+  width: calc((100% - 45px) / 3);
   background: var(--muuri-tile);
   overflow: hidden;
   border-radius: 7.5px;
@@ -12323,7 +12328,7 @@ textarea.form-control-lg {
 
 @media (max-width: 992px) {
   .item {
-    width: calc((100vw - 40px - var(--sidebar-width)) / 2);
+    width: calc((100% - 40px) / 2);
   }
 }
 @media (max-width: 766px) {
@@ -12582,7 +12587,6 @@ textarea.form-control-lg {
 }
 
 .main-content {
-  margin-left: 16.6667%;
   overflow-y: auto;
 }
 @media (max-width: 766px) {
@@ -12761,7 +12765,7 @@ button.btn-whitish[disabled] {
 
 /* Sidebar */
 :root {
-  --sidebar-width: 70px; /* Initial width */
+  --sidebar-width: 60px; /* Initial width */
   --right-sidebar-width: 0px;
 }
 
@@ -12884,8 +12888,7 @@ button.btn-whitish[disabled] {
 }
 
 .entity-content {
-  background-color: #a3baae;
-  max-height: calc(100vh - var(--navbar-height));
+  height: calc(100vh - var(--navbar-height));
   overflow-y: auto;
   width: calc(100vw - var(--sidebar-width));
   transition: width 0.3s ease;

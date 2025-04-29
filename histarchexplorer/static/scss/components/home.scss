@@ -1,5 +1,6 @@
 #index-container {
   height: calc(100vh - var(--logo-height) - var(--navbar-height) - 95px);
+  margin-top: var(--navbar-height);
 
   @media (max-width: 47.9375em) {
     height: calc(100vh - 95px);
