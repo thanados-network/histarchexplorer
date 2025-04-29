@@ -12884,6 +12884,7 @@ button.btn-whitish[disabled] {
 }
 
 .entity-content {
+  height: calc(100vh - var(--navbar-height));
   overflow-y: auto;
   width: calc(100vw - var(--sidebar-width));
   transition: width 0.3s ease;
