@@ -19,6 +19,10 @@
   const more_images = {{ more_images | tojson | safe }};
 </script>
 
+<script>
+  const related_entities = JSON.parse(JSON.parse({{ data|tojson }}).related_entities || 'null');
+</script>
+
 
 <div id="overview-content"></div>
 <script src="../../static/js/overview.js"></script>

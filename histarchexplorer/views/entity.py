@@ -200,6 +200,27 @@ def getentity(id_: int, tab_name=None) -> str:
     initial_images = []
     more_images = False
     total_images = 0
+   # related_entities_json = json.dumps({}, ensure_ascii=False, indent=4)
+
+    # def get_related_entities(
+    #         main_entity: Entity,
+    #         entities: list[Entity]) -> dict[str, dict[str, list[Entity]]]:
+    #     related_entities: dict[str, Any] = defaultdict(lambda: defaultdict(list))
+    #     for subunit in entities:
+    #         if subunit.id == main_entity.id:
+    #             continue
+    #         match subunit.system_class:
+    #             case 'Group' | 'Person':
+    #                 related_entities[subunit.system_class][subunit.name].append(
+    #                     subunit)
+    #             case _:
+    #                 if not subunit.types:
+    #                     continue
+    #                 for type_ in subunit.types:
+    #                     label = type_.type_hierarchy[0]['label']
+    #                     if label in app.config['STANDARD_TYPES']:
+    #                         related_entities[label][type_.label].append(subunit.to_serializable())
+    #     return related_entities
 
     if tab_name == 'feature':
         entities = Entity.get_linked_entities_by_properties_recursive(
@@ -235,7 +256,15 @@ def getentity(id_: int, tab_name=None) -> str:
     elif tab_name == 'overview':
         data = get_entity()
         entity_obj = Entity.get_entity(id_, Parser(show=['depictions']))
+        entities = Entity.get_linked_entities_by_properties_recursive(
+            id_,
+            get_parser_for_getentity(id_)
+        )
+        main_entity = get_main_entity(id_, entities)
         images = []
+      #  related_entities = get_related_entities(main_entity, entities)
+        # related_entities_json = json.dumps(related_entities, ensure_ascii=False, indent=4)
+
 
         for image in entity_obj.depictions:
             if image.main_image:
@@ -262,10 +291,8 @@ def getentity(id_: int, tab_name=None) -> str:
         main_image=main_image,
         initial_images=initial_images,
         more_images=more_images,
-        total_images=total_images
-    )
-
-
+        total_images=total_images)
+        #related_entities=related_entities_json)
 
 
 def get_main_entity(id_: int, entities: list[Entity]) -> Entity:

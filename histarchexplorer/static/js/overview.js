@@ -1,3 +1,5 @@
+console.log("related_entities:", related_entities);
+
 const systemClassMap = {
     'place': 'places',
     'feature': 'places',
@@ -80,7 +82,6 @@ document.getElementById("overview-content").innerHTML =
     ` : ''}
     </div>
     
-      
        <div class="${entity.description_class}">
         <div class="item-content">
           <div class="muuri-description">
@@ -172,14 +173,59 @@ document.getElementById("overview-content").innerHTML =
        <h1>4</h1>
        <p> Ja, was ist denn das?</p>
        </div>
-    </div>
+    
    
        
-        <div class="item">
+       <div class="item">
         <h1>2</h1>
         <p> 2. Muuri</p>
        </div>
-
+       
+       
+       ${related_entities ? `
+  <div class="item item-wide">
+    <div class="item-content">
+      <div class="muuri-references">
+        <p class="tile-label text-uppercase">References</p>
+        <ul class="no-bullets">
+          ${Object.entries(related_entities).map(([key, type_]) => 
+            (key === "Bibliography" || key === "External reference") ? 
+              Object.values(type_).flat().map(item => {
+                const icon = key === "Bibliography" 
+                  ? '<i class="bi bi-book"></i>'
+                  : '<i class="bi bi-box-arrow-up-right"></i>';
+                const name = key === "Bibliography"
+                  ? `<a href="/entity/${item.id}" class="reference-name">${item.name}</a>`
+                  : (() => {
+                      const parts = item.name.split('/');
+                      return `<a href="${item.name}" class="reference-name">${parts.slice(0, 3).join('/')}</a>`;
+                    })();
+                const description = `
+                  <p class="reference-description">
+                    ${item.description || ''}
+                    ${(item.relations || []).filter(rel => rel.relation_to_id === entity.id)
+                      .map(rel => rel.relation_description).join(' ')}
+                  </p>
+                `;
+                return `
+                  <li>
+                    <div class="reference-content">
+                      <div class="reference-header">
+                        ${icon}
+                        ${name}
+                      </div>
+                      ${description}
+                    </div>
+                  </li>
+                `;
+              }).join('') : ''
+          ).join('')}
+        </ul>
+      </div>
+    </div>
+  </div>
+` : ''}
+</div>
 `;
 
 document.addEventListener("DOMContentLoaded", function () {
