@@ -9,7 +9,7 @@
             <!-- 🧠 Multi-select Dropdown with Choices.js -->
             <div class="mb-4">
               <label for="system-class-select" class="form-label">Filter by
-                Type (system_class):</label>
+                Type:</label>
               <select class="form-select" id="system-class-select"
                       name="system_class[]" multiple>
                 <optgroup label="Actors">
@@ -250,7 +250,7 @@
       document.addEventListener("DOMContentLoaded", function () {
           // ---- Variables for Static Search Pagination ----
           const staticResultList = document.getElementById('static-result-list');
-          // allResults is passed from the server as a JSON array
+          // allResults is passed from the server as a JSON arrayyyyyyy
           const allResults = {{ results|tojson|safe }};
           let currentIndex = 0;
           const batchSize = 10;
