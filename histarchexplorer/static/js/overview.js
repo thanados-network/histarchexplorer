@@ -268,7 +268,10 @@ function initializeMuuri() {
     const gridElement = document.querySelector('.grid-muuri');
     if (!gridElement) return;
 
-    const grid = new Muuri(gridElement, { layoutOnResize: true });
+    const grid = new Muuri(gridElement, { layoutOnResize: true,
+    layout: { fillGaps: true,
+    }});
+
     window.muuriGrid = grid;
 
     const container = gridElement.parentElement;
