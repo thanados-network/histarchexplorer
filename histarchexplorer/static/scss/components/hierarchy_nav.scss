@@ -98,12 +98,14 @@ button.btn-whitish[disabled] {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.7vw;
+  font-size: clamp(1rem, 1.5vw, 1.8rem);
   font-weight: 600;
   margin-bottom: rem(10);
   text-transform: uppercase;
   color: var(--text-color2);
   padding: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @media (max-width: 769px) {
