@@ -164,22 +164,6 @@ document.getElementById("overview-content").innerHTML =
   ` : '').join('')}
 ` : ''}
 
-       <div class="item item-half">
-       <h1>3</h1>
-       <p> Ja, was ist denn das?</p>
-       </div>
-       
-        <div class="item item-half">
-       <h1>4</h1>
-       <p> Ja, was ist denn das?</p>
-       </div>
-    
-   
-       
-       <div class="item">
-        <h1>2</h1>
-        <p> 2. Muuri</p>
-       </div>
        
       ${entity.relations && entity.relations.length > 0 ? `
   <div class="item item-wide">

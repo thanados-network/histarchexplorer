@@ -154,19 +154,6 @@ def getentity(id_: int, tab_name=None) -> str:
     # )
     # main_entity = get_main_entity(id_, entities)
 
-    def get_entity():
-        entity_ = Entity.get_entity(id_, Parser())
-        return {
-            'entity': json.dumps(
-                entity_.to_serializable(),
-                ensure_ascii=False,
-                indent=4),
-            'categorized_types': json.dumps(
-                categorized_types(entity_),
-                ensure_ascii=False,
-                indent=4)
-        }
-
     def get_map_data():
         geom_there = check_p46_geoms(id_)
         if geom_there:
@@ -254,19 +241,29 @@ def getentity(id_: int, tab_name=None) -> str:
         data['spatial'] = map_data
 
     elif tab_name == 'overview':
-        data = get_entity()
-        entity_obj = Entity.get_entity(id_, Parser(show=['depictions']))
+        #data = get_entity()
+        entity_ = Entity.get_entity(id_, Parser())
+
+        data= {
+            'entity': json.dumps(
+                entity_.to_serializable(),
+                ensure_ascii=False,
+                indent=4),
+            'categorized_types': json.dumps(
+                categorized_types(entity_),
+                ensure_ascii=False,
+                indent=4)
+        }
        # entities = Entity.get_linked_entities_by_properties_recursive(
        #     id_,
        #     get_parser_for_getentity(id_)
     #)
-        #main_entity = get_main_entity(id_, entities)
         images = []
       #  related_entities = get_related_entities(main_entity, entities)
         # related_entities_json = json.dumps(related_entities, ensure_ascii=False, indent=4)
 
 
-        for image in entity_obj.depictions:
+        for image in entity_.depictions:
             if image.main_image:
                 main_image = serialize_image(image)
             else:
