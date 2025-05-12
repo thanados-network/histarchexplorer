@@ -1,5 +1,22 @@
 console.log("related_entities:", related_entities);
 
+function geometryCollectionToFeatureCollection(geometryCollection) {
+    return {
+        type: "FeatureCollection",
+        features: geometryCollection.geometries.map(geometry => ({
+            type: "Feature",
+            geometry: {
+                type: geometry.type,
+                coordinates: geometry.coordinates
+            },
+            properties: {
+                title: geometry.title || '',
+                description: geometry.description || ''
+            }
+        }))
+    };
+}
+
 const systemClassMap = {
     'place': 'places',
     'feature': 'places',
@@ -15,7 +32,7 @@ const systemClassMap = {
     'source': 'sources',
     'file': 'files'
 };
-
+/*Icons for Hierarchy */
 function getEntityIcon(entity) {
     const systemClass = entity.system_class.toLowerCase();
     if (['feature', 'stratigraphic unit'].includes(systemClass)) {
@@ -33,7 +50,6 @@ console.log('categorized_types:', categorized_types);
 document.getElementById("overview-content").innerHTML =
     `
      <div class="col flex-column grid-muuri">
-      
       <div class="item item-half hierarchy-item">
        ${entity.ancestor_entities && entity.ancestor_entities.length > 0 ? `
         ${entity.ancestor_entities.map(ancestorEntity => `
@@ -90,7 +106,7 @@ document.getElementById("overview-content").innerHTML =
           </div>
         </div>
        </div>
-       
+   
        ${categorized_types ? `
   <div class="item-half">
     <div class="item-content">
@@ -113,7 +129,7 @@ document.getElementById("overview-content").innerHTML =
     </div>
   </div>
 ` : ''}
-       
+         
        ${entity.geometry ? `
   <div class="item">
     <div class="map-wrapper">
@@ -128,7 +144,7 @@ document.getElementById("overview-content").innerHTML =
     </div>
   </div>
 ` : ''}
-       
+     
        ${main_image && !['actor', 'person'].includes(entity.system_class.toLowerCase()) ? `
   <div class="item">
     <div class="item-content item-content-full">
@@ -144,7 +160,7 @@ document.getElementById("overview-content").innerHTML =
     </div>
   </div>
 ` : ''}
-       
+     
        ${images && images.length ? `
   ${images.map((depiction, index) => !depiction.main_image ? `
     <div class="${index < 3 ? 'item-half' : 'item'}">
@@ -163,8 +179,23 @@ document.getElementById("overview-content").innerHTML =
     </div>
   ` : '').join('')}
 ` : ''}
-
        
+        <div class="item item-half">
+        <h1>2</h1>
+        <p> 2. Muuri</p>
+       </div>
+       
+       <div class="item item-half">
+       <h1>3</h1>
+       <p> Ja, was ist denn das?</p>
+       </div>
+       
+        <div class="item item-half">
+       <h1>4</h1>
+       <p> Ja, was ist denn das?</p>
+       </div>
+    
+      
       ${entity.relations && entity.relations.length > 0 ? `
   <div class="item item-wide">
     <div class="item-content">
@@ -291,26 +322,49 @@ function forceMuuriLayout() {
     }
 }
 
+//Map
 window.requestAnimationFrame(() => {
     initializeMuuri();
 
-
     const mapContainer = document.getElementById('muuri-map');
     if (mapContainer && typeof L !== 'undefined' && gisData) {
-        const map = L.map('muuri-map').setView(
-            [gisData.coordinates[1], gisData.coordinates[0]], 13
-        );
+        const map = L.map('muuri-map');
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        L.marker([gisData.coordinates[1], gisData.coordinates[0]]).addTo(map)
-            .bindPopup(entityName)
-            .openPopup();
-    }
+        // convert gisData to GeometryCollection if single geometry point
+        const convertedGeometryCollection = (gisData.type === 'GeometryCollection')
+            ? gisData
+            : {
+                type: 'GeometryCollection',
+                geometries: [gisData]
+            };
 
-}, 100);
+        const featureCollection = geometryCollectionToFeatureCollection(convertedGeometryCollection);
+
+
+        console.log('FeatureCollection:', featureCollection);
+
+        const geoLayer = L.geoJSON(featureCollection, {
+            onEachFeature: function (feature, layer) {
+                const { title, description } = feature.properties;
+                layer.bindPopup(`<b>${entityName}</b><br><b>${title}</b><br>${description}`);
+            }
+        }).addTo(map);
+
+        const bounds = geoLayer.getBounds();
+        if (bounds.isValid()) {
+            map.fitBounds(bounds, { maxZoom: 13 });
+        }
+
+        setTimeout(() => map.invalidateSize(), 200);
+    }
+});
+
+
 
 
 function activateTab(tabName, skipPushState = false) {
