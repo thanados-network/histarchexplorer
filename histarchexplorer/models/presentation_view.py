@@ -1,6 +1,6 @@
 import json
 from dataclasses import asdict, dataclass, field
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 import requests
 
@@ -13,6 +13,26 @@ class GeometryModel:
     id: int
     type: str
     coordinates: Any
+
+
+@dataclass
+class PropertyModel:
+    locationId: int
+    title: str
+    description: str
+    shapeType: str
+
+
+@dataclass
+class FeatureModel:
+    geometry: GeometryModel
+    properties: PropertyModel
+
+    def to_dict(self) -> dict:
+        return {
+            "type": "Feature",
+            "geometry": asdict(self.geometry),
+            "properties": asdict(self.properties)}
 
 
 @dataclass
@@ -41,7 +61,7 @@ class EntityTypeModel:
     title: str
     descriptions: Optional[str]
     is_standard: Optional[bool]
-    type_hierarchy: Optional[List[TypeHierarchyEntry]]
+    type_hierarchy: Optional[list[TypeHierarchyEntry]]
     value: Optional[str]
     unit: Optional[str]
 
@@ -64,6 +84,7 @@ class ExternalReferenceModel:
             reference_system=data.get("referenceSystem"),
             resolver_url=data.get("resolverURL"),
             reference_url=data.get("referenceURL"))
+
 
 @dataclass
 class Reference:
@@ -110,8 +131,8 @@ class Relation:
     description: Optional[str] = None
     aliases: Optional[list[str]] = None
     time_range: Optional[TimeRangeModel] = None
-    geometries: List[GeometryModel] = field(default_factory=list)
-    types: List[EntityTypeModel] = field(default_factory=list)
+    geometries: list[FeatureModel] = field(default_factory=list)
+    types: list[EntityTypeModel] = field(default_factory=list)
 
 
 @dataclass
@@ -120,16 +141,15 @@ class PresentationView:
     systemClass: str
     title: str
     description: str
-    aliases: List[str]
-    geometries: List[GeometryModel] = field(default_factory=list)
+    aliases: list[str]
+    geometries: list[FeatureModel] = field(default_factory=list)
     when: Optional[TimeRangeModel] = None
-    types: List[EntityTypeModel] = field(default_factory=list)
-    externalReferenceSystems: List[ExternalReferenceModel] = field(
+    types: list[EntityTypeModel] = field(default_factory=list)
+    externalReferenceSystems: list[ExternalReferenceModel] = field(
         default_factory=list)
-    references: List[Reference] = field(default_factory=list)
-    files: List[File] = field(default_factory=list)
-    relations: dict[str, List[Relation]] = field(default_factory=dict)
-
+    references: list[Reference] = field(default_factory=list)
+    files: list[File] = field(default_factory=list)
+    relations: dict[str, list[Relation]] = field(default_factory=dict)
 
     def to_json(self, *, indent: Optional[int] = 2) -> str:
         return json.dumps(asdict(self), indent=indent, ensure_ascii=False)
@@ -137,17 +157,30 @@ class PresentationView:
     @staticmethod
     def parse_geometries(
             geometry_data: Any,
-            relation_id: int = 0) -> List[GeometryModel]:
-        geometries = []
-        if isinstance(geometry_data, dict):
-            geometries.append(GeometryModel(
+            relation_id: int = 0) -> list["FeatureModel"]:
+
+        if not geometry_data:
+            return []
+
+        def parse_single(data: dict) -> "FeatureModel":
+            geometry_model = GeometryModel(
                 id=relation_id,
-                type=geometry_data["type"],
-                coordinates=geometry_data["geometry"]["coordinates"]))
-        elif isinstance(geometry_data, list):
-            for g in geometry_data:
-                if isinstance(g, dict):
-                    geometries.append(GeometryModel(**g))
+                type=data['geometry']["type"],
+                coordinates=data["geometry"]["coordinates"])
+            property_model = PropertyModel(
+                locationId=data["properties"]["locationId"],
+                title=data["properties"]["title"],
+                description=data["properties"]["description"],
+                shapeType=data["properties"]["shapeType"])
+            return FeatureModel(
+                geometry=geometry_model,
+                properties=property_model)
+        geometries = []
+        if geometry_data.get('type') == 'FeatureCollection':
+            for geom in geometry_data['features']:
+                geometries.append(parse_single(geom))
+        else:
+            geometries.append(parse_single(geometry_data))
         return geometries
 
     @staticmethod
@@ -161,7 +194,7 @@ class PresentationView:
             if when.get("end") else None)
 
     @staticmethod
-    def parse_types(types_data: List[dict]) -> List[EntityTypeModel]:
+    def parse_types(types_data: list[dict]) -> list[EntityTypeModel]:
         types = []
         for type_ in types_data:
             hierarchy = []
@@ -180,8 +213,8 @@ class PresentationView:
         return types
 
     @staticmethod
-    def parse_relations(raw_relations: dict) -> dict[str, List[Relation]]:
-        grouped_relations: dict[str, List[Relation]] = {}
+    def parse_relations(raw_relations: dict) -> dict[str, list[Relation]]:
+        grouped_relations: dict[str, list[Relation]] = {}
         for system_class, relation_list in raw_relations.items():
             relations = []
             for rel in relation_list:
@@ -223,7 +256,7 @@ class PresentationView:
         return grouped_relations
 
     @staticmethod
-    def parse_file(raw_file: dict) -> List[File]:
+    def parse_file(raw_file: dict) -> list[File]:
         files = []
         for f in raw_file:
             if isinstance(f, dict):
@@ -256,7 +289,7 @@ class PresentationView:
             title=data.get("title", ""),
             description=data.get("description", ""),
             aliases=data.get("aliases", []),
-            geometries=cls.parse_geometries(data.get("geometries", [])),
+            geometries=cls.parse_geometries(data.get("geometries", {})),
             when=cls.parse_time_range(data.get("when")),
             types=cls.parse_types(data.get("types", [])),
             externalReferenceSystems=[
@@ -269,3 +302,11 @@ class PresentationView:
                 if isinstance(ref, dict)],
             files=cls.parse_file(data.get('files', [])),
             relations=cls.parse_relations(data.get("relations", {})))
+
+
+class Entity(PresentationView):
+    def __init__(self):
+        self.geometries_collection = {
+            'structure':
+                {},
+            'collection': []}
