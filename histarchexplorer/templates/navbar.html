@@ -1,21 +1,26 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+<nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
     <div class="container-fluid">
+        {% block page_name %}{% endblock %}
+        <button id="toggleSidebar" class="btn{% if page_name != "landing" %} opacity-0 nopointer{% endif %}" type="button">
+            <i class="bi bi-list"></i>
+        </button>
         <a class="navbar-brand" title="{{ _('home') }}"
            href="{{ url_for('index') }}">
-          <img id="logo" src="/static/images/logos/logo_mode_light.svg">
+            <img id="logo" src="/static/images/logos/logo_mode_light.svg">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target=".navbar-collapse"
                 aria-controls=".navbar-collapse" aria-expanded="false"
                 aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+            <i class="bi bi-three-dots-vertical"></i>
         </button>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% for nav_item in navbar %}
                     {% for category, title in nav_item.items() %}
                         <li class="nav-item">
-                            <a class="nav-link nav-link-hover {% if category == request.endpoint %}active{% endif %}" aria-current="page"
+                            <a class="nav-link nav-link-hover {% if category == request.endpoint %}active{% endif %}"
+                               aria-current="page"
                                title="{{ title }}"
                                href="{{ url_for(category) }}">{{ _(category) | upper }}
                             </a>
@@ -27,10 +32,12 @@
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" id="dark" role="button" onclick="setTheme(this.id)" title="{{ _('toggle dark/light mode') }}">
+                    <a class="nav-link" id="dark" role="button" onclick="setTheme(this.id)"
+                       title="{{ _('toggle dark/light mode') }}">
                         <i class="bi bi-moon"></i>
                     </a>
-                    <a class="nav-link" id="light" role="button" onclick="setTheme(this.id)" title="{{ _('toggle dark/light mode') }}">
+                    <a class="nav-link" id="light" role="button" onclick="setTheme(this.id)"
+                       title="{{ _('toggle dark/light mode') }}">
                         <i class="bi bi-sun"></i>
                     </a>
                 </li>

@@ -1,0 +1,56 @@
+@use '../globals' as *;
+
+.cards_home {
+  opacity: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  width: 100%;
+  align-items: center;
+  align-self: auto;
+  position: absolute;
+  bottom: rem(227);
+  background: rgba(255, 255, 255, 0.65);
+  margin: 0;
+  pointer-events: none; /* Disable pointer events initially */
+
+  @media (max-width: 61.9375em) {
+    grid-template-columns: repeat(3, minmax(135px, 1fr));
+  }
+
+  @media (max-width: 47.9375em) {
+    grid-template-columns: 1fr;
+    position: sticky;
+    top: 100vh;
+    overflow-y: auto;
+    opacity: 1;
+    pointer-events: auto; /* Enable pointer events on small screens */
+  }
+}
+
+@media (min-width: 47.9375em) {
+  #counters:hover ~ .cards_home,
+  #mobileAnchor:hover ~ .cards_home,
+  .cards_home:hover {
+    opacity: 1;
+    pointer-events: auto; /* Enable pointer events when visible */
+  }
+}
+
+#entities_mobile {
+  display:none;
+  color: rgba(0, 0, 0, 0.7);
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 16px;
+
+  @media (max-width: 47.9375em) {
+    display: inline-block;
+  }
+
+  .bi-arrow-down-circle-fill {
+    font-size: 3.5rem;
+  }
+}
+
+

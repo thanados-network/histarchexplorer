@@ -1,12 +1,14 @@
-from typing import Any
+from typing import Any, Optional, TYPE_CHECKING
 
 from histarchexplorer.models.util import format_date, split_date_string
 
+if TYPE_CHECKING:  # pragma: no cover
+    from histarchexplorer.models.entity import Entity
 
 class Relation:
     def __init__(self, data: dict[str, Any]):
         self.label = data['label']
-        self.relation_to_id = data['relationTo'].rsplit('/', 1)[-1]
+        self.relation_to_id = int(data['relationTo'].rsplit('/', 1)[-1])
         self.relation_to = data['relationTo']
         self.relation_type = data['relationType']
         self.relation_system_class = data['relationSystemClass']
@@ -19,6 +21,7 @@ class Relation:
         self.end_to = None
         self.begin = None
         self.end = None
+        self.related_entity: Optional[Entity] = None
         if 'when' in data:
             self.begin_from = split_date_string(
                 data['when']['timespans'][0]['start']['earliest'])

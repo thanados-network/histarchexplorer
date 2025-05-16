@@ -1,0 +1,13 @@
+<div id="map-sidebar-content">
+    {% if features is iterable and features|length > 0 %}
+        {% for feature in features %}
+            {% if feature.system_class == 'Feature' %}
+                <h2 id="feature-{{ feature.id }}">{{ feature.name }}</h2>
+                <p>{{ feature.description }}</p>
+            {% endif %}
+        {% endfor %}
+    {% elif features is not iterable %}
+        <h2 id="feature-{{ features.id }}">{{ features.name }}</h2>
+        <p>{{ features.description }}</p>
+    {% endif %}
+</div>

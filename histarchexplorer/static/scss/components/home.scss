@@ -1,22 +1,43 @@
 #index-container {
   height: calc(100vh - var(--logo-height) - var(--navbar-height) - 95px);
+  margin-top: var(--navbar-height);
+
+  @media (max-width: 47.9375em) {
+    height: calc(100vh - 95px);
+  }
+
+}
+.button-container {
+  position: absolute;
+  top: 92%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  width: 100%;
+  text-align: center;
+}
+#counters {
+  background-color: var(--counters-bg);
+  min-height: 95px;
+  max-width: 100vw;
+
+  @media (max-width: 47.9375em) {
+    display: none;
+    pointer-events: none;
+    visibility: hidden;
+  }
 }
 
 #map {
   width: 100%;
   height: 100%;
   display: none;
+  z-index: 0;
 }
 
 .map-gray .leaflet-map-pane > .leaflet-pane:not(.leaflet-marker-pane) {
   -webkit-filter: grayscale(100%) opacity(0.9);
   filter: grayscale(100%) opacity(0.9);
-}
-
-#counters {
-  background-color: var(--counters-bg);
-  min-height: 95px;
-  max-width: 100vw;
 }
 
 #index-image {
@@ -29,3 +50,4 @@
   background-position: center;
   max-height: 100%;
 }
+

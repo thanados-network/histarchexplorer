@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1>{{ entity.properties.title or "Unnamed" }}</h1>
+
+{% if entity.descriptions %}
+    <p>{{ entity.descriptions[0].value }}</p>
+{% endif %}
+
+{% if entity.geometry %}
+    <p><strong>Coordinates:</strong> {{ entity.geometry.coordinates }}</p>
+{% endif %}
+
+<a href="/search">← Back to search</a>
+
+{% endblock %}

@@ -1,8 +1,374 @@
 {% extends "layout.html" %}
 {% block content %}
+  <div class="container" style="padding-top: 120px;">
+    <div class="relative-wrapper">
+      <div class="static-search-form-wrapper">
+        <!-- 🔍 Search Form -->
+        <form method="POST" action="/search" id="static-search-form">
+          <div class="form-area-wrapper">
+            <!-- 🧠 Multi-select Dropdown with Choices.js -->
+            <div class="mb-4">
+              <label for="system-class-select" class="form-label">Filter by
+                Type:</label>
+              <select class="form-select" id="system-class-select"
+                      name="system_class[]" multiple>
+                <optgroup label="Actors">
+                  <option value="person"
+                          {% if 'person' in system_classes %}selected{% endif %}>
+                    Person
+                  </option>
+                  <option value="group"
+                          {% if 'group' in system_classes %}selected{% endif %}>
+                    Group
+                  </option>
+                </optgroup>
+                <optgroup label="Items">
+                  <option value="artifact"
+                          {% if 'artifact' in system_classes %}selected{% endif %}>
+                    Artifact
+                  </option>
+                  <option value="human_remains"
+                          {% if 'human_remains' in system_classes %}selected{% endif %}>
+                    Human Remains
+                  </option>
+                </optgroup>
+                <optgroup label="Events">
+                  <option value="acquisition"
+                          {% if 'acquisition' in system_classes %}selected{% endif %}>
+                    Acquisition
+                  </option>
+                  <option value="event"
+                          {% if 'event' in system_classes %}selected{% endif %}>
+                    Event
+                  </option>
+                  <option value="activity"
+                          {% if 'activity' in system_classes %}selected{% endif %}>
+                    Activity
+                  </option>
+                  <option value="creation"
+                          {% if 'creation' in system_classes %}selected{% endif %}>
+                    Creation
+                  </option>
+                  <option value="move"
+                          {% if 'move' in system_classes %}selected{% endif %}>
+                    Move
+                  </option>
+                  <option value="production"
+                          {% if 'production' in system_classes %}selected{% endif %}>
+                    Production
+                  </option>
+                  <option value="modification"
+                          {% if 'modification' in system_classes %}selected{% endif %}>
+                    Modification
+                  </option>
+                </optgroup>
+                <optgroup label="Places">
+                  <option value="place"
+                          {% if 'place' in system_classes %}selected{% endif %}>
+                    Place
+                  </option>
+                  <option value="stratigraphic_unit"
+                          {% if 'stratigraphic_unit' in system_classes %}selected{% endif %}>
+                    Stratigraphic Unit
+                  </option>
+                  <option value="feature"
+                          {% if 'feature' in system_classes %}selected{% endif %}>
+                    Feature
+                  </option>
+                </optgroup>
+                <optgroup label="Sources">
+                  <option value="source"
+                          {% if 'source' in system_classes %}selected{% endif %}>
+                    Source
+                  </option>
+                  <option value="bibliography"
+                          {% if 'bibliography' in system_classes %}selected{% endif %}>
+                    Bibliography
+                  </option>
+                  <option value="external_reference"
+                          {% if 'external_reference' in system_classes %}selected{% endif %}>
+                    External Reference
+                  </option>
+                  <option value="edition"
+                          {% if 'edition' in system_classes %}selected{% endif %}>
+                    Edition
+                  </option>
+                </optgroup>
+                <optgroup label="Files">
+                  <option value="file"
+                          {% if 'file' in system_classes %}selected{% endif %}>
+                    File
+                  </option>
+                </optgroup>
+              </select>
+            </div>
 
-    <div class="maxscreen-footer-nav">hello search</div>
+            <!-- 🔍 Text Input + Button -->
+            <div class="input-group mb-3">
+              <input type="text" id="search-input" name="query"
+                     value="{{ query or '' }}" placeholder="Search..."
+                     class="form-control" autocomplete="off">
+              <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 👉 Hint when nothing has been searched yet -->
+    {% if not results and not query %}
+      <div style="padding: 100px 0; text-align: center; color: #888;">
+        <em>Start typing above to see live results or press enter to run a
+          search.</em>
+      </div>
+    {% endif %}
+
+    <!-- 📄 Static Search Results (rendered via JavaScript) -->
+    {% if results is defined and results|length > 0 %}
+      <div class="mt-5" id="static-results">
+        <h2>Static Search Results:</h2>
+        <ul id="static-result-list"></ul>
+      </div>
+    {% elif query %}
+      <p><em>No results found for "{{ query }}"</em></p>
+    {% endif %}
+
+    <!-- The Live Search Popup is moved OUTSIDE the wrapper for proper overlay behavior -->
+    <div id="live-results" class="live-popup"></div>
+  </div>
+
+  <!-- ✅ Include Choices.js CSS & JS -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+  <script
+    src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+  <!-- ✅ CSS Styles -->
+  <style>
+      /* Live search popup styling (fixed as an overlay) */
+      #live-results {
+          display: none;
+          position: fixed;
+          top: 270px; /* adjust this value so that it appears below the search input */
+          left: 32%;
+          transform: translateX(-50%);
+          width: 600px; /* adjust as needed or use max-width: 90%; */
+          max-height: 300px;
+          overflow-y: auto;
+          z-index: 2000;
+          background: white;
+          border: 1px solid #ccc;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          padding: 8px;
+      }
+
+      #live-results.show {
+          display: block;
+      }
+
+      /* Default styles for the list items */
+      #static-result-list li {
+          background-color: transparent; /* No gray background by default */
+          cursor: pointer; /* Make the entire list item look clickable */
+      }
+
+      /* Apply background color when hovering over the result */
+      #static-result-list li:hover {
+          background-color: #f0f0f0; /* Gray background on hover */
+      }
+
+      /* Ensure the anchor tag takes up the full space of the list item */
+      #static-result-list li a {
+          display: block; /* Make the anchor a block-level element */
+          text-decoration: none; /* Remove the underline */
+          color: inherit; /* Inherit the text color */
+      }
+
+      /* Optional: Ensure the cursor remains a pointer on hover */
+      #static-result-list li a:hover {
+          cursor: pointer; /* Pointer cursor only when hovering over the text */
+      }
 
 
-{% include 'footer.html' %}
+      /* Default styles for the live result items */
+#live-results div {
+    background-color: transparent; /* No gray background by default */
+    cursor: pointer; /* Make the entire div look clickable */
+}
+
+/* Apply background color when hovering over the live result */
+#live-results div:hover {
+    background-color: #f0f0f0; /* Gray background on hover */
+}
+
+/* Ensure the anchor tag takes up the full space of the div */
+#live-results a {
+    display: block; /* Make the anchor a block-level element */
+    text-decoration: none; /* Remove the underline */
+    color: inherit; /* Inherit the text color */
+}
+
+/* Optional: Ensure the cursor remains a pointer on hover */
+#live-results a:hover {
+    cursor: pointer; /* Pointer cursor when hovering over the anchor */
+}
+
+
+      /* Ensure our container and wrappers allow free expansion */
+      .relative-wrapper,
+      .form-area-wrapper,
+      .static-search-form-wrapper {
+          position: relative;
+          overflow: visible;
+      }
+
+      /* Choices.js dropdown styling */
+      .choices__list--dropdown {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          width: 100%;
+          z-index: 9999 !important;
+          background: white;
+          border: 1px solid #ccc;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .container {
+          overflow: visible;
+          /* Optional: add bottom padding so the page doesn’t look cut off */
+          padding-bottom: 50px;
+      }
+
+      #system-class-select {
+          margin-bottom: 1rem;
+      }
+  </style>
+
+  <!-- ✅ JavaScript for Live Search and Static Search "Load More" functionality -->
+  <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          // ---- Variables for Static Search Pagination ----
+          const staticResultList = document.getElementById('static-result-list');
+          // allResults is passed from the server as a JSON arrayyyyyyy
+          const allResults = {{ results|tojson|safe }};
+          let currentIndex = 0;
+          const batchSize = 10;
+
+          // Function to render next batch of static results
+          function renderNextBatch(count = batchSize) {
+              const nextBatch = allResults.slice(currentIndex, currentIndex + count);
+              for (const result of nextBatch) {
+                  const li = document.createElement('li');
+                  li.classList.add('mb-2');
+                  li.innerHTML = `
+    <a href="/entity/${result.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
+        <strong>
+          ${result.name || 'Unnamed'}
+        </strong>
+        (${result.system_class})
+        <br>
+        ${result.description ? result.description.slice(0, 300) + '<br>' : ''}
+    </a>
+`;
+                  staticResultList.appendChild(li);
+              }
+              currentIndex += count;
+              // If more results remain and the "Load more" button is not in the DOM, append it.
+              if (currentIndex < allResults.length && !document.getElementById('load-more-btn')) {
+                  const btnWrapper = document.createElement('div');
+                  btnWrapper.className = 'text-center mt-3';
+                  const btn = document.createElement('button');
+                  btn.id = 'load-more-btn';
+                  btn.className = 'btn btn-secondary';
+                  btn.innerText = 'Load more';
+                  btn.addEventListener('click', renderNextBatch);
+                  btnWrapper.appendChild(btn);
+                  document.getElementById('static-results').appendChild(btnWrapper);
+              }
+              // If no more results remain, remove the button if it exists.
+              if (currentIndex >= allResults.length) {
+                  const existingBtn = document.getElementById('load-more-btn');
+                  if (existingBtn) {
+                      existingBtn.parentNode.remove();
+                  }
+              }
+          }
+
+          // Render the first batch of static results, if they exist.
+          if (allResults && allResults.length) {
+              renderNextBatch();
+          }
+
+          // ---- Live Search Functionality ----
+          const input = document.getElementById('search-input');
+          const liveResultsBox = document.getElementById('live-results');
+
+          if (input) {
+              input.addEventListener('input', async function () {
+                  const query = input.value.trim();
+                  if (query.length < 3) {
+                      liveResultsBox.innerHTML = "<p style='padding:8px; color:gray;'>Type at least 3 characters...</p>";
+                      liveResultsBox.classList.remove('show');
+                      return;
+                  }
+
+                  // Build selected classes query parameters
+                  const selectedOptions = Array.from(document.querySelectorAll('#system-class-select option:checked'))
+                      .map(opt => opt.value);
+                  const classParams = selectedOptions.map(cls => `system_class=${encodeURIComponent(cls)}`).join('&');
+                  const url = `/search_live?q=${encodeURIComponent(query)}&${classParams}`;
+
+                  liveResultsBox.innerHTML = `<p style="padding:8px; color:blue;">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Loading live results for "${query}"...
+          </p>`;
+                  liveResultsBox.classList.add('show');
+
+                  try {
+                      const res = await fetch(url);
+                      const liveResults = await res.json();
+                      if (!Array.isArray(liveResults) || liveResults.length === 0) {
+                          liveResultsBox.innerHTML = `<p style="padding:8px; color:orange;">No live results found for "${query}".</p>`;
+                      } else {
+                          liveResultsBox.innerHTML = liveResults.map(r => `
+    <a href="/entity/${r.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
+        <div class="p-2">
+            <strong>
+              ${r.name || 'Unnamed'}
+            </strong><br>
+            <small>${r.description ? r.description.slice(0, 150) + '…' : ''}</small>
+        </div>
+    </a>
+`).join('');
+
+                      }
+                  } catch (err) {
+                      console.error("Live search error:", err);
+                      liveResultsBox.innerHTML = `<p style="padding:8px; color:red;">Error loading live results.</p>`;
+                  }
+              });
+
+              // Hide the live results popup when clicking outside the search form area.
+              document.addEventListener('click', function (e) {
+                  const wrapper = document.querySelector('.relative-wrapper');
+                  if (wrapper && !wrapper.contains(e.target)) {
+                      liveResultsBox.classList.remove('show');
+                  }
+              });
+          }
+
+          // ---- Choices.js Initialization ----
+          const selectElement = document.getElementById('system-class-select');
+          if (selectElement) {
+              new Choices(selectElement, {
+                  removeItemButton: true,
+                  shouldSort: false,
+                  placeholder: true,
+                  placeholderValue: 'Select one or more types',
+                  maxItemCount: 15
+              });
+          }
+      });
+  </script>
 {% endblock %}

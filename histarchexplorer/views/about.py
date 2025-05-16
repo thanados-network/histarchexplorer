@@ -4,17 +4,15 @@ from histarchexplorer import app
 from histarchexplorer.utils import helpers
 
 
-def capitalize_first(value: str) -> str:
-    if not value:
-        return ''
-    return value[0].upper() + value[1:]
 
 
-app.jinja_env.filters['capitalize_first'] = capitalize_first
 
 
 @app.route('/about')
 def about() -> str:
+
+    def build_object(id_: int) -> None:
+        g.cursor.execute('SELECT * FROM tng.config WHERE id = %s', (id_,))
     def build_object(id):
 
         g.cursor.execute('SELECT * FROM tng.config WHERE id = %s', (id,))
@@ -142,4 +140,8 @@ ORDER BY l.sortorder, l.id;
 
     persons_list = list(persons.values())
 
-    return render_template('about.html', project=project, institutions=institutions, persons=persons_list)
+    return render_template(
+        'about.html',
+        project=project,
+        institutions=institutions,
+        persons=persons_list)

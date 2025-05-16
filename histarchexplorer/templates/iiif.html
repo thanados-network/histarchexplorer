@@ -1,0 +1,38 @@
+<div id="iiif-viewer" class="iiif-viewer-container" style="height: 500px; width: 100%;">
+  <script src="/static/node_modules/mirador/dist/mirador.min.js"></script>
+  <script>
+      const config = {
+          "id": "iiif-viewer",
+          "layout": "1x1",
+          "mainMenuSettings": {
+              "show": false
+          },
+          "workspaceControlPanel": {
+              "enabled": false
+          },
+          "window": {
+              "allowClose": false,
+              "defaultSideBarPanel": 'attribution',
+              "sideBarOpenByDefault": false,
+              "forceDrawAnnotations": true,
+              "highlightAllAnnotations": true,
+
+          },
+          "workspace": {
+              "type": "{{ "mosaic" if entity.depictions|length < 9 else 'elastic' }}"
+          },
+          "language": "{{ session.language }}",
+          "availableLanguages": {
+              "de": "Deutsch",
+              "en": "English",
+              "fr": "Français"
+          },
+          "windows": [
+                {
+                    "loadedManifest": "{{ depiction.iiif_manifest }}"}
+
+          ]
+      };
+      Mirador.viewer(config);
+  </script>
+</div>

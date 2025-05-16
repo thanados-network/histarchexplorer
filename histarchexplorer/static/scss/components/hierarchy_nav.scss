@@ -1,0 +1,129 @@
+@use '../globals'as *;
+
+.main-entity-ellipse {
+  //border: 1px solid black;
+  border-radius: 30px;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding-bottom: rem(5);
+  max-width: 80%;
+  margin: auto;
+  display: grid;
+
+  @media (min-width: 1921px) or (max-width: 769px) {
+    max-width: 90%;
+    margin: auto;
+    display: grid;
+    align-content: center;
+    align-items: center;
+  }
+
+  border-top: rem(5) solid transparent;
+  border-bottom: rem(5) solid transparent;
+
+  &--places {
+    border-top-color: var(--limegreen);
+    border-bottom-color: var(--limegreen);
+  }
+
+  &--actors {
+    border-top-color: var(--pink);
+    border-bottom-color: var(--pink);
+  }
+
+  &--events {
+    border-top-color: var(--blue);
+    border-bottom-color: var(--blue);
+  }
+
+  &--items {
+    border-top-color: var(--light-orange);
+    border-bottom-color: var(--light-orange);
+  }
+
+  &--sources {
+    border-top-color: var(--reddish-brown);
+    border-bottom-color: var(--reddish-brown);
+  }
+
+  &--files {
+    border-top-color: var(--dark-greyblue);
+    border-bottom-color: var(--dark-greyblue);
+  }
+
+}
+
+
+.hierarchy-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+
+  button {
+    transition: transform 0.2s ease-in-out;
+
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+}
+
+button.btn-whitish {
+  background-color: rgba(255, 255, 255, 0.6);
+  border: none;
+  box-shadow: none;
+}
+
+button.btn-whitish:hover {
+  background-color: rgba(255, 255, 255, 1);
+  color: #000;
+}
+
+button.btn-whitish:disabled,
+button.btn-whitish[disabled] {
+  background-color: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.hierarchy-line {
+  background-color: grey;
+  height: 30px;
+  width: 1px;
+  margin: 5px 0;
+}
+
+.hierarchy-card-label {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(1rem, 1.5vw, 1.8rem);
+  font-weight: 600;
+  margin-bottom: rem(10);
+  text-transform: uppercase;
+  color: var(--text-color2);
+  padding: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 769px) {
+  .hierarchy-card-label {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 1921px) {
+  .hierarchy-card-label {
+    font-size: 1.4rem;
+  }
+}
+
+
+.hierarchy-item {
+  background-color: lightgrey;
+  padding-top: 1rem;
+  display: grid;
+  height: calc(100vh - 106px);
+}

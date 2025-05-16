@@ -65,3 +65,12 @@ class ApiAccess:
             params=parser.__dict__,
             proxies=PROXIES,
             timeout=30).json()
+
+
+    @staticmethod
+    def get_system_class_count(parser: Parser) -> dict[str, Any]:
+        return requests.get(
+            f"{app.config['API_URL']}/system_class_count/",
+            params=parser.__dict__,
+            proxies=PROXIES,
+            timeout=30).json()

@@ -1,16 +1,18 @@
-//500px, 640px, 1150px, 1400px
+//576px, 640px, 767px, 1150px, 1400px
 $breakpoints-up: (
-        'mini' : '31.25em',
+        'mini' : '36em',
         'medium': '40em',
+        'md-lg': '47.9375',
         'large': '71.875em',
         'xlarge': '87.5em',
 );
 
-//639px, 1149px, 1399px
+//639px, 766px, 1149px, 1399px
 $breakpoints-down: (
-        'mini': '31.188em',
+        'mini': '35.9375em',
         'small': '39.9375em',
         'medium': '71.8125em',
+        'md-lg': '47.875',
         'large': '87.4375em',
 );
 

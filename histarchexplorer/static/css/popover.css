@@ -1,0 +1,8 @@
+.popover-body {
+  max-height: 200px;
+  overflow-y: auto;  /
+}
+
+.popover {
+  max-width: 300px;
+}

@@ -1,0 +1,24 @@
+.relative-wrapper {
+  position: relative;
+}
+
+.live-popup {
+  position: absolute;
+  top: 100%; // Direkt unter dem Formular
+  left: 0;
+  right: 0;
+  background: #fff;
+  color: #000;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  display: none; // Standardmäßig ausgeblendet
+  padding: 8px;
+  font-size: 16px;
+
+  &.show {
+    display: block;
+  }
+}
