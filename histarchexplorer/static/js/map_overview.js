@@ -1,4 +1,3 @@
-// Ensure gisData is always an array
 const gisArray = Array.isArray(gisData) ? gisData : [gisData];
 
 // Wrap gisArray into a FeatureCollection
@@ -63,22 +62,23 @@ overview_map.on('load', () => {
       .addTo(overview_map);
   });
 
-  // Fit map to all points
-  const bounds = new maplibregl.LngLatBounds();
-  featureCollection.features.forEach((f) => {
-    bounds.extend(f.geometry.coordinates);
-  });
-  overview_map.fitBounds(bounds, { padding: 40 });
+  // Fit map to all points, or center if only one point
+const bounds = new maplibregl.LngLatBounds();
+featureCollection.features.forEach((f) => {
+  bounds.extend(f.geometry.coordinates);
+});
 
-  // Optional: popup on layer click
-  overview_map.on('click', 'point-layer', (e) => {
-    const props = e.features[0].properties;
-    const coords = e.features[0].geometry.coordinates;
-    new maplibregl.Popup()
-      .setLngLat(coords)
-      .setHTML(`<b>${entityName}</b><p><b>${props.title}</b> ${props.description}</p>`)
-      .addTo(overview_map);
-  });
+if (featureCollection.features.length > 1) {
+  overview_map.fitBounds(bounds, { padding: 40, maxZoom: 12 });
+} else if (featureCollection.features.length === 1) {
+  // Single point: center and zoom level 12
+  overview_map.setCenter(bounds.getCenter());
+  overview_map.setZoom(12);
+} else {
+  // No points: fallback center/zoom
+  overview_map.setCenter([0, 0]);
+  overview_map.setZoom(2);
+}
 
   // Change cursor on hover
   overview_map.on('mouseenter', 'point-layer', () => {
