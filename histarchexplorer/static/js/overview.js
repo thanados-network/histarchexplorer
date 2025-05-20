@@ -13,8 +13,13 @@ window.onload = function () {
     }, 500);
 };
 
+let resizeTimeout;
+
 window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
     grid.refreshItems().layout();
+  }, 150);
 });
 
 /*
