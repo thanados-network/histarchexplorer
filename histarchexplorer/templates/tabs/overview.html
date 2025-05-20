@@ -1,15 +1,20 @@
+<link href="../../static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"/>
+<script src="../../static/node_modules/maplibre-gl/dist/maplibre-gl.js"></script>
+
 <link rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script
     src="https://cdn.jsdelivr.net/gh/haltu/muuri@0.9.5/dist/muuri.min.js">
 </script>
-{#<script src="{{ url_for('static', filename='js/map_landing.js') }}"></script>#}
+
+
 
 <script> const entity = JSON.parse(JSON.parse({{ data|tojson }}).entity)</script>
 <script> const categorized_types = JSON.parse(JSON.parse({{ data|tojson }}).categorized_types)</script>
 <script> const gisData = entity.geometry ? entity.geometry : null</script>
 <script> const entityName = entity.name</script>
+<script src="{{ url_for('static', filename='js/map_overview.js') }}"></script>
 <script>
     console.log("Data:", {{ data | tojson | safe }});
 </script>
@@ -23,59 +28,272 @@
     const related_entities = JSON.parse(JSON.parse({{ data|tojson }}).related_entities || 'null');
 </script>
 
-
+<link rel="stylesheet" href="/static/css/main.css">
 <!-- <div id="overview-content"></div> -->
-<style>
-    .grid {
-        position: relative;
-    }
 
-    .item {
-        display: block;
-        position: absolute;
-        width: 100px;
-        height: 100px;
-        margin: 5px;
-        z-index: 1;
-        background: #000;
-        color: #fff;
-    }
 
-    .item.muuri-item-dragging {
-        z-index: 3;
-    }
+<div class="row">
+  <div class="col flex-column grid-muuri">
 
-    .item.muuri-item-releasing {
-        z-index: 2;
-    }
+    <div class="item item-half hierarchy-item">
+      {% if ancestor_entities %}
+        {% for entity in ancestor_entities %}
+          <div class="hierarchy-button">
+            <button type="button"
+                    class="btn btn-whitish rounded-5">
+              <a href="{{ url_for('landing', id_=entity.id) }}"
+                 class="nude-link text-decoration-none">
+                {{ entity.standard_type.icon | safe }}
+                {{ entity.name }}
+              </a>
+            </button>
+            <div class="hierarchy-line"></div>
+          </div>
+        {% endfor %}
+      {% endif %}
+      {% set system_class_map = {
+                    'place': 'places',
+                    'feature': 'places',
+                    'stratigraphic unit': 'places',
+                    'move': 'events',
+                    'acquisition': 'events',
+                    'modification': 'events',
+                    'activity': 'events',
+                    'group': 'actors',
+                    'person': 'actors',
+                    'event': 'events',
+                    'artifact': 'items',
+                    'source': 'sources',
+                    'file': 'files'
+                } %}
 
-    .item.muuri-item-hidden {
-        z-index: 0;
-    }
+      {% if entity.system_class.lower() in ['group', 'person'] and main_image %}
+        <div class="entity-card__icon">
+          <img src="{{ main_image.url }}" alt="{{ entity.name }}"/>
+        </div>
+        <div class="hierarchy-card-label">{{ entity.name }}</div>
+      {% else %}
+        <div
+            class="main-entity-ellipse main-entity-ellipse--{{ system_class_map.get(entity.system_class.lower(), '') }}">
+          <div class="entity-card__icon">
+            {% if entity.system_class.lower() in ['feature', 'stratigraphic unit'] %}
+              <img src="/static/images/entity_icons/place.png"
+                   alt="{{ entity.system_class }}">
+            {% elif entity.system_class.lower() in ['move', 'acquisition', 'modification', 'activity'] %}
+              <img src="/static/images/entity_icons/event.png"
+                   alt="{{ entity.system_class }}">
+            {% else %}
+              <img
+                  src="/static/images/entity_icons/{{ entity.system_class | lower }}.png"
+                  alt="{{ entity.system_class }}">
+            {% endif %}
+          </div>
+          <div class="hierarchy-card-label mb-0">{{ entity.name }}</div>
+          <div class="entity-type mb-0 ">
+            {% if entity.standard_type %}
+              <p>{{ entity.standard_type.label | upper }}</p>
+            {% endif %}
+          </div>
 
-    .item-content {
-        position: relative;
-        width: 100%;
-        height: 100%;
-    }
-</style>
 
-<div class="grid">
-  <div class="item">
-    <div class="item-content">
-      <!-- Safe zone, enter your custom markup -->
-      This can be anything.
-      <!-- Safe zone ends -->
+          <div class="entity-date">
+            <p>{{ entity.formated_date }}</p>
+            {% if entity.types %}
+              {% for type in entity.types %}
+                {% if type.root == 'Chronology' %}
+                  <p>{{ type.label or 'No date available' }}</p>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+
+      <!--  Subunits button -->
+      {% if entity.subunits %}
+        <div class="hierarchy-button">
+          <div class="hierarchy-line"></div>
+          <button type="button" class="btn btn-whitish rounded-5" disabled>
+            <i class="bi bi-diagram-3"></i>
+            <span class="nude-link">
+                                    {{ entity.subunits | length }}
+              {{ "Subentity" if entity.subunits | length == 1 else "Subentities" }}</span>
+
+          </button>
+        </div>
+      {% endif %}
+      <div class="entity-country">
+        {% if entity.types %}
+          {% for type in entity.types %}
+            {% if type.hierarchy == 'Country' %}
+              <p>{{ type.label }}</p>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </div>
+      </button>
     </div>
-  </div>
 
-  <div class="item">
-    <div class="item-content">
-      <!-- Safe zone, enter your custom markup -->
-      <div class="my-custom-content">Yippee!</div>
-      <!-- Safe zone ends -->
-    </div>
+    <!-- Description -->
+    {% if entity.description %}
+      <div class="{{ entity.description_class }}">
+        <div class="item-content">
+          <div class="muuri-description">
+            <span class="tile-label">DESCRIPTION</span>
+            <p>{{ entity.description }}</p>
+          </div>
+        </div>
+      </div>
+
+    {% endif %}
+
+    <!-- Attributes -->
+    {% if categorized_types %}
+      <div class="item-half">
+        <div class="item-content">
+          <span class="tile-label">ATTRIBUTES</span>
+          <div class="categorized-types">
+            {% for label, value in categorized_types.items() %}
+              <p class="tile-sub-label text-uppercase mt-3">
+                {{ value[0]['icon'] | safe }} {{ label }}</p>
+              {% for type in value %}
+                <div class="badge bg-dark-subtle text-wrap m-1">
+                  <h6 class="m-0 text-center">
+                    {{ type['type'].label }}
+                    {% if type['type'].value and type['type'].unit %}:
+                      {{ type['type'].value }}
+                      {{ type['type'].unit }}
+                    {% endif %}
+                  </h6>
+                </div>
+              {% endfor %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+
+    <!-- Map Location -->
+    {% if entity.geometry %}
+      <div class="item">
+        <div class="map-wrapper">
+          <div class="item-content item-content-full">
+            <div class="location">
+              <div id="muuri-map"></div>
+              <button id="expand-button"
+                      class="btn btn-light btn-sm">
+                <i class="bi bi-arrows-fullscreen"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    {% endif %}
+
+
+
+    <!-- First image -->
+    {% if main_image and (entity.system_class.lower() not in ['actor', 'person']) %}
+      <div class="item">
+        <div class="item-content item-content-full">
+          <div class="muuri-images">
+            <div class="image">
+              {% if main_image.iiif_base_path %}
+                <img src="{{ main_image.iiif_base_path }}/full/max/0/default.jpg"
+                     alt="{{ main_image.title }}">
+              {% else %}
+                <img src="{{ main_image.url }}"
+                     alt="{{ main_image.title }}">
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+
+
+    <!-- All other images -->
+    {% if initial_images %}
+      {% for depiction in initial_images %}
+        <div class="{% if loop.index0 < 3 %}item-half{% else %}item{% endif %}">
+          <div class="item-content item-content-full">
+            <div class="image">
+                <img
+                    src="{% if depiction.iiif_base_path %}
+                      {{ depiction.iiif_base_path }}/full/max/0/default.jpg
+                    {% else %}
+                      {{ depiction.url }}
+                    {% endif %}"
+                    alt="{{ depiction.title }}"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+
+    <!-- Bibliography and External References -->
+    {% if related_entities %}
+      <div class="item item-wide">
+        <div class="item-content">
+          <div class="muuri-references">
+            <p class="tile-label text-uppercase">References</p>
+            <ul class="no-bullets">
+              {% for key, type_ in related_entities.items() %}
+                {% if key == "Bibliography" or key == "External reference" %}
+                  {% for entity_ in type_.values() %}
+                    {% for item in entity_ %}
+                      <li>
+                        <div class="reference-content">
+                          <div class="reference-header">
+                            {% if key == "Bibliography" %}
+                              <i class="bi bi-book"></i>
+                              <a href="{{ url_for('landing', id_=item.id) }}" class="reference-name">
+                                {{ item.name }}
+                              </a>
+                            {% elif key == "External reference" %}
+                              <i class="bi bi-box-arrow-up-right"></i>
+                              {% set parts = item.name.split('/') %}
+                              {% set result = parts[:3] %}
+                              <a href="{{ item.name }}" class="reference-name">
+                                {{ result | join('/') }}
+                              </a>
+                            {% endif %}
+
+                          </div>
+                          <p class="reference-description">
+                            {{ item.description }}
+                            {% for relation in item.relations %}
+                              {% if entity.id == relation.relation_to_id %}
+                                {{ relation.relation_description }}
+                              {% endif %}
+                            {% endfor %}
+                          </p>
+                        </div>
+                      </li>
+
+                    {% endfor %}
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
   </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 
 <script src="../../static/js/overview.js"></script>

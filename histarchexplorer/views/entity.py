@@ -148,6 +148,7 @@ def entity(id_: int, tab_name="overview") -> str:
 @app.route('/getentity/<int:id_>/<tab_name>')
 def getentity(id_: int, tab_name=None) -> str:
     data = {}
+    entity_ = None
     # entities = Entity.get_linked_entities_by_properties_recursive(
     #     id_,
     #     get_parser_for_getentity(id_)
@@ -284,11 +285,14 @@ def getentity(id_: int, tab_name=None) -> str:
     return render_template(
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
+        entity=entity_,
+        categorized_types=categorized_types(entity_) if entity_ else None,
         features=features,
         main_image=main_image,
         initial_images=initial_images,
         more_images=more_images,
-        total_images=total_images)
+        total_images=total_images,
+        )
         #related_entities=related_entities_json)
 
 
