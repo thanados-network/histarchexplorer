@@ -161,7 +161,7 @@ def entities(tab_name="") -> str:
 
 @app.route('/get_entities/<tab_name>')
 def get_entities(tab_name: str = None) -> str:
-
+    print(tab_name)
     return render_template(
             f'tabs/browse.html',
             tab_name=tab_name)
