@@ -85,3 +85,4 @@ SIDEBAR_OPTIONS = [
     {'order': 1, 'route': 'overview', 'icon': 'bi bi-info-circle'},
     {'order': 2, 'route': 'map', 'icon': 'bi bi-map'},
 ]
+

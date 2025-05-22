@@ -7,6 +7,7 @@ from histarchexplorer import app
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.types import Types
+from histarchexplorer.utils import cerberos
 
 sidebar_elements = app.config['SIDEBAR_OPTIONS']
 valid_routes = {item['route'] for item in sidebar_elements}
@@ -15,37 +16,34 @@ valid_routes = {item['route'] for item in sidebar_elements}
 def check_p46_geoms(
         id):  # todo replace this check with API. Benchmark for 50505 local postgres (1 row retrieved starting from 1 in 1 s 443 ms (execution: 1 s 147 ms, fetching: 296 ms)
     sql = """
-    WITH RECURSIVE p46_links AS (
-          SELECT *
-          FROM model.link
-          WHERE property_code = 'P46'
-            AND (%(id)s = domain_id OR %(id)s = range_id)
+          WITH RECURSIVE
+              p46_links AS (SELECT *
+                            FROM model.link
+                            WHERE property_code = 'P46'
+                              AND (%(id)s = domain_id OR %(id)s = range_id)
 
-          UNION
+                            UNION
 
-          SELECT l.*
-          FROM model.link l
-          JOIN p46_links pl
-            ON l.property_code = 'P46'
-               AND (l.domain_id = pl.range_id OR l.range_id = pl.domain_id)
-        ),
-        all_ids AS (
-          SELECT domain_id AS id FROM p46_links
-          UNION
-          SELECT range_id AS id FROM p46_links
-          UNION
-          SELECT %(id)s AS id
-        )
-    SELECT EXISTS (
-      SELECT 1
-      FROM model.entity e
-      JOIN all_ids a ON e.id = a.id
-      JOIN model.link gl ON e.id = gl.domain_id
-        AND gl.property_code = 'P53'
-      JOIN model.gis g ON gl.range_id = g.entity_id
-      LIMIT 1
-    ) AS has_row;
-    """
+                            SELECT l.*
+                            FROM model.link l
+                                     JOIN p46_links pl
+                                          ON l.property_code = 'P46'
+                                              AND (l.domain_id = pl.range_id OR l.range_id = pl.domain_id)),
+              all_ids AS (SELECT domain_id AS id
+                          FROM p46_links
+                          UNION
+                          SELECT range_id AS id
+                          FROM p46_links
+                          UNION
+                          SELECT %(id)s AS id)
+          SELECT EXISTS (SELECT 1
+                         FROM model.entity e
+                                  JOIN all_ids a ON e.id = a.id
+                                  JOIN model.link gl ON e.id = gl.domain_id
+                             AND gl.property_code = 'P53'
+                                  JOIN model.gis g ON gl.range_id = g.entity_id
+                         LIMIT 1) AS has_row; \
+          """
     # Execute parameterized query
     g.cursor.execute(sql, {'id': id})
     result = g.cursor.fetchone()
@@ -55,31 +53,30 @@ def check_p46_geoms(
 def get_root_id(
         id):  # todo alternative with api: Benchmarl for 77841: 1 row retrieved starting from 1 in 122 ms (execution: 80 ms, fetching: 42 ms)
     sql = """
-            WITH RECURSIVE parent_chain AS (
+          WITH RECURSIVE parent_chain AS (
               -- Anchor: start with the link where 77841 is the range_id
-              SELECT
-                domain_id,
-                range_id,
-                0 AS level
+              SELECT domain_id,
+                     range_id,
+                     0 AS level
               FROM model.link
               WHERE property_code = 'P46'
                 AND range_id = %(id)s
-            
+
               UNION ALL
-            
+
               -- Recursive part: find the parent link where the current domain_id is the new row's range_id
-              SELECT
-                l.domain_id,
-                l.range_id,
-                pc.level + 1 AS level
+              SELECT l.domain_id,
+                     l.range_id,
+                     pc.level + 1 AS level
               FROM model.link l
-              JOIN parent_chain pc
-                ON l.property_code = 'P46'
-                AND l.range_id = pc.domain_id
-            )
-            SELECT domain_id
-            FROM parent_chain ORDER BY level DESC LIMIT 1;
-    """
+                       JOIN parent_chain pc
+                            ON l.property_code = 'P46'
+                                AND l.range_id = pc.domain_id)
+          SELECT domain_id
+          FROM parent_chain
+          ORDER BY level DESC
+          LIMIT 1; \
+          """
     # Execute parameterized query
     g.cursor.execute(sql, {'id': id})
     result = g.cursor.fetchone()
@@ -88,18 +85,14 @@ def get_root_id(
 
 def check_geom(id):
     """Checks if an ID has geometry in model.gis via a linked entity."""
-    sql = """SELECT EXISTS (
-                SELECT 1 
-                FROM model.gis 
-                WHERE entity_id = (
-                    SELECT range_id 
-                    FROM model.link 
-                    WHERE domain_id = %(id)s 
-                    AND property_code = 'P53'
-                    LIMIT 1
-                )
-            );
-    """
+    sql = """SELECT EXISTS (SELECT 1
+                            FROM model.gis
+                            WHERE entity_id = (SELECT range_id
+                                               FROM model.link
+                                               WHERE domain_id = %(id)s
+                                                 AND property_code = 'P53'
+                                               LIMIT 1)); \
+          """
     g.cursor.execute(sql, {'id': id})
     result = g.cursor.fetchone()
     print(id if result and result[0] else None)
@@ -114,12 +107,12 @@ def get_first_geom(id):
         return id_to_return
 
     # Try to find the parent entity (domain_id)
-    sql = """SELECT domain_id 
-             FROM model.link 
-             WHERE range_id = %(id)s 
-             AND property_code = 'P46'
-             LIMIT 1;
-    """
+    sql = """SELECT domain_id
+             FROM model.link
+             WHERE range_id = %(id)s
+               AND property_code = 'P46'
+             LIMIT 1; \
+          """
     g.cursor.execute(sql, {'id': id})
     result = g.cursor.fetchone()
 
@@ -127,6 +120,7 @@ def get_first_geom(id):
         parent_id = result[0]
         return get_first_geom(parent_id)  # Recursively check the parent
     return None  # No parent found with geometry
+
 
 
 @app.route('/entity/<int:id_>')
@@ -145,10 +139,34 @@ def entity(id_: int, tab_name="overview") -> str:
         entity_id=id_)
 
 
+@app.route('/entities')
+@app.route('/entities/<tab_name>')
+def entities(tab_name="") -> str:
+
+    view_classes = cerberos.get_view_class_count()
+
+    sidebar_elements = [
+        {'order': i + 1, 'route': key}
+        for i, key in enumerate(sorted(view_classes.keys()))
+    ]
+    if tab_name == "":
+        tab_name = sidebar_elements[0]['route']
+
+    return render_template(
+        'entity.html',
+        view_classes=view_classes, sidebar_elements=sidebar_elements, entity_id=0, page_name="landing",
+        active_tab=tab_name, )
+
+
 @app.route('/getentity/<int:id_>/<tab_name>')
 def getentity(id_: int, tab_name=None) -> str:
+    if id_ == 0:
+        return render_template(
+            f'tabs/browse.html', tab_name=tab_name)
+
     data = {}
     entity_ = None
+
     # entities = Entity.get_linked_entities_by_properties_recursive(
     #     id_,
     #     get_parser_for_getentity(id_)
@@ -167,7 +185,8 @@ def getentity(id_: int, tab_name=None) -> str:
                 property = {'id': ent.id, 'label': ent.name, 'class': ent.system_class}
                 if ent.id == first_geom and ent.system_class != 'Place':
                     property['main'] = True
-                if ent.system_class in ['Feature', 'Place', 'Stratigraphic unit', 'Human remains', 'Artifact'] and ent.geometry:
+                if ent.system_class in ['Feature', 'Place', 'Stratigraphic unit', 'Human remains',
+                                        'Artifact'] and ent.geometry:
                     features['features'].append({
                         'type': 'Feature',
                         'geometry': ent.geometry,
@@ -188,7 +207,7 @@ def getentity(id_: int, tab_name=None) -> str:
     initial_images = []
     more_images = False
     total_images = 0
-   # related_entities_json = json.dumps({}, ensure_ascii=False, indent=4)
+    # related_entities_json = json.dumps({}, ensure_ascii=False, indent=4)
 
     # def get_related_entities(
     #         main_entity: Entity,
@@ -242,10 +261,10 @@ def getentity(id_: int, tab_name=None) -> str:
         data['spatial'] = map_data
 
     elif tab_name == 'overview':
-        #data = get_entity()
+        # data = get_entity()
         entity_ = Entity.get_entity(id_, Parser())
 
-        data= {
+        data = {
             'entity': json.dumps(
                 entity_.to_serializable(),
                 ensure_ascii=False,
@@ -255,14 +274,13 @@ def getentity(id_: int, tab_name=None) -> str:
                 ensure_ascii=False,
                 indent=4)
         }
-       # entities = Entity.get_linked_entities_by_properties_recursive(
-       #     id_,
-       #     get_parser_for_getentity(id_)
-    #)
+        # entities = Entity.get_linked_entities_by_properties_recursive(
+        #     id_,
+        #     get_parser_for_getentity(id_)
+        # )
         images = []
-      #  related_entities = get_related_entities(main_entity, entities)
+        #  related_entities = get_related_entities(main_entity, entities)
         # related_entities_json = json.dumps(related_entities, ensure_ascii=False, indent=4)
-
 
         for image in entity_.depictions:
             if image.main_image:
@@ -292,8 +310,8 @@ def getentity(id_: int, tab_name=None) -> str:
         initial_images=initial_images,
         more_images=more_images,
         total_images=total_images,
-        )
-        #related_entities=related_entities_json)
+    )
+    # related_entities=related_entities_json)
 
 
 def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
@@ -328,6 +346,7 @@ def get_ancestor_entities(main_entity: Entity, entities: list[Entity]) -> list[d
     ancestor_entities.reverse()
     return ancestor_entities
 
+
 def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
     divisions = defaultdict(list)
     for type_ in main_entity.types:
@@ -335,11 +354,10 @@ def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
             'type': type_.to_serializable(), 'icon': type_.division['icon']})
     sorted_divisions = dict(sorted(
         divisions.items(),
-        key=lambda x: (x[0] == x[0] == 'case_study', 'other',  x[0])
+        key=lambda x: (x[0] == x[0] == 'case_study', 'other', x[0])
     ))
 
     return sorted_divisions
-
 
 
 def get_parser_for_getentity(id_: int) -> Parser:

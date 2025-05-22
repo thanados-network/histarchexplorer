@@ -13,7 +13,7 @@ document.getElementById('toggleSidebar').addEventListener('click', function () {
     } else {
         root.style.setProperty('--sidebar-width', '60px');
     }
-    setTimeout(forceMuuriLayout, 300);
+    // setTimeout(forceMuuriLayout, 300); todo: move to tab js
 });
 
 let loadedCount = 0; // Track completed tab loads
@@ -132,7 +132,9 @@ document.addEventListener('DOMContentLoaded', function () {
             new bootstrap.Tab(tabElement).show();
             // Only update history if needed
             if (!skipPushState) {
-                const newUrl = `/entity/${entityId}/${tabName}`;
+                let newUrl = `/entity/${entityId}/${tabName}`;
+                if (entityId === 0) newUrl = `/entities/${tabName}`;
+
                 if (window.location.pathname !== newUrl) {
                     history.pushState({tab: tabName}, '', newUrl);
                 }
@@ -158,7 +160,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const tabName = event.target.id.replace('tab-', '');
             // Only push state if we're really switching tabs.
             if (!history.state || history.state.tab !== tabName) {
-                const newUrl = `/entity/${entityId}/${tabName}`;
+                let newUrl = `/entity/${entityId}/${tabName}`;
+                if (entityId === 0) newUrl = `/entities/${tabName}`;
                 history.pushState({tab: tabName}, '', newUrl);
             }
         });

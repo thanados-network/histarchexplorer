@@ -511,10 +511,7 @@ def reset() -> Response:
         
         INSERT INTO tng.maps (name, display_name, tilestring, sortorder) 
             VALUES ('OpenStreetMap', 'Open Street Map', 'L.tileLayer(
-            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, 
-            attribution: ''&copy; <a 
-            href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> 
-            contributors''});', 1);
+            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: ''&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors''});', 1);
         
         CREATE TABLE IF NOT EXISTS tng.config
         (
@@ -750,10 +747,7 @@ def reset() -> Response:
 
         INSERT INTO tng.settings (index_img, index_map, img_map, greyscale, 
         shown_entities)
-        VALUES ('/static/images/index_map_bg
-        /Blank_map_of_Europe_central_network.png',
-                1,
-                'image', TRUE, '[]'::JSONB)
+        VALUES ('/static/images/index_map_bg/Blank_map_of_Europe_central_network.png', 1, 'image', TRUE, '[]'::JSONB)
         
     ''')
 

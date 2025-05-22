@@ -1,0 +1,20 @@
+<div id="{{ tab_name }}-content">lorem ipsum {{ tab_name }}</div>
+
+
+{#
+<div class="d-flex flex-nowrap justify-content-around py-2 border-bottom gap-2" id="badge-bar">
+  {% set current_tab = view_classes[tab_name] %}
+  {% for subunit in current_tab.subunits %}
+    {% for subunit_name, subunit_count in subunit.items() %}
+      <button type="button"
+              class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-1"
+              data-subunit="{{ subunit_name }}">
+        <img src="{{ url_for('static', filename='images/entity_icons/' + subunit_name + '.png') }}"
+             alt="{{ subunit_name }}"
+             style="width: 40px; height: 40px;">
+        <span class="text-capitalize">{{ subunit_name.replace('_', ' ') }}</span>
+        <span class="badge bg-secondary-subtle">{{ subunit_count }}</span>
+      </button>
+    {% endfor %}
+  {% endfor %}
+</div>#}

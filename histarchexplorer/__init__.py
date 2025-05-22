@@ -17,7 +17,7 @@ babel = Babel(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer.views import (
-    admin, login, views, about, entities, entity, landing)
+    admin, login, views, about, entity, landing)
 from histarchexplorer.utils import view_util
 
 

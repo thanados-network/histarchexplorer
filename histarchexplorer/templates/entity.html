@@ -4,7 +4,8 @@
 
     <script>
         const tabsToLoad = {{ sidebar_elements | sort(attribute='order') | map(attribute='route') | list | tojson }};
-        const entityId = {{ entity_id }}
+        const entityId = {{ entity_id }};
+                {% if entity_id == 0 %} const viewClasses = {{ view_classes|tojson }}; {% endif %}
     </script>
 
     <div class="entity-container">
@@ -20,7 +21,14 @@
                                     data-bs-target="#tab-pane-{{ item.route }}" role="tab"
                                     aria-controls="tab-pane-{{ item.route }}"
                                     aria-selected="{{ 'true' if loop.first else 'false' }}">
-                                <i class="bi {{ item.icon }} fs-5"></i>
+
+                                {% if 'icon' in item %}
+                                    <i class="bi {{ item.icon }} fs-5"></i>
+                                {% else %}
+                                    <img src="/static/images/entity_icons/{{ item.route[:-1] | lower }}.png"
+                                         alt="{{ item.route }}" class="fs-5" style="width: 30px; height: 30px;"/>
+                                {% endif %}
+
                                 <span class="ms-2">{{ item.route }}</span>
                             </a>
                         </li>
@@ -36,7 +44,6 @@
             </div>
 
 
-            <!-- Main content area - MUURI Tiles -->
             <div class="col flex-column">
                 <div class="entity-content">
                     {% for item in sidebar_elements %}
@@ -54,9 +61,15 @@
             </div>
             <div class="col flex-column grid">
                 <div id="right-sidebar" class="bg-body-secondary">
-                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet
-                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet
-                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet
+                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor
+                    sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem
+                    ipsum dolor sit amet
+                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor
+                    sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem
+                    ipsum dolor sit amet
+                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor
+                    sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem
+                    ipsum dolor sit amet
                 </div>
             </div>
         </div>
