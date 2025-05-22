@@ -154,15 +154,20 @@ def entities(tab_name="") -> str:
 
     return render_template(
         'entity.html',
-        view_classes=view_classes, sidebar_elements=sidebar_elements, entity_id=0, page_name="landing",
+        view_classes=view_classes,
+        sidebar_elements=sidebar_elements,
+        entity_id=0, page_name="landing",
         active_tab=tab_name, )
 
+@app.route('/get_entities/<tab_name>')
+def get_entities(tab_name: str = None) -> str:
 
-@app.route('/getentity/<int:id_>/<tab_name>')
-def getentity(id_: int, tab_name=None) -> str:
-    if id_ == 0:
-        return render_template(
-            f'tabs/browse.html', tab_name=tab_name)
+    return render_template(
+            f'tabs/browse.html',
+            tab_name=tab_name)
+
+@app.route('/get_entity/<int:id_>/<tab_name>')
+def get_entity(id_: int, tab_name=None) -> str:
 
     data = {}
     entity_ = None

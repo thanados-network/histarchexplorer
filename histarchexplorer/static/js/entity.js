@@ -19,7 +19,7 @@ document.getElementById('toggleSidebar').addEventListener('click', function () {
 let loadedCount = 0; // Track completed tab loads
 
 async function loadHTML(id, tab, index, totalTabs) {
-    const response = await fetch(`/getentity/${id}/${tab}`);
+    const response = await fetch(`/get_entity/${id}/${tab}`);
 
     if (response.status === 404) {
         console.error(`Error 404: Content for tab "${tab}" not found.`);
