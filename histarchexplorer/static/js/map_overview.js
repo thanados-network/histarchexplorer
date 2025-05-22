@@ -69,15 +69,11 @@ featureCollection.features.forEach((f) => {
 });
 
 if (featureCollection.features.length > 1) {
-  overview_map.fitBounds(bounds, { padding: 40, maxZoom: 12 });
+  overview_map.fitBounds(bounds, { padding: 40, maxZoom: 12, duration: 0 });
 } else if (featureCollection.features.length === 1) {
   // Single point: center and zoom level 12
   overview_map.setCenter(bounds.getCenter());
   overview_map.setZoom(12);
-} else {
-  // No points: fallback center/zoom
-  overview_map.setCenter([0, 0]);
-  overview_map.setZoom(2);
 }
 
   // Change cursor on hover
