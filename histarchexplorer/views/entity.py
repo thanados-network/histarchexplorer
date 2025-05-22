@@ -253,14 +253,9 @@ def get_entity(id_: int, tab_name=None) -> str:
         # data = get_entity()
         entities = Entity.get_linked_entities_by_properties_recursive(
             id_,
-            Parser(
-                properties=['P67'],
-                limit=0,
-                format='lpx'
-        ))
-        main_entity = get_main_entity(id_, entities)
-        entity_ = Entity.get_entity(id_, Parser())
-        related_entities = get_related_entities(main_entity, entities)
+            get_parser_for_landing(id_))
+        entity_= get_main_entity(id_, entities)
+        related_entities = get_related_entities(entity_, entities)
 
         data = {
             'entity': json.dumps(
@@ -309,6 +304,45 @@ def get_entity(id_: int, tab_name=None) -> str:
 
     # related_entities=related_entities_json)
 
+
+def get_parser_for_landing(id_: int) -> Parser:
+    simple_entity = Entity.get_entity(id_, Parser(show=['None']))
+    match simple_entity.system_class:
+        case 'Place' | 'Feature' | 'Stratigraphic unit':
+            properties = ['P46', 'P67']
+        case 'Human remains' | 'Artifact':
+            properties = ['P46', 'P67', 'P52']
+        case 'Source' | 'Source translation':
+            properties = ['P67', 'P73', 'P128']
+        case 'Event' | 'Acquisition' | 'Activity' | 'Creation' | 'Move' | \
+             'Production' | 'Modification':
+            properties = [
+                'P67', 'P11', 'P14', 'P22', 'P23', 'P25', 'P7',
+                'P26', 'P27', 'P24', 'P31', 'P25', 'P108', 'P9',
+                'P134']
+        case 'Bibliography' | 'Edition' | 'External reference':
+            properties = ['P67']
+        case 'Group' | 'Person':
+            properties = [
+                'OA7', 'OA8', 'OA9', 'P107', 'P74', 'P52', 'P11',
+                'P14', 'P22', 'P23', 'P25']
+        case _:
+            properties = []
+    return Parser(
+        properties=properties,
+        limit=0,
+        format='lpx')
+
+def add_entity_object_to_relation(
+        main_entity: Entity,
+        entities: list[Entity]) -> None:
+    if not main_entity.relations:
+        return None
+    for relation in main_entity.relations:
+        for relation_entity in entities:
+            if int(relation_entity.id) == int(relation.relation_to_id):
+                relation.related_entity = relation_entity
+    return None
 
 def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
     for entity in entities:
