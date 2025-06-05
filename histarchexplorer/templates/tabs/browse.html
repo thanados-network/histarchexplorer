@@ -1,20 +1,106 @@
-<div id="{{ tab_name }}-content">lorem ipsum {{ tab_name }}</div>
+<div id="example-table-{{ tab_name }}"></div>
+
+<script>
+    const filteredEntities{{ tab_name }} = getEntitiesForTab('{{ tab_name }}');
+    console.log('tab_name');
+    console.log('{{ tab_name }}');
+    console.log(filteredEntities{{ tab_name }});
+
+    const columns{{ tab_name }} = [
+        {
+            title: "Name",
+            field: "name",
+            headerFilter: "input",
+            headerFilterFunc: "like",
+            formatter: function (cell) {
+                const id = cell.getRow().getData().id;
+                const name = cell.getRow().getData().name;
+                return `<a href="/entity/${id}">${name}</a>`;
+            }
+        }
+    ];
+
+    if (fieldHasValues(filteredEntities{{ tab_name }}, "begin")) {
+        filteredEntities{{ tab_name }}.forEach(entity => {
+            entity.beginBP = calculateTimeBP(entity.begin);
+        });
+        columns{{ tab_name }}.push({
+            title: "Begin",
+            field: "begin",
+            formatter: function (cell) {
+                const value = cell.getValue();
+                if (!value) return '';
+                return makeLocalDate(value).localdate;
+            },
+            sorter: function (a, b) {
+                return calculateTimeBP(a) - calculateTimeBP(b);
+            },
+            headerFilter: minMaxFilterEditor,
+            headerFilterFunc: minMaxFilterFunction,
+            headerFilterLiveFilter: false,
+        });
+    }
 
 
-{#
-<div class="d-flex flex-nowrap justify-content-around py-2 border-bottom gap-2" id="badge-bar">
-  {% set current_tab = view_classes[tab_name] %}
-  {% for subunit in current_tab.subunits %}
-    {% for subunit_name, subunit_count in subunit.items() %}
-      <button type="button"
-              class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-1"
-              data-subunit="{{ subunit_name }}">
-        <img src="{{ url_for('static', filename='images/entity_icons/' + subunit_name + '.png') }}"
-             alt="{{ subunit_name }}"
-             style="width: 40px; height: 40px;">
-        <span class="text-capitalize">{{ subunit_name.replace('_', ' ') }}</span>
-        <span class="badge bg-secondary-subtle">{{ subunit_count }}</span>
-      </button>
-    {% endfor %}
-  {% endfor %}
-</div>#}
+    if (fieldHasValues(filteredEntities{{ tab_name }}, "end")) {
+        columns{{ tab_name }}.push({
+            title: "End",
+            field: "end",
+            formatter: function (cell) {
+                const value = cell.getValue();
+                if (!value) return '';
+                return makeLocalDate(value).localdate;
+            },
+            sorter: function (a, b) {
+                return calculateTimeBP(a) - calculateTimeBP(b);
+            },
+            headerFilter: minMaxFilterEditor,
+            headerFilterFunc: minMaxFilterFunction,
+            headerFilterLiveFilter: false,
+        });
+    }
+
+
+    if (fieldHasValues(filteredEntities{{ tab_name }}, "description")) {
+        filteredEntities{{ tab_name }}.forEach(entity => {
+            entity.description = translateDescription(entity.description);
+        });
+        columns{{ tab_name }}.push({
+            title: "Description", field: "description", headerFilter: "input",
+            headerFilterFunc: "like",
+        });
+    }
+
+    if ("{{ tab_name }}" !== "files") {
+
+        columns{{ tab_name }}.push({
+            title: "Class",
+            field: "class",
+            editor: "input",
+            headerFilter: "list",
+            headerFilterParams: {valuesLookup: true, clearable: true}
+        });
+    }
+
+
+    if (fieldHasValues(filteredEntities{{ tab_name }}, "type")) {
+        columns{{ tab_name }}.push({
+            title: "Type", field: "type", editor: "input",
+            headerFilter: "input",
+            headerFilterFunc: "like"
+        });
+    }
+
+    const table{{ tab_name }} = new Tabulator("#example-table-{{ tab_name }}", {
+        layout: "fitColumns",
+        height: "calc( 100vh -  100px)",
+        data: filteredEntities{{ tab_name }},
+        pagination: "local",
+        paginationSize: 50,
+        paginationSizeSelector: [20, 50, 100],
+        persistence: false,
+        persistenceID: "persistence{{ tab_name }}",
+        columns: columns{{ tab_name }}
+    });
+</script>
+
