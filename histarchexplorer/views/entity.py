@@ -83,6 +83,91 @@ def get_root_id(
     return result[0] if result else id
 
 
+def get_root_type(id):
+    sql = """
+            WITH RECURSIVE parent_chain AS (
+            SELECT
+                domain_id,
+                range_id,
+                0 AS level
+            FROM model.link
+            WHERE property_code = 'P127'
+              AND domain_id =  %(id)s
+        
+            UNION
+        
+            SELECT
+                 %(id)s AS domain_id,
+                 %(id)s AS range_id,
+                0 AS level
+        
+            WHERE NOT EXISTS (
+                SELECT 1 FROM model.link
+                WHERE property_code = 'P127'
+                  AND domain_id =  %(id)s
+            )
+        
+            UNION ALL
+        
+            SELECT l.domain_id,
+                   l.range_id,
+                   pc.level + 1 AS level
+            FROM model.link l
+            JOIN parent_chain pc ON l.property_code = 'P127' AND l.domain_id = pc.range_id
+        )
+        
+        SELECT range_id
+        FROM parent_chain
+        ORDER BY level DESC
+        LIMIT 1;
+        """
+
+    g.cursor.execute(sql, {'id': id})
+    result = g.cursor.fetchone()
+    return result[0] if result else id
+
+def get_recursive_type_ids(id):
+    sql = """
+            (WITH RECURSIVE children_chain AS (
+            -- Anchor: start with the given id as the root
+            SELECT
+                 %(id)s AS id,   -- your starting ID here
+                0 AS level
+            UNION ALL
+            -- Recursive: find children where the domain_id = parent's id
+            SELECT
+                l.domain_id AS id,
+                cc.level + 1
+            FROM model.link l
+            JOIN children_chain cc ON l.range_id = cc.id
+            WHERE l.property_code = 'P127'
+        )
+        SELECT id
+        FROM children_chain
+        ORDER BY level, id)
+    """
+    g.cursor.execute(sql, {'id': id})
+    result = g.cursor.fetchall()
+    print('result get_recursive_type_ids(id)')
+    print(result)
+    return result
+
+
+def build_id_collection(ids):
+    if not ids:
+        return []
+
+    result = [
+        row[0]
+        for id in ids
+        for row in get_recursive_type_ids(id)
+    ]
+    print('result build_id_collection(ids)')
+    print(result)
+    return result
+
+
+
 def check_geom(id):
     """Checks if an ID has geometry in model.gis via a linked entity."""
     sql = """SELECT EXISTS (SELECT 1
@@ -134,11 +219,13 @@ def get_browse_list_entities():
     data = {
         'shown classes': result.shown_entities,
         'hidden classes': result.hidden_entities,
-#        'shown types': result.shown_types,
-#        'hidden types': result.hidden_types,
+        'shown types': build_id_collection(result.shown_types),
+        'hidden types': build_id_collection(result.hidden_types),
         'shown ids': result.shown_ids,
         'hidden ids': result.hidden_ids,
     }
+
+
 
 
     # Prepare filter values; handle None as empty lists to avoid errors in query
@@ -153,8 +240,8 @@ def get_browse_list_entities():
 
     shown_entities = parse_json(data['shown classes'])
     hidden_entities = parse_json(data['hidden classes'])
-#    shown_types = parse_json(data['shown types'])
-#    hidden_types = parse_json(data['hidden types'])
+    shown_types = parse_json(data['shown types'])
+    hidden_types = parse_json(data['hidden types'])
     shown_ids = parse_json(data['shown ids'])
     hidden_ids = parse_json(data['hidden ids'])
 
@@ -170,13 +257,13 @@ def get_browse_list_entities():
         where_clauses.append("e.openatlas_class_name != ALL (%s)")
         params.append(hidden_entities)
 
-    # if shown_types:
-    #     where_clauses.append("e.type = ANY (%s)")
-    #     params.append(shown_types)
-    #
-    # if hidden_types:
-    #     where_clauses.append("e.type != ALL (%s)")
-    #     params.append(hidden_types)
+    if shown_types:
+        where_clauses.append("e.id IN (SELECT a.id FROM model.entity a JOIN model.link b ON a.id = b.domain_id WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
+        params.append(shown_types)
+
+    if hidden_types:
+        where_clauses.append("e.id NOT IN (SELECT a.id FROM model.entity a JOIN model.link b ON a.id = b.domain_id WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
+        params.append(hidden_types)
 
     if shown_ids:
         where_clauses.append("e.id = ANY (%s)")
@@ -196,13 +283,35 @@ def get_browse_list_entities():
                 'id', e.id,
                 'name', e.name,
                 'description', e.description,
-                'class', e.openatlas_class_name
+                'class', e.openatlas_class_name,
+                'type', e.type,
+                'type_id', e.typeid,
+                'begin', e.begin,
+                'end', e.end
             )
         ) AS items
-        FROM model.entity e
-        {where_sql}
+        FROM (WITH RECURSIVE all_children AS (
+    SELECT h.id AS id
+    FROM web.hierarchy h
+    WHERE h.category = 'standard'
+
+    UNION ALL
+
+    SELECT l.domain_id
+    FROM model.link l
+    JOIN all_children ac ON l.range_id = ac.id
+    WHERE l.property_code = 'P127'
+)
+SELECT a.name, a.id, a.description, a.openatlas_class_name, ac.id AS typeid, c.name as type, tng.getdates(a.begin_from, a.begin_to, a.begin_comment) AS begin, tng.getdates(a.end_to, a.end_from, a.end_comment) AS end
+FROM model.entity a JOIN model.link l1 ON l1.domain_id = a.id
+JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id WHERE l1.property_code = 'P2' UNION ALL
+SELECT a.name, a.id, a.description, a.openatlas_class_name, null AS typeid, null as type, tng.getdates(a.begin_from, a.begin_to, a.begin_comment) AS begin, tng.getdates(a.end_to, a.end_from, a.end_comment) AS end
+FROM model.entity a WHERE id NOT IN (SELECT a.id
+FROM model.entity a JOIN model.link l1 ON l1.domain_id = a.id
+JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id WHERE l1.property_code = 'P2')) e {where_sql}
     """
 
+    print((query, tuple(params)))
     g.cursor.execute(query, tuple(params))
     data['entities'] = g.cursor.fetchone()[0] or []
 

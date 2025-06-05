@@ -6,6 +6,7 @@ from flask import (
     flash, session)
 from flask_login import current_user, login_required
 from flask_babel import lazy_gettext as _
+from setuptools.windows_support import hide_file
 from werkzeug import Response
 
 from histarchexplorer import app
@@ -16,7 +17,7 @@ from histarchexplorer.database.config_classes import get_config_classes
 from histarchexplorer.database.config_properties import get_config_properties
 from histarchexplorer.database.map import get_base_map, get_base_map_by_id
 from histarchexplorer.database.settings import (
-    get_map_settings, get_shown_entities)
+    get_map_settings, get_shown_entities, get_hidden_entities)
 from histarchexplorer.utils import helpers
 
 
@@ -180,6 +181,7 @@ FROM tng.links l
                      k not in app.config['CLASSES_TO_SKIP']}
 
     shown_entities = get_shown_entities()
+    hidden_entities = get_hidden_entities()
 
     view_classes = app.config['VIEW_CLASSES']
 
@@ -196,6 +198,7 @@ FROM tng.links l
         settings=settings,
         class_items=entities_dict,
         shown_entities=shown_entities,
+        hidden_entities=hidden_entities,
         view_classes=view_classes)
 
 
@@ -489,6 +492,18 @@ def select_entities() -> Response:
 
     return redirect(url_for('admin'))
 
+@app.route('/admin/deselect_entities', methods=['GET', 'POST'])
+def deselect_entities() -> Response:
+    if request.method == 'POST':
+        deselected_entities = request.form.getlist('selected_entities')
+
+        deselected_entities_str = json.dumps(deselected_entities)
+
+        g.cursor.execute('UPDATE tng.settings SET hidden_entities = %s::JSONB',
+                         (deselected_entities_str,))
+
+    return redirect(url_for('admin'))
+
 
 @app.route('/reset')
 @login_required
@@ -753,6 +768,28 @@ def reset() -> Response:
         INSERT INTO tng.settings (index_img, index_map, img_map, greyscale, 
         shown_entities)
         VALUES ('/static/images/index_map_bg/Blank_map_of_Europe_central_network.png', 1, 'image', TRUE, '[]'::JSONB)
+        
+        
+        create function tng.getdates(first timestamp without time zone, last timestamp without time zone, comment text) returns text
+            language plpgsql
+        as
+        $$
+        DECLARE
+            return_date TEXT;
+        BEGIN
+            CASE
+                WHEN comment LIKE '-%' THEN
+                    -- Use the comment as a negative year with leading zeros
+                    SELECT TO_CHAR(comment::INTEGER, 'FM000000000') INTO return_date;
+                ELSE
+                    -- Use the date logic
+                    SELECT TO_CHAR(LEAST(first, last), 'FM00000YYYY-MM-DD') INTO return_date;
+                CASE WHEN EXTRACT(YEAR FROM (LEAST(first, last)::DATE)) < 1 THEN SELECT '-' || return_date INTO return_date; ELSE NULL; END CASE;
+            END CASE;
+        
+            RETURN return_date;
+        END;
+        $$;
         
     ''')
 
