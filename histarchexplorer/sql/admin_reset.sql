@@ -252,8 +252,8 @@
         );
 
         INSERT INTO tng.settings (index_img, index_map, img_map, greyscale,
-        shown_entities)
-        VALUES ('/static/images/index_map_bg/Blank_map_of_Europe_central_network.png', 1, 'image', TRUE, '[]'::JSONB);
+        shown_entities, hidden_entities)
+        VALUES ('/static/images/index_map_bg/Blank_map_of_Europe_central_network.png', 1, 'image', TRUE, '[]'::JSONB, '[]'::JSONB);
 
 
         create function tng.getdates(first timestamp without time zone, last timestamp without time zone, comment text) returns text
