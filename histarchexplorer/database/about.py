@@ -52,3 +52,5 @@ build_connections_sql = '''
     WHERE domain_id = %s
     ORDER BY property, sortorder
 '''
+
+get_models_sql = 'SELECT * FROM tng.config WHERE id = %s'

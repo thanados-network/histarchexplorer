@@ -1,11 +1,11 @@
 from flask import g
 
-from histarchexplorer.database.about import build_connections_sql
+from histarchexplorer.database.about import build_connections_sql, get_models_sql
 
 
 def build_object(build_connections, id):
 
-    g.cursor.execute('SELECT * FROM tng.config WHERE id = %s', (id,))
+    g.cursor.execute(get_models_sql, (id,))
     object_data = g.cursor.fetchone()
     if not object_data:
         return {}
