@@ -13,7 +13,7 @@ def about() -> str:
     # Example usage
     #print(json.dumps(build_object(build_connections, 1), ensure_ascii=False, indent=4))
 
-    g.cursor.execute('SELECT name, description, legal_notice, imprint FROM tng.config WHERE id = 1')
+    g.cursor.execute(about_str_sql)
 
     project_result = g.cursor.fetchone()
     project = {

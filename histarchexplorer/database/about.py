@@ -54,3 +54,5 @@ build_connections_sql = '''
 '''
 
 get_models_sql = 'SELECT * FROM tng.config WHERE id = %s'
+
+about_str_sql = "SELECT name, description, legal_notice, imprint FROM tng.config WHERE id = 1"
