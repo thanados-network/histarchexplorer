@@ -23,6 +23,11 @@ def index() -> str:
         map_data=map_data,
         view_classes=view_classes)
 
+@app.route('/prototype')
+def prototype() -> str:
+    return render_template('prototyppage.html')
+
+
 
 import requests
 from flask import render_template, request
