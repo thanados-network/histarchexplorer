@@ -1,6 +1,7 @@
 from typing import Any
 
 from flask import request, session
+
 from histarchexplorer import app
 
 
