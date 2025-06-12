@@ -2,11 +2,10 @@ import json
 import os
 from typing import Optional
 
-from flask import (
-    render_template, abort, g, request, redirect, url_for,
-    flash, session, current_app)
-from flask_login import current_user, login_required
+from flask import (abort, current_app, flash, g, redirect, render_template,
+                   request, session, url_for)
 from flask_babel import lazy_gettext as _
+from flask_login import current_user, login_required
 from werkzeug import Response
 
 from histarchexplorer import app
@@ -16,8 +15,9 @@ from histarchexplorer.database.config import (
 from histarchexplorer.database.config_classes import get_config_classes
 from histarchexplorer.database.config_properties import get_config_properties
 from histarchexplorer.database.map import get_base_map, get_base_map_by_id
-from histarchexplorer.database.settings import (
-    get_map_settings, get_shown_entities, get_hidden_entities)
+from histarchexplorer.database.settings import (get_hidden_entities,
+                                                get_map_settings,
+                                                get_shown_entities)
 from histarchexplorer.utils import helpers
 
 

@@ -2,8 +2,6 @@ from typing import Any, Optional
 
 from flask import g, url_for
 
-import requests
-
 
 class Depiction:
     def __init__(self, data: dict[str, Any], entity_id: int) -> None:

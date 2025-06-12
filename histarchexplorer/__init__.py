@@ -1,11 +1,9 @@
 from typing import Any
 
 import psycopg2.extras
-
-from flask import Flask, g, Response, session, request, url_for
+from flask import Flask, Response, g, request, session, url_for
 from flask_babel import Babel
 from psycopg2 import DatabaseError
-
 from psycopg2.extensions import connection
 
 from histarchexplorer.database.settings import get_main_image_table

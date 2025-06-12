@@ -7,7 +7,6 @@ from histarchexplorer import app
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.types import Types
-from histarchexplorer.utils import cerberos
 
 sidebar_elements = app.config['SIDEBAR_OPTIONS']
 valid_routes = {item['route'] for item in sidebar_elements}

@@ -1,8 +1,7 @@
-import json
 from flask import render_template
+
 from histarchexplorer import app
 from histarchexplorer.database.about import *
-from histarchexplorer.models.about import build_object, build_connections
 from histarchexplorer.utils import helpers
 
 

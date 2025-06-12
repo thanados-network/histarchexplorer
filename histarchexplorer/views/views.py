@@ -1,14 +1,13 @@
 from typing import Optional
 
-from flask import redirect, render_template, request, session
+from flask import jsonify, redirect, session
 from werkzeug import Response
 
 from histarchexplorer import app
 from histarchexplorer.database.map import get_map_tilestring
 from histarchexplorer.database.settings import get_map_settings
 from histarchexplorer.utils.cerberos import get_view_class_count
-from flask import jsonify
-import requests
+
 
 @app.route('/')
 def index() -> str:
