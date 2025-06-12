@@ -20,8 +20,7 @@ def flask_app():
             host=app.config['DATABASE_HOST'],
             user=app.config['DATABASE_USER'],
             password=app.config['DATABASE_PASS'],
-            port=app.config['DATABASE_PORT']
-        )
+            port=app.config['DATABASE_PORT'] )
         fixture_conn.autocommit = True
 
         with fixture_conn.cursor() as cursor:
