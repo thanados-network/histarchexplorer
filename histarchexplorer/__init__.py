@@ -7,7 +7,7 @@ from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
 from histarchexplorer.database.settings import get_main_image_table
-from histarchexplorer.services.search_service import SearchService
+from histarchexplorer.services.search import SearchService
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
