@@ -6,15 +6,25 @@ def test_index_page(client):
     The 'client' fixture gives us a test client for your Flask application,
     allowing us to make requests to your app's endpoints.
     """
-    print("\nRunning test_index_page...")
-    # Make a GET request to the root URL ('/') of your Flask application
-    response = client.get('/')
+    rv = client.get('/')
+    assert rv.status_code == 200
+    assert b"SEARCH" in rv.data
 
-    # Assert that the HTTP status code of the response is 200 (OK)
-    assert response.status_code == 200
 
-    # Assert that the byte string 'Entities' is present in the response data.
-    # The response.data attribute contains the raw bytes of the response body.
-    assert b"ENTITIES" in response.data
 
-    print("test_index_page completed successfully.")
+def test_set_language_view(client):
+    """
+    Test the /language=<language> view to ensure it sets the session language
+    and redirects correctly.
+    """
+    test_language = 'de'
+    referrer_url = '/'
+    response = client.get(
+        f'/language={test_language}',
+        headers={'Referer': referrer_url})
+    assert response.status_code == 302
+    assert response.location == referrer_url
+    with client.session_transaction() as session:
+        assert session['language'] == test_language
+
+

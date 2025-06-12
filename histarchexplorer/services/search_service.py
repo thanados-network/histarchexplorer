@@ -55,7 +55,7 @@ class SearchService:
 
         if not system_classes:
             system_class_to_use = self.view_classes.get(category, ['all'])[0]
-            url = f"{self.api_url}api/search/{system_class_to_use}/{query}"
+            url = f"{self.api_url}search/{system_class_to_use}/{query}"
             all_results.extend(self._make_api_call(url))
         else:
             for sc in system_classes:
