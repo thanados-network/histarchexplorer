@@ -139,7 +139,7 @@
     <div class="entity-country">
       {% if entity.types %}
         {% for type in entity.types %}
-          {% if type.hierarchy == 'Country' %}
+          {% if type.hierarchy == 'Administrative unit' %}
             <p>{{ type.label }}</p>
           {% endif %}
         {% endfor %}
