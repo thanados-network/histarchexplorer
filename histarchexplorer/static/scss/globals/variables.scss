@@ -8,6 +8,15 @@
   --light-muuri-tile: hsl(0, 20%, 97%, 0.3);
   --dark-muuri-tile: hsla(0, 0%, 49%, 0.3);
 
+  --light-hierarchy-item: hsl(0, 0%, 83%);
+  --dark-hierarchy-item: hsl(0, 0%, 35%);
+
+  --light-label: black;
+  --dark-label: white;
+
+  --light-text: hsl(0, 0%, 33%);
+  --dark-text: hsl(0, 3%, 94%);
+
 
   --card-hover: var(--light-card-hover);
 
@@ -30,7 +39,7 @@
   --text-color2: var(--light-text1);
   --card-bg: var(--light-card);
   --card-hover: var(--light-card-hover);
-  --muuri-tile: var(--light-muuri-tile)
+  --muuri-tile: var(--light-muuri-tile);
 }
 
 
@@ -40,6 +49,9 @@ body.light {
   --card-bg: var(--light-card);
   --card-hover: var(--light-card-hover);
   --muuri-tile: var(--light-muuri-tile);
+  --hierarchy-item: var(--light-hierarchy-item);
+  --reference-label: var(--light-label);
+  --reference-text: var(--light-text);
 }
 
 body.dark {
@@ -48,4 +60,7 @@ body.dark {
   --card-bg: var(--dark-card);
   --card-hover: var(--dark-card-hover);
   --muuri-tile: var(--dark-muuri-tile);
+  --hierarchy-item: var(--dark-hierarchy-item);
+  --reference-label: var(--dark-label);
+  --reference-text: var(--dark-text);
 }

@@ -280,6 +280,7 @@
 }
 
 .entity-country {
+  color:black;
   margin-top: 1rem;
 }
 
@@ -363,7 +364,7 @@
 
   .reference-name {
     font-weight: bold;
-    color: #000;
+    color: var(--reference-label);
     text-decoration: none;
   }
 }
@@ -371,7 +372,7 @@
 .reference-description {
   font-size: 0.875rem;
   font-weight: 300;
-  color: #555;
+  color: var(--reference-text);
   margin-left: 1.75rem;
   margin-top: 0.25rem;
   line-height: 1.4;
