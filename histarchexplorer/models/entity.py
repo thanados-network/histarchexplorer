@@ -179,6 +179,9 @@ class Entity:
                 'en': description[0],
                 'de': description[1]}
             description = lang_dict.get(session['language'], description[0]) #fallback
+
+        if isinstance(description, list):
+            description = description[0]
         return description
 
     @staticmethod
