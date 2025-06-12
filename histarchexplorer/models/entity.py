@@ -1,10 +1,9 @@
 from __future__ import annotations
 
+import re
 from typing import Any, Optional
 
 from flask import session
-
-import re
 
 from histarchexplorer import app
 from histarchexplorer.api.api_access import ApiAccess
@@ -12,8 +11,8 @@ from histarchexplorer.api.parser import Parser
 from histarchexplorer.models.depiction import Depiction
 from histarchexplorer.models.relation import Relation
 from histarchexplorer.models.types import Types
-from histarchexplorer.models.util import format_date, split_date_string, \
-    uc_first, date_template_format
+from histarchexplorer.models.util import date_template_format, format_date, \
+    split_date_string, uc_first
 
 
 def get_alias(names) -> str:

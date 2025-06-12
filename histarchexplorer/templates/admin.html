@@ -14,9 +14,9 @@
                     </div>
                     <form method="post" action="{{ url_for('select_entities') }}">
                         <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="entityDropdown"
+                            <button class="btn btn-secondary dropdown-toggle me-3" type="button" id="entityDropdown"
                                     data-bs-toggle="dropdown" aria-expanded="false">
-                                Select Entities
+                                Shown Classes
                             </button>
                             <ul class="dropdown-menu dropdown-menu-columns" aria-labelledby="entityDropdown">
 
@@ -31,7 +31,44 @@
                                                 >
 
                                                 <label class="form-check-label" for="flexCheck{{ loop.index }}">
-                                                    {{ category }} {% if class_items[category] %} ({{ class_items[category] }}
+                                                    {{ category }} {% if class_items[category] %} (
+                                                    {{ class_items[category] }}
+                                                    ) {% else %}
+                                                    (0) {% endif %}
+                                                </label>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                {% endfor %}
+
+                                <button type="submit" class="btn btn-primary mt-3">Save Selection</button>
+                            </ul>
+
+                        </div>
+
+                    </form>
+                    <form method="post" action="{{ url_for('deselect_entities') }}">
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="entityDropdownBlacklist"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                Hidden Classes
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-columns" aria-labelledby="entityDropdownBlacklist">
+
+                                {% for view_class in view_classes %}
+                                    <li><h6 class="dropdown-header">{{ view_class |upper }}</h6></li>
+                                    {% for category in (view_classes[view_class]) %}
+                                        <li>
+                                            <div class="form-check ms-3">
+                                                <input class="form-check-input" type="checkbox" name="selected_entities"
+                                                       value="{{ category }}" id="flexCheck{{ loop.index }}Blacklist"
+                                                       {% if category in hidden_entities %}checked{% endif %}
+                                                >
+
+                                                <label class="form-check-label"
+                                                       for="flexCheck{{ loop.index }}Blacklist">
+                                                    {{ category }} {% if class_items[category] %} (
+                                                    {{ class_items[category] }}
                                                     ) {% else %}
                                                     (0) {% endif %}
                                                 </label>
@@ -350,25 +387,27 @@
                                                                 </div>
                                                             {% endif %}
 
-                                            {% if tab.target in ['nav-institutions', 'nav-persons'] %}
-                                            <div class="col-lg col-md-12">
-                                                <label for="InputMail{{ entry.id }}"
-                                                       class="form-label">{{ _('e-mail')|capitalize_first}}</label>
-                                                <input type="email" class="form-control"
-                                                       id="InputMail{{ entry.id }}"
-                                                       name="mail"
-                                                       value="{{ entry.email or '' }}"
-                                                       aria-describedby="mailHelp{{ entry.id }}"
-                                                       disabled>
-                                                <div class="invalid-feedback">{{ _('Please provide a valid mail address: someone@somemail.com')}}.
-                                                </div>
-                                            </div>
-                                            <div class="col-lg col-md-12">
-                                                <label for="InputImage" class="form-label">Image URL</label>
-                                                <input type="text" class="form-control" id="InputImage" name="image"
-                                                       value="{{ entry.image or '' }}" disabled>
-                                            </div>
-                                            {% endif %}
+                                                            {% if tab.target in ['nav-institutions', 'nav-persons'] %}
+                                                                <div class="col-lg col-md-12">
+                                                                    <label for="InputMail{{ entry.id }}"
+                                                                           class="form-label">{{ _('e-mail')|capitalize_first }}</label>
+                                                                    <input type="email" class="form-control"
+                                                                           id="InputMail{{ entry.id }}"
+                                                                           name="mail"
+                                                                           value="{{ entry.email or '' }}"
+                                                                           aria-describedby="mailHelp{{ entry.id }}"
+                                                                           disabled>
+                                                                    <div class="invalid-feedback">{{ _('Please provide a valid mail address: someone@somemail.com') }}.
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg col-md-12">
+                                                                    <label for="InputImage" class="form-label">Image
+                                                                        URL</label>
+                                                                    <input type="text" class="form-control"
+                                                                           id="InputImage" name="image"
+                                                                           value="{{ entry.image or '' }}" disabled>
+                                                                </div>
+                                                            {% endif %}
 
                                                             {% if tab.target in ['nav-main-project', 'nav-projects', 'nav-institutions'] %}
                                                                 <div class="col-lg col-md-12">
@@ -590,76 +629,75 @@
         </div>
 
 
-
-    <div class="modal" id="deleteModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ _('Confirm Delete') }}.</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>{{ _('Are you sure you want to delete') }}: "<span id="deleteName"></span>"?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary"
-                            data-bs-dismiss="modal">{{ _('Cancel') }}</button>
-                    <a id="confirmedDelete" type="button" href="#"
-                       class="btn btn-primary">{{ _('Confirm Delete') }}</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal for Add Map Form -->
-    <div class="modal fade" id="addMapModal" tabindex="-1" aria-labelledby="addMapModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addMapModalLabel">{{ _('Add Map') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" action="{{ url_for('add_map') }}" class="needs-validation" novalidate>
-                        <input type="hidden" name="map_id" value="{{ map_id }}">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label for="InputName"
-                                       class="form-label">{{ _('name')|capitalize_first }}</label>
-                                <input type="text" class="form-control" id="InputName" name="name" required>
-                                <div class="invalid-feedback">{{ _('Please provide a name') }}.</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="InputDispName" class="form-label">{{ _('Display Name') }}</label>
-                                <input type="text" class="form-control" id="InputDispName" name="displayname"
-                                       required>
-                                <div class="invalid-feedback">{{ _('Please provide a display name') }}.</div>
-                            </div>
-                            <div class="col-md-2 d-none">
-                                <label for="InputOrder"
-                                       class="form-label">{{ _('order')|capitalize_first }}</label>
-                                <input type="text" class="form-control" id="InputOrder" name="inputorder"
-                                       value="{{ maps|length  + 1 }}" required>
-                                <div class="invalid-feedback">{{ _('Please provide an order') }}.</div>
-                            </div>
-                        </div>
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <label for="InputDescription" class="form-label">Leaflet Tile Layer
-                                    String</label>
-                                <textarea class="form-control" id="InputDescription"
-                                          name="description"></textarea>
-                            </div>
-                        </div>
-                        <div class="mt-3 text-end">
-                            <button type="submit" class="btn btn-primary">{{ _('Add Map') }}</button>
-                        </div>
-                    </form>
+        <div class="modal" id="deleteModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ _('Confirm Delete') }}.</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{ _('Are you sure you want to delete') }}: "<span id="deleteName"></span>"?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                        <a id="confirmedDelete" type="button" href="#"
+                           class="btn btn-primary">{{ _('Confirm Delete') }}</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- Modal for Add Map Form -->
+        <div class="modal fade" id="addMapModal" tabindex="-1" aria-labelledby="addMapModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addMapModalLabel">{{ _('Add Map') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" action="{{ url_for('add_map') }}" class="needs-validation" novalidate>
+                            <input type="hidden" name="map_id" value="{{ map_id }}">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="InputName"
+                                           class="form-label">{{ _('name')|capitalize_first }}</label>
+                                    <input type="text" class="form-control" id="InputName" name="name" required>
+                                    <div class="invalid-feedback">{{ _('Please provide a name') }}.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="InputDispName" class="form-label">{{ _('Display Name') }}</label>
+                                    <input type="text" class="form-control" id="InputDispName" name="displayname"
+                                           required>
+                                    <div class="invalid-feedback">{{ _('Please provide a display name') }}.</div>
+                                </div>
+                                <div class="col-md-2 d-none">
+                                    <label for="InputOrder"
+                                           class="form-label">{{ _('order')|capitalize_first }}</label>
+                                    <input type="text" class="form-control" id="InputOrder" name="inputorder"
+                                           value="{{ maps|length  + 1 }}" required>
+                                    <div class="invalid-feedback">{{ _('Please provide an order') }}.</div>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <label for="InputDescription" class="form-label">Leaflet Tile Layer
+                                        String</label>
+                                    <textarea class="form-control" id="InputDescription"
+                                              name="description"></textarea>
+                                </div>
+                            </div>
+                            <div class="mt-3 text-end">
+                                <button type="submit" class="btn btn-primary">{{ _('Add Map') }}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
         <!-- Modal for Add Entry Form -->
@@ -668,7 +706,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addEntryModalLabel">{{_('add entry')|capitalize_first}}</h5>
+                        <h5 class="modal-title" id="addEntryModalLabel">{{ _('add entry')|capitalize_first }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -676,34 +714,38 @@
                             <input type="hidden" name="category" id="currentTab">
                             <div class="row">
                                 <div class="col-lg">
-                                    <label for="InputNameModal" class="form-label">{{_('name')|capitalize_first}}</label>
+                                    <label for="InputNameModal"
+                                           class="form-label">{{ _('name')|capitalize_first }}</label>
                                     <input type="text" class="form-control" id="InputNameModal" name="name"
                                            required>
-                                    <div class="invalid-feedback">{{ _('Please provide a name')}}.</div>
+                                    <div class="invalid-feedback">{{ _('Please provide a name') }}.</div>
                                 </div>
                                 <div class="col-lg">
-                                    <label for="InputDescriptionModal" class="form-label">{{ _('description')|capitalize_first}}</label>
+                                    <label for="InputDescriptionModal"
+                                           class="form-label">{{ _('description')|capitalize_first }}</label>
                                     <textarea class="form-control" id="InputDescriptionModal"
                                               name="description"></textarea>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-lg institutions-show persons-show modal-input">
-                                    <label for="InputAddressModal" class="form-label">{{ _('address')|capitalize_first}}</label>
+                                    <label for="InputAddressModal"
+                                           class="form-label">{{ _('address')|capitalize_first }}</label>
                                     <textarea class="form-control" id="InputAddressModal" name="address"></textarea>
                                     <label for="InputImageModal" class="form-label">Image URL</label>
                                     <input type="text" class="form-control" id="InputImageModal" name="image">
                                 </div>
                                 <div class="col-lg institutions-show persons-show projects-show modal-input">
-                                    <label for="InputMailModal" class="form-label">{{ _('e-mail')|capitalize_first}}</label>
+                                    <label for="InputMailModal"
+                                           class="form-label">{{ _('e-mail')|capitalize_first }}</label>
                                     <input type="email" class="form-control" id="InputMailModal" name="mail">
-                                    <div class="invalid-feedback">{{ _('Please provide a valid mail address: someone@somemail.com')}}.
+                                    <div class="invalid-feedback">{{ _('Please provide a valid mail address: someone@somemail.com') }}.
                                     </div>
                                 </div>
                                 <div class="col-lg institutions-show projects-show modal-input">
                                     <label for="InputWebsiteModal" class="form-label">Website</label>
                                     <input type="url" class="form-control" id="InputWebsiteModal" name="website">
-                                    <div class="invalid-feedback">{{ _('Please provide a valid website url: https://someurl.com')}}
+                                    <div class="invalid-feedback">{{ _('Please provide a valid website url: https://someurl.com') }}
                                     </div>
                                 </div>
                                 <div class="col-lg persons-show modal-input">
@@ -713,18 +755,21 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg main-project-show modal-input">
-                                    <label for="InputImprintModal" class="form-label">{{ _('imprint')|capitalize_first}}</label>
+                                    <label for="InputImprintModal"
+                                           class="form-label">{{ _('imprint')|capitalize_first }}</label>
                                     <textarea class="form-control" id="InputImprintModal" name="imprint"></textarea>
                                 </div>
                                 <div class="col-lg main-project-show modal-input">
-                                    <label for="InputLegalNoticeModal" class="form-label">{{ _('legal notice')|capitalize_first}}</label>
+                                    <label for="InputLegalNoticeModal"
+                                           class="form-label">{{ _('legal notice')|capitalize_first }}</label>
                                     <textarea class="form-control" id="InputLegalNoticeModal"
                                               name="legalnotice"></textarea>
                                 </div>
 
                             </div>
                             <div class="mt-3 text-end">
-                                <button type="submit" class="btn btn-primary">{{_('add entry')|capitalize_first}}</button>
+                                <button type="submit"
+                                        class="btn btn-primary">{{ _('add entry')|capitalize_first }}</button>
                             </div>
                         </form>
                     </div>
@@ -748,7 +793,7 @@
             </div>
         </div>
     </div>
-</div>
+    </div>
 
     <form method="POST" action="/choose_indexBg">
         <div class="card mt-5 mb-5">

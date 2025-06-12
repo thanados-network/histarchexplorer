@@ -1,6 +1,5 @@
 from typing import Any
 
-
 from flask_babel import lazy_gettext as _
 
 from histarchexplorer import app
