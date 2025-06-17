@@ -87,15 +87,8 @@ def before_request() -> None:
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
     session['language'] = get_locale()
     g.main_images = get_main_image_table()
-    app.jinja_env.filters['capitalize_first'] = capitalize_first
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
-
-
-def capitalize_first(value: str) -> str:
-    if not value:
-        return ''
-    return value[0].upper() + value[1:]
 
 
 @app.context_processor

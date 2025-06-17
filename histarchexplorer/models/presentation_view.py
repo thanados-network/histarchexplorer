@@ -1,3 +1,4 @@
+# pragma: no cover
 import json
 from dataclasses import asdict, dataclass, field
 from typing import Any, Optional

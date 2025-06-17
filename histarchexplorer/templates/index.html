@@ -27,7 +27,7 @@
         {% for view_class, details in view_classes.items() %}
         <div class="col-lg col-md-4">
             <h5 class="statistic-counter">{{ details['count'] }}</h5>
-            <p>{{view_class | capitalize_first}}</p>
+            <p>{{view_class | capitalize}}</p>
         </div>
         {% endfor %}
     </div>
@@ -40,7 +40,7 @@
         <div class="entity-card__icon">
             <img src="/static/images/entity_icons/{{ view_class[:-1] | lower }}.png" alt="{{ view_class }}">
         </div>
-        <div class="entity-card__label">{{ view_class | capitalize_first }}</div>
+        <div class="entity-card__label">{{ view_class | capitalize }}</div>
         <div class="entity-card__description">Lorem ipsum dolor sit amet consectetur. Risus malesuada feugiat
             sit integer non. Nisl blandit at scelerisque id arcu nisi nisl lacus.
         </div>

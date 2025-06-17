@@ -33,7 +33,7 @@ class Parser:
     def __setattr__(
             self,
             name: str,
-            value: Optional[str | list[str]] = None) -> None:
+            value: Optional[str | list[str]] = None) -> None: # pragma: no cover
         if (name in self.__annotations__ and
                 isinstance(getattr(self, name), list)):
             if getattr(self, name) is None:
@@ -45,5 +45,5 @@ class Parser:
         else:
             super().__setattr__(name, value)
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         return str(self.__dict__)

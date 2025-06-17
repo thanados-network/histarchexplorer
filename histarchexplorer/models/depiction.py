@@ -18,10 +18,7 @@ class Depiction:
         self.entity_id = entity_id
         self.main_image = self.check_if_main_image()
 
-
-
-
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         return str(self.__dict__)
 
     def check_if_main_image(self) -> bool:

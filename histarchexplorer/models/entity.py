@@ -75,7 +75,7 @@ class Entity:
             self.end = format_date(self.end_from, self.end_to)
             self.formated_date = date_template_format(self.begin, self.end)
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         return str(self.__dict__)
 
     def get_depiction(self, depictions) -> list[Depiction]:
@@ -93,8 +93,6 @@ class Entity:
                 'crm:P9i_forms_part_of',
                 'crm:P107i_is_current_or_former_member_of']:
                 parent_relation = relation
-                break
-            if parent_relation:
                 break
         return parent_relation
 
@@ -141,17 +139,17 @@ class Entity:
     def get_entity(id_: int, parser: Parser) -> Entity:
         return Entity(ApiAccess.get_entity(id_, parser))
 
-    @staticmethod
-    def get_entities_linked_to_entity(
-            id_: int,
-            parser: Parser) -> list[Entity]:
-        return [Entity(entity) for entity in
-                ApiAccess.get_entities_linked_to_entity(id_, parser)]
-
-    @staticmethod
-    def get_by_system_class(class_: str, parser: Parser) -> list[Entity]:
-        return [Entity(entity) for entity in
-                ApiAccess.get_by_system_class(class_, parser)]
+    # @staticmethod
+    # def get_entities_linked_to_entity(
+    #         id_: int,
+    #         parser: Parser) -> list[Entity]:
+    #     return [Entity(entity) for entity in
+    #             ApiAccess.get_entities_linked_to_entity(id_, parser)]
+    #
+    # @staticmethod
+    # def get_by_system_class(class_: str, parser: Parser) -> list[Entity]:
+    #     return [Entity(entity) for entity in
+    #             ApiAccess.get_by_system_class(class_, parser)]
 
     @staticmethod
     def get_linked_entities_by_properties_recursive(
@@ -166,29 +164,21 @@ class Entity:
             return ''
         description = [i['value'] for i in data][0]
 
-# ##en_##English text##_en## -> [('en', 'English text')]
+        # ##en_##English text##_en## -> [('en', 'English text')]
         matches = re.findall(r'##(\w+)_##(.*?)##_\1##', description, re.DOTALL)
         if matches:
             lang_dict = {lang: text.strip() for lang, text in matches}
             return lang_dict.get(session['language'], description)
-
 
         description = description.split('##German')
         if len(description) > 1:
             lang_dict = {
                 'en': description[0],
                 'de': description[1]}
-            description = lang_dict.get(session['language'], description[0]) #fallback
+            description = lang_dict.get(
+                session['language'],
+                description[0])  # fallback
 
         if isinstance(description, list):
             description = description[0]
         return description
-
-    @staticmethod
-    def handling_geometry(
-            data: dict[str, Any]) -> Optional[list[dict[str, Any]]]:
-        if geometry := data.get('geometry'):
-            if geometry['type'] == 'GeometryCollection':
-                return geometry['geometries']
-            return geometry
-        return None

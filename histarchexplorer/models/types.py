@@ -17,7 +17,7 @@ class Types:
         self.icon = self.get_icon()
         self.division = self.get_divisions()
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         return str(self.__dict__)
 
     def to_serializable(self: Any) -> Any:

@@ -13,4 +13,10 @@ folder:
 
 python packages
 
-        sudo apt install python3-bcrypt python3-flask python3-flask-babel python3-flaskext.wtf python3-flask-login python3-mypy python3-numpy python3-psycopg2 python3-requests python3-werkzeug python3-wtforms python3-flask-caching python3-pytest python3-pytest-cov python3-pytest-flask
+        sudo apt install python3-bcrypt python3-flask python3-flask-babel 
+        python3-flask-login python3-mypy python3-numpy python3-psycopg2
+        python3-werkzeug python3-wtforms python3-flask-caching python3-requests
+
+for development
+
+        sudo apt install python3-pytest python3-pytest-cov python3-pytest-flask

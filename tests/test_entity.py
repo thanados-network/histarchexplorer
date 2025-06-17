@@ -17,6 +17,15 @@ def test_entity(client):
         assert rv.status_code == 200
         assert b"Thunau Obere Holzwiese" in rv.data
 
+        # Test main image
+        rv = client.get(url_for('get_entity', id_=128351, tab_name='overview'))
+        assert rv.status_code == 200
+        assert b"ERC Synergy Grant HistoGenes" in rv.data
+
+        # Test alias
+        rv = client.get(url_for('get_entity', id_=13800, tab_name='overview'))
+        assert rv.status_code == 200
+        assert b"Abbey Chiemsee" in rv.data
 
         rv = client.get(url_for('entities'))
         assert rv.status_code == 200

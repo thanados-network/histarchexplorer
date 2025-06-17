@@ -34,5 +34,5 @@ class Relation:
             self.begin = format_date(self.begin_from, self.begin_to)
             self.end = format_date(self.end_from, self.end_to)
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         return str(self.__dict__)

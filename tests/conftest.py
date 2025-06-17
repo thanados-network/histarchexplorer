@@ -6,11 +6,6 @@ from histarchexplorer import app as flask_app_instance
 
 @pytest.fixture(scope='session')
 def flask_app():
-    """
-    Fixture to set up and tear down the Flask application for testing.
-    This fixture has a 'session' scope, meaning it runs once per test session.
-    """
-    print("\nSetting up Flask app for testing...")
     app = flask_app_instance
     app.config.from_pyfile('testing.py', silent=False)
     fixture_conn = None
@@ -24,10 +19,12 @@ def flask_app():
         fixture_conn.autocommit = True
 
         with fixture_conn.cursor() as cursor:
-            sql_path = os.path.join(app.root_path, 'sql', 'admin_reset.sql')
-            with open(sql_path, 'r', encoding='utf-8') as file:
-                sql_script = file.read()
-            cursor.execute(sql_script)
+            sql_scripts = ['admin_reset.sql', 'add_user.sql']
+            for script in sql_scripts:
+                sql_path = os.path.join(app.root_path, 'sql', script)
+                with open(sql_path, 'r', encoding='utf-8') as file:
+                    sql_script = file.read()
+                cursor.execute(sql_script)
         print(f"Successfully connected to test database: "
               f"{app.config['DATABASE_NAME']} and schema prepared.")
         yield app
@@ -47,14 +44,7 @@ def flask_app():
 
 @pytest.fixture(scope='function')
 def client(flask_app):
-    """
-    Fixture to provide a test client for the Flask app.
-    This fixture has a 'function' scope, meaning it runs before each test function.
-    It uses the 'flask_app' fixture, ensuring the app is set up.
-    """
-    print("Setting up Flask test client...")
     with flask_app.test_client() as client:
         with client.session_transaction() as sess:
             sess.clear()
         yield client
-    print("Tearing down Flask test client.")

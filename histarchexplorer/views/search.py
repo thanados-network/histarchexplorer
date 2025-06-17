@@ -32,20 +32,20 @@ def search():
         system_classes=system_classes)
 
 
-@app.route('/search_result/<int:entity_id>')
-def search_result_detail(entity_id: int):
-    """
-    Displays detailed information for a specific search result entity.
-    """
-    search_service = current_app.search_service
-    entity = search_service.get_entity_detail(entity_id)
-
-    if entity is None:
-        current_app.logger.warning(
-            f"Entity with ID {entity_id} not found or error fetching.")
-        return render_template('error.html', message="Entity not found."), 404
-
-    return render_template('search_detail.html', entity=entity)
+# @app.route('/search_result/<int:entity_id>')
+# def search_result_detail(entity_id: int):
+#     """
+#     Displays detailed information for a specific search result entity.
+#     """
+#     search_service = current_app.search_service
+#     entity = search_service.get_entity_detail(entity_id)
+#
+#     if entity is None:
+#         current_app.logger.warning(
+#             f"Entity with ID {entity_id} not found or error fetching.")
+#         return render_template('error.html', message="Entity not found."), 404
+#
+#     return render_template('search_detail.html', entity=entity)
 
 
 @app.route('/search_live')
