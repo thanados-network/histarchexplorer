@@ -19,7 +19,7 @@ window.addEventListener('resize', () => {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
     grid.refreshItems().layout();
-  }, 150);
+  }, 300);
 });
 
 /*
