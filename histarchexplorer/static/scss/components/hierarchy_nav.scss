@@ -126,5 +126,22 @@ button.btn-whitish[disabled] {
   background-color: var(--hierarchy-item);
   padding-top: 1rem;
   display: grid;
-  height: calc(100vh - 106px);
+  min-height: calc(100vh - 106px);
 }
+
+.attribute-area {
+  //border: 1px solid black;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: rem(20);
+  max-width: 80%;
+  margin: auto;
+  display: grid;
+
+  @media (min-width: 1921px) or (max-width: 769px) {
+    max-width: 90%;
+    margin: auto;
+    display: grid;
+    align-content: center;
+    align-items: center;
+  }}

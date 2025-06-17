@@ -146,6 +146,30 @@
       {% endif %}
     </div>
     </button>
+
+  <div class="attribute-area">
+    <!-- Attributes -->
+    {% if categorized_types %}
+          <span class="tile-label">ATTRIBUTES</span>
+          <div class="categorized-types">
+            {% for label, value in categorized_types.items() %}
+              <p class="tile-sub-label text-uppercase mt-3">
+                {{ value[0]['icon'] | safe }} {{ label }}</p>
+              {% for type in value %}
+                <div class="badge bg-dark-subtle text-wrap m-1">
+                  <h6 class="m-0 text-center">
+                    {{ type['type'].label }}
+                    {% if type['type'].value and type['type'].unit %}:
+                      {{ type['type'].value }}
+                      {{ type['type'].unit }}
+                    {% endif %}
+                  </h6>
+                </div>
+              {% endfor %}
+            {% endfor %}
+      </div>
+    {% endif %}
+  </div>
   </div>
 
   <!-- Description -->
@@ -161,31 +185,33 @@
 
   {% endif %}
 
-  <!-- Attributes -->
-  {% if categorized_types %}
-    <div class="item-half">
-      <div class="item-content">
-        <span class="tile-label">ATTRIBUTES</span>
-        <div class="categorized-types">
-          {% for label, value in categorized_types.items() %}
-            <p class="tile-sub-label text-uppercase mt-3">
-              {{ value[0]['icon'] | safe }} {{ label }}</p>
-            {% for type in value %}
-              <div class="badge bg-dark-subtle text-wrap m-1">
-                <h6 class="m-0 text-center">
-                  {{ type['type'].label }}
-                  {% if type['type'].value and type['type'].unit %}:
-                    {{ type['type'].value }}
-                    {{ type['type'].unit }}
-                  {% endif %}
-                </h6>
-              </div>
+
+  <!--
+    {% if categorized_types %}
+      <div class="item-half">
+        <div class="item-content">
+          <span class="tile-label">ATTRIBUTES</span>
+          <div class="categorized-types">
+            {% for label, value in categorized_types.items() %}
+              <p class="tile-sub-label text-uppercase mt-3">
+                {{ value[0]['icon'] | safe }} {{ label }}</p>
+              {% for type in value %}
+                <div class="badge bg-dark-subtle text-wrap m-1">
+                  <h6 class="m-0 text-center">
+                    {{ type['type'].label }}
+                    {% if type['type'].value and type['type'].unit %}:
+                      {{ type['type'].value }}
+                      {{ type['type'].unit }}
+                    {% endif %}
+                  </h6>
+                </div>
+              {% endfor %}
             {% endfor %}
-          {% endfor %}
+          </div>
         </div>
       </div>
-    </div>
-  {% endif %}
+    {% endif %}
+  Attributes -->
 
 
   <!-- Map Location -->
@@ -210,7 +236,7 @@
 
   <!-- First image -->
   {% if main_image and (entity.system_class.lower() not in ['actor', 'person']) %}
-    <div class="item">
+    <div class="item-half">
       <div class="item-content item-content-full">
         <div class="muuri-images">
           <div class="image">
@@ -253,7 +279,7 @@
 
   <!-- Bibliography and External References -->
   {% if related_entities.Bibliography or related_entities['External reference'] %}
-    <div class="item item-wide">
+    <div class="item item-5-6">
       <div class="item-content">
         <div class="muuri-references">
           <p class="tile-label text-uppercase">References</p>
