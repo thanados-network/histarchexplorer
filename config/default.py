@@ -43,6 +43,10 @@ STANDARD_TYPES = [
     'Place', 'Feature', 'Stratigraphic unit']
 
 TYPE_DIVISIONS = {
+    'administrative unit': {
+        'ids': [86],
+        'icon': ('css', 'bi bi-map')
+    },
     'dimensions': {
         'ids': [15678],
         'icon': ('css', 'bi bi-rulers')},
@@ -85,4 +89,3 @@ SIDEBAR_OPTIONS = [
     {'order': 1, 'route': 'overview', 'icon': 'bi bi-info-circle'},
     {'order': 2, 'route': 'map', 'icon': 'bi bi-map'},
 ]
-

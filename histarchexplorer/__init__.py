@@ -1,23 +1,23 @@
 from typing import Any
 
 import psycopg2.extras
-
-from flask import Flask, g, Response, session, request, url_for
+from flask import Flask, Response, g, request, session, url_for
 from flask_babel import Babel
 from psycopg2 import DatabaseError
-
 from psycopg2.extensions import connection
 
 from histarchexplorer.database.settings import get_main_image_table
+from histarchexplorer.services.search import SearchService
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
 app.config.from_pyfile('production.py')
+app.search_service = SearchService(app)
 babel = Babel(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer.views import (
-    admin, login, views, about, entity, landing)
+    admin, login, views, about, entity, landing, search)
 from histarchexplorer.utils import view_util
 
 
@@ -63,7 +63,7 @@ def get_sidebar_icons() -> dict[int, str]:
         icon_tag = create_icon(icon)
         for id_ in ids:
             icons[id_] = icon_tag
-    icons['other']= '<i class="bi bi-box-arrow-left"></i>'
+    icons['other'] = '<i class="bi bi-box-arrow-left"></i>'
     return icons
 
 
@@ -80,6 +80,7 @@ def get_type_divisions():
             out[id_] = {'label': label, 'icon': icon}
     return out
 
+
 @app.before_request
 def before_request() -> None:
     g.db = connect()
@@ -89,6 +90,7 @@ def before_request() -> None:
     app.jinja_env.filters['capitalize_first'] = capitalize_first
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
+
 
 def capitalize_first(value: str) -> str:
     if not value:

@@ -1,6 +1,7 @@
 from flask import g
 
-from histarchexplorer.database.about import build_connections_sql, get_models_sql
+from histarchexplorer.database.about import build_connections_sql, \
+    get_models_sql
 
 
 def build_object(build_connections, id):

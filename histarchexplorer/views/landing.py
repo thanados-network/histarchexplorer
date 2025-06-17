@@ -2,7 +2,6 @@ from collections import defaultdict
 from typing import Any
 
 from flask import render_template
-from urllib.parse import urlparse
 
 from histarchexplorer import app
 from histarchexplorer.api.parser import Parser
