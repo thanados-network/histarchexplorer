@@ -3,7 +3,7 @@ from flask import g
 
 def get_projects() -> tuple[str]:
     g.cursor.execute(
-        """SELECT 
+        f"""SELECT 
             c.id,
             c.name,
             c.description,
@@ -15,26 +15,23 @@ def get_projects() -> tuple[str]:
         FROM 
             tng.config as c
 		JOIN  tng.config_classes as cc ON c.config_class = cc.id 
-		WHERE cc.name IN ('project', 'main-project');""")
+		WHERE cc.id IN ({g.config_classes['project']}, {g.config_classes['main-project']});""")
     return g.cursor.fetchall()
 
 def get_institutions():
-    institutions_sql = """
-        SELECT 
-            c.name,
-            c.address, 
-            c.website,
-            c.image, 
-            role.name AS role
-        FROM tng.links l
-        JOIN tng.config c ON l.range_id = c.id
-        LEFT JOIN tng.config role ON l.attribute = role.id AND role.config_class = '3' --role name & config class
+    g.cursor.execute(
+        f"""SELECT 
+            id,
+            name,
+            description,
+            address, 
+            email,
+            website,
+            image
+        FROM 
+            tng.config
         WHERE 
-            l.domain_id = (SELECT id FROM tng.config WHERE config_class = '5') -- only links concerning main-project
-        AND c.config_class = '4'
-        ORDER BY l.sortorder, l.id;
-    """
-    g.cursor.execute(institutions_sql)
+            config_class = {g.config_classes['institution']};""")
     return g.cursor.fetchall()
 
 def get_persons():
