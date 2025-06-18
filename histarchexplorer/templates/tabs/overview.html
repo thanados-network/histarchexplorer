@@ -85,7 +85,7 @@
       <div class="entity-card__icon">
         <img src="{{ main_image.url }}" alt="{{ entity.name }}"/>
       </div>
-      <div class="hierarchy-card-label">{{ entity.name }}</div>
+      <div class="hierarchy-card-label" data-system-class="{{ entity.system_class.lower() }}">{{ entity.name }}</div>
       <div class="entity-date">
         <p>{{ entity.formated_date }}</p>
       </div>

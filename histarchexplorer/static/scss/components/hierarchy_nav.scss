@@ -115,6 +115,10 @@ button.btn-whitish[disabled] {
   }
 }
 
+.hierarchy-card-label[data-system-class="person"] {
+  align-items: flex-start;
+}
+
 @media (min-width: 1921px) {
   .hierarchy-card-label {
     font-size: 1.4rem;

@@ -12586,6 +12586,7 @@ textarea.form-control-lg {
 .entity-card__icon img {
   max-width: 80%;
   height: auto;
+  border-radius: 10px;
 }
 
 .super-entity {
@@ -12795,6 +12796,10 @@ button.btn-whitish[disabled] {
     font-size: 2.5rem;
   }
 }
+.hierarchy-card-label[data-system-class=person] {
+  align-items: flex-start;
+}
+
 @media (min-width: 1921px) {
   .hierarchy-card-label {
     font-size: 1.4rem;
