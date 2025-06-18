@@ -11,3 +11,7 @@ def get_config_properties() -> Any:
         SELECT id, name_inv, range,domain, 'inverse' AS direction FROM 
         tng.config_properties''')
     return g.cursor.fetchall()
+
+
+def set_hidden_entities(entities ):
+    pass

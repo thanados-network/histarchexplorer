@@ -2,8 +2,9 @@ import json
 import os
 from typing import Optional
 
-from flask import (abort, current_app, flash, g, redirect, render_template,
-                   request, session, url_for)
+from flask import (
+    abort, current_app, flash, g, redirect, render_template,
+    request, session, url_for)
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from werkzeug import Response
@@ -12,10 +13,11 @@ from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
 from histarchexplorer.database.config import (
     get_config_data, update_jsonb_column)
-from histarchexplorer.database.config_properties import get_config_properties
+from histarchexplorer.database.admin import get_config_properties
 from histarchexplorer.database.map import get_base_map, get_base_map_by_id
 from histarchexplorer.database.settings import (
     get_hidden_entities, get_map_settings, get_shown_entities)
+from histarchexplorer.services.admin import set_hidden_entities
 from histarchexplorer.utils import helpers
 
 
@@ -150,7 +152,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     shown_entities = get_shown_entities()
     hidden_entities = get_hidden_entities()
-
+    print(shown_entities)
+    print(hidden_entities)
     view_classes = app.config['VIEW_CLASSES']
 
     return render_template(
@@ -440,8 +443,8 @@ def delete_map(map_id: int) -> Response:
     return redirect(url_for('admin') + '/maps')
 
 
-@app.route('/choose_indexBg', methods=['POST'])
-def choose_index_bg() -> Response:
+@app.route('/choose_index_background', methods=['POST'])
+def choose_index_background() -> Response:
     map_id = request.form.get('mapselection')
     default_img = request.form.get('default_img')
     map_img = request.form.get('imgmap')
@@ -471,12 +474,10 @@ def select_entities() -> Response:
 @app.route('/admin/deselect_entities', methods=['GET', 'POST'])
 def deselect_entities() -> Response:
     if request.method == 'POST':
-        deselected_entities = request.form.getlist('selected_entities')
+        set_hidden_entities(request.form.getlist('selected_entities'))
 
-        deselected_entities_str = json.dumps(deselected_entities)
 
-        g.cursor.execute('UPDATE tng.settings SET hidden_entities = %s::JSONB',
-                         (deselected_entities_str,))
+
 
     return redirect(url_for('admin'))
 
