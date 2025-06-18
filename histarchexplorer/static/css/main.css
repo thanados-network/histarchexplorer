@@ -12438,6 +12438,7 @@ textarea.form-control-lg {
   .item-middle,
   .item-fit {
     border-radius: 0;
+    padding-bottom: 0.625rem;
   }
 }
 .item-fit {
