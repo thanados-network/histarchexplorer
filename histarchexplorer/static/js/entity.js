@@ -13,7 +13,9 @@ document.getElementById('toggleSidebar').addEventListener('click', function () {
     } else {
         root.style.setProperty('--sidebar-width', '60px');
     }
-    // setTimeout(forceMuuriLayout, 300); todo: move to tab js
+    setTimeout(() => {
+    grid.refreshItems().layout();
+}, 300);
 });
 
 let loadedCount = 0; // Track completed tab loads
