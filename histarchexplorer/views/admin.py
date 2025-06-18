@@ -17,7 +17,7 @@ from histarchexplorer.database.admin import get_config_properties
 from histarchexplorer.database.map import get_base_map, get_base_map_by_id
 from histarchexplorer.database.settings import (
     get_hidden_entities, get_map_settings, get_shown_entities)
-from histarchexplorer.services.admin import set_hidden_entities
+from histarchexplorer.services.admin import Admin, set_hidden_entities
 from histarchexplorer.utils import helpers
 
 
@@ -26,8 +26,7 @@ from histarchexplorer.utils import helpers
 @app.route('/admin/<tab>/<entry>')
 @login_required
 def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    check_manager_user()
 
     # todo: this will be obsolete if we change to dict instead to named tuples
     language = session.get(
@@ -176,8 +175,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 @app.route('/admin/add_entry', methods=['POST'])
 @login_required
 def add_entry() -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    check_manager_user()
     language = session.get(
         'language',
         request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
@@ -264,8 +262,7 @@ def delete_entry(tab: str, id_: int) -> Response:
 @app.route('/admin/delete_link/<link_id>/<tab>/<entry>')
 @login_required
 def delete_link(link_id: int, tab: str, entry: str) -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    check_manager_user()
 
     g.cursor.execute('DELETE FROM tng.links WHERE id = %(link_id)s',
                      {'link_id': int(link_id)})
@@ -298,8 +295,7 @@ def add_link(
 @app.route('/edit_entry', methods=['POST', 'GET'])
 @login_required
 def edit_entry() -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    check_manager_user()
 
     language = session.get(
         'language',
@@ -354,8 +350,7 @@ def edit_entry() -> Response:
 @app.route('/edit_map', methods=['POST'])
 @login_required
 def edit_map() -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    check_manager_user()
 
     name = request.form.get('name')
     display_name = request.form.get('displayname')
@@ -399,8 +394,7 @@ def edit_map() -> Response:
 @app.route('/admin/add_map', methods=['POST'])
 @login_required
 def add_map() -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    check_manager_user()
 
     name = request.form.get('name')
     displayname = request.form.get('displayname')
@@ -430,8 +424,7 @@ def add_map() -> Response:
 @app.route('/admin/delete_map/<int:map_id>')
 @login_required
 def delete_map(map_id: int) -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    check_manager_user()
 
     try:
         g.cursor.execute('DELETE FROM tng.maps WHERE id = %(map_id)s',
@@ -445,54 +438,47 @@ def delete_map(map_id: int) -> Response:
 
 @app.route('/choose_index_background', methods=['POST'])
 def choose_index_background() -> Response:
-    map_id = request.form.get('mapselection')
-    default_img = request.form.get('default_img')
-    map_img = request.form.get('imgmap')
-    greyscale = request.form.get('greyscale') == 'on'
-
-    g.cursor.execute(
-        'UPDATE tng.settings SET (index_map, index_img, img_map, greyscale) '
-        '= (%s, %s, %s, %s) WHERE ID = (SELECT ID FROM tng.settings LIMIT 1)',
-        (map_id, default_img, map_img, greyscale)
-    )
+    form = request.form
+    settings = {
+        'index_map': form.get('mapselection'),
+        'index_img': form.get('default_img'),
+        'img_map': form.get('imgmap'),
+        'greyscale': form.get('greyscale') == 'on'}
+    Admin.set_index_background(settings)
     return redirect(url_for('admin'))
 
 
 @app.route('/admin/select_entities', methods=['GET', 'POST'])
 def select_entities() -> Response:
     if request.method == 'POST':
-        selected_entities = request.form.getlist('selected_entities')
-
-        selected_entities_str = json.dumps(selected_entities)
-
-        g.cursor.execute('UPDATE tng.settings SET shown_entities = %s::JSONB',
-                         (selected_entities_str,))
-
+        Admin.set_shown_entities(request.form.getlist('selected_entities'))
+        flash(_('set shown entities'), 'info')
     return redirect(url_for('admin'))
 
 
 @app.route('/admin/deselect_entities', methods=['GET', 'POST'])
 def deselect_entities() -> Response:
     if request.method == 'POST':
-        set_hidden_entities(request.form.getlist('selected_entities'))
-
-
-
-
+        Admin.set_hidden_entities(request.form.getlist('selected_entities'))
+        flash(_('set hidden entities'), 'info')
     return redirect(url_for('admin'))
 
 
+# Todo: This reset button is only here for development purpose.
 @app.route('/reset')
 @login_required
 def reset() -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+    # check_manager_user()
     sql_path = os.path.join(current_app.root_path, 'sql', 'admin_reset.sql')
     with open(sql_path, 'r', encoding='utf-8') as file:
         sql_script = file.read()
     g.cursor.execute(sql_script)
-
     return redirect(url_for('admin'))
+
+
+def check_manager_user() -> None:
+    if current_user.group not in ['admin', 'manager']:
+        abort(403)
 
 # @app.route('/sortlinks', methods=['POST'])
 # def sort_links() -> Response:

@@ -1,13 +1,17 @@
-import json
+from histarchexplorer.database.admin import (
+    set_hidden_entities, set_index_background, set_shown_entities)
 
-from flask import g
 
+class Admin:
 
-def set_hidden_entities(form: list[str]):
-    print(form)
-    deselected_entities_str = json.dumps(form)
-    print(deselected_entities_str)
-    g.cursor.execute(
-        'UPDATE tng.settings SET hidden_entities = %s',
-        (form,)  # This should be a Python list of strings
-    )
+    @staticmethod
+    def set_hidden_entities(form: list[str]) -> None:
+        return set_hidden_entities(form)
+
+    @staticmethod
+    def set_shown_entities(form: list[str]) -> None:
+        return set_shown_entities(form)
+
+    @staticmethod
+    def set_index_background(settings: dict[str, str]) -> None:
+        return set_index_background(settings)

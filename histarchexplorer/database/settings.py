@@ -15,7 +15,9 @@ def get_shown_entities() -> Any:
         'SELECT shown_entities '
         'FROM tng.settings '
         'LIMIT 1')
-    return g.cursor.fetchone().shown_entities
+    result = g.cursor.fetchone()
+    return result[0] or []
+
 
 def get_hidden_entities() -> Any:
     g.cursor.execute(
@@ -23,7 +25,7 @@ def get_hidden_entities() -> Any:
         'FROM tng.settings '
         'LIMIT 1')
     result = g.cursor.fetchone()
-    return result[0] if result else []
+    return result[0] or []
 
 def get_main_image_table() -> dict[int, int]:
     main_image = {}
