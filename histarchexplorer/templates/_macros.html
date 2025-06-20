@@ -1,0 +1,23 @@
+{% macro close_button(dismiss_target, label='close', extra_classes='') %}
+  <button type="button" class="btn-close {{ extra_classes }}"
+          data-bs-dismiss="{{ dismiss_target }}"
+          aria-label="{{ _(label)|capitalize }}">
+  </button>
+{% endmacro %}
+
+
+{% macro flash_messages(category, alert_class) %}
+  {% with messages = get_flashed_messages(category_filter=[category], with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages mt-5 mb-5">
+        {% for cat, message in messages %}
+          <div class="alert alert-{{ alert_class }} alert-dismissible fade show"
+               role="alert">
+            {{ message }}
+            {{ close_button("alert") }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+{% endmacro %}

@@ -6,251 +6,9 @@
     <h3>{{ _('admin options') |upper }} <span
       class="text-body-secondary"> | {{ _('DB Interface') }}</span></h3>
 
-    <div class="card mt-5 mb-5">
-      <div class="card-body">
-        <h5 class="card-title">{{ _('Tools') |upper }}</h5>
-        <div class="d-flex justify-content-start align-items-start">
-          <div class="button-card me-3">
-            <button id="resetButton" class="btn btn-danger">Reset</button>
-          </div>
-          <form method="post" action="{{ url_for('select_entities') }}">
-            <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle me-3"
-                      type="button" id="entityDropdown"
-                      data-bs-toggle="dropdown" aria-expanded="false">
-                Shown Classes
-              </button>
-              <ul class="dropdown-menu dropdown-menu-columns"
-                  aria-labelledby="entityDropdown">
+    {% include 'admin/tools.html' %}
 
-                {% for view_class in view_classes %}
-                  <li><h6 class="dropdown-header">{{ view_class |upper }}</h6>
-                  </li>
-                  {% for category in (view_classes[view_class]) %}
-                    <li>
-                      <div class="form-check ms-3">
-                        <input class="form-check-input" type="checkbox"
-                               name="selected_entities"
-                               value="{{ category }}"
-                               id="flexCheck{{ loop.index }}"
-                               {% if category in shown_entities %}checked{% endif %}
-                        >
-
-                        <label class="form-check-label"
-                               for="flexCheck{{ loop.index }}">
-                          {{ category }} {% if class_items[category] %} (
-                          {{ class_items[category] }}
-                          ) {% else %}
-                          (0) {% endif %}
-                        </label>
-                      </div>
-                    </li>
-                  {% endfor %}
-                {% endfor %}
-
-                <button type="submit" class="btn btn-primary mt-3">Save
-                  Selection
-                </button>
-              </ul>
-
-            </div>
-
-          </form>
-          <form method="post" action="{{ url_for('deselect_entities') }}">
-            <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle" type="button"
-                      id="entityDropdownBlacklist"
-                      data-bs-toggle="dropdown" aria-expanded="false">
-                Hidden Classes
-              </button>
-              <ul class="dropdown-menu dropdown-menu-columns"
-                  aria-labelledby="entityDropdownBlacklist">
-
-                {% for view_class in view_classes %}
-                  <li><h6 class="dropdown-header">{{ view_class |upper }}</h6>
-                  </li>
-                  {% for category in (view_classes[view_class]) %}
-                    <li>
-                      <div class="form-check ms-3">
-                        <input class="form-check-input" type="checkbox"
-                               name="selected_entities"
-                               value="{{ category }}"
-                               id="flexCheck{{ loop.index }}Blacklist"
-                               {% if category in hidden_entities %}checked{% endif %}
-                        >
-
-                        <label class="form-check-label"
-                               for="flexCheck{{ loop.index }}Blacklist">
-                          {{ category }} {% if class_items[category] %} (
-                          {{ class_items[category] }}
-                          ) {% else %}
-                          (0) {% endif %}
-                        </label>
-                      </div>
-                    </li>
-                  {% endfor %}
-                {% endfor %}
-
-                <button type="submit" class="btn btn-primary mt-3">Save
-                  Selection
-                </button>
-              </ul>
-
-            </div>
-
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mt-5 mb-5">
-      <div class="card-body">
-        <h5 class="card-title">{{ _('maps') |upper }}</h5>
-        {% with map_success_messages = get_flashed_messages(category_filter=["map success"], with_categories=true) %}
-          {% if map_success_messages %}
-            <div class="flash-messages mt-5 mb-5">
-              {% for category, message in map_success_messages %}
-                <div class="alert alert-success alert-dismissible fade show"
-                     role="alert">
-                  {{ message }}
-                  <button type="button" class="btn-close"
-                          data-bs-dismiss="alert"
-                          aria-label="{{ _('close')|capitalize }}"></button>
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-
-        {% with map_error_messages = get_flashed_messages(category_filter=["map danger"], with_categories=true) %}
-          {% if map_error_messages %}
-            <div class="flash-messages mt-5 mb-5">
-              {% for category, message in map_error_messages %}
-                <div class="alert alert-danger alert-dismissible fade show"
-                     role="alert">
-                  {{ message }}
-                  <button type="button" class="btn-close"
-                          data-bs-dismiss="alert"
-                          aria-label="{{ _('close')|capitalize }}"></button>
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-
-        <div class="accordion" id="mapsAccordion">
-          {% for map in maps %}
-
-            <div class="accordion-item" id="mapItem-{{ map.id }}"
-                 data-id="{{ map.id }}"
-                 data-order="{{ map.sortorder }}">
-              <h2 class="accordion-header">
-                <button class="accordion-button collapsed"
-                        type="button" data-bs-toggle="collapse"
-                        data-bs-target="#map{{ map.id }}"
-                        aria-expanded="false"
-                        aria-controls="map{{ map.id }}">
-                  {{ map.display_name }}
-                </button>
-              </h2>
-              <div id="map{{ map.id }}"
-                   class="accordion-collapse collapse"
-                   data-bs-parent="#mapsAccordion">
-                <div class="accordion-body">
-                  <form method="POST" action="{{ url_for('edit_map') }}"
-                        class="projectForm needs-validation"
-                        id="mapForm{{ map.id }}"
-                        novalidate>
-                    <input type="hidden" name="map_id" value="{{ map.id }}">
-                    <div class="row needs-validation">
-                      <div class="col-md-6">
-                        <label for="InputName{{ map.id }}" class="form-label">
-                          {{ _('name')|capitalize }}</label>
-                        <input type="text" class="form-control"
-                               id="InputName{{ map.id }}"
-                               name="name" value="{{ map.name or '' }}"
-                               aria-describedby="NameHelp{{ map.id }}"
-                               disabled required>
-                        <div
-                          class="invalid-feedback">{{ _('Please provide a name') }}.
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <label for="InputDispName{{ map.id }}"
-                               class="form-label">
-                          {{ _('Display Name') }}</label>
-                        <input type="text" class="form-control"
-                               id="InputDispName{{ map.id }}"
-                               name="displayname"
-                               value="{{ map.display_name or '' }}"
-                               aria-describedby="DispNameHelp{{ map.id }}"
-                               disabled required>
-                        <div
-                          class="invalid-feedback">{{ _('Please provide a name') }}.
-                        </div>
-                      </div>
-                      <div class="col-md-2 d-none">
-                        <label for="InputOrder{{ map.id }}" class="form-label">
-                          {{ _('order')|capitalize }}</label>
-                        <input type="text" class="form-control"
-                               id="InputOrder{{ map.id }}"
-                               name="inputorder" value="{{ map.sortorder }}"
-                               aria-describedby="MapOrder{{ map.id }}"
-                               disabled required>
-                        <div
-                          class="invalid-feedback">{{ _('Please provide an order') }}.
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row mt-4">
-                      <div class="col-12">
-                        <label for="InputDescription{{ map.id }}"
-                               class="form-label">{{ _('Leaflet Tile Layer String') }}</label>
-                        <textarea class="form-control"
-                                  id="InputDescription{{ map.id }}"
-                                  name="description"
-                                  aria-describedby="descriptionHelp{{ map.id }}"
-                                  disabled>{{ map.tilestring or '' }}</textarea>
-                      </div>
-                    </div>
-
-                    <div class="mt-3 text-end">
-                      <button type="button" class="btn btn-primary"
-                              id='editMap{{ map.id }}'
-                              onclick="editMap({{ map.id }}, true)">{{ _('edit')|capitalize }}
-                      </button>
-                      <button type="button"
-                              class="btn btn-danger"
-                              id='deleteMap{{ map.id }}'
-                              value="{{ map.id }}"
-                              onclick="deleteMap({{ map.id }}, '{{ map.name }}')"
-                              data-bs-toggle="modal"
-                              data-bs-target="#deleteModal">{{ _('delete')|capitalize }}
-                      </button>
-                      <button type="button" class="btn btn-secondary d-none"
-                              id='cancelMap{{ map.id }}'
-                              onclick="editMap({{ map.id }}, false)">{{ _('cancel')|capitalize }}
-                      </button>
-
-                      <button type="submit" class="btn btn-primary d-none"
-                              id='saveMap{{ map.id }}'
-                              value="{{ map.id }}">{{ _('save')|capitalize }}
-                      </button>
-
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-
-          {% endfor %}
-        </div>
-        <button class="btn btn-primary m-2 float-end"
-                onclick="addMap('map')">
-          {{ _('add entry')|capitalize }}
-        </button>
-      </div>
-    </div>
+    {% include 'admin/maps.html' %}
 
 
     <div class="card mt-5 mb-5">
@@ -265,9 +23,7 @@
                     class="alert alert-{{ category }} alert-dismissible fade show"
                     role="alert">
                     {{ message }}
-                    <button type="button" class="btn-close"
-                            data-bs-dismiss="alert"
-                            aria-label="{{ _('close')|capitalize }}"></button>
+                    {{ ui.close_button("alert") }}
                   </div>
                 {% endif %}
               {% endfor %}
@@ -700,8 +456,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">{{ _('Confirm Delete') }}.</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+            {{ ui.close_button("modal") }}
           </div>
           <div class="modal-body">
             <p>{{ _('Are you sure you want to delete') }}: "<span
@@ -726,8 +481,7 @@
           <div class="modal-header">
             <h5 class="modal-title"
                 id="addMapModalLabel">{{ _('Add Map') }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+            {{ ui.close_button("modal") }}
           </div>
           <div class="modal-body">
             <form method="POST" action="{{ url_for('add_map') }}"
@@ -793,8 +547,7 @@
           <div class="modal-header">
             <h5 class="modal-title"
                 id="addEntryModalLabel">{{ _('add entry')|capitalize }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+            {{ ui.close_button("modal") }}
           </div>
           <div class="modal-body">
             <form method="POST" action="{{ url_for('add_entry') }}"

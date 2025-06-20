@@ -1,0 +1,109 @@
+<div class="card mt-5 mb-5">
+  <div class="card-body">
+    <h5 class="card-title">{{ _('tools') | upper }}</h5>
+    <div class="d-flex justify-content-start align-items-start">
+
+      <div class="button-card me-3">
+        <button id="resetButton" class="btn btn-danger">
+          {{ _('reset') | upper }}
+        </button>
+      </div>
+
+      <form method="post" action="{{ url_for('select_entities') }}">
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle me-3"
+                  type="button"
+                  id="entityDropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">
+            {{ _('show classes') | capitalize }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-columns"
+              aria-labelledby="entityDropdown">
+            {% for view_class in view_classes %}
+              <li>
+                <h6 class="dropdown-header">{{ view_class |upper }}</h6>
+              </li>
+              {% for category in (view_classes[view_class]) %}
+                <li>
+                  <div class="form-check ms-3">
+                    <input class="form-check-input" type="checkbox"
+                           name="selected_entities"
+                           value="{{ category }}"
+                           id="flexCheck{{ loop.index }}"
+                      {% if category in shown_entities %}
+                           checked
+                      {% endif %}>
+
+                    <label class="form-check-label"
+                           for="flexCheck{{ loop.index }}">
+                      {{ category }}
+                      {% if class_items[category] %}
+                        ({{ class_items[category] }})
+                      {% else %}
+                        (0)
+                      {% endif %}
+                    </label>
+                  </div>
+                </li>
+              {% endfor %}
+            {% endfor %}
+            <button type="submit" class="btn btn-primary mt-3">
+              {{ _('save selection') | capitalize }}
+            </button>
+          </ul>
+        </div>
+      </form>
+
+      <form method="post" action="{{ url_for('deselect_entities') }}">
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle"
+                  type="button"
+                  id="entityDropdownBlacklist"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">
+            {{ _('hidden classes') | capitalize }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-columns"
+              aria-labelledby="entityDropdownBlacklist">
+            {% for view_class in view_classes %}
+              <li>
+                <h6 class="dropdown-header">
+                  {{ view_class |upper }}
+                </h6>
+              </li>
+              {% for category in (view_classes[view_class]) %}
+                <li>
+                  <div class="form-check ms-3">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           name="selected_entities"
+                           value="{{ category }}"
+                           id="flexCheck{{ loop.index }}Blacklist"
+                      {% if category in hidden_entities %}
+                           checked
+                      {% endif %}>
+
+                    <label class="form-check-label"
+                           for="flexCheck{{ loop.index }}Blacklist">
+                      {{ category }}
+                      {% if class_items[category] %}
+                        ({{ class_items[category] }})
+                      {% else %}
+                        (0)
+                      {% endif %}
+                    </label>
+                  </div>
+                </li>
+              {% endfor %}
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary mt-3">
+              {{ _('save selection') | capitalize }}
+            </button>
+          </ul>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
