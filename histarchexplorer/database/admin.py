@@ -17,6 +17,14 @@ def get_config_properties() -> Any:
     return g.cursor.fetchall()
 
 
+def get_config_config_class_by_id(id_: int) -> int | None:
+    g.cursor.execute(
+        'SELECT config_class FROM tng.config WHERE id = %s',
+        (id_,))
+    row = g.cursor.fetchone()
+    return row[0] if row else None
+
+
 def set_hidden_entities(entities: list[str]) -> None:
     g.cursor.execute(
         'UPDATE tng.settings SET hidden_entities = %s',
@@ -82,6 +90,12 @@ def update_map(data: dict[str, str]) -> None:
 def check_if_main_project_exist() -> bool:
     g.cursor.execute("SELECT 1 FROM tng.config WHERE config_class = 5 LIMIT 1")
     return g.cursor.fetchone() is not None
+
+
+def delete_entry(id_: int) -> None:
+    g.cursor.execute(
+        'DELETE FROM tng.config WHERE id = %(id)s',
+        {'id': id_})
 
 
 def create_config_entry(data: dict) -> int:
@@ -160,3 +174,37 @@ def _upsert_jsonb_fields(config_id: int, data: dict) -> None:
                 """, {
                     'key': language,
                     'config_id': config_id})
+
+
+def check_sortorder() -> int:
+    g.cursor.execute(
+        '''
+        SELECT COALESCE(MAX(sortorder) + 1, 1)
+        FROM tng.links
+        WHERE sortorder IS NOT NULL''')
+    return g.cursor.fetchone()[0]
+
+
+def add_link(data: dict[str, Any]) -> None:
+    g.cursor.execute(
+        '''
+        INSERT INTO tng.links
+        (domain_id, range_id, property, attribute, sortorder)
+        VALUES (%(domain)s, %(range)s, %(prop)s, NULLIF(%(role)s, 0),
+                %(sortorder)s)
+        ''', {
+            'domain': data['domain'],
+            'range': data['range'],
+            'prop': data['prop'],
+            'role': data['role'],
+            'sortorder': data['sortorder']})
+
+
+def delete_link(id_: int) -> None:
+    g.cursor.execute(
+        """
+        DELETE
+        FROM tng.links
+        WHERE id = %(link_id)s
+        """, {
+            'link_id': id_})

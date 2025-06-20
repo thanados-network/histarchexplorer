@@ -174,55 +174,43 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         view_classes=view_classes)
 
 
-@app.route('/admin/delete_entry/<id>/<tab>')
+@app.route('/admin/delete_entry/<int:id_>/<tab>')
 @login_required
-def delete_entry(tab: str, id_: int) -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
-
-    g.cursor.execute(f'SELECT config_class FROM tng.config WHERE id = {id_}')
-    result = g.cursor.fetchone()
-    if result.config_class == 5:
-        flash('Main Project cannot be deleted', 'danger')
-        return redirect(url_for('admin') + tab)
-
-    g.cursor.execute('DELETE FROM tng.config WHERE id = %(id)s',
-                     {'id': int(id_)})
+def delete_entry(id_: int, tab: str) -> Response:
+    check_manager_user()
+    if Admin.get_config_config_class_by_id(id_) == 5:
+        flash(_('Main Project cannot be deleted'), 'danger')
+        return redirect(url_for('admin', tab=tab))
+    Admin.delete_entry(id_)
     flash('Entry deleted successfully!', 'success')
     return redirect(url_for('admin') + tab)
 
 
-@app.route('/admin/delete_link/<link_id>/<tab>/<entry>')
+@app.route('/admin/delete_link/<int:link_id>/<tab>/<entry>')
 @login_required
 def delete_link(link_id: int, tab: str, entry: str) -> Response:
     check_manager_user()
-
-    g.cursor.execute('DELETE FROM tng.links WHERE id = %(link_id)s',
-                     {'link_id': int(link_id)})
-    flash('Link deleted successfully!', 'success')
-    return redirect(url_for('admin') + tab + '/' + entry)
+    Admin.delete_link(link_id)
+    flash(_('Link deleted successfully!'), 'success')
+    return redirect(url_for('admin', tab=tab, entry=entry))
 
 
-@app.route('/admin/add_link/<domain>/<range_>/<prop>/<role>/<tab>/<entry>',
-           methods=['GET', 'POST'])
+@app.route('/admin/add_link/', methods=['GET', 'POST'])
 @login_required
-def add_link(
-        domain: int,
-        range_: int,
-        prop: int,
-        role: int,
-        tab: str,
-        entry: str) -> Response:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
-    g.cursor.execute(
-        f'INSERT INTO tng.links (domain_id, range_id, property, attribute, '
-        f'sortorder) '
-        f'VALUES ({domain}, {range_}, {prop}, NULLIF({role}, 0), COALESCE(('
-        f'SELECT (sortorder + 1) FROM tng.links WHERE sortorder IS NOT NULL '
-        f'ORDER BY sortorder DESC LIMIT 1),1))')
-    flash('Link added successfully', 'success')
-    return redirect(url_for('admin') + tab + '/' + entry)
+def add_link() -> Response:
+    check_manager_user()
+    Admin.add_link({
+        'domain': int(request.args.get('domain')),
+        'range': int(request.args.get('range')),
+        'prop': int(request.args.get('property')),
+        'role': int(request.args.get('role')),
+        'sortorder': Admin.check_sortorder()})
+    flash(_('Link added successfully'), 'success')
+    return redirect(
+        url_for(
+            'admin',
+            tab=request.args.get('tab', ''),
+            entry=request.args.get('entry', '')))
 
 
 @app.route('/admin/add_entry', methods=['POST'])
@@ -247,13 +235,13 @@ def add_entry() -> Response:
 
     try:
         new_id = Admin.add_entry(form_data)
-        flash('Entry added successfully!', 'success')
+        flash(_('Entry added successfully!'), 'success')
         return redirect(f"{redirect_base}/{current_tab}{new_id}")
 
     except Admin.TooManyMainProjects:
         flash(
-            f'Error adding entry {form_data["name"]}: Only one main project '
-            f'allowed',
+            f'Error adding entry {form_data["name"]}: '
+            'Only one main project allowed',
             'danger')
     except Exception as e:
         flash(f'Error adding entry {form_data["name"]}: {e}', 'danger')
