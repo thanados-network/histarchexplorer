@@ -3,12 +3,27 @@
   <script src="/static/node_modules/sortablejs/Sortable.min.js"></script>
 
   <div class="container py-5 en">
-    <h3>{{ _('admin options') |upper }} <span
-      class="text-body-secondary"> | {{ _('DB Interface') }}</span></h3>
+    <h3>
+      {{ _('admin options') |upper }}
+      <span class="text-body-secondary"> | {{ _('DB Interface') }}</span>
+    </h3>
 
-    {% include 'admin/tools.html' %}
+    <div class="card mt-5 mb-5">
+      <div class="card-body">
+        <h5 class="card-title">{{ _('tools') | upper }}</h5>
+        <div class="d-flex justify-content-start align-items-start">
+          {% include 'admin/tools.html' %}
+        </div>
+      </div>
+    </div>
 
-    {% include 'admin/maps.html' %}
+    <div class="card mt-5 mb-5">
+      <div class="card-body">
+        <h5 class="card-title">{{ _('maps') |upper }}</h5>
+        {% include 'admin/maps.html' %}
+      </div>
+    </div>
+
 
     <div class="card mt-5 mb-5">
       <div class="card-body">
@@ -651,7 +666,14 @@
       </div>
     </div>
 
-    {% include 'admin/index_page_options.html' %}
+    <div class="card mt-5 mb-5">
+      <div class="card-body">
+        <h5 class="card-title">
+          {{ _('index page options') | upper }}
+        </h5>
+        {% include 'admin/index_page_options.html' %}
+      </div>
+    </div>
 
   </div>
 

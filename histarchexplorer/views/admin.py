@@ -320,8 +320,6 @@ def deselect_entities() -> Response:
 
 
 # Todo: This reset button is only here for development purpose.
-
-
 @app.route('/reset')
 @login_required
 def reset() -> Response:

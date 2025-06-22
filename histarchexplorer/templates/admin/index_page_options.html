@@ -1,66 +1,59 @@
 <form method="POST" action="{{ url_for('choose_index_background') }}">
-  <div class="card mt-5 mb-5">
-    <div class="card-body">
-      <h5 class="card-title">
-        {{ _('index page options') | upper }}
-      </h5>
-      <div class="col-md-3 mt-3">
-        <label for="ImgMap">
-          {{ _('choose index background') | capitalize }}
-        </label>
-        <select class="form-control" id="ImgMap" name="imgmap">
-          {% for background in ['map', 'image'] %}
-            <option value={{ background }}
-                      {% if background == settings.img_map %}selected{% endif %}>
-              {{ background | capitalize }}
-            </option>
-          {% endfor %}
-        </select>
-      </div>
+  <div class="col-md-3 mt-3">
+    <label for="ImgMap">
+      {{ _('choose index background') | capitalize }}
+    </label>
+    <select class="form-control" id="ImgMap" name="imgmap">
+      {% for background in ['map', 'image'] %}
+        <option value={{ background }}
+                  {% if background == settings.img_map %}selected{% endif %}>
+          {{ background | capitalize }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
 
-      <div class="form-group row mt-3">
-        <div class="col-md-6 border-end ">
-          <h6>{{ _('map options') | upper }}</h6>
-          <label for="selectMap" class="form-label">
-            {{ _('select map background') | capitalize }}
-          </label>
-          <select class="form-control" id="selectMap" name="mapselection">
-            {% for map in maps %}
-              <option
-                value="{{ map.id }}"
-                data-tilestring="{{ map.tilestring }}"
-                {% if map.id== settings.map %} selected {% endif %}>
-                {{ map.display_name }}
-              </option>
-            {% endfor %}
-          </select>
-          <div class="form-check form-switch mt-3 mb-3">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="greyscaleSwitch"
-              name="greyscale" {% if settings.greyscale %} checked {% endif %}>
-            <label class="form-check-label"
-                   for="greyscaleSwitch">Greyscale</label>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <h6>{{ _('image options') | upper }}</h6>
-          <label for="defaultImg" class="form-label">
-            {{ _('define default background image') | capitalize }}
-          </label>
-          <input
-            type="text"
-            class="form-control"
-            id="defaultImg"
-            name="default_img"
-            value="{{ settings.img }}">
-        </div>
+  <div class="form-group row mt-3">
+    <div class="col-md-6 border-end ">
+      <h6>{{ _('map options') | upper }}</h6>
+      <label for="selectMap" class="form-label">
+        {{ _('select map background') | capitalize }}
+      </label>
+      <select class="form-control" id="selectMap" name="mapselection">
+        {% for map in maps %}
+          <option
+            value="{{ map.id }}"
+            data-tilestring="{{ map.tilestring }}"
+            {% if map.id== settings.map %} selected {% endif %}>
+            {{ map.display_name }}
+          </option>
+        {% endfor %}
+      </select>
+      <div class="form-check form-switch mt-3 mb-3">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="greyscaleSwitch"
+          name="greyscale" {% if settings.greyscale %} checked {% endif %}>
+        <label class="form-check-label"
+               for="greyscaleSwitch">Greyscale</label>
       </div>
-      <button
-        type="submit"
-        class="btn btn-primary m-2 float-end">{{ _('save')|capitalize }}
-      </button>
+    </div>
+    <div class="col-md-6">
+      <h6>{{ _('image options') | upper }}</h6>
+      <label for="defaultImg" class="form-label">
+        {{ _('define default background image') | capitalize }}
+      </label>
+      <input
+        type="text"
+        class="form-control"
+        id="defaultImg"
+        name="default_img"
+        value="{{ settings.img }}">
     </div>
   </div>
+  <button
+    type="submit"
+    class="btn btn-primary m-2 float-end">{{ _('save')|capitalize }}
+  </button>
 </form>
