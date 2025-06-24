@@ -41,34 +41,41 @@ function isValidDate(d) {
     return d instanceof Date && !isNaN(d);
 }
 
-function calculateTimeBP(dateString) {
-    if (!dateString) dateString = '-9999999999999999999999999999999999999999999999999999-'
+function calculateTimeBP(dateString, isBegin) {
+    if (!dateString && isBegin) dateString = '-999999999-01-01'; // Default placeholder for begin
+    if (!dateString && !isBegin) dateString = '999999999-01-01'; // Default placeholder for begin
+
     const today = new Date();
-    const currentMonth = today.getMonth();
+    const currentMonth = today.getMonth(); // 0-11
     const currentYear = today.getFullYear();
-    const currentDay = today.getDate();
+    const currentDay = today.getDate(); // 1-31
 
     const daysPerMonth = 365.2525 / 12;
     const daysSinceZero = currentYear * 365.2525 + currentMonth * daysPerMonth + currentDay;
 
     let isNegative = false;
-    let stringLength = 9;
-
+    let yearPartEndIndex = dateString.indexOf('-');
     if (dateString[0] === '-') {
-        stringLength += 1;
         isNegative = true;
+        yearPartEndIndex = dateString.indexOf('-', 1);
     }
+    if(yearPartEndIndex === -1) yearPartEndIndex = dateString.length;
 
-    let yearFromString = parseInt(dateString.substring(0, stringLength)) || 0;
-    let monthFromString = (parseInt(dateString.substring(stringLength + 1, stringLength + 3)))-1 || 0;
-    let dayFromString = parseInt(dateString.substring(stringLength + 4, stringLength + 6)) || 0;
+    let yearFromString = parseInt(dateString.substring(0, yearPartEndIndex));
+    if (isNaN(yearFromString)) yearFromString = 0;
+
+    let monthFromString = parseInt(dateString.substring(yearPartEndIndex + 1, yearPartEndIndex + 3));
+    if (isNaN(monthFromString)) monthFromString = 0; else monthFromString -= 1;
+
+    let dayFromString = parseInt(dateString.substring(yearPartEndIndex + 4, yearPartEndIndex + 6));
+    if (isNaN(dayFromString)) dayFromString = 0;
 
     const daysToZero = isNegative
         ? (yearFromString * 365.2525 - (monthFromString) * daysPerMonth) + dayFromString
         : yearFromString * 365.2525 + monthFromString * daysPerMonth + dayFromString;
 
     const daysBP = daysSinceZero - daysToZero;
-    return daysBP
+    return daysBP;
 }
 
 function fieldHasValues(entities, field) {

@@ -12285,6 +12285,10 @@ textarea.form-control-lg {
   padding: 20px !important;
 }
 
+.tabulator-footer {
+  background-color: transparent !important;
+}
+
 .cards_home {
   opacity: 0;
   display: grid;

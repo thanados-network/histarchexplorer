@@ -2,15 +2,15 @@
 
 <script>
     const filteredEntities{{ tab_name }} = getEntitiesForTab('{{ tab_name }}');
-    console.log('tab_name');
-    console.log('{{ tab_name }}');
-    console.log(filteredEntities{{ tab_name }});
+    let beginDBP{{tab_name}} = null
+    let endDBP{{tab_name}} = null
+    let type_id{{tab_name}} = null
 
     const columns{{ tab_name }} = [
         {
             title: "Name",
             field: "name",
-            headerSort:false,
+            headerSort: false,
             minWidth: 450,
             formatter: function (cell) {
                 const data = cell.getRow().getData();
@@ -19,16 +19,26 @@
                 const begin = data.begin;
                 const end = data.end;
                 const description = translateDescription(data.description);
+                let localBeginDate = ''
+                let localEndDate = ''
+                if (data.type_id) data.type_id = data.type_id;
 
                 let dateString = '';
                 if (begin) {
-                    dateString += makeLocalDate(begin).localdate;
+                    localBeginDate = makeLocalDate(begin).localdate
+                    dateString += localBeginDate;
+                    beginDBP{{tab_name}} = calculateTimeBP(begin, true);
+
                 }
-                if (begin && end && begin !== end) {
+
+                if (end) localEndDate = makeLocalDate(end).localdate;
+
+                if (begin && end && localBeginDate !== localEndDate) {
                     dateString += " - ";
                 }
-                if (end && end !== begin) {
+                if (end && localEndDate !== localBeginDate) {
                     dateString += makeLocalDate(end).localdate;
+                    endDBP{{tab_name}} = calculateTimeBP(end, false);
                 }
 
                 let hoverTitle = `${name || ''} ${dateString ? '(' + dateString + ')' : ''}`.trim();
@@ -45,8 +55,8 @@
         },
         {
             title: "Category",
-            field: "class", // Still needs a field if you ever want to filter by it
-            headerSort:false,
+            field: "class",
+            headerSort: false,
             maxWidth: 450,
             minWidth: 450,
             formatter: function (cell) {
@@ -95,6 +105,31 @@
                     combinedHtml +
                     `</div>`;
             }
+        },
+        {
+            title: "Begin",
+            field: "begin",
+            visible: false
+        },
+        {
+            title: "End",
+            field: "end",
+            visible: false
+        },
+        {
+            title: "BeginDBP",
+            field: "beginDBP",
+            visible: false
+        },
+        {
+            title: "EndDBP",
+            field: "endDBP",
+            visible: false
+        },
+        {
+            title: "TypeId",
+            field: "type_id",
+            visible: false
         }
     ];
 
@@ -102,11 +137,22 @@
     const table{{ tab_name }} = new Tabulator("#table-{{ tab_name }}", {
         layout: "fitColumns",
         responsiveLayout: "collapse",
-        height: "calc( 100vh - 100px - 4rem)", // Adjusted height from previous step
+        height: "calc( 100vh - 100px - 4rem)",
         data: filteredEntities{{ tab_name }},
         pagination: "local",
         paginationSize: 50,
         paginationSizeSelector: [20, 50, 100],
         columns: columns{{ tab_name }},
     });
+
+    table{{ tab_name }}.on("rowClick", function (e, row) {
+        const rowData = row.getData();
+        const id = rowData.id;
+
+        if (id) {
+            const url = `/entity/${id}`;
+            window.location.href = url;
+        }
+    });
+
 </script>
