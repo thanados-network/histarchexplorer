@@ -23,43 +23,43 @@ from histarchexplorer.utils.view_util import construct_admin_tabs
 @login_required
 def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     check_manager_user()
-
+    print(g.config_relationship_labels)
     g.cursor.execute("""
                      SELECT l.id        AS link_id,
                             l.sortorder AS sortorder,
                             s.id        AS start_id,
                             s.name      AS start_name,
-                            cp.name     AS config_property,
+                            cp.name     AS relationship,
                             cp.id       AS property_id,
                             'direct'    AS direction,
                             e.name      AS end_name,
                             e.id        AS end_id,
-                            r.name      AS role,
-                            r.id        AS role_id
+                            r.name      AS attribute,
+                            r.id        AS attribute_id
                      FROM tng.links l
-                              JOIN tng.config s ON l.domain_id = s.id
-                              JOIN tng.config e ON l.range_id = e.id
-                              JOIN tng.config_properties cp ON l.property =
+                              JOIN tng.entities s ON l.domain_id = s.id
+                              JOIN tng.entities e ON l.range_id = e.id
+                              JOIN tng.relationship_labels cp ON l.property =
                                                                cp.id
-                              LEFT JOIN tng.config r ON l.attribute = r.id
+                              LEFT JOIN tng.entities r ON l.attribute = r.id
                      UNION ALL
                      SELECT l.id        AS link_id,
                             l.sortorder AS sortorder,
                             s.id        AS start_id,
                             s.name      AS start_name,
-                            cp.name_inv AS config_property,
+                            cp.name_inv AS relationship,
                             cp.id       AS property_id,
                             'inverse'   AS direction,
                             e.name      AS end_name,
                             e.id        AS end_id,
-                            r.name      AS role,
-                            r.id        AS role_id
+                            r.name      AS attribute,
+                            r.id        AS attribute_id
                      FROM tng.links l
-                              JOIN tng.config s ON l.range_id = s.id
-                              JOIN tng.config e ON l.domain_id = e.id
-                              JOIN tng.config_properties cp ON l.property =
+                              JOIN tng.entities s ON l.range_id = s.id
+                              JOIN tng.entities e ON l.domain_id = e.id
+                              JOIN tng.relationship_labels cp ON l.property =
                                                                cp.id
-                              LEFT JOIN tng.config r ON l.attribute = r.id
+                              LEFT JOIN tng.entities r ON l.attribute = r.id
                      ORDER BY sortorder
                      """)
 
@@ -69,17 +69,20 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     links_list = [dict(zip(colnames, row)) for row in links_data]
 
+    print(links_list)
+
     for row in links_list:
         row['start_name'] = helpers.get_translation(row['start_name'])
         row['end_name'] = helpers.get_translation(row['end_name'])
-        row['config_property'] = helpers.get_translation(
-            row['config_property'])
-        row['role'] = helpers.get_translation(row['role'])
+        row['relationship'] = helpers.get_translation(
+            row['relationship'])
+        row['attribute'] = helpers.get_translation(row['attribute'])
 
     class_items = {
         k: v for k, v in get_entities_count_by_case_study().items()
         if k not in app.config['CLASSES_TO_SKIP']}
 
+    print(g.config_entities)
     return render_template(
         "admin.html",
         entities=g.config_entities,
@@ -87,7 +90,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         activetab=tab,
         activeentry=entry,
         links_data=links_list,
-        config_properties=g.config_properties,
+        relationship_labels=g.config_relationship_labels,
         maps=Admin.get_maps(),
         settings=g.settings.get_map_settings(),
         class_items=class_items,
@@ -100,7 +103,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 @login_required
 def delete_entry(id_: int, tab: str) -> Response:
     check_manager_user()
-    if Admin.get_config_config_class_by_id(id_) == 5:
+    if Admin.get_config_config_types_by_id(id_) == 5:
         flash(_('Main Project cannot be deleted'), 'danger')
         return redirect(url_for('admin', tab=tab))
     Admin.delete_entry(id_)
@@ -125,7 +128,7 @@ def add_link() -> Response:
         'domain': int(request.args.get('domain')),
         'range': int(request.args.get('range')),
         'prop': int(request.args.get('property')),
-        'role': int(request.args.get('role')),
+        'attribute': int(request.args.get('attribute')),
         'sortorder': Admin.check_sortorder()})
     flash(_('Link added successfully'), 'success')
     return redirect(

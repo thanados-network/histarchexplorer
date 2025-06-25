@@ -52,7 +52,7 @@
               aria-labelledby="{{ tab.id }}" tabindex="0">
               <div class="accordion" id="{{ tab.label }}accordion">
                 {% for entry in entities %}
-                  {% if entry.config_class == tab.id %}
+                  {% if entry.type == tab.id %}
                     <div class="accordion-item">
                       <h2 class="accordion-header">
                         <button
@@ -350,7 +350,7 @@
                                     <input type="text"
                                            class="form-control me-2"
                                            disabled
-                                           value="{{ link.config_property['label'] }}">
+                                           value="{{ link.relationship['label'] }}">
                                     <input type="text"
                                            class="form-control me-2"
                                            disabled
@@ -358,10 +358,10 @@
                                     <input type="text"
                                            class="form-control me-2"
                                            disabled
-                                           value="{{ link.role['label'] }}">
+                                           value="{{ link.attribute['label'] }}">
                                     <button class="btn btn-danger"
                                             id='delete{{ link.id }}'
-                                            onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name.label }}', '{{ link.config_property.label }}', '{{ link.end_name.label }}', '{{ tab.target }}', '{{ tab.target + entry.id_|string }}', )"
+                                            onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name.label }}', '{{ link.relationship.label }}', '{{ link.end_name.label }}', '{{ tab.target }}', '{{ tab.target + entry.id_|string }}', )"
                                             data-bs-toggle="modal"
                                             data-bs-target="#deleteModal"
                                             style="min-width: 125px">{{ _('Delete') }}
@@ -379,7 +379,7 @@
                                 aria-label="Select connection">
                                 <option
                                   selected>{{ _('select connection')|capitalize }}</option>
-                                {% for row in config_properties %}
+                                {% for row in relationship_labels %}
                                   {% if tab.id == row.domain %}
                                     <option data-range="{{ row.range }}"
                                             data-direction="{{ row.direction }}"
@@ -396,7 +396,7 @@
                                   selected>{{ _('select node')|capitalize }}</option>
                                 {% for row in entities %}
                                   <option
-                                    class="config-class-{{ row.config_class }} d-none"
+                                    class="config-class-{{ row.type }} d-none"
                                     data-classId="{{ row.id }}"
                                     value="{{ row.id }}">{{ row.name['display']['label'] }}
                                   </option>
@@ -410,7 +410,7 @@
                                 <option
                                   value="0">{{ _('not specified') }}</option>
                                 {% for row in entities %}
-                                  {% if row.config_class == 3 %}
+                                  {% if row.type == 3 %}
                                     <option
                                       value="{{ row.id }}">{{ row.name['display']['label'] }}</option>
                                   {% endif %}

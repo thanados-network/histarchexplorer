@@ -24,20 +24,20 @@ def construct_admin_tabs() -> list[dict[str, str | int]]:
         {
             'label': _('main-project'),
             'target': 'nav-main-project',
-            'id': g.config_classes['main-project']
+            'id': g.config_types['main-project']
         }, {
             'label': _('projects'),
             'target': 'nav-projects',
-            'id': g.config_classes['project']
+            'id': g.config_types['project']
         }, {
             'label': _('persons'),
             'target': 'nav-persons',
-            'id': g.config_classes['person']
+            'id': g.config_types['person']
         }, {
             'label': _('institutions'),
             'target': 'nav-institutions',
-            'id': g.config_classes['institution']
+            'id': g.config_types['institution']
         }, {
             'label': _('attributes'),
             'target': 'nav-attributes',
-            'id': g.config_classes['role']}]
+            'id': g.config_types['attribute']}]

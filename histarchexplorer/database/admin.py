@@ -6,20 +6,29 @@ from flask import g
 from histarchexplorer.database.config import check_if_config_entry_exist
 
 
+#def get_config_properties() -> Any:
+#    g.cursor.execute(
+#        '''
+#        SELECT id, name, name_inv, domain_type_id, range_type_id
+#        FROM tng.relationship_labels''')
+#    return g.cursor.fetchall()
+
+
 def get_config_properties() -> Any:
     g.cursor.execute(
         '''
-        SELECT id, name, domain, range, 'direct' AS direction
-        FROM tng.config_properties
+        SELECT id, name, domain_type_id, range_type_id, 'direct' AS direction
+        FROM tng.relationship_labels
         UNION ALL
-        SELECT id, name_inv, range, domain, 'inverse' AS direction
-        FROM tng.config_properties''')
+        SELECT id, name_inv, range_type_id, domain_type_id, 'inverse' AS direction
+        FROM tng.relationship_labels''')
     return g.cursor.fetchall()
 
 
-def get_config_config_class_by_id(id_: int) -> int | None:
+
+def get_config_type_class_by_id(id_: int) -> int | None:
     g.cursor.execute(
-        'SELECT config_class FROM tng.config WHERE id = %s',
+        'SELECT type FROM tng.entities WHERE id = %s',
         (id_,))
     row = g.cursor.fetchone()
     return row[0] if row else None
@@ -88,40 +97,40 @@ def update_map(data: dict[str, str]) -> None:
 
 
 def check_if_main_project_exist() -> bool:
-    g.cursor.execute("SELECT 1 FROM tng.config WHERE config_class = 5 LIMIT 1")
+    g.cursor.execute("SELECT 1 FROM tng.entitiesWHERE config_class = 5 LIMIT 1")
     return g.cursor.fetchone() is not None
 
 
 def delete_entry(id_: int) -> None:
     g.cursor.execute(
-        'DELETE FROM tng.config WHERE id = %(id)s',
+        'DELETE FROM tng.entitiesWHERE id = %(id)s',
         {'id': id_})
 
 
 def create_config_entry(data: dict) -> int:
-    config_class = g.config_class_map.get(data['category'])
-    if config_class is None:
+    config_type = g.config_types_map.get(data['category'])
+    if config_type is None:
         raise ValueError(f"Unknown category {data['category']}")
 
-    if config_class == 5 and check_if_main_project_exist():
+    if config_type == 5 and check_if_main_project_exist():
         raise 404
 
     g.cursor.execute(
         """
         INSERT INTO tng.config
-        (email, website, orcid_id, image, config_class)
+        (email, website, orcid_id, image, config_type)
         VALUES (NULLIF(%(email)s, ''),
                 NULLIF(%(website)s, ''),
                 NULLIF(%(orcid_id)s, ''),
                 NULLIF(%(image)s, ''),
-                %(config_class)s)
+                %(config_type)s)
         RETURNING id
         """, {
             'email': data.get('email'),
             'website': data.get('website'),
             'orcid_id': data.get('orcid_id'),
             'image': data.get('image'),
-            'config_class': config_class})
+            'config_type': config_type})
     id_ = g.cursor.fetchone()[0]
     _upsert_jsonb_fields(id_, data)
 
@@ -190,13 +199,13 @@ def add_link(data: dict[str, Any]) -> None:
         '''
         INSERT INTO tng.links
         (domain_id, range_id, property, attribute, sortorder)
-        VALUES (%(domain)s, %(range)s, %(prop)s, NULLIF(%(role)s, 0),
+        VALUES (%(domain)s, %(range)s, %(prop)s, NULLIF(%(attribute)s, 0),
                 %(sortorder)s)
         ''', {
             'domain': data['domain'],
             'range': data['range'],
             'prop': data['prop'],
-            'role': data['role'],
+            'attribute': data['attribute'],
             'sortorder': data['sortorder']})
 
 

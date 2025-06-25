@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.10 (Debian 15.10-0+deb12u1)
--- Dumped by pg_dump version 15.10 (Debian 15.10-0+deb12u1)
+-- Dumped from database version 15.13 (Debian 15.13-0+deb12u1)
+-- Dumped by pg_dump version 15.13 (Debian 15.13-0+deb12u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -15,19 +15,6 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
---
--- Data for Name: config_classes; Type: TABLE DATA; Schema: tng; Owner: openatlas
---
-
-INSERT INTO tng.config_classes VALUES
-	(1, 'project', NULL),
-	(2, 'person', NULL),
-	(3, 'role', NULL),
-	(4, 'institution', NULL),
-	(5, 'main-project', NULL),
-	(6, 'language_code', NULL);
-
 
 --
 -- Data for Name: config; Type: TABLE DATA; Schema: tng; Owner: openatlas
@@ -58,6 +45,19 @@ INSERT INTO tng.config VALUES
 	(19, '{"de": "NHM", "en": "NHM_"}', '{"de": "Naturhistorisches Museum"}', '{"de": "Burgring 7"}', 4, NULL, NULL, 'https://nhm.at/jart/prj3/nhm-resp/resources/images/logo.svg', 'https://nhm.at/', '{}', '{}'),
 	(24, '{"de": "FH Wien"}', '{}', '{}', 4, NULL, NULL, NULL, NULL, '{}', '{}'),
 	(16, '{"de": "THANADOS", "en": "THANADOS"}', '{}', '{}', 1, NULL, NULL, NULL, 'https://thanados.net/', '{}', '{}');
+
+
+--
+-- Data for Name: config_classes; Type: TABLE DATA; Schema: tng; Owner: openatlas
+--
+
+INSERT INTO tng.config_classes VALUES
+	(1, 'project', NULL),
+	(2, 'person', NULL),
+	(3, 'role', NULL),
+	(4, 'institution', NULL),
+	(5, 'main-project', NULL),
+	(6, 'language_code', NULL);
 
 
 --
@@ -98,7 +98,9 @@ INSERT INTO tng.links VALUES
 	(19, 16, 2, 1, 8, 19),
 	(20, 1, 2, 3, 5, 20),
 	(21, 4, 20, 2, 13, 21),
-	(22, 16, 20, 5, 14, 22);
+	(22, 16, 20, 5, 14, 22),
+	(23, 3, 24, 2, 14, 23),
+	(24, 3, 24, 2, 23, 24);
 
 
 --
@@ -143,7 +145,7 @@ SELECT pg_catalog.setval('tng.config_properties_id_seq', 5, true);
 -- Name: links_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
 --
 
-SELECT pg_catalog.setval('tng.links_id_seq', 22, true);
+SELECT pg_catalog.setval('tng.links_id_seq', 24, true);
 
 
 --

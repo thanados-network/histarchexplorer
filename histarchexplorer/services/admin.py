@@ -4,7 +4,7 @@ from histarchexplorer.database.admin import (
     add_link, add_new_map, check_sortorder, create_config_entry, delete_entry,
     delete_link,
     delete_map,
-    get_config_config_class_by_id,  set_hidden_entities,
+    get_config_type_class_by_id, set_hidden_entities,
     set_index_background,
     set_shown_entities, update_config_entry, update_map)
 from histarchexplorer.database.map import get_maps
@@ -62,8 +62,8 @@ class Admin:
         return check_sortorder()
 
     @staticmethod
-    def get_config_config_class_by_id(id_: int) -> int | None:
-        return get_config_config_class_by_id(id_)
+    def get_config_config_types_by_id(id_: int) -> int | None:
+        return get_config_type_class_by_id(id_)
 
     @staticmethod
     def delete_entry(id_: int) -> None:

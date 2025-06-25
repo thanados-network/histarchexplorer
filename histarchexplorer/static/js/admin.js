@@ -243,4 +243,3 @@ function saveSortOrder(items, table) {
         body: JSON.stringify({criteria: items, table: table}),
     })
 }
-

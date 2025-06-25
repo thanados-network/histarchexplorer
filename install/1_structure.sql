@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.10 (Debian 15.10-0+deb12u1)
--- Dumped by pg_dump version 15.10 (Debian 15.10-0+deb12u1)
+-- Dumped from database version 15.13 (Debian 15.13-0+deb12u1)
+-- Dumped by pg_dump version 15.13 (Debian 15.13-0+deb12u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -16,30 +16,32 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-ALTER TABLE IF EXISTS ONLY tng.links DROP CONSTRAINT IF EXISTS links_config_properties_fk;
-ALTER TABLE IF EXISTS ONLY tng.links DROP CONSTRAINT IF EXISTS links_config_fk_role;
-ALTER TABLE IF EXISTS ONLY tng.links DROP CONSTRAINT IF EXISTS links_config_fk_range;
-ALTER TABLE IF EXISTS ONLY tng.links DROP CONSTRAINT IF EXISTS links_config_fk_domain;
-ALTER TABLE IF EXISTS ONLY tng.config DROP CONSTRAINT IF EXISTS config_config_classes_fk;
+ALTER TABLE IF EXISTS ONLY tng.relationship_labels DROP CONSTRAINT IF EXISTS relationship_labels_range_id_fkey;
+ALTER TABLE IF EXISTS ONLY tng.relationship_labels DROP CONSTRAINT IF EXISTS relationship_labels_domain_id_fkey;
+ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS config_config_classes_fk;
+DROP TRIGGER IF EXISTS delete_links_trigger ON tng.entities;
 DROP TRIGGER IF EXISTS delete_links_trigger ON tng.config;
 ALTER TABLE IF EXISTS ONLY tng.settings DROP CONSTRAINT IF EXISTS settings_pkey;
 ALTER TABLE IF EXISTS ONLY tng.maps DROP CONSTRAINT IF EXISTS maps_pkey;
 ALTER TABLE IF EXISTS ONLY tng.links DROP CONSTRAINT IF EXISTS links_pkey;
-ALTER TABLE IF EXISTS ONLY tng.config_properties DROP CONSTRAINT IF EXISTS config_properties_pkey;
-ALTER TABLE IF EXISTS ONLY tng.config DROP CONSTRAINT IF EXISTS config_pkey;
-ALTER TABLE IF EXISTS ONLY tng.config_classes DROP CONSTRAINT IF EXISTS config_classes_pkey;
+ALTER TABLE IF EXISTS ONLY tng.relationship_labels DROP CONSTRAINT IF EXISTS config_properties_pkey;
+ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS config_pkey;
+ALTER TABLE IF EXISTS ONLY tng.types DROP CONSTRAINT IF EXISTS config_classes_pkey;
 ALTER TABLE IF EXISTS tng.settings ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS tng.maps ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS tng.links ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS tng.config_properties ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS tng.config_classes ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS tng.config ALTER COLUMN id DROP DEFAULT;
+DROP TABLE IF EXISTS tng.types;
 DROP SEQUENCE IF EXISTS tng.settings_id_seq;
 DROP TABLE IF EXISTS tng.settings;
+DROP TABLE IF EXISTS tng.relationship_labels;
 DROP SEQUENCE IF EXISTS tng.maps_id_seq;
 DROP TABLE IF EXISTS tng.maps;
 DROP SEQUENCE IF EXISTS tng.links_id_seq;
 DROP TABLE IF EXISTS tng.links;
+DROP TABLE IF EXISTS tng.entities;
 DROP SEQUENCE IF EXISTS tng.config_properties_id_seq;
 DROP TABLE IF EXISTS tng.config_properties;
 DROP SEQUENCE IF EXISTS tng.config_id_seq;
@@ -223,6 +225,27 @@ ALTER SEQUENCE tng.config_properties_id_seq OWNED BY tng.config_properties.id;
 
 
 --
+-- Name: entities; Type: TABLE; Schema: tng; Owner: openatlas
+--
+
+CREATE TABLE tng.entities (
+    id integer DEFAULT nextval('tng.config_id_seq'::regclass) NOT NULL,
+    name jsonb,
+    description jsonb,
+    address jsonb,
+    type integer,
+    email text,
+    orcid_id text,
+    image text,
+    website text,
+    legal_notice jsonb,
+    imprint jsonb
+);
+
+
+ALTER TABLE tng.entities OWNER TO openatlas;
+
+--
 -- Name: links; Type: TABLE; Schema: tng; Owner: openatlas
 --
 
@@ -298,6 +321,21 @@ ALTER SEQUENCE tng.maps_id_seq OWNED BY tng.maps.id;
 
 
 --
+-- Name: relationship_labels; Type: TABLE; Schema: tng; Owner: openatlas
+--
+
+CREATE TABLE tng.relationship_labels (
+    id integer DEFAULT nextval('tng.config_properties_id_seq'::regclass) NOT NULL,
+    name jsonb,
+    name_inv jsonb,
+    domain_type_id integer,
+    range_type_id integer
+);
+
+
+ALTER TABLE tng.relationship_labels OWNER TO openatlas;
+
+--
 -- Name: settings; Type: TABLE; Schema: tng; Owner: openatlas
 --
 
@@ -339,6 +377,18 @@ ALTER TABLE tng.settings_id_seq OWNER TO openatlas;
 
 ALTER SEQUENCE tng.settings_id_seq OWNED BY tng.settings.id;
 
+
+--
+-- Name: types; Type: TABLE; Schema: tng; Owner: openatlas
+--
+
+CREATE TABLE tng.types (
+    id integer DEFAULT nextval('tng.config_classes_id_seq'::regclass) NOT NULL,
+    name text
+);
+
+
+ALTER TABLE tng.types OWNER TO openatlas;
 
 --
 -- Name: config id; Type: DEFAULT; Schema: tng; Owner: openatlas
@@ -383,26 +433,26 @@ ALTER TABLE ONLY tng.settings ALTER COLUMN id SET DEFAULT nextval('tng.settings_
 
 
 --
--- Name: config_classes config_classes_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
+-- Name: types config_classes_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
-ALTER TABLE ONLY tng.config_classes
+ALTER TABLE ONLY tng.types
     ADD CONSTRAINT config_classes_pkey PRIMARY KEY (id);
 
 
 --
--- Name: config config_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
+-- Name: entities config_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
-ALTER TABLE ONLY tng.config
+ALTER TABLE ONLY tng.entities
     ADD CONSTRAINT config_pkey PRIMARY KEY (id);
 
 
 --
--- Name: config_properties config_properties_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
+-- Name: relationship_labels config_properties_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
-ALTER TABLE ONLY tng.config_properties
+ALTER TABLE ONLY tng.relationship_labels
     ADD CONSTRAINT config_properties_pkey PRIMARY KEY (id);
 
 
@@ -438,43 +488,34 @@ CREATE TRIGGER delete_links_trigger BEFORE DELETE ON tng.config FOR EACH ROW EXE
 
 
 --
--- Name: config config_config_classes_fk; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
+-- Name: entities delete_links_trigger; Type: TRIGGER; Schema: tng; Owner: openatlas
 --
 
-ALTER TABLE ONLY tng.config
-    ADD CONSTRAINT config_config_classes_fk FOREIGN KEY (config_class) REFERENCES tng.config_classes(id);
-
-
---
--- Name: links links_config_fk_domain; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
---
-
-ALTER TABLE ONLY tng.links
-    ADD CONSTRAINT links_config_fk_domain FOREIGN KEY (domain_id) REFERENCES tng.config(id);
+CREATE TRIGGER delete_links_trigger BEFORE DELETE ON tng.entities FOR EACH ROW EXECUTE FUNCTION tng.delete_links_on_config_delete();
 
 
 --
--- Name: links links_config_fk_range; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
+-- Name: entities config_config_classes_fk; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
-ALTER TABLE ONLY tng.links
-    ADD CONSTRAINT links_config_fk_range FOREIGN KEY (range_id) REFERENCES tng.config(id);
-
-
---
--- Name: links links_config_fk_role; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
---
-
-ALTER TABLE ONLY tng.links
-    ADD CONSTRAINT links_config_fk_role FOREIGN KEY (attribute) REFERENCES tng.config(id);
+ALTER TABLE ONLY tng.entities
+    ADD CONSTRAINT config_config_classes_fk FOREIGN KEY (type) REFERENCES tng.types(id);
 
 
 --
--- Name: links links_config_properties_fk; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
+-- Name: relationship_labels relationship_labels_domain_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
-ALTER TABLE ONLY tng.links
-    ADD CONSTRAINT links_config_properties_fk FOREIGN KEY (property) REFERENCES tng.config_properties(id);
+ALTER TABLE ONLY tng.relationship_labels
+    ADD CONSTRAINT relationship_labels_domain_id_fkey FOREIGN KEY (domain_type_id) REFERENCES tng.types(id) NOT VALID;
+
+
+--
+-- Name: relationship_labels relationship_labels_range_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE ONLY tng.relationship_labels
+    ADD CONSTRAINT relationship_labels_range_id_fkey FOREIGN KEY (range_type_id) REFERENCES tng.types(id) NOT VALID;
 
 
 --
