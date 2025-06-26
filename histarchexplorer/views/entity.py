@@ -499,10 +499,11 @@ def get_entity(id_: int, tab_name=None) -> str:
             get_parser_for_landing(id_))
         main_entity= get_main_entity(id_, entities)
 
-        if main_entity.geometry.get("type") == "GeometryCollection":
+        if isinstance(main_entity.geometry, dict) and main_entity.geometry.get("type") == "GeometryCollection":
             main_entity.geometry["geometries"] = [
                 geom for geom in main_entity.geometry.get("geometries", [])
-                if geom.get("type") == "Point"]
+                if geom.get("type") == "Point"
+            ]
 
         print(main_entity.geometry)
         print('=== DEBUG PERSON ENTITY ===')
