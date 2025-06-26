@@ -532,8 +532,8 @@ def get_entity(id_: int, tab_name=None) -> str:
         if not main_image and images:
             main_image = images.pop(0)
 
-        initial_images = images[:3]
-        more_images = len(images) > 3
+        initial_images = images[:2]
+        more_images = len(images) > 2
         total_images = len(images)
 
     elif tab_name not in valid_routes:
