@@ -128,7 +128,7 @@ def add_link() -> Response:
         'domain': int(request.args.get('domain')),
         'range': int(request.args.get('range')),
         'prop': int(request.args.get('property')),
-        'attribute': int(request.args.get('attribute')),
+        'role': int(request.args.get('role')),
         'sortorder': Admin.check_sortorder()})
     flash(_('Link added successfully'), 'success')
     return redirect(

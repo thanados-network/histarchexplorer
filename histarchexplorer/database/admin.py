@@ -204,7 +204,7 @@ def add_link(data: dict[str, Any]) -> None:
             'domain': data['domain'],
             'range': data['range'],
             'prop': data['prop'],
-            'attribute': data['attribute'],
+            'attribute': data['role'],
             'sortorder': data['sortorder']})
 
 

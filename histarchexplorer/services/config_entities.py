@@ -12,19 +12,19 @@ from histarchexplorer.database.admin import get_config_properties
 
 
 @dataclass()
-class RelationshipLabel:
-    id_: int
+class Properties:
+    id: int
     name: dict[str, str | dict[str, str]]
     domain: int
     range: int
     direction: str
 
     @classmethod
-    def get_all(cls) -> list['RelationshipLabel']:
+    def get_all(cls) -> list['Properties']:
         properties = []
         for property_ in get_config_properties():
-            properties.append(RelationshipLabel(
-                id_=property_.id,
+            properties.append(Properties(
+                id=property_.id,
                 name=add_display(property_.name),
                 domain=property_.domain_type_id,
                 range=property_.range_type_id,

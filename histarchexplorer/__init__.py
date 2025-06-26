@@ -9,7 +9,7 @@ from psycopg2.extensions import connection
 from histarchexplorer.database.settings import get_main_image_table
 from histarchexplorer.services.config import get_config_classes
 from histarchexplorer.services.config_entities import ConfigEntity, \
-    RelationshipLabel
+    Properties
 from histarchexplorer.services.search import SearchService
 from histarchexplorer.services.settings import Settings
 
@@ -99,7 +99,7 @@ def before_request() -> None:
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
     g.config_classes = get_config_classes()
-    g.config_properties = RelationshipLabel.get_all()
+    g.config_properties = Properties.get_all()
     g.settings = Settings.initialize_settings()
     # Todo: this is basically the same as
     #   config_classes but with 's' and attributes instead of attribute
