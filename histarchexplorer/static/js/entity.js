@@ -14,7 +14,7 @@ document.getElementById('toggleSidebar').addEventListener('click', function () {
         root.style.setProperty('--sidebar-width', '60px');
     }
     setTimeout(() => {
-    grid.refreshItems().layout();
+    if (typeof(grid) !== 'undefined') grid.refreshItems().layout();
 }, 300);
 });
 

@@ -20,6 +20,9 @@
             data.entities.forEach(entity => {
                 entity.beginDBP = calculateTimeBP(entity.begin, true);
                 entity.endDBP = calculateTimeBP(entity.end, false);
+                entity.all = [entity.description, entity.class, entity.type, entity.name]
+                    .filter(v => v !== null && v !== undefined && v !== '')
+                    .join(' ');
             });
 
         {% endif %}
