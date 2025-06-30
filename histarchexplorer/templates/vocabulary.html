@@ -4,16 +4,17 @@
   <div style="padding-top: 100px;"></div> <!-- To avoid navbar overlap -->
 
   <style>
-    body, html {
-      height: 100%;
-      overflow-y: auto;
-    }
-    #quercus-tree {
-      max-height: 80vh;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      padding: 10px;
-    }
+      body, html {
+          height: 100%;
+          overflow-y: auto;
+      }
+
+      #quercus-tree {
+          max-height: 80vh;
+          overflow-y: auto;
+          border: 1px solid #ccc;
+          padding: 10px;
+      }
   </style>
   <!-- Container for Quercus tree -->
   <div id="quercus-tree" style="min-height: 300px;"></div>
@@ -23,50 +24,63 @@
   <script src="{{ url_for('static', filename='js/quercus.js') }}"></script>
 
   <script>
-    function buildTree(flatData) {
-      const nodesById = {};
-      Object.values(flatData).forEach(node => {
-        nodesById[node.id] = {
-          id: node.id,
-          name: node.name,
-          children: []
-        };
-      });
+      function buildTree(flatData) {
+          const nodesById = {};
 
-      Object.values(flatData).forEach(node => {
-        if (!node.root || node.root.length === 0) return; // top-level
-
-        node.root.forEach(parentId => {
-          if (nodesById[parentId]) {
-            nodesById[parentId].children.push(nodesById[node.id]);
-          }
-        });
-      });
-
-      return Object.values(nodesById).filter(node => !flatData[node.id].root || flatData[node.id].root.length === 0);
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      fetch("https://thanados.openatlas.eu/api/0.4/type_tree/")
-        .then(res => res.json())
-        .then(data => {
-          const nestedData = buildTree(data.typeTree);
-
-          new Treeview({
-            containerId: "quercus-tree",
-            data: nestedData,
-            initiallyExpanded: false,
-            searchEnabled: true,
-            multiSelectEnabled: false,
-            cascadeSelectChildren: false,
-            showSelectAllButton: false,
-            showExpandCollapseAllButtons: true,
+          // Erst alle Knoten als flache Objekte anlegen, ohne Kinder
+          Object.values(flatData).forEach(node => {
+              nodesById[node.id] = {
+                  id: node.id,
+                  name: node.name,
+                  children: []
+              };
           });
-        })
-        .catch(err => {
-          console.error("Failed to fetch or build tree data:", err);
-          document.getElementById("quercus-tree").innerText = "Failed to load vocabulary.";
-        });
-    });
+
+          // Nun hängen wir die Kinder an ihre Eltern
+          Object.values(flatData).forEach(node => {
+              if (node.subs && node.subs.length > 0) {
+                  node.subs.forEach(childId => {
+                      if (nodesById[childId]) {
+                          nodesById[node.id].children.push(nodesById[childId]);
+                      }
+                  });
+              }
+          });
+
+          // Die Wurzelknoten sind diejenigen ohne Eltern
+          const hasParent = new Set();
+          Object.values(flatData).forEach(node => {
+              if (node.subs && node.subs.length > 0) {
+                  node.subs.forEach(childId => hasParent.add(childId));
+              }
+          });
+
+          // Nur die Knoten ohne Eltern (also nicht in hasParent) sind Wurzeln
+          return Object.values(nodesById).filter(node => !hasParent.has(node.id));
+      }
+
+
+      document.addEventListener("DOMContentLoaded", () => {
+          fetch("https://thanados.openatlas.eu/api/0.4/type_tree/")
+              .then(res => res.json())
+              .then(data => {
+                  const nestedData = buildTree(data.typeTree);
+
+                  new Treeview({
+                      containerId: "quercus-tree",
+                      data: nestedData,
+                      initiallyExpanded: false,
+                      searchEnabled: true,
+                      multiSelectEnabled: false,
+                      cascadeSelectChildren: false,
+                      showSelectAllButton: false,
+                      showExpandCollapseAllButtons: true,
+                  });
+              })
+              .catch(err => {
+                  console.error("Failed to fetch or build tree data:", err);
+                  document.getElementById("quercus-tree").innerText = "Failed to load vocabulary.";
+              });
+      });
   </script>
 {% endblock %}
