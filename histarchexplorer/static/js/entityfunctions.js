@@ -42,9 +42,12 @@ function isValidDate(d) {
 }
 
 function calculateTimeBP(dateString, isBegin) {
-    if (!dateString && isBegin) dateString = '-999999999-01-01'; // Default placeholder for begin
-    if (!dateString && !isBegin) dateString = '999999999-01-01'; // Default placeholder for begin
+    //if (!dateString && isBegin) dateString = '-999999999-01-01'; // Default placeholder for begin
+    //if (!dateString && !isBegin) dateString = '999999999-01-01'; // Default placeholder for begin
 
+    if (!dateString) {
+        return null
+    }
     const today = new Date();
     const currentMonth = today.getMonth(); // 0-11
     const currentYear = today.getFullYear();
@@ -59,7 +62,7 @@ function calculateTimeBP(dateString, isBegin) {
         isNegative = true;
         yearPartEndIndex = dateString.indexOf('-', 1);
     }
-    if(yearPartEndIndex === -1) yearPartEndIndex = dateString.length;
+    if (yearPartEndIndex === -1) yearPartEndIndex = dateString.length;
 
     let yearFromString = parseInt(dateString.substring(0, yearPartEndIndex));
     if (isNaN(yearFromString)) yearFromString = 0;
@@ -75,7 +78,7 @@ function calculateTimeBP(dateString, isBegin) {
         : yearFromString * 365.2525 + monthFromString * daysPerMonth + dayFromString;
 
     const daysBP = daysSinceZero - daysToZero;
-    return daysBP;
+    return 0-daysBP;
 }
 
 function fieldHasValues(entities, field) {
@@ -88,17 +91,72 @@ function fieldHasValues(entities, field) {
 function translateDescription(text) {
     {
         if (text) {
-    const pattern = new RegExp(`##${language}_##([\\s\\S]*?)##_${language}##`, 'm');
-    const match = text.match(pattern);
-    if (match && match[1]) {
-        return match[1].trim();
+            const pattern = new RegExp(`##${language}_##([\\s\\S]*?)##_${language}##`, 'm');
+            const match = text.match(pattern);
+            if (match && match[1]) {
+                return match[1].trim();
+            }
+            return text;
+        }
+        return '';
     }
-    return text;
-    }
-    return '';
-}
 }
 
 function getUniqueValues(data, field) {
     return [...new Set(data.map(row => row[field]).filter(Boolean))].sort();
+}
+
+function createSortLevel(id, fields) {
+    const div = document.createElement('div');
+    div.classList.add('row', 'align-items-end', 'mb-2');
+    div.dataset.id = id;
+
+    div.innerHTML = `
+    <div class="col">
+      <label class="form-label">Sort by</label>
+      <select class="form-select sort-field">
+        ${fields.includes('name') ? `<option value="name">Name</option>`:''}
+        ${fields.includes('class') ? `<option value="class">Class</option>`:''}
+        ${fields.includes('type') ? `<option value="type">Type</option>`:''}
+        ${fields.includes('beginDBP') ? `<option value="beginDBP">Begin</option>`:''}
+        ${fields.includes('endDBP') ? `<option value="endDBP">End</option>`:''}
+      </select>
+    </div>
+    <div class="col">
+      <label class="form-label">Direction</label>
+      <select class="form-select sort-direction">
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <button type="button" class="btn btn-outline-danger remove-sort-level">Remove</button>
+    </div>
+  `;
+
+    return div;
+}
+
+function getKeysWithValues(dataArray) {
+    const keysWithValues = new Set();
+
+    if (!Array.isArray(dataArray) || dataArray.length === 0) {
+        return [];
+    }
+
+    dataArray.forEach(obj => {
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const value = obj[key];
+                if (value !== null && typeof value !== 'undefined') {
+                    if (typeof value === 'string' && value.trim() === '') {
+                        continue;
+                    }
+                    keysWithValues.add(key);
+                }
+            }
+        }
+    });
+
+    return Array.from(keysWithValues);
 }

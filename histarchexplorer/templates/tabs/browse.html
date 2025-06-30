@@ -1,16 +1,54 @@
+<div id {{ tab_name }}-header>
+    <h1>{{ tab_name[0]|upper }}{{ tab_name[1:] }}</h1>
+    <div class="input-group mb-3">
+        <div class="input-group mb-3" style="max-width: 400px;">
+            <input type="text" id="filterInput{{ tab_name }}" class="form-control" placeholder="Search/Filter">
+            <button class="btn btn-outline-secondary" type="button" id="clearFilter{{ tab_name }}">&times;</button>
+        </div>
+    </div>
+</div>
 <div id="table-{{ tab_name }}" class="tabulator-container"></div>
 
+<div class="modal fade" id="modal-{{ tab_name }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="modal-title-{{ tab_name }}" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title-{{ tab_name }}">Filter/Sort
+                    {{ tab_name[0]|upper }}{{ tab_name[1:] }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="sort-levels-{{ tab_name }}"></div>
+                <button type="button" class="btn btn-outline-primary mb-3" id="add-sort-level-{{ tab_name }}">
+                    Add Sort Level
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" id="reset-sort-btn-{{ tab_name }}">Reset Sort</button>
+                <button type="button" class="btn btn-primary" id="apply-sort-btn-{{ tab_name }}">Apply Sort</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
+
     const filteredEntities{{ tab_name }} = getEntitiesForTab('{{ tab_name }}');
     let beginDBP{{tab_name}} = null
     let endDBP{{tab_name}} = null
     let type_id{{tab_name}} = null
+    let type_value{{tab_name}} = false
+
+    const {{ tab_name }}Fields = getKeysWithValues(filteredEntities{{ tab_name }})
 
     const columns{{ tab_name }} = [
         {
             title: "Name",
             field: "name",
-            headerSort: false,
+            headerSort: true,
             minWidth: 450,
             formatter: function (cell) {
                 const data = cell.getRow().getData();
@@ -74,6 +112,7 @@
                 let rightContent = '';
                 let rawType = '';
                 if (typeValue) {
+                    type_value{{tab_name}} = true
                     rawType = typeValue;
                     rightContent = typeValue;
                 }
@@ -119,16 +158,29 @@
         {
             title: "BeginDBP",
             field: "beginDBP",
-            visible: false
+            visible: false,
+            sorterParams: {alignEmptyValues: "bottom"}
         },
         {
             title: "EndDBP",
             field: "endDBP",
-            visible: false
+            visible: false,
+            sorterParams: {alignEmptyValues: "bottom"}
         },
         {
             title: "TypeId",
             field: "type_id",
+            visible: false
+        },
+        {
+            title: "Type",
+            field: "type",
+            visible: false,
+            sorterParams: {alignEmptyValues: "bottom"}
+        },
+        {
+            title: "all",
+            field: "all",
             visible: false
         }
     ];
@@ -153,6 +205,74 @@
             const url = `/entity/${id}`;
             window.location.href = url;
         }
+    });
+
+    const {{tab_name}}Modal = new bootstrap.Modal('#modal-{{ tab_name }}', {})
+
+    const sortLevelsContainer{{ tab_name }} = document.getElementById('sort-levels-{{ tab_name }}');
+    const addSortLevelBtn{{ tab_name }} = document.getElementById('add-sort-level-{{ tab_name }}');
+
+    let sortLevelId{{ tab_name }} = 0;
+
+    function addSortLevel{{ tab_name }}() {
+        const level{{ tab_name }} = createSortLevel(sortLevelId{{ tab_name }}++, {{ tab_name }}Fields);
+        sortLevelsContainer{{ tab_name }}.appendChild(level{{ tab_name }});
+    }
+
+    addSortLevelBtn{{ tab_name }}.addEventListener('click', () => {
+        addSortLevel{{ tab_name }}();
+    });
+
+    sortLevelsContainer{{ tab_name }}.addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-sort-level')) {
+            e.target.closest('.row').remove();
+        }
+    });
+
+    document.getElementById('apply-sort-btn-{{ tab_name }}').addEventListener('click', () => {
+        const sorters{{ tab_name }} = [];
+
+        const levels{{ tab_name }} = sortLevelsContainer{{ tab_name }}.querySelectorAll('.row');
+        levels{{ tab_name }}.forEach(level => {
+            const field{{ tab_name }} = level.querySelector('.sort-field').value;
+            const direction{{ tab_name }} = level.querySelector('.sort-direction').value;
+            if (field{{ tab_name }}) {
+                sorters{{ tab_name }}.push({column: field{{ tab_name }}, dir: direction{{tab_name}}});
+            }
+        });
+
+        table{{ tab_name }}.setSort(sorters{{ tab_name }});
+    });
+
+    document.getElementById('reset-sort-btn-{{ tab_name }}').addEventListener('click', () => {
+        table{{ tab_name }}.clearSort();
+        sortLevelsContainer{{ tab_name }}.innerHTML = '';  // Optionally clear UI
+        addSortLevel{{ tab_name }}();  // Optionally add one empty level back
+    });
+
+    document.getElementById('modal-{{ tab_name }}').addEventListener('shown.bs.modal', () => {
+        if (sortLevelsContainer{{ tab_name }}.children.length === 0) {
+            addSortLevel{{ tab_name }}();
+        }
+    });
+
+    const filterInput{{ tab_name }} = document.getElementById("filterInput{{ tab_name }}");
+    const clearButton{{ tab_name }} = document.getElementById("clearFilter{{ tab_name }}");
+
+    filterInput{{ tab_name }}.addEventListener("input", function () {
+        const value{{ tab_name }} = this.value.trim();
+        if (value{{ tab_name }}) {
+            table{{tab_name}}.setFilter("all", "like", value{{ tab_name }});
+        } else {
+            table{{tab_name}}.clearFilter();
+        }
+    });
+
+    // Clear button logic
+    clearButton{{ tab_name }}.addEventListener("click", function () {
+        filterInput{{ tab_name }}.value = "";
+        table{{tab_name}}.clearFilter();
+        filterInput{{ tab_name }}.focus();
     });
 
 </script>
