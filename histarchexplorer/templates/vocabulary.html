@@ -9,15 +9,49 @@
           overflow-y: auto;
       }
 
-      #quercus-tree {
-          max-height: 80vh;
+      /* Tab Buttons */
+      .tab-buttons {
+          margin-bottom: 10px;
+      }
+      .tab-buttons button {
+          padding: 8px 16px;
+          margin-right: 4px;
+          border: 1px solid #ccc;
+          background: #f0f0f0;
+          cursor: pointer;
+          border-radius: 4px;
+          font-weight: bold;
+      }
+      .tab-buttons button.active {
+          background: #007bff;
+          color: white;
+          border-color: #007bff;
+      }
+
+      /* Tree containers */
+      .tree-container {
+          max-height: 70vh;
           overflow-y: auto;
           border: 1px solid #ccc;
           padding: 10px;
+          display: none; /* hidden by default */
+      }
+      .tree-container.active {
+          display: block;
       }
   </style>
-  <!-- Container for Quercus tree -->
-  <div id="quercus-tree" style="min-height: 300px;"></div>
+
+  <!-- Tab Buttons -->
+  <div class="tab-buttons">
+      <button id="tab-main" class="active" onclick="showTab('main')">Main Classes</button>
+      <button id="tab-custom" onclick="showTab('custom')">Types</button>
+      <button id="tab-value" onclick="showTab('value')">Value Types</button>
+  </div>
+
+  <!-- Tree Containers -->
+  <div id="tree-main" class="tree-container active"></div>
+  <div id="tree-custom" class="tree-container"></div>
+  <div id="tree-value" class="tree-container"></div>
 
   <!-- Quercus CSS and JS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/quercus.css') }}">
@@ -25,50 +59,93 @@
 
   <script>
       function buildTree(flatData) {
-          const nodesById = {};
+    const nodesById = {};
 
-          // Erst alle Knoten als flache Objekte anlegen, ohne Kinder
-          Object.values(flatData).forEach(node => {
-              nodesById[node.id] = {
-                  id: node.id,
-                  name: node.name,
-                  children: []
-              };
-          });
+    Object.values(flatData).forEach(node => {
+        nodesById[node.id] = {
+            id: node.id,
+            name: node.name,
+            children: []
+        };
+    });
 
-          // Nun hängen wir die Kinder an ihre Eltern
-          Object.values(flatData).forEach(node => {
-              if (node.subs && node.subs.length > 0) {
-                  node.subs.forEach(childId => {
-                      if (nodesById[childId]) {
-                          nodesById[node.id].children.push(nodesById[childId]);
-                      }
-                  });
+    Object.values(flatData).forEach(node => {
+        if (node.subs && node.subs.length > 0) {
+            node.subs.forEach(childId => {
+                if (nodesById[childId]) {
+                    nodesById[node.id].children.push(nodesById[childId]);
+                }
+            });
+        }
+    });
+
+    const hasParent = new Set();
+    Object.values(flatData).forEach(node => {
+        if (node.subs && node.subs.length > 0) {
+            node.subs.forEach(childId => hasParent.add(childId));
+        }
+    });
+
+    // Hier alphabetisch sortieren
+    return Object.values(nodesById)
+      .filter(node => !hasParent.has(node.id))
+      .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+
+      function filterByCategory(data, category) {
+          const filtered = {};
+          for (const key in data) {
+              if (data[key].category === category) {
+                  filtered[key] = data[key];
               }
-          });
-
-          // Die Wurzelknoten sind diejenigen ohne Eltern
-          const hasParent = new Set();
-          Object.values(flatData).forEach(node => {
-              if (node.subs && node.subs.length > 0) {
-                  node.subs.forEach(childId => hasParent.add(childId));
-              }
-          });
-
-          // Nur die Knoten ohne Eltern (also nicht in hasParent) sind Wurzeln
-          return Object.values(nodesById).filter(node => !hasParent.has(node.id));
+          }
+          return filtered;
       }
 
+      function showTab(tab) {
+          document.querySelectorAll('.tree-container').forEach(div => div.classList.remove('active'));
+          document.getElementById('tree-' + tab).classList.add('active');
+
+          document.querySelectorAll('.tab-buttons button').forEach(btn => btn.classList.remove('active'));
+          document.getElementById('tab-' + tab).classList.add('active');
+      }
 
       document.addEventListener("DOMContentLoaded", () => {
           fetch("https://thanados.openatlas.eu/api/0.4/type_tree/")
               .then(res => res.json())
               .then(data => {
-                  const nestedData = buildTree(data.typeTree);
+                  // Filter die Daten für jede Kategorie
+                  const mainTypes = buildTree(filterByCategory(data.typeTree, 'standard'));
+                  const customTypes = buildTree(filterByCategory(data.typeTree, 'custom'));
+                  const valueTypes = buildTree(filterByCategory(data.typeTree, 'value'));
+
+                  // Initialisiere die 3 Trees
+                  new Treeview({
+                      containerId: "tree-main",
+                      data: mainTypes,
+                      initiallyExpanded: false,
+                      searchEnabled: true,
+                      multiSelectEnabled: false,
+                      cascadeSelectChildren: false,
+                      showSelectAllButton: false,
+                      showExpandCollapseAllButtons: true,
+                  });
 
                   new Treeview({
-                      containerId: "quercus-tree",
-                      data: nestedData,
+                      containerId: "tree-custom",
+                      data: customTypes,
+                      initiallyExpanded: false,
+                      searchEnabled: true,
+                      multiSelectEnabled: false,
+                      cascadeSelectChildren: false,
+                      showSelectAllButton: false,
+                      showExpandCollapseAllButtons: true,
+                  });
+
+                  new Treeview({
+                      containerId: "tree-value",
+                      data: valueTypes,
                       initiallyExpanded: false,
                       searchEnabled: true,
                       multiSelectEnabled: false,
