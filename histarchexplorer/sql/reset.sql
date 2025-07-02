@@ -16,6 +16,30 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS relationship_labels_range_id_fkey;
+ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS relationship_labels_domain_id_fkey;
+ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS entities_class_id_fkey;
+DROP TRIGGER IF EXISTS delete_links_trigger ON tng.entities;
+ALTER TABLE IF EXISTS ONLY tng.settings DROP CONSTRAINT IF EXISTS settings_pkey;
+ALTER TABLE IF EXISTS ONLY tng.maps DROP CONSTRAINT IF EXISTS maps_pkey;
+ALTER TABLE IF EXISTS ONLY tng.links DROP CONSTRAINT IF EXISTS links_pkey;
+ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS entities_pkey;
+ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS config_properties_pkey;
+ALTER TABLE IF EXISTS ONLY tng.classes DROP CONSTRAINT IF EXISTS config_classes_pkey;
+ALTER TABLE IF EXISTS tng.settings ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS tng.maps ALTER COLUMN id DROP DEFAULT;
+DROP SEQUENCE IF EXISTS tng.settings_id_seq;
+DROP TABLE IF EXISTS tng.settings;
+DROP TABLE IF EXISTS tng.properties;
+DROP SEQUENCE IF EXISTS tng.maps_id_seq;
+DROP TABLE IF EXISTS tng.maps;
+DROP SEQUENCE IF EXISTS tng.links_id_seq;
+DROP TABLE IF EXISTS tng.links;
+DROP TABLE IF EXISTS tng.entities;
+DROP TABLE IF EXISTS tng.classes;
+DROP FUNCTION IF EXISTS tng.getdates(first timestamp without time zone, last timestamp without time zone, comment text);
+DROP FUNCTION IF EXISTS tng.delete_links_on_config_delete();
+DROP SCHEMA IF EXISTS tng;
 --
 -- Name: tng; Type: SCHEMA; Schema: -; Owner: openatlas
 --
@@ -313,112 +337,107 @@ ALTER TABLE ONLY tng.settings ALTER COLUMN id SET DEFAULT nextval('tng.settings_
 -- Data for Name: classes; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-COPY tng.classes (id, name) FROM stdin;
-1	project
-2	person
-4	institution
-5	main-project
-6	language_code
-3	attribute
-\.
+INSERT INTO tng.classes (id, name) OVERRIDING SYSTEM VALUE VALUES
+	(1, 'project'),
+	(2, 'person'),
+	(4, 'institution'),
+	(5, 'main-project'),
+	(6, 'language_code'),
+	(3, 'attribute');
 
 
 --
 -- Data for Name: entities; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-COPY tng.entities (id, name, description, address, class_id, email, orcid_id, image, website, legal_notice, imprint) FROM stdin;
-2	{"de": "Stefan Eichert", "en": "Stefan Eichert"}	\N	\N	2	\N	\N	\N	\N	\N	\N
-3	{"de": "Lisa Aldrian", "en": "Lisa Aldrian"}	\N	\N	2	\N	\N	\N	\N	\N	\N
-4	{"de": "David Ruß", "en": "David Ruß"}	\N	\N	2	\N	\N	\N	\N	\N	\N
-5	{"de": "Projektleitung", "en": "Principal Investigator"}	\N	\N	3	\N	\N	\N	\N	\N	\N
-6	{"de": "Hauptkoordinator", "en": "Main Coordinator"}	\N	\N	3	\N	\N	\N	\N	\N	\N
-7	{"de": "Forscher", "en": "Researcher"}	\N	\N	3	\N	\N	\N	\N	\N	\N
-8	{"de": "Softwareentwickler", "en": "Software Developer"}	\N	\N	3	\N	\N	\N	\N	\N	\N
-9	{"de": "Design & Programmierung", "en": "Design & Programming"}	\N	\N	3	\N	\N	\N	\N	\N	\N
-10	{"de": "Archäologe", "en": "Archaeologist"}	\N	\N	3	\N	\N	\N	\N	\N	\N
-11	{"de": "Anthropologe", "en": "Anthropologist"}	\N	\N	3	\N	\N	\N	\N	\N	\N
-12	{"de": "Datenaufnahme", "en": "Data Acquisition"}	\N	\N	3	\N	\N	\N	\N	\N	\N
-13	{"de": "Historiker", "en": "Historian"}	\N	\N	3	\N	\N	\N	\N	\N	\N
-14	{"de": "Sponsor", "en": "Sponsor"}	\N	\N	3	https://example.example	\N	\N	\N	\N	\N
-15	{"de": "Partner", "en": "Partner"}	\N	\N	3	https://example.example	\N	\N	\N	\N	\N
-17	{"de": "RELIC", "en": "RELIC"}	\N	\N	1	\N	\N	\N	\N	\N	\N
-18	{"de": "REPLICO", "en": "REPLICO"}	\N	\N	1	\N	\N	\N	\N	\N	\N
-20	{"de": "Universität Wien", "en": "University of Vienna"}	{"de": "Die Wiener Uni", "en": "Viennese university"}	{"de": "Universitätsring 1\\r\\n1010 Wien", "en": "Universitätsring 1\\r\\n1010 Vienna"}	4	uni@univie.ac.at	\N	https://www.univie.ac.at/fileadmin/templates/Startseite/assets/uni_logo_220@2x.jpg	https://www.univie.ac.at/	{}	{}
-1	{"de": "HistArchExplorer ", "en": "HistArchExplorer "}	{"de": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.  \\r\\n\\r\\nDuis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.  \\r\\n\\r\\nUt wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.  \\r\\n\\r\\nNam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.  \\r\\n\\r\\nDuis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.   \\r\\n\\r\\nAt vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam"}	{}	5	\N	\N	\N	http://127.0.0.1:5000/	{"de": "Ich auch nicht"}	{"de": "Hab ich keins"}
-21	{"de": "Austrian Centre for Digital Humanities", "en": "Austrian Centre for Digital Humanities & Cultural Heritage"}	{"de": "Digitale Geisteswissenschaften"}	{"de": "Bäckerstraße 13\\r\\n1010 Wien"}	4	ACDH-CH-Office@oeaw.ac.at	\N	https://www.oeaw.ac.at/fileadmin/oeaw/institutstemplate/acdh/img/acdh-ch-logo96.png	https://www.oeaw.ac.at/acdh/acdh-ch-home	{}	{}
-22	{"de": "Nina Brundke", "en": "Nina Richards"}	{"de": "Beste Anthropologin", "en": "Best anthropologist! "}	{"en": "Burgring 7"}	2	nina@richards.us	\N	\N	\N	{}	{}
-23	{"de": "Physiotherapeut"}	{}	{}	3	\N	\N	\N	\N	{}	{}
-19	{"de": "NHM", "en": "NHM_"}	{"de": "Naturhistorisches Museum"}	{"de": "Burgring 7"}	4	\N	\N	https://nhm.at/jart/prj3/nhm-resp/resources/images/logo.svg	https://nhm.at/	{}	{}
-24	{"de": "FH Wien"}	{}	{}	4	\N	\N	\N	\N	{}	{}
-16	{"de": "THANADOS", "en": "THANADOS"}	{}	{}	1	\N	\N	\N	https://thanados.net/	{}	{}
-\.
+INSERT INTO tng.entities (id, name, description, address, class_id, email, orcid_id, image, website, legal_notice, imprint) OVERRIDING SYSTEM VALUE VALUES
+	(2, '{"de": "Stefan Eichert", "en": "Stefan Eichert"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL),
+	(3, '{"de": "Lisa Aldrian", "en": "Lisa Aldrian"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL),
+	(4, '{"de": "David Ruß", "en": "David Ruß"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5, '{"de": "Projektleitung", "en": "Principal Investigator"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
+	(6, '{"de": "Hauptkoordinator", "en": "Main Coordinator"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
+	(7, '{"de": "Forscher", "en": "Researcher"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
+	(8, '{"de": "Softwareentwickler", "en": "Software Developer"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
+	(9, '{"de": "Design & Programmierung", "en": "Design & Programming"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
+	(10, '{"de": "Archäologe", "en": "Archaeologist"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
+	(11, '{"de": "Anthropologe", "en": "Anthropologist"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
+	(12, '{"de": "Datenaufnahme", "en": "Data Acquisition"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
+	(13, '{"de": "Historiker", "en": "Historian"}', NULL, NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL),
+	(14, '{"de": "Sponsor", "en": "Sponsor"}', NULL, NULL, 3, 'https://example.example', NULL, NULL, NULL, NULL, NULL),
+	(15, '{"de": "Partner", "en": "Partner"}', NULL, NULL, 3, 'https://example.example', NULL, NULL, NULL, NULL, NULL),
+	(17, '{"de": "RELIC", "en": "RELIC"}', NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL),
+	(18, '{"de": "REPLICO", "en": "REPLICO"}', NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL),
+	(20, '{"de": "Universität Wien", "en": "University of Vienna"}', '{"de": "Die Wiener Uni", "en": "Viennese university"}', '{"de": "Universitätsring 1\r\n1010 Wien", "en": "Universitätsring 1\r\n1010 Vienna"}', 4, 'uni@univie.ac.at', NULL, 'https://www.univie.ac.at/fileadmin/templates/Startseite/assets/uni_logo_220@2x.jpg', 'https://www.univie.ac.at/', '{}', '{}'),
+	(1, '{"de": "HistArchExplorer ", "en": "HistArchExplorer "}', '{"de": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.  \r\n\r\nDuis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.  \r\n\r\nUt wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.  \r\n\r\nNam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.  \r\n\r\nDuis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.   \r\n\r\nAt vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam"}', '{}', 5, NULL, NULL, NULL, 'http://127.0.0.1:5000/', '{"de": "Ich auch nicht"}', '{"de": "Hab ich keins"}'),
+	(21, '{"de": "Austrian Centre for Digital Humanities", "en": "Austrian Centre for Digital Humanities & Cultural Heritage"}', '{"de": "Digitale Geisteswissenschaften"}', '{"de": "Bäckerstraße 13\r\n1010 Wien"}', 4, 'ACDH-CH-Office@oeaw.ac.at', NULL, 'https://www.oeaw.ac.at/fileadmin/oeaw/institutstemplate/acdh/img/acdh-ch-logo96.png', 'https://www.oeaw.ac.at/acdh/acdh-ch-home', '{}', '{}'),
+	(22, '{"de": "Nina Brundke", "en": "Nina Richards"}', '{"de": "Beste Anthropologin", "en": "Best anthropologist! "}', '{"en": "Burgring 7"}', 2, 'nina@richards.us', NULL, NULL, NULL, '{}', '{}'),
+	(23, '{"de": "Physiotherapeut"}', '{}', '{}', 3, NULL, NULL, NULL, NULL, '{}', '{}'),
+	(19, '{"de": "NHM", "en": "NHM_"}', '{"de": "Naturhistorisches Museum"}', '{"de": "Burgring 7"}', 4, NULL, NULL, 'https://nhm.at/jart/prj3/nhm-resp/resources/images/logo.svg', 'https://nhm.at/', '{}', '{}'),
+	(24, '{"de": "FH Wien"}', '{}', '{}', 4, NULL, NULL, NULL, NULL, '{}', '{}'),
+	(16, '{"de": "THANADOS", "en": "THANADOS"}', '{}', '{}', 1, NULL, NULL, NULL, 'https://thanados.net/', '{}', '{}');
 
 
 --
 -- Data for Name: links; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-COPY tng.links (id, domain_id, range_id, property, attribute, sortorder) FROM stdin;
-1	1	22	3	5	1
-2	22	19	2	11	2
-3	22	21	2	5	3
-4	16	22	1	12	4
-5	18	22	1	5	5
-6	17	22	1	10	6
-7	3	19	2	8	7
-8	3	24	2	23	8
-9	17	3	1	12	9
-10	1	3	3	8	10
-11	4	19	2	10	11
-12	18	4	1	13	12
-13	17	4	1	10	13
-14	1	4	3	12	14
-15	2	19	2	5	15
-16	2	19	2	10	16
-17	2	19	2	8	17
-20	1	2	3	5	20
-21	4	20	2	13	21
-22	16	20	5	14	22
-23	3	24	2	14	23
-24	3	24	2	23	24
-25	1	2	3	23	25
-27	3	21	2	23	26
-28	1	24	4	23	27
-29	1	2	3	23	28
-\.
+INSERT INTO tng.links (id, domain_id, range_id, property, attribute, sortorder) OVERRIDING SYSTEM VALUE VALUES
+	(1, 1, 22, 3, 5, 1),
+	(2, 22, 19, 2, 11, 2),
+	(3, 22, 21, 2, 5, 3),
+	(4, 16, 22, 1, 12, 4),
+	(5, 18, 22, 1, 5, 5),
+	(6, 17, 22, 1, 10, 6),
+	(7, 3, 19, 2, 8, 7),
+	(8, 3, 24, 2, 23, 8),
+	(9, 17, 3, 1, 12, 9),
+	(10, 1, 3, 3, 8, 10),
+	(11, 4, 19, 2, 10, 11),
+	(12, 18, 4, 1, 13, 12),
+	(13, 17, 4, 1, 10, 13),
+	(14, 1, 4, 3, 12, 14),
+	(15, 2, 19, 2, 5, 15),
+	(16, 2, 19, 2, 10, 16),
+	(17, 2, 19, 2, 8, 17),
+	(20, 1, 2, 3, 5, 20),
+	(21, 4, 20, 2, 13, 21),
+	(22, 16, 20, 5, 14, 22),
+	(23, 3, 24, 2, 14, 23),
+	(24, 3, 24, 2, 23, 24),
+	(25, 1, 2, 3, 23, 25),
+	(27, 3, 21, 2, 23, 26),
+	(28, 1, 24, 4, 23, 27),
+	(29, 1, 2, 3, 23, 28);
 
 
 --
 -- Data for Name: maps; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-COPY tng.maps (id, name, display_name, tilestring, sortorder) FROM stdin;
-1	OpenStreetMap	Open Street Map	L.tileLayer(\n            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});	1
-2	uio	uo		2
-\.
+INSERT INTO tng.maps (id, name, display_name, tilestring, sortorder) VALUES
+	(1, 'OpenStreetMap', 'Open Street Map', 'L.tileLayer(
+            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: ''&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors''});', 1),
+	(2, 'uio', 'uo', '', 2);
 
 
 --
 -- Data for Name: properties; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-COPY tng.properties (id, name, name_inv, domain_type_id, range_type_id) FROM stdin;
-1	{"de": "hat Mitglied", "en": "has member"}	{"de": "ist Mitglied von", "en": "is member of"}	1	2
-2	{"de": "hat Zugehörigkeit", "en": "has affiliation"}	{"de": "ist Zugehörigkeit von", "en": "is affiliation of"}	2	4
-3	{"de": "hat Kernmitglied", "en": "has core member"}	{"de": "ist Kernmitglied von", "en": "is core member of"}	5	2
-4	{"de": "hat Kerninstitution", "en": "has core institution"}	{"de": "ist Kerninstitution von", "en": "is core institution of"}	5	4
-5	{"de": "hat Institution", "en": "has institution"}	{"de": "ist Institution von", "en": "is institution of"}	1	4
-\.
+INSERT INTO tng.properties (id, name, name_inv, domain_type_id, range_type_id) OVERRIDING SYSTEM VALUE VALUES
+	(1, '{"de": "hat Mitglied", "en": "has member"}', '{"de": "ist Mitglied von", "en": "is member of"}', 1, 2),
+	(2, '{"de": "hat Zugehörigkeit", "en": "has affiliation"}', '{"de": "ist Zugehörigkeit von", "en": "is affiliation of"}', 2, 4),
+	(3, '{"de": "hat Kernmitglied", "en": "has core member"}', '{"de": "ist Kernmitglied von", "en": "is core member of"}', 5, 2),
+	(4, '{"de": "hat Kerninstitution", "en": "has core institution"}', '{"de": "ist Kerninstitution von", "en": "is core institution of"}', 5, 4),
+	(5, '{"de": "hat Institution", "en": "has institution"}', '{"de": "ist Institution von", "en": "is institution of"}', 1, 4);
 
 
 --
 -- Data for Name: settings; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-COPY tng.settings (id, index_img, index_map, img_map, greyscale, shown_classes, shown_types, hidden_classes, hidden_types, shown_ids, hidden_ids) FROM stdin;
-1	/static/images/index_map_bg/Blank_map_of_Europe_central_network.png	1	map	t	{person,group,artifact,human_remains,acquisition,event,activity,creation,move,production,modification,place,stratigraphic_unit,feature,source,bibliography,external_reference,edition,file}	\N	{group,stratigraphic_unit,source,external_reference}	\N	\N	\N
-\.
+INSERT INTO tng.settings (id, index_img, index_map, img_map, greyscale, shown_classes, shown_types, hidden_classes, hidden_types, shown_ids, hidden_ids) VALUES
+	(1, '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png', 1, 'map', true, '{artifact,human_remains,acquisition,event,activity,creation,move,production,modification,place,stratigraphic_unit,feature,source,bibliography,external_reference,edition,file}', NULL, '{group,stratigraphic_unit,source,external_reference}', NULL, NULL, NULL);
 
 
 --
