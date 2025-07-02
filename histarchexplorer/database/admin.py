@@ -134,7 +134,7 @@ def update_map(data: dict[str, str]) -> None:
 
 def check_if_main_project_exist() -> bool:
     g.cursor.execute(
-        "SELECT 1 FROM tng.entities WHERE config_class = 5 LIMIT 1")
+        "SELECT 1 FROM tng.entities WHERE class_id = 5 LIMIT 1")
     return g.cursor.fetchone() is not None
 
 

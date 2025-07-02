@@ -61,19 +61,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         view_classes=app.config['VIEW_CLASSES'])
 
 
-@app.route('/admin/delete_entry/<int:id_>/<tab>')
-@login_required
-def delete_entry(id_: int, tab: str) -> Response:
-    check_manager_user()
-    if Admin.get_config_config_classes_by_id(id_) == 5:
-        flash(_('Main Project cannot be deleted'), 'danger')
-        return redirect(url_for('admin', tab=tab))
-    Admin.delete_entry(id_)
-    flash('Entry deleted successfully!', 'success')
-    return redirect(url_for('admin') + tab)
 
 
-@app.route('/admin/delete_link/<int:link_id>/<tab>/<entry>')
+@app.route('/admin/delete_link/<int:link_id>/<tab>/<entry>', methods=['GET'])
 @login_required
 def delete_link(link_id: int, tab: str, entry: str) -> Response:
     check_manager_user()
@@ -82,7 +72,7 @@ def delete_link(link_id: int, tab: str, entry: str) -> Response:
     return redirect(url_for('admin', tab=tab, entry=entry))
 
 
-@app.route('/admin/add_link/', methods=['GET', 'POST'])
+@app.route('/admin/add_link/', methods=['GET'])
 @login_required
 def add_link() -> Response:
     check_manager_user()
@@ -104,7 +94,6 @@ def add_link() -> Response:
 @login_required
 def add_entry() -> Response:
     check_manager_user()
-
     form_data = {
         'category': request.form.get('category', ''),
         'name': request.form.get('name', ''),
@@ -116,7 +105,6 @@ def add_entry() -> Response:
         'description': request.form.get('description', ''),
         'imprint': request.form.get('imprint', ''),
         'legal_notice': request.form.get('legalnotice', '')}
-
     current_tab = 'nav-' + form_data['category']
     redirect_base = url_for('admin') + current_tab
     try:
@@ -133,6 +121,16 @@ def add_entry() -> Response:
 
     return redirect(redirect_base)
 
+@app.route('/admin/delete_entry/<int:id_>/<tab>')
+@login_required
+def delete_entry(id_: int, tab: str) -> Response:
+    check_manager_user()
+    if Admin.get_config_config_classes_by_id(id_) == 5:
+        flash(_('Main Project cannot be deleted'), 'danger')
+        return redirect(url_for('admin', tab=tab))
+    Admin.delete_entry(id_)
+    flash('Entry deleted successfully!', 'success')
+    return redirect(url_for('admin') + tab)
 
 @app.route('/edit_entry', methods=['POST', 'GET'])
 @login_required
