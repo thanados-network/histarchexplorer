@@ -3,26 +3,22 @@ from typing import Any
 from flask import g
 
 
-def get_map_settings() -> Any:
+def get_shown_classes() -> Any:
     g.cursor.execute(
-        'SELECT index_img, index_map, img_map, greyscale '
+        'SELECT shown_classes '
         'FROM tng.settings '
         'LIMIT 1')
-    return g.cursor.fetchone()
+    result = g.cursor.fetchone()
+    return result[0] or []
 
-def get_shown_entities() -> Any:
-    g.cursor.execute(
-        'SELECT shown_entities '
-        'FROM tng.settings '
-        'LIMIT 1')
-    return g.cursor.fetchone().shown_entities
 
-def get_hidden_entities() -> Any:
+def get_hidden_classes() -> Any:
     g.cursor.execute(
-        'SELECT hidden_entities '
+        'SELECT hidden_classes '
         'FROM tng.settings '
         'LIMIT 1')
-    return g.cursor.fetchone().hidden_entities
+    result = g.cursor.fetchone()
+    return result[0] or []
 
 def get_main_image_table() -> dict[int, int]:
     main_image = {}
@@ -34,3 +30,8 @@ def get_main_image_table() -> dict[int, int]:
     for row in g.cursor.fetchall():
         main_image[row[0]] = row[1]
     return main_image
+
+
+def get_settings():
+    g.cursor.execute("SELECT * FROM tng.settings LIMIT 1")
+    return g.cursor.fetchone()

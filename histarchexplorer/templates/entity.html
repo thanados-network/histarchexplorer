@@ -13,8 +13,8 @@
             const viewClasses = {{ view_classes|tojson }};
             const data = {{ data|tojson }}
             function getEntitiesForTab(tabName) {
-                const validTypes = viewClasses[tabName] || [];
-                return data.entities.filter(entity => validTypes.includes(entity.class));
+                const validClasses = viewClasses[tabName] || [];
+                return data.entities.filter(entity => validClasses.includes(entity.class));
             }
 
             data.entities.forEach(entity => {

@@ -208,68 +208,40 @@ def get_first_geom(id):
 
 
 def get_browse_list_entities():
-    # Fetch filter settings
-    g.cursor.execute("""
-        SELECT shown_entities, shown_types, hidden_entities, hidden_types, shown_ids, hidden_ids
-        FROM tng.settings
-        LIMIT 1
-    """)
-    result = g.cursor.fetchone()
-
+    # This data can be removed, if the key aren't needed somewhere else
     data = {
-        'shown classes': result.shown_entities,
-        'hidden classes': result.hidden_entities,
-        'shown types': build_id_collection(result.shown_types),
-        'hidden types': build_id_collection(result.hidden_types),
-        'shown ids': result.shown_ids,
-        'hidden ids': result.hidden_ids,
-    }
-
-
-
-
-    # Prepare filter values; handle None as empty lists to avoid errors in query
-    def parse_json(field):
-        if field is None:
-            return []
-        # Sometimes fields might be stringified JSON
-        if isinstance(field, str):
-            import json
-            return json.loads(field)
-        return field
-
-    shown_entities = parse_json(data['shown classes'])
-    hidden_entities = parse_json(data['hidden classes'])
-    shown_types = parse_json(data['shown types'])
-    hidden_types = parse_json(data['hidden types'])
-    shown_ids = parse_json(data['shown ids'])
-    hidden_ids = parse_json(data['hidden ids'])
+        'shown classes': g.settings.shown_classes,
+        'hidden classes': g.settings.hidden_classes,
+        'shown types': build_id_collection(g.settings.shown_types),
+        'hidden types': build_id_collection(g.settings.hidden_types),
+        'shown ids': g.settings.shown_ids,
+        'hidden ids': g.settings.hidden_ids}
 
     # Build WHERE clauses dynamically
     where_clauses = []
     params = []
 
-    if shown_entities:
+    if shown_classes := data['shown classes']:
         where_clauses.append("e.openatlas_class_name = ANY (%s)")
-        params.append(shown_entities)
+        params.append(shown_classes)
 
-    if hidden_entities:
+    if hidden_classes:= data['hidden classes']:
         where_clauses.append("e.openatlas_class_name != ALL (%s)")
-        params.append(hidden_entities)
+        params.append(hidden_classes)
 
-    if shown_types:
+    if shown_types:= data['shown types']:
         where_clauses.append("e.id IN (SELECT a.id FROM model.entity a JOIN model.link b ON a.id = b.domain_id WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
         params.append(shown_types)
 
-    if hidden_types:
+    if hidden_types:= data['shown types']:
         where_clauses.append("e.id NOT IN (SELECT a.id FROM model.entity a JOIN model.link b ON a.id = b.domain_id WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
         params.append(hidden_types)
 
-    if shown_ids:
+    if shown_ids:= data['shown ids']:
         where_clauses.append("e.id = ANY (%s)")
         params.append(shown_ids)
 
-    if hidden_ids:
+    if hidden_ids:= data['hidden ids']:
         where_clauses.append("e.id != ALL (%s)")
         params.append(hidden_ids)
 

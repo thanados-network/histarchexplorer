@@ -162,8 +162,6 @@ function setSaveValues(classList, saveButton, info, thisElement) {
 
 
 function saveLinkValues(button) {
-    console.log(button);
-
     let domain = button.dataset.domain;
     let range = button.dataset.range;
 
@@ -171,10 +169,19 @@ function saveLinkValues(button) {
         [domain, range] = [range, domain];
     }
 
-    const {property, role, tab, entry} = button.dataset;
+    const { property, role, tab, entry } = button.dataset;
 
-    // Construct URL and navigate
-    window.location.href = `/admin/add_link/${domain}/${range}/${property}/${role}/${tab}/${entry}`;
+    const params = new URLSearchParams({
+        domain,
+        range,
+        property,
+        role,
+        tab,
+        entry
+    });
+
+    // Construct URL with query parameters
+    window.location.href = `/admin/add_link/?${params.toString()}`;
 }
 
 
@@ -236,4 +243,3 @@ function saveSortOrder(items, table) {
         body: JSON.stringify({criteria: items, table: table}),
     })
 }
-

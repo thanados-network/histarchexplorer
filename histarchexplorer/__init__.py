@@ -6,11 +6,11 @@ from flask_babel import Babel
 from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
-
 from histarchexplorer.database.settings import get_main_image_table
-from histarchexplorer.services.about import Project
-from histarchexplorer.services.config_classes import get_config_classes
+from histarchexplorer.services.config import ConfigEntity, Link, Properties, \
+    get_config_classes
 from histarchexplorer.services.search import SearchService
+from histarchexplorer.services.settings import Settings
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
@@ -87,15 +87,31 @@ def get_type_divisions():
 def before_request() -> None:
     g.db = connect()
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
+    if request.path.startswith('/reset'):
+        return None
     session['language'] = get_locale()
     g.language = session.get(
         'language',
         request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
+    g.preferred_langauge = app.config['PREFERRED_LANGUAGE']
     g.main_images = get_main_image_table()
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
     g.config_classes = get_config_classes()
+    g.config_properties = Properties.get_all()
+    g.config_links = Link.get_all()
+    g.settings = Settings.initialize_settings()
+    # Todo: this is basically the same as
+    #   config_classes but with 's' and attributes instead of attribute
+    g.config_classes_map = {
+        'projects': 1,  # option for config_class=2 project vs 1=main_project?
+        'persons': 2,
+        'institutions': 4,
+        'attributes': 3,
+        'main-project': 5}
+    g.config_entities = ConfigEntity.get_all_localized()
     g.search_service = SearchService(app)
+    return None
 
 
 @app.context_processor

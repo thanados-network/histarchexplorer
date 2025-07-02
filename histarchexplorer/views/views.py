@@ -1,22 +1,23 @@
 from typing import Optional
 
-from flask import redirect, render_template, request, session
+from flask import g, redirect, render_template, request, session
 from werkzeug import Response
 
 from histarchexplorer import app
-from histarchexplorer.database.map import get_map_tilestring
-from histarchexplorer.database.settings import get_map_settings
+from histarchexplorer.database.map import  get_map_tilestring
 from histarchexplorer.utils.cerberos import get_view_class_count
 
 
 @app.route('/')
 def index() -> str:
-    map_data = get_map_settings()
-    map_ = get_map_tilestring(map_data)
+    map_data = g.settings.get_map_settings()
+    map_ = None
+    if index_map := map_data['map']:
+        map_ = get_map_tilestring(index_map).tilestring
     view_classes = get_view_class_count()
     return render_template(
         'index.html',
-        map=map_.tilestring,
+        map=map_,
         map_data=map_data,
         view_classes=view_classes)
 

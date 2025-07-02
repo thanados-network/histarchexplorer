@@ -22,9 +22,9 @@ API_URL = 'https://thanados.openatlas.eu/api/'
 API_PROXY = ''
 OPENATLAS_CASE_STUDY_IDS: list[int] = []
 
-CLASSES_TO_SKIP = [
+CLASSES_TO_SKIP = {
     'object_location', 'type', 'appellation', 'administrative_unit',
-    'source_translation', 'type_tools', 'reference_system']
+    'source_translation', 'type_tools', 'reference_system'}
 
 VIEW_CLASSES = {
     'actors': ('person', 'group'),
