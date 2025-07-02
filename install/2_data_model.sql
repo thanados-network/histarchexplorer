@@ -99,8 +99,7 @@ INSERT INTO tng.links OVERRIDING SYSTEM VALUE VALUES
 
 INSERT INTO tng.maps VALUES
 	(1, 'OpenStreetMap', 'Open Street Map', 'L.tileLayer(
-            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: ''&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors''});', 1),
-	(2, 'uio', 'uo', '', 2);
+            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: ''&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors''});', 1);
 
 
 --
@@ -120,7 +119,7 @@ INSERT INTO tng.properties OVERRIDING SYSTEM VALUE VALUES
 --
 
 INSERT INTO tng.settings VALUES
-	(1, '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png', 1, 'map', true, '{person,group,artifact,human_remains,acquisition,event,activity,creation,move,production,modification,place,stratigraphic_unit,feature,source,bibliography,external_reference,edition,file}', NULL, '{group,stratigraphic_unit,source,external_reference}', NULL, NULL, NULL);
+	(1, '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png', 1, 'map', true, '{artifact,human_remains,acquisition,event,activity,creation,move,production,modification,place,stratigraphic_unit,feature,source,bibliography,external_reference,edition,file}', NULL, '{group,stratigraphic_unit,source,external_reference}', NULL, NULL, NULL);
 
 
 --
