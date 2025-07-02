@@ -99,17 +99,17 @@ def add_entry() -> Response:
 
     current_tab = 'nav-' + form_data['category']
     redirect_base = url_for('admin') + current_tab
-    #try:
-    new_id = Admin.add_entry(form_data)
-    flash(_('Entry added successfully!'), 'success')
-    return redirect(f"{redirect_base}/{current_tab}{new_id}")
-    #except Admin.TooManyMainProjects:
-    #    flash(
-    #        f'Error adding entry {form_data["name"]}: '
-    #        'Only one main project allowed',
-    #        'danger')
-    #except Exception as e:
-    #    flash(f'Error adding entry {form_data["name"]}: {e}', 'danger')
+    try:
+        new_id = Admin.add_entry(form_data)
+        flash(_('Entry added successfully!'), 'success')
+        return redirect(f"{redirect_base}/{current_tab}{new_id}")
+    except Admin.TooManyMainProjects:
+        flash(
+            f'Error adding entry {form_data["name"]}: '
+            'Only one main project allowed',
+            'danger')
+    except Exception as e:
+        flash(f'Error adding entry {form_data["name"]}: {e}', 'danger')
 
     return redirect(redirect_base)
 

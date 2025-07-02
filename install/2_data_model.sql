@@ -20,7 +20,7 @@ SET row_security = off;
 -- Data for Name: classes; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-INSERT INTO tng.classes VALUES
+INSERT INTO tng.classes OVERRIDING SYSTEM VALUE VALUES
 	(1, 'project'),
 	(2, 'person'),
 	(4, 'institution'),
@@ -33,7 +33,7 @@ INSERT INTO tng.classes VALUES
 -- Data for Name: entities; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-INSERT INTO tng.entities VALUES
+INSERT INTO tng.entities OVERRIDING SYSTEM VALUE VALUES
 	(2, '{"de": "Stefan Eichert", "en": "Stefan Eichert"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL),
 	(3, '{"de": "Lisa Aldrian", "en": "Lisa Aldrian"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL),
 	(4, '{"de": "David Ruß", "en": "David Ruß"}', NULL, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -64,7 +64,7 @@ INSERT INTO tng.entities VALUES
 -- Data for Name: links; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-INSERT INTO tng.links VALUES
+INSERT INTO tng.links OVERRIDING SYSTEM VALUE VALUES
 	(1, 1, 22, 3, 5, 1),
 	(2, 22, 19, 2, 11, 2),
 	(3, 22, 21, 2, 5, 3),
@@ -86,7 +86,11 @@ INSERT INTO tng.links VALUES
 	(21, 4, 20, 2, 13, 21),
 	(22, 16, 20, 5, 14, 22),
 	(23, 3, 24, 2, 14, 23),
-	(24, 3, 24, 2, 23, 24);
+	(24, 3, 24, 2, 23, 24),
+	(25, 1, 2, 3, 23, 25),
+	(27, 3, 21, 2, 23, 26),
+	(28, 1, 24, 4, 23, 27),
+	(29, 1, 2, 3, 23, 28);
 
 
 --
@@ -102,7 +106,7 @@ INSERT INTO tng.maps VALUES
 -- Data for Name: properties; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
-INSERT INTO tng.properties VALUES
+INSERT INTO tng.properties OVERRIDING SYSTEM VALUE VALUES
 	(1, '{"de": "hat Mitglied", "en": "has member"}', '{"de": "ist Mitglied von", "en": "is member of"}', 1, 2),
 	(2, '{"de": "hat Zugehörigkeit", "en": "has affiliation"}', '{"de": "ist Zugehörigkeit von", "en": "is affiliation of"}', 2, 4),
 	(3, '{"de": "hat Kernmitglied", "en": "has core member"}', '{"de": "ist Kernmitglied von", "en": "is core member of"}', 5, 2),
@@ -119,10 +123,31 @@ INSERT INTO tng.settings VALUES
 
 
 --
+-- Name: classes_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
+--
+
+SELECT pg_catalog.setval('tng.classes_id_seq', 1, false);
+
+
+--
+-- Name: entities_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
+--
+
+SELECT pg_catalog.setval('tng.entities_id_seq', 30, true);
+
+
+--
 -- Name: links_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
 --
 
-SELECT pg_catalog.setval('tng.links_id_seq', 24, true);
+SELECT pg_catalog.setval('tng.links_id_seq', 29, true);
+
+
+--
+-- Name: links_id_seq1; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
+--
+
+SELECT pg_catalog.setval('tng.links_id_seq1', 32, true);
 
 
 --
@@ -130,6 +155,13 @@ SELECT pg_catalog.setval('tng.links_id_seq', 24, true);
 --
 
 SELECT pg_catalog.setval('tng.maps_id_seq', 1, true);
+
+
+--
+-- Name: properties_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
+--
+
+SELECT pg_catalog.setval('tng.properties_id_seq', 1, false);
 
 
 --

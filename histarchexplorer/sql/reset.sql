@@ -86,6 +86,20 @@ CREATE TABLE tng.classes (
 ALTER TABLE tng.classes OWNER TO openatlas;
 
 --
+-- Name: classes_id_seq; Type: SEQUENCE; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE tng.classes ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME tng.classes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: entities; Type: TABLE; Schema: tng; Owner: openatlas
 --
 
@@ -105,6 +119,20 @@ CREATE TABLE tng.entities (
 
 
 ALTER TABLE tng.entities OWNER TO openatlas;
+
+--
+-- Name: entities_id_seq; Type: SEQUENCE; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE tng.entities ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME tng.entities_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
 
 --
 -- Name: links; Type: TABLE; Schema: tng; Owner: openatlas
@@ -142,6 +170,20 @@ ALTER TABLE tng.links_id_seq OWNER TO openatlas;
 --
 
 ALTER SEQUENCE tng.links_id_seq OWNED BY tng.links.id;
+
+
+--
+-- Name: links_id_seq1; Type: SEQUENCE; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE tng.links ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME tng.links_id_seq1
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
 
 
 --
@@ -197,6 +239,20 @@ CREATE TABLE tng.properties (
 ALTER TABLE tng.properties OWNER TO openatlas;
 
 --
+-- Name: properties_id_seq; Type: SEQUENCE; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE tng.properties ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME tng.properties_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: settings; Type: TABLE; Schema: tng; Owner: openatlas
 --
 
@@ -237,13 +293,6 @@ ALTER TABLE tng.settings_id_seq OWNER TO openatlas;
 --
 
 ALTER SEQUENCE tng.settings_id_seq OWNED BY tng.settings.id;
-
-
---
--- Name: links id; Type: DEFAULT; Schema: tng; Owner: openatlas
---
-
-ALTER TABLE ONLY tng.links ALTER COLUMN id SET DEFAULT nextval('tng.links_id_seq'::regclass);
 
 
 --
@@ -333,6 +382,10 @@ COPY tng.links (id, domain_id, range_id, property, attribute, sortorder) FROM st
 22	16	20	5	14	22
 23	3	24	2	14	23
 24	3	24	2	23	24
+25	1	2	3	23	25
+27	3	21	2	23	26
+28	1	24	4	23	27
+29	1	2	3	23	28
 \.
 
 
@@ -368,10 +421,31 @@ COPY tng.settings (id, index_img, index_map, img_map, greyscale, shown_entities,
 
 
 --
+-- Name: classes_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
+--
+
+SELECT pg_catalog.setval('tng.classes_id_seq', 1, false);
+
+
+--
+-- Name: entities_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
+--
+
+SELECT pg_catalog.setval('tng.entities_id_seq', 29, true);
+
+
+--
 -- Name: links_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
 --
 
-SELECT pg_catalog.setval('tng.links_id_seq', 24, true);
+SELECT pg_catalog.setval('tng.links_id_seq', 29, true);
+
+
+--
+-- Name: links_id_seq1; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
+--
+
+SELECT pg_catalog.setval('tng.links_id_seq1', 32, true);
 
 
 --
@@ -379,6 +453,13 @@ SELECT pg_catalog.setval('tng.links_id_seq', 24, true);
 --
 
 SELECT pg_catalog.setval('tng.maps_id_seq', 1, true);
+
+
+--
+-- Name: properties_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
+--
+
+SELECT pg_catalog.setval('tng.properties_id_seq', 1, false);
 
 
 --
@@ -397,19 +478,19 @@ ALTER TABLE ONLY tng.classes
 
 
 --
--- Name: entities config_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
---
-
-ALTER TABLE ONLY tng.entities
-    ADD CONSTRAINT config_pkey PRIMARY KEY (id);
-
-
---
 -- Name: properties config_properties_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
 ALTER TABLE ONLY tng.properties
     ADD CONSTRAINT config_properties_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: entities entities_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE ONLY tng.entities
+    ADD CONSTRAINT entities_pkey PRIMARY KEY (id);
 
 
 --
@@ -444,11 +525,11 @@ CREATE TRIGGER delete_links_trigger BEFORE DELETE ON tng.entities FOR EACH ROW E
 
 
 --
--- Name: entities config_config_classes_fk; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
+-- Name: entities entities_class_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
 ALTER TABLE ONLY tng.entities
-    ADD CONSTRAINT config_config_classes_fk FOREIGN KEY (class_id) REFERENCES tng.classes(id);
+    ADD CONSTRAINT entities_class_id_fkey FOREIGN KEY (class_id) REFERENCES tng.classes(id) NOT VALID;
 
 
 --

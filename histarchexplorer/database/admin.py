@@ -67,7 +67,7 @@ def get_config_properties() -> Any:
 
 def get_config_class_by_id(id_: int) -> int | None:
     g.cursor.execute(
-        'SELECT type FROM tng.entities WHERE id = %s',
+        'SELECT class_id FROM tng.entities WHERE id = %s',
         (id_,))
     row = g.cursor.fetchone()
     return row[0] if row else None
@@ -147,14 +147,11 @@ def delete_entry(id_: int) -> None:
 
 
 def add_entry(data: dict) -> int:
-    # todo: fix add new entry. It is a database problem
-    print(data)
     config_class = g.config_classes_map.get(data['category'])
     if config_class is None:
         raise ValueError(f"Unknown category {data['category']}")
     if config_class == 5 and check_if_main_project_exist():
         raise 404
-    print(config_class)
     g.cursor.execute(
         """
         INSERT INTO tng.entities

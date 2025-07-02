@@ -18,17 +18,16 @@ SET row_security = off;
 
 ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS relationship_labels_range_id_fkey;
 ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS relationship_labels_domain_id_fkey;
-ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS config_config_classes_fk;
+ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS entities_class_id_fkey;
 DROP TRIGGER IF EXISTS delete_links_trigger ON tng.entities;
 ALTER TABLE IF EXISTS ONLY tng.settings DROP CONSTRAINT IF EXISTS settings_pkey;
 ALTER TABLE IF EXISTS ONLY tng.maps DROP CONSTRAINT IF EXISTS maps_pkey;
 ALTER TABLE IF EXISTS ONLY tng.links DROP CONSTRAINT IF EXISTS links_pkey;
+ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS entities_pkey;
 ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS config_properties_pkey;
-ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS config_pkey;
 ALTER TABLE IF EXISTS ONLY tng.classes DROP CONSTRAINT IF EXISTS config_classes_pkey;
 ALTER TABLE IF EXISTS tng.settings ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS tng.maps ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS tng.links ALTER COLUMN id DROP DEFAULT;
 DROP SEQUENCE IF EXISTS tng.settings_id_seq;
 DROP TABLE IF EXISTS tng.settings;
 DROP TABLE IF EXISTS tng.properties;
@@ -111,6 +110,20 @@ CREATE TABLE tng.classes (
 ALTER TABLE tng.classes OWNER TO openatlas;
 
 --
+-- Name: classes_id_seq; Type: SEQUENCE; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE tng.classes ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME tng.classes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: entities; Type: TABLE; Schema: tng; Owner: openatlas
 --
 
@@ -130,6 +143,20 @@ CREATE TABLE tng.entities (
 
 
 ALTER TABLE tng.entities OWNER TO openatlas;
+
+--
+-- Name: entities_id_seq; Type: SEQUENCE; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE tng.entities ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME tng.entities_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
 
 --
 -- Name: links; Type: TABLE; Schema: tng; Owner: openatlas
@@ -167,6 +194,20 @@ ALTER TABLE tng.links_id_seq OWNER TO openatlas;
 --
 
 ALTER SEQUENCE tng.links_id_seq OWNED BY tng.links.id;
+
+
+--
+-- Name: links_id_seq1; Type: SEQUENCE; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE tng.links ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME tng.links_id_seq1
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
 
 
 --
@@ -222,6 +263,20 @@ CREATE TABLE tng.properties (
 ALTER TABLE tng.properties OWNER TO openatlas;
 
 --
+-- Name: properties_id_seq; Type: SEQUENCE; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE tng.properties ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME tng.properties_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: settings; Type: TABLE; Schema: tng; Owner: openatlas
 --
 
@@ -265,13 +320,6 @@ ALTER SEQUENCE tng.settings_id_seq OWNED BY tng.settings.id;
 
 
 --
--- Name: links id; Type: DEFAULT; Schema: tng; Owner: openatlas
---
-
-ALTER TABLE ONLY tng.links ALTER COLUMN id SET DEFAULT nextval('tng.links_id_seq'::regclass);
-
-
---
 -- Name: maps id; Type: DEFAULT; Schema: tng; Owner: openatlas
 --
 
@@ -294,19 +342,19 @@ ALTER TABLE ONLY tng.classes
 
 
 --
--- Name: entities config_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
---
-
-ALTER TABLE ONLY tng.entities
-    ADD CONSTRAINT config_pkey PRIMARY KEY (id);
-
-
---
 -- Name: properties config_properties_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
 ALTER TABLE ONLY tng.properties
     ADD CONSTRAINT config_properties_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: entities entities_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE ONLY tng.entities
+    ADD CONSTRAINT entities_pkey PRIMARY KEY (id);
 
 
 --
@@ -341,11 +389,11 @@ CREATE TRIGGER delete_links_trigger BEFORE DELETE ON tng.entities FOR EACH ROW E
 
 
 --
--- Name: entities config_config_classes_fk; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
+-- Name: entities entities_class_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
 ALTER TABLE ONLY tng.entities
-    ADD CONSTRAINT config_config_classes_fk FOREIGN KEY (class_id) REFERENCES tng.classes(id);
+    ADD CONSTRAINT entities_class_id_fkey FOREIGN KEY (class_id) REFERENCES tng.classes(id) NOT VALID;
 
 
 --
