@@ -1,9 +1,10 @@
 from typing import Optional
 
-from flask import g, redirect, render_template, request, session
+import requests
+from flask import g, jsonify, redirect, render_template, request, session
 from werkzeug import Response
 
-from histarchexplorer import app
+from histarchexplorer import app, cache
 from histarchexplorer.database.map import  get_map_tilestring
 from histarchexplorer.utils.cerberos import get_view_class_count
 
@@ -31,3 +32,12 @@ def prototype() -> str:
 def set_language(language: Optional[str] = None) -> Response:
     session['language'] = language
     return redirect(request.referrer)
+
+
+@app.route('/type-tree')
+@cache.cached()
+def type_tree():
+    response = requests.get(
+        f"{app.config['API_URL']}/type_by_view_class/",
+        timeout=20)
+    return jsonify(response.json())

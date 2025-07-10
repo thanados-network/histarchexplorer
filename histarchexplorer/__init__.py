@@ -3,6 +3,7 @@ from typing import Any
 import psycopg2.extras
 from flask import Flask, Response, g, request, session, url_for
 from flask_babel import Babel
+from flask_caching import Cache
 from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
@@ -16,6 +17,11 @@ app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
 app.config.from_pyfile('production.py')
 babel = Babel(app)
+
+app.config['CACHE_TYPE'] = 'FileSystemCache'
+app.config['CACHE_DIR'] = '/var/tmp/flask-cache'
+app.config['CACHE_DEFAULT_TIMEOUT'] = 86400  # Cache results for 60 seconds
+cache = Cache(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer.views import (
