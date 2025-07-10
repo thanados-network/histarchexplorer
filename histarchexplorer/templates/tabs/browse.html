@@ -45,10 +45,10 @@
                                     </button>
                                     <span>
                                     <button type="button" class="btn btn-warning" id="reset-sort-btn-{{ tab_name }}">
-                                        Reset Sort
+                                        Reset
                                     </button>
                                     <button type="button" class="btn btn-primary" id="apply-sort-btn-{{ tab_name }}">
-                                        Apply Sort
+                                        Apply
                                     </button>
                                     </span>
                                 </div>
@@ -73,10 +73,10 @@
                                     </button>
                                     <span>
                                     <button type="button" class="btn btn-warning" id="reset-filter-btn-{{ tab_name }}">
-                                        Reset Filter
+                                        Reset
                                     </button>
                                     <button type="button" class="btn btn-primary" id="apply-filter-btn-{{ tab_name }}">
-                                        Apply Filter
+                                        Apply
                                     </button>
                                     </span>
                                 </div>
@@ -91,8 +91,6 @@
         </div>
     </div>
 </div>
-</div>
-
 
 <script>
 
@@ -314,25 +312,6 @@
         if (sortLevelsContainer{{ tab_name }}.children.length === 0) {
             addSortLevel{{ tab_name }}();
         }
-    });
-
-    const filterInput{{ tab_name }} = document.getElementById("filterInput{{ tab_name }}");
-    const clearButton{{ tab_name }} = document.getElementById("clearFilter{{ tab_name }}");
-
-    filterInput{{ tab_name }}.addEventListener("input", function () {
-        const value{{ tab_name }} = this.value.trim();
-        if (value{{ tab_name }}) {
-            table{{tab_name}}.setFilter("all", "like", value{{ tab_name }});
-        } else {
-            table{{tab_name}}.clearFilter();
-        }
-    });
-
-    // Clear button logic
-    clearButton{{ tab_name }}.addEventListener("click", function () {
-        filterInput{{ tab_name }}.value = "";
-        table{{tab_name}}.clearFilter();
-        filterInput{{ tab_name }}.focus();
     });
 
 </script>
