@@ -5,7 +5,7 @@ from flask import g, jsonify, redirect, render_template, request, session
 from werkzeug import Response
 
 from histarchexplorer import app, cache
-from histarchexplorer.database.map import  get_map_tilestring
+from histarchexplorer.database.map import get_map_tilestring
 from histarchexplorer.utils.cerberos import get_view_class_count
 
 
@@ -22,11 +22,6 @@ def index() -> str:
         map_data=map_data,
         view_classes=view_classes)
 
-@app.route('/prototype')
-def prototype() -> str:
-    return render_template('prototyppage.html')
-
-
 
 @app.route('/language=<language>')
 def set_language(language: Optional[str] = None) -> Response:
@@ -39,5 +34,5 @@ def set_language(language: Optional[str] = None) -> Response:
 def type_tree():
     response = requests.get(
         f"{app.config['API_URL']}/type_by_view_class/",
-        timeout=20)
-    return jsonify(response.json())
+        timeout=20).json()
+    return jsonify(response)
