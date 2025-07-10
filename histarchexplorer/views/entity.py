@@ -233,7 +233,7 @@ def get_browse_list_entities():
         where_clauses.append("e.id IN (SELECT a.id FROM model.entity a JOIN model.link b ON a.id = b.domain_id WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
         params.append(shown_types)
 
-    if hidden_types:= data['shown types']:
+    if hidden_types:= data['hidden types']:
         where_clauses.append("e.id NOT IN (SELECT a.id FROM model.entity a JOIN model.link b ON a.id = b.domain_id WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
         params.append(hidden_types)
 
