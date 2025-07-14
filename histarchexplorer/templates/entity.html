@@ -7,19 +7,24 @@
     <script type="text/javascript" src="/static/js/entityfunctions.js"></script>
 
     <script>
+
         const tabsToLoad = {{ sidebar_elements | sort(attribute='order') | map(attribute='route') | list | tojson }};
         const entityId = {{ entity_id }};
         {% if entity_id == 0 %}
+            const typeTreeData = {{ typetree_data|tojson}}
             const viewClasses = {{ view_classes|tojson }};
             const data = {{ data|tojson }}
             function getEntitiesForTab(tabName) {
-                const validTypes = viewClasses[tabName] || [];
-                return data.entities.filter(entity => validTypes.includes(entity.class));
+                const validClasses = viewClasses[tabName] || [];
+                return data.entities.filter(entity => validClasses.includes(entity.class));
             }
 
             data.entities.forEach(entity => {
                 entity.beginDBP = calculateTimeBP(entity.begin, true);
                 entity.endDBP = calculateTimeBP(entity.end, false);
+                entity.all = [entity.description, entity.class, entity.type, entity.name]
+                    .filter(v => v !== null && v !== undefined && v !== '')
+                    .join(' ');
             });
 
         {% endif %}

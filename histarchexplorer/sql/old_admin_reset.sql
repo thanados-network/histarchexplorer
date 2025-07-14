@@ -236,25 +236,36 @@
         'institution'), NULL, NULL, NULL, NULL);
 
 
-        CREATE TABLE IF NOT EXISTS tng.settings
-        (
-            id        SERIAL PRIMARY KEY,
-            index_img TEXT,
-            index_map INT,
-            img_map   TEXT,
-            greyscale   BOOLEAN,
-            shown_entities  JSONB, --classes
-            shown_types JSONB, --types
-            hidden_entities  JSONB, --classes
-            hidden_types JSONB, --types
-            shown_ids JSONB, --ids
-            hidden_ids JSONB --ids
+        CREATE TABLE IF NOT EXISTS tng.settings (
+            id               SERIAL PRIMARY KEY,
+            index_img        TEXT,
+            index_map        INT,
+            img_map          TEXT,
+            greyscale        BOOLEAN,
+            shown_entities   TEXT[],  -- classes
+            shown_types      TEXT[],  -- types
+            hidden_entities  TEXT[],  -- classes
+            hidden_types     TEXT[],  -- types
+            shown_ids        TEXT[],  -- ids
+            hidden_ids       TEXT[]   -- ids
         );
 
-        INSERT INTO tng.settings (index_img, index_map, img_map, greyscale,
-        shown_entities, hidden_entities)
-        VALUES ('/static/images/index_map_bg/Blank_map_of_Europe_central_network.png', 1, 'image', TRUE, '[]'::JSONB, '[]'::JSONB);
 
+        INSERT INTO tng.settings (
+            index_img,
+            index_map,
+            img_map,
+            greyscale,
+            shown_entities,
+            hidden_entities
+        ) VALUES (
+            '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png',
+            1,
+            'image',
+            TRUE,
+            NULL,
+            NULL
+        );
 
         create function tng.getdates(first timestamp without time zone, last timestamp without time zone, comment text) returns text
             language plpgsql

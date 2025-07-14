@@ -1,22 +1,15 @@
-from flask import render_template
+from flask import g, render_template
 
 from histarchexplorer import app
-from histarchexplorer.services.about import Institution, Person, Project
+from histarchexplorer.services.config import ConfigEntity
 
 
 @app.route('/about')
 def about() -> str:
-    project = None
-    sub_projects = []
-    for p in Project.get_all_localized():
-        if p.main_project:
-            project = p
-            continue
-        sub_projects.append(p)
-
+    grouped = ConfigEntity.group_by_class_name(g.config_entities)
     return render_template(
         'about.html',
-        project=project,
-        sub_projects=sub_projects,
-        institutions=Institution.get_all_localized(),
-        persons=Person.get_all_localized())
+        project=grouped.get('main-project', [None])[0],
+        sub_projects=grouped.get('project', []),
+        institutions=grouped.get('institution', []),
+        persons=grouped.get('person', []))
