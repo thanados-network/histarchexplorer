@@ -8,6 +8,7 @@ from histarchexplorer.api.parser import Parser
 from histarchexplorer.database.entity import get_entity_by_id
 from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.types import Types
+from histarchexplorer.views.views import type_tree
 
 sidebar_elements = app.config['SIDEBAR_OPTIONS']
 valid_routes = {item['route'] for item in sidebar_elements}
@@ -362,6 +363,8 @@ def entities(tab_name="") -> str:
     if tab_name == "" and sidebar_elements:
         tab_name = sidebar_elements[0]['route']
 
+    print(type_tree())
+
     return render_template(
         'entity.html',
         view_classes=filtered_view_classes,
@@ -369,7 +372,8 @@ def entities(tab_name="") -> str:
         sidebar_elements=sidebar_elements,
         entity_id=0,
         page_name="landing",
-        active_tab=tab_name
+        active_tab=tab_name,
+        typetree_data=type_tree().json
     )
 
 

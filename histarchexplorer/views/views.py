@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 
 import requests
@@ -29,8 +30,7 @@ def set_language(language: Optional[str] = None) -> Response:
     return redirect(request.referrer)
 
 
-@app.route('/type-tree')
-@cache.cached()
+@cache.memoize()
 def type_tree():
     response = requests.get(
         f"{app.config['API_URL']}/type_by_view_class/",

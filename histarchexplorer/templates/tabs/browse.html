@@ -92,6 +92,24 @@
     </div>
 </div>
 
+<div class="modal fade" id="modal-{{ tab_name }}-tree" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="modal-title-{{ tab_name }}-tree" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+              Select type
+            </div>
+            <div class="modal-body">
+                <div id="tree-{{ tab_name }}">
+                </div>
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 
     const filteredEntities{{ tab_name }} = getEntitiesForTab('{{ tab_name }}');
@@ -312,6 +330,24 @@
         if (sortLevelsContainer{{ tab_name }}.children.length === 0) {
             addSortLevel{{ tab_name }}();
         }
+    });
+
+    const filterInput{{ tab_name }} = document.getElementById("filterInput{{ tab_name }}");
+    const clearButton{{ tab_name }} = document.getElementById("clearFilter{{ tab_name }}");
+
+    filterInput{{ tab_name }}.addEventListener("input", function () {
+        const value{{ tab_name }} = this.value.trim();
+        if (value{{ tab_name }}) {
+            table{{tab_name}}.setFilter("all", "like", value{{ tab_name }});
+        } else {
+            table{{tab_name}}.clearFilter();
+        }
+    });
+    
+    clearButton{{ tab_name }}.addEventListener("click", function () {
+        filterInput{{ tab_name }}.value = "";
+        table{{tab_name}}.clearFilter();
+        filterInput{{ tab_name }}.focus();
     });
 
 </script>
