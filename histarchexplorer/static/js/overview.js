@@ -24,6 +24,16 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+function observeModelSizeChanges() {
+  const ro = new ResizeObserver(() => {
+    if (grid) grid.refreshItems().layout();
+  });
+
+  document.querySelectorAll('model-viewer').forEach(model => {
+    ro.observe(model);
+  });
+}
+
 let resizeTimeout;
 
 window.addEventListener('resize', () => {
@@ -44,4 +54,20 @@ document.querySelectorAll('model-viewer').forEach(model => {
             if (spinner) spinner.style.display = 'none';
         }
     });
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  console.log("overview.js geladen");
+
+  if (customElements.get('model-viewer')) {
+    initModelViewers();
+    initMuuri();
+    observeModelSizeChanges();
+  } else {
+    customElements.whenDefined('model-viewer').then(() => {
+      initModelViewers();
+      initMuuri();
+      observeModelSizeChanges();
+    });
+  }
 });
