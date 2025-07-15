@@ -20,47 +20,42 @@ from histarchexplorer.services.admin import Admin, EntryNotFound
 @app.route('/admin/<tab>/<entry>')
 @login_required
 def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
-    tabs = [
-        {
-            'label': _('main-project'),
-            'target': 'nav-main-project',
-            'id': g.config_classes['main-project']
-        }, {
-            'label': _('projects'),
-            'target': 'nav-projects',
-            'id': g.config_classes['project']
-        }, {
-            'label': _('persons'),
-            'target': 'nav-persons',
-            'id': g.config_classes['person']
-        }, {
-            'label': _('institutions'),
-            'target': 'nav-institutions',
-            'id': g.config_classes['institution']
-        }, {
-            'label': _('attributes'),
-            'target': 'nav-attributes',
-            'id': g.config_classes['attribute']}]
     check_manager_user()
-    class_items = {
-        k: v for k, v in get_entities_count_by_case_study().items()
-        if k not in app.config['CLASSES_TO_SKIP']}
+    tabs = [
+        {'label': _('main-project'), 'target': 'nav-main-project',
+         'id': g.config_classes['main-project']},
+        {'label': _('projects'), 'target': 'nav-projects',
+         'id': g.config_classes['project']},
+        {'label': _('persons'), 'target': 'nav-persons',
+         'id': g.config_classes['person']},
+        {'label': _('institutions'), 'target': 'nav-institutions',
+         'id': g.config_classes['institution']},
+        {'label': _('attributes'), 'target': 'nav-attributes',
+         'id': g.config_classes['attribute']}]
+
+    if not tab and tabs:
+        tab = tabs[0]['target']
+    for tab_ in tabs:
+        tab_['is_active'] = (tab_['target'] == tab)
+
     return render_template(
         "admin.html",
-        entities=g.config_entities,
         tabs=tabs,
-        activetab=tab,
-        activeentry=entry,
-        links_data=g.config_links,
-        properties=g.config_properties,
+        processed_entities_by_tab=Admin.process_entities_by_tab(tabs, entry),
+        processed_links_by_entity=Admin.process_links_by_entity(),
+        processed_properties_by_tab=Admin.process_properties_by_tab(tabs),
+        processed_roles=Admin.process_roles(),
+        processed_target_nodes=Admin.process_target_nodes(),
+        current_language=g.language,
+        available_languages=app.config['LANGUAGES'],
         maps=Admin.get_maps(),
         settings=g.settings.get_map_settings(),
-        class_items=class_items,
+        class_items={
+            k: v for k, v in get_entities_count_by_case_study().items()
+            if k not in app.config['CLASSES_TO_SKIP']},
         shown_classes=g.settings.shown_classes,
         hidden_classes=g.settings.hidden_classes,
         view_classes=app.config['VIEW_CLASSES'])
-
-
 
 
 @app.route('/admin/delete_link/<int:link_id>/<tab>/<entry>', methods=['GET'])
@@ -121,6 +116,7 @@ def add_entry() -> Response:
 
     return redirect(redirect_base)
 
+
 @app.route('/admin/delete_entry/<int:id_>/<tab>')
 @login_required
 def delete_entry(id_: int, tab: str) -> Response:
@@ -131,6 +127,7 @@ def delete_entry(id_: int, tab: str) -> Response:
     Admin.delete_entry(id_)
     flash('Entry deleted successfully!', 'success')
     return redirect(url_for('admin') + tab)
+
 
 @app.route('/edit_entry', methods=['POST', 'GET'])
 @login_required
