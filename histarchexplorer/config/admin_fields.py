@@ -78,6 +78,15 @@ FIELD_CONFIGS = {
             'col_class': 'col-md-4'
         },
         {
+            'key': 'TESTING',
+            'label': 'adsasda',
+            'type': 'text',
+            'translatable': True,
+            'required': True,
+            'col_class': 'col-md-4'
+        },
+
+        {
             'key': 'description',
             'label': 'description',
             'type': 'textarea',

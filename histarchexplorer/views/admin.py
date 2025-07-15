@@ -13,6 +13,7 @@ from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.services.admin import Admin, EntryNotFound
+from histarchexplorer.views.views import type_tree
 
 
 @app.route('/admin/')
@@ -37,7 +38,6 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         tab = tabs[0]['target']
     for tab_ in tabs:
         tab_['is_active'] = (tab_['target'] == tab)
-
     return render_template(
         "admin.html",
         tabs=tabs,

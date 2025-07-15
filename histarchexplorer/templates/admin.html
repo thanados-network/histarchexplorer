@@ -2,7 +2,8 @@
 {% extends "layout.html" %}
 {% block content %}
 
-  <script src="{{ url_for('static', filename='node_modules/sortablejs/Sortable.min.js') }}"></script>
+  <script
+    src="{{ url_for('static', filename='node_modules/sortablejs/Sortable.min.js') }}"></script>
 
   <div class="container py-5 en">
     <h3>
@@ -84,49 +85,72 @@
                           {# Dynamic Fields Loop #}
                           <div class="row needs-validation">
                             {% for field in entity.fields_config %}
-                              <div class="{{ field.col_class or 'col-md-6' }} mt-2"> {# Add margin-top for spacing #}
-                                <label for="Input{{ field.key | capitalize }}{{ entity.id }}"
+                              <div
+                                class="{{ field.col_class or 'col-md-6' }} mt-2">
+                                {# Add margin-top for spacing #}
+                                <label for="Input
+                                  {{ field.key | capitalize }}{{ entity.id }}"
                                        class="form-label">
                                   {{ _(field.label)|capitalize }}
                                   {% if field.translatable and not entity[field.key + '_has_current_translation'] %}
-                                    ({{ (entity[field.key].display.language|upper  or _('no translation available')) | capitalize }})
+                                    {% set original_language_info = entity[field.key] if entity[field.key] is mapping and 'display' in entity[field.key] else none %}
+                                    {% if original_language_info %}
+                                      (
+                                      {{ (original_language_info.display.language|upper  or _('no translation available')) | capitalize }}
+                                      )
+                                    {% else %}
+                                      (
+                                      {{ _('no translation available') | capitalize }}
+                                      )
+                                    {% endif %}
                                   {% endif %}
                                 </label>
 
                                 {% if field.type == 'textarea' %}
                                   <textarea class="form-control"
-                                            id="Input{{ field.key | capitalize }}{{ entity.id }}"
+                                            id="Input
+
+                                              {{ field.key | capitalize }}{{ entity.id }}"
                                             name="{{ field.key }}"
                                             aria-describedby="{{ field.key }}Help{{ entity.id }}"
-                                            {% if field.placeholder %}placeholder="{{ field.placeholder }}"{% endif %}
-                                            {% if field.required %}required{% endif %}
+                                            {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
+                                            {% if field.required %}required
+                                            data-required-field{% endif %}
                                             disabled>{{ entity[field.key + '_display_label'] or '' }}</textarea>
                                 {% else %}
                                   <input type="{{ field.type }}"
                                          class="form-control"
-                                         id="Input{{ field.key | capitalize }}{{ entity.id }}"
+                                         id="Input
+
+                                           {{ field.key | capitalize }}{{ entity.id }}"
                                          name="{{ field.key }}"
                                          value="{{ entity[field.key + '_display_label'] or '' }}"
                                          aria-describedby="{{ field.key }}Help{{ entity.id }}"
                                          {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
-                                         {% if field.required %}required{% endif %}
+                                         {% if field.required %}required
+                                         data-required-field{% endif %}
                                          disabled>
                                 {% endif %}
 
                                 {% if field.translatable and not entity[field.key + '_has_current_translation'] %}
-                                  <div class="form-text">{{ _('This entry has no translation for') }}
+                                  <div
+                                    class="form-text">{{ _('This entry has no translation for') }}
                                     "{{ available_languages[current_language] }}".
                                   </div>
                                 {% endif %}
                                 {% if field.required %}
-                                  <div class="invalid-feedback">{{ _('Please provide a') }} {{ _(field.label) }}.</div>
+                                  <div
+                                    class="invalid-feedback">{{ _('Please provide a') }} {{ _(field.label) }}.
+                                  </div>
                                 {% endif %}
 
                                 {# Special handling for image preview #}
                                 {% if field.display_image and entity[field.key] %}
-                                  <img class="mt-2" src="{{ entity[field.key] }}"
+                                  <img class="mt-2"
+                                       src="{{ entity[field.key] }}"
                                        alt="{{ entity.name_display_label or '' }}'s Logo"
-                                       {% if field.key == 'image' and tab_item.target == 'nav-persons' %}width="140" height="140"{% endif %}>
+                                       {% if field.key == 'image' and tab_item.target == 'nav-persons' %}width="140"
+                                       height="140"{% endif %}>
                                 {% endif %}
                               </div>
                             {% endfor %}

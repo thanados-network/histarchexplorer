@@ -81,46 +81,64 @@ class Admin:
     @staticmethod
     def _has_translation(entity, field_key) -> bool:
         value_attr = getattr(entity, field_key, None)
+
         if isinstance(value_attr, dict) and 'display' in value_attr:
             return bool(value_attr['display'].get(g.language))
-        return bool(value_attr)
+        elif value_attr is not None:
+            return True
+        return False
 
     @staticmethod
-    def process_entities_by_tab(tabs: list[dict], entry: Optional[str]) -> dict[str, list[dict[str, Any]]]:
+    def process_entities_by_tab(
+            tabs: list[dict],
+            entry: Optional[str]) -> dict[str, list[dict[str, Any]]]:
         result = {}
         for t_data in tabs:
             tab_id = t_data['id']
             tab_target = t_data['target']
-
             fields_for_tab = FIELD_CONFIGS.get(tab_target, [])
-
             filtered = []
-            for entity in filter(lambda e: e.class_id == tab_id, g.config_entities):
-                entity_dict = entity.__dict__.copy()
-
+            for entity in filter(
+                    lambda e: e.class_id == tab_id, g.config_entities):
+                entity_dict = {'id': entity.id}
                 for field_config in fields_for_tab:
                     field_key = field_config['key']
-                    if field_config.get('translatable', False):
+                    is_translatable = field_config.get('translatable', False)
+
+                    # --- 1. Determine Translation Status ---
+                    if is_translatable:
                         entity_dict[f"{field_key}_has_current_translation"] = \
                             Admin._has_translation(entity, field_key)
                     else:
-                        entity_dict[f"{field_key}_has_current_translation"] = bool(getattr(entity, field_key, None))
+                        entity_dict[
+                            f"{field_key}_has_current_translation"] = bool(
+                            getattr(entity, field_key, None))
 
-                    field_value = getattr(entity, field_key, None)
-                    if field_config.get('translatable', False) and isinstance(field_value, dict) and 'display' in field_value:
-                         entity_dict[f"{field_key}_display_label"] = field_value['display'].get('label', '')
+                    raw_field_value = getattr(entity, field_key, None)
+
+                    if (is_translatable and isinstance(raw_field_value, dict)
+                            and 'display' in raw_field_value):
+                        entity_dict[f"{field_key}_display_label"] = (
+                            raw_field_value['display'].get('label', ''))
+                        entity_dict[field_key] = raw_field_value
+                    elif raw_field_value is not None:
+                        entity_dict[f"{field_key}_display_label"] = \
+                            raw_field_value
+                        entity_dict[field_key] = raw_field_value
                     else:
-                         entity_dict[f"{field_key}_display_label"] = field_value
+                        entity_dict[f"{field_key}_display_label"] = ''
+                        entity_dict[field_key] = None
 
                 is_active = (tab_target + str(entity.id) == entry)
                 entity_dict.update({
                     'is_active_entry': is_active,
                     'is_collapsed_entry': not is_active,
-                    'fields_config': fields_for_tab})
+                    'fields_config': fields_for_tab
+                })
 
                 filtered.append(entity_dict)
             result[tab_target] = filtered
-        return result
+        return dict(result)
 
     @staticmethod
     def process_links_by_entity() -> dict[int, list[dict[str, Any]]]:
@@ -129,7 +147,7 @@ class Admin:
             link_dict = link.__dict__.copy()
             for field in ['config_property', 'end_name', 'role', 'start_name']:
                 link_dict[f"{field}_display_label"] = \
-                getattr(link, field)['display']['label']
+                    getattr(link, field)['display']['label']
             result[link.start_id].append(link_dict)
         return dict(result)
 
