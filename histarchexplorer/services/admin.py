@@ -204,7 +204,7 @@ class Admin:
             'name': None,
             'class_name': None}
 
-    # Todo: replace with an API call to check if it is a type
+    # Todo: replace with API call
     @staticmethod
     def get_openatlas_entity(entity_id: int) -> Any:
         return get_openatlas_entity(entity_id)

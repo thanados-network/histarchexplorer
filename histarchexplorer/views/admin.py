@@ -13,7 +13,6 @@ from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.services.admin import Admin, EntryNotFound
-from histarchexplorer.views.views import type_tree
 
 
 @app.route('/admin/')
@@ -41,11 +40,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     initial_case_study_type_id = None
     initial_case_study_type_name = None
-    # Assuming g.settings holds the case_study_type_id
     if hasattr(g, 'settings') and hasattr(g.settings, 'case_study_type_id') and g.settings.case_study_type_id:
         try:
             initial_case_study_type_id = int(g.settings.case_study_type_id)
-            # Fetch details for the initial ID to display its name
             details = Admin.get_openatlas_entity(initial_case_study_type_id)
             if details:
                 initial_case_study_type_name = details.name
@@ -182,10 +179,10 @@ def edit_entry() -> Response:
 def edit_map() -> Response:
     check_manager_user()
     form_data = {
-        'name': request.form.get('name', ''),
-        'display_name': request.form.get('displayname', ''),
-        'sortorder': request.form.get('inputorder', ''),
-        'tilestring': request.form.get('description', ''),
+        'name': request.form.get('name'),
+        'display_name': request.form.get('displayname'),
+        'sortorder': request.form.get('inputorder'),
+        'tilestring': request.form.get('description'),
         'map_id': request.form.get('map_id')}
 
     if not form_data['map_id']:
@@ -273,20 +270,16 @@ def update_case_study_id(id_: int) -> Response:
     check_manager_user()
     if request.method == 'POST':
         validation_result = Admin.check_case_study_type_id(id_)
-        print(validation_result)
         if validation_result['is_valid']:
             try:
                 Admin.update_case_study_id_setting(id_)
-                return jsonify({'success': True, 'message': str(_('updated case study id successfully'))})
+                flash(_('updated case study id successfully'), 'info')
             except Exception:
-                # FAILURE: Return JSON with error
-                return jsonify({'success': False, 'message': str(_('Failed to update case study id in settings'))}), 400 # Bad Request
+                flash(_('Failed to update case study id in settings'), 'error')
         else:
-            # INVALID ID: Return JSON with error
-            message = str(_('Invalid Case Study ID. Must be a positive integer and its entity type must be "type".'))
-            return jsonify({'success': False, 'message': message}), 400 # Bad Request
-    # If not POST, though unlikely with current JS
-    return jsonify({'success': False, 'message': str(_('Invalid request method'))}), 405 # Method Not Allowed
+            message = _('Invalid Case Study ID. Must be a positive integer and its entity type must be "type".')
+            flash(message, 'error')
+    return redirect(url_for('admin'))
 
 
 @app.route('/admin/check_case_study_id_ajax/<int:entity_id>', methods=['GET'])
@@ -297,11 +290,9 @@ def check_case_study_id_ajax(entity_id: int) -> Response:
     return jsonify(result)
 
 
-# Todo: This reset button is only here for development purpose.
 @app.route('/reset')
 @login_required
 def reset() -> Response:
-    # Avoid exposing password in command line
     env = os.environ.copy()
     env['PGPASSWORD'] = current_app.config['DATABASE_PASS']
     subprocess.run([
@@ -320,21 +311,3 @@ def reset() -> Response:
 def check_manager_user() -> None:
     if current_user.group not in ['admin', 'manager']:
         abort(403)
-
-# @app.route('/sortlinks', methods=['POST'])
-# def sort_links() -> Response:
-#     @login_required
-#     def reset_():
-#         if current_user.group not in ['admin', 'manager']:
-#             abort(403)
-#
-#     data = request.get_json()
-#     criteria = data['criteria']
-#     table = data['table']
-#
-#     for row in criteria:
-#         g.cursor.execute(
-#             f'UPDATE tng.{table} SET sortorder = %(order)s  WHERE id = %(
-#             id)s',
-#             {'id': row['id'], 'order': row['order'], 'table': table})
-#     return jsonify({'status': 'ok'})
