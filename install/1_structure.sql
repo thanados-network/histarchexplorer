@@ -138,7 +138,8 @@ CREATE TABLE tng.entities (
     image text,
     website text,
     legal_notice jsonb,
-    imprint jsonb
+    imprint jsonb,
+    case_study_type_id integer
 );
 
 
@@ -291,7 +292,8 @@ CREATE TABLE tng.settings (
     hidden_classes text[],
     hidden_types text[],
     shown_ids text[],
-    hidden_ids text[]
+    hidden_ids text[],
+    case_study_type_id integer
 );
 
 
