@@ -58,14 +58,13 @@ FIELD_CONFIGS = {
             'label': 'website',
             'type': 'url',
             'placeholder': 'https://someurl.com',
-            'col_class': 'col-lg col-md-12'
+            'col_class': 'col-lg col-md-6'
         },
         {
-            'key': 'case_study_id',
-            'label': 'Case Study ID',
-            'type': 'text',
-            'placeholder': '12541',
-            'col_class': 'col-lg col-md-12'
+            'key': 'case_study',
+            'label': 'Case Study',
+            'type': 'select',
+            'col_class': 'col-lg col-md-4'
         }
     ],
     'nav-persons': [
@@ -77,15 +76,6 @@ FIELD_CONFIGS = {
             'required': True,
             'col_class': 'col-md-4'
         },
-        {
-            'key': 'TESTING',
-            'label': 'adsasda',
-            'type': 'text',
-            'translatable': True,
-            'required': True,
-            'col_class': 'col-md-4'
-        },
-
         {
             'key': 'description',
             'label': 'description',

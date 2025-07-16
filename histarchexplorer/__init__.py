@@ -20,7 +20,7 @@ babel = Babel(app)
 
 app.config['CACHE_TYPE'] = 'FileSystemCache'
 app.config['CACHE_DIR'] = '/var/tmp/flask-cache'
-app.config['CACHE_DEFAULT_TIMEOUT'] = 86400  # Cache results for 60 seconds
+app.config['CACHE_DEFAULT_TIMEOUT'] = 3600
 cache = Cache(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position

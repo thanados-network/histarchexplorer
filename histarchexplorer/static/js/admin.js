@@ -1,5 +1,5 @@
 function toggleFields(form, enabled) {
-    const fields = form.querySelectorAll('input:not([type="hidden"]), textarea');
+    const fields = form.querySelectorAll('input:not([type="hidden"]), textarea, select');
 
     fields.forEach(field => {
         if (enabled) {

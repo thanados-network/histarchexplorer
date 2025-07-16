@@ -13,6 +13,8 @@ from histarchexplorer import app
 from histarchexplorer.api.helpers import get_entities_count_by_case_study
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.services.admin import Admin, EntryNotFound
+from histarchexplorer.utils.view_util import find_children_by_id
+from histarchexplorer.views.views import type_tree
 
 
 @app.route('/admin/')
@@ -50,6 +52,13 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             current_app.logger.warning(f"Invalid case_study_type_id in settings: {g.settings.case_study_type_id}")
             initial_case_study_type_id = None
             initial_case_study_type_name = None
+
+
+    case_study_children = find_children_by_id(
+        type_tree().get_json(),
+        initial_case_study_type_id)
+
+
     return render_template(
         "admin.html",
         tabs=tabs,
@@ -69,6 +78,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         hidden_classes=g.settings.hidden_classes,
         initial_case_study_type_id=initial_case_study_type_id,
         initial_case_study_type_name=initial_case_study_type_name,
+        case_study_children=case_study_children,
         view_classes=app.config['VIEW_CLASSES'])
 
 
@@ -113,7 +123,8 @@ def add_entry() -> Response:
         'address': request.form.get('address', ''),
         'description': request.form.get('description', ''),
         'imprint': request.form.get('imprint', ''),
-        'legal_notice': request.form.get('legalnotice', '')}
+        'legal_notice': request.form.get('legalnotice', ''),
+        'case_study': int(request.form.get('case_study'))}
     current_tab = 'nav-' + form_data['category']
     redirect_base = url_for('admin') + current_tab
     try:
@@ -157,7 +168,8 @@ def edit_entry() -> Response:
         'address': request.form.get('address', ''),
         'description': request.form.get('description', ''),
         'imprint': request.form.get('imprint', ''),
-        'legal_notice': request.form.get('legalnotice', '')}
+        'legal_notice': request.form.get('legalnotice', ''),
+        'case_study': int(request.form.get('case_study'))}
     try:
         Admin.edit_entry(form_data)
         flash(f'"{form_data["name"]}" updated successfully', 'success')

@@ -15,6 +15,7 @@ def get_config_entities() -> tuple[str]:
             c.email,
             c.image,      
             c.orcid_id,
+            c.case_study_type_id,
             cc.name as class_name 
         FROM 
             tng.entities as c

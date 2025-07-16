@@ -36,3 +36,9 @@ def type_tree():
         f"{app.config['API_URL']}/type_by_view_class/",
         timeout=20).json()
     return jsonify(response)
+
+
+@app.route('/clear-cache')
+def clear_cache():
+    cache.clear()
+    return jsonify({"message": "Cache cleared successfully."}), 200

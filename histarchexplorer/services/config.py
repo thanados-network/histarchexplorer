@@ -87,6 +87,7 @@ class ConfigEntity:
     image: str
     orcid_id: str
     class_name: str
+    case_study: int
     attributes: dict[int, list[str]] | None
     main_project: bool
     affiliations: list[dict[str, Any]] | None
@@ -109,6 +110,7 @@ class ConfigEntity:
                 image=entry.image,
                 orcid_id=entry.orcid_id,
                 class_name=entry.class_name,
+                case_study=entry.case_study_type_id,
                 main_project=(entry.class_name == 'main-project'),
                 attributes=get_project_roles(
                     entry.id,

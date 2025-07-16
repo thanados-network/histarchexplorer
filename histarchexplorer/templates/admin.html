@@ -134,7 +134,6 @@
                                 {% if field.type == 'textarea' %}
                                   <textarea class="form-control"
                                             id="Input
-
                                               {{ field.key | capitalize }}{{ entity.id }}"
                                             name="{{ field.key }}"
                                             aria-describedby="{{ field.key }}Help{{ entity.id }}"
@@ -142,12 +141,22 @@
                                             {% if field.required %}required
                                             data-required-field{% endif %}
                                             disabled>{{ entity[field.key + '_display_label'] or '' }}</textarea>
+                                {% elif field.type == 'select' %}
+                                  <select class="form-select"
+                                          id="Input{{ field.key | capitalize }}{{ entity.id }}"
+                                          name="{{ field.key }}"
+                                          aria-describedby="{{ field.key }}Help{{ entity.id }}"
+                                          {% if field.required %}required data-required-field{% endif %}
+                                          disabled>
+                                    <option value="">{{ _('Select a value') }}</option>
+                                  {% for child in case_study_children %}
+                                    <option value="{{ child.id }}" {% if child.id == entity.case_study %}selected{% endif %}>{{ child.name }}</option>
+                                  {% endfor %}
+                                  </select>
                                 {% else %}
                                   <input type="{{ field.type }}"
                                          class="form-control"
-                                         id="Input
-
-                                           {{ field.key | capitalize }}{{ entity.id }}"
+                                         id="Input{{ field.key | capitalize }}{{ entity.id }}"
                                          name="{{ field.key }}"
                                          value="{{ entity[field.key + '_display_label'] or '' }}"
                                          aria-describedby="{{ field.key }}Help{{ entity.id }}"
