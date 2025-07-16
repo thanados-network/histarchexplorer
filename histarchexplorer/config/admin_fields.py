@@ -36,6 +36,12 @@ FIELD_CONFIGS = {
             'placeholder': 'https://someurl.com',
             'col_class': 'col-lg col-md-12'
         },
+        {
+            'key': 'case_study',
+            'label': 'Case Study',
+            'type': 'select',
+            'col_class': 'col-lg col-md-4'
+        }
     ],
     'nav-projects': [
         {
