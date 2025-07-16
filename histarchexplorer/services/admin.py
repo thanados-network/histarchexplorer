@@ -4,15 +4,16 @@ from typing import Any, Optional
 from flask import g
 
 from histarchexplorer.config.admin_fields import FIELD_CONFIGS
-from histarchexplorer.database.admin import (add_entry, add_link, add_new_map,
-                                             check_sortorder, delete_entry,
-                                             delete_link, delete_map,
-                                             get_config_class_by_id,
-                                             get_openatlas_entity,
-                                             set_hidden_classes,
-                                             set_index_background,
-                                             set_shown_classes,
-                                             update_config_entry, update_map)
+from histarchexplorer.database.admin import (
+    add_entry, add_link, add_new_map,
+    check_sortorder, delete_entry,
+    delete_link, delete_map,
+    get_config_class_by_id,
+    get_openatlas_entity,
+    set_hidden_classes,
+    set_index_background,
+    set_shown_classes,
+    update_case_study_type_hierarchy, update_config_entry, update_map)
 from histarchexplorer.database.map import get_maps
 
 
@@ -106,8 +107,6 @@ class Admin:
                 for field_config in fields_for_tab:
                     field_key = field_config['key']
                     is_translatable = field_config.get('translatable', False)
-
-                    # --- 1. Determine Translation Status ---
                     if is_translatable:
                         entity_dict[f"{field_key}_has_current_translation"] = \
                             Admin._has_translation(entity, field_key)
@@ -135,8 +134,7 @@ class Admin:
                 entity_dict.update({
                     'is_active_entry': is_active,
                     'is_collapsed_entry': not is_active,
-                    'fields_config': fields_for_tab
-                })
+                    'fields_config': fields_for_tab})
 
                 filtered.append(entity_dict)
             result[tab_target] = filtered
@@ -150,14 +148,16 @@ class Admin:
             for field in ['config_property', 'end_name', 'role', 'start_name']:
                 field_obj = getattr(link, field, None)
                 if isinstance(field_obj, dict) and 'display' in field_obj:
-                    link_dict[f"{field}_display_label"] = field_obj['display']['label']
+                    link_dict[f"{field}_display_label"] = field_obj['display'][
+                        'label']
                 else:
                     link_dict[f"{field}_display_label"] = str(field_obj)
             result[link.start_id].append(link_dict)
         return dict(result)
 
     @staticmethod
-    def process_properties_by_tab(tabs: list[dict]) -> dict[str, list[dict[str, Any]]]:
+    def process_properties_by_tab(tabs: list[dict]) -> dict[
+        str, list[dict[str, Any]]]:
         result = {}
         for t_data in tabs:
             tab_id = t_data['id']
@@ -167,7 +167,8 @@ class Admin:
                 if prop.domain == tab_id:
                     prop_dict = prop.__dict__.copy()
                     if isinstance(prop.name, dict) and 'display' in prop.name:
-                        prop_dict['name_display_label'] = prop.name['display']['label']
+                        prop_dict['name_display_label'] = prop.name['display'][
+                            'label']
                     else:
                         prop_dict['name_display_label'] = str(prop.name)
                     props.append(prop_dict)
@@ -180,16 +181,14 @@ class Admin:
             {**entity.__dict__,
              'name_display_label': entity.name['display']['label']}
             for entity in g.config_entities
-            if entity.class_id == g.config_classes['attribute']
-        ]
+            if entity.class_id == g.config_classes['attribute']]
 
     @staticmethod
     def process_target_nodes() -> list[dict[str, Any]]:
         return [
             {**entity.__dict__,
              'name_display_label': entity.name['display']['label']}
-            for entity in g.config_entities
-        ]
+            for entity in g.config_entities]
 
     @staticmethod
     def check_case_study_type_id(entity_id: int) -> dict[str, Any]:
@@ -199,13 +198,11 @@ class Admin:
             return {
                 'is_valid': is_valid,
                 'name': details.name,
-                'class_name': details.openatlas_class_name
-            }
+                'class_name': details.openatlas_class_name}
         return {
             'is_valid': False,
             'name': None,
-            'class_name': None
-        }
+            'class_name': None}
 
     # Todo: replace with an API call to check if it is a type
     @staticmethod
@@ -213,6 +210,5 @@ class Admin:
         return get_openatlas_entity(entity_id)
 
     @staticmethod
-    def update_case_study_id_setting(id_: int):
-        # Todo make update for tng.settings
-        pass
+    def update_case_study_id_setting(id_: int) -> None:
+        return update_case_study_type_hierarchy(int(id_))

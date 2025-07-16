@@ -48,12 +48,11 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             # Fetch details for the initial ID to display its name
             details = Admin.get_openatlas_entity(initial_case_study_type_id)
             if details:
-                initial_case_study_type_name = details['name']
+                initial_case_study_type_name = details.name
         except (ValueError, TypeError):
             current_app.logger.warning(f"Invalid case_study_type_id in settings: {g.settings.case_study_type_id}")
             initial_case_study_type_id = None
             initial_case_study_type_name = None
-
     return render_template(
         "admin.html",
         tabs=tabs,
@@ -274,15 +273,20 @@ def update_case_study_id(id_: int) -> Response:
     check_manager_user()
     if request.method == 'POST':
         validation_result = Admin.check_case_study_type_id(id_)
+        print(validation_result)
         if validation_result['is_valid']:
-            # "Magic happens" - actually update the setting
-            if Admin.update_case_study_id_setting(id_):
-                flash(_('updated case study id successfully'), 'info')
-            else:
-                flash(_('Failed to update case study id in settings'), 'error')
+            try:
+                Admin.update_case_study_id_setting(id_)
+                return jsonify({'success': True, 'message': str(_('updated case study id successfully'))})
+            except Exception:
+                # FAILURE: Return JSON with error
+                return jsonify({'success': False, 'message': str(_('Failed to update case study id in settings'))}), 400 # Bad Request
         else:
-            flash(_('Invalid Case Study ID. Must be a positive integer and its entity type must be "type".'), 'error')
-    return redirect(url_for('admin'))
+            # INVALID ID: Return JSON with error
+            message = str(_('Invalid Case Study ID. Must be a positive integer and its entity type must be "type".'))
+            return jsonify({'success': False, 'message': message}), 400 # Bad Request
+    # If not POST, though unlikely with current JS
+    return jsonify({'success': False, 'message': str(_('Invalid request method'))}), 405 # Method Not Allowed
 
 
 @app.route('/admin/check_case_study_id_ajax/<int:entity_id>', methods=['GET'])
@@ -291,6 +295,7 @@ def check_case_study_id_ajax(entity_id: int) -> Response:
     check_manager_user()
     result = Admin.check_case_study_type_id(entity_id)
     return jsonify(result)
+
 
 # Todo: This reset button is only here for development purpose.
 @app.route('/reset')

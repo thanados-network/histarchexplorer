@@ -226,12 +226,12 @@ function addEntry(category) {
 
             // Perform final server-side check before submitting the form
             try {
-                const response = await fetch(`/admin/check_case_study_id_ajax/${parsedValue}`);
-                const data = await response.json();
+                const validationResponse = await fetch(`/admin/check_case_study_id_ajax/${parsedValue}`);
+                const validationData = await validationResponse.json();
 
-                if (data.is_valid) {
-                    // Valid, proceed with submission using fetch
-                    const finalActionUrl = actionTemplate.replace('_CASE_STUDY_ID_PLACEHOLDER_', parsedValue);
+                if (validationData.is_valid) {
+                    // Valid, proceed with submission
+                    const finalActionUrl = actionTemplate + parsedValue; // Construct the URL
                     const formData = new FormData(this); // Get form data
 
                     const submitResponse = await fetch(finalActionUrl, {
@@ -239,24 +239,42 @@ function addEntry(category) {
                         body: formData
                     });
 
+                    // Check if the submission itself was successful (HTTP 2xx status)
                     if (submitResponse.ok) {
-                        // Redirect after successful submission
-                        window.location.href = '/admin'; // Or the specific redirect URL from your Flask app
+                        const submitResult = await submitResponse.json(); // Parse the JSON response from the POST
+                        if (submitResult.success) {
+                            // Display success message (if any) and redirect
+                            // You might want to display a temporary success message before redirecting
+                            // For now, we'll just redirect as Flask flashes messages on next page load
+                            window.location.href = '/admin';
+                        } else {
+                            // Server-side logic indicated failure
+                            console.error('Server reported submission failure:', submitResult.message);
+                            caseStudyInputField.classList.add('is-invalid');
+                            if (caseStudyIDFeedback) {
+                                caseStudyIDFeedback.textContent = submitResult.message || 'Failed to save ID. Server error.';
+                            }
+                            caseStudyForm.classList.add('was-validated');
+                        }
                     } else {
-                        console.error('Form submission failed:', submitResponse.statusText);
+                        // HTTP error (e.g., 400, 500, or a redirect that fetch doesn't follow as 'ok')
+                        console.error('Form submission failed with HTTP status:', submitResponse.status, submitResponse.statusText);
+                        const errorText = await submitResponse.text(); // Get raw error text for debugging
+                        console.error('Server response:', errorText);
+
                         caseStudyInputField.classList.add('is-invalid');
                         if (caseStudyIDFeedback) {
-                            caseStudyIDFeedback.textContent = 'Failed to save ID. Server error.';
+                            caseStudyIDFeedback.textContent = `Failed to save ID. Server responded with ${submitResponse.status}.`;
                         }
                         caseStudyForm.classList.add('was-validated');
                     }
 
                 } else {
-                    // Not valid, display error and prevent submission
+                    // Not valid based on the AJAX check, display error and prevent submission
                     caseStudyInputField.classList.add('is-invalid');
                     if (caseStudyIDFeedback) {
-                        caseStudyIDFeedback.textContent = data.name ?
-                            `ID ${parsedValue} (${data.name}) is not of type "type".` :
+                        caseStudyIDFeedback.textContent = validationData.name ?
+                            `ID ${parsedValue} (${validationData.name}) is not of type "type".` :
                             `ID ${parsedValue} not found or is not of type "type".`;
                     }
                     caseStudyForm.classList.add('was-validated');

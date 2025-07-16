@@ -233,10 +233,14 @@ def check_sortorder() -> int:
 def get_openatlas_entity(id_) -> NamedTuple:
     g.cursor.execute(
         '''
-        SELECT name, openatlas_class_name FROM model.entity
+        SELECT id, name, openatlas_class_name FROM model.entity
         WHERE id = %(id)s''', {'id': id_})
     return g.cursor.fetchone()
 
+def update_case_study_type_hierarchy(id_: int) -> None:
+    g.cursor.execute(
+        'UPDATE tng.settings SET case_study_type_id = %s',
+        (id_,))
 
 def add_link(data: dict[str, Any]) -> None:
     g.cursor.execute(
