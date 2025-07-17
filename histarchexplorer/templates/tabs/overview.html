@@ -186,7 +186,7 @@
   <!-- Description -->
   {% if entity.description %}
     <div class="{{ entity.description_class }}">
-      <div class="item-content">
+      <div class="item item-content" data-type="description">
         <div class="muuri-description">
           <span class="tile-label">DESCRIPTION</span>
           <p>{{ entity.description }}</p>
@@ -227,7 +227,7 @@
 
   <!-- Map Location -->
   {% if entity.geometry %}
-    <div class="item">
+    <div class="item" data-type="map">
       <div class="map-wrapper">
         <div class="item-content item-content-full">
           <div class="location">
@@ -258,7 +258,7 @@
       {{ ui.overview_image(depiction) }}
     {% endfor %}
 
-    <div class="item-half">
+    <div class="item item-half" data-type="image">
       <div class="item-content item-content-full">
         <div class="muuri-images">
           <div class="image position-relative">
@@ -284,7 +284,7 @@
 
   <!-- Bibliography and External References -->
   {% if related_entities.Bibliography or related_entities['External reference'] %}
-    <div class="item item-5-6">
+    <div class="item item-5-6" data-type="reference">
       <div class="item-content">
         <div class="muuri-references">
           <p class="tile-label text-uppercase">References</p>

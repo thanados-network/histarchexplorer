@@ -13186,5 +13186,8 @@ button.btn-whitish[disabled] {
     transform: rotate(360deg);
   }
 }
+.image.position-relative {
+  position: relative;
+}
 
 /*# sourceMappingURL=main.css.map */

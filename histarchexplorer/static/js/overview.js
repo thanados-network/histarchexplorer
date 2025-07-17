@@ -1,37 +1,49 @@
 window.grid = new Muuri('.grid-muuri', {
     layout: {
         fillGaps: true,
+    },
+    sortData: {
+        type: (item) => item.getElement().getAttribute('data-type')
     }
 });
 
+window.grid.sort((a, b) => {
+    const order = ['description', 'map', 'image', 'reference'];
+    const aType = a.getElement().getAttribute('data-type');
+    const bType = b.getElement().getAttribute('data-type');
+    return order.indexOf(aType) - order.indexOf(bType);
+});
+
+window.grid.layout();
 // var grid = new Muuri('.grid', {dragEnabled: true});
 
 
-window.onload = function () {
-    setTimeout(() => {
-        window.grid.refreshItems().layout();
-    }, 500);
-};
-
-
-function observeModelSizeChanges() {
-    const ro = new ResizeObserver(() => {
-        if (grid) grid.refreshItems().layout();
-    });
-
-    document.querySelectorAll('model-viewer').forEach(model => {
-        ro.observe(model);
-    });
-}
-
-let resizeTimeout;
-
-window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-        window.grid.refreshItems().layout();
-    }, 300);
-});
+//window.onload = function () {
+//    setTimeout(() => {
+//        window.grid.refreshItems().layout();
+//    }, 500);
+//};
+//
+//
+//function observeModelSizeChanges() {
+//    const ro = new ResizeObserver(() => {
+//        if (grid) grid.refreshItems().layout();
+//    });
+//
+//    document.querySelectorAll('model-viewer').forEach(model => {
+//        ro.observe(model);
+//    });
+//}
+//
+//let resizeTimeout;
+//
+//window.addEventListener('resize', () => {
+//    clearTimeout(resizeTimeout);
+//    resizeTimeout = setTimeout(() => {
+//        window.grid.refreshItems().layout();
+//    }, 300);
+//});
+//
 
 
 //3d Model Spinner removal when 3dmodel loaded
@@ -62,9 +74,13 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+
 document.addEventListener('DOMContentLoaded', () => {
     if (window.grid) {
-        console.log("Frühes Layout-Refresh fürs 3D-Modell");
+        setTimeout(() => {
+            window.grid.refreshItems().layout();
+        }, 500);
         window.grid.refreshItems().layout();
     }
 });
+
