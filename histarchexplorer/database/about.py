@@ -43,6 +43,26 @@ def get_project_attributes_sql(
             'attribute_id': g.config_classes['attribute']})
     return g.cursor.fetchall()
 
+def get_project_attributes_sql_inverse(
+        id_: int,
+        config_class_id: int) -> tuple[str]:
+    g.cursor.execute(
+        """
+        SELECT l.range_id,
+               attribute.name AS attribute
+        FROM tng.links l
+                 JOIN tng.entities c ON l.domain_id = c.id
+                 LEFT JOIN tng.entities attribute ON l.attribute = attribute.id
+            AND attribute.class_id = %(attribute_id)s
+        WHERE l.domain_id = %(id)s
+          AND c.class_id = %(config_class_id)s
+        ORDER BY l.sortorder, l.id;
+        """, {
+            'id': id_,
+            'config_class_id': config_class_id,
+            'attribute_id': g.config_classes['attribute']})
+    return g.cursor.fetchall()
+
 
 def get_affiliations(id_: int) -> tuple[str]:
     g.cursor.execute(

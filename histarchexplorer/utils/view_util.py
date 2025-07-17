@@ -1,7 +1,7 @@
 import datetime
-from typing import Any, Optional
+from typing import Any
 
-from flask import render_template, request
+from flask import g, render_template, url_for
 from flask_babel import lazy_gettext as _
 
 from histarchexplorer import app
@@ -55,10 +55,23 @@ def get_cite_button(entity: Entity) -> tuple[None, None] | tuple[str, str]:
     if not entity:
         return None, None
     current_date = datetime.date.today().strftime("%Y-%m-%d")
+    projects = {e.case_study: e for e in g.config_entities if e.case_study}
+    case_studies = []
+    for type_ in entity.types:
+        if cs := projects.get(int(type_.id)):
+            case_studies.append(cs)
+    if not case_studies:
+        case_studies = [e for e in g.config_entities
+                        if e.class_id == g.config_classes['main-project']]
+    case_study_names = '/'.join(
+        [cs.name['display']['label'] for cs in case_studies])
+
     button_html = render_template('cite/button.html')
     modal_html = render_template(
         'cite/modal.html',
         entity=entity,
-        current_url=request.url,
+        case_study_names=case_study_names,
+        case_studies=case_studies,
+        current_url=url_for('entity', id_=entity.id, _external=True),
         today_date=current_date)
     return button_html, modal_html
