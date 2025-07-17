@@ -49,7 +49,7 @@ function addMap() {
 function addEntry(category) {
     const hiddenField = document.getElementById('currentTab');
     hiddenField.value = category.replace('nav-', '');
-    console.log(hiddenField.value)
+    //console.log(hiddenField.value)
 
     document.querySelectorAll('.modal-input').forEach(el => el.classList.add('d-none'));
     document.querySelectorAll(`.${hiddenField.value}-show`).forEach(el => el.classList.remove('d-none'));

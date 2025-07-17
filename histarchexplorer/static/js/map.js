@@ -229,10 +229,10 @@ function setSidebarContent(id, mode = 'toggle') {
 
 
 document.getElementById('tab-map').addEventListener('click', function (event) {
-    console.log('map clicked')
+    //console.log('map clicked')
     if (notYetClickedTabs.includes('map') && !onePointFeature) {
         setTimeout(() => {
-            console.log('map clicked for the first time');
+            //console.log('map clicked for the first time');
             notYetClickedTabs = notYetClickedTabs.filter(item => item !== 'map');
             map.fitBounds(bounds, {padding: 200});
         }, 300);
