@@ -43,16 +43,11 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     initial_case_study_type_id = None
     initial_case_study_type_name = None
-    if hasattr(g, 'settings') and hasattr(g.settings, 'case_study_type_id') and g.settings.case_study_type_id:
-        try:
-            initial_case_study_type_id = int(g.settings.case_study_type_id)
-            details = Admin.get_openatlas_entity(initial_case_study_type_id)
-            if details:
-                initial_case_study_type_name = details.name
-        except (ValueError, TypeError):
-            current_app.logger.warning(f"Invalid case_study_type_id in settings: {g.settings.case_study_type_id}")
-            initial_case_study_type_id = None
-            initial_case_study_type_name = None
+    if g.settings.case_study_type_id:
+        initial_case_study_type_id = int(g.settings.case_study_type_id)
+        details = Admin.get_openatlas_entity(initial_case_study_type_id)
+        if details:
+            initial_case_study_type_name = details.name
 
 
     case_study_children = find_children_by_id(
@@ -287,13 +282,12 @@ def update_case_study_id(id_: int) -> Response:
     if request.method == 'POST':
         validation_result = Admin.check_case_study_type_id(id_)
         if validation_result['is_valid']:
-            try:
-                Admin.update_case_study_id_setting(id_)
-                flash(_('updated case study id successfully'), 'info')
-            except Exception:
-                flash(_('Failed to update case study id in settings'), 'error')
+            Admin.update_case_study_id_setting(id_)
+            flash(_('updated case study id successfully'), 'info')
         else:
-            message = _('Invalid Case Study ID. Must be a positive integer and its entity type must be "type".')
+            message = _(
+                'Invalid Case Study ID. Must be a positive integer '
+                'and its entity type must be "type".')
             flash(message, 'error')
     return redirect(url_for('admin'))
 
@@ -306,8 +300,8 @@ def check_case_study_id_ajax(entity_id: int) -> Response:
     return jsonify(result)
 
 
+# Todo: remove for production
 @app.route('/reset')
-@login_required
 def reset() -> Response:
     env = os.environ.copy()
     env['PGPASSWORD'] = current_app.config['DATABASE_PASS']
@@ -322,7 +316,6 @@ def reset() -> Response:
         check=True)
 
     return redirect(url_for('admin'))
-
 
 
 @app.route('/clear-cache')

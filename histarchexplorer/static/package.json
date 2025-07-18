@@ -12,7 +12,8 @@
     "maplibre-gl": "^5.1.1",
     "muuri": "^0.9.5",
     "quercus.js": "^0.3.0",
-    "sortablejs": "^1.15.2"
+    "sortablejs": "^1.15.2",
+    "tabulator-tables": "^6.3.1"
   },
   "repository": {
     "type": "git",
