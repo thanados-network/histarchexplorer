@@ -7,6 +7,22 @@
         <button class="btn btn-outline-secondary" type="button" id="clearFilter{{ tab_name }}">&times;</button>
     </div>
 
+    <div style="min-width: 400px" id="sliderBegin{{ tab_name }}"></div>
+    <div style="min-width: 400px" id="sliderEnd{{ tab_name }}"></div>
+
+    <div class="dropdown d-none" id="classDropdown{{ tab_name }}">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+            Classes
+        </button>
+        <ul class="dropdown-menu p-2" style="min-width: 250px;" id="classSelect{{ tab_name }}">
+        </ul>
+    </div>
+
+    <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2"
+            onclick="{{ tab_name }}TreeModal.show()" title="Types">Types
+    </button>
+
     <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2"
             onclick="{{ tab_name }}Modal.show()" title="Advanced Search/Filter">
         <i class="bi bi-funnel"></i>
@@ -67,10 +83,7 @@
                             <div class="accordion-body">
                                 <div id="filter-levels-{{ tab_name }}"></div>
                                 <div class="d-flex justify-content-between">
-                                    <button type="button" class="btn btn-outline-primary"
-                                            id="add-filter-level-{{ tab_name }}">
-                                        Add Filter
-                                    </button>
+
                                     <span>
                                     <button type="button" class="btn btn-warning" id="reset-filter-btn-{{ tab_name }}">
                                         Reset
@@ -97,7 +110,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-              Select type
+                Select type
             </div>
             <div class="modal-body">
                 <div id="tree-{{ tab_name }}">
@@ -112,13 +125,24 @@
 
 <script>
 
-    const filteredEntities{{ tab_name }} = getEntitiesForTab('{{ tab_name }}');
+    //prepare data
+    const {{ tab_name }}Data = {}
+
+    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, viewClasses.{{ tab_name }}, ["standard"])
+    {{ tab_name }}Data.tableData = getEntitiesForTab('{{ tab_name }}');
+    {{ tab_name }}Data.fields = getKeysWithValues({{ tab_name }}Data.tableData)
+    {{ tab_name }}Data.classes = [...new Set({{ tab_name }}Data.tableData.map(item => item.class))];
+    {{ tab_name }}Data.typeIds = [...new Set({{ tab_name }}Data.tableData.map(item => item.type_id))];
+    {{ tab_name }}Data.timelineBegin = getSortedDistinctTimeline({{ tab_name }}Data.tableData, "beginString", "beginDBP");
+    {{ tab_name }}Data.timelineEnd = getSortedDistinctTimeline({{ tab_name }}Data.tableData, "endString", "endDBP");
+
+
+    //columns for table
     let beginDBP{{tab_name}} = null
     let endDBP{{tab_name}} = null
     let type_id{{tab_name}} = null
     let type_value{{tab_name}} = false
 
-    const {{ tab_name }}Fields = getKeysWithValues(filteredEntities{{ tab_name }})
 
     const columns{{ tab_name }} = [
         {
@@ -135,24 +159,23 @@
                 const description = translateDescription(data.description);
                 let localBeginDate = ''
                 let localEndDate = ''
-                if (data.type_id) data.type_id = data.type_id;
-
                 let dateString = '';
                 if (begin) {
-                    localBeginDate = makeLocalDate(begin).localdate
+                    localBeginDate = data.beginString
                     dateString += localBeginDate;
-                    beginDBP{{tab_name}} = calculateTimeBP(begin, true);
-
+                    beginDBP{{tab_name}} = data.beginDBP;
                 }
 
-                if (end) localEndDate = makeLocalDate(end).localdate;
+                if (end) {
+                    localEndDate = data.endString;
+                }
 
                 if (begin && end && localBeginDate !== localEndDate) {
                     dateString += " - ";
                 }
                 if (end && localEndDate !== localBeginDate) {
-                    dateString += makeLocalDate(end).localdate;
-                    endDBP{{tab_name}} = calculateTimeBP(end, false);
+                    dateString += data.endString;
+                    endDBP{{tab_name}} = data.endDBP;
                 }
 
                 let hoverTitle = `${name || ''} ${dateString ? '(' + dateString + ')' : ''}`.trim();
@@ -234,7 +257,7 @@
         {
             title: "BeginDBP",
             field: "beginDBP",
-            visible: false,
+            visible: true,
             sorterParams: {alignEmptyValues: "bottom"}
         },
         {
@@ -266,7 +289,7 @@
         layout: "fitColumns",
         responsiveLayout: "collapse",
         height: "calc( 100vh - 100px - 4rem)",
-        data: filteredEntities{{ tab_name }},
+        data: {{ tab_name }}Data.tableData,
         pagination: "local",
         paginationSize: 50,
         paginationSizeSelector: [20, 50, 100],
@@ -283,6 +306,8 @@
         }
     });
 
+
+    //advanced filter/sort modal
     const {{tab_name}}Modal = new bootstrap.Modal('#modal-{{ tab_name }}', {})
 
     const sortLevelsContainer{{ tab_name }} = document.getElementById('sort-levels-{{ tab_name }}');
@@ -291,7 +316,7 @@
     let sortLevelId{{ tab_name }} = 0;
 
     function addSortLevel{{ tab_name }}() {
-        const level{{ tab_name }} = createSortLevel(sortLevelId{{ tab_name }}++, {{ tab_name }}Fields);
+        const level{{ tab_name }} = createSortLevel(sortLevelId{{ tab_name }}++, {{ tab_name }}Data.fields);
         sortLevelsContainer{{ tab_name }}.appendChild(level{{ tab_name }});
     }
 
@@ -332,22 +357,156 @@
         }
     });
 
+    //simple filter input
     const filterInput{{ tab_name }} = document.getElementById("filterInput{{ tab_name }}");
     const clearButton{{ tab_name }} = document.getElementById("clearFilter{{ tab_name }}");
 
     filterInput{{ tab_name }}.addEventListener("input", function () {
-        const value{{ tab_name }} = this.value.trim();
-        if (value{{ tab_name }}) {
-            table{{tab_name}}.setFilter("all", "like", value{{ tab_name }});
-        } else {
-            table{{tab_name}}.clearFilter();
-        }
+        applyCombinedFilter{{ tab_name }}();
     });
-    
+
     clearButton{{ tab_name }}.addEventListener("click", function () {
         filterInput{{ tab_name }}.value = "";
-        table{{tab_name}}.clearFilter();
+        applyCombinedFilter{{ tab_name }}();
         filterInput{{ tab_name }}.focus();
     });
 
+    //filter classes
+    const classList{{ tab_name }} = {{ tab_name }}Data.classes;
+
+
+    if (classList{{ tab_name }}.length > 1) {
+        const classSelect{{ tab_name }} = document.getElementById("classSelect{{ tab_name }}");
+        const classDropdown = document.getElementById("classDropdown{{ tab_name }}");
+        classDropdown.classList.remove("d-none");
+
+        classList{{ tab_name }}.forEach(cls => {
+            const li = document.createElement("li");
+            li.classList.add("form-check");
+
+            li.innerHTML = `
+        <input class="form-check-input" type="checkbox" value="${cls}" id="check-${cls}">
+        <label class="form-check-label" for="check-${cls}">${cls.replace('_', ' ')}</label>
+    `;
+
+            classSelect{{ tab_name }}.appendChild(li);
+        });
+    }
+
+    document.addEventListener("change", function (e) {
+        if (e.target.matches(`#classSelect{{ tab_name }} input[type="checkbox"]`)) {
+            applyCombinedFilter{{ tab_name }}();
+        }
+    });
+
+    function applyCombinedFilter{{ tab_name }}() {
+        const textValue{{tab_name}} = document.getElementById(`filterInput{{tab_name}}`).value.trim();
+
+        const checkboxes{{tab_name}} = document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]:checked`);
+        const selectedClasses{{tab_name}} = Array.from(checkboxes{{tab_name}}).map(cb => cb.value);
+
+        const filters{{tab_name}} = [];
+
+        if (textValue{{tab_name}}) {
+            filters{{tab_name}}.push({field: "all", type: "like", value: textValue{{tab_name}}});
+        }
+
+        if (selectedClasses{{tab_name}}.length > 0) {
+            filters{{tab_name}}.push({
+                field: "class",
+                type: "in",
+                value: selectedClasses{{tab_name}}
+            });
+        }
+
+        if ({{ tab_name }}Data.fields.includes("begin")) {
+            const beginSliderValues = sliderBegin{{ tab_name }}.noUiSlider.get();
+            console.log('beginSliderValues');
+            console.log(beginSliderValues);
+            const [beginMin, beginMax] = getDaysBPBfromString(beginSliderValues, {{ tab_name }}Data.timelineBegin);
+
+            if (!isNaN(beginMin) && !isNaN(beginMax)) {
+                filters{{tab_name}}.push({field: "beginDBP", type: ">=", value: beginMin});
+                filters{{tab_name}}.push({field: "beginDBP", type: "<=", value: beginMax});
+                //filters{{tab_name}}.push([{field: "beginDBP", type: "=", value: null}]);
+            }
+        }
+
+        if ({{ tab_name }}Data.fields.includes("end")) {
+            const endSliderValues = sliderEnd{{ tab_name }}.noUiSlider.get();
+            const [endMin, endMax] = getDaysBPBfromString(endSliderValues, {{ tab_name }}Data.timelineEnd);
+
+            if (!isNaN(endMin) && !isNaN(endMax)) {
+                filters{{tab_name}}.push({field: "endDBP", type: ">=", value: endMin});
+                filters{{tab_name}}.push({field: "endDBP", type: "<=", value: endMax});
+            }
+        }
+
+        if (filters{{tab_name}}.length > 0) {
+            table{{tab_name}}.setFilter(filters{{tab_name}});
+        } else {
+            table{{tab_name}}.clearFilter();
+        }
+    }
+
+    if ({{ tab_name }}Data.fields.includes("begin")) {
+
+        const sliderBegin{{ tab_name }} = document.getElementById('sliderBegin{{ tab_name }}');
+
+        const arbitraryValuesForSlider{{ tab_name }} = {{ tab_name }}Data.timelineBegin.map(e => e.string);
+
+
+        noUiSlider.create(sliderBegin{{ tab_name }}, {
+            range: {min: 0, max: arbitraryValuesForSlider{{ tab_name }}.length - 1},
+            start: [arbitraryValuesForSlider{{ tab_name }}[0], arbitraryValuesForSlider{{ tab_name }}[arbitraryValuesForSlider{{ tab_name }}.length - 1]],
+            step: 1,
+            tooltips: true,
+            format: {
+                to: function (value) {
+                    return arbitraryValuesForSlider{{ tab_name }}[Math.round(value)];
+                },
+                from: function (value) {
+                    return arbitraryValuesForSlider{{ tab_name }}.indexOf(value);
+                }
+            }
+        });
+
+        sliderBegin{{ tab_name }}.noUiSlider.on("change", function (values) {
+             applyCombinedFilter{{ tab_name }}()
+        });
+
+
+    }
+
+    if ({{ tab_name }}Data.fields.includes("end")) {
+
+        const sliderEnd{{ tab_name }} = document.getElementById('sliderEnd{{ tab_name }}');
+
+        const arbitraryValuesForSlider{{ tab_name }} = {{ tab_name }}Data.timelineEnd.map(e => e.string);
+
+
+        noUiSlider.create(sliderEnd{{ tab_name }}, {
+            range: {min: 0, max: arbitraryValuesForSlider{{ tab_name }}.length - 1},
+            start: [arbitraryValuesForSlider{{ tab_name }}[0], arbitraryValuesForSlider{{ tab_name }}[arbitraryValuesForSlider{{ tab_name }}.length - 1]],
+            step: 1,
+            tooltips: true,
+            format: {
+                to: function (value) {
+                    return arbitraryValuesForSlider{{ tab_name }}[Math.round(value)];
+                },
+                from: function (value) {
+                    return arbitraryValuesForSlider{{ tab_name }}.indexOf(value);
+                }
+            }
+        });
+
+        sliderEnd{{ tab_name }}.noUiSlider.on("change", function (values) {
+                applyCombinedFilter{{ tab_name }}()
+            }
+        );
+
+
+    }
+
 </script>
+

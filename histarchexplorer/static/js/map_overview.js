@@ -51,7 +51,7 @@ overview_map.on('load', () => {
 
   // Add one marker per point
   featureCollection.features.forEach((feature) => {
-    console.log(feature.geometry.coordinates);
+    //console.log(feature.geometry.coordinates);
     new maplibregl.Marker()
       .setLngLat(feature.geometry.coordinates)
       .setPopup(

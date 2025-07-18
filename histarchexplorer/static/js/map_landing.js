@@ -25,7 +25,7 @@ if (gisData) {
     });
     var entityGeom = L.geoJSON(gisData, {
         onEachFeature: function (feature, layer) {
-            console.log(feature)
+            //console.log(feature)
             layer.bindPopup('<b>' + entityName + '</b><p><b>' + feature.title + '</b> ' + feature.description + '</p>');
         }
     }).addTo(overview_map);

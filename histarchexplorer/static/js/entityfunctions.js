@@ -41,10 +41,7 @@ function isValidDate(d) {
     return d instanceof Date && !isNaN(d);
 }
 
-function calculateTimeBP(dateString, isBegin) {
-    //if (!dateString && isBegin) dateString = '-999999999-01-01'; // Default placeholder for begin
-    //if (!dateString && !isBegin) dateString = '999999999-01-01'; // Default placeholder for begin
-
+function calculateTimeBP(dateString) {
     if (!dateString) {
         return null
     }
@@ -78,7 +75,7 @@ function calculateTimeBP(dateString, isBegin) {
         : yearFromString * 365.2525 + monthFromString * daysPerMonth + dayFromString;
 
     const daysBP = daysSinceZero - daysToZero;
-    return 0-daysBP;
+    return 0 - daysBP;
 }
 
 function fieldHasValues(entities, field) {
@@ -115,11 +112,11 @@ function createSortLevel(id, fields) {
     <div class="col">
       <label class="form-label">Sort by</label>
       <select class="form-select sort-field">
-        ${fields.includes('name') ? `<option value="name">Name</option>`:''}
-        ${fields.includes('class') ? `<option value="class">Class</option>`:''}
-        ${fields.includes('type') ? `<option value="type">Type</option>`:''}
-        ${fields.includes('beginDBP') ? `<option value="beginDBP">Begin</option>`:''}
-        ${fields.includes('endDBP') ? `<option value="endDBP">End</option>`:''}
+        ${fields.includes('name') ? `<option value="name">Name</option>` : ''}
+        ${fields.includes('class') ? `<option value="class">Class</option>` : ''}
+        ${fields.includes('type') ? `<option value="type">Type</option>` : ''}
+        ${fields.includes('beginDBP') ? `<option value="beginDBP">Begin</option>` : ''}
+        ${fields.includes('endDBP') ? `<option value="endDBP">End</option>` : ''}
       </select>
     </div>
     <div class="col">
@@ -159,4 +156,96 @@ function getKeysWithValues(dataArray) {
     });
 
     return Array.from(keysWithValues);
+}
+
+function collectAndGroupMatchingData(jsonData, keysToMatch, categoriesToMatch) {
+    const result = {};
+    const seen = []; // Track already grouped values
+
+    if (!Array.isArray(categoriesToMatch)) {
+        console.warn("categoriesToMatch must be an array");
+        return result;
+    }
+
+    const keyGroups = [];
+
+    keysToMatch.forEach(currentKey => {
+        const section = jsonData[currentKey];
+        if (!Array.isArray(section)) return;
+
+        // Filter entries by category
+        const filteredEntries = section.filter(entry =>
+            entry?.category && categoriesToMatch.includes(entry.category)
+        ).map(entry => ({
+            id: entry.id,
+            label: entry.name,
+            category: entry.category,
+            children: cloneWithChildren(entry.children)
+        }));
+
+        // Try to group with already seen entries
+        let foundGroup = false;
+        for (const group of keyGroups) {
+            if (deepEqual(group.data, filteredEntries)) {
+                group.keys.push(currentKey);
+                foundGroup = true;
+                break;
+            }
+        }
+
+        if (!foundGroup) {
+            keyGroups.push({keys: [currentKey], data: filteredEntries});
+        }
+    });
+
+    // Build result object
+    keyGroups.forEach(group => {
+        const combinedKey = group.keys.join(", ");
+        result[combinedKey] = group.data;
+    });
+
+    return result;
+}
+
+function cloneWithChildren(items) {
+    if (!Array.isArray(items)) return [];
+    return items.map(item => ({
+        id: item.id,
+        label: item.label,
+        url: item.url,
+        children: cloneWithChildren(item.children)
+    }));
+}
+
+// Deep equality check (simplified for JSON-serializable objects)
+function deepEqual(a, b) {
+    return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function getSortedDistinctTimeline(data, stringKey, numberKey) {
+    const seen = new Set();
+
+    const filtered = data
+        .filter(item => item[stringKey] && typeof item[numberKey] === "number")
+        .filter(item => {
+            if (seen.has(item[stringKey])) return false;
+            seen.add(item[stringKey]);
+            return true;
+        })
+        .map(item => ({
+            string: item[stringKey],
+            number: item[numberKey]
+        }))
+        .sort((a, b) => a.number - b.number);
+
+    return filtered;
+}
+
+function getDaysBPBfromString(values, dates) {
+    const min = values[0];
+    const max = values[1];
+    let earliest = dates.filter(date => date.string === min)[0];
+    let latest = dates.filter(date => date.string === max);
+    latest = latest[latest.length - 1];
+    return [earliest.number, latest.number];
 }
