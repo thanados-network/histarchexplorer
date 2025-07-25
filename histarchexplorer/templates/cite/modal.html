@@ -14,8 +14,9 @@
       </div>
       <div class="container-fluid">
         <div class="row">
+        <p class="fw-bold">This is just a example, what we can add additionally and how it can be accessed</p>
           {% for project in projects %}
-            <div class="col-6">
+            <div class="col-5 bg-light">
               <p>{{ project.name.display.label }}</p>
               {% for link in project.links %}
                 <p>{{ link.config_property.display.label }}: {{ link.end_name.display.label }}</p>
