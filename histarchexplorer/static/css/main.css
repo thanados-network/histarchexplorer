@@ -13190,4 +13190,9 @@ button.btn-whitish[disabled] {
   position: relative;
 }
 
+.grid-media {
+  width: 100%;
+  position: relative;
+}
+
 /*# sourceMappingURL=main.css.map */
