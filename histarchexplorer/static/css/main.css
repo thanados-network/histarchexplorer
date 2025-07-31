@@ -69,6 +69,18 @@ body {
   height: calc(100vh - var(--navbar-height) - var(--logo-height));
 }
 
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-top: var(--navbar-height);
+}
+
+.scrollable-container {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
 .MuiAppBar-positionAbsolute,
 .mirador-viewer {
   top: 3.5rem;
