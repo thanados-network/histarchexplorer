@@ -1,15 +1,13 @@
-const mediaGrid = new Muuri('.grid-media', {
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.querySelector('.grid-media');
+  if (!container) return;
+
+  const mediaGrid = new Muuri('.grid-media', {
     layout: {
-        fillGaps: true,
+      fillGaps: true,
     },
-});
+    items: '.item-half'
+  });
 
-mediaGrid.layout();
-
-let resizeTimeout;
-window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-        mediaGrid.refreshItems().layout();
-    }, 300);
+  mediaGrid.refreshItems().layout();
 });

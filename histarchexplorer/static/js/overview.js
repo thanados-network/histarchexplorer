@@ -1,4 +1,4 @@
-window.grid = new Muuri('.grid-muuri', {
+const overviewGrid = new Muuri('.grid-muuri', {
     layout: {
         fillGaps: true,
     },
@@ -7,47 +7,23 @@ window.grid = new Muuri('.grid-muuri', {
     }
 });
 
-window.grid.sort((a, b) => {
+overviewGrid.sort((a, b) => {
     const order = ['description', 'map', 'image', 'reference'];
     const aType = a.getElement().getAttribute('data-type');
     const bType = b.getElement().getAttribute('data-type');
     return order.indexOf(aType) - order.indexOf(bType);
 });
 
-window.grid.layout();
-// var grid = new Muuri('.grid', {dragEnabled: true});
-
-
-//window.onload = function () {
-//    setTimeout(() => {
-//        window.grid.refreshItems().layout();
-//    }, 500);
-//};
-
-
-//function observeModelSizeChanges() {
-//    const ro = new ResizeObserver(() => {
-//        if (grid) grid.refreshItems().layout();
-//    });
-//
-//    document.querySelectorAll('model-viewer').forEach(model => {
-//        ro.observe(model);
-//    });
-//}
-
-//necessary for maximizing resize!
-let resizeTimeout;
+overviewGrid.layout();
 
 window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-        window.grid.refreshItems().layout();
+    clearTimeout(overviewGrid.resizeTimeout);
+    overviewGrid.resizeTimeout = setTimeout(() => {
+        overviewGrid.refreshItems().layout();
     }, 300);
 });
 
-
-
-//3d Model Spinner removal when 3dmodel loaded
+// remove 3D Model spinner, when loaded
 document.querySelectorAll('model-viewer').forEach(model => {
     model.addEventListener('poster-dismissed', () => {
         const wrapper = model.closest('.model-wrapper');
@@ -55,33 +31,34 @@ document.querySelectorAll('model-viewer').forEach(model => {
             const spinner = wrapper.querySelector('.spinner');
             if (spinner) spinner.style.display = 'none';
         }
-        if (window.grid) {
-            window.grid.refreshItems().layout();
-        }
+        overviewGrid.refreshItems().layout();
     });
 });
 
-window.addEventListener('DOMContentLoaded', () => {
+// DOM loaded, initialize optional models
+document.addEventListener('DOMContentLoaded', () => {
     if (customElements.get('model-viewer')) {
         initModelViewers();
-        initMuuri();
         observeModelSizeChanges();
     } else {
         customElements.whenDefined('model-viewer').then(() => {
             initModelViewers();
-            initMuuri();
             observeModelSizeChanges();
         });
     }
+
+    setTimeout(() => {
+        overviewGrid.refreshItems().layout();
+    }, 500);
 });
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (window.grid) {
-        setTimeout(() => {
-            window.grid.refreshItems().layout();
-        }, 500);
-        window.grid.refreshItems().layout();
-    }
-});
+function observeModelSizeChanges() {
+    const ro = new ResizeObserver(() => {
+        overviewGrid.refreshItems().layout();
+    });
 
+    document.querySelectorAll('model-viewer').forEach(model => {
+        ro.observe(model);
+    });
+}
