@@ -84,7 +84,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 def delete_link(link_id: int, tab: str, entry: str) -> Response:
     check_manager_user()
     Admin.delete_link(link_id)
-    flash(_('Link deleted successfully!'), 'success')
+    flash(_('Link deleted successfully'), 'success')
     return redirect(url_for('admin', tab=tab, entry=entry))
 
 

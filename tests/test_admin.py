@@ -43,5 +43,25 @@ def test_admin_page(client):
         rv = client.get(url_for('admin'), follow_redirects=True)
         assert b"Invalid Case Study ID" in rv.data
 
+        rv = client.get(
+            url_for(
+            'add_link',
+                domain='1',
+                range='3',
+                property='3',
+                role='2',
+                sortorder='5'),
+            follow_redirects=True)
+        assert b'Link added successfully' in rv.data
+
+        rv = client.get(
+            url_for(
+            'delete_link',
+                link_id='8',
+                tab='nav-persons',
+                entry='nav-persons2'),
+            follow_redirects=True)
+        assert b'Link deleted successfully' in rv.data
+
         rv = client.get(url_for('logout'), follow_redirects=True)
         assert b'ENTITIES' in rv.data
