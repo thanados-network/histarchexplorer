@@ -1,5 +1,7 @@
+{% import '_macros.html' as ui %}
 <script type="module" src="/static/node_modules/muuri/dist/muuri.min.js"></script>
 <script src="../../static/js/media.js"></script>
+<script src="/static/node_modules/@google/model-viewer/dist/model-viewer-umd.js"></script>
 <script> const entity = JSON.parse(JSON.parse({{ data|tojson }}).entity)</script>
 
 
@@ -7,8 +9,6 @@
 
 <div class="col flex-column grid-media">
   {% for image in all_images %}
-    <div class="item item-half" data-type="image">
-      <img src="{{ image.url }}" alt="{{ image.title }}" style="width: 100%; height: auto;"/>
-    </div>
+    {{ ui.overview_image(image) }}
   {% endfor %}
 </div>
