@@ -9,6 +9,7 @@ from flask import abort, g, render_template, request
 from histarchexplorer import app, cache
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.database.entity import get_entity_by_id
+from histarchexplorer.models.depiction import Depiction
 from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.types import Types
 from histarchexplorer.utils.view_util import get_cite_button
@@ -471,10 +472,10 @@ def get_entity(id_: int, tab_name=None) -> str:
 
         catalogue_entities = Entity.get_linked_entities_by_properties_recursive(
             id_,
-            get_parser_for_landing(id_)
-        )
-        print(len(catalogue_entities))
+            get_parser_for_landing(id_))
         entity_tree = build_entity_tree(catalogue_entities)
+        for entity in entity_tree:
+            entity.all_child_depictions = collect_child_depictions(entity)
 
 
 
@@ -569,7 +570,21 @@ def get_entity(id_: int, tab_name=None) -> str:
 
     # related_entities=related_entities_json)
 
-def build_entity_tree(entities: list[Entity]) -> list[dict[str, Any]]:
+def collect_child_depictions(entity: Entity) -> list[Depiction]:
+    all_depictions = []
+
+    def recurse(e: Entity):
+        if not hasattr(e, 'children'):
+            e.children = []
+        for child in e.children:
+            all_depictions.extend(child.depictions or [])
+            recurse(child)
+
+    if hasattr(entity, 'children'):
+        recurse(entity)
+    return all_depictions
+
+def build_entity_tree(entities: list[Entity]) -> list[Entity]:
     entity_dict = {e.id: e for e in entities}
 
     for entity in entities:

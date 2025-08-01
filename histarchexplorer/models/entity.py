@@ -61,6 +61,7 @@ class Entity:
         self.end = None
         self.parent: Optional[Relation] = self.get_parent()
         self.subunits: Optional[Relation]  = self.get_subunits()
+        self.children = []
         self.geometry = data.get('geometry')
         if 'when' in data:
             self.begin_from = split_date_string(

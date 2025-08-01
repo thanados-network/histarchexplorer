@@ -1,44 +1,63 @@
-
-
-{% macro loop_entity(entity) %}
-  <li class="list-group-item">
-    <div class="d-flex align-items-start justify-content-between">
-      <div class="d-flex">
-        {% if entity.depictions and entity.depictions[0].iiif_base_path %}
-          <img
-            src="{{ entity.depictions[0].iiif_base_path }}/full/!200,200/0/default.jpg"
-            alt="Thumbnail"
-            class="me-3 rounded"
-            style="width: 100px; height: auto; object-fit: contain;">
-        {% endif %}
-        <div>
-          <strong>{{ entity.name }}</strong><br>
-          <small>{{ entity.description }}</small>
-          <ul class="mt-2">
-            {% for t in entity.types %}
-              <li>{{ t.label }}{% if t.value %}: {{ t.value }}
-                {{ t.unit }}{% endif %}</li>
-            {% endfor %}
-          </ul>
+{% macro loop_entity(entity, top) %}
+  <li class="list-group-item" xmlns="http://www.w3.org/1999/html">
+    <div class="row ">
+      <div class="col">
+        <div class="d-flex align-items-center">
+          {% if entity.depictions and entity.depictions[0].iiif_base_path %}
+            <img
+              src="{{ entity.depictions[0].iiif_base_path }}/full/!200,200/0/default.jpg"
+              alt="Thumbnail"
+              class="me-3 rounded"
+              style="width: 100px; height: auto; object-fit: contain;">
+          {% endif %}
+          <div class="flex-grow-1">
+            <strong>{{ entity.name }}</strong><br>
+            <small>{{ entity.description }}</small>
+            <ul class="mt-2">
+              {% for t in entity.types %}
+                <li>{{ t.label }}{% if t.value %}: {{ t.value }}
+                  {{ t.unit }}{% endif %}</li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
       </div>
 
+      <!-- Right Column: Gallery of child depictions -->
+      {% if entity.all_child_depictions %}
+        <div class="col text-center">
+          <strong>{{ _('finds') | capitalize }}</strong>
+          <div class="d-flex flex-wrap justify-content-center">
+            {% for depiction in entity.all_child_depictions %}
+              {% if depiction.iiif_base_path %}
+                <img
+                  src="{{ depiction.iiif_base_path }}/full/!150,150/0/default.jpg"
+                  alt="Thumb"
+                  class="m-1 rounded"
+                  style="max-width: 150px; max-height: 150px; height: auto; width: auto;">
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+    <div class="row align-items-center">
       {% if entity.children %}
-        <button class="btn btn-link p-0 ms-3 toggle-arrow" type="button"
+        <button class="btn btn-link p-3 ms-3 toggle-arrow" type="button"
                 data-bs-toggle="collapse"
                 data-bs-target="#collapse-{{ entity.id }}"
                 aria-expanded="false"
                 aria-controls="collapse-{{ entity.id }}">
-          <i class="bi bi-chevron-right rotate-icon"></i>
+          <i class="bi bi-chevron-down rotate-icon fs-4"></i>
         </button>
       {% endif %}
     </div>
-
     {% if entity.children %}
+      <hr class="my-2">
       <div class="collapse mt-2" id="collapse-{{ entity.id }}">
         <ul class="list-group mt-2">
           {% for child in entity.children %}
-            {{ loop_entity(child) }}
+            {{ loop_entity(child, False) }}
           {% endfor %}
         </ul>
       </div>
@@ -49,11 +68,13 @@
 <div class="container-fluid">
   <div class="row">
     <!-- Sidebar -->
-    <div class="col-2 position-sticky" style="top: 0; max-height: 100vh; overflow-y: auto;" id="sidebar">
+    <div class="col-2 position-sticky"
+         style="top: 0; max-height: 100vh; overflow-y: auto;" id="sidebar">
       <ul class="list-group" id="entity-index">
         {% for entity in entity_tree %}
           <li class="list-group-item">
-            <a href="#entity-{{ entity.id }}" class="index-link d-block text-decoration-none">
+            <a href="#entity-{{ entity.id }}"
+               class="index-link d-block text-decoration-none">
               {{ entity.name }}
             </a>
           </li>
@@ -65,12 +86,9 @@
     <div class="col-10">
       <ul class="list-group">
         {% for entity in entity_tree %}
-          <li id="entity-{{ entity.id }}">
-            {{ loop_entity(entity) }}
-          </li>
+          {{ loop_entity(entity, True) }}
         {% endfor %}
       </ul>
     </div>
   </div>
 </div>
-
