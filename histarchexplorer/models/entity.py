@@ -50,7 +50,7 @@ class Entity:
         self.standard_type = self.get_standard_type()
         self.alias = get_alias(data.get('names'))
         self.relations = get_relation_class(data.get('relations'))
-        self.depictions = self.get_depiction(data.get('depictions'))
+        self.depictions: list[Depiction] = self.get_depiction(data.get('depictions'))
         self.reference_systems = data.get('links')
         self.begin_from = None
         self.begin_to = None
@@ -59,8 +59,9 @@ class Entity:
         self.end_to = None
         self.begin = None
         self.end = None
-        self.parent = self.get_parent()
-        self.subunits = self.get_subunits()
+        self.parent: Optional[Relation] = self.get_parent()
+        self.subunits: Optional[Relation]  = self.get_subunits()
+        self.children = []
         self.geometry = data.get('geometry')
         if 'when' in data:
             self.begin_from = split_date_string(
@@ -142,7 +143,7 @@ class Entity:
             description_class = "item-middle"
         return description_class
 
-    def get_subunits(self) -> list[Relation]:
+    def get_subunits(self) -> Optional[list[Relation]]:
         if not self.relations:
             return []
         subunit = []

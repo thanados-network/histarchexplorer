@@ -9,6 +9,7 @@ from flask import abort, g, render_template, request
 from histarchexplorer import app, cache
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.database.entity import get_entity_by_id
+from histarchexplorer.models.depiction import Depiction
 from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.types import Types
 from histarchexplorer.utils.view_util import get_cite_button
@@ -394,6 +395,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     data = {}
     main_entity = None
     related_entities = {}
+    catalogue_entities = []
 
     # entities = Entity.get_linked_entities_by_properties_recursive(
     #     id_,
@@ -466,6 +468,16 @@ def get_entity(id_: int, tab_name=None) -> str:
             print('No spatial features found. Aborting with 404.')
             abort(404)
         data['spatial'] = map_data
+    elif tab_name == 'catalogue':
+
+        c_entities = Entity.get_linked_entities_by_properties_recursive(
+            id_,
+            get_parser_for_landing(id_))
+        catalogue_entities = build_entity_tree(c_entities)
+        for entity in catalogue_entities:
+            entity.all_child_depictions = collect_child_depictions(entity)
+
+
 
     elif tab_name == 'overview':
         # data = get_entity()
@@ -553,10 +565,42 @@ def get_entity(id_: int, tab_name=None) -> str:
         total_images=total_images,
         all_images=all_images,
         related_entities=related_entities or {},
-        cite_button=get_cite_button(main_entity))
+        cite_button=get_cite_button(main_entity),
+        catalogue_entities=catalogue_entities )
 
     # related_entities=related_entities_json)
 
+def collect_child_depictions(entity: Entity) -> list[Depiction]:
+    all_depictions = []
+
+    def recurse(e: Entity):
+        if not hasattr(e, 'children'):
+            e.children = []
+        for child in e.children:
+            all_depictions.extend(child.depictions or [])
+            recurse(child)
+
+    if hasattr(entity, 'children'):
+        recurse(entity)
+    return all_depictions
+
+def build_entity_tree(entities: list[Entity]) -> list[Entity]:
+    entity_dict = {e.id: e for e in entities}
+
+    for entity in entities:
+        if entity.parent and entity.parent.relation_to_id in entity_dict:
+            parent_entity = entity_dict[entity.parent.relation_to_id]
+            if not hasattr(parent_entity, 'children'):
+                parent_entity.children = []
+            parent_entity.children.append(entity)
+
+    tree = []
+    for entity in entities:
+        if entity.parent and entity.parent.relation_to_id in entity_dict:
+            continue
+        if hasattr(entity, 'children'):
+            tree.extend(entity.children)
+    return tree
 
 def get_parser_for_landing(id_: int) -> Parser:
     simple_entity = get_entity_by_id(id_)

@@ -130,7 +130,6 @@ def inject_conf_var() -> dict[str, Any]:
             request.accept_languages.best_match(
                 app.config['LANGUAGES'].keys()))}
 
-
 @app.after_request
 def apply_caching(response: Response) -> Response:
     response.headers['Strict-Transport-Security'] = \
