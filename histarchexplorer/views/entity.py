@@ -395,7 +395,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     data = {}
     main_entity = None
     related_entities = {}
-    entity_tree = []
+    catalogue_entities = []
 
     # entities = Entity.get_linked_entities_by_properties_recursive(
     #     id_,
@@ -470,11 +470,11 @@ def get_entity(id_: int, tab_name=None) -> str:
         data['spatial'] = map_data
     elif tab_name == 'catalogue':
 
-        catalogue_entities = Entity.get_linked_entities_by_properties_recursive(
+        c_entities = Entity.get_linked_entities_by_properties_recursive(
             id_,
             get_parser_for_landing(id_))
-        entity_tree = build_entity_tree(catalogue_entities)
-        for entity in entity_tree:
+        catalogue_entities = build_entity_tree(c_entities)
+        for entity in catalogue_entities:
             entity.all_child_depictions = collect_child_depictions(entity)
 
 
@@ -566,7 +566,7 @@ def get_entity(id_: int, tab_name=None) -> str:
         all_images=all_images,
         related_entities=related_entities or {},
         cite_button=get_cite_button(main_entity),
-        entity_tree=entity_tree )
+        catalogue_entities=catalogue_entities )
 
     # related_entities=related_entities_json)
 

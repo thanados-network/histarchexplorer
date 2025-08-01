@@ -71,7 +71,7 @@
     <div class="col-2 position-sticky"
          style="top: 0; max-height: 100vh; overflow-y: auto;" id="sidebar">
       <ul class="list-group" id="entity-index">
-        {% for entity in entity_tree %}
+        {% for entity in catalogue_entities %}
           <li class="list-group-item">
             <a href="#entity-{{ entity.id }}"
                class="index-link d-block text-decoration-none">
@@ -85,7 +85,7 @@
     <!-- Main content -->
     <div class="col-10">
       <ul class="list-group">
-        {% for entity in entity_tree %}
+        {% for entity in catalogue_entities %}
           {{ loop_entity(entity, True) }}
         {% endfor %}
       </ul>
