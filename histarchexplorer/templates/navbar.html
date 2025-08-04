@@ -27,6 +27,13 @@
                         </li>
                     {% endfor %}
                 {% endfor %}
+            <li class="nav-item">
+    <a class="nav-link nav-link-hover {% if request.endpoint == 'vocabulary' %}active{% endif %}"
+       aria-current="page"
+       title="Vocabulary"
+       href="{{ url_for('vocabulary') }}">VOCABULARY
+    </a>
+</li>
             </ul>
         </div>
         <div class="collapse navbar-collapse">
