@@ -2,7 +2,6 @@ from collections import defaultdict
 from typing import Any
 
 from flask import render_template
-from urllib.parse import urlparse
 
 from histarchexplorer import app
 from histarchexplorer.api.parser import Parser
@@ -63,8 +62,8 @@ def landing(id_: int) -> str:
     #print("Depictions:", main_entity.depictions)
 
     total_images = len(images)
-    initial_images = images[:3]  # Show only the first 3 images
-    more_images = total_images > 3
+    initial_images = images[:2]  # Show only the first 3 images
+    more_images = total_images > 2
 
     total_images = len([img for img in images if not img.main_image])
 

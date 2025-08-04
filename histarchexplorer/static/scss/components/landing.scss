@@ -27,15 +27,15 @@
   display: block;
   margin: 5px;
   position: absolute;
-  width: calc((100% - 45px) / 3);
+  width: calc((100% - 20px) / 3);
   background: var(--muuri-tile);
   overflow: hidden;
   border-radius: 7.5px;
 }
 
-@media (max-width: 992px) { // Below col-md breakpoint
+@media (max-width: 1400px) { // Below col-md breakpoint
   .item {
-    width: calc((100% - 40px ) / 2); // 2 tiles
+    width: calc((100% - 20px ) / 2); // 2 tiles
   }
 }
 
@@ -51,9 +51,9 @@
   width: calc(((100%) / 3) * 2); //2 tiles width
 }
 
-@media (max-width: 992px) { // two tiles
+@media (max-width: 1400px) { // two tiles
   .item-middle {
-    width: calc(100% - 20px);
+     width: calc(((100%) / 4) * 3);
   }
 }
 
@@ -63,9 +63,26 @@
   }
 }
 
+.item-5-6 {
+  width: calc(((((100% - 20px) / 3) / 2) * 5 + 10px));
+}
+@media (max-width: 1400px) {
+   .item-5-6 {
+    width: calc(((100% - 20px)/4)*3);
+  }
+}
+@media (max-width: 766px) {
+   .item-5-6 {
+    width: 100%; // 1 tile
+    margin: 0px;
+    padding: 0px;
+  }
+}
+
 .item-half {
   display: block;
   margin: 2.5px;
+  margin-top: 5px;
   position: absolute;
   width: calc((((100% - 30px) / 3) - 10px) / 2);
   max-height: fit-content;
@@ -74,15 +91,17 @@
   border-radius: 7.5px;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1400px) {
   .item-half {
-    width: calc((((100% - 20px) / 2) - 10px) / 2);
+    width: calc(((100% - 25px) / 2) / 2);
   }
 }
 
 @media (max-width: 766px) { // Mobile
   .item-half {
-    width: calc(100% - 10px); // 1 tile
+    width: calc(100%); // 1 tile
+    margin: 0px;
+    padding: 0px;
   }
 }
 
@@ -90,7 +109,7 @@
   width: calc(100% - 30px); // full width of three tiles
 }
 
-@media (max-width: 992px) { // two tiles
+@media (max-width: 1400px) { // two tiles
   .item-wide {
     width: calc(100% - 20px);
   }
@@ -101,6 +120,32 @@
     width: calc(100% - 10px);
   }
 }
+
+@media (min-width: 767px) and (max-width: 992px) {
+  .item,
+  .item-half,
+  .item-middle,
+  .item-fit {
+    width: calc((100% - 20px) / 2); // zwei Spalten
+  }
+
+  .item-wide {
+    width: calc(100% - 10px); // volle Breite
+  }
+    .item-5-6 {
+    width: calc(100% - 10px); // volle Breite
+  }
+}
+
+
+@media (max-width: 766px) {
+  .item,
+  .item-half,
+  .item-middle,
+  .item-fit {
+    border-radius:0;
+    padding-bottom: rem(10);
+  }}
 
 .item-fit {
   display: block;
@@ -128,12 +173,30 @@
   padding: 0;
 }
 
+//Images
+
 .image img {
   max-width: 100%;
   height: auto;
   display: block;
   margin: 0 auto;
   position: relative;
+}
+
+
+.image {
+  position: relative;
+
+  .hover-max {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  &:hover {
+    .hover-max {
+      opacity: 1;
+    }
+  }
 }
 
 
@@ -204,7 +267,14 @@
 //Map-Style
 .location {
   width: 100%;
-  height: calc(100vh - 106px);
+  height: calc(66.6vh - 106px);
+}
+
+@media (max-width: 766px) {
+  .location {
+    width: 100%;
+    height: calc(100vh - 106px);
+  }
 }
 
 #muuri-map {
@@ -249,6 +319,11 @@
       margin-top: 1.5rem;
     }
   }
+  @media (max-height: 766px) {
+    margin-top: 0px;
+  }
+
+
 
   // Icon styling
   i {
@@ -263,8 +338,9 @@
 }
 
 .entity-card__icon img {
-  max-width: 60%; //ev. change here to extra card, so that on entity page this can stay on 80-100%
+  max-width: 80%; //ev. change here to extra card, so that on entity page this can stay on 80-100%
   height: auto;
+  border-radius: 10px;
 }
 
 
@@ -280,6 +356,7 @@
 }
 
 .entity-country {
+  color:black;
   margin-top: 1rem;
 }
 
@@ -296,6 +373,7 @@
 
 .entity-country {
   text-align: center;
+  heigth:auto;
 }
 
 @media (max-width: 992px) {
@@ -363,7 +441,7 @@
 
   .reference-name {
     font-weight: bold;
-    color: #000;
+    color: var(--reference-label);
     text-decoration: none;
   }
 }
@@ -371,7 +449,7 @@
 .reference-description {
   font-size: 0.875rem;
   font-weight: 300;
-  color: #555;
+  color: var(--reference-text);
   margin-left: 1.75rem;
   margin-top: 0.25rem;
   line-height: 1.4;

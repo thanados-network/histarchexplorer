@@ -1,0 +1,74 @@
+<div class="modal fade" id="addEntryModal" tabindex="-1"
+       aria-labelledby="addEntryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"
+              id="addEntryModalLabel">{{ _('add entry')|capitalize }}</h5>
+          {{ ui.close_button("modal") }}
+        </div>
+        <div class="modal-body">
+          <form method="POST" action="{{ url_for('add_entry') }}"
+                class="needs-validation" novalidate>
+            <input type="hidden" name="category" id="currentTab">
+
+            {# Dynamically render fields based on FIELD_CONFIGS for each tab #}
+            {% for tab_item in tabs %}
+              <div class="modal-category-fields {{ tab_item.target | replace('nav-', '') }}-show"
+                   id="modal-fields-{{ tab_item.target }}"
+                   {% if not loop.first %}style="display: none;"{% endif %}> {# Hide all but the first by default #}
+
+                <div class="row">
+                  {% for field in FIELD_CONFIGS[tab_item.target] %}
+                    <div class="{{ field.col_class or 'col-md-6' }} mt-2 modal-input">
+                      <label for="Input{{ field.key | capitalize }}Modal" class="form-label">
+                        {{ _(field.label)|capitalize }}
+                      </label>
+
+                      {% if field.type == 'textarea' %}
+                        <textarea class="form-control"
+                                  id="Input{{ field.key | capitalize }}Modal"
+                                  name="{{ field.key }}"
+                                  aria-describedby="{{ field.key }}HelpModal"
+                                  {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
+                                  {% if field.required %}required{% endif %}></textarea>
+                      {% elif field.type == 'select' %}
+                        <select class="form-select"
+                                id="Input{{ field.key | capitalize }}Modal"
+                                name="{{ field.key }}"
+                                aria-describedby="{{ field.key }}HelpModal"
+                                {% if field.required %}required{% endif %}>
+                          <option value="">{{ _('Select a value') }}</option>
+                          {% if field.key == 'case_study' %}
+                            {% for child in case_study_children %}
+                              <option value="{{ child.id }}">{{ child.name }}</option>
+                            {% endfor %}
+                          {% endif %}
+                        </select>
+                      {% else %}
+                        <input type="{{ field.type }}"
+                               class="form-control"
+                               id="Input{{ field.key | capitalize }}Modal"
+                               name="{{ field.key }}"
+                               {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
+                               {% if field.required %}required{% endif %}>
+                      {% endif %}
+
+                      {% if field.required %}
+                        <div class="invalid-feedback">{{ _('Please provide a') }} {{ _(field.label) }}.</div>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+
+            <div class="mt-3 text-end">
+              <button type="submit"
+                      class="btn btn-primary">{{ _('add entry')|capitalize }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>

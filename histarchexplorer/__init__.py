@@ -1,31 +1,31 @@
 from typing import Any
 
 import psycopg2.extras
-
-from flask import Flask, g, Response, session, request, url_for
+from flask import Flask, Response, g, request, session, url_for
 from flask_babel import Babel
+from flask_caching import Cache
 from psycopg2 import DatabaseError
-
 from psycopg2.extensions import connection
 
 from histarchexplorer.database.settings import get_main_image_table
-
-
-
-
+from histarchexplorer.services.config import ConfigEntity, Link, Properties, \
+    get_config_classes
+from histarchexplorer.services.search import SearchService
+from histarchexplorer.services.settings import Settings
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
 app.config.from_pyfile('production.py')
 babel = Babel(app)
 
-from histarchexplorer.views import vocabulary
-app.register_blueprint(vocabulary.vocabulary_bp)
-
+app.config['CACHE_TYPE'] = 'FileSystemCache'
+app.config['CACHE_DIR'] = '/var/tmp/flask-cache'
+app.config['CACHE_DEFAULT_TIMEOUT'] = 3600
+cache = Cache(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer.views import (
-    admin, login, views, about, entity, landing)
+    admin, login, views, about, entity, landing, search)
 from histarchexplorer.utils import view_util
 
 
@@ -71,7 +71,7 @@ def get_sidebar_icons() -> dict[int, str]:
         icon_tag = create_icon(icon)
         for id_ in ids:
             icons[id_] = icon_tag
-    icons['other']= '<i class="bi bi-box-arrow-left"></i>'
+    icons['other'] = '<i class="bi bi-box-arrow-left"></i>'
     return icons
 
 
@@ -88,20 +88,36 @@ def get_type_divisions():
             out[id_] = {'label': label, 'icon': icon}
     return out
 
+
 @app.before_request
 def before_request() -> None:
     g.db = connect()
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
+    if request.path.startswith('/reset'):
+        return None
     session['language'] = get_locale()
+    g.language = session.get(
+        'language',
+        request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
+    g.preferred_langauge = app.config['PREFERRED_LANGUAGE']
     g.main_images = get_main_image_table()
-    app.jinja_env.filters['capitalize_first'] = capitalize_first
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
-
-def capitalize_first(value: str) -> str:
-    if not value:
-        return ''
-    return value[0].upper() + value[1:]
+    g.config_classes = get_config_classes()
+    g.config_properties = Properties.get_all()
+    g.config_links = Link.get_all()
+    g.settings = Settings.initialize_settings()
+    # Todo: this is basically the same as
+    #   config_classes but with 's' and attributes instead of attribute
+    g.config_classes_map = {
+        'projects': 1,  # option for config_class=2 project vs 1=main_project?
+        'persons': 2,
+        'institutions': 4,
+        'attributes': 3,
+        'main-project': 5}
+    g.config_entities = ConfigEntity.get_all_localized()
+    g.search_service = SearchService(app)
+    return None
 
 
 @app.context_processor
@@ -113,7 +129,6 @@ def inject_conf_var() -> dict[str, Any]:
             'language',
             request.accept_languages.best_match(
                 app.config['LANGUAGES'].keys()))}
-
 
 @app.after_request
 def apply_caching(response: Response) -> Response:

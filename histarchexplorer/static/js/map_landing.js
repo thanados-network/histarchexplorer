@@ -25,7 +25,7 @@ if (gisData) {
     });
     var entityGeom = L.geoJSON(gisData, {
         onEachFeature: function (feature, layer) {
-            console.log(feature)
+            //console.log(feature)
             layer.bindPopup('<b>' + entityName + '</b><p><b>' + feature.title + '</b> ' + feature.description + '</p>');
         }
     }).addTo(overview_map);
@@ -52,7 +52,7 @@ expandButton.addEventListener('click', event => {
         });
         //Expand-Shrink Button
         if (muuriMap.classList.contains('expanded-map')) {
-            expandButton.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
+            expandButton.innerHTML = '<i class="bi bi-box-arrow-up-right"></i>';
             //Enable map zoom etc
             overview_map.scrollWheelZoom.enable();
             overview_map.doubleClickZoom.enable();
@@ -61,7 +61,7 @@ expandButton.addEventListener('click', event => {
             overview_map.dragging.enable();
 
         } else {
-            expandButton.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';
+            expandButton.innerHTML = '<i class="bi bi-box-arrow-up-right"></i>';
 
             overview_map.scrollWheelZoom.disable();
             overview_map.doubleClickZoom.disable();

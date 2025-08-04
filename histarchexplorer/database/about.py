@@ -1,58 +1,87 @@
 from flask import g
 
 
-def get_institutions():
-    institutions_sql = """
-        SELECT 
+def get_config_entities() -> tuple[str]:
+    g.cursor.execute(
+        f"""SELECT 
+            c.id,
             c.name,
-            c.address, 
+            c.description,
             c.website,
-            c.image, 
-            role.name AS role
-        FROM tng.links l
-        JOIN tng.config c ON l.range_id = c.id
-        LEFT JOIN tng.config role ON l.attribute = role.id AND role.config_class = '3' --role name & config class
-        WHERE 
-            l.domain_id = (SELECT id FROM tng.config WHERE config_class = '5') -- only links concerning main-project
-        AND c.config_class = '4'
-        ORDER BY l.sortorder, l.id;
-    """
-    g.cursor.execute(institutions_sql)
+            c.legal_notice,
+            c.imprint,
+            c.class_id,
+            c.address, 
+            c.email,
+            c.image,      
+            c.orcid_id,
+            c.case_study_type_id,
+            cc.name as class_name 
+        FROM 
+            tng.entities as c
+		JOIN  tng.classes as cc ON c.class_id = cc.id;""")
     return g.cursor.fetchall()
 
-def get_persons():
-    persons_sql = """
-        SELECT 
-            p.name, 
-            p.image, 
-            b.name AS role, 
-            a.name AS affiliation, 
-            COALESCE(a.website, '') AS website, 
-            COALESCE(p.email, '') AS email
-        FROM tng.links l
-        JOIN tng.config p ON l.range_id = p.id
-        JOIN tng.config_properties cp ON l.property = cp.id
-        LEFT JOIN tng.config b ON l.attribute = b.id AND b.config_class = '3'
-        LEFT JOIN tng.links la ON la.domain_id = p.id AND la.property = 2
-        LEFT JOIN tng.config a ON la.range_id = a.id
-        WHERE l.domain_id = (SELECT id FROM tng.config WHERE config_class = '5')
-            AND p.config_class = '2'
-            AND cp.id = 4
-        ORDER BY l.sortorder, l.id;
-    """
-    g.cursor.execute(persons_sql)
-    return g.cursor.fetchall()
 
-build_connections_sql = '''
-    SELECT p.name AS property, p.id AS property_id, c.name AS target, d.name AS role, l.sortorder, c.id AS target_id
-    FROM tng.links l
-    JOIN tng.config c ON l.range_id = c.id
-    JOIN tng.config_properties p ON l.property = p.id
-    LEFT JOIN tng.config d ON l.attribute = d.id
-    WHERE domain_id = %s
-    ORDER BY property, sortorder
-'''
+# def get_project_attributes_sql(
+#         id_: int,
+#         config_class_id: int) -> tuple[str]:
+#     g.cursor.execute(
+#         """
+#         SELECT l.domain_id,
+#                attribute.name AS attribute
+#         FROM tng.links l
+#                  JOIN tng.entities c ON l.range_id = c.id
+#                  LEFT JOIN tng.entities attribute ON l.attribute = attribute.id
+#             AND attribute.class_id = %(attribute_id)s
+#         WHERE l.range_id = %(id)s
+#           AND c.class_id = %(config_class_id)s
+#         ORDER BY l.sortorder, l.id;
+#         """, {
+#             'id': id_,
+#             'config_class_id': config_class_id,
+#             'attribute_id': g.config_classes['attribute']})
+#     return g.cursor.fetchall()
 
-get_models_sql = 'SELECT * FROM tng.config WHERE id = %s'
+# def get_project_attributes_sql_inverse(
+#         id_: int,
+#         config_class_id: int) -> tuple[str]:
+#     g.cursor.execute(
+#         """
+#         SELECT l.range_id,
+#                attribute.name AS attribute
+#         FROM tng.links l
+#                  JOIN tng.entities c ON l.domain_id = c.id
+#                  LEFT JOIN tng.entities attribute ON l.attribute = attribute.id
+#             AND attribute.class_id = %(attribute_id)s
+#         WHERE l.domain_id = %(id)s
+#           AND c.class_id = %(config_class_id)s
+#         ORDER BY l.sortorder, l.id;
+#         """, {
+#             'id': id_,
+#             'config_class_id': config_class_id,
+#             'attribute_id': g.config_classes['attribute']})
+#     return g.cursor.fetchall()
 
-about_str_sql = "SELECT name, description, legal_notice, imprint FROM tng.config WHERE id = 1"
+
+# def get_affiliations(id_: int) -> tuple[str]:
+#     g.cursor.execute(
+#         """
+#         SELECT DISTINCT l.range_id,
+#                         a.name    AS affiliation,
+#                         attribute.name AS attribute
+#         FROM tng.links l
+#                  LEFT JOIN tng.entities attribute
+#                            ON l.attribute = attribute.id
+#                                AND attribute.class_id = %(attribute_id)s
+#                  LEFT JOIN tng.links la
+#                            ON la.range_id = l.range_id
+#                                AND la.property = %(affiliation_id)s
+#                  LEFT JOIN tng.entities a
+#                            ON la.range_id = a.id
+#         WHERE l.domain_id = %(id)s;
+#         """, {
+#             'id': id_,
+#             'affiliation_id': 2,
+#             'attribute_id': g.config_classes['attribute']})
+#     return g.cursor.fetchall()

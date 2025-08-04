@@ -1,11 +1,34 @@
-# Repository for the frontend development 
+# Repository for the frontend development
 
-# Install 
- 
+# Install
+
 to compile scss to css please do the following:
 
         npm install -g sass
 
-to automatically compile your scss files run the following in your static folder:
+to automatically compile your scss files run the following in your static
+folder:
 
         sass --watch scss/main.scss:css/main.css
+
+python packages
+
+        sudo apt install python3-bcrypt python3-flask python3-flask-babel 
+        sudo apt install python3-flask-login python3-mypy python3-numpy python3-psycopg2
+        sudo apt install python3-werkzeug python3-wtforms python3-flask-caching python3-requests
+
+for development
+
+        sudo apt install python3-pytest python3-pytest-cov python3-pytest-flask
+
+
+to create the database, choose a existing OpenAtlas (https://openatlas.eu) 
+postgresql database and run
+
+        cd install
+        cat 1_structure.sql 2_data_model.sql | psql -d <DATABASE_NAME> -f -
+
+Or run the script in the histarchexplorer root folder, if you have the correct database credentials in "instance/production.py"
+
+        export PYTHONPATH=".:$PYTHONPATH"
+        python3 install/install_script.py

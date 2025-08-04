@@ -171,4 +171,41 @@
 
 }
 
+.name-column-date-subtitle {
+  color: grey;
+  //margin-left: 1rem;
+}
+
+.category-column-type-subtitle {
+  color: grey;
+  font-style: italic;
+  //margin-left: 1rem;
+}
+
+.tabulator-cell-clearfix {
+  clear: both;
+}
+
+.tabulator-container {
+  margin: 1.5rem !important;
+  max-width: calc(100% - 4rem);
+  box-sizing: border-box;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tabulator-row .tabulator-responsive-collapse table tr td:first-of-type {
+  padding-right: 0px;
+  display: none;
+}
+
+.tabulator-row .tabulator-responsive-collapse {
+  border-top: none !important;
+  padding: 20px!important;
+}
+
+.tabulator-footer {
+  background-color: transparent!important;
+}
 

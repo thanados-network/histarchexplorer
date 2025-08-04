@@ -42,33 +42,40 @@ function isValidDate(d) {
 }
 
 function calculateTimeBP(dateString) {
-    if (!dateString) dateString = '-9999999999999999999999999999999999999999999999999999-'
+    if (!dateString) {
+        return null
+    }
     const today = new Date();
-    const currentMonth = today.getMonth();
+    const currentMonth = today.getMonth(); // 0-11
     const currentYear = today.getFullYear();
-    const currentDay = today.getDate();
+    const currentDay = today.getDate(); // 1-31
 
     const daysPerMonth = 365.2525 / 12;
     const daysSinceZero = currentYear * 365.2525 + currentMonth * daysPerMonth + currentDay;
 
     let isNegative = false;
-    let stringLength = 9;
-
+    let yearPartEndIndex = dateString.indexOf('-');
     if (dateString[0] === '-') {
-        stringLength += 1;
         isNegative = true;
+        yearPartEndIndex = dateString.indexOf('-', 1);
     }
+    if (yearPartEndIndex === -1) yearPartEndIndex = dateString.length;
 
-    let yearFromString = parseInt(dateString.substring(0, stringLength)) || 0;
-    let monthFromString = (parseInt(dateString.substring(stringLength + 1, stringLength + 3)))-1 || 0;
-    let dayFromString = parseInt(dateString.substring(stringLength + 4, stringLength + 6)) || 0;
+    let yearFromString = parseInt(dateString.substring(0, yearPartEndIndex));
+    if (isNaN(yearFromString)) yearFromString = 0;
+
+    let monthFromString = parseInt(dateString.substring(yearPartEndIndex + 1, yearPartEndIndex + 3));
+    if (isNaN(monthFromString)) monthFromString = 0; else monthFromString -= 1;
+
+    let dayFromString = parseInt(dateString.substring(yearPartEndIndex + 4, yearPartEndIndex + 6));
+    if (isNaN(dayFromString)) dayFromString = 0;
 
     const daysToZero = isNegative
         ? (yearFromString * 365.2525 - (monthFromString) * daysPerMonth) + dayFromString
         : yearFromString * 365.2525 + monthFromString * daysPerMonth + dayFromString;
 
     const daysBP = daysSinceZero - daysToZero;
-    return daysBP
+    return 0 - daysBP;
 }
 
 function fieldHasValues(entities, field) {
@@ -81,94 +88,164 @@ function fieldHasValues(entities, field) {
 function translateDescription(text) {
     {
         if (text) {
-    const pattern = new RegExp(`##${language}_##([\\s\\S]*?)##_${language}##`, 'm');
-    const match = text.match(pattern);
-    if (match && match[1]) {
-        return match[1].trim();
+            const pattern = new RegExp(`##${language}_##([\\s\\S]*?)##_${language}##`, 'm');
+            const match = text.match(pattern);
+            if (match && match[1]) {
+                return match[1].trim();
+            }
+            return text;
+        }
+        return '';
     }
-    return text;
-    }
-    return '';
-}
 }
 
 function getUniqueValues(data, field) {
     return [...new Set(data.map(row => row[field]).filter(Boolean))].sort();
 }
 
-var minMaxFilterEditor = function(cell, onRendered, success, cancel, editorParams){
+function createSortLevel(id, fields) {
+    const div = document.createElement('div');
+    div.classList.add('row', 'align-items-end', 'mb-2');
+    div.dataset.id = id;
 
-    var end;
+    div.innerHTML = `
+    <div class="col">
+      <label class="form-label">Sort by</label>
+      <select class="form-select sort-field">
+        ${fields.includes('name') ? `<option value="name">Name</option>` : ''}
+        ${fields.includes('class') ? `<option value="class">Class</option>` : ''}
+        ${fields.includes('type') ? `<option value="type">Type</option>` : ''}
+        ${fields.includes('beginDBP') ? `<option value="beginDBP">Begin</option>` : ''}
+        ${fields.includes('endDBP') ? `<option value="endDBP">End</option>` : ''}
+      </select>
+    </div>
+    <div class="col">
+      <label class="form-label">Direction</label>
+      <select class="form-select sort-direction">
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <button type="button" class="btn btn-outline-danger remove-sort-level">Remove</button>
+    </div>
+  `;
 
-    var container = document.createElement("span");
+    return div;
+}
 
-    //create and style inputs
-    var start = document.createElement("input");
-    start.setAttribute("type", "number");
-    start.setAttribute("placeholder", "Min");
-    start.setAttribute("min", 0);
-    start.setAttribute("max", 1000);
-    start.style.padding = "4px";
-    start.style.width = "50%";
-    start.style.boxSizing = "border-box";
+function getKeysWithValues(dataArray) {
+    const keysWithValues = new Set();
 
-    start.value = cell.getValue();
-
-    function buildValues(){
-        success({
-            start:start.value,
-            end:end.value,
-        });
+    if (!Array.isArray(dataArray) || dataArray.length === 0) {
+        return [];
     }
 
-    function keypress(e){
-        if(e.keyCode == 13){
-            buildValues();
-        }
-
-        if(e.keyCode == 27){
-            cancel();
-        }
-    }
-
-    end = start.cloneNode();
-    end.setAttribute("placeholder", "Max");
-
-    start.addEventListener("change", buildValues);
-    start.addEventListener("blur", buildValues);
-    start.addEventListener("keydown", keypress);
-
-    end.addEventListener("change", buildValues);
-    end.addEventListener("blur", buildValues);
-    end.addEventListener("keydown", keypress);
-
-
-    container.appendChild(start);
-    container.appendChild(end);
-
-    return container;
- }
-
-//custom max min filter function
-function minMaxFilterFunction(headerValue, rowValue, rowData, filterParams){
-    //headerValue - the value of the header filter element
-    //rowValue - the value of the column in this row
-    //rowData - the data for the row being filtered
-    //filterParams - params object passed to the headerFilterFuncParams property
-
-        if(rowValue){
-            if(headerValue.start != ""){
-                if(headerValue.end != ""){
-                    return rowValue >= headerValue.start && rowValue <= headerValue.end;
-                }else{
-                    return rowValue >= headerValue.start;
-                }
-            }else{
-                if(headerValue.end != ""){
-                    return rowValue <= headerValue.end;
+    dataArray.forEach(obj => {
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const value = obj[key];
+                if (value !== null && typeof value !== 'undefined') {
+                    if (typeof value === 'string' && value.trim() === '') {
+                        continue;
+                    }
+                    keysWithValues.add(key);
                 }
             }
         }
+    });
 
-    return true; //must return a boolean, true if it passes the filter.
+    return Array.from(keysWithValues);
+}
+
+function collectAndGroupMatchingData(jsonData, keysToMatch, categoriesToMatch) {
+    const result = {};
+    const seen = []; // Track already grouped values
+
+    if (!Array.isArray(categoriesToMatch)) {
+        console.warn("categoriesToMatch must be an array");
+        return result;
+    }
+
+    const keyGroups = [];
+
+    keysToMatch.forEach(currentKey => {
+        const section = jsonData[currentKey];
+        if (!Array.isArray(section)) return;
+
+        // Filter entries by category
+        const filteredEntries = section.filter(entry =>
+            entry?.category && categoriesToMatch.includes(entry.category)
+        ).map(entry => ({
+            id: entry.id,
+            label: entry.name,
+            category: entry.category,
+            children: cloneWithChildren(entry.children)
+        }));
+
+        // Try to group with already seen entries
+        let foundGroup = false;
+        for (const group of keyGroups) {
+            if (deepEqual(group.data, filteredEntries)) {
+                group.keys.push(currentKey);
+                foundGroup = true;
+                break;
+            }
+        }
+
+        if (!foundGroup) {
+            keyGroups.push({keys: [currentKey], data: filteredEntries});
+        }
+    });
+
+    // Build result object
+    keyGroups.forEach(group => {
+        const combinedKey = group.keys.join(", ");
+        result[combinedKey] = group.data;
+    });
+
+    return result;
+}
+
+function cloneWithChildren(items) {
+    if (!Array.isArray(items)) return [];
+    return items.map(item => ({
+        id: item.id,
+        label: item.label,
+        url: item.url,
+        children: cloneWithChildren(item.children)
+    }));
+}
+
+// Deep equality check (simplified for JSON-serializable objects)
+function deepEqual(a, b) {
+    return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function getSortedDistinctTimeline(data, stringKey, numberKey) {
+    const seen = new Set();
+
+    const filtered = data
+        .filter(item => item[stringKey] && typeof item[numberKey] === "number")
+        .filter(item => {
+            if (seen.has(item[stringKey])) return false;
+            seen.add(item[stringKey]);
+            return true;
+        })
+        .map(item => ({
+            string: item[stringKey],
+            number: item[numberKey]
+        }))
+        .sort((a, b) => a.number - b.number);
+
+    return filtered;
+}
+
+function getDaysBPBfromString(values, dates) {
+    const min = values[0];
+    const max = values[1];
+    let earliest = dates.filter(date => date.string === min)[0];
+    let latest = dates.filter(date => date.string === max);
+    latest = latest[latest.length - 1];
+    return [earliest.number, latest.number];
 }

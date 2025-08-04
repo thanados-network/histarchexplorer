@@ -1,0 +1,19 @@
+{% macro input_field(id, label, name, type="text", required=False, value="", feedback="") %}
+<div class="mb-3">
+  <label for="{{ id }}" class="form-label">{{ label }}</label>
+  <input type="{{ type }}" class="form-control" id="{{ id }}" name="{{ name }}" value="{{ value }}" {% if required %}required{% endif %}>
+  {% if required %}
+    <div class="invalid-feedback">{{ feedback }}</div>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro textarea_field(id, label, name, required=False, feedback="") %}
+<div class="mb-3">
+  <label for="{{ id }}" class="form-label">{{ label }}</label>
+  <textarea class="form-control" id="{{ id }}" name="{{ name }}" {% if required %}required{% endif %}></textarea>
+  {% if required %}
+    <div class="invalid-feedback">{{ feedback }}</div>
+  {% endif %}
+</div>
+{% endmacro %}

@@ -8,7 +8,7 @@ if TYPE_CHECKING:  # pragma: no cover
 class Relation:
     def __init__(self, data: dict[str, Any]):
         self.label = data['label']
-        self.relation_to_id = int(data['relationTo'].rsplit('/', 1)[-1])
+        self.relation_to_id = int(data['relationTo'].rsplit('/', 1)[-1]) # This is the Entity.id
         self.relation_to = data['relationTo']
         self.relation_type = data['relationType']
         self.relation_system_class = data['relationSystemClass']
@@ -34,5 +34,5 @@ class Relation:
             self.begin = format_date(self.begin_from, self.begin_to)
             self.end = format_date(self.end_from, self.end_to)
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # pragma: no cover
         return str(self.__dict__)

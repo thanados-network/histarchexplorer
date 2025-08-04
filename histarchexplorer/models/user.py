@@ -5,6 +5,8 @@ from typing import Any, Optional
 from flask import g
 from flask_login import UserMixin
 
+from histarchexplorer.database.user import get_by_username, get_user_by_id
+
 
 class User(UserMixin):
     def __init__(self, row: Optional[Any] = None) -> None:
@@ -18,28 +20,14 @@ class User(UserMixin):
         self.password = row.password
         self.group = row.group_name
 
-
-class UserMapper:
-    sql = """
-        SELECT 
-            u.id, u.username, u.password, u.active, u.real_name, u.info,
-            u.created, u.modified, u.login_last_success, u.login_last_failure, 
-            u.login_failed_count, u.password_reset_code, 
-            u.password_reset_date, 
-            u.email, r.name as group_name, u.unsubscribe_code
-        FROM web."user" u
-        LEFT JOIN web.group r ON u.group_id = r.id """
+    @staticmethod
+    def get_by_id(user_id: int) -> Optional['User']:
+        if user_data := get_user_by_id(user_id):
+            return User(user_data)
+        return None  # e.g. obsolete session values
 
     @staticmethod
-    def get_by_id(user_id: int) -> Optional[User]:
-        g.cursor.execute(
-            UserMapper.sql + 'WHERE u.id = %(id)s;',
-            {'id': user_id})
-        return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
+    def get_by_username(username: str) -> Optional['User']:
+        user_data = get_by_username(username)
+        return User(user_data) if user_data else None
 
-    @staticmethod
-    def get_by_username(username: str) -> Optional[User]:
-        sql = UserMapper.sql + (
-            'WHERE LOWER(u.username) = LOWER(%(''username)s);')
-        g.cursor.execute(sql, {'username': username})
-        return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None

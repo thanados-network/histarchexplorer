@@ -51,7 +51,7 @@ overview_map.on('load', () => {
 
   // Add one marker per point
   featureCollection.features.forEach((feature) => {
-    console.log(feature.geometry.coordinates);
+    //console.log(feature.geometry.coordinates);
     new maplibregl.Marker()
       .setLngLat(feature.geometry.coordinates)
       .setPopup(
@@ -85,42 +85,26 @@ if (featureCollection.features.length > 1) {
   });
 });
 
-// Expand/Shrink logic
-const expandButton = document.getElementById('expand-button');
+
 const mapContainer = document.querySelector('.map-wrapper');
 const muuriMap = document.getElementById('muuri-map');
 
-expandButton.addEventListener('click', () => {
-  setTimeout(() => {
-    muuriMap.classList.toggle('expanded-map');
-    mapContainer.classList.toggle('expanded-map');
-
-    const locationTile = document.querySelector('.map-wrapper').parentElement;
-    if (locationTile) {
-      locationTile.classList.toggle('item');
+//link map expand to map-tab
+window.activateTab = function(tabName, skipPushState = false) {
+    const tabElement = document.querySelector(`#tab-${tabName}`);
+    if (tabElement) {
+        new bootstrap.Tab(tabElement).show();
+        if (!skipPushState) {
+            const newUrl = `/entity/${entityId}/${tabName}`;
+            if (window.location.pathname !== newUrl) {
+                history.pushState({ tab: tabName }, '', newUrl);
+            }
+        }
     }
+};
 
-    document.querySelectorAll('.item, .item-content').forEach(item => {
-      if (!item.contains(muuriMap)) {
-        item.classList.toggle('hidden');
-      }
-    });
-
-    if (muuriMap.classList.contains('expanded-map')) {
-      expandButton.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
-      overview_map.dragPan.enable();
-      overview_map.scrollZoom.enable();
-      overview_map.doubleClickZoom.enable();
-      overview_map.touchZoomRotate.enable();
-    } else {
-      expandButton.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';
-      overview_map.dragPan.disable();
-      overview_map.scrollZoom.disable();
-      overview_map.doubleClickZoom.disable();
-      overview_map.touchZoomRotate.disable();
-    }
-
-    overview_map.resize();
-    if (window.grid) grid.refreshItems().layout();
-  }, 300);
+const expandButton = document.getElementById('expand-button');
+const tabName = 'map';
+expandButton.addEventListener('click', event => {
+    window.activateTab('map');
 });

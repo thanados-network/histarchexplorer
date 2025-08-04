@@ -11,7 +11,9 @@ from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import InputRequired
 
 from histarchexplorer import app
-from histarchexplorer.models.user import UserMapper
+from flask_babel import lazy_gettext as _
+
+from histarchexplorer.models.user import User
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -19,17 +21,18 @@ login_manager.login_view = 'login'
 
 
 @login_manager.user_loader
-def load_user(user_id: int) -> Optional[UserMapper]:
-    return UserMapper.get_by_id(user_id)
+def load_user(user_id: int) -> Optional[User]:
+    return User.get_by_id(user_id)
 
 
 class LoginForm(FlaskForm):
     username = StringField(
-        'Username', [InputRequired()],
+        _('username'),
+        [InputRequired()],
         render_kw={'autofocus': True})
-    password = PasswordField('Password', [InputRequired()])
-    show_passwords = BooleanField('show password')
-    save = SubmitField('login')
+    password = PasswordField(_('password'), [InputRequired()])
+    show_passwords = BooleanField(_('show password'))
+    save = SubmitField(_('login'))
 
 
 @app.route('/login', methods=["GET", "POST"])
@@ -38,7 +41,7 @@ def login() -> str | Response:
         return redirect('/')
     form = LoginForm()
     if form.validate_on_submit():
-        user = UserMapper.get_by_username(request.form['username'])
+        user = User.get_by_username(request.form['username'])
         if user:
             hash_ = hashpw(
                 request.form['password'].encode('utf-8'),

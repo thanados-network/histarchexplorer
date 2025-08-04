@@ -1,83 +1,131 @@
 {% extends "layout.html" %}
 {% block content %}
-  <div class="container">
-    <div class="py-5">
-      <h2>{{ _('Project') |upper }} <span class="text-body-secondary"> | {{ project.name|upper }}</span></h2>
-      <p class="mt-2"> {{ project.description | replace("\n", "<br>") | safe }}
-      </p>
-    </div>
-    <div class="team-card">
-      <div class="row">
-        <h2>TEAM <span class="text-body-secondary"> | ABOUT US</span></h2>
-
-        <!-- Team Members -->
-        <div class="row">
-          {% for person in persons %}
-            <div class="col-lg-4 text-center">
-              <img class="rounded-circle"
-                   src="{{ person.image if person.image else '/static/images/team/cool_dude2.jpg' }}"
-                   alt="{{ person.name }}'s Foto" width="140" height="140">
-              <div class="team-card__member">
-                <p>{{ person.name }}</p>
+  <div class="page-wrapper">
+    <div class="scrollable-container">
+      <div class="container">
+        <div class="py-5">
+          <div class="team-card">
+            <div class="row">
+              <h2>
+                {{ _('Project') | upper }}
+                <span
+                  class="text-body-secondary"> | {{ project.name.display.label | upper }}</span>
+              </h2>
+              <div class="row">
+                <p class="mt-2">
+                  {{ project.description.display.label | replace("\n", "<br>") | safe }}
+                </p>
               </div>
-              <ul class="list-unstyled">
-                {% for role in person.roles %}
-                  <li>{{ role | capitalize_first }}</li>
-                {% endfor %}
-                <li class="mt-3">
-                  <i title="email" class="bi bi-envelope me-1 text-body-secondary"></i>
-                  <a href="mailto:{{ person.email }}" class="text-body-secondary text-decoration-none">{{ person.email }}</a>
-                </li>
-                {% if person.affiliation %}
-                  <li>
-                    <i title="institution" class="bi bi-briefcase me-1 text-body-secondary"></i>
-                    <a href="{{ person.website }}" target="_blank"
-                       class="text-body-secondary text-decoration-none">{{ person.affiliation }}</a>
-                  </li>
-                {% endif %}
-              </ul>
             </div>
-          {% endfor %}
-        </div>
-
-      </div>
-    </div>
-
-    <div class="sponsor-container text-center py-5">
-      <h2>{{ _('Sponsors')|upper }} <span class="text-body-secondary"> | {{ _('Cooperations')|upper }}</span></h2>
-      <div class="row">
-        {% for institution in institutions %}
-          <div class="col-md-3 text-center">
-            <h6 class="pt-3 fst-italic">{{ institution.role | upper }}</h6>
-            {% if institution.image %}
-              <a href="{{ institution.website if institution.website }}" target="_blank">
-                <img class="mt-2" src="{{ institution.image if institution.image }}" alt="{{ institution.name }}'s Logo">
-              </a>
-            {% else %}
-              <h5 class="py-3">{{ institution.name }}</h5>
-              <a href="{{ institution.website }}" target="_blank">Website</a>
-            {% endif %}
-            <p class="text-body-secondary">{{ institution.address | replace("\n", "<br>") | safe }}</p>
           </div>
-        {% endfor %}
-      </div>
-    </div>
+        </div>
+        <div class="team-card">
+          <div class="row">
+            <h2>
+              {{ _('Team') | upper }}
+              <span class="text-body-secondary">
+            | {{ _('about us') | upper }}
+          </span>
+            </h2>
 
+            <!-- Team Members -->
+            <div class="row">
+              {% for person in persons %}
+                <div class="col-lg-4 text-center">
+                  <img class="rounded-circle"
+                       src="{{ person.image if person.image else '/static/images/team/cool_dude2.jpg' }}"
+                       alt="{{ person.name.display.label }}'s Foto" width="140"
+                       height="140">
+                  <div class="team-card__member">
+                    <p>{{ person.name.display.label }}</p>
+                  </div>
+                  <ul class="list-unstyled">
+                    {% for link in person.links %}
+                      {% if link.property_id == 2 %}
+                        <li>
+                          <i title="institution"
+                             class="bi bi-briefcase me-1 text-body-secondary"></i>
+                          {{ link.end_name.display.label }} {{ _('as') }} {{ link.role.display.label | capitalize }}
+                        </li>
+                      {% endif %}
+                    {% endfor %}
+                    {% for link in person.links %}
+                      {% if link.property_id == 1 %}
+                        <li>
+                          {{ _('project') | capitalize }}: {{ link.end_name.display.label }} {{ _('as') }} {{ link.role.display.label | capitalize }}
+                        </li>
+                      {% endif %}
+                    {% endfor %}
+                    {% if person.email %}
+                      <li class="mt-3">
+                        <i title="email"
+                           class="bi bi-envelope me-1 text-body-secondary"></i>
+                        <a href="mailto:{{ person.email }}"
+                           class="text-body-secondary text-decoration-none">{{ person.email }}</a>
+                      </li>
+                    {% endif %}
+                  </ul>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
 
-    <div class="row legal py-5">
-      <div class="col-md-7 legal-card">
-        <h4>{{ _('Legal Note') |upper }}</h4>
-        <p>{{ project.legal_notice | replace("\n", "<br>") | safe }}</p>
-      </div>
-      <div class="col-md-5 team-card">
-        <div class="en" style="display: block;">
-          <h4>{{ _('Imprint') |upper }}</h4>
-          <p>{{ project.imprint | replace("\n", "<br>") | safe }}</p>
+        <div class="sponsor-container text-center py-5">
+          <h2>
+            {{ _('Sponsors') | upper }}
+            <span
+              class="text-body-secondary"> | {{ _('Cooperations')|upper }}</span>
+          </h2>
+          <div class="row">
+            {% for institution in institutions %}
+              <div class="col-md-3 text-center">
+                <h6 class="pt-3 fst-italic">
+                  {% for link in institution.links %}
+                    {% if link.end_id == project.id %}
+                      <li>{{ link.role.display.label | capitalize }}</li>
+                    {% endif %}
+                  {% endfor %}
+                </h6>
+                {% if institution.image %}
+                  <a href="{{ institution.website if institution.website }}"
+                     target="_blank">
+                    <img class="mt-2"
+                         src="{{ institution.image if institution.image }}"
+                         alt="{{ institution.name.display.label }}'s Logo">
+                  </a>
+                {% else %}
+                  <h5 class="py-3">{{ institution.name.display.label }}</h5>
+                  {% if institution.website %}
+                    <a href="{{ institution.website }}" target="_blank">institution.name.display.label</a>
+                  {% endif %}
+                {% endif %}
+                {% if institution.address %}
+                  <p class="text-body-secondary">
+                    {{ institution.address.display.label | replace("\n", "<br>") | safe }}
+                  </p>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
         </div>
 
 
+        <div class="row legal py-5">
+          <div class="col-md-7 legal-card">
+            <h4>{{ _('Legal Note') |upper }}</h4>
+            <p>{{ project.legal_notice.display.label | replace("\n", "<br>") | safe }}</p>
+          </div>
+
+          <div class="col-md-5 team-card">
+            <div class="en" style="display: block;">
+              <h4>{{ _('Imprint') |upper }}</h4>
+              <p>{{ project.imprint.display.label | replace("\n", "<br>") | safe }}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+    {% include 'footer.html' %}
   </div>
-  {% include 'footer.html' %}
 {% endblock %}

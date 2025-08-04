@@ -1,0 +1,40 @@
+<div class="modal fade" id="citationModal" tabindex="-1"
+     aria-labelledby="citationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="citationModalLabel">Cite this Page</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="citationText" class="border border-secondary rounded-1 p-2 bg-light">
+          <span>"{{ entity.name }}". From: {{ project_name }}: {{ current_url }} [Accessed: {{ today_date }}]</span>
+        </p>
+      </div>
+      <div class="container-fluid">
+        <div class="row">
+        <p class="fw-bold">This is just a example, what we can add additionally and how it can be accessed</p>
+          {% for project in projects %}
+            <div class="col-5 bg-light">
+              <p>{{ project.name.display.label }}</p>
+              {% for link in project.links %}
+                <p>{{ link.config_property.display.label }}: {{ link.end_name.display.label }}</p>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="copyCitationBtn">
+          <i class="bi bi-copy"></i> Copy Citation
+        </button>
+        <button type="button" class="btn btn-secondary"
+                data-bs-dismiss="modal">Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+

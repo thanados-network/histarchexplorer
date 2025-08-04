@@ -1,0 +1,6 @@
+[report]
+precision=2
+skip_covered=True
+sort=cover
+[run]
+omit =

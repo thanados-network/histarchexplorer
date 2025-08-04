@@ -1,13 +1,19 @@
+
 import json
 from collections import defaultdict
+from datetime import datetime
+from typing import Any
 
-from flask import abort, g, render_template
+from flask import abort, g, render_template, request
 
-from histarchexplorer import app
+from histarchexplorer import app, cache
 from histarchexplorer.api.parser import Parser
+from histarchexplorer.database.entity import get_entity_by_id
+from histarchexplorer.models.depiction import Depiction
 from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.types import Types
-from histarchexplorer.utils import cerberos
+from histarchexplorer.utils.view_util import get_cite_button
+from histarchexplorer.views.views import type_tree
 
 sidebar_elements = app.config['SIDEBAR_OPTIONS']
 valid_routes = {item['route'] for item in sidebar_elements}
@@ -208,68 +214,40 @@ def get_first_geom(id):
 
 
 def get_browse_list_entities():
-    # Fetch filter settings
-    g.cursor.execute("""
-        SELECT shown_entities, shown_types, hidden_entities, hidden_types, shown_ids, hidden_ids
-        FROM tng.settings
-        LIMIT 1
-    """)
-    result = g.cursor.fetchone()
-
+    # This data can be removed, if the key aren't needed somewhere else
     data = {
-        'shown classes': result.shown_entities,
-        'hidden classes': result.hidden_entities,
-        'shown types': build_id_collection(result.shown_types),
-        'hidden types': build_id_collection(result.hidden_types),
-        'shown ids': result.shown_ids,
-        'hidden ids': result.hidden_ids,
-    }
-
-
-
-
-    # Prepare filter values; handle None as empty lists to avoid errors in query
-    def parse_json(field):
-        if field is None:
-            return []
-        # Sometimes fields might be stringified JSON
-        if isinstance(field, str):
-            import json
-            return json.loads(field)
-        return field
-
-    shown_entities = parse_json(data['shown classes'])
-    hidden_entities = parse_json(data['hidden classes'])
-    shown_types = parse_json(data['shown types'])
-    hidden_types = parse_json(data['hidden types'])
-    shown_ids = parse_json(data['shown ids'])
-    hidden_ids = parse_json(data['hidden ids'])
+        'shown classes': g.settings.shown_classes,
+        'hidden classes': g.settings.hidden_classes,
+        'shown types': build_id_collection(g.settings.shown_types),
+        'hidden types': build_id_collection(g.settings.hidden_types),
+        'shown ids': g.settings.shown_ids,
+        'hidden ids': g.settings.hidden_ids}
 
     # Build WHERE clauses dynamically
     where_clauses = []
     params = []
 
-    if shown_entities:
+    if shown_classes := data['shown classes']:
         where_clauses.append("e.openatlas_class_name = ANY (%s)")
-        params.append(shown_entities)
+        params.append(shown_classes)
 
-    if hidden_entities:
+    if hidden_classes:= data['hidden classes']:
         where_clauses.append("e.openatlas_class_name != ALL (%s)")
-        params.append(hidden_entities)
+        params.append(hidden_classes)
 
-    if shown_types:
+    if shown_types:= data['shown types']:
         where_clauses.append("e.id IN (SELECT a.id FROM model.entity a JOIN model.link b ON a.id = b.domain_id WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
         params.append(shown_types)
 
-    if hidden_types:
+    if hidden_types:= data['hidden types']:
         where_clauses.append("e.id NOT IN (SELECT a.id FROM model.entity a JOIN model.link b ON a.id = b.domain_id WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
         params.append(hidden_types)
 
-    if shown_ids:
+    if shown_ids:= data['shown ids']:
         where_clauses.append("e.id = ANY (%s)")
         params.append(shown_ids)
 
-    if hidden_ids:
+    if hidden_ids:= data['hidden ids']:
         where_clauses.append("e.id != ALL (%s)")
         params.append(hidden_ids)
 
@@ -390,6 +368,8 @@ def entities(tab_name="") -> str:
     if tab_name == "" and sidebar_elements:
         tab_name = sidebar_elements[0]['route']
 
+    print(type_tree())
+
     return render_template(
         'entity.html',
         view_classes=filtered_view_classes,
@@ -397,7 +377,8 @@ def entities(tab_name="") -> str:
         sidebar_elements=sidebar_elements,
         entity_id=0,
         page_name="landing",
-        active_tab=tab_name
+        active_tab=tab_name,
+        typetree_data=type_tree().json
     )
 
 
@@ -412,7 +393,9 @@ def get_entities(tab_name: str = None) -> str:
 @app.route('/get_entity/<int:id_>/<tab_name>')
 def get_entity(id_: int, tab_name=None) -> str:
     data = {}
-    entity_ = None
+    main_entity = None
+    related_entities = {}
+    catalogue_entities = []
 
     # entities = Entity.get_linked_entities_by_properties_recursive(
     #     id_,
@@ -420,6 +403,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     # )
     # main_entity = get_main_entity(id_, entities)
 
+    @cache.memoize()
     def get_map_data():
         geom_there = check_p46_geoms(id_)
         if geom_there:
@@ -442,39 +426,17 @@ def get_entity(id_: int, tab_name=None) -> str:
             return features
         return {'type': 'FeatureCollection', 'features': []}
 
-    def serialize_image(image):
-        return {
-            "url": image.url,
-            "title": image.title,
-            "iiif_base_path": image.iiif_base_path
-        }
 
     features = []
     main_image = None
     initial_images = []
+    remaining_images = []
     more_images = False
     total_images = 0
+    all_images = []
     # related_entities_json = json.dumps({}, ensure_ascii=False, indent=4)
 
-    # def get_related_entities(
-    #         main_entity: Entity,
-    #         entities: list[Entity]) -> dict[str, dict[str, list[Entity]]]:
-    #     related_entities: dict[str, Any] = defaultdict(lambda: defaultdict(list))
-    #     for subunit in entities:
-    #         if subunit.id == main_entity.id:
-    #             continue
-    #         match subunit.system_class:
-    #             case 'Group' | 'Person':
-    #                 related_entities[subunit.system_class][subunit.name].append(
-    #                     subunit)
-    #             case _:
-    #                 if not subunit.types:
-    #                     continue
-    #                 for type_ in subunit.types:
-    #                     label = type_.type_hierarchy[0]['label']
-    #                     if label in app.config['STANDARD_TYPES']:
-    #                         related_entities[label][type_.label].append(subunit.to_serializable())
-    #     return related_entities
+
 
     if tab_name == 'feature':
         entities = Entity.get_linked_entities_by_properties_recursive(
@@ -506,59 +468,169 @@ def get_entity(id_: int, tab_name=None) -> str:
             print('No spatial features found. Aborting with 404.')
             abort(404)
         data['spatial'] = map_data
+    elif tab_name == 'catalogue':
+
+        c_entities = Entity.get_linked_entities_by_properties_recursive(
+            id_,
+            get_parser_for_landing(id_))
+        catalogue_entities = build_entity_tree(c_entities)
+        for entity in catalogue_entities:
+            entity.all_child_depictions = collect_child_depictions(entity)
+
+
 
     elif tab_name == 'overview':
         # data = get_entity()
-        entity_ = Entity.get_entity(id_, Parser())
+        entities = Entity.get_linked_entities_by_properties_recursive(
+            id_,
+            get_parser_for_landing(id_))
+        main_entity= get_main_entity(id_, entities)
+
+        if isinstance(main_entity.geometry, dict) and main_entity.geometry.get("type") == "GeometryCollection":
+            main_entity.geometry["geometries"] = [
+                geom for geom in main_entity.geometry.get("geometries", [])
+                if geom.get("type") == "Point"
+            ]
+
+        #print(main_entity.geometry)
+        #print('=== DEBUG PERSON ENTITY ===')
+        #print('ID:', main_entity.id)
+        #print('Name:', main_entity.name)
+        #print('Class:', main_entity.system_class)
+        #print('Formated date:', main_entity.formated_date)
+        #print('Types (Chronology):', [(t.label, t.root) for t in main_entity.types if t.root == 'Chronology'])
+
+        related_entities = get_related_entities(main_entity, entities)
 
         data = {
             'entity': json.dumps(
-                entity_.to_serializable(),
+                main_entity.to_serializable(),
                 ensure_ascii=False,
                 indent=4),
             'categorized_types': json.dumps(
-                categorized_types(entity_),
+                categorized_types(main_entity),
                 ensure_ascii=False,
                 indent=4)
         }
-        # entities = Entity.get_linked_entities_by_properties_recursive(
-        #     id_,
-        #     get_parser_for_getentity(id_)
-        # )
+
         images = []
-        #  related_entities = get_related_entities(main_entity, entities)
+
         # related_entities_json = json.dumps(related_entities, ensure_ascii=False, indent=4)
 
-        for image in entity_.depictions:
+        for image in main_entity.depictions:
             if image.main_image:
-                main_image = serialize_image(image)
+                main_image = image
             else:
-                images.append(serialize_image(image))
+                images.append(image)
 
         if not main_image and images:
             main_image = images.pop(0)
 
-        initial_images = images[:3]
-        more_images = len(images) > 3
-        total_images = len(images)
+        initial_images = images[:2]
+        remaining_images = images[2:]
+        more_images = len(remaining_images) > 0
+        total_images = len(images+[main_image])
+
+
+    #Media-tab
+
+    elif tab_name == 'media':
+        entities = Entity.get_linked_entities_by_properties_recursive(
+            id_,
+            get_parser_for_landing(id_)
+        )
+        main_entity = get_main_entity(id_, entities)
+
+        all_images = main_entity.depictions
+
+        data = {
+            'entity': json.dumps(main_entity.to_serializable(), ensure_ascii=False),
+            'categorized_types': json.dumps(categorized_types(main_entity), ensure_ascii=False)
+        }
 
     elif tab_name not in valid_routes:
         if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
             abort(404)
-
     return render_template(
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
-        entity=entity_,
-        categorized_types=categorized_types(entity_) if entity_ else None,
+        entity=main_entity,
+        categorized_types=categorized_types(main_entity) if main_entity else None,
         features=features,
         main_image=main_image,
         initial_images=initial_images,
+        remaining_images=remaining_images,
         more_images=more_images,
         total_images=total_images,
-    )
+        all_images=all_images,
+        related_entities=related_entities or {},
+        cite_button=get_cite_button(main_entity),
+        catalogue_entities=catalogue_entities )
+
     # related_entities=related_entities_json)
+
+def collect_child_depictions(entity: Entity) -> list[Depiction]:
+    all_depictions = []
+
+    def recurse(e: Entity):
+        if not hasattr(e, 'children'):
+            e.children = []
+        for child in e.children:
+            all_depictions.extend(child.depictions or [])
+            recurse(child)
+
+    if hasattr(entity, 'children'):
+        recurse(entity)
+    return all_depictions
+
+def build_entity_tree(entities: list[Entity]) -> list[Entity]:
+    entity_dict = {e.id: e for e in entities}
+
+    for entity in entities:
+        if entity.parent and entity.parent.relation_to_id in entity_dict:
+            parent_entity = entity_dict[entity.parent.relation_to_id]
+            if not hasattr(parent_entity, 'children'):
+                parent_entity.children = []
+            parent_entity.children.append(entity)
+
+    tree = []
+    for entity in entities:
+        if entity.parent and entity.parent.relation_to_id in entity_dict:
+            continue
+        if hasattr(entity, 'children'):
+            tree.extend(entity.children)
+    return tree
+
+def get_parser_for_landing(id_: int) -> Parser:
+    simple_entity = get_entity_by_id(id_)
+    match simple_entity.openatlas_class_name.capitalize():
+        case 'Place' | 'Feature' | 'Stratigraphic unit':
+            properties = ['P46', 'P67']
+        case 'Human remains' | 'Artifact':
+            properties = ['P46', 'P67', 'P52']
+        case 'Source' | 'Source translation':
+            properties = ['P67', 'P73', 'P128']
+        case 'Event' | 'Acquisition' | 'Activity' | 'Creation' | 'Move' | \
+             'Production' | 'Modification':
+            properties = [
+                'P67', 'P11', 'P14', 'P22', 'P23', 'P25', 'P7',
+                'P26', 'P27', 'P24', 'P31', 'P25', 'P108', 'P9',
+                'P134']
+        case 'Bibliography' | 'Edition' | 'External reference':
+            properties = ['P67']
+        case 'Group' | 'Person':
+            properties = [
+                'OA7', 'OA8', 'OA9', 'P107', 'P74', 'P52', 'P11',
+                'P14', 'P22', 'P23', 'P25']
+        case _:
+            properties = []
+    return Parser(
+        properties=properties,
+        limit=0,
+        format='lpx',
+        centroid='true')
+
 
 
 def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
@@ -594,6 +666,27 @@ def get_ancestor_entities(main_entity: Entity, entities: list[Entity]) -> list[d
     return ancestor_entities
 
 
+def get_related_entities(
+        main_entity: Entity,
+        entities: list[Entity]) -> dict[str, dict[str, list[Entity]]]:
+    related_entities: dict[str, Any] = defaultdict(lambda: defaultdict(list))
+    for subunit in entities:
+        if subunit.id == main_entity.id:
+            continue
+        match subunit.system_class:
+            case 'Group' | 'Person':
+                related_entities[subunit.system_class][subunit.name].append(
+                    subunit)
+            case _:
+                if not subunit.types:
+                    continue
+                for type_ in subunit.types:
+                    label = type_.type_hierarchy[0]['label']
+                    if label in app.config['STANDARD_TYPES']:
+                        related_entities[label][type_.label].append(subunit.to_serializable())
+    return related_entities
+
+
 def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
     divisions = defaultdict(list)
     for type_ in main_entity.types:
@@ -606,31 +699,3 @@ def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
 
     return sorted_divisions
 
-
-def get_parser_for_getentity(id_: int) -> Parser:
-    simple_entity = Entity.get_entity(id_, Parser(show=['None']))
-    match simple_entity.system_class:
-        case 'Place' | 'Feature' | 'Stratigraphic unit':
-            properties = ['P46', 'P67']
-        case 'Human remains' | 'Artifact':
-            properties = ['P46', 'P67', 'P52']
-        case 'Source' | 'Source translation':
-            properties = ['P67', 'P73', 'P128']
-        case 'Event' | 'Acquisition' | 'Activity' | 'Creation' | 'Move' | \
-             'Production' | 'Modification':
-            properties = [
-                'P67', 'P11', 'P14', 'P22', 'P23', 'P25', 'P7',
-                'P26', 'P27', 'P24', 'P31', 'P25', 'P108', 'P9',
-                'P134']
-        case 'Bibliography' | 'Edition' | 'External reference':
-            properties = ['P67']
-        case 'Group' | 'Person':
-            properties = [
-                'OA7', 'OA8', 'OA9', 'P107', 'P74', 'P52', 'P11',
-                'P14', 'P22', 'P23', 'P25']
-        case _:
-            properties = []
-    return Parser(
-        properties=properties,
-        limit=0,
-        format='lpx')
