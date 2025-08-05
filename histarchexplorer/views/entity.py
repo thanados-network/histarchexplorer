@@ -430,7 +430,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     initial_images = []
     remaining_images = []
     more_images = False
-    total_images = 0
+    number_of_images = 0
     all_images = []
     # related_entities_json = json.dumps({}, ensure_ascii=False, indent=4)
 
@@ -517,7 +517,7 @@ def get_entity(id_: int, tab_name=None) -> str:
         initial_images = images[:2]
         remaining_images = images[2:]
         more_images = len(remaining_images) > 0
-        total_images = len(images+[main_image])
+        number_of_images = len(images+[main_image])
 
 
     #Media-tab
@@ -540,6 +540,8 @@ def get_entity(id_: int, tab_name=None) -> str:
         if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
             abort(404)
+    print(all_images)
+    print([img.iiif_manifest for img in all_images])
     return render_template(
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
@@ -550,8 +552,9 @@ def get_entity(id_: int, tab_name=None) -> str:
         initial_images=initial_images,
         remaining_images=remaining_images,
         more_images=more_images,
-        total_images=total_images,
+        total_images=number_of_images,
         all_images=all_images,
+        manifests=[img.iiif_manifest for img in all_images],
         related_entities=related_entities or {},
         cite_button=get_cite_button(main_entity))
 

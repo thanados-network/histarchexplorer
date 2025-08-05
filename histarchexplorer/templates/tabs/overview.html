@@ -249,7 +249,7 @@
 
   <!-- First image -->
   {% if main_image and (entity.system_class.lower() not in ['actor', 'person']) %}
-    {{ ui.overview_image(main_image) }}
+    {{ ui.overview_image(main_image, manifests) }}
   {% endif %}
 
   <!-- All initial images, split last one out -->
@@ -258,7 +258,7 @@
     {% set other_images = initial_images[:-1] %}
 
     {% for depiction in other_images %}
-      {{ ui.overview_image(depiction) }}
+      {{ ui.overview_image(depiction, manifests) }}
     {% endfor %}
 
     <div class="item-half" data-type="image">

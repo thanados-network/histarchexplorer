@@ -24,7 +24,7 @@
 {% endmacro %}
 
 
-{% macro overview_image(image) %}
+{% macro overview_image(image, manifests) %}
   <div class="item-half">
     <div class="item-content item-content-full">
       <div class="muuri-images">
@@ -43,7 +43,9 @@
 
             {# IIIF-Bild, wenn kein WebP #}
           {% elif image.iiif_base_path and image.mimetype|lower != 'image/webp' %}
-            <a href="{{ image.iiif_base_path }}/full/max/0/default.jpg"
+{#            <a href="{{ image.iiif_base_path }}/full/max/0/default.jpg"#}
+              <a href="{{ url_for('view_mirador') }}?urls={{ manifests | join(',') | urlencode }}"
+
                target="_blank"
                class="hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
                style="z-index: 10;">
