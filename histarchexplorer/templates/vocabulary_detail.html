@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <div style="padding-top: 100px;"></div>
+
+  <div class="container">
+    <h1>{{ this_type.name }}</h1>
+    {% if this_type.description %}
+      <p><strong>Description:</strong> {{ this_type.description }}</p>
+    {% endif %}
+
+    <p><strong>Category:</strong> {{ this_type.category }}</p>
+
+    {% if parents %}
+      <p><strong>Parent Types:</strong>
+        {% for parent in parents if parent %}
+          <a href="{{ url_for('vocabulary_detail', type_id=parent.id) }}">{{ parent.name }}</a>{% if not loop.last %}, {% endif %}
+        {% endfor %}
+      </p>
+    {% endif %}
+
+    {% if children %}
+      <p><strong>Child Types:</strong>
+        <ul>
+          {% for child in children if child %}
+            <li><a href="{{ url_for('vocabulary_detail', type_id=child.id) }}">{{ child.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </p>
+    {% endif %}
+  </div>
+{% endblock %}

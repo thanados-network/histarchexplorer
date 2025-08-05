@@ -1,7 +1,7 @@
 from typing import Optional
 
 import requests
-from flask import g, jsonify, redirect, render_template, request, \
+from flask import g, jsonify, redirect, render_template, abort, request, \
     session, current_app
 from werkzeug import Response
 
@@ -41,3 +41,31 @@ def type_tree():
 def vocabulary():
     type_filters = current_app.config.get("TYPE_FILTERS", {})
     return render_template("vocabulary.html", type_filters=type_filters)
+
+from flask import render_template, current_app
+import requests
+
+@app.route("/vocabulary/<int:type_id>")
+def vocabulary_detail(type_id):
+    try:
+        # Fetch full type tree
+        res = requests.get("https://thanados.openatlas.eu/api/0.4/type_tree/")
+        res.raise_for_status()
+        type_tree = res.json().get("typeTree", {})
+
+        # Get the type by ID
+        this_type = type_tree.get(str(type_id))
+        if not this_type:
+            return f"Type with ID {type_id} not found.", 404
+
+        # Resolve parents and children (as full objects)
+        parents = [type_tree.get(str(pid)) for pid in this_type.get("root", [])]
+        children = [type_tree.get(str(cid)) for cid in this_type.get("subs", [])]
+
+        return render_template("vocabulary_detail.html",
+                               this_type=this_type,
+                               parents=parents,
+                               children=children)
+    except Exception as e:
+        return f"Error loading type: {e}", 500
+

@@ -9,13 +9,20 @@
           overflow-y: auto;
       }
 
-      .tab-buttons {
+      .tab-buttons-container {
+          display: flex;
+          justify-content: center;
           margin-bottom: 10px;
+          padding-right: 10px;
+      }
+
+      .tab-buttons {
+          display: flex;
+          gap: 6px;
       }
 
       .tab-buttons button {
           padding: 8px 16px;
-          margin-right: 4px;
           border: 1px solid #ccc;
           background: #f0f0f0;
           cursor: pointer;
@@ -41,16 +48,15 @@
           display: block;
       }
 
-      .tab-buttons-container {
-          display: flex;
-          justify-content: center;
-          margin-bottom: 10px;
-          padding-right: 10px;
+      .detail-btn {
+          margin-left: 8px;
+          text-decoration: none;
+          font-size: 0.9em;
+          opacity: 0.7;
       }
 
-      .tab-buttons {
-          display: flex;
-          gap: 6px;
+      .detail-btn:hover {
+          opacity: 1;
       }
   </style>
 
@@ -63,12 +69,15 @@
     </div>
   </div>
 
+  <!-- Tree Containers -->
   <div id="tree-main" class="tree-container active"></div>
   <div id="tree-custom" class="tree-container"></div>
   <div id="tree-value" class="tree-container"></div>
 
+  <!-- Quercus JS + CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/quercus.css') }}">
   <script src="{{ url_for('static', filename='js/quercus.js') }}"></script>
+
   <script>
       const typeFilters = {{ type_filters | tojson }};
   </script>
@@ -135,6 +144,33 @@
           return filtered;
       }
 
+      function injectDetailIcons(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.querySelectorAll('li[data-id]').forEach(li => {
+        const id = li.getAttribute('data-id');
+        if (!id) return;
+
+        // Avoid duplication
+        if (li.querySelector('.detail-btn')) return;
+
+        const nodeText = li.querySelector('.treeview-node-text');
+        if (!nodeText) return;
+
+        const btn = document.createElement('a');
+        btn.href = `/vocabulary/${id}`;
+        btn.textContent = ' 🔍'; // leading space to separate from text
+        btn.className = 'detail-btn';
+        btn.title = 'View details';
+        btn.target = '_blank';
+        btn.style.textDecoration = 'none';
+        btn.style.opacity = '0.8';
+
+        nodeText.appendChild(btn);
+    });
+}
+
 
       function showTab(tab) {
           document.querySelectorAll('.tree-container').forEach(div => div.classList.remove('active'));
@@ -150,15 +186,19 @@
               .then(data => {
                   const typeTree = data.typeTree;
 
-
-                  const mainTypes = buildTree(filterByCategoryAndIds(data.typeTree, 'standard', typeFilters.standard || []));
-
+                  const mainTypes = buildTree(filterByCategoryAndIds(typeTree, 'standard', typeFilters.standard || []));
                   const customTypes = buildTree(filterByCategoryAndIds(typeTree, 'custom', Object.keys(typeTree).map(Number)));
                   const valueTypes = buildTree(filterByCategoryAndIds(typeTree, 'value', Object.keys(typeTree).map(Number)));
 
                   new Treeview({containerId: "tree-main", data: mainTypes});
                   new Treeview({containerId: "tree-custom", data: customTypes});
                   new Treeview({containerId: "tree-value", data: valueTypes});
+
+                  setTimeout(() => {
+                      injectDetailIcons("tree-main");
+                      injectDetailIcons("tree-custom");
+                      injectDetailIcons("tree-value");
+                  }, 300);
               })
               .catch(err => {
                   console.error("Failed to fetch or build tree data:", err);
