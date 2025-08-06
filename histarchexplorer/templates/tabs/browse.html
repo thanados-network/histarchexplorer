@@ -353,10 +353,6 @@
     const filterInput{{ tab_name }} = document.getElementById("filterInput{{ tab_name }}");
     const clearButton{{ tab_name }} = document.getElementById("clearFilter{{ tab_name }}");
 
-    filterInput{{ tab_name }}.addEventListener("input", function () {
-        applyCombinedFilter{{ tab_name }}();
-    });
-
     clearButton{{ tab_name }}.addEventListener("click", function () {
         filterInput{{ tab_name }}.value = "";
         applyCombinedFilter{{ tab_name }}();
@@ -388,68 +384,301 @@
     document.addEventListener("change", function (e) {
         if (e.target.matches(`#classSelect{{ tab_name }} input[type="checkbox"]`)) {
             applyCombinedFilter{{ tab_name }}();
+            // Don't rebuild here - only when modal opens
         }
     });
 
+    // NEW DYNAMIC TREE FILTERING FUNCTIONS
+
+    // Function to get filtered data based on current search
+    function getFilteredTableData{{ tab_name }}() {
+        const textValue = document.getElementById(`filterInput{{tab_name}}`).value.trim();
+        const checkboxes = document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]:checked`);
+        const selectedClasses = Array.from(checkboxes).map(cb => cb.value);
+
+        let filteredData = {{ tab_name }}Data.tableData;
+
+        // Apply text filter
+        if (textValue) {
+            filteredData = filteredData.filter(item =>
+                item.all && item.all.toLowerCase().includes(textValue.toLowerCase())
+            );
+        }
+
+        // Apply class filter
+        if (selectedClasses.length > 0) {
+            filteredData = filteredData.filter(item =>
+                selectedClasses.includes(item.class)
+            );
+        }
+
+        // Apply date range filters if they exist
+        if ({{ tab_name }}Data.fields.includes("begin") && typeof sliderBegin{{ tab_name }} !== 'undefined' && sliderBegin{{ tab_name }}.noUiSlider) {
+            const beginSliderValues = sliderBegin{{ tab_name }}.noUiSlider.get();
+            const [beginMin, beginMax] = getDaysBPBfromString(beginSliderValues, {{ tab_name }}Data.timelineBegin);
+
+            if (!isNaN(beginMin) && !isNaN(beginMax)) {
+                filteredData = filteredData.filter(item =>
+                    item.beginDBP >= beginMin && item.beginDBP <= beginMax
+                );
+            }
+        }
+
+        if ({{ tab_name }}Data.fields.includes("end") && typeof sliderEnd{{ tab_name }} !== 'undefined' && sliderEnd{{ tab_name }}.noUiSlider) {
+            const endSliderValues = sliderEnd{{ tab_name }}.noUiSlider.get();
+            const [endMin, endMax] = getDaysBPBfromString(endSliderValues, {{ tab_name }}Data.timelineEnd);
+
+            if (!isNaN(endMin) && !isNaN(endMax)) {
+                filteredData = filteredData.filter(item =>
+                    item.endDBP >= endMin && item.endDBP <= endMax
+                );
+            }
+        }
+
+        return filteredData;
+    }
+
+    // Function to get type IDs that should be shown in tree (including ancestors)
+    function getValidTypeIdsWithAncestors{{ tab_name }}(filteredData, treeData) {
+        const resultTypeIds = [...new Set(filteredData.map(item => item.type_id))];
+        const validTypeIds = new Set();
+
+        // Helper function to find all ancestors of a node
+        function findAncestors(nodeId, tree) {
+            for (const node of tree) {
+                if (node.id === nodeId) {
+                    return [nodeId];
+                }
+                if (node.children && node.children.length > 0) {
+                    const childResult = findAncestors(nodeId, node.children);
+                    if (childResult.length > 0) {
+                        return [node.id, ...childResult];
+                    }
+                }
+            }
+            return [];
+        }
+
+        // For each result type ID, find its ancestors and add them all
+        for (const tree in treeData) {
+            for (const typeId of resultTypeIds) {
+                const ancestors = findAncestors(typeId, treeData[tree]);
+                ancestors.forEach(ancestorId => validTypeIds.add(ancestorId));
+            }
+        }
+
+        return validTypeIds;
+    }
+
+    // Function to filter tree data to only show valid nodes
+    function filterTreeData{{ tab_name }}(treeData, validTypeIds) {
+        function filterNodes(nodes) {
+            const result = [];
+
+            for (const node of nodes) {
+                const nodeCopy = {...node}; // Create a copy
+
+                if (validTypeIds.has(node.id)) {
+                    // This node should be included
+                    if (node.children && node.children.length > 0) {
+                        nodeCopy.children = filterNodes(node.children);
+                    }
+                    result.push(nodeCopy);
+                } else {
+                    // This node shouldn't be included, but check if any children should be
+                    if (node.children && node.children.length > 0) {
+                        const filteredChildren = filterNodes(node.children);
+                        if (filteredChildren.length > 0) {
+                            // Include this node because it has valid children
+                            nodeCopy.children = filteredChildren;
+                            result.push(nodeCopy);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        const filteredTreeData = {};
+        for (const tree in treeData) {
+            filteredTreeData[tree] = filterNodes(treeData[tree]);
+        }
+
+        return filteredTreeData;
+    }
+
+    // Function to rebuild tree with filtered data
+    function rebuildTreeWithFilteredData{{ tab_name }}() {
+        console.log('=== REBUILDING TREE ===');
+
+        const filteredData = getFilteredTableData{{ tab_name }}();
+        console.log('Filtered data count:', filteredData.length);
+        console.log('Type IDs in filtered data:', [...new Set(filteredData.map(item => item.type_id))]);
+
+        const validTypeIds = getValidTypeIdsWithAncestors{{ tab_name }}(filteredData, {{ tab_name }}Data.treeData);
+        console.log('Valid type IDs (including ancestors):', Array.from(validTypeIds));
+
+        // Create fresh filtered tree data from original data
+        const filteredTreeData = filterTreeData{{ tab_name }}({{ tab_name }}Data.treeData, validTypeIds);
+        console.log('Filtered tree data:', filteredTreeData);
+
+        // Clear existing trees
+        const container = document.getElementById("{{ tab_name }}-tree-container");
+        if (!container) return; // Safety check
+
+        container.innerHTML = '';
+
+        // Store current selections before rebuilding
+        const currentSelections = {};
+        if (window.{{ tab_name }}TreeInstances) {
+            for (const tree in window.{{ tab_name }}TreeInstances) {
+                if (window.{{ tab_name }}TreeInstances[tree]) {
+                    currentSelections[tree] = {
+                        selectedNodeIds: window.{{ tab_name }}TreeInstances[tree].selectedNodeIds || [],
+                        selectedNodeIdsWithChildren: window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren || []
+                    };
+                }
+            }
+        }
+        console.log('Current selections before rebuild:', currentSelections);
+
+        // Completely clear and reinitialize tree instances
+        window.{{ tab_name }}TreeInstances = {};
+
+        // Rebuild trees with fresh data from original treeData
+        const allOriginalTrees = Object.keys({{ tab_name }}Data.treeData);
+        console.log('All original trees:', allOriginalTrees);
+
+        for (const tree of allOriginalTrees) {
+            // Check if this tree has any valid nodes after filtering
+            const hasValidNodes = filteredTreeData[tree] && filteredTreeData[tree].length > 0;
+            console.log(`Tree "${tree}" has valid nodes:`, hasValidNodes);
+
+            if (hasValidNodes) {
+                console.log(`Creating tree for "${tree}" with nodes:`, filteredTreeData[tree]);
+
+                const div = document.createElement('div');
+                div.id = `{{ tab_name }}Tree${tree}`;
+                div.classList.add('tree-container');
+                div.innerHTML = `
+                    <div class="tree-header">
+                        <h3 class="tree-header-title">${tree.charAt(0).toUpperCase()}${tree.slice(1)}</h3>
+                    </div>
+                `;
+
+                div.classList.add('typeTreeSelector');
+                container.appendChild(div);
+
+                // Create new Treeview instance with fresh data
+                const treeview = new Treeview({
+                    containerId: `{{ tab_name }}Tree${tree}`,
+                    data: filteredTreeData[tree], // This is fresh filtered data from original
+                    searchEnabled: true,
+                    nodeNameKey: 'label',
+                    initiallyExpanded: false,
+                    checkboxSelectionEnabled: true,
+                    multiSelectEnabled: true,
+                    showExpandCollapseAllButtons: true,
+                    showSelectAllButton: true,
+                    showInvertSelectionButton: true,
+                    onSelectionChange: (selectedNodesData) => {
+                        window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = selectedNodesData.map(node => node.id);
+                        window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = treeview.getSelectedNodesAndChildrenValues('id');
+                    }
+                });
+
+                window.{{ tab_name }}TreeInstances[tree] = treeview;
+                window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = [];
+                window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = [];
+
+                // Only restore selections that still exist in the current filtered data
+                if (currentSelections[tree]?.selectedNodeIds.length > 0) {
+                    const validSelections = currentSelections[tree].selectedNodeIds.filter(id => validTypeIds.has(id));
+                    console.log(`Restoring selections for "${tree}":`, validSelections);
+                    if (validSelections.length > 0) {
+                        try {
+                            treeview.selectNodes(validSelections);
+                            window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = validSelections;
+                        } catch (e) {
+                            console.log('Could not restore selections:', e);
+                        }
+                    }
+                }
+            } else {
+                console.log(`Skipping tree "${tree}" - no valid nodes`);
+            }
+        }
+
+        console.log('=== TREE REBUILD COMPLETE ===');
+    }
+
+    // UPDATED applyCombinedFilter function
     function applyCombinedFilter{{ tab_name }}() {
-        const textValue{{tab_name}} = document.getElementById(`filterInput{{tab_name}}`).value.trim();
+        const textValue = document.getElementById(`filterInput{{tab_name}}`).value.trim();
+        const checkboxes = document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]:checked`);
+        const selectedClasses = Array.from(checkboxes).map(cb => cb.value);
 
-        const checkboxes{{tab_name}} = document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]:checked`);
-        const selectedClasses{{tab_name}} = Array.from(checkboxes{{tab_name}}).map(cb => cb.value);
-        const allowedIds = [1, 2, 3, 123, 73]; // Your array of IDs
+        const filters = [];
 
-        const filters{{tab_name}} = [];
-
-
+        // Only apply type filter if we have valid selections
         if (selectedNodes{{ tab_name }}.length > 0) {
-            filters{{tab_name}}.push({
+            filters.push({
                 field: "type_id",
                 type: "in",
                 value: selectedNodes{{ tab_name }}
             });
         }
 
-        if (textValue{{tab_name}}) {
-            filters{{tab_name}}.push({field: "all", type: "like", value: textValue{{tab_name}}});
+        if (textValue) {
+            filters.push({field: "all", type: "like", value: textValue});
         }
 
-        if (selectedClasses{{tab_name}}.length > 0) {
-            filters{{tab_name}}.push({
+        if (selectedClasses.length > 0) {
+            filters.push({
                 field: "class",
                 type: "in",
-                value: selectedClasses{{tab_name}}
+                value: selectedClasses
             });
         }
 
-
-        if ({{ tab_name }}Data.fields.includes("begin")) {
+        if ({{ tab_name }}Data.fields.includes("begin") && typeof sliderBegin{{ tab_name }} !== 'undefined' && sliderBegin{{ tab_name }}.noUiSlider) {
             const beginSliderValues = sliderBegin{{ tab_name }}.noUiSlider.get();
-            console.log('beginSliderValues');
-            console.log(beginSliderValues);
             const [beginMin, beginMax] = getDaysBPBfromString(beginSliderValues, {{ tab_name }}Data.timelineBegin);
 
             if (!isNaN(beginMin) && !isNaN(beginMax)) {
-                filters{{tab_name}}.push({field: "beginDBP", type: ">=", value: beginMin});
-                filters{{tab_name}}.push({field: "beginDBP", type: "<=", value: beginMax});
+                filters.push({field: "beginDBP", type: ">=", value: beginMin});
+                filters.push({field: "beginDBP", type: "<=", value: beginMax});
             }
         }
 
-        if ({{ tab_name }}Data.fields.includes("end")) {
+        if ({{ tab_name }}Data.fields.includes("end") && typeof sliderEnd{{ tab_name }} !== 'undefined' && sliderEnd{{ tab_name }}.noUiSlider) {
             const endSliderValues = sliderEnd{{ tab_name }}.noUiSlider.get();
             const [endMin, endMax] = getDaysBPBfromString(endSliderValues, {{ tab_name }}Data.timelineEnd);
 
             if (!isNaN(endMin) && !isNaN(endMax)) {
-                filters{{tab_name}}.push({field: "endDBP", type: ">=", value: endMin});
-                filters{{tab_name}}.push({field: "endDBP", type: "<=", value: endMax});
+                filters.push({field: "endDBP", type: ">=", value: endMin});
+                filters.push({field: "endDBP", type: "<=", value: endMax});
             }
         }
 
-        if (filters{{tab_name}}.length > 0) {
-            table{{tab_name}}.setFilter(filters{{tab_name}});
+        if (filters.length > 0) {
+            table{{tab_name}}.setFilter(filters);
         } else {
             table{{tab_name}}.clearFilter();
         }
     }
+
+    // Filter input event listener with tree rebuild
+    filterInput{{ tab_name }}.addEventListener("input", function () {
+        applyCombinedFilter{{ tab_name }}();
+        // Don't rebuild here - only when modal opens
+    });
+
+    // Event listener for when tree modal is shown
+    document.getElementById('modal-{{ tab_name }}-tree').addEventListener('shown.bs.modal', () => {
+        rebuildTreeWithFilteredData{{ tab_name }}();
+    });
 
     if ({{ tab_name }}Data.fields.includes("begin")) {
 
@@ -474,10 +703,9 @@
         });
 
         sliderBegin{{ tab_name }}.noUiSlider.on("change", function (values) {
-            applyCombinedFilter{{ tab_name }}()
+            applyCombinedFilter{{ tab_name }}();
+            // Don't rebuild here - only when modal opens
         });
-
-
     }
 
     if ({{ tab_name }}Data.fields.includes("end")) {
@@ -503,11 +731,10 @@
         });
 
         sliderEnd{{ tab_name }}.noUiSlider.on("change", function (values) {
-                applyCombinedFilter{{ tab_name }}()
+                applyCombinedFilter{{ tab_name }}();
+                // Don't rebuild here - only when modal opens
             }
         );
-
-
     }
 
     const {{ tab_name }}TreesToBuild = Object.keys({{ tab_name }}Data.treeData);
@@ -564,12 +791,16 @@
     function filtertypes{{ tab_name }}() {
         selectedNodes{{ tab_name }} = [];
         if (document.getElementById("include-subcategories-{{ tab_name }}").checked) {
-            for (const tree of {{ tab_name }}TreesToBuild) {
-                selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren);
+            for (const tree of Object.keys({{ tab_name }}Data.treeData)) {
+                if (window.{{ tab_name }}TreeInstances[tree]) {
+                    selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren);
+                }
             }
         } else {
-            for (const tree of {{ tab_name }}TreesToBuild) {
-                selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIds);
+            for (const tree of Object.keys({{ tab_name }}Data.treeData)) {
+                if (window.{{ tab_name }}TreeInstances[tree]) {
+                    selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIds);
+                }
             }
         }
         console.log(selectedNodes{{ tab_name }})
@@ -578,4 +809,3 @@
 
 
 </script>
-
