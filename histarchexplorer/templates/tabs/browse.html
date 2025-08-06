@@ -384,11 +384,10 @@
     document.addEventListener("change", function (e) {
         if (e.target.matches(`#classSelect{{ tab_name }} input[type="checkbox"]`)) {
             applyCombinedFilter{{ tab_name }}();
-            // Don't rebuild here - only when modal opens
         }
     });
 
-    // NEW DYNAMIC TREE FILTERING FUNCTIONS
+    // DYNAMIC TREE FILTERING FUNCTIONS
 
     // Function to get filtered data based on current search
     function getFilteredTableData{{ tab_name }}() {
@@ -470,58 +469,70 @@
         return validTypeIds;
     }
 
-    // Function to filter tree data to only show valid nodes
-    function filterTreeData{{ tab_name }}(treeData, validTypeIds) {
-        function filterNodes(nodes) {
-            const result = [];
-
-            for (const node of nodes) {
+    // Function to mark tree nodes as available/unavailable using selectable property
+    function markTreeDataAvailability{{ tab_name }}(treeData, validTypeIds) {
+        function markNodes(nodes) {
+            return nodes.map(node => {
                 const nodeCopy = {...node}; // Create a copy
 
-                if (validTypeIds.has(node.id)) {
-                    // This node should be included
-                    if (node.children && node.children.length > 0) {
-                        nodeCopy.children = filterNodes(node.children);
-                    }
-                    result.push(nodeCopy);
-                } else {
-                    // This node shouldn't be included, but check if any children should be
-                    if (node.children && node.children.length > 0) {
-                        const filteredChildren = filterNodes(node.children);
-                        if (filteredChildren.length > 0) {
-                            // Include this node because it has valid children
-                            nodeCopy.children = filteredChildren;
-                            result.push(nodeCopy);
-                        }
-                    }
+                // Set selectable based on availability - library will handle the rest!
+                nodeCopy.selectable = validTypeIds.has(node.id);
+
+                // Process children recursively
+                if (node.children && node.children.length > 0) {
+                    nodeCopy.children = markNodes(node.children);
                 }
-            }
 
-            return result;
+                return nodeCopy;
+            });
         }
 
-        const filteredTreeData = {};
+        const markedTreeData = {};
         for (const tree in treeData) {
-            filteredTreeData[tree] = filterNodes(treeData[tree]);
+            markedTreeData[tree] = markNodes(treeData[tree]);
         }
 
-        return filteredTreeData;
+        return markedTreeData;
+    }
+
+    // Enhanced CSS to make unavailable nodes more visually distinct
+    function addEnhancedUnavailableStyles{{ tab_name }}() {
+        if (!document.getElementById('enhanced-unavailable-styles-{{ tab_name }}')) {
+            const styleElement = document.createElement('style');
+            styleElement.id = 'enhanced-unavailable-styles-{{ tab_name }}';
+            styleElement.textContent = `
+                /* Enhance the existing .not-selectable class */
+                .custom-treeview-wrapper .treeview-node-content.not-selectable {
+                    opacity: 0.4 !important; /* More faded than default 0.6 */
+                    color: #999 !important;
+                    font-style: italic !important;
+                }
+
+                /* Also grey out the checkbox if present */
+                .custom-treeview-wrapper .treeview-node-content.not-selectable .treeview-checkbox {
+                    opacity: 0.3 !important;
+                }
+
+                /* Add a subtle strikethrough effect */
+                .custom-treeview-wrapper .treeview-node-content.not-selectable .treeview-node-text {
+                    text-decoration: line-through;
+                    text-decoration-color: #ccc;
+                }
+            `;
+            document.head.appendChild(styleElement);
+        }
     }
 
     // Function to rebuild tree with filtered data
     function rebuildTreeWithFilteredData{{ tab_name }}() {
-        console.log('=== REBUILDING TREE ===');
-
         const filteredData = getFilteredTableData{{ tab_name }}();
-        console.log('Filtered data count:', filteredData.length);
-        console.log('Type IDs in filtered data:', [...new Set(filteredData.map(item => item.type_id))]);
-
         const validTypeIds = getValidTypeIdsWithAncestors{{ tab_name }}(filteredData, {{ tab_name }}Data.treeData);
-        console.log('Valid type IDs (including ancestors):', Array.from(validTypeIds));
 
-        // Create fresh filtered tree data from original data
-        const filteredTreeData = filterTreeData{{ tab_name }}({{ tab_name }}Data.treeData, validTypeIds);
-        console.log('Filtered tree data:', filteredTreeData);
+        // Mark unavailable nodes as non-selectable - library handles the styling!
+        const markedTreeData = markTreeDataAvailability{{ tab_name }}({{ tab_name }}Data.treeData, validTypeIds);
+
+        // Add our enhanced styling
+        addEnhancedUnavailableStyles{{ tab_name }}();
 
         // Clear existing trees
         const container = document.getElementById("{{ tab_name }}-tree-container");
@@ -541,79 +552,65 @@
                 }
             }
         }
-        console.log('Current selections before rebuild:', currentSelections);
 
         // Completely clear and reinitialize tree instances
         window.{{ tab_name }}TreeInstances = {};
 
-        // Rebuild trees with fresh data from original treeData
+        // Rebuild trees - now ALL trees are shown, with unavailable nodes greyed out
         const allOriginalTrees = Object.keys({{ tab_name }}Data.treeData);
-        console.log('All original trees:', allOriginalTrees);
 
         for (const tree of allOriginalTrees) {
-            // Check if this tree has any valid nodes after filtering
-            const hasValidNodes = filteredTreeData[tree] && filteredTreeData[tree].length > 0;
-            console.log(`Tree "${tree}" has valid nodes:`, hasValidNodes);
+            const div = document.createElement('div');
+            div.id = `{{ tab_name }}Tree${tree}`;
+            div.classList.add('tree-container');
+            div.innerHTML = `
+                <div class="tree-header">
+                    <h3 class="tree-header-title">${tree.charAt(0).toUpperCase()}${tree.slice(1)}</h3>
+                </div>
+            `;
 
-            if (hasValidNodes) {
-                console.log(`Creating tree for "${tree}" with nodes:`, filteredTreeData[tree]);
+            div.classList.add('typeTreeSelector');
+            container.appendChild(div);
 
-                const div = document.createElement('div');
-                div.id = `{{ tab_name }}Tree${tree}`;
-                div.classList.add('tree-container');
-                div.innerHTML = `
-                    <div class="tree-header">
-                        <h3 class="tree-header-title">${tree.charAt(0).toUpperCase()}${tree.slice(1)}</h3>
-                    </div>
-                `;
+            // Create Treeview with marked data (unavailable nodes have selectable: false)
+            const treeview = new Treeview({
+                containerId: `{{ tab_name }}Tree${tree}`,
+                data: markedTreeData[tree], // Library will automatically apply .not-selectable class
+                searchEnabled: true,
+                nodeNameKey: 'label',
+                initiallyExpanded: false,
+                checkboxSelectionEnabled: true,
+                multiSelectEnabled: true,
+                showExpandCollapseAllButtons: true,
+                showSelectAllButton: true,
+                showInvertSelectionButton: true,
+                onSelectionChange: (selectedNodesData) => {
+                    // Only available nodes will be selectable, so no filtering needed here
+                    window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = selectedNodesData.map(node => node.id);
+                    window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = treeview.getSelectedNodesAndChildrenValues('id');
+                }
+            });
 
-                div.classList.add('typeTreeSelector');
-                container.appendChild(div);
+            window.{{ tab_name }}TreeInstances[tree] = treeview;
+            window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = [];
+            window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = [];
 
-                // Create new Treeview instance with fresh data
-                const treeview = new Treeview({
-                    containerId: `{{ tab_name }}Tree${tree}`,
-                    data: filteredTreeData[tree], // This is fresh filtered data from original
-                    searchEnabled: true,
-                    nodeNameKey: 'label',
-                    initiallyExpanded: false,
-                    checkboxSelectionEnabled: true,
-                    multiSelectEnabled: true,
-                    showExpandCollapseAllButtons: true,
-                    showSelectAllButton: true,
-                    showInvertSelectionButton: true,
-                    onSelectionChange: (selectedNodesData) => {
-                        window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = selectedNodesData.map(node => node.id);
-                        window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = treeview.getSelectedNodesAndChildrenValues('id');
-                    }
-                });
-
-                window.{{ tab_name }}TreeInstances[tree] = treeview;
-                window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = [];
-                window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = [];
-
-                // Only restore selections that still exist in the current filtered data
-                if (currentSelections[tree]?.selectedNodeIds.length > 0) {
-                    const validSelections = currentSelections[tree].selectedNodeIds.filter(id => validTypeIds.has(id));
-                    console.log(`Restoring selections for "${tree}":`, validSelections);
-                    if (validSelections.length > 0) {
-                        try {
-                            treeview.selectNodes(validSelections);
-                            window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = validSelections;
-                        } catch (e) {
-                            console.log('Could not restore selections:', e);
-                        }
+            // Restore selections that are still available
+            if (currentSelections[tree]?.selectedNodeIds.length > 0) {
+                const validSelections = currentSelections[tree].selectedNodeIds.filter(id => validTypeIds.has(id));
+                if (validSelections.length > 0) {
+                    try {
+                        validSelections.forEach(id => treeview.selectNodeById(id, true));
+                        window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = validSelections;
+                    } catch (e) {
+                        console.log('Could not restore selections:', e);
                     }
                 }
-            } else {
-                console.log(`Skipping tree "${tree}" - no valid nodes`);
             }
         }
-
-        console.log('=== TREE REBUILD COMPLETE ===');
     }
 
-    // UPDATED applyCombinedFilter function
+    // applyCombinedFilter function
     function applyCombinedFilter{{ tab_name }}() {
         const textValue = document.getElementById(`filterInput{{tab_name}}`).value.trim();
         const checkboxes = document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]:checked`);
@@ -621,7 +618,6 @@
 
         const filters = [];
 
-        // Only apply type filter if we have valid selections
         if (selectedNodes{{ tab_name }}.length > 0) {
             filters.push({
                 field: "type_id",
@@ -669,10 +665,9 @@
         }
     }
 
-    // Filter input event listener with tree rebuild
+    // Filter input event listener
     filterInput{{ tab_name }}.addEventListener("input", function () {
         applyCombinedFilter{{ tab_name }}();
-        // Don't rebuild here - only when modal opens
     });
 
     // Event listener for when tree modal is shown
@@ -704,7 +699,6 @@
 
         sliderBegin{{ tab_name }}.noUiSlider.on("change", function (values) {
             applyCombinedFilter{{ tab_name }}();
-            // Don't rebuild here - only when modal opens
         });
     }
 
@@ -732,7 +726,6 @@
 
         sliderEnd{{ tab_name }}.noUiSlider.on("change", function (values) {
                 applyCombinedFilter{{ tab_name }}();
-                // Don't rebuild here - only when modal opens
             }
         );
     }
@@ -791,16 +784,12 @@
     function filtertypes{{ tab_name }}() {
         selectedNodes{{ tab_name }} = [];
         if (document.getElementById("include-subcategories-{{ tab_name }}").checked) {
-            for (const tree of Object.keys({{ tab_name }}Data.treeData)) {
-                if (window.{{ tab_name }}TreeInstances[tree]) {
-                    selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren);
-                }
+            for (const tree of {{ tab_name }}TreesToBuild) {
+                selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren);
             }
         } else {
-            for (const tree of Object.keys({{ tab_name }}Data.treeData)) {
-                if (window.{{ tab_name }}TreeInstances[tree]) {
-                    selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIds);
-                }
+            for (const tree of {{ tab_name }}TreesToBuild) {
+                selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIds);
             }
         }
         console.log(selectedNodes{{ tab_name }})
