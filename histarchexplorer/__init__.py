@@ -25,7 +25,7 @@ cache = Cache(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer.views import (
-    admin, login, views, about, entity, landing, search)
+    admin, login, views, about, entity, landing, search, media)
 from histarchexplorer.utils import view_util
 
 
@@ -129,7 +129,6 @@ def inject_conf_var() -> dict[str, Any]:
             'language',
             request.accept_languages.best_match(
                 app.config['LANGUAGES'].keys()))}
-
 
 @app.after_request
 def apply_caching(response: Response) -> Response:

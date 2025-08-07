@@ -1,25 +1,26 @@
-let grid = new Muuri('.grid-muuri', {
+window.overviewGrid = new Muuri('.grid-muuri', {
     layout: {
         fillGaps: true,
+    },
+    sortData: {
+        type: (item) => item.getElement().getAttribute('data-type')
     }
 });
 
-// var grid = new Muuri('.grid', {dragEnabled: true});
+window.overviewGrid.sort((a, b) => {
+    const order = ['description', 'map', 'image', 'reference'];
+    const aType = a.getElement().getAttribute('data-type');
+    const bType = b.getElement().getAttribute('data-type');
+    return order.indexOf(aType) - order.indexOf(bType);
+});
 
-
-window.onload = function () {
-    setTimeout(() => {
-        grid.refreshItems().layout();
-    }, 500);
-};
-
-let resizeTimeout;
+window.overviewGrid.layout();
 
 window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(() => {
-    grid.refreshItems().layout();
-  }, 300);
+    clearTimeout(window.overviewGrid.resizeTimeout);
+    window.overviewGrid.resizeTimeout = setTimeout(() => {
+        window.overviewGrid.refreshItems().layout();
+    }, 300);
 });
 
 
@@ -58,3 +59,43 @@ const observer = new MutationObserver(() => {
 });
 
 observer.observe(document.body, { childList: true, subtree: true });
+
+// remove 3D Model spinner, when loaded
+document.querySelectorAll('model-viewer').forEach(model => {
+    model.addEventListener('poster-dismissed', () => {
+        const wrapper = model.closest('.model-wrapper');
+        if (wrapper) {
+            const spinner = wrapper.querySelector('.spinner');
+            if (spinner) spinner.style.display = 'none';
+        }
+        window.overviewGrid.refreshItems().layout();
+    });
+});
+
+// DOM loaded, initialize optional models
+document.addEventListener('DOMContentLoaded', () => {
+    if (customElements.get('model-viewer')) {
+        initModelViewers();
+        observeModelSizeChanges();
+    } else {
+        customElements.whenDefined('model-viewer').then(() => {
+            initModelViewers();
+            observeModelSizeChanges();
+        });
+    }
+
+    setTimeout(() => {
+        window.overviewGrid.refreshItems().layout();
+    }, 500);
+});
+
+
+function observeModelSizeChanges() {
+    const ro = new ResizeObserver(() => {
+        window.overviewGrid.refreshItems().layout();
+    });
+
+    document.querySelectorAll('model-viewer').forEach(model => {
+        ro.observe(model);
+    });
+}

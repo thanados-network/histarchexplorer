@@ -173,12 +173,30 @@
   padding: 0;
 }
 
+//Images
+
 .image img {
   max-width: 100%;
   height: auto;
   display: block;
   margin: 0 auto;
   position: relative;
+}
+
+
+.image {
+  position: relative;
+
+  .hover-max {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  &:hover {
+    .hover-max {
+      opacity: 1;
+    }
+  }
 }
 
 
