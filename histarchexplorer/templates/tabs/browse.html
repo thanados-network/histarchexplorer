@@ -7,8 +7,27 @@
         <button class="btn btn-outline-secondary" type="button" id="clearFilter{{ tab_name }}">&times;</button>
     </div>
 
-    <div style="min-width: 400px" id="sliderBegin{{ tab_name }}"></div>
-    <div style="min-width: 400px" id="sliderEnd{{ tab_name }}"></div>
+    <!-- Begin slider + checkbox -->
+    <div style="min-width: 400px;">
+        <div id="sliderBegin{{ tab_name }}"></div>
+        <div class="form-check mt-1">
+            <input class="form-check-input" type="checkbox" id="includeNoBegin{{ tab_name }}" checked>
+            <label class="form-check-label" for="includeNoBegin{{ tab_name }}">
+                include entries without begin date
+            </label>
+        </div>
+    </div>
+
+    <!-- End slider + checkbox -->
+    <div style="min-width: 400px;">
+        <div id="sliderEnd{{ tab_name }}"></div>
+        <div class="form-check mt-1">
+            <input class="form-check-input" type="checkbox" id="includeNoEnd{{ tab_name }}" checked>
+            <label class="form-check-label" for="includeNoEnd{{ tab_name }}">
+                include entries without end date
+            </label>
+        </div>
+    </div>
 
     <div class="dropdown d-none" id="classDropdown{{ tab_name }}">
         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
@@ -29,6 +48,7 @@
     </button>
 
 </div>
+
 
 <div id="table-{{ tab_name }}" class="tabulator-container"></div>
 
