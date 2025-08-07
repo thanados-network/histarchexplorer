@@ -84,7 +84,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 def delete_link(link_id: int, tab: str, entry: str) -> Response:
     check_manager_user()
     Admin.delete_link(link_id)
-    flash(_('Link deleted successfully!'), 'success')
+    flash(_('Link deleted successfully'), 'success')
     return redirect(url_for('admin', tab=tab, entry=entry))
 
 
@@ -271,6 +271,7 @@ def select_entities() -> Response:
 @login_required
 def deselect_entities() -> Response:
     check_manager_user()
+    print(request.form.getlist('selected_entities'))
     if request.method == 'POST':
         Admin.set_hidden_classes(request.form.getlist('selected_entities'))
         flash(_('set hidden entities'), 'info')
@@ -305,6 +306,11 @@ def check_case_study_id_ajax(entity_id: int) -> Response:
 # Todo: remove for production
 @app.route('/reset')
 def reset() -> Response:
+    make_reset()
+    flash(_('reset database'), 'info')
+    return redirect(url_for('admin'))
+
+def make_reset():
     env = os.environ.copy()
     env['PGPASSWORD'] = current_app.config['DATABASE_PASS']
     subprocess.run([
@@ -316,9 +322,6 @@ def reset() -> Response:
         '-f', os.path.join(current_app.root_path, 'sql', 'reset.sql')],
         env=env,
         check=True)
-
-    return redirect(url_for('admin'))
-
 
 @app.route('/clear-cache')
 def clear_cache():

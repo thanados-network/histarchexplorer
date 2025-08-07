@@ -1,12 +1,12 @@
+{% import '_macros.html' as ui %}
 <link href="../../static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"/>
 <script src="../../static/node_modules/maplibre-gl/dist/maplibre-gl.js"></script>
 
-<link rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script
-    src="https://cdn.jsdelivr.net/gh/haltu/muuri@0.9.5/dist/muuri.min.js">
-</script>
+<script type="module" src="/static/node_modules/muuri/dist/muuri.min.js"></script>
+
+<script src="../../static/js/overview.js"></script>
+
+<script src="/static/node_modules/@google/model-viewer/dist/model-viewer-umd.js"></script>
 
 
 <script> const entity = JSON.parse(JSON.parse({{ data|tojson }}).entity)</script>
@@ -28,24 +28,11 @@
 <script> const entityName = entity.name</script>
 <script src="{{ url_for('static', filename='js/map_overview.js') }}"></script>
 <script>
-    //console.log("Data:", {{ data | tojson | safe }});
-    //console.log("entity:", entity);
-    //console.log("gisData:", gisData);
-
-</script>
-
-<script>
-    const main_image = {{ main_image | tojson | safe }};
-    const images = {{ initial_images | tojson | safe }};
-    const more_images = {{ more_images | tojson | safe }};
-</script>
-
-<script>
     const related_entities = JSON.parse(JSON.parse({{ data|tojson }}).related_entities || 'null');
 </script>
 
+
 <link rel="stylesheet" href="/static/css/main.css">
-<!-- <div id="overview-content"></div> -->
 
 <div class="col flex-column grid-muuri">
 
@@ -141,6 +128,7 @@
         </button>
       </div>
     {% endif %}
+    <!--
     <div class="entity-country">
       {% if entity.types %}
         {% for type in entity.types %}
@@ -151,6 +139,8 @@
       {% endif %}
     </div>
     </button>
+    -->
+
 
     <div class="attribute-area">
       <!-- Attributes -->
@@ -180,7 +170,7 @@
   <!-- Description -->
   {% if entity.description %}
     <div class="{{ entity.description_class }}">
-      <div class="item-content">
+      <div class="item-content" data-type="description">
         <div class="muuri-description">
           <span class="tile-label">DESCRIPTION</span>
           <p>{{ entity.description }}</p>
@@ -221,7 +211,7 @@
 
   <!-- Map Location -->
   {% if entity.geometry %}
-    <div class="item">
+    <div class="item" data-type="map">
       <div class="map-wrapper">
         <div class="item-content item-content-full">
           <div class="location">
@@ -238,20 +228,35 @@
   {% endif %}
 
 
-
   <!-- First image -->
   {% if main_image and (entity.system_class.lower() not in ['actor', 'person']) %}
-    <div class="item-half">
+    {{ ui.overview_image(main_image, manifests) }}
+  {% endif %}
+
+  <!-- All initial images, split last one out -->
+  {% if initial_images %}
+    {% set last_image = initial_images[-1] %}
+    {% set other_images = initial_images[:-1] %}
+
+    {% for depiction in other_images %}
+      {{ ui.overview_image(depiction, manifests) }}
+    {% endfor %}
+
+    <div class="item-half" data-type="image">
       <div class="item-content item-content-full">
         <div class="muuri-images">
-          <div class="image">
-            {% if main_image.iiif_base_path %}
-              <img src="{{ main_image.iiif_base_path }}/full/max/0/default.jpg"
-                   alt="{{ main_image.title }}">
-            {% else %}
-              <img src="{{ main_image.url }}"
-                   alt="{{ main_image.title }}">
-            {% endif %}
+          <div class="image position-relative">
+            <a href="{{ last_image.iiif_base_path }}/full/max/0/default.jpg"
+               target="_blank"
+               class="hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
+               style="z-index: 10;">
+              <i class="bi bi-arrows-fullscreen"></i>
+            </a>
+            <img src="{{ last_image.url }}" alt="{{ last_image.title }}">
+            <button id="show-more-images"
+                    class="hover-max position-absolute bottom-0 start-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded">
+              More images
+            </button>
           </div>
         </div>
       </div>
@@ -260,31 +265,10 @@
 
 
 
-  <!-- All other images -->
-  {% if initial_images %}
-    {% for depiction in initial_images %}
-      <div class="{% if loop.index0 < 3 %}item-half{% else %}item{% endif %}">
-        <div class="item-content item-content-full">
-          <div class="image">
-            <img
-                src="{% if depiction.iiif_base_path %}
-                      {{ depiction.iiif_base_path }}/full/max/0/default.jpg
-                    {% else %}
-                      {{ depiction.url }}
-                    {% endif %}"
-                alt="{{ depiction.title }}"
-            />
-            </a>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-  {% endif %}
-
 
   <!-- Bibliography and External References -->
   {% if related_entities.Bibliography or related_entities['External reference'] %}
-    <div class="item item-5-6">
+    <div class="item item-5-6" data-type="reference">
       <div class="item-content">
         <div class="muuri-references">
           <p class="tile-label text-uppercase">References</p>
@@ -341,7 +325,20 @@
 
 {{ cite_button.modal_html | safe }}
 
-<script src="../../static/js/overview.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        setTimeout(() => {
+            window.grid.refreshItems().layout();
+        }, 100);
+    })
+
+
+</script>
+
+
+
+
 
 
 

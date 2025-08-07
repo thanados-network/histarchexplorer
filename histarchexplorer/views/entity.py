@@ -9,6 +9,7 @@ from flask import abort, g, render_template, request
 from histarchexplorer import app, cache
 from histarchexplorer.api.parser import Parser
 from histarchexplorer.database.entity import get_entity_by_id
+from histarchexplorer.models.depiction import Depiction
 from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.types import Types
 from histarchexplorer.utils.view_util import get_cite_button
@@ -394,6 +395,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     data = {}
     main_entity = None
     related_entities = {}
+    catalogue_entities = []
 
     # entities = Entity.get_linked_entities_by_properties_recursive(
     #     id_,
@@ -424,18 +426,14 @@ def get_entity(id_: int, tab_name=None) -> str:
             return features
         return {'type': 'FeatureCollection', 'features': []}
 
-    def serialize_image(image):
-        return {
-            "url": image.url,
-            "title": image.title,
-            "iiif_base_path": image.iiif_base_path
-        }
 
     features = []
     main_image = None
     initial_images = []
+    remaining_images = []
     more_images = False
-    total_images = 0
+    number_of_images = 0
+    all_images = []
     # related_entities_json = json.dumps({}, ensure_ascii=False, indent=4)
 
 
@@ -470,6 +468,16 @@ def get_entity(id_: int, tab_name=None) -> str:
             print('No spatial features found. Aborting with 404.')
             abort(404)
         data['spatial'] = map_data
+    elif tab_name == 'catalogue':
+
+        c_entities = Entity.get_linked_entities_by_properties_recursive(
+            id_,
+            get_parser_for_landing(id_))
+        catalogue_entities = build_entity_tree(c_entities)
+        for entity in catalogue_entities:
+            entity.all_child_depictions = collect_child_depictions(entity)
+
+
 
     elif tab_name == 'overview':
         # data = get_entity()
@@ -478,12 +486,19 @@ def get_entity(id_: int, tab_name=None) -> str:
             get_parser_for_landing(id_))
         main_entity= get_main_entity(id_, entities)
 
-        print('=== DEBUG PERSON ENTITY ===')
-        print('ID:', main_entity.id)
-        print('Name:', main_entity.name)
-        print('Class:', main_entity.system_class)
-        print('Formated date:', main_entity.formated_date)
-        print('Types (Chronology):', [(t.label, t.root) for t in main_entity.types if t.root == 'Chronology'])
+        if isinstance(main_entity.geometry, dict) and main_entity.geometry.get("type") == "GeometryCollection":
+            main_entity.geometry["geometries"] = [
+                geom for geom in main_entity.geometry.get("geometries", [])
+                if geom.get("type") == "Point"
+            ]
+
+        #print(main_entity.geometry)
+        #print('=== DEBUG PERSON ENTITY ===')
+        #print('ID:', main_entity.id)
+        #print('Name:', main_entity.name)
+        #print('Class:', main_entity.system_class)
+        #print('Formated date:', main_entity.formated_date)
+        #print('Types (Chronology):', [(t.label, t.root) for t in main_entity.types if t.root == 'Chronology'])
 
         related_entities = get_related_entities(main_entity, entities)
 
@@ -504,21 +519,41 @@ def get_entity(id_: int, tab_name=None) -> str:
 
         for image in main_entity.depictions:
             if image.main_image:
-                main_image = serialize_image(image)
+                main_image = image
             else:
-                images.append(serialize_image(image))
+                images.append(image)
 
         if not main_image and images:
             main_image = images.pop(0)
 
-        initial_images = images[:3]
-        more_images = len(images) > 3
-        total_images = len(images)
+        initial_images = images[:2]
+        remaining_images = images[2:]
+        more_images = len(remaining_images) > 0
+        number_of_images = len(images+[main_image])
+
+
+    #Media-tab
+
+    elif tab_name == 'media':
+        entities = Entity.get_linked_entities_by_properties_recursive(
+            id_,
+            get_parser_for_landing(id_)
+        )
+        main_entity = get_main_entity(id_, entities)
+
+        all_images = main_entity.depictions
+
+        data = {
+            'entity': json.dumps(main_entity.to_serializable(), ensure_ascii=False),
+            'categorized_types': json.dumps(categorized_types(main_entity), ensure_ascii=False)
+        }
 
     elif tab_name not in valid_routes:
         if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
             abort(404)
+    print(all_images)
+    print([img.iiif_manifest for img in all_images])
     return render_template(
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
@@ -527,13 +562,48 @@ def get_entity(id_: int, tab_name=None) -> str:
         features=features,
         main_image=main_image,
         initial_images=initial_images,
+        remaining_images=remaining_images,
         more_images=more_images,
-        total_images=total_images,
+        total_images=number_of_images,
+        all_images=all_images,
+        manifests=[img.iiif_manifest for img in all_images],
         related_entities=related_entities or {},
-        cite_button=get_cite_button(main_entity))
+        cite_button=get_cite_button(main_entity),
+        catalogue_entities=catalogue_entities )
 
     # related_entities=related_entities_json)
 
+def collect_child_depictions(entity: Entity) -> list[Depiction]:
+    all_depictions = []
+
+    def recurse(e: Entity):
+        if not hasattr(e, 'children'):
+            e.children = []
+        for child in e.children:
+            all_depictions.extend(child.depictions or [])
+            recurse(child)
+
+    if hasattr(entity, 'children'):
+        recurse(entity)
+    return all_depictions
+
+def build_entity_tree(entities: list[Entity]) -> list[Entity]:
+    entity_dict = {e.id: e for e in entities}
+
+    for entity in entities:
+        if entity.parent and entity.parent.relation_to_id in entity_dict:
+            parent_entity = entity_dict[entity.parent.relation_to_id]
+            if not hasattr(parent_entity, 'children'):
+                parent_entity.children = []
+            parent_entity.children.append(entity)
+
+    tree = []
+    for entity in entities:
+        if entity.parent and entity.parent.relation_to_id in entity_dict:
+            continue
+        if hasattr(entity, 'children'):
+            tree.extend(entity.children)
+    return tree
 
 def get_parser_for_landing(id_: int) -> Parser:
     simple_entity = get_entity_by_id(id_)

@@ -1,334 +1,344 @@
 {# admin.html #}
 {% extends "layout.html" %}
 {% block content %}
-
   <script
     src="{{ url_for('static', filename='node_modules/sortablejs/Sortable.min.js') }}"></script>
 
-  <div class="container py-5 en">
-    <h3>
-      {{ _('admin options') |upper }}
-      <span class="text-body-secondary"> | {{ _('DB Interface') }}</span>
-    </h3>
 
-    {{ ui.flash_messages() }}
+  <div class="page-wrapper">
+    <div class="scrollable-container">
+      <div class="container pt-2">
+        <h3>
+          {{ _('admin options') |upper }}
+          <span class="text-body-secondary"> | {{ _('DB Interface') }}</span>
+        </h3>
 
-    <div class="card mt-5 mb-5">
-      <div class="card-body">
-        <h5 class="card-title">{{ _('tools') | upper }}</h5>
-        <div class="d-flex justify-content-start align-items-start">
-          {% include 'admin/tools.html' %}
+        {{ ui.flash_messages() }}
+
+        <div class="card mt-5 mb-5">
+          <div class="card-body">
+            <h5 class="card-title">{{ _('tools') | upper }}</h5>
+            <div class="d-flex justify-content-start align-items-start">
+              {% include 'admin/tools.html' %}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <div class="card mt-5 mb-5">
-      <div class="card-body">
-        <h5 class="card-title">{{ _('general settings') | upper }}</h5>
-        <div class="d-flex justify-content-start align-items-start">
-          <form id="caseStudyForm" method="POST" class="needs-validation" novalidate
-                data-action-template="/admin/update_case_study_id/">
-            <div class="mb-3">
-              <label for="caseStudyHierarchyID" class="form-label">{{ _('case study hierarchy ID') }}</label>
-              <input type="text" class="form-control" id="caseStudyHierarchyID" name="case_study_id"
-                     pattern="^\d+$"
-                     value="{{ initial_case_study_type_id or '' }}"
-                     required>
-              <div class="invalid-feedback" id="caseStudyIDFeedback">
-                {{ _('Please enter a positive integer for the Case Study Hierarchy ID.') }}
-              </div>
-              <span id="caseStudyTypeName" class="form-text text-muted mt-2">
+        <div class="card mt-5 mb-5">
+          <div class="card-body">
+            <h5 class="card-title">{{ _('general settings') | upper }}</h5>
+            <div class="d-flex justify-content-start align-items-start">
+              <form id="caseStudyForm" method="POST" class="needs-validation"
+                    novalidate
+                    data-action-template="/admin/update_case_study_id/">
+                <div class="mb-3">
+                  <label for="caseStudyHierarchyID"
+                         class="form-label">{{ _('case study hierarchy ID') }}</label>
+                  <input type="text" class="form-control"
+                         id="caseStudyHierarchyID" name="case_study_id"
+                         pattern="^\d+$"
+                         value="{{ initial_case_study_type_id or '' }}"
+                         required>
+                  <div class="invalid-feedback" id="caseStudyIDFeedback">
+                    {{ _('Please enter a positive integer for the Case Study Hierarchy ID.') }}
+                  </div>
+                  <span id="caseStudyTypeName"
+                        class="form-text text-muted mt-2">
                 {% if initial_case_study_type_name %}
                   ({{ initial_case_study_type_name }})
                 {% endif %}
               </span>
+                </div>
+                <button type="submit"
+                        class="btn btn-primary">{{ _('Save') }}</button>
+              </form>
             </div>
-            <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mt-5 mb-5">
-      <div class="card-body">
-        <h5 class="card-title">{{ _('maps') |upper }}</h5>
-        {% include 'admin/maps.html' %}
-      </div>
-    </div>
-
-    <div class="card mt-5 mb-5">
-      <div class="card-body">
-        <h5 class="card-title">{{ _('about section content') |upper }}</h5>
-        <nav>
-          <div class="nav nav-pills mt-3 mb-2" id="nav-tab" role="tablist">
-            {% for tab_item in tabs %}
-              <button
-                class="nav-link{% if tab_item.is_active %} active{% endif %}"
-                id="{{ tab_item.id }}" data-bs-toggle="tab"
-                data-bs-target="#{{ tab_item.target }}" type="button"
-                role="tab"
-                aria-controls="{{ tab_item.target }}"
-                aria-selected="{{ tab_item.is_active | string | lower }}">
-                {{ tab_item.label | upper }}
-              </button>
-            {% endfor %}
           </div>
-        </nav>
-        <div class="tab-content" id="nav-tabContent">
-          {% for tab_item in tabs %}
-            <div
-              class="tab-pane fade{% if tab_item.is_active %} show active{% endif %}"
-              id="{{ tab_item.target }}" role="tabpanel"
-              aria-labelledby="{{ tab_item.id }}" tabindex="0">
-              <div class="accordion" id="{{ tab_item.label }}accordion">
-                {% for entity in processed_entities_by_tab[tab_item.target] %}
-                  <div class="accordion-item">
-                    <h2 class="accordion-header">
-                      <button
-                        class="accordion-button {% if entity.is_collapsed_entry %}collapsed{% endif %}"
-                        type="button" data-bs-toggle="collapse"
-                        data-bs-target="#{{ tab_item.target }}{{ entity.id }}"
-                        aria-expanded="{{ entity.is_active_entry | string | lower }}"
-                        aria-controls="{{ tab_item.target }}{{ entity.id }}">
-                        {{ entity.name_display_label or '' }}
-                      </button>
-                    </h2>
-                    <div id="{{ tab_item.target }}{{ entity.id }}"
-                         class="accordion-collapse collapse {% if entity.is_active_entry %} show {% endif %}"
-                         data-bs-parent="#{{ tab_item.label }}accordion">
-                      <div class="accordion-body">
-                        <form method="POST"
-                              action="{{ url_for('edit_entry') }}"
-                              class="projectForm needs-validation"
-                              id="form{{ entity.id }}"
-                              novalidate>
-                          <input type="hidden" name="config_id"
-                                 value="{{ entity.id }}">
-                          <input type="hidden" name="current_tab"
-                                 value="{{ tab_item.target }}">
-                          <input type="hidden" name="current_entry"
-                                 value="{{ tab_item.target }}{{ entity.id }}">
+        </div>
 
-                          <div class="row needs-validation">
-                            {% for field in entity.fields_config %}
-                              <div
-                                class="{{ field.col_class or 'col-md-6' }} mt-2">
-                                <label for="Input
-                                  {{ field.key | capitalize }}{{ entity.id }}"
-                                       class="form-label">
-                                  {{ _(field.label)|capitalize }}
-                                  {% if field.translatable and not entity[field.key + '_has_current_translation'] %}
-                                    {% set original_language_info = entity[field.key] if entity[field.key] is mapping and 'display' in entity[field.key] else none %}
-                                    {% if original_language_info %}
-                                      (
-                                      {{ (original_language_info.display.language|upper  or _('no translation available')) | capitalize }}
-                                      )
-                                    {% else %}
-                                      (
-                                      {{ _('no translation available') | capitalize }}
-                                      )
-                                    {% endif %}
-                                  {% endif %}
-                                </label>
+        <div class="card mt-5 mb-5">
+          <div class="card-body">
+            <h5 class="card-title">{{ _('maps') |upper }}</h5>
+            {% include 'admin/maps.html' %}
+          </div>
+        </div>
 
-                                {% if field.type == 'textarea' %}
-                                  <textarea class="form-control"
-                                            id="Input
-                                              {{ field.key | capitalize }}{{ entity.id }}"
-                                            name="{{ field.key }}"
-                                            aria-describedby="{{ field.key }}Help{{ entity.id }}"
-                                            {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
-                                            {% if field.required %}required
-                                            data-required-field{% endif %}
-                                            disabled>{{ entity[field.key + '_display_label'] or '' }}</textarea>
-                                {% elif field.type == 'select' %}
-                                  <select class="form-select"
-                                          id="Input{{ field.key | capitalize }}{{ entity.id }}"
-                                          name="{{ field.key }}"
-                                          aria-describedby="{{ field.key }}Help{{ entity.id }}"
-                                          {% if field.required %}required data-required-field{% endif %}
-                                          disabled>
-                                    <option value="">{{ _('Select a value') }}</option>
-                                  {% for child in case_study_children %}
-                                    <option value="{{ child.id }}" {% if child.id == entity.case_study %}selected{% endif %}>{{ child.name }}</option>
-                                  {% endfor %}
-                                  </select>
-                                {% else %}
-                                  <input type="{{ field.type }}"
-                                         class="form-control"
-                                         id="Input{{ field.key | capitalize }}{{ entity.id }}"
-                                         name="{{ field.key }}"
-                                         value="{{ entity[field.key + '_display_label'] or '' }}"
-                                         aria-describedby="{{ field.key }}Help{{ entity.id }}"
-                                         {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
-                                         {% if field.required %}required
-                                         data-required-field{% endif %}
-                                         disabled>
-                                {% endif %}
-
-                                {% if field.translatable and not entity[field.key + '_has_current_translation'] %}
-                                  <div
-                                    class="form-text">{{ _('This entry has no translation for') }}
-                                    "{{ available_languages[current_language] }}".
-                                  </div>
-                                {% endif %}
-                                {% if field.required %}
-                                  <div
-                                    class="invalid-feedback">{{ _('Please provide a') }} {{ _(field.label) }}.
-                                  </div>
-                                {% endif %}
-
-                                {% if field.display_image and entity[field.key] %}
-                                  <img class="mt-2"
-                                       src="{{ entity[field.key] }}"
-                                       alt="{{ entity.name_display_label or '' }}'s Logo"
-                                       {% if field.key == 'image' and tab_item.target == 'nav-persons' %}width="140"
-                                       height="140"{% endif %}>
-                                {% endif %}
-                              </div>
-                            {% endfor %}
-                          </div>
-
-                          <div class="mt-3 text-end">
-                            <button type="button" class="btn btn-primary"
-                                    id='edit{{ entity.id }}'
-                                    onclick="changeEdit({{ entity.id }}, true)">{{ _('Edit') }}
-                            </button>
-                            <button type="button"
-                                    class="btn btn-danger{% if tab_item.id == g.config_classes['main-project'] %} d-none-at-all{% endif %}"
-                                    id='delete{{ entity.id }}'
-                                    value="{{ entity.id }}"
-                                    onclick="deleteEntry({{ entity.id }}, '{{ entity.name_display_label or '' }}', '{{ tab_item.target }}')"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#deleteModal">{{ _('Delete') }}
-                            </button>
-                            <button type="button"
-                                    class="btn btn-secondary d-none"
-                                    id='cancel{{ entity.id }}'
-                                    onclick="changeEdit({{ entity.id }}, false)">{{ _('Cancel') }}
-                            </button>
-
-                            <button type="submit"
-                                    class="btn btn-primary d-none"
-                                    id='save{{ entity.id }}'
-                                    value="{{ entity.id }}">{{ _('Save') }}
-                            </button>
-                          </div>
-                        </form>
-
-                        {% if tab_item.id != g.config_classes['attribute'] %}
-                          <hr>
-                          <div id="{{ tab_item.target }}-links"
-                               class="link-divs">
-                            {% for link in processed_links_by_entity.get(entity.id, []) %}
-                              <div class="d-flex mb-2"
-                                   data-order="{{ link.sortorder }}"
-                                   data-id="{{ link.link_id }}">
-                                <i title="moveUpDown"
-                                   class="bi bi-arrow-down-up mt-2 me-2"></i>
-                                <input type="text"
-                                       class="form-control me-2"
-                                       disabled
-                                       value="{{ link.config_property_display_label }}">
-                                <input type="text"
-                                       class="form-control me-2"
-                                       disabled
-                                       value="{{ link.end_name_display_label }}">
-                                <input type="text"
-                                       class="form-control me-2"
-                                       disabled
-                                       value="{{ link.role_display_label }}">
-                                <button class="btn btn-danger"
-                                        id='delete{{ link.link_id }}'
-                                        onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name_display_label }}', '{{ link.config_property_display_label }}', '{{ link.end_name_display_label }}', '{{ tab_item.target }}', '{{ tab_item.target + entity.id|string }}', )"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteModal"
-                                        style="min-width: 125px">{{ _('Delete') }}
-                                </button>
-                              </div>
-                            {% endfor %}
-                          </div>
-
-                          <div class="d-flex mb-2">
-                            <select
-                              class="link-type form-select me-2 connection-select ms-4"
-                              aria-label="Select connection">
-                              <option
-                                selected>{{ _('select connection')|capitalize }}</option>
-                              {% for prop in processed_properties_by_tab[tab_item.target] %}
-                                <option data-range="{{ prop.range }}"
-                                        data-direction="{{ prop.direction }}"
-                                        data-entry="{{ entity.id }}"
-                                        value="{{ prop.id }}">{{ prop.name_display_label }}
-                                </option>
-                              {% endfor %}
-                            </select>
-                            <select
-                              class="link-target form-select me-2 connection-select"
-                              aria-label="Select node" disabled>
-                              <option
-                                selected>{{ _('select node') | capitalize }}</option>
-                              {% for node in processed_target_nodes %}
-                                <option
-                                  class="config-class-{{ node.class_id }} d-none"
-                                  data-classId="{{ node.id }}"
-                                  value="{{ node.id }}">{{ node.name_display_label }}
-                                </option>
-                              {% endfor %}
-                            </select>
-                            <select
-                              class="link-role form-select me-2 connection-select"
-                              aria-label="Select role" disabled>
-                              <option
-                                selected>{{ _('select role') | capitalize }}</option>
-                              <option
-                                value="0">{{ _('not specified') }}</option>
-                              {% for role_item in processed_roles %}
-                                <option
-                                  value="{{ role_item.id }}">{{ role_item.name_display_label }}</option>
-                              {% endfor %}
-                            </select>
-                            <button data-domain="" data-range=""
-                                    data-property=""
-                                    data-direction="" data-role=""
-                                    data-tab="{{ tab_item.target }}"
-                                    data-entry="
-                                      {{ tab_item.target }}{{ entity.id }}"
-                                    class="btn btn-primary"
-                                    onclick="saveLinkValues(this)"
-                                    style="min-width: 125px" disabled>
-                              {{ _('save')|capitalize }}
-                            </button>
-                          </div>
-                        {% endif %}
-                      </div>
-                    </div>
-                  </div>
+        <div class="card mt-5 mb-5">
+          <div class="card-body">
+            <h5 class="card-title">{{ _('about section content') |upper }}</h5>
+            <nav>
+              <div class="nav nav-pills mt-3 mb-2" id="nav-tab" role="tablist">
+                {% for tab_item in tabs %}
+                  <button
+                    class="nav-link{% if tab_item.is_active %} active{% endif %}"
+                    id="{{ tab_item.id }}" data-bs-toggle="tab"
+                    data-bs-target="#{{ tab_item.target }}" type="button"
+                    role="tab"
+                    aria-controls="{{ tab_item.target }}"
+                    aria-selected="{{ tab_item.is_active | string | lower }}">
+                    {{ tab_item.label | upper }}
+                  </button>
                 {% endfor %}
               </div>
-              {% if tab_item.id != g.config_classes['main-project'] %}
-                <button class="btn btn-primary m-2 float-end"
-                        onclick="addEntry('{{ tab_item.target|string }}')">
-                  {{ _('add entry')|capitalize }}
-                </button>
-              {% endif %}
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+              {% for tab_item in tabs %}
+                <div
+                  class="tab-pane fade{% if tab_item.is_active %} show active{% endif %}"
+                  id="{{ tab_item.target }}" role="tabpanel"
+                  aria-labelledby="{{ tab_item.id }}" tabindex="0">
+                  <div class="accordion" id="{{ tab_item.label }}accordion">
+                    {% for entity in processed_entities_by_tab[tab_item.target] %}
+                      <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button
+                            class="accordion-button {% if entity.is_collapsed_entry %}collapsed{% endif %}"
+                            type="button" data-bs-toggle="collapse"
+                            data-bs-target="#{{ tab_item.target }}{{ entity.id }}"
+                            aria-expanded="{{ entity.is_active_entry | string | lower }}"
+                            aria-controls="{{ tab_item.target }}{{ entity.id }}">
+                            {{ entity.name_display_label or '' }}
+                          </button>
+                        </h2>
+                        <div id="{{ tab_item.target }}{{ entity.id }}"
+                             class="accordion-collapse collapse {% if entity.is_active_entry %} show {% endif %}"
+                             data-bs-parent="#{{ tab_item.label }}accordion">
+                          <div class="accordion-body">
+                            <form method="POST"
+                                  action="{{ url_for('edit_entry') }}"
+                                  class="projectForm needs-validation"
+                                  id="form{{ entity.id }}"
+                                  novalidate>
+                              <input type="hidden" name="config_id"
+                                     value="{{ entity.id }}">
+                              <input type="hidden" name="current_tab"
+                                     value="{{ tab_item.target }}">
+                              <input type="hidden" name="current_entry"
+                                     value="{{ tab_item.target }}{{ entity.id }}">
+
+                              <div class="row needs-validation">
+                                {% for field in entity.fields_config %}
+                                  <div
+                                    class="{{ field.col_class or 'col-md-6' }} mt-2">
+                                    <label for="Input{{ field.key | capitalize }}{{ entity.id }}"
+                                           class="form-label">
+                                      {{ _(field.label)|capitalize }}
+                                      {% if field.translatable and not entity[field.key + '_has_current_translation'] %}
+                                        {% set original_language_info = entity[field.key] if entity[field.key] is mapping and 'display' in entity[field.key] else none %}
+                                        {% if original_language_info %}
+                                          (
+                                          {{ (original_language_info.display.language|upper  or _('no translation available')) | capitalize }}
+                                          )
+                                        {% else %}
+                                          (
+                                          {{ _('no translation available') | capitalize }}
+                                          )
+                                        {% endif %}
+                                      {% endif %}
+                                    </label>
+
+                                    {% if field.type == 'textarea' %}
+                                      <textarea class="form-control"
+                                                id="Input {{ field.key | capitalize }}{{ entity.id }}"
+                                                name="{{ field.key }}"
+                                                aria-describedby="{{ field.key }}Help{{ entity.id }}"
+                                                {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
+                                                {% if field.required %}required
+                                                data-required-field{% endif %}
+                                                disabled>{{ entity[field.key + '_display_label'] or '' }}</textarea>
+                                    {% elif field.type == 'select' %}
+                                      <select class="form-select"
+                                              id="Input
+                                                {{ field.key | capitalize }}{{ entity.id }}"
+                                              name="{{ field.key }}"
+                                              aria-describedby="{{ field.key }}Help{{ entity.id }}"
+                                              {% if field.required %}required
+                                              data-required-field{% endif %}
+                                              disabled>
+                                        <option
+                                          value="">{{ _('Select a value') }}</option>
+                                        {% for child in case_study_children %}
+                                          <option value="{{ child.id }}"
+                                                  {% if child.id == entity.case_study %}selected{% endif %}>{{ child.name }}</option>
+                                        {% endfor %}
+                                      </select>
+                                    {% else %}
+                                      <input type="{{ field.type }}"
+                                             class="form-control"
+                                             id="Input{{ field.key | capitalize }}{{ entity.id }}"
+                                             name="{{ field.key }}"
+                                             value="{{ entity[field.key + '_display_label'] or '' }}"
+                                             aria-describedby="{{ field.key }}Help{{ entity.id }}"
+                                             {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
+                                             {% if field.required %}required
+                                             data-required-field{% endif %}
+                                             disabled>
+                                    {% endif %}
+
+                                    {% if field.translatable and not entity[field.key + '_has_current_translation'] %}
+                                      <div
+                                        class="form-text">{{ _('This entry has no translation for') }}
+                                        "{{ available_languages[current_language] }}".
+                                      </div>
+                                    {% endif %}
+                                    {% if field.required %}
+                                      <div
+                                        class="invalid-feedback">{{ _('Please provide a') }} {{ _(field.label) }}.
+                                      </div>
+                                    {% endif %}
+
+                                    {% if field.display_image and entity[field.key] %}
+                                      <img class="mt-2"
+                                           src="{{ entity[field.key] }}"
+                                           alt="{{ entity.name_display_label or '' }}'s Logo"
+                                           {% if field.key == 'image' and tab_item.target == 'nav-persons' %}width="140"
+                                           height="140"{% endif %}>
+                                    {% endif %}
+                                  </div>
+                                {% endfor %}
+                              </div>
+
+                              <div class="mt-3 text-end">
+                                <button type="button" class="btn btn-primary"
+                                        id='edit{{ entity.id }}'
+                                        onclick="changeEdit({{ entity.id }}, true)">{{ _('Edit') }}
+                                </button>
+                                <button type="button"
+                                        class="btn btn-danger{% if tab_item.id == g.config_classes['main-project'] %} d-none-at-all{% endif %}"
+                                        id='delete{{ entity.id }}'
+                                        value="{{ entity.id }}"
+                                        onclick="deleteEntry({{ entity.id }}, '{{ entity.name_display_label or '' }}', '{{ tab_item.target }}')"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal">{{ _('Delete') }}
+                                </button>
+                                <button type="button"
+                                        class="btn btn-secondary d-none"
+                                        id='cancel{{ entity.id }}'
+                                        onclick="changeEdit({{ entity.id }}, false)">{{ _('Cancel') }}
+                                </button>
+
+                                <button type="submit"
+                                        class="btn btn-primary d-none"
+                                        id='save{{ entity.id }}'
+                                        value="{{ entity.id }}">{{ _('Save') }}
+                                </button>
+                              </div>
+                            </form>
+
+                            {% if tab_item.id != g.config_classes['attribute'] %}
+                              <hr>
+                              <div id="{{ tab_item.target }}-links"
+                                   class="link-divs">
+                                {% for link in processed_links_by_entity.get(entity.id, []) %}
+                                  <div class="d-flex mb-2"
+                                       data-order="{{ link.sortorder }}"
+                                       data-id="{{ link.link_id }}">
+                                    <i title="moveUpDown"
+                                       class="bi bi-arrow-down-up mt-2 me-2"></i>
+                                    <input type="text"
+                                           class="form-control me-2"
+                                           disabled
+                                           value="{{ link.config_property_display_label }}">
+                                    <input type="text"
+                                           class="form-control me-2"
+                                           disabled
+                                           value="{{ link.end_name_display_label }}">
+                                    <input type="text"
+                                           class="form-control me-2"
+                                           disabled
+                                           value="{{ link.role_display_label }}">
+                                    <button class="btn btn-danger"
+                                            id='delete{{ link.link_id }}'
+                                            onclick="deleteLink('{{ link.link_id }}', '{{ link.start_name_display_label }}', '{{ link.config_property_display_label }}', '{{ link.end_name_display_label }}', '{{ tab_item.target }}', '{{ tab_item.target + entity.id|string }}', )"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal"
+                                            style="min-width: 125px">{{ _('Delete') }}
+                                    </button>
+                                  </div>
+                                {% endfor %}
+                              </div>
+
+                              <div class="d-flex mb-2">
+                                <select
+                                  class="link-type form-select me-2 connection-select ms-4"
+                                  aria-label="Select connection">
+                                  <option
+                                    selected>{{ _('select connection')|capitalize }}</option>
+                                  {% for prop in processed_properties_by_tab[tab_item.target] %}
+                                    <option data-range="{{ prop.range }}"
+                                            data-direction="{{ prop.direction }}"
+                                            data-entry="{{ entity.id }}"
+                                            value="{{ prop.id }}">{{ prop.name_display_label }}
+                                    </option>
+                                  {% endfor %}
+                                </select>
+                                <select
+                                  class="link-target form-select me-2 connection-select"
+                                  aria-label="Select node" disabled>
+                                  <option
+                                    selected>{{ _('select node') | capitalize }}</option>
+                                  {% for node in processed_target_nodes %}
+                                    <option
+                                      class="config-class-{{ node.class_id }} d-none"
+                                      data-classId="{{ node.id }}"
+                                      value="{{ node.id }}">{{ node.name_display_label }}
+                                    </option>
+                                  {% endfor %}
+                                </select>
+                                <select
+                                  class="link-role form-select me-2 connection-select"
+                                  aria-label="Select role" disabled>
+                                  <option
+                                    selected>{{ _('select role') | capitalize }}</option>
+                                  <option
+                                    value="0">{{ _('not specified') }}</option>
+                                  {% for role_item in processed_roles %}
+                                    <option
+                                      value="{{ role_item.id }}">{{ role_item.name_display_label }}</option>
+                                  {% endfor %}
+                                </select>
+                                <button data-domain="" data-range=""
+                                        data-property=""
+                                        data-direction="" data-role=""
+                                        data-tab="{{ tab_item.target }}"
+                                        data-entry="
+                                      {{ tab_item.target }}{{ entity.id }}"
+                                        class="btn btn-primary"
+                                        onclick="saveLinkValues(this)"
+                                        style="min-width: 125px" disabled>
+                                  {{ _('save')|capitalize }}
+                                </button>
+                              </div>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                  {% if tab_item.id != g.config_classes['main-project'] %}
+                    <button class="btn btn-primary m-2 float-end"
+                            onclick="addEntry('{{ tab_item.target|string }}')">
+                      {{ _('add entry')|capitalize }}
+                    </button>
+                  {% endif %}
+                </div>
+              {% endfor %}
             </div>
-          {% endfor %}
+          </div>
         </div>
-      </div>
-    </div>
 
-    <div class="card mt-5 mb-5">
-      <div class="card-body">
-        <h5 class="card-title">
-          {{ _('index page options') | upper }}
-        </h5>
-        {% include 'admin/index_page_options.html' %}
-      </div>
-    </div>
+        <div class="card mt-5 mb-5">
+          <div class="card-body">
+            <h5 class="card-title">
+              {{ _('index page options') | upper }}
+            </h5>
+            {% include 'admin/index_page_options.html' %}
+          </div>
+        </div>
 
+      </div>
+      {% include 'admin/modals.html' %}
+    </div>
   </div>
-  {% include 'admin/modals.html' %}
-
   <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
