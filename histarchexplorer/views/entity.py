@@ -477,8 +477,6 @@ def get_entity(id_: int, tab_name=None) -> str:
         for entity in catalogue_entities:
             entity.all_child_depictions = collect_child_depictions(entity)
 
-
-
     elif tab_name == 'overview':
         # data = get_entity()
         entities = Entity.get_linked_entities_by_properties_recursive(
