@@ -29,7 +29,11 @@
 
     <div class="d-flex flex-wrap gap-3">
         <div style="min-width: 300px;" class="d-none ms-3 me-3" id="begin-{{ tab_name }}-container">
-            <div id="sliderBegin{{ tab_name }}"></div>
+            <div class="d-flex align-items-center gap-2">
+                <span id="sliderBeginMin{{ tab_name }}" class="text-nowrap me-3"></span>
+                <div class="slider-styled flex-grow-1" id="sliderBegin{{ tab_name }}"></div>
+                <span id="sliderBeginMax{{ tab_name }}" class="text-nowrap ms-3"></span>
+            </div>
             <div class="form-check mt-2">
                 <input class="form-check-input" type="checkbox" id="includeNoBegin{{ tab_name }}" checked>
                 <label class="form-check-label" for="includeNoBegin{{ tab_name }}">
@@ -39,7 +43,11 @@
         </div>
 
         <div style="min-width: 300px;" class="d-none ms-3 me-3" id="end-{{ tab_name }}-container">
-            <div id="sliderEnd{{ tab_name }}"></div>
+            <div class="d-flex align-items-center gap-2">
+                <span id="sliderEndMin{{ tab_name }}" class="text-nowrap me-3"></span>
+                <div class="slider-styled flex-grow-1" id="sliderEnd{{ tab_name }}"></div>
+                <span id="sliderEndMax{{ tab_name }}" class="text-nowrap ms-3"></span>
+            </div>
             <div class="form-check mt-2">
                 <input class="form-check-input" type="checkbox" id="includeNoEnd{{ tab_name }}" checked>
                 <label class="form-check-label" for="includeNoEnd{{ tab_name }}">
@@ -756,57 +764,76 @@
     if ({{ tab_name }}Data.fields.includes("begin")) {
 
         const sliderBegin{{ tab_name }} = document.getElementById('sliderBegin{{ tab_name }}');
+        const sliderBeginMin{{ tab_name }} = document.getElementById('sliderBeginMin{{ tab_name }}');
+        const sliderBeginMax{{ tab_name }} = document.getElementById('sliderBeginMax{{ tab_name }}');
 
-        const arbitraryValuesForSlider{{ tab_name }} = {{ tab_name }}Data.timelineBegin.map(e => e.string);
-
+        const arbitraryValuesForSliderBegin{{ tab_name }} = {{ tab_name }}Data.timelineBegin.map(e => e.string);
 
         noUiSlider.create(sliderBegin{{ tab_name }}, {
-            range: {min: 0, max: arbitraryValuesForSlider{{ tab_name }}.length - 1},
-            start: [arbitraryValuesForSlider{{ tab_name }}[0], arbitraryValuesForSlider{{ tab_name }}[arbitraryValuesForSlider{{ tab_name }}.length - 1]],
+            range: {min: 0, max: arbitraryValuesForSliderBegin{{ tab_name }}.length - 1},
+            start: [
+                arbitraryValuesForSliderBegin{{ tab_name }}[0],
+                arbitraryValuesForSliderBegin{{ tab_name }}[arbitraryValuesForSliderBegin{{ tab_name }}.length - 1]
+            ],
             step: 1,
             tooltips: false,
             format: {
                 to: function (value) {
-                    return arbitraryValuesForSlider{{ tab_name }}[Math.round(value)];
+                    return arbitraryValuesForSliderBegin{{ tab_name }}[Math.round(value)];
                 },
                 from: function (value) {
-                    return arbitraryValuesForSlider{{ tab_name }}.indexOf(value);
+                    return arbitraryValuesForSliderBegin{{ tab_name }}.indexOf(value);
                 }
             }
         });
 
-        sliderBegin{{ tab_name }}.noUiSlider.on("change", function (values) {
+        sliderBegin{{ tab_name }}.noUiSlider.on("update", function (values) {
+            sliderBeginMin{{ tab_name }}.textContent = values[0];
+            sliderBeginMax{{ tab_name }}.textContent = values[1];
+        });
+
+        sliderBegin{{ tab_name }}.noUiSlider.on("change", function () {
             applyCombinedFilter{{ tab_name }}();
         });
     }
 
+
     if ({{ tab_name }}Data.fields.includes("end")) {
 
         const sliderEnd{{ tab_name }} = document.getElementById('sliderEnd{{ tab_name }}');
+        const sliderEndMin{{ tab_name }} = document.getElementById('sliderEndMin{{ tab_name }}');
+        const sliderEndMax{{ tab_name }} = document.getElementById('sliderEndMax{{ tab_name }}');
 
-        const arbitraryValuesForSlider{{ tab_name }} = {{ tab_name }}Data.timelineEnd.map(e => e.string);
-
+        const arbitraryValuesForSliderEnd{{ tab_name }} = {{ tab_name }}Data.timelineEnd.map(e => e.string);
 
         noUiSlider.create(sliderEnd{{ tab_name }}, {
-            range: {min: 0, max: arbitraryValuesForSlider{{ tab_name }}.length - 1},
-            start: [arbitraryValuesForSlider{{ tab_name }}[0], arbitraryValuesForSlider{{ tab_name }}[arbitraryValuesForSlider{{ tab_name }}.length - 1]],
+            range: {min: 0, max: arbitraryValuesForSliderEnd{{ tab_name }}.length - 1},
+            start: [
+                arbitraryValuesForSliderEnd{{ tab_name }}[0],
+                arbitraryValuesForSliderEnd{{ tab_name }}[arbitraryValuesForSliderEnd{{ tab_name }}.length - 1]
+            ],
             step: 1,
             tooltips: false,
             format: {
                 to: function (value) {
-                    return arbitraryValuesForSlider{{ tab_name }}[Math.round(value)];
+                    return arbitraryValuesForSliderEnd{{ tab_name }}[Math.round(value)];
                 },
                 from: function (value) {
-                    return arbitraryValuesForSlider{{ tab_name }}.indexOf(value);
+                    return arbitraryValuesForSliderEnd{{ tab_name }}.indexOf(value);
                 }
             }
         });
 
-        sliderEnd{{ tab_name }}.noUiSlider.on("change", function (values) {
-                applyCombinedFilter{{ tab_name }}();
-            }
-        );
+        sliderEnd{{ tab_name }}.noUiSlider.on("update", function (values) {
+            sliderEndMin{{ tab_name }}.textContent = values[0];
+            sliderEndMax{{ tab_name }}.textContent = values[1];
+        });
+
+        sliderEnd{{ tab_name }}.noUiSlider.on("change", function () {
+            applyCombinedFilter{{ tab_name }}();
+        });
     }
+
 
     const {{ tab_name }}TreesToBuild = Object.keys({{ tab_name }}Data.treeData);
     console.log({{ tab_name }}TreesToBuild);

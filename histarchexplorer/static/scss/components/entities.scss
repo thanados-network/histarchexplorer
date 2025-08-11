@@ -193,6 +193,7 @@
   border: 1px solid #dee2e6 !important;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease-in-out;
 }
 
 .tabulator-row .tabulator-responsive-collapse table tr td:first-of-type {
@@ -208,4 +209,5 @@
 .tabulator-footer {
   background-color: transparent!important;
 }
+
 
