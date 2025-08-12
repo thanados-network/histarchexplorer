@@ -57,11 +57,18 @@
         </div>
     </div>
 
+    <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2"
+            title="Change View">
+        <i class="bi bi-list"></i>
+    </button>
+
 
 </div>
 
 
 <div id="table-{{ tab_name }}" class="tabulator-container"></div>
+<div id="tile-{{ tab_name }}" class="tile-container"></div>
+<div id="map-{{ tab_name }}" class="map-container"></div>
 
 <div class="modal fade" id="modal-{{ tab_name }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
      aria-labelledby="modal-title-{{ tab_name }}" aria-hidden="true">
