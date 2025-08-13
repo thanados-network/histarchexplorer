@@ -3,6 +3,11 @@
 <script src="../../static/node_modules/muuri/dist/muuri.min.js"></script>
 
 <style>
+.grid .item {
+  position: absolute !important;
+  display: block !important;
+}
+
     .grid {
   position: relative;
 }
@@ -123,12 +128,15 @@
 
 
 <div id="table-{{ tab_name }}" class="tabulator-container"></div>
+
+
 <div id="tile-{{ tab_name }}" class="tile-container d-none">
   <div class="grid">
+
   <div class="item">
     <div class="item-content">
       <!-- Safe zone, enter your custom markup -->
-      <div class="my-custom-content">Yippeeuuu!</div>
+      This can be anything.
       <!-- Safe zone ends -->
     </div>
   </div>
@@ -136,19 +144,19 @@
   <div class="item">
     <div class="item-content">
       <!-- Safe zone, enter your custom markup -->
-      <div class="my-custom-content">Yippee!</div>
+      <div class="my-custom-content">
+        Yippee!
+      </div>
       <!-- Safe zone ends -->
     </div>
   </div>
-    <div class="item">
-    <div class="item-content">
-      <!-- Safe zone, enter your custom markup -->
-      <div class="my-custom-content">Yippeeoooo!</div>
-      <!-- Safe zone ends -->
-    </div>
-  </div>
+
 </div>
 </div>
+
+
+
+
 {% if tab_name == 'places' %}
     <div id="map-{{ tab_name }}" class="map-container d-none"></div>
 {% endif %}
@@ -233,6 +241,14 @@
 </div>
 
 <script>
+    var grid{{ tab_name }} = null;
+
+    function initializeMuuriGrid{{ tab_name }}() {
+        if (!grid{{ tab_name }}) {
+            grid{{ tab_name }} = new Muuri('#tile-{{ tab_name }} .grid');
+            grid{{ tab_name }}.refreshItems().layout();
+        }
+    }
 
     function {{tab_name}}ToggleView(view) {
         const tabName = "{{tab_name}}";
@@ -243,6 +259,9 @@
             if (!el) return;
             if (v === view) {
                 el.classList.remove("d-none");
+                if (v === "tile") {
+                    initializeMuuriGrid{{ tab_name }}();
+                }
             } else {
                 el.classList.add("d-none");
             }
