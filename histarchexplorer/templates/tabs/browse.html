@@ -1,6 +1,36 @@
 <link href="../../static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"/>
 <script src="../../static/node_modules/maplibre-gl/dist/maplibre-gl.js"></script>
+<script src="../../static/node_modules/muuri/dist/muuri.min.js"></script>
 
+<style>
+    .grid {
+  position: relative;
+}
+.item {
+  display: block;
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  margin: 5px;
+  z-index: 1;
+  background: #000;
+  color: #fff;
+}
+.item.muuri-item-dragging {
+  z-index: 3;
+}
+.item.muuri-item-releasing {
+  z-index: 2;
+}
+.item.muuri-item-hidden {
+  z-index: 0;
+}
+.item-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+</style>
 <div id="{{ tab_name }}-header"
      class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3 mt-3 ms-3 me-3">
 
@@ -93,7 +123,32 @@
 
 
 <div id="table-{{ tab_name }}" class="tabulator-container"></div>
-<div id="tile-{{ tab_name }}" class="tile-container d-none"></div>
+<div id="tile-{{ tab_name }}" class="tile-container d-none">
+  <div class="grid">
+  <div class="item">
+    <div class="item-content">
+      <!-- Safe zone, enter your custom markup -->
+      <div class="my-custom-content">Yippeeuuu!</div>
+      <!-- Safe zone ends -->
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="item-content">
+      <!-- Safe zone, enter your custom markup -->
+      <div class="my-custom-content">Yippee!</div>
+      <!-- Safe zone ends -->
+    </div>
+  </div>
+    <div class="item">
+    <div class="item-content">
+      <!-- Safe zone, enter your custom markup -->
+      <div class="my-custom-content">Yippeeoooo!</div>
+      <!-- Safe zone ends -->
+    </div>
+  </div>
+</div>
+</div>
 {% if tab_name == 'places' %}
     <div id="map-{{ tab_name }}" class="map-container d-none"></div>
 {% endif %}
