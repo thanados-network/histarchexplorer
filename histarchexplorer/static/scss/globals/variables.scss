@@ -8,6 +8,9 @@
   --light-muuri-tile: hsl(0, 20%, 97%, 0.3);
   --dark-muuri-tile: hsla(0, 0%, 49%, 0.3);
 
+  --ov-bg-light: whitesmoke;
+  --ov-bg-dark: none;
+
   --light-hierarchy-item: hsl(0, 0%, 83%);
   --dark-hierarchy-item: hsl(0, 0%, 35%);
 
@@ -44,6 +47,7 @@
 
 
 body.light {
+  --ov-bg: var(--ov-bg-light);
   --counters-bg: var(--counters-bg-light);
   --footer-bg: var(--footer-bg-light);
   --card-bg: var(--light-card);
@@ -63,4 +67,5 @@ body.dark {
   --hierarchy-item: var(--dark-hierarchy-item);
   --reference-label: var(--dark-label);
   --reference-text: var(--dark-text);
+  --ov-bg: var(--ov-bg-dark);
 }

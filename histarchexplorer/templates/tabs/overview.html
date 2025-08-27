@@ -282,7 +282,7 @@
                         <div class="reference-header">
                           {% if key == "Bibliography" %}
                             <i class="bi bi-book"></i>
-                            <a href="{{ url_for('landing', id_=item.id) }}" class="reference-name">
+                            <a href="{{ url_for('entity', id_=item.id) }}" class="reference-name">
                               {{ item.name }}
                             </a>
                           {% elif key == "External reference" %}
