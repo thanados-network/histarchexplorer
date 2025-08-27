@@ -64,7 +64,7 @@
         <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2"
                 data-bs-toggle="dropdown"
                 title="Change View">
-            <i class="bi bi-list"></i>
+            <i id="{{ tab_name }}-dropdown-btn-icon" class="bi bi-list-ul"></i>
         </button>
 
         <ul class="dropdown-menu">
@@ -74,11 +74,11 @@
                 </a>
             </li>
             {% if tab_name == "places" %}
-            <li>
-                <a id="{{ tab_name }}-map-btn" class="dropdown-item btn" onclick="{{ tab_name }}ToggleView('map')">
-                    <i class="bi bi-geo-alt-fill me-2"></i> Map
-                </a>
-            </li>
+                <li>
+                    <a id="{{ tab_name }}-map-btn" class="dropdown-item btn" onclick="{{ tab_name }}ToggleView('map')">
+                        <i class="bi bi-geo-alt-fill me-2"></i> Map
+                    </a>
+                </li>
             {% endif %}
             <li>
                 <a id="{{ tab_name }}-tiles-btn" class="dropdown-item btn" onclick="{{ tab_name }}ToggleView('tile')">
@@ -183,15 +183,30 @@
         const tabName = "{{tab_name}}";
         const views = ["map", "table", "tile"];
 
+        // 1. Show the selected view, hide others
         views.forEach(v => {
             const el = document.getElementById(`${v}-${tabName}`);
             if (!el) return;
-            if (v === view) {
-                el.classList.remove("d-none");
-            } else {
-                el.classList.add("d-none");
-            }
+            el.classList.toggle("d-none", v !== view);
         });
+
+        // 2. Change the dropdown button icon
+        const iconMap = {
+            table: "bi-list-ul",
+            map: "bi-geo-alt-fill",
+            tile: "bi-grid-3x3-gap-fill"
+        };
+
+        const dropdownBtn = document.querySelector(`#${tabName}-dropdown-btn-icon`);
+        if (dropdownBtn && iconMap[view]) {
+            dropdownBtn.className = `bi ${iconMap[view]}`;
+        }
+
+        {% if tab_name == 'places' %}
+            addTerrain();
+            addSkybox();
+            addControls()
+        {% endif %}
     }
 
     //prepare data
@@ -989,10 +1004,93 @@
     {% if tab_name == 'places' %}
         const map = new maplibregl.Map({
             container: 'map-{{ tab_name }}',
-            style: 'https://demotiles.maplibre.org/style.json', // stylesheet location
+            style: 'https://api.maptiler.com/maps/topo-v2/style.json?key=E7Jrgaazm79UlTuEI5f5',
+            zoom: 17,
+            maxPitch: 85,
+            maxZoom: 25,
             center: [-74.5, 40], // starting position [lng, lat]
             zoom: 9 // starting zoom
         });
+
+        function addTerrain() {
+            const terrainUrl = 'https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=E7Jrgaazm79UlTuEI5f5';
+
+            map.addSource('terrainSource', {type: 'raster-dem', url: terrainUrl, tileSize: 256});
+            map.addSource('hillshadeSource', {type: 'raster-dem', url: terrainUrl, tileSize: 256});
+
+            map.addLayer({
+                id: 'hills',
+                type: 'hillshade',
+                source: 'hillshadeSource',
+                layout: {visibility: 'visible'},
+                paint: {'hillshade-shadow-color': 'rgba(71,59,36,0.56)'}
+            });
+
+            map.addControl(new maplibregl.TerrainControl({source: 'terrainSource', exaggeration: 1}));
+        }
+
+        function addSkybox() {
+            map.setSky({
+                "sky-color": "#b2ddfa",
+                "horizon-color": "#FFFFFF",
+                "fog-color": "#FFFFFF",
+                "fog-ground-blend": 0.8,
+                "horizon-fog-blend": 0.1,
+                "sky-horizon-blend": 0.6,
+                "atmosphere-blend": 0.5,
+            });
+        }
+
+        function addControls() {
+            map.addControl(new maplibregl.NavigationControl({visualizePitch: true, showZoom: true, showCompass: true}));
+        }
+
+        map.on('load', () => {
+            // 1. Add the GeoJSON source
+            map.addSource('{{ tab_name }}-source', {
+                type: 'geojson',
+                data: data.geometries // Must be a valid GeoJSON object
+            });
+
+            // 2. Add a layer for polygons / lines / points
+            map.addLayer({
+                id: '{{ tab_name }}-layer-fill',
+                type: 'fill',
+                source: '{{ tab_name }}-source',
+                paint: {
+                    'fill-color': '#088',
+                    'fill-opacity': 0.5
+                },
+                filter: ['==', '$type', 'Polygon']
+            });
+
+            map.addLayer({
+                id: '{{ tab_name }}-layer-line',
+                type: 'line',
+                source: '{{ tab_name }}-source',
+                paint: {
+                    'line-color': '#088',
+                    'line-width': 2
+                },
+                filter: ['==', '$type', 'LineString']
+            });
+
+            map.addLayer({
+                id: '{{ tab_name }}-layer-circle',
+                type: 'circle',
+                source: '{{ tab_name }}-source',
+                paint: {
+                    'circle-radius': 6,
+                    'circle-color': '#088'
+                },
+                filter: ['==', '$type', 'Point']
+            });
+
+            // 3. Zoom to data bounds
+
+        });
+
+
     {% endif %}
 
 </script>
