@@ -1,0 +1,153 @@
+<script> {# Map #}
+//Map
+{% if tab_name in ['places', 'items'] %}
+
+    let filter{{ tab_name }} = ['artifact', 'human_remains']
+    {% if tab_name in ['places'] %}
+        filter{{ tab_name }} = ['place', 'feature', 'stratigraphic_unit']
+    {% endif %}
+
+    const filteredGeomData{{ tab_name }} = data.geometries.features.filter(
+        f => filter{{ tab_name }}.includes(f.properties.class));
+
+    const featureCollection{{ tab_name }} = {
+        type: "FeatureCollection",
+        features: filteredGeomData{{ tab_name }}
+    };
+
+    const bounds{{ tab_name }} = new maplibregl.LngLatBounds();
+    featureCollection{{ tab_name }}.features.forEach(extendBounds{{ tab_name }});
+    const center{{ tab_name }} = bounds{{ tab_name }}.getCenter();
+    const onePointFeature{{ tab_name }} = (featureCollection{{ tab_name }}.features.length === 1 && featureCollection{{ tab_name }}.features[0].geometry.type === 'Point');
+
+    const map{{tab_name}} = new maplibregl.Map({
+        container: 'map-{{ tab_name }}',
+        style: 'https://api.maptiler.com/maps/topo-v2/style.json?key=E7Jrgaazm79UlTuEI5f5',
+        maxPitch: 85,
+        maxZoom: 25,
+        center: center{{ tab_name }}, // starting position [lng, lat]
+
+    });
+
+    function addTerrain{{ tab_name }}() {
+        const terrainUrl = 'https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=E7Jrgaazm79UlTuEI5f5';
+
+        map{{tab_name}}.addSource('terrainSource', {type: 'raster-dem', url: terrainUrl, tileSize: 256});
+        map{{tab_name}}.addSource('hillshadeSource', {type: 'raster-dem', url: terrainUrl, tileSize: 256});
+
+        map{{tab_name}}.addLayer({
+            id: 'hills',
+            type: 'hillshade',
+            source: 'hillshadeSource',
+            layout: {visibility: 'visible'},
+            paint: {'hillshade-shadow-color': 'rgba(71,59,36,0.56)'}
+        });
+
+        map{{tab_name}}.addControl(new maplibregl.TerrainControl({source: 'terrainSource', exaggeration: 1}));
+    }
+
+    function addSkybox{{ tab_name }}() {
+        map{{tab_name}}.setSky({
+            "sky-color": "#b2ddfa",
+            "horizon-color": "#FFFFFF",
+            "fog-color": "#FFFFFF",
+            "fog-ground-blend": 0.8,
+            "horizon-fog-blend": 0.1,
+            "sky-horizon-blend": 0.6,
+            "atmosphere-blend": 0.5,
+        });
+    }
+
+    function addControls{{ tab_name }}() {
+        map{{tab_name}}.addControl(new maplibregl.NavigationControl({
+            visualizePitch: true,
+            showZoom: true,
+            showCompass: true
+        }));
+    }
+
+    map{{tab_name}}.on('load', () => {
+        // 1. Add the GeoJSON source
+        map{{tab_name}}.addSource('{{ tab_name }}-source', {
+            type: 'geojson',
+            data: featureCollection{{ tab_name }} // Must be a valid GeoJSON object
+        });
+
+        // 2. Add a layer for polygons / lines / points
+        map{{tab_name}}.addLayer({
+            id: '{{ tab_name }}-layer-fill',
+            type: 'fill',
+            source: '{{ tab_name }}-source',
+            paint: {
+                'fill-color': '#088',
+                'fill-opacity': 0.5
+            },
+            filter: ['==', '$type', 'Polygon']
+        });
+
+        map{{tab_name}}.addLayer({
+            id: '{{ tab_name }}-layer-line',
+            type: 'line',
+            source: '{{ tab_name }}-source',
+            paint: {
+                'line-color': '#088',
+                'line-width': 2
+            },
+            filter: ['==', '$type', 'LineString']
+        });
+
+        map{{tab_name}}.addLayer({
+            id: '{{ tab_name }}-layer-circle',
+            type: 'circle',
+            source: '{{ tab_name }}-source',
+            paint: {
+                'circle-radius': 6,
+                'circle-color': '#088'
+            },
+            filter: ['==', '$type', 'Point']
+        });
+
+
+    });
+
+
+
+
+    function extendBounds{{ tab_name }}(feature) {
+        const {type, coordinates} = feature.geometry;
+
+        const extend = (coord) => {
+            if (Array.isArray(coord) &&
+                coord.length === 2 &&
+                typeof coord[0] === "number" &&
+                typeof coord[1] === "number") {
+                bounds{{ tab_name }}.extend(coord);
+            }
+        };
+
+        switch (type) {
+            case "Point":
+                extend(coordinates);
+                break;
+            case "LineString":
+            case "MultiPoint":
+                coordinates.forEach(c => extend(c));
+                break;
+            case "Polygon":
+            case "MultiLineString":
+                coordinates.forEach(ring => ring.forEach(c => extend(c)));
+                break;
+            case "MultiPolygon":
+                coordinates.forEach(polygon =>
+                    polygon.forEach(ring =>
+                        ring.forEach(c => extend(c))
+                    )
+                );
+                break;
+        }
+    }
+
+
+{% endif %}
+
+</script> {# Map #}

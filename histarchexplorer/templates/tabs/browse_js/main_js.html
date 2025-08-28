@@ -1,0 +1,113 @@
+<script> {# Main Javascript Functionality #}
+
+let {{ tab_name }}MapLoaded = false
+
+function {{tab_name}}ToggleView(view) {
+    const tabName = "{{tab_name}}";
+    const views = ["map", "table", "tile"];
+
+    // 1. Show the selected view, hide others
+    views.forEach(v => {
+        const el = document.getElementById(`${v}-${tabName}`);
+        if (!el) return;
+        el.classList.toggle("d-none", v !== view);
+        if (v === "tile") {
+            console.log('Tile view selected, refreshing grid');
+            // Adjust tile container height
+            adjustTileHeight{{ tab_name }}();
+
+            // Always refresh the grid when switching to tile view
+            if (grid{{ tab_name }}) {
+                console.log('Grid exists, destroying and recreating');
+                grid{{ tab_name }}.destroy();
+                grid{{ tab_name }} = null;
+            }
+            initializeMuuriGrid{{ tab_name }}();
+        }
+    });
+
+    // 2. Change the dropdown button icon
+    const iconMap = {
+        table: "bi-list-ul",
+        map: "bi-geo-alt-fill",
+        tile: "bi-grid-3x3-gap-fill"
+    };
+
+    const dropdownBtn = document.querySelector(`#${tabName}-dropdown-btn-icon`);
+    if (dropdownBtn && iconMap[view]) {
+        dropdownBtn.className = `bi ${iconMap[view]}`;
+    }
+
+    {% if tab_name in ["places", "items"] %}
+        if (!{{ tab_name }}MapLoaded) {
+            addTerrain{{ tab_name }}();
+            addSkybox{{ tab_name }}();
+            addControls{{ tab_name }}();
+
+            setTimeout(() => {
+                if (!bounds{{ tab_name }}.isEmpty() && !onePointFeature{{ tab_name }}) {
+                    map{{ tab_name }}.fitBounds(bounds{{ tab_name }}, {padding: 200});
+                    document.getElementById('map-{{ tab_name }}').style.opacity = "1"
+                }
+            }, 500);
+
+            {{ tab_name }}MapLoaded = true
+        }
+    {% endif %}
+}
+
+
+//prepare data
+const {{ tab_name }}Data = {}
+
+{{ tab_name }}Data.tableData = getEntitiesForTab('{{ tab_name }}');
+{{ tab_name }}Data.typeIds = [...new Set({{ tab_name }}Data.tableData.map(item => item.type_id))];
+{{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, viewClasses.{{ tab_name }}, ["standard"], {{ tab_name }}Data.typeIds)
+
+{{ tab_name }}Data.fields = getKeysWithValues({{ tab_name }}Data.tableData)
+{{ tab_name }}Data.classes = [...new Set({{ tab_name }}Data.tableData.map(item => item.class))];
+
+{{ tab_name }}Data.timelineBegin = getSortedDistinctTimeline({{ tab_name }}Data.tableData, "beginString", "beginDBP");
+{{ tab_name }}Data.timelineEnd = getSortedDistinctTimeline({{ tab_name }}Data.tableData, "endString", "endDBP");
+
+const classList{{ tab_name }} = {{ tab_name }}Data.classes;
+
+function adjustTableHeight{{ tab_name }}() {
+    // small delay to ensure layout is ready
+    setTimeout(function () {
+        const header = document.getElementById(`{{tab_name}}-header`);
+        const table = document.getElementById(`table-{{tab_name}}`);
+        {% if tab_name in ['places','items'] %}
+            const mapContainer{{tab_name}} = document.getElementById(`map-{{tab_name}}`);
+        {% endif %}
+
+        if (!header || !table) return;
+
+        const headerHeight = header.offsetHeight;
+
+        // 100vh - 96px - headerHeight - 3rem
+        const maxHeight = window.innerHeight - 96 - headerHeight - (3 * 16); // 3rem = 48px
+        table.style.maxHeight = `${maxHeight}px`;
+        {% if tab_name in ['places','items'] %}
+            mapContainer{{tab_name}}.style.height = `${maxHeight + 16}px`;
+        {% endif %}
+    }, 500);
+}
+
+// Run on resize
+window.addEventListener("resize", function () {
+    adjustTableHeight{{tab_name}}();
+});
+
+// Run on initial load
+adjustTableHeight{{tab_name}}();
+document.getElementById('toggleSidebar').addEventListener('click', function () {
+    adjustTableHeight{{tab_name}}();
+})
+
+document.getElementById('tab-{{ tab_name }}').addEventListener('click', function () {
+    adjustTableHeight{{tab_name}}();
+})
+
+
+</script> {# Main Javascript Functionality #}
