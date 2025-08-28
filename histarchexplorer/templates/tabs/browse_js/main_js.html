@@ -11,6 +11,19 @@ function {{tab_name}}ToggleView(view) {
         const el = document.getElementById(`${v}-${tabName}`);
         if (!el) return;
         el.classList.toggle("d-none", v !== view);
+        if (v === "tile") {
+            console.log('Tile view selected, refreshing grid');
+            // Adjust tile container height
+            adjustTileHeight{{ tab_name }}();
+
+            // Always refresh the grid when switching to tile view
+            if (grid{{ tab_name }}) {
+                console.log('Grid exists, destroying and recreating');
+                grid{{ tab_name }}.destroy();
+                grid{{ tab_name }} = null;
+            }
+            initializeMuuriGrid{{ tab_name }}();
+        }
     });
 
     // 2. Change the dropdown button icon
@@ -32,7 +45,7 @@ function {{tab_name}}ToggleView(view) {
             addControls{{ tab_name }}();
 
             setTimeout(() => {
-                if (!bounds{{ tab_name }}.isEmpty()&&!onePointFeature{{ tab_name }}) {
+                if (!bounds{{ tab_name }}.isEmpty() && !onePointFeature{{ tab_name }}) {
                     map{{ tab_name }}.fitBounds(bounds{{ tab_name }}, {padding: 200});
                     document.getElementById('map-{{ tab_name }}').style.opacity = "1"
                 }
@@ -42,6 +55,7 @@ function {{tab_name}}ToggleView(view) {
         }
     {% endif %}
 }
+
 
 //prepare data
 const {{ tab_name }}Data = {}

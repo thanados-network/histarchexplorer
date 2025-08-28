@@ -93,7 +93,12 @@
 
 
 <div id="table-{{ tab_name }}" class="tabulator-container"></div>
-<div id="tile-{{ tab_name }}" class="tile-container d-none"></div>
+<div id="tile-{{ tab_name }}" class="tile-container d-none">
+  <div class="grid" id="grid-{{ tab_name }}">
+    <!-- Items will be populated by JavaScript -->
+  </div>
+  <div id="tile-pagination-{{ tab_name }}" class="tile-pagination"></div>
+</div>
 {% if tab_name in ['places', 'items'] %}
     <div id="map-{{ tab_name }}" class="map-container d-none"></div>
 {% endif %}
@@ -177,6 +182,7 @@
     </div>
 </div>
 
+
 {% include "/tabs/browse_js/main_js.html" %}
 
 {% include "/tabs/browse_js/tabulator_js.html" %}
@@ -184,3 +190,6 @@
 {% include "/tabs/browse_js/filter_js.html" %}
 
 {% include "/tabs/browse_js/map_js.html" %}
+
+{% include "/tabs/browse_js/tiles_js.html" %}
+
