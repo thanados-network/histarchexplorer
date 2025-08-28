@@ -1,0 +1,180 @@
+<script> {# Tabulator Table Initialisation #}
+    //columns for table
+    let beginDBP{{tab_name}} = null
+    let endDBP{{tab_name}} = null
+    let type_id{{tab_name}} = null
+    let type_value{{tab_name}} = false
+
+    if ({{ tab_name }}Data.fields.includes("begin")) {
+        document.getElementById("begin-{{ tab_name }}-container").classList.remove("d-none")
+    }
+    if ({{ tab_name }}Data.fields.includes("end")) {
+        document.getElementById("end-{{ tab_name }}-container").classList.remove("d-none")
+    }
+    if ({{ tab_name }}Data.fields.includes("type")) {
+        document.getElementById("{{ tab_name }}TypesButton").classList.remove("d-none")
+    }
+
+    const columns{{ tab_name }} = [
+        {
+            title: "Name",
+            field: "name",
+            headerSort: true,
+            minWidth: 450,
+            formatter: function (cell) {
+                const data = cell.getRow().getData();
+                const id = data.id;
+                const name = data.name;
+                const begin = data.begin;
+                const end = data.end;
+                const description = translateDescription(data.description);
+                let localBeginDate = ''
+                let localEndDate = ''
+                let dateString = '';
+                if (begin) {
+                    localBeginDate = data.beginString
+                    dateString += localBeginDate;
+                    beginDBP{{tab_name}} = data.beginDBP;
+                }
+
+                if (end) {
+                    localEndDate = data.endString;
+                }
+
+                if (begin && end && localBeginDate !== localEndDate) {
+                    dateString += " - ";
+                }
+                if (end && localEndDate !== localBeginDate) {
+                    dateString += data.endString;
+                    endDBP{{tab_name}} = data.endDBP;
+                }
+
+                let hoverTitle = `${name || ''} ${dateString ? '(' + dateString + ')' : ''}`.trim();
+
+                if (description) {
+                    hoverTitle += `\n\n${description}`;
+                }
+
+                return `<div title="${hoverTitle}">` +
+                    `<span>${name}</span><br>` +
+                    `<span class="name-column-date-subtitle">${dateString}</span>` +
+                    `</div>`;
+            }
+        },
+        {
+            title: "Category",
+            field: "class",
+            headerSort: false,
+            maxWidth: 450,
+            minWidth: 450,
+            formatter: function (cell) {
+                const data = cell.getRow().getData();
+                let classValue = data.class;
+                let typeValue = data.type;
+
+                let leftContent = '';
+                let rawClass = '';
+                if (classValue) {
+                    rawClass = classValue;
+                    leftContent = classValue.charAt(0).toUpperCase() + classValue.slice(1);
+                }
+
+                let rightContent = '';
+                let rawType = '';
+                if (typeValue) {
+                    type_value{{tab_name}} = true
+                    rawType = typeValue;
+                    rightContent = typeValue;
+                }
+
+                let combinedHtml = '';
+
+                if (leftContent) {
+                    combinedHtml += `<span>${leftContent}</span>`;
+                }
+                if (rightContent) {
+                    combinedHtml += `<br><i class="category-column-type-subtitle">${rightContent}</i>`;
+                }
+
+                if (leftContent || rightContent) {
+                    combinedHtml += `<div class="tabulator-cell-clearfix"></div>`;
+                }
+
+                let hoverTitle = '';
+                if (rawClass && rawType) {
+                    hoverTitle = `${leftContent} / ${rawType}`;
+                } else if (rawClass) {
+                    hoverTitle = rawClass;
+                } else if (rawType) {
+                    hoverTitle = rawType;
+                }
+
+
+                return `<div title="${hoverTitle}">` +
+                    combinedHtml +
+                    `</div>`;
+            }
+        },
+        {
+            title: "Begin",
+            field: "begin",
+            visible: false
+        },
+        {
+            title: "End",
+            field: "end",
+            visible: false
+        },
+        {
+            title: "BeginDBP",
+            field: "beginDBP",
+            visible: false,
+            sorterParams: {alignEmptyValues: "bottom"}
+        },
+        {
+            title: "EndDBP",
+            field: "endDBP",
+            visible: false,
+            sorterParams: {alignEmptyValues: "bottom"}
+        },
+        {
+            title: "TypeId",
+            field: "type_id",
+            visible: false
+        },
+        {
+            title: "Type",
+            field: "type",
+            visible: false,
+            sorterParams: {alignEmptyValues: "bottom"}
+        },
+        {
+            title: "all",
+            field: "all",
+            visible: false
+        }
+    ];
+
+
+    const table{{ tab_name }} = new Tabulator("#table-{{ tab_name }}", {
+        layout: "fitColumns",
+        responsiveLayout: "collapse",
+        height: "calc( 100vh - 100px - 4rem)",
+        data: {{ tab_name }}Data.tableData,
+        pagination: "local",
+        paginationSize: 50,
+        paginationSizeSelector: [20, 50, 100],
+        columns: columns{{ tab_name }},
+    });
+
+    table{{ tab_name }}.on("rowClick", function (e, row) {
+        const rowData = row.getData();
+        const id = rowData.id;
+
+        if (id) {
+            const url = `/entity/${id}`;
+            window.location.href = url;
+        }
+    });
+
+</script> {# Tabulator Table Initialisation #}
