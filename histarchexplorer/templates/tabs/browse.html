@@ -494,6 +494,10 @@ function adjustTileHeight{{ tab_name }}() {
 
         tileContainer.style.height = `${maxHeight}px`;
         tileContainer.style.maxHeight = `${maxHeight}px`;
+
+        if (grid{{ tab_name }}) {
+      grid{{ tab_name }}.refreshItems().layout();
+    }
     }, 500);
 }
 
