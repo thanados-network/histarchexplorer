@@ -151,7 +151,7 @@
             <p class="tile-sub-label text-uppercase mt-3">
               {{ value[0]['icon'] | safe }} {{ label.replace('_', ' ').title() }}</p>
             {% for type in value %}
-              <div class="badge bg-dark-subtle text-wrap m-1">
+              <div class="badge custom-badge text-wrap m-1">
                 <h6 class="m-0 text-center">
                   {{ type['type'].label }}
                   {% if type['type'].value and type['type'].unit %}:
@@ -169,7 +169,7 @@
 
   <!-- Description -->
   {% if entity.description %}
-    <div class="{{ entity.description_class }}">
+    <div class="item {{ entity.description_class }}">
       <div class="item-content" data-type="description">
         <div class="muuri-description">
           <span class="tile-label">DESCRIPTION</span>
@@ -282,7 +282,7 @@
                         <div class="reference-header">
                           {% if key == "Bibliography" %}
                             <i class="bi bi-book"></i>
-                            <a href="{{ url_for('landing', id_=item.id) }}" class="reference-name">
+                            <a href="{{ url_for('entity', id_=item.id) }}" class="reference-name">
                               {{ item.name }}
                             </a>
                           {% elif key == "External reference" %}
