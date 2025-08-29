@@ -1,63 +1,93 @@
 <style>
-    /* === Tile background image layer === */
-    .tile-container .grid .item {
-        position: relative;
-        overflow: hidden;
+  /* === Tile background image layer === */
+  .tile-container .grid .item {
+      position: relative;
+      overflow: hidden;
 
-        /* defaults for our per-tile animation (JS overrides these) */
-        --bg-start: 118%; /* base (acts like cover) */
-        --bg-target: 100%; /* hover (acts like contain for most wide imgs) */
-    }
+      /* defaults for our per-tile animation (JS overrides these) */
+      --bg-start: 118%; /* base (acts like cover) */
+      --bg-target: 100%; /* hover (acts like contain for most wide imgs) */
+  }
 
-    .tile-container .grid .item .item-bg {
-        position: absolute;
-        inset: 0;
-        background-position: center;
-        background-repeat: no-repeat;
+  .tile-container .grid .item .item-bg {
+      position: absolute;
+      inset: 0;
+      background-position: center;
+      background-repeat: no-repeat;
 
-        /* base uses computed "cover" percentage */
-        background-size: var(--bg-start);
+      /* base uses computed "cover" percentage */
+      background-size: var(--bg-start);
 
-        opacity: 0;
-        transition: opacity .25s ease, background-size .35s ease;
-        z-index: 0; /* under overlay/content */
-    }
+      opacity: 0;
+      transition: opacity .25s ease, background-size .35s ease;
+      z-index: 0; /* under overlay/content */
+  }
 
-    /* reveal image when loaded */
-    .tile-container .grid .item.has-bg .item-bg {
-        opacity: 1;
-    }
+  /* reveal image when loaded */
+  .tile-container .grid .item.has-bg .item-bg {
+      opacity: 1;
+  }
 
-    /* hover animates to computed "contain" percentage */
-    .tile-container .grid .item:hover .item-bg {
-        background-size: var(--bg-target);
-    }
+  /* hover animates to computed "contain" percentage */
+  .tile-container .grid .item:hover .item-bg {
+      background-size: var(--bg-target);
+  }
 
-    /* Optional: readability overlay (doesn't block hover) */
-    .tile-container .grid .item .item-overlay {
-        position: absolute;
-        inset: 0;
-        background: rgba(241, 241, 241, 0.79);
-        opacity: 1;
-        transition: opacity .2s ease;
-        z-index: 1;
-        pointer-events: none;
-    }
+  /* Optional: readability overlay (doesn't block hover) */
+  .tile-container .grid .item .item-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(241, 241, 241, 0.79);
+      opacity: 1;
+      transition: opacity .2s ease;
+      z-index: 1;
+      pointer-events: none;
+  }
 
-    .tile-container .grid .item:hover .item-overlay {
-        opacity: .4;
-    }
+  .tile-container .grid .item:hover .item-overlay {
+      opacity: .4;
+  }
 
-    .tile-container .grid .item:hover .item-content {
-        opacity: .4;
-    }
+  .tile-container .grid .item:hover .item-content {
+      opacity: .4;
+  }
 
-    /* Content on top */
-    .tile-container .grid .item .item-content {
-        position: relative;
-        z-index: 2;
-    }
+  /* Content on top */
+  .tile-container .grid .item .item-content {
+      position: relative;
+      z-index: 2;
+  }
+
+  /* === Sticky pagination, compact with spacing === */
+  .tile-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .tile-container .grid {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 48px; /* keep space so pagination isn’t flush */
+  }
+
+  .tile-container .tile-pagination {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  border-top: 1px solid #ccc;
+  z-index: 5;
+
+  padding: 6px 8px;      /* space inside */
+  font-size: 13px;
+  min-height: 40px;      /* a little taller bar */
+
+  display: flex;         /* enable flexbox */
+  align-items: center;   /* center vertically */
+}
+
 </style>
+
 
 
 <script>
