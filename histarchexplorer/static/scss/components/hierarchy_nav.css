@@ -1,0 +1,284 @@
+:root {
+  --light-card: hsl(0, 0%, 85%);
+  --dark-card: hsl(0, 0%, 49%);
+  --light-card-hover: hsl(227, 33%, 91%);
+  --dark-card-hover: hsl(230, 19%, 36%);
+  --footer-bg-light: transparent;
+  --footer-bg-dark: hsl(0, 0%, 31%);
+  --light-muuri-tile: hsl(0, 20%, 97%, 0.3);
+  --dark-muuri-tile: hsla(0, 0%, 49%, 0.3);
+  --ov-bg-light: none;
+  --ov-bg-dark: none;
+  --light-hierarchy-item: hsl(0, 0%, 83%);
+  --dark-hierarchy-item: hsl(0, 0%, 35%);
+  --light-label: black;
+  --dark-label: white;
+  --light-text: hsl(0, 0%, 33%);
+  --dark-text: hsl(0, 3%, 94%);
+  --card-hover: var(--light-card-hover);
+  --counters-bg-light: hsla(208, 34%, 60%, 0.75);
+  --counters-bg-dark: hsla(208, 24%, 44%, 0.74);
+  --light-text1: hsl(0, 0%, 0%);
+  --light-text2: hsl(230, 17%, 14%);
+  --logo-height: 132px;
+  --navbar-height: 96px;
+  --limegreen: hsl(163, 72%, 41%);
+  --brightred: hsl(356, 69%, 56%);
+  --blue: hsl(208, 92%, 53%);
+  --light-orange: hsl(37, 97%, 70%);
+  --pink: hsl(329, 70%, 58%);
+  --reddish-brown: hsl(349, 19%, 29%);
+  --dark-greyblue: hsl(232, 19%, 15%);
+  --text-color1: var(--light-text2);
+  --text-color2: var(--light-text1);
+  --card-bg: var(--light-card);
+  --card-hover: var(--light-card-hover);
+  --muuri-tile: var(--light-muuri-tile);
+}
+
+body.light {
+  --ov-bg: var(--ov-bg-light);
+  --counters-bg: var(--counters-bg-light);
+  --footer-bg: var(--footer-bg-light);
+  --card-bg: var(--light-card);
+  --card-hover: var(--light-card-hover);
+  --muuri-tile: var(--light-muuri-tile);
+  --hierarchy-item: var(--light-hierarchy-item);
+  --reference-label: var(--light-label);
+  --reference-text: var(--light-text);
+}
+
+body.dark {
+  --counters-bg: var(--counters-bg-dark);
+  --footer-bg: var(--footer-bg-dark);
+  --card-bg: var(--dark-card);
+  --card-hover: var(--dark-card-hover);
+  --muuri-tile: var(--dark-muuri-tile);
+  --hierarchy-item: var(--dark-hierarchy-item);
+  --reference-label: var(--dark-label);
+  --reference-text: var(--dark-text);
+  --ov-bg: var(--ov-bg-dark);
+}
+
+:root {
+  --font-inter: "Inter", sans-serif;
+}
+
+body {
+  font-family: var(--font-inter);
+}
+
+.maxscreen-footer-nav {
+  height: calc(100vh - var(--navbar-height) - var(--logo-height));
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-top: var(--navbar-height);
+}
+
+.scrollable-container {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.MuiAppBar-positionAbsolute,
+.mirador-viewer {
+  top: 3.5rem;
+}
+
+.mosaic-tile {
+  margin: 0;
+}
+.mosaic-root {
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  position: absolute;
+}
+
+.mirador-canvas-nav {
+  display: none;
+}
+
+#loading-indicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+.main-entity-ellipse {
+  border-radius: 30px;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding-bottom: 0.3125rem;
+  max-width: 80%;
+  margin: auto;
+  margin-top: 1rem;
+  display: grid;
+  border-top: 0.3125rem solid transparent;
+  border-bottom: 0.3125rem solid transparent;
+}
+@media (min-width: 1921px) or (max-width: 769px) {
+  .main-entity-ellipse {
+    max-width: 90%;
+    margin: auto;
+    margin-top: 1rem;
+    display: grid;
+    align-content: center;
+    align-items: center;
+  }
+}
+.main-entity-ellipse--places {
+  border-top-color: var(--limegreen);
+  border-bottom-color: var(--limegreen);
+}
+.main-entity-ellipse--actors {
+  border-top-color: var(--pink);
+  border-bottom-color: var(--pink);
+}
+.main-entity-ellipse--events {
+  border-top-color: var(--blue);
+  border-bottom-color: var(--blue);
+}
+.main-entity-ellipse--items {
+  border-top-color: var(--light-orange);
+  border-bottom-color: var(--light-orange);
+}
+.main-entity-ellipse--sources {
+  border-top-color: var(--reddish-brown);
+  border-bottom-color: var(--reddish-brown);
+}
+.main-entity-ellipse--files {
+  border-top-color: var(--dark-greyblue);
+  border-bottom-color: var(--dark-greyblue);
+}
+
+.hierarchy-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  color: black;
+}
+.hierarchy-button button {
+  transition: transform 0.2s ease-in-out;
+}
+.hierarchy-button button:hover {
+  transform: scale(1.2);
+}
+
+button.btn-whitish {
+  background-color: rgba(255, 255, 255, 0.6);
+  border: none;
+  box-shadow: none;
+}
+
+button.btn-whitish:hover {
+  background-color: rgb(255, 255, 255);
+  color: #000;
+}
+
+button.btn-whitish:disabled,
+button.btn-whitish[disabled] {
+  background-color: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.hierarchy-line {
+  background-color: grey;
+  height: 30px;
+  width: 1px;
+  margin: 5px 0;
+}
+
+.hierarchy-card-label {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(1rem, 1.5vw, 1.8rem);
+  font-weight: 600;
+  margin-bottom: 0.625rem;
+  text-transform: uppercase;
+  color: var(--text-color2);
+  padding: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+@media (max-width: 769px) {
+  .hierarchy-card-label {
+    font-size: 2.5rem;
+  }
+}
+.hierarchy-card-label[data-system-class=person] {
+  align-items: flex-start;
+}
+
+@media (min-width: 1921px) {
+  .hierarchy-card-label {
+    font-size: 1.4rem;
+  }
+}
+.hierarchy-item {
+  background-color: var(--hierarchy-item);
+  padding-top: 1rem;
+  min-height: calc(100vh - 106px);
+}
+
+.attribute-area {
+  position: relative;
+  top: 1rem;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 1.25rem;
+  max-width: 80%;
+  margin: auto;
+  display: grid;
+  margin-bottom: 3rem;
+}
+@media (min-width: 1921px) or (max-width: 769px) {
+  .attribute-area {
+    max-width: 90%;
+    margin: auto;
+    display: grid;
+    align-content: center;
+    align-items: center;
+  }
+}
+
+.cite-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cite-button {
+  background: whitesmoke;
+  height: 2rem;
+  border: none;
+  padding: 0.25rem 0.25rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  color: #444;
+  margin-right: 0.5rem;
+}
+.cite-button i {
+  font-size: 1rem;
+}
+.cite-button:hover {
+  background-color: rgb(254, 254, 254);
+}
+.cite-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/*# sourceMappingURL=hierarchy_nav.css.map */
