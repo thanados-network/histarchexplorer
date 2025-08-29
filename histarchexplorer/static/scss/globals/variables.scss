@@ -7,6 +7,8 @@
   --footer-bg-dark: hsl(0, 0%, 31%);
   --light-muuri-tile: hsl(0, 20%, 97%, 0.3);
   --dark-muuri-tile: hsla(0, 0%, 49%, 0.3);
+  --light-badge: hsl(230, 19%, 87%);
+  --dark-badge: hsl(0, 1%, 22%);
 
   --ov-bg-light: none;
   --ov-bg-dark: none;
@@ -56,6 +58,7 @@ body.light {
   --hierarchy-item: var(--light-hierarchy-item);
   --reference-label: var(--light-label);
   --reference-text: var(--light-text);
+  --badge-color: var(--light-badge);
 }
 
 body.dark {
@@ -68,4 +71,5 @@ body.dark {
   --reference-label: var(--dark-label);
   --reference-text: var(--dark-text);
   --ov-bg: var(--ov-bg-dark);
+  --badge-color: var(--dark-badge);
 }

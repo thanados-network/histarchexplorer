@@ -8,6 +8,10 @@
   --footer-bg-dark: hsl(0, 0%, 31%);
   --light-muuri-tile: hsl(0, 20%, 97%, 0.3);
   --dark-muuri-tile: hsla(0, 0%, 49%, 0.3);
+  --light-badge: hsl(230, 19%, 87%);
+  --dark-badge: hsl(0, 1%, 22%);
+  --ov-bg-light: none;
+  --ov-bg-dark: none;
   --light-hierarchy-item: hsl(0, 0%, 83%);
   --dark-hierarchy-item: hsl(0, 0%, 35%);
   --light-label: black;
@@ -36,6 +40,7 @@
 }
 
 body.light {
+  --ov-bg: var(--ov-bg-light);
   --counters-bg: var(--counters-bg-light);
   --footer-bg: var(--footer-bg-light);
   --card-bg: var(--light-card);
@@ -44,6 +49,7 @@ body.light {
   --hierarchy-item: var(--light-hierarchy-item);
   --reference-label: var(--light-label);
   --reference-text: var(--light-text);
+  --badge-color: var(--light-badge);
 }
 
 body.dark {
@@ -55,6 +61,8 @@ body.dark {
   --hierarchy-item: var(--dark-hierarchy-item);
   --reference-label: var(--dark-label);
   --reference-text: var(--dark-text);
+  --ov-bg: var(--ov-bg-dark);
+  --badge-color: var(--dark-badge);
 }
 
 :root {
@@ -12993,13 +13001,17 @@ textarea.form-control-lg {
   line-height: 1.4;
 }
 
+.custom-badge {
+  background-color: var(--badge-color);
+}
+
 .main-entity-ellipse {
   border-radius: 30px;
   background-color: rgba(255, 255, 255, 0.5);
   padding-bottom: 0.3125rem;
   max-width: 80%;
   margin: auto;
-  display: grid;
+  margin-top: 1rem;
   border-top: 0.3125rem solid transparent;
   border-bottom: 0.3125rem solid transparent;
 }
@@ -13007,6 +13019,7 @@ textarea.form-control-lg {
   .main-entity-ellipse {
     max-width: 90%;
     margin: auto;
+    margin-top: 1rem;
     display: grid;
     align-content: center;
     align-items: center;
@@ -13109,7 +13122,6 @@ button.btn-whitish[disabled] {
 .hierarchy-item {
   background-color: var(--hierarchy-item);
   padding-top: 1rem;
-  display: grid;
   min-height: calc(100vh - 106px);
 }
 
@@ -13122,7 +13134,7 @@ button.btn-whitish[disabled] {
   max-width: 80%;
   margin: auto;
   display: grid;
-  margin-bottom: 1.25rem;
+  margin-bottom: 3rem;
 }
 @media (min-width: 1921px) or (max-width: 769px) {
   .attribute-area {
@@ -13312,6 +13324,7 @@ button.btn-whitish[disabled] {
 }
 
 .entity-content {
+  background-color: var(--ov-bg);
   height: calc(100vh - var(--navbar-height));
   overflow-y: auto;
   width: calc(100vw - var(--sidebar-width));
