@@ -5,7 +5,7 @@
 
 
 .entity-content {
-  //background-color: #2fa769;
+ background-color: var(--ov-bg);
   height: calc(100vh - var(--navbar-height));
   overflow-y: auto;
   width: calc(100vw - var(--sidebar-width));

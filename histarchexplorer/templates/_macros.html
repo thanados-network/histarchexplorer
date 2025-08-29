@@ -43,21 +43,15 @@
 
             {# IIIF-Bild, wenn kein WebP #}
           {% elif image.iiif_base_path and image.mimetype|lower != 'image/webp' %}
-{#            <a href="{{ image.iiif_base_path }}/full/max/0/default.jpg"#}
-              <a href="{{ url_for('view_mirador') }}?urls={{ manifests | join(',') | urlencode }}"
-
+            <a href="{{ url_for('view_mirador') }}?urls={{ manifests | join(',') | urlencode }}"
                target="_blank"
                class="hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
                style="z-index: 10;">
               <i class="bi bi-arrows-fullscreen"></i>
             </a>
-            <img
-                src="{{ image.iiif_base_path }}/full/400,/0/default.jpg"
-                alt="{{ image.title }}">
-          {% else %}
-            <img
-                src="{{ image.url }}"
-                alt="{{ image.title }}">
+            <img src="{{ image.iiif_base_path }}/full/400,/0/default.jpg" alt="{{ image.title }}">
+          {% elif image.mimetype|lower != 'image/webp' %}
+            <img src="{{ image.url }}" alt="{{ image.title }}">
           {% endif %}
 
         </div>

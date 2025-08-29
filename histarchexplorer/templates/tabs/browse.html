@@ -1,14 +1,16 @@
-<div id="{{ tab_name }}-header" class="d-flex align-items-center justify-content-between flex-wrap gap-3 m-3">
+<link href="../../static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"/>
+<script src="../../static/node_modules/maplibre-gl/dist/maplibre-gl.js"></script>
+<script type="text/javascript" src="/static/js/mapfunctions.js"></script>
+
+<div id="{{ tab_name }}-header"
+     class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3 mt-3 ms-3 me-3">
 
     <h3 class="m-0">{{ tab_name[0]|upper }}{{ tab_name[1:] }}</h3>
 
-    <div class="input-group" style="max-width: 400px;">
+    <div class="input-group" style="max-width: 600px;">
         <input type="text" id="filterInput{{ tab_name }}" class="form-control" placeholder="Search / Filter">
         <button class="btn btn-outline-secondary" type="button" id="clearFilter{{ tab_name }}">&times;</button>
     </div>
-
-    <div style="min-width: 400px" id="sliderBegin{{ tab_name }}"></div>
-    <div style="min-width: 400px" id="sliderEnd{{ tab_name }}"></div>
 
     <div class="dropdown d-none" id="classDropdown{{ tab_name }}">
         <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
@@ -19,47 +21,121 @@
         </ul>
     </div>
 
-    <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2"
+    <button id="{{ tab_name }}TypesButton" type="button"
+            class="d-none btn btn-outline-secondary d-flex align-items-center gap-2"
             onclick="{{ tab_name }}TreeModal.show()" title="Types">Types
     </button>
 
     <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2"
-            onclick="{{ tab_name }}Modal.show()" title="Advanced Search/Filter">
+            onclick="{{ tab_name }}Modal.show()" title="Advanced Sort">
         <i class="bi bi-funnel"></i>
     </button>
 
+    <div class="d-flex flex-wrap gap-3">
+        <div style="min-width: 300px;" class="d-none ms-3 me-3" id="begin-{{ tab_name }}-container">
+            <div class="d-flex align-items-center gap-2">
+                <span id="sliderBeginMin{{ tab_name }}" class="text-nowrap me-3"></span>
+                <div class="slider-styled flex-grow-1" id="sliderBegin{{ tab_name }}"></div>
+                <span id="sliderBeginMax{{ tab_name }}" class="text-nowrap ms-3"></span>
+            </div>
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" id="includeNoBegin{{ tab_name }}" checked>
+                <label class="form-check-label" for="includeNoBegin{{ tab_name }}">
+                    include {{ tab_name }} without begin date
+                </label>
+            </div>
+        </div>
+
+        <div style="min-width: 300px;" class="d-none ms-3 me-3" id="end-{{ tab_name }}-container">
+            <div class="d-flex align-items-center gap-2">
+                <span id="sliderEndMin{{ tab_name }}" class="text-nowrap me-3"></span>
+                <div class="slider-styled flex-grow-1" id="sliderEnd{{ tab_name }}"></div>
+                <span id="sliderEndMax{{ tab_name }}" class="text-nowrap ms-3"></span>
+            </div>
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" id="includeNoEnd{{ tab_name }}" checked>
+                <label class="form-check-label" for="includeNoEnd{{ tab_name }}">
+                    include {{ tab_name }} without end date
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="dropdown">
+        <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2"
+                data-bs-toggle="dropdown"
+                title="Change View">
+            <i id="{{ tab_name }}-dropdown-btn-icon" class="bi bi-list-ul"></i>
+        </button>
+
+        <ul class="dropdown-menu">
+            <li>
+                <a id="{{ tab_name }}-list-btn" class="dropdown-item btn" onclick="{{ tab_name }}ToggleView('table')">
+                    <i class="bi bi-list-ul me-2"></i> List
+                </a>
+            </li>
+            {% if tab_name in ["places", "items"] %}
+                <li>
+                    <a id="{{ tab_name }}-map-btn" class="dropdown-item btn" onclick="{{ tab_name }}ToggleView('map')">
+                        <i class="bi bi-geo-alt-fill me-2"></i> Map
+                    </a>
+                </li>
+            {% endif %}
+            <li>
+                <a id="{{ tab_name }}-tiles-btn" class="dropdown-item btn" onclick="{{ tab_name }}ToggleView('tile')">
+                    <i class="bi bi-grid-3x3-gap-fill me-2"></i> Tiles
+                </a>
+            </li>
+        </ul>
+    </div>
+
+
 </div>
 
-<div id="table-{{ tab_name }}" class="tabulator-container"></div>
 
+<div id="table-{{ tab_name }}" class="tabulator-container"></div>
+<div id="tile-{{ tab_name }}" class="tile-container d-none">
+  <div class="grid" id="grid-{{ tab_name }}">
+    <!-- Items will be populated by JavaScript -->
+  </div>
+  <div id="tile-pagination-{{ tab_name }}" class="tile-pagination"></div>
+</div>
+{% if tab_name in ['places', 'items'] %}
+    <div id="map-{{ tab_name }}" class="map-container d-none"></div>
+{% endif %}
 <div class="modal fade" id="modal-{{ tab_name }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
      aria-labelledby="modal-title-{{ tab_name }}" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-fullscreen-sm-down">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modal-title-{{ tab_name }}">Filter/Sort
+                <h5 class="modal-title" id="modal-title-{{ tab_name }}">Sort
                     {{ tab_name[0]|upper }}{{ tab_name[1:] }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="accordion" id="accordion{{ tab_name }}">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#{{ tab_name }}collapseSort" aria-expanded="true"
-                                    aria-controls="{{ tab_name }}collapseSort">
-                                Sort
-                            </button>
-                        </h2>
-                        <div id="{{ tab_name }}collapseSort" class="accordion-collapse collapse show">
-                            <div class="accordion-body">
-                                <div id="sort-levels-{{ tab_name }}"></div>
-                                <div class="d-flex justify-content-between">
-                                    <button type="button" class="btn btn-outline-primary"
-                                            id="add-sort-level-{{ tab_name }}">
-                                        Add Sort Level
-                                    </button>
-                                    <span>
+                <div class="row align-items-end mb-2">
+                    <div class="col">
+                        <label class="form-label">Sort by</label>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Direction</label>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-outline-danger remove-sort-level opacity-0 disabled">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+                <div id="sort-levels-{{ tab_name }}">
+
+                </div>
+            </div>
+            <div class="d-flex justify-content-between m-3">
+                <button type="button" class="btn btn-outline-primary"
+                        id="add-sort-level-{{ tab_name }}">
+                    Add Sort Level
+                </button>
+                <span>
                                     <button type="button" class="btn btn-warning" id="reset-sort-btn-{{ tab_name }}">
                                         Reset
                                     </button>
@@ -67,446 +143,54 @@
                                         Apply
                                     </button>
                                     </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#{{ tab_name }}collapseFilter" aria-expanded="false"
-                                    aria-controls="{{ tab_name }}collapseFilter">
-                                Filter
-                            </button>
-                        </h2>
-                        <div id="{{ tab_name }}collapseFilter" class="accordion-collapse collapse">
-                            <div class="accordion-body">
-                                <div id="filter-levels-{{ tab_name }}"></div>
-                                <div class="d-flex justify-content-between">
-
-                                    <span>
-                                    <button type="button" class="btn btn-warning" id="reset-filter-btn-{{ tab_name }}">
-                                        Reset
-                                    </button>
-                                    <button type="button" class="btn btn-primary" id="apply-filter-btn-{{ tab_name }}">
-                                        Apply
-                                    </button>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-
             </div>
         </div>
     </div>
 </div>
+
 
 <div class="modal fade" id="modal-{{ tab_name }}-tree" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
      aria-labelledby="modal-title-{{ tab_name }}-tree" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl modal-fullscreen-sm-down">
         <div class="modal-content">
             <div class="modal-header">
-                Select type
+                <h5 class="modal-title" id="modal-title-{{ tab_name }}-tree">Select Type(s)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div id="tree-{{ tab_name }}">
-                </div>
+                <div id="{{ tab_name }}-tree-container"></div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer justify-content-between">
+
+                <span class="form-check">
+                    <input class="form-check-input" type="checkbox" id="include-subcategories-{{ tab_name }}">
+                    <label class="form-check-label" for="include-subcategories-{{ tab_name }}">
+                      Include subcategories
+                    </label>
+                </span>
+                <span>
+                <button type="button" class="btn btn-warning" id="reset-type-btn-{{ tab_name }}">
+                    Reset
+                </button>
+                <button type="button" class="btn btn-primary" id="apply-type-btn-{{ tab_name }}"
+                        onclick="filtertypes{{ tab_name }}()" ;>
+                    Apply
+                </button>
+                </span>
 
             </div>
         </div>
     </div>
 </div>
 
-<script>
 
-    //prepare data
-    const {{ tab_name }}Data = {}
+{% include "/tabs/browse_js/main_js.html" %}
 
-    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, viewClasses.{{ tab_name }}, ["standard"])
-    {{ tab_name }}Data.tableData = getEntitiesForTab('{{ tab_name }}');
-    {{ tab_name }}Data.fields = getKeysWithValues({{ tab_name }}Data.tableData)
-    {{ tab_name }}Data.classes = [...new Set({{ tab_name }}Data.tableData.map(item => item.class))];
-    {{ tab_name }}Data.typeIds = [...new Set({{ tab_name }}Data.tableData.map(item => item.type_id))];
-    {{ tab_name }}Data.timelineBegin = getSortedDistinctTimeline({{ tab_name }}Data.tableData, "beginString", "beginDBP");
-    {{ tab_name }}Data.timelineEnd = getSortedDistinctTimeline({{ tab_name }}Data.tableData, "endString", "endDBP");
+{% include "/tabs/browse_js/tabulator_js.html" %}
 
+{% include "/tabs/browse_js/filter_js.html" %}
 
-    //columns for table
-    let beginDBP{{tab_name}} = null
-    let endDBP{{tab_name}} = null
-    let type_id{{tab_name}} = null
-    let type_value{{tab_name}} = false
+{% include "/tabs/browse_js/map_js.html" %}
 
-
-    const columns{{ tab_name }} = [
-        {
-            title: "Name",
-            field: "name",
-            headerSort: true,
-            minWidth: 450,
-            formatter: function (cell) {
-                const data = cell.getRow().getData();
-                const id = data.id;
-                const name = data.name;
-                const begin = data.begin;
-                const end = data.end;
-                const description = translateDescription(data.description);
-                let localBeginDate = ''
-                let localEndDate = ''
-                let dateString = '';
-                if (begin) {
-                    localBeginDate = data.beginString
-                    dateString += localBeginDate;
-                    beginDBP{{tab_name}} = data.beginDBP;
-                }
-
-                if (end) {
-                    localEndDate = data.endString;
-                }
-
-                if (begin && end && localBeginDate !== localEndDate) {
-                    dateString += " - ";
-                }
-                if (end && localEndDate !== localBeginDate) {
-                    dateString += data.endString;
-                    endDBP{{tab_name}} = data.endDBP;
-                }
-
-                let hoverTitle = `${name || ''} ${dateString ? '(' + dateString + ')' : ''}`.trim();
-
-                if (description) {
-                    hoverTitle += `\n\n${description}`;
-                }
-
-                return `<div title="${hoverTitle}">` +
-                    `<span>${name}</span><br>` +
-                    `<span class="name-column-date-subtitle">${dateString}</span>` +
-                    `</div>`;
-            }
-        },
-        {
-            title: "Category",
-            field: "class",
-            headerSort: false,
-            maxWidth: 450,
-            minWidth: 450,
-            formatter: function (cell) {
-                const data = cell.getRow().getData();
-                let classValue = data.class;
-                let typeValue = data.type;
-
-                let leftContent = '';
-                let rawClass = '';
-                if (classValue) {
-                    rawClass = classValue;
-                    leftContent = classValue.charAt(0).toUpperCase() + classValue.slice(1);
-                }
-
-                let rightContent = '';
-                let rawType = '';
-                if (typeValue) {
-                    type_value{{tab_name}} = true
-                    rawType = typeValue;
-                    rightContent = typeValue;
-                }
-
-                let combinedHtml = '';
-
-                if (leftContent) {
-                    combinedHtml += `<span>${leftContent}</span>`;
-                }
-                if (rightContent) {
-                    combinedHtml += `<br><i class="category-column-type-subtitle">${rightContent}</i>`;
-                }
-
-                if (leftContent || rightContent) {
-                    combinedHtml += `<div class="tabulator-cell-clearfix"></div>`;
-                }
-
-                let hoverTitle = '';
-                if (rawClass && rawType) {
-                    hoverTitle = `${leftContent} / ${rawType}`;
-                } else if (rawClass) {
-                    hoverTitle = rawClass;
-                } else if (rawType) {
-                    hoverTitle = rawType;
-                }
-
-
-                return `<div title="${hoverTitle}">` +
-                    combinedHtml +
-                    `</div>`;
-            }
-        },
-        {
-            title: "Begin",
-            field: "begin",
-            visible: false
-        },
-        {
-            title: "End",
-            field: "end",
-            visible: false
-        },
-        {
-            title: "BeginDBP",
-            field: "beginDBP",
-            visible: true,
-            sorterParams: {alignEmptyValues: "bottom"}
-        },
-        {
-            title: "EndDBP",
-            field: "endDBP",
-            visible: false,
-            sorterParams: {alignEmptyValues: "bottom"}
-        },
-        {
-            title: "TypeId",
-            field: "type_id",
-            visible: false
-        },
-        {
-            title: "Type",
-            field: "type",
-            visible: false,
-            sorterParams: {alignEmptyValues: "bottom"}
-        },
-        {
-            title: "all",
-            field: "all",
-            visible: false
-        }
-    ];
-
-
-    const table{{ tab_name }} = new Tabulator("#table-{{ tab_name }}", {
-        layout: "fitColumns",
-        responsiveLayout: "collapse",
-        height: "calc( 100vh - 100px - 4rem)",
-        data: {{ tab_name }}Data.tableData,
-        pagination: "local",
-        paginationSize: 50,
-        paginationSizeSelector: [20, 50, 100],
-        columns: columns{{ tab_name }},
-    });
-
-    table{{ tab_name }}.on("rowClick", function (e, row) {
-        const rowData = row.getData();
-        const id = rowData.id;
-
-        if (id) {
-            const url = `/entity/${id}`;
-            window.location.href = url;
-        }
-    });
-
-
-    //advanced filter/sort modal
-    const {{tab_name}}Modal = new bootstrap.Modal('#modal-{{ tab_name }}', {})
-
-    const sortLevelsContainer{{ tab_name }} = document.getElementById('sort-levels-{{ tab_name }}');
-    const addSortLevelBtn{{ tab_name }} = document.getElementById('add-sort-level-{{ tab_name }}');
-
-    let sortLevelId{{ tab_name }} = 0;
-
-    function addSortLevel{{ tab_name }}() {
-        const level{{ tab_name }} = createSortLevel(sortLevelId{{ tab_name }}++, {{ tab_name }}Data.fields);
-        sortLevelsContainer{{ tab_name }}.appendChild(level{{ tab_name }});
-    }
-
-    addSortLevelBtn{{ tab_name }}.addEventListener('click', () => {
-        addSortLevel{{ tab_name }}();
-    });
-
-    sortLevelsContainer{{ tab_name }}.addEventListener('click', (e) => {
-        if (e.target.classList.contains('remove-sort-level')) {
-            e.target.closest('.row').remove();
-        }
-    });
-
-    document.getElementById('apply-sort-btn-{{ tab_name }}').addEventListener('click', () => {
-        const sorters{{ tab_name }} = [];
-
-        const levels{{ tab_name }} = sortLevelsContainer{{ tab_name }}.querySelectorAll('.row');
-        levels{{ tab_name }}.forEach(level => {
-            const field{{ tab_name }} = level.querySelector('.sort-field').value;
-            const direction{{ tab_name }} = level.querySelector('.sort-direction').value;
-            if (field{{ tab_name }}) {
-                sorters{{ tab_name }}.push({column: field{{ tab_name }}, dir: direction{{tab_name}}});
-            }
-        });
-
-        table{{ tab_name }}.setSort(sorters{{ tab_name }});
-    });
-
-    document.getElementById('reset-sort-btn-{{ tab_name }}').addEventListener('click', () => {
-        table{{ tab_name }}.clearSort();
-        sortLevelsContainer{{ tab_name }}.innerHTML = '';  // Optionally clear UI
-        addSortLevel{{ tab_name }}();  // Optionally add one empty level back
-    });
-
-    document.getElementById('modal-{{ tab_name }}').addEventListener('shown.bs.modal', () => {
-        if (sortLevelsContainer{{ tab_name }}.children.length === 0) {
-            addSortLevel{{ tab_name }}();
-        }
-    });
-
-    //simple filter input
-    const filterInput{{ tab_name }} = document.getElementById("filterInput{{ tab_name }}");
-    const clearButton{{ tab_name }} = document.getElementById("clearFilter{{ tab_name }}");
-
-    filterInput{{ tab_name }}.addEventListener("input", function () {
-        applyCombinedFilter{{ tab_name }}();
-    });
-
-    clearButton{{ tab_name }}.addEventListener("click", function () {
-        filterInput{{ tab_name }}.value = "";
-        applyCombinedFilter{{ tab_name }}();
-        filterInput{{ tab_name }}.focus();
-    });
-
-    //filter classes
-    const classList{{ tab_name }} = {{ tab_name }}Data.classes;
-
-
-    if (classList{{ tab_name }}.length > 1) {
-        const classSelect{{ tab_name }} = document.getElementById("classSelect{{ tab_name }}");
-        const classDropdown = document.getElementById("classDropdown{{ tab_name }}");
-        classDropdown.classList.remove("d-none");
-
-        classList{{ tab_name }}.forEach(cls => {
-            const li = document.createElement("li");
-            li.classList.add("form-check");
-
-            li.innerHTML = `
-        <input class="form-check-input" type="checkbox" value="${cls}" id="check-${cls}">
-        <label class="form-check-label" for="check-${cls}">${cls.replace('_', ' ')}</label>
-    `;
-
-            classSelect{{ tab_name }}.appendChild(li);
-        });
-    }
-
-    document.addEventListener("change", function (e) {
-        if (e.target.matches(`#classSelect{{ tab_name }} input[type="checkbox"]`)) {
-            applyCombinedFilter{{ tab_name }}();
-        }
-    });
-
-    function applyCombinedFilter{{ tab_name }}() {
-        const textValue{{tab_name}} = document.getElementById(`filterInput{{tab_name}}`).value.trim();
-
-        const checkboxes{{tab_name}} = document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]:checked`);
-        const selectedClasses{{tab_name}} = Array.from(checkboxes{{tab_name}}).map(cb => cb.value);
-
-        const filters{{tab_name}} = [];
-
-        if (textValue{{tab_name}}) {
-            filters{{tab_name}}.push({field: "all", type: "like", value: textValue{{tab_name}}});
-        }
-
-        if (selectedClasses{{tab_name}}.length > 0) {
-            filters{{tab_name}}.push({
-                field: "class",
-                type: "in",
-                value: selectedClasses{{tab_name}}
-            });
-        }
-
-        if ({{ tab_name }}Data.fields.includes("begin")) {
-            const beginSliderValues = sliderBegin{{ tab_name }}.noUiSlider.get();
-            console.log('beginSliderValues');
-            console.log(beginSliderValues);
-            const [beginMin, beginMax] = getDaysBPBfromString(beginSliderValues, {{ tab_name }}Data.timelineBegin);
-
-            if (!isNaN(beginMin) && !isNaN(beginMax)) {
-                filters{{tab_name}}.push({field: "beginDBP", type: ">=", value: beginMin});
-                filters{{tab_name}}.push({field: "beginDBP", type: "<=", value: beginMax});
-                //filters{{tab_name}}.push([{field: "beginDBP", type: "=", value: null}]);
-            }
-        }
-
-        if ({{ tab_name }}Data.fields.includes("end")) {
-            const endSliderValues = sliderEnd{{ tab_name }}.noUiSlider.get();
-            const [endMin, endMax] = getDaysBPBfromString(endSliderValues, {{ tab_name }}Data.timelineEnd);
-
-            if (!isNaN(endMin) && !isNaN(endMax)) {
-                filters{{tab_name}}.push({field: "endDBP", type: ">=", value: endMin});
-                filters{{tab_name}}.push({field: "endDBP", type: "<=", value: endMax});
-            }
-        }
-
-        if (filters{{tab_name}}.length > 0) {
-            table{{tab_name}}.setFilter(filters{{tab_name}});
-        } else {
-            table{{tab_name}}.clearFilter();
-        }
-    }
-
-    if ({{ tab_name }}Data.fields.includes("begin")) {
-
-        const sliderBegin{{ tab_name }} = document.getElementById('sliderBegin{{ tab_name }}');
-
-        const arbitraryValuesForSlider{{ tab_name }} = {{ tab_name }}Data.timelineBegin.map(e => e.string);
-
-
-        noUiSlider.create(sliderBegin{{ tab_name }}, {
-            range: {min: 0, max: arbitraryValuesForSlider{{ tab_name }}.length - 1},
-            start: [arbitraryValuesForSlider{{ tab_name }}[0], arbitraryValuesForSlider{{ tab_name }}[arbitraryValuesForSlider{{ tab_name }}.length - 1]],
-            step: 1,
-            tooltips: true,
-            format: {
-                to: function (value) {
-                    return arbitraryValuesForSlider{{ tab_name }}[Math.round(value)];
-                },
-                from: function (value) {
-                    return arbitraryValuesForSlider{{ tab_name }}.indexOf(value);
-                }
-            }
-        });
-
-        sliderBegin{{ tab_name }}.noUiSlider.on("change", function (values) {
-             applyCombinedFilter{{ tab_name }}()
-        });
-
-
-    }
-
-    if ({{ tab_name }}Data.fields.includes("end")) {
-
-        const sliderEnd{{ tab_name }} = document.getElementById('sliderEnd{{ tab_name }}');
-
-        const arbitraryValuesForSlider{{ tab_name }} = {{ tab_name }}Data.timelineEnd.map(e => e.string);
-
-
-        noUiSlider.create(sliderEnd{{ tab_name }}, {
-            range: {min: 0, max: arbitraryValuesForSlider{{ tab_name }}.length - 1},
-            start: [arbitraryValuesForSlider{{ tab_name }}[0], arbitraryValuesForSlider{{ tab_name }}[arbitraryValuesForSlider{{ tab_name }}.length - 1]],
-            step: 1,
-            tooltips: true,
-            format: {
-                to: function (value) {
-                    return arbitraryValuesForSlider{{ tab_name }}[Math.round(value)];
-                },
-                from: function (value) {
-                    return arbitraryValuesForSlider{{ tab_name }}.indexOf(value);
-                }
-            }
-        });
-
-        sliderEnd{{ tab_name }}.noUiSlider.on("change", function (values) {
-                applyCombinedFilter{{ tab_name }}()
-            }
-        );
-
-
-    }
-
-</script>
+{% include "/tabs/browse_js/tiles_js.html" %}
 

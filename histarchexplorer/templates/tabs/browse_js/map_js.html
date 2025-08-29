@@ -1,0 +1,204 @@
+<script> {# Map #}
+//Map
+{% if tab_name in ['places', 'items'] %}
+
+    let filter{{ tab_name }} = ['artifact', 'human_remains']
+    {% if tab_name in ['places'] %}
+        filter{{ tab_name }} = ['place', 'feature', 'stratigraphic_unit']
+    {% endif %}
+
+    const filteredGeomData{{ tab_name }} = data.geometries.features.filter(
+        f => filter{{ tab_name }}.includes(f.properties.class));
+
+    const featureCollection{{ tab_name }} = {
+        type: "FeatureCollection",
+        features: filteredGeomData{{ tab_name }}
+    };
+
+    const bounds{{ tab_name }} = new maplibregl.LngLatBounds();
+    featureCollection{{ tab_name }}.features.forEach(extendBounds{{ tab_name }});
+    const center{{ tab_name }} = bounds{{ tab_name }}.getCenter();
+    const onePointFeature{{ tab_name }} = (featureCollection{{ tab_name }}.features.length === 1 && featureCollection{{ tab_name }}.features[0].geometry.type === 'Point');
+
+    const map{{tab_name}} = new maplibregl.Map({
+        container: 'map-{{ tab_name }}',
+        style: 'https://api.maptiler.com/maps/topo-v2/style.json?key=E7Jrgaazm79UlTuEI5f5',
+        maxPitch: 85,
+        maxZoom: 25,
+        center: center{{ tab_name }}, // starting position [lng, lat]
+
+    });
+
+    const mapVectorLayers{{ tab_name }} = [
+        '{{ tab_name }}-layer-fill',
+        '{{ tab_name }}-layer-line',
+        '{{ tab_name }}-layer-circle'
+    ]
+
+    map{{tab_name}}.on('load', () => {
+    const mapRef = map{{tab_name}};
+    const sourceId = '{{ tab_name }}-source';
+
+    // 1. Add the GeoJSON source
+    mapRef.addSource(sourceId, {
+        type: 'geojson',
+        data: featureCollection{{ tab_name }}
+    });
+
+    // 2. Define base layers
+    const baseLayers = [
+        {
+            id: '{{ tab_name }}-layer-fill',
+            type: 'fill',
+            paint: { 'fill-color': '#088', 'fill-opacity': 0.5 },
+            filter: ['==', '$type', 'Polygon']
+        },
+        {
+            id: '{{ tab_name }}-layer-outline',
+            type: 'line',
+            paint: { 'line-color': '#004747', 'line-width': 1 },
+            filter: ['==', '$type', 'Polygon']
+        },
+        {
+            id: '{{ tab_name }}-layer-line',
+            type: 'line',
+            paint: { 'line-color': '#088', 'line-width': 2 },
+            filter: ['==', '$type', 'LineString']
+        },
+        {
+            id: '{{ tab_name }}-layer-circle',
+            type: 'circle',
+            paint: { 'circle-radius': 9, 'circle-color': '#088' },
+            filter: ['==', '$type', 'Point']
+        }
+    ];
+
+    // 3. Define highlight layers
+    const highlightLayers = [
+        {
+            id: 'highlight-polygon',
+            type: 'fill',
+            paint: { 'fill-color': '#FF4444', 'fill-opacity': 0.5 },
+            filter: ['==', '$type', 'Polygon']
+        },
+        {
+            id: 'highlight-polygon-outline',
+            type: 'line',
+            paint: { 'line-color': 'rgba(255,255,255,0.8)', 'line-width': 3 },
+            filter: ['==', '$type', 'Polygon']
+        },
+        {
+            id: 'highlight-linestring',
+            type: 'line',
+            paint: { 'line-color': 'rgba(255,68,68,0.63)', 'line-width': 3 },
+            filter: ['==', '$type', 'LineString']
+        },
+        {
+            id: 'highlight-points',
+            type: 'circle',
+            paint: { 'circle-color': 'rgba(255,68,68,0.86)', 'circle-radius': 12 },
+            filter: ['==', '$type', 'Point']
+        }
+    ];
+
+    // 4. Add all layers in one go
+    [...baseLayers, ...highlightLayers].forEach(layer => {
+        mapRef.addLayer({
+            source: sourceId,
+            ...layer
+        });
+    });
+
+    // 5. Init interactions
+    setPointer(mapVectorLayers{{ tab_name }}, mapRef);
+    highlightFeatures([], mapRef);
+
+});
+
+    map{{ tab_name }}.on('click', (e) => {
+        highlightFeatures([], map{{ tab_name }})
+        const clickedFeatures = map{{ tab_name }}.queryRenderedFeatures(e.point, {
+            layers: mapVectorLayers{{ tab_name }}
+        });
+
+        if (!clickedFeatures.length) return;
+        console.log('clickedFeatures', clickedFeatures);
+
+        const featureNames = clickedFeatures.map(f =>
+            `<button class="map-popup-hoverlink" data-id="${f.properties.id}" onclick="window.location.href='/entity/${f.properties.id}'">
+    ${f.properties.name} (${f.properties.class})
+  </button>`
+        );
+        featureIds = clickedFeatures.map(f => f.properties.id);
+
+        highlightFeatures(featureIds, map{{ tab_name }});
+
+        showPopup(e.lngLat, featureNames, map{{ tab_name }});
+    });
+
+
+    function extendBounds{{ tab_name }}(feature) {
+        const {type, coordinates} = feature.geometry;
+
+        const extend = (coord) => {
+            if (Array.isArray(coord) &&
+                coord.length === 2 &&
+                typeof coord[0] === "number" &&
+                typeof coord[1] === "number") {
+                bounds{{ tab_name }}.extend(coord);
+            }
+        };
+
+        switch (type) {
+            case "Point":
+                extend(coordinates);
+                break;
+            case "LineString":
+            case "MultiPoint":
+                coordinates.forEach(c => extend(c));
+                break;
+            case "Polygon":
+            case "MultiLineString":
+                coordinates.forEach(ring => ring.forEach(c => extend(c)));
+                break;
+            case "MultiPolygon":
+                coordinates.forEach(polygon =>
+                    polygon.forEach(ring =>
+                        ring.forEach(c => extend(c))
+                    )
+                );
+                break;
+        }
+    }
+
+table{{ tab_name }}.on("dataFiltered", function (filters, rows) {
+    filteredIDdata{{ tab_name }} = rows.map(row => row.getData().id);
+
+    console.log('Stored filtered data:', filteredIDdata{{ tab_name }}.length);
+    console.log(filteredIDdata{{ tab_name }});
+
+    const filteredFeatures{{ tab_name }} = featureCollection{{ tab_name }}.features.filter(
+        f => filteredIDdata{{ tab_name }}.includes(f.properties.id)
+    );
+
+    const src = map{{ tab_name }}.getSource('{{ tab_name }}-source');
+    if (src) {
+        src.setData({
+            type: 'FeatureCollection',
+            features: filteredFeatures{{ tab_name }}
+        });
+    } else {
+        // Wait until the map is loaded
+        map{{ tab_name }}.on('load', () => {
+            map{{ tab_name }}.getSource('{{ tab_name }}-source').setData({
+                type: 'FeatureCollection',
+                features: filteredFeatures{{ tab_name }}
+            });
+        });
+    }
+});
+
+
+{% endif %}
+
+</script> {# Map #}

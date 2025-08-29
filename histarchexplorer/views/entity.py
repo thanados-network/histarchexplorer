@@ -154,8 +154,8 @@ def get_recursive_type_ids(id):
     """
     g.cursor.execute(sql, {'id': id})
     result = g.cursor.fetchall()
-    print('result get_recursive_type_ids(id)')
-    print(result)
+    #print('result get_recursive_type_ids(id)')
+    #print(result)
     return result
 
 
@@ -168,8 +168,8 @@ def build_id_collection(ids):
         for id in ids
         for row in get_recursive_type_ids(id)
     ]
-    print('result build_id_collection(ids)')
-    print(result)
+    #print('result build_id_collection(ids)')
+    #print(result)
     return result
 
 
@@ -186,7 +186,7 @@ def check_geom(id):
           """
     g.cursor.execute(sql, {'id': id})
     result = g.cursor.fetchone()
-    print(id if result and result[0] else None)
+    #print(id if result and result[0] else None)
 
     return id if result and result[0] else None
 
@@ -289,9 +289,45 @@ FROM model.entity a JOIN model.link l1 ON l1.domain_id = a.id
 JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id WHERE l1.property_code = 'P2')) e {where_sql}
     """
 
-    print((query, tuple(params)))
+    #print((query, tuple(params)))
     g.cursor.execute(query, tuple(params))
     data['entities'] = g.cursor.fetchone()[0] or []
+
+    geom_query = f"""
+            SELECT jsonb_build_object(
+                'type', 'FeatureCollection',
+                'features', jsonb_agg(
+                    jsonb_build_object(
+                        'type', 'Feature',
+                        'geometry', ST_AsGeoJSON(
+            
+                                COALESCE(g.geom_point, g.geom_polygon, g.geom_linestring), 4326
+            
+                        )::jsonb,
+                        'properties', jsonb_build_object(
+                            'id', e.id,
+                            'name', e.name,
+                            'class', e.openatlas_class_name
+                        )
+                    )
+                )
+            ) AS geojson
+            FROM model.entity e
+            JOIN model.link l
+                ON e.id = l.domain_id
+            JOIN model.gis g
+                ON g.entity_id = l.range_id
+            {where_sql} 
+            AND l.property_code = 'P53'
+              AND (
+                  g.geom_point IS NOT NULL
+                  OR g.geom_polygon IS NOT NULL
+                  OR g.geom_linestring IS NOT NULL
+              );
+"""
+
+    g.cursor.execute(geom_query, tuple(params))
+    data['geometries'] = g.cursor.fetchone()[0] or []
 
     count_query = f"""
                      SELECT e.openatlas_class_name, COUNT(*) AS count
@@ -368,7 +404,8 @@ def entities(tab_name="") -> str:
     if tab_name == "" and sidebar_elements:
         tab_name = sidebar_elements[0]['route']
 
-    print(type_tree())
+    #print(type_tree())
+    print(data['geometries'])
 
     return render_template(
         'entity.html',
@@ -378,13 +415,13 @@ def entities(tab_name="") -> str:
         entity_id=0,
         page_name="landing",
         active_tab=tab_name,
-        typetree_data=type_tree().json
-    )
+        typetree_data=type_tree().json,
+        main_image_json=g.main_images)
 
 
 @app.route('/get_entities/<tab_name>')
 def get_entities(tab_name: str = None) -> str:
-    print(tab_name)
+    #print(tab_name)
     return render_template(
         f'tabs/browse.html',
         tab_name=tab_name)
@@ -465,7 +502,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     elif tab_name == 'map':
         map_data = get_map_data()
         if not map_data['features']:
-            print('No spatial features found. Aborting with 404.')
+            #print('No spatial features found. Aborting with 404.')
             abort(404)
         data['spatial'] = map_data
     elif tab_name == 'catalogue':
@@ -476,8 +513,6 @@ def get_entity(id_: int, tab_name=None) -> str:
         catalogue_entities = build_entity_tree(c_entities)
         for entity in catalogue_entities:
             entity.all_child_depictions = collect_child_depictions(entity)
-
-
 
     elif tab_name == 'overview':
         # data = get_entity()
@@ -552,8 +587,9 @@ def get_entity(id_: int, tab_name=None) -> str:
         if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
             abort(404)
-    print(all_images)
-    print([img.iiif_manifest for img in all_images])
+    #print(all_images)
+    #print([img.iiif_manifest for img in all_images])
+
     return render_template(
         f'tabs/{tab_name}.html',
         data=json.dumps(data),

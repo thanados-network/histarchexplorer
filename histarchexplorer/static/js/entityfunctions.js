@@ -103,24 +103,25 @@ function getUniqueValues(data, field) {
     return [...new Set(data.map(row => row[field]).filter(Boolean))].sort();
 }
 
-function createSortLevel(id, fields) {
+function createSortLevel(id, fields, classList, typeIds,) {
     const div = document.createElement('div');
     div.classList.add('row', 'align-items-end', 'mb-2');
     div.dataset.id = id;
-
+    let showClasses = false;
+    let showTypes = false;
+    if (fields.includes('class') && classList.length > 1) {showClasses = true}
+    if (fields.includes('type') && typeIds.length > 1) {showTypes = true}
     div.innerHTML = `
     <div class="col">
-      <label class="form-label">Sort by</label>
       <select class="form-select sort-field">
         ${fields.includes('name') ? `<option value="name">Name</option>` : ''}
-        ${fields.includes('class') ? `<option value="class">Class</option>` : ''}
-        ${fields.includes('type') ? `<option value="type">Type</option>` : ''}
+        ${showClasses ? `<option value="class">Class</option>` : ''}
+        ${showTypes ? `<option value="type">Type</option>` : ''}
         ${fields.includes('beginDBP') ? `<option value="beginDBP">Begin</option>` : ''}
         ${fields.includes('endDBP') ? `<option value="endDBP">End</option>` : ''}
       </select>
     </div>
     <div class="col">
-      <label class="form-label">Direction</label>
       <select class="form-select sort-direction">
         <option value="asc">Ascending</option>
         <option value="desc">Descending</option>
@@ -158,10 +159,8 @@ function getKeysWithValues(dataArray) {
     return Array.from(keysWithValues);
 }
 
-function collectAndGroupMatchingData(jsonData, keysToMatch, categoriesToMatch) {
+function collectAndGroupMatchingData(jsonData, keysToMatch, categoriesToMatch, typeIds) {
     const result = {};
-    const seen = []; // Track already grouped values
-
     if (!Array.isArray(categoriesToMatch)) {
         console.warn("categoriesToMatch must be an array");
         return result;
@@ -173,17 +172,19 @@ function collectAndGroupMatchingData(jsonData, keysToMatch, categoriesToMatch) {
         const section = jsonData[currentKey];
         if (!Array.isArray(section)) return;
 
-        // Filter entries by category
-        const filteredEntries = section.filter(entry =>
-            entry?.category && categoriesToMatch.includes(entry.category)
-        ).map(entry => ({
-            id: entry.id,
-            label: entry.name,
-            category: entry.category,
-            children: cloneWithChildren(entry.children)
-        }));
+        const filteredEntries = section
+            .filter(entry => entry?.category && categoriesToMatch.includes(entry.category))
+            .map(entry => ({
+                id: entry.id,
+                label: entry.name,
+                children: cloneWithChildren(entry.children, typeIds)
+            }))
 
-        // Try to group with already seen entries
+            .filter(entry => entry.id && (
+                typeIds.includes(entry.id) || (entry.children?.length > 0)
+            ));
+
+
         let foundGroup = false;
         for (const group of keyGroups) {
             if (deepEqual(group.data, filteredEntries)) {
@@ -192,32 +193,42 @@ function collectAndGroupMatchingData(jsonData, keysToMatch, categoriesToMatch) {
                 break;
             }
         }
-
         if (!foundGroup) {
-            keyGroups.push({keys: [currentKey], data: filteredEntries});
+            keyGroups.push({ keys: [currentKey], data: filteredEntries });
         }
     });
 
-    // Build result object
     keyGroups.forEach(group => {
         const combinedKey = group.keys.join(", ");
         result[combinedKey] = group.data;
     });
 
+    console.log(result);
+
     return result;
 }
 
-function cloneWithChildren(items) {
+function cloneWithChildren(items, typeIds) {
     if (!Array.isArray(items)) return [];
-    return items.map(item => ({
-        id: item.id,
-        label: item.label,
-        url: item.url,
-        children: cloneWithChildren(item.children)
-    }));
+
+    return items
+        .map(item => {
+
+            const filteredChildren = cloneWithChildren(item.children, typeIds);
+
+            if (typeIds.includes(item.id) || filteredChildren.length > 0) {
+                return {
+                    id: item.id,
+                    label: item.name,
+                    children: filteredChildren
+                };
+            }
+            return null;
+        })
+        .filter(Boolean);
 }
 
-// Deep equality check (simplified for JSON-serializable objects)
+
 function deepEqual(a, b) {
     return JSON.stringify(a) === JSON.stringify(b);
 }

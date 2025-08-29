@@ -2,10 +2,6 @@
 <link href="../../static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"/>
 <script src="../../static/node_modules/maplibre-gl/dist/maplibre-gl.js"></script>
 
-<link rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script type="module" src="/static/node_modules/muuri/dist/muuri.min.js"></script>
 
 <script src="../../static/js/overview.js"></script>
@@ -32,26 +28,11 @@
 <script> const entityName = entity.name</script>
 <script src="{{ url_for('static', filename='js/map_overview.js') }}"></script>
 <script>
-    //console.log("Data:", {{ data | tojson | safe }});
-    //console.log("entity:", entity);
-    //console.log("gisData:", gisData);
-
-</script>
-
-<script>
-    const main_image = {{ main_image | tojson | safe }};
-    const images = {{ initial_images | tojson | safe }};
-    const more_images = {{ more_images | tojson | safe }};
-    const remainingImages = {{ remaining_images|tojson }};
-</script>
-
-<script>
     const related_entities = JSON.parse(JSON.parse({{ data|tojson }}).related_entities || 'null');
 </script>
 
 
 <link rel="stylesheet" href="/static/css/main.css">
-<!-- <div id="overview-content"></div> -->
 
 <div class="col flex-column grid-muuri">
 
@@ -170,7 +151,7 @@
             <p class="tile-sub-label text-uppercase mt-3">
               {{ value[0]['icon'] | safe }} {{ label.replace('_', ' ').title() }}</p>
             {% for type in value %}
-              <div class="badge bg-dark-subtle text-wrap m-1">
+              <div class="badge custom-badge text-wrap m-1">
                 <h6 class="m-0 text-center">
                   {{ type['type'].label }}
                   {% if type['type'].value and type['type'].unit %}:
@@ -188,7 +169,7 @@
 
   <!-- Description -->
   {% if entity.description %}
-    <div class="{{ entity.description_class }}">
+    <div class="item {{ entity.description_class }}">
       <div class="item-content" data-type="description">
         <div class="muuri-description">
           <span class="tile-label">DESCRIPTION</span>
@@ -301,7 +282,7 @@
                         <div class="reference-header">
                           {% if key == "Bibliography" %}
                             <i class="bi bi-book"></i>
-                            <a href="{{ url_for('landing', id_=item.id) }}" class="reference-name">
+                            <a href="{{ url_for('entity', id_=item.id) }}" class="reference-name">
                               {{ item.name }}
                             </a>
                           {% elif key == "External reference" %}
@@ -346,34 +327,12 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const btn = document.getElementById('show-more-images');
-        const gridContainer = document.querySelector('.grid-muuri');
 
-        console.log('Button:', btn);
-        console.log('Grid Container:', gridContainer);
-        console.log('Remaining images:', remainingImages);
-        console.log('Muuri grid:', window.grid);
+        setTimeout(() => {
+            window.grid.refreshItems().layout();
+        }, 100);
+    })
 
-        if (btn && gridContainer && remainingImages.length > 0) {
-            btn.addEventListener('click', function () {
-                remainingImages.forEach(image => {
-                    const el = document.createElement('div');
-                    el.classList.add('item-half');
-                    el.innerHTML = `
-                    <img src="${image.url}" alt="${image.label || ''}" loading="lazy">
-                `;
-                    gridContainer.appendChild(el);
-                    window.grid.add(el);
-                });
-
-                btn.style.display = 'none';
-
-                setTimeout(() => {
-                    window.grid.refreshItems().layout();
-                }, 100);
-            });
-        }
-    });
 
 </script>
 
