@@ -1,0 +1,274 @@
+@use '../globals'as *;
+
+.name-column-date-subtitle {
+  color: grey;
+  //margin-left: 1rem;
+}
+
+.category-column-type-subtitle {
+  color: grey;
+  font-style: italic;
+  //margin-left: 1rem;
+}
+
+.tabulator-cell-clearfix {
+  clear: both;
+}
+
+.tabulator-container {
+  max-height: calc(100vh - var(--navbar-height) - 52px - 3rem);
+  margin: 0 1rem 1rem 1rem !important;
+  box-sizing: border-box;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease-in-out;
+}
+
+.tabulator-row .tabulator-responsive-collapse table tr td:first-of-type {
+  padding-right: 0px;
+  display: none;
+}
+
+.tabulator-row .tabulator-responsive-collapse {
+  border-top: none !important;
+  padding: 20px !important;
+}
+
+.tabulator-footer {
+  background-color: transparent !important;
+}
+
+/* Round slider styling */
+.slider-styled {
+  height: 10px !important;
+}
+
+.slider-styled .noUi-target {
+  border: none !important;
+  box-shadow: none !important;
+  height: 10px !important;
+  border-radius: 5px !important;
+}
+
+.slider-styled .noUi-base {
+  height: 10px !important;
+}
+
+.slider-styled .noUi-connect {
+  background: #2936c1 !important;
+  height: 10px !important;
+  border-radius: 5px !important;
+  z-index: 10 !important;
+  position: relative !important;
+}
+
+.slider-styled .noUi-handle {
+  height: 18px !important;
+  width: 18px !important;
+  top: -5px !important;
+  right: -9px !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  border: 1px solid #ccc !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 20 !important;
+}
+
+.slider-styled .noUi-handle:before,
+.slider-styled .noUi-handle:after {
+  display: none !important;
+}
+
+.slider-styled .noUi-touch-area {
+  height: 40px !important;
+  width: 40px !important;
+  margin: -11px !important;
+}
+
+.map-container {
+  opacity: 0;
+  transition: opacity 1000ms ease-in-out;
+}
+
+/* ===== Container & Grid Base ===== */
+.tile-container {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 100px - 4rem); /* Match table height */
+  max-height: 830px; /* Match table max-height */
+  overflow-y: auto; /* Enable scrolling within the container */
+  overflow-x: hidden;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Responsive column config (defaults for big screens) */
+.tile-container .grid {
+  --cols: 8; /* Big displays → 8 tiles per row */
+  --gap: 16px; /* Space between tiles */
+  position: relative !important; /* Muuri container should be relative */
+  width: 100%;
+  min-height: 100%;
+  padding: 0; /* gutters handled by item margins */
+  box-sizing: border-box;
+}
+
+/* ===== Muuri Items ===== */
+.tile-container .grid .item {
+  position: absolute !important; /* Muuri positions items absolutely */
+  display: block !important;
+  box-sizing: border-box;
+
+  /* Exact width per column minus horizontal margins (gap) */
+  width: calc((100% / var(--cols)) - var(--gap));
+  margin: calc(var(--gap) / 2);
+  height: 360px;
+
+  z-index: 1;
+  background: var(--muuri-tile);
+  border-radius: 5px; /* Rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: none;
+  transition: box-shadow .3s ease, transform .3s ease;
+}
+
+.tile-container .item-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 25px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  text-align: center;
+}
+
+.tile-container .item-title {
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 1.3;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Allow up to 3 lines */
+  -webkit-box-orient: vertical;
+}
+
+.tile-container .item-category {
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.tile-container .item-date {
+  color: #888;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: auto; /* Push to bottom */
+  letter-spacing: 0.2px;
+}
+
+.tile-container .grid .item:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile-container .grid .item {
+    transition: none;
+  }
+}
+
+/* ===== Breakpoints: only adjust column count ===== */
+@media (max-width: 1600px) {
+  .tile-container .grid {
+    --cols: 6;
+  }
+}
+
+@media (max-width: 1200px) {
+  .tile-container .grid {
+    --cols: 4;
+  }
+}
+
+@media (max-width: 992px) {
+  .tile-container .grid {
+    --cols: 3;
+  }
+}
+
+@media (max-width: 768px) {
+  .tile-container .grid {
+    --cols: 2;
+  }
+}
+
+@media (max-width: 480px) {
+  .tile-container .grid {
+    --cols: 1;
+  }
+}
+
+/* ===== Pagination (unchanged) ===== */
+.tile-pagination {
+  position: relative;
+  background: #fff;
+  border-top: 1px solid #ddd;
+  padding: 10px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.tile-pagination .pagination-info {
+  font-size: 14px;
+  color: #666;
+  margin: 0 15px;
+}
+
+.tile-pagination .pagination-controls {
+  display: flex;
+  gap: 5px;
+}
+
+.tile-pagination button {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.tile-pagination button:hover:not(:disabled) {
+  background: #f5f5f5;
+}
+
+.tile-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tile-pagination button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.maplibregl-popup-content {
+  max-height: 50vh;
+  overflow-y: auto;
+}
