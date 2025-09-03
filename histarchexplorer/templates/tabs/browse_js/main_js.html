@@ -40,13 +40,13 @@ function {{tab_name}}ToggleView(view) {
 
     {% if tab_name in ["places", "items"] %}
         if (!{{ tab_name }}MapLoaded) {
-            addTerrain{{ tab_name }}();
-            addSkybox{{ tab_name }}();
-            addControls{{ tab_name }}();
+            addTerrain(map{{ tab_name }});
+            addSkybox(map{{ tab_name }});
+            addControls(map{{ tab_name }});
 
             setTimeout(() => {
                 if (!bounds{{ tab_name }}.isEmpty() && !onePointFeature{{ tab_name }}) {
-                    map{{ tab_name }}.fitBounds(bounds{{ tab_name }}, {padding: 200});
+                    map{{ tab_name }}.fitBounds(bounds{{ tab_name }}, {padding: 20});
                     document.getElementById('map-{{ tab_name }}').style.opacity = "1"
                 }
             }, 500);

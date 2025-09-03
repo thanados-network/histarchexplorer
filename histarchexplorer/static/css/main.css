@@ -12595,6 +12595,11 @@ textarea.form-control-lg {
   border-color: #007bff;
 }
 
+.maplibregl-popup-content {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
 .grid-muuri {
   width: 100%;
   position: relative;

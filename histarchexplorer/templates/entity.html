@@ -6,106 +6,109 @@
   <link rel="stylesheet" href="/static/node_modules/quercus.js/src/treeview.css">
   <script src="/static/node_modules/quercus.js/src/treeview.js"></script>
   <script src="/static/node_modules/muuri/dist/muuri.min.js"></script>
-  <script type="text/javascript" src="/static/js/entityfunctions.js"></script>
+  <link href="/static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"/>
+    <script src="/static/node_modules/maplibre-gl/dist/maplibre-gl.js"></script>
+<script src="/static/node_modules/@google/model-viewer/dist/model-viewer-umd.js"></script>
 
-  <script>
+    <script type="text/javascript" src="/static/js/entityfunctions.js"></script>
 
-    const tabsToLoad = {{ sidebar_elements | sort(attribute='order') | map(attribute='route') | list | tojson }};
-    const entityId = {{ entity_id }};
-    {% if entity_id == 0 %}
-      const typeTreeData = {{ typetree_data|tojson}}
-      const viewClasses = {{ view_classes|tojson }};
-      const data = {{ data|tojson }}
-      function getEntitiesForTab(tabName) {
-        const validClasses = viewClasses[tabName] || [];
-        return data.entities.filter(entity => validClasses.includes(entity.class));
-      }
+    <script>
 
-      data.entities.forEach(entity => {
-        entity.beginDBP = calculateTimeBP(entity.begin);
-        entity.endDBP = calculateTimeBP(entity.end);
-        if (entity.begin) entity.beginString = makeLocalDate(entity.begin).localdate;
-        if (entity.end) entity.endString = makeLocalDate(entity.end).localdate;
+        const tabsToLoad = {{ sidebar_elements | sort(attribute='order') | map(attribute='route') | list | tojson }};
+        const entityId = {{ entity_id }};
+        {% if entity_id == 0 %}
+            const typeTreeData = {{ typetree_data|tojson}}
+            const viewClasses = {{ view_classes|tojson }};
+            const data = {{ data|tojson }}
+            function getEntitiesForTab(tabName) {
+                const validClasses = viewClasses[tabName] || [];
+                return data.entities.filter(entity => validClasses.includes(entity.class));
+            }
 
-        entity.all = [entity.description, entity.class, entity.type, entity.name]
-            .filter(v => v !== null && v !== undefined && v !== '')
-            .map(v => v.replace(/[\r\n]+/g, ' '))  // <- Replace line breaks with spaces
-            .join(' ');
-      });
+            data.entities.forEach(entity => {
+                entity.beginDBP = calculateTimeBP(entity.begin);
+                entity.endDBP = calculateTimeBP(entity.end);
+                if (entity.begin) entity.beginString = makeLocalDate(entity.begin).localdate;
+                if (entity.end) entity.endString = makeLocalDate(entity.end).localdate;
 
-    {% endif %}
-  </script>
+                entity.all = [entity.description, entity.class, entity.type, entity.name]
+                    .filter(v => v !== null && v !== undefined && v !== '')
+                    .map(v => v.replace(/[\r\n]+/g, ' '))  // <- Replace line breaks with spaces
+                    .join(' ');
+            });
 
-  <div class="entity-container">
-    <div class="row g-0 d-flex">
-      <!-- Navigation-Sidebar -->
-      <div id="nav-sidebar" class="col col-auto d-none d-md-flex flex-column bg-body-tertiary align-items-center">
-        <ul class="nav nav-pills flex-column text-center w-100">
-          {% for item in sidebar_elements %}
-            <li class="nav-item d-none to-remove-{{ item.route }}" role="presentation">
-              <a
-                  class="nav-link d-flex align-items-center {{ 'active' if active_tab == item.route else '' }}"
-                  id="tab-{{ item.route }}" data-bs-toggle="tab"
-                  title="{{ item.label if item.label else item.route }}"
-                  data-bs-target="#tab-pane-{{ item.route }}" role="tab"
-                  aria-controls="tab-pane-{{ item.route }}"
-                  aria-selected="{{ 'true' if loop.first else 'false' }}">
+        {% endif %}
+    </script>
 
-                {% if 'icon' in item %}
-                  <i class="bi {{ item.icon }} fs-5"></i>
-                {% else %}
-                  <img src="/static/images/entity_icons/{{ item.route[:-1] | lower }}.png"
-                       alt="{{ item.route }}" class="fs-5" style="width: 30px; height: 30px;"/>
-                {% endif %}
+    <div class="entity-container">
+        <div class="row g-0 d-flex">
+            <!-- Navigation-Sidebar -->
+            <div id="nav-sidebar" class="col col-auto d-none d-md-flex flex-column bg-body-tertiary align-items-center">
+                <ul class="nav nav-pills flex-column text-center w-100">
+                    {% for item in sidebar_elements %}
+                        <li class="nav-item d-none to-remove-{{ item.route }}" role="presentation">
+                            <a
+                                    class="nav-link d-flex align-items-center {{ 'active' if active_tab == item.route else '' }}"
+                                    id="tab-{{ item.route }}" data-bs-toggle="tab"
+                                    title="{{ item.label if item.label else item.route }}"
+                                    data-bs-target="#tab-pane-{{ item.route }}" role="tab"
+                                    aria-controls="tab-pane-{{ item.route }}"
+                                    aria-selected="{{ 'true' if loop.first else 'false' }}">
 
-                <span class="ms-2">
+                                {% if 'icon' in item %}
+                                    <i class="bi {{ item.icon }} fs-5"></i>
+                                {% else %}
+                                    <img src="/static/images/entity_icons/{{ item.route[:-1] | lower }}.png"
+                                         alt="{{ item.route }}" class="fs-5" style="width: 30px; height: 30px;"/>
+                                {% endif %}
+
+                                <span class="ms-2">
                                     {{ item.label if item.label else item.route }}
                                 </span>
-              </a>
-            </li>
-          {% endfor %}
-          <li class="nav-item to-remove-spinner" role="presentation">
-            <button title="loading"
-                    class="nav-link d-flex align-items-center"
-                    id="tab-spinner">
-              <i class="spinner-border"></i>
-            </button>
-          </li>
-        </ul>
-      </div>
-
-
-      <div class="col flex-column">
-        <div class="entity-content">
-          {% for item in sidebar_elements %}
-            <div
-                class="tab-pane fade d-none to-remove-{{ item.route }} {{ 'show active' if active_tab == item.route else '' }}"
-                id="tab-pane-{{ item.route }}" role="tabpanel" aria-labelledby="tab-{{ loop.index }}">
-              <div id="pane-content-{{ item.route }}">
-                <div class="spinner-grow" style="width: 3rem; height: 3rem;" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-                <span>{{ item.route }}</span>
-              </div>
+                            </a>
+                        </li>
+                    {% endfor %}
+                    <li class="nav-item to-remove-spinner" role="presentation">
+                        <button title="loading"
+                                class="nav-link d-flex align-items-center"
+                                id="tab-spinner">
+                            <i class="spinner-border"></i>
+                        </button>
+                    </li>
+                </ul>
             </div>
-          {% endfor %}
+
+
+            <div class="col flex-column">
+                <div class="entity-content">
+                    {% for item in sidebar_elements %}
+                        <div class="tab-pane fade d-none to-remove-{{ item.route }} {{ 'show active' if active_tab == item.route else '' }}"
+                             id="tab-pane-{{ item.route }}" role="tabpanel" aria-labelledby="tab-{{ loop.index }}">
+                            <div id="pane-content-{{ item.route }}">
+                                <div class="spinner-grow" style="width: 3rem; height: 3rem;" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <span>{{ item.route }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col flex-column grid">
+                <div id="right-sidebar" class="bg-body-secondary">
+                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor
+                    sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem
+                    ipsum dolor sit amet
+                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor
+                    sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem
+                    ipsum dolor sit amet
+                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor
+                    sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem
+                    ipsum dolor sit amet
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="col flex-column grid">
-        <div id="right-sidebar" class="bg-body-secondary">
-          lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor
-          sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem
-          ipsum dolor sit amet
-          lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor
-          sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem
-          ipsum dolor sit amet
-          lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor
-          sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem
-          ipsum dolor sit amet
-        </div>
-      </div>
     </div>
-  </div>
-  <script src="{{ url_for('static', filename='js/entity.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/entity.js') }}"></script>
 {% endblock %}
 

@@ -29,88 +29,112 @@
 
     });
 
-    function addTerrain{{ tab_name }}() {
-        const terrainUrl = 'https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=E7Jrgaazm79UlTuEI5f5';
-
-        map{{tab_name}}.addSource('terrainSource', {type: 'raster-dem', url: terrainUrl, tileSize: 256});
-        map{{tab_name}}.addSource('hillshadeSource', {type: 'raster-dem', url: terrainUrl, tileSize: 256});
-
-        map{{tab_name}}.addLayer({
-            id: 'hills',
-            type: 'hillshade',
-            source: 'hillshadeSource',
-            layout: {visibility: 'visible'},
-            paint: {'hillshade-shadow-color': 'rgba(71,59,36,0.56)'}
-        });
-
-        map{{tab_name}}.addControl(new maplibregl.TerrainControl({source: 'terrainSource', exaggeration: 1}));
-    }
-
-    function addSkybox{{ tab_name }}() {
-        map{{tab_name}}.setSky({
-            "sky-color": "#b2ddfa",
-            "horizon-color": "#FFFFFF",
-            "fog-color": "#FFFFFF",
-            "fog-ground-blend": 0.8,
-            "horizon-fog-blend": 0.1,
-            "sky-horizon-blend": 0.6,
-            "atmosphere-blend": 0.5,
-        });
-    }
-
-    function addControls{{ tab_name }}() {
-        map{{tab_name}}.addControl(new maplibregl.NavigationControl({
-            visualizePitch: true,
-            showZoom: true,
-            showCompass: true
-        }));
-    }
+    const mapVectorLayers{{ tab_name }} = [
+        '{{ tab_name }}-layer-fill',
+        '{{ tab_name }}-layer-line',
+        '{{ tab_name }}-layer-circle'
+    ]
 
     map{{tab_name}}.on('load', () => {
-        // 1. Add the GeoJSON source
-        map{{tab_name}}.addSource('{{ tab_name }}-source', {
-            type: 'geojson',
-            data: featureCollection{{ tab_name }} // Must be a valid GeoJSON object
-        });
+    const mapRef = map{{tab_name}};
+    const sourceId = '{{ tab_name }}-source';
 
-        // 2. Add a layer for polygons / lines / points
-        map{{tab_name}}.addLayer({
-            id: '{{ tab_name }}-layer-fill',
-            type: 'fill',
-            source: '{{ tab_name }}-source',
-            paint: {
-                'fill-color': '#088',
-                'fill-opacity': 0.5
-            },
-            filter: ['==', '$type', 'Polygon']
-        });
-
-        map{{tab_name}}.addLayer({
-            id: '{{ tab_name }}-layer-line',
-            type: 'line',
-            source: '{{ tab_name }}-source',
-            paint: {
-                'line-color': '#088',
-                'line-width': 2
-            },
-            filter: ['==', '$type', 'LineString']
-        });
-
-        map{{tab_name}}.addLayer({
-            id: '{{ tab_name }}-layer-circle',
-            type: 'circle',
-            source: '{{ tab_name }}-source',
-            paint: {
-                'circle-radius': 6,
-                'circle-color': '#088'
-            },
-            filter: ['==', '$type', 'Point']
-        });
-
-
+    // 1. Add the GeoJSON source
+    mapRef.addSource(sourceId, {
+        type: 'geojson',
+        data: featureCollection{{ tab_name }}
     });
 
+    // 2. Define base layers
+    const baseLayers = [
+        {
+            id: '{{ tab_name }}-layer-fill',
+            type: 'fill',
+            paint: { 'fill-color': '#088', 'fill-opacity': 0.5 },
+            filter: ['==', '$type', 'Polygon']
+        },
+        {
+            id: '{{ tab_name }}-layer-outline',
+            type: 'line',
+            paint: { 'line-color': '#004747', 'line-width': 1 },
+            filter: ['==', '$type', 'Polygon']
+        },
+        {
+            id: '{{ tab_name }}-layer-line',
+            type: 'line',
+            paint: { 'line-color': '#088', 'line-width': 2 },
+            filter: ['==', '$type', 'LineString']
+        },
+        {
+            id: '{{ tab_name }}-layer-circle',
+            type: 'circle',
+            paint: { 'circle-radius': 9, 'circle-color': '#088' },
+            filter: ['==', '$type', 'Point']
+        }
+    ];
 
+    // 3. Define highlight layers
+    const highlightLayers = [
+        {
+            id: 'highlight-polygon',
+            type: 'fill',
+            paint: { 'fill-color': '#FF4444', 'fill-opacity': 0.5 },
+            filter: ['==', '$type', 'Polygon']
+        },
+        {
+            id: 'highlight-polygon-outline',
+            type: 'line',
+            paint: { 'line-color': 'rgba(255,255,255,0.8)', 'line-width': 3 },
+            filter: ['==', '$type', 'Polygon']
+        },
+        {
+            id: 'highlight-linestring',
+            type: 'line',
+            paint: { 'line-color': 'rgba(255,68,68,0.63)', 'line-width': 3 },
+            filter: ['==', '$type', 'LineString']
+        },
+        {
+            id: 'highlight-points',
+            type: 'circle',
+            paint: { 'circle-color': 'rgba(255,68,68,0.86)', 'circle-radius': 12 },
+            filter: ['==', '$type', 'Point']
+        }
+    ];
+
+    // 4. Add all layers in one go
+    [...baseLayers, ...highlightLayers].forEach(layer => {
+        mapRef.addLayer({
+            source: sourceId,
+            ...layer
+        });
+    });
+
+    // 5. Init interactions
+    setPointer(mapVectorLayers{{ tab_name }}, mapRef);
+    highlightFeatures([], mapRef);
+
+});
+
+    map{{ tab_name }}.on('click', (e) => {
+        highlightFeatures([], map{{ tab_name }})
+        const clickedFeatures = map{{ tab_name }}.queryRenderedFeatures(e.point, {
+            layers: mapVectorLayers{{ tab_name }}
+        });
+
+        if (!clickedFeatures.length) return;
+        console.log('clickedFeatures', clickedFeatures);
+
+        const featureNames = clickedFeatures.map(f =>
+            `<button class="map-popup-hoverlink" data-id="${f.properties.id}" onclick="window.location.href='/entity/${f.properties.id}'">
+    ${f.properties.name} (${f.properties.class})
+  </button>`
+        );
+        featureIds = clickedFeatures.map(f => f.properties.id);
+
+        highlightFeatures(featureIds, map{{ tab_name }});
+
+        showPopup(e.lngLat, featureNames, map{{ tab_name }});
+    });
 
 
     function extendBounds{{ tab_name }}(feature) {
@@ -146,6 +170,33 @@
                 break;
         }
     }
+
+table{{ tab_name }}.on("dataFiltered", function (filters, rows) {
+    filteredIDdata{{ tab_name }} = rows.map(row => row.getData().id);
+
+    console.log('Stored filtered data:', filteredIDdata{{ tab_name }}.length);
+    console.log(filteredIDdata{{ tab_name }});
+
+    const filteredFeatures{{ tab_name }} = featureCollection{{ tab_name }}.features.filter(
+        f => filteredIDdata{{ tab_name }}.includes(f.properties.id)
+    );
+
+    const src = map{{ tab_name }}.getSource('{{ tab_name }}-source');
+    if (src) {
+        src.setData({
+            type: 'FeatureCollection',
+            features: filteredFeatures{{ tab_name }}
+        });
+    } else {
+        // Wait until the map is loaded
+        map{{ tab_name }}.on('load', () => {
+            map{{ tab_name }}.getSource('{{ tab_name }}-source').setData({
+                type: 'FeatureCollection',
+                features: filteredFeatures{{ tab_name }}
+            });
+        });
+    }
+});
 
 
 {% endif %}

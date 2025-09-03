@@ -1,13 +1,5 @@
 {% import '_macros.html' as ui %}
-<link href="../../static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"/>
-<script src="../../static/node_modules/maplibre-gl/dist/maplibre-gl.js"></script>
-
-<script type="module" src="/static/node_modules/muuri/dist/muuri.min.js"></script>
-
 <script src="../../static/js/overview.js"></script>
-
-<script src="/static/node_modules/@google/model-viewer/dist/model-viewer-umd.js"></script>
-
 
 <script> const entity = JSON.parse(JSON.parse({{ data|tojson }}).entity)</script>
 <script> const categorized_types = JSON.parse(JSON.parse({{ data|tojson }}).categorized_types)</script>

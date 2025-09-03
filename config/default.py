@@ -1,31 +1,34 @@
 # Don't edit this file. To override settings please use instance/production.py
 
+# Application metadata
 VERSION = '0.1.0'
-LANGUAGES = {'de': 'Deutsch', 'en': 'English'}
-PREFERRED_LANGUAGE = 'en'
-DEBUG = True
-SECRET_KEY = 'secretkey'
+LANGUAGES = {'de': 'Deutsch', 'en': 'English'}  # Supported languages
+PREFERRED_LANGUAGE = 'en'  # Default language
+DEBUG = False  # Debug mode toggle
+SECRET_KEY = 'secretkey'  # Secret key for sessions and security
 
+# Database configuration
 DATABASE_NAME = 'openatlas'
 DATABASE_USER = 'openatlas'
 DATABASE_HOST = 'localhost'
 DATABASE_PORT = 5432
-DATABASE_PASS = 'CHANGE ME'
+DATABASE_PASS = 'CHANGE ME'  # ⚠️ Must be changed in production
 
-# Security
-SESSION_COOKIE_SECURE = False
-REMEMBER_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = 'Lax'
+# Security settings
+SESSION_COOKIE_SECURE = False  # Use HTTPS for session cookie
+REMEMBER_COOKIE_SECURE = True  # Use HTTPS for "remember me" cookie
+SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection mode
 
+# API configuration
 API_URL = 'https://thanados.openatlas.eu/api/'
-# API_URL = 'https://demo-dev.openatlas.eu/api/'
-API_PROXY = ''
-OPENATLAS_CASE_STUDY_IDS: list[int] = []
+API_PROXY = ''  # Optional proxy for API requests
 
-CLASSES_TO_SKIP = {
+# Data handling
+CLASSES_TO_SKIP = {  # Entity classes excluded from processing
     'object_location', 'type', 'appellation', 'administrative_unit',
     'source_translation', 'type_tools', 'reference_system'}
 
+# Entity groups shown in views
 VIEW_CLASSES = {
     'actors': ('person', 'group'),
     'items': ('artifact', 'human_remains'),
@@ -36,12 +39,14 @@ VIEW_CLASSES = {
     'files': ('file',)
 }
 
+# Commonly used standard entity types
 STANDARD_TYPES = [
     'Source', 'Event', 'Actor function', 'Involvement', 'Bibliography',
     'Edition', 'License', 'External reference',
     'Source translation', 'Actor relation', 'Human remains', 'Artifact',
     'Place', 'Feature', 'Stratigraphic unit']
 
+# Categorization of entity types with icons
 TYPE_DIVISIONS = {
     'administrative unit': {
         'ids': [86],
@@ -74,17 +79,20 @@ TYPE_DIVISIONS = {
     }
 }
 
+# Icons displayed in sidebar, mapped to entity IDs
 SIDEBAR_ICONS = {
     'images': {
-        'grave.svg': [26204, 26205, 26208, 26206, 26207, 219910, 174459, 198713],
+        'grave.svg': [
+            26204, 26205, 26208, 26206, 26207, 219910, 174459, 198713],
     },
     'css_icon_class': {
         'bi bi-geo-alt-fill': [22378, 73],
         'bi bi-house-door': [26197],
         'bi bi-geo-yelp': [13362],
-        # 'bi bi-person-arms-up': [218963, 213216, 119444, 119334], # Anthroplogy
+        # 'bi bi-person-arms-up': [218963, 213216, 119444, 119334], # Anthropology
     }}
 
+# Sidebar menu items and order
 SIDEBAR_OPTIONS = [
     {'order': 1, 'route': 'overview', 'icon': 'bi bi-info-circle'},
     {'order': 2, 'route': 'map', 'icon': 'bi bi-map'},
