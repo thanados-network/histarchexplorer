@@ -8,10 +8,6 @@
   --footer-bg-dark: hsl(0, 0%, 31%);
   --light-muuri-tile: hsl(0, 20%, 97%, 0.3);
   --dark-muuri-tile: hsla(0, 0%, 49%, 0.3);
-  --light-badge: hsl(230, 19%, 87%);
-  --dark-badge: hsl(0, 1%, 22%);
-  --ov-bg-light: none;
-  --ov-bg-dark: none;
   --light-hierarchy-item: hsl(0, 0%, 83%);
   --dark-hierarchy-item: hsl(0, 0%, 35%);
   --light-label: black;
@@ -40,7 +36,6 @@
 }
 
 body.light {
-  --ov-bg: var(--ov-bg-light);
   --counters-bg: var(--counters-bg-light);
   --footer-bg: var(--footer-bg-light);
   --card-bg: var(--light-card);
@@ -49,7 +44,6 @@ body.light {
   --hierarchy-item: var(--light-hierarchy-item);
   --reference-label: var(--light-label);
   --reference-text: var(--light-text);
-  --badge-color: var(--light-badge);
 }
 
 body.dark {
@@ -61,8 +55,6 @@ body.dark {
   --hierarchy-item: var(--dark-hierarchy-item);
   --reference-label: var(--dark-label);
   --reference-text: var(--dark-text);
-  --ov-bg: var(--ov-bg-dark);
-  --badge-color: var(--dark-badge);
 }
 
 :root {
@@ -298,7 +290,7 @@ body {
   z-index: 0;
 }
 
-.map-gray .maplibregl-canvas {
+.map-gray .leaflet-map-pane > .leaflet-pane:not(.leaflet-marker-pane) {
   -webkit-filter: grayscale(100%) opacity(0.9);
   filter: grayscale(100%) opacity(0.9);
 }
@@ -12762,7 +12754,7 @@ textarea.form-control-lg {
   padding-bottom: 0.3125rem;
   max-width: 80%;
   margin: auto;
-  margin-top: 1rem;
+  display: grid;
   border-top: 0.3125rem solid transparent;
   border-bottom: 0.3125rem solid transparent;
 }
@@ -12770,7 +12762,6 @@ textarea.form-control-lg {
   .main-entity-ellipse {
     max-width: 90%;
     margin: auto;
-    margin-top: 1rem;
     display: grid;
     align-content: center;
     align-items: center;
@@ -12873,6 +12864,7 @@ button.btn-whitish[disabled] {
 .hierarchy-item {
   background-color: var(--hierarchy-item);
   padding-top: 1rem;
+  display: grid;
   min-height: calc(100vh - 106px);
 }
 
@@ -12885,7 +12877,7 @@ button.btn-whitish[disabled] {
   max-width: 80%;
   margin: auto;
   display: grid;
-  margin-bottom: 3rem;
+  margin-bottom: 1.25rem;
 }
 @media (min-width: 1921px) or (max-width: 769px) {
   .attribute-area {
@@ -12958,7 +12950,6 @@ button.btn-whitish[disabled] {
 
 #nav-sidebar {
   width: var(--sidebar-width);
-  overflow-x: hidden;
   transition: width 0.3s ease;
   color: var(--nav-sidebar);
   height: calc(100vh - var(--navbar-height));
@@ -13076,7 +13067,6 @@ button.btn-whitish[disabled] {
 }
 
 .entity-content {
-  background-color: var(--ov-bg);
   height: calc(100vh - var(--navbar-height));
   overflow-y: auto;
   width: calc(100vw - var(--sidebar-width));
@@ -13198,6 +13188,102 @@ button.btn-whitish[disabled] {
   overflow: hidden;
 }
 
+.content-container {
+  margin-top: var(--navbar-height);
+}
+
+.entity-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.875rem;
+}
+@media (min-width: 40em) {
+  .entity-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 40em) and (min-width: 71.875em) {
+  .entity-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.entity-card {
+  position: relative;
+  overflow: hidden;
+  margin: 1.25rem;
+  background: var(--card-bg);
+  color: var(--text-color2);
+  text-align: center;
+  padding: 1.25rem;
+  border-radius: 0.3125rem;
+  transition: backbround 150ms ease-in-out;
+  cursor: pointer;
+}
+@media (max-width: 35.9375em) {
+  .entity-card {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+.entity-card:hover {
+  background: var(--card-hover);
+}
+.entity-card--places {
+  border-top: 0.3125rem solid var(--limegreen);
+}
+.entity-card--actors {
+  border-top: 0.3125rem solid var(--pink);
+}
+.entity-card--events {
+  border-top: 0.3125rem solid var(--blue);
+}
+.entity-card--items {
+  border-top: 0.3125rem solid var(--light-orange);
+}
+.entity-card--sources {
+  border-top: 0.3125rem solid var(--reddish-brown);
+}
+.entity-card--files {
+  border-top: 0.3125rem solid var(--dark-greyblue);
+}
+.entity-card__icon img {
+  max-width: 70%; /* Set the width of the image */
+  height: auto;
+}
+.entity-card__label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.7vw;
+  font-weight: 600;
+  margin-bottom: 0.625rem;
+  text-transform: uppercase;
+  color: var(--text-color2);
+  letter-spacing: 0.0625rem;
+  padding: 0.5rem;
+}
+@media (max-width: 769px) {
+  .entity-card__label {
+    font-size: 2.5rem;
+  }
+}
+@media (min-width: 1921px) {
+  .entity-card__label {
+    font-size: 1.4rem;
+  }
+}
+.entity-card__description {
+  color: var(--text-color1);
+  font-weight: 300;
+  text-align: justify;
+}
+.entity-card__count {
+  color: var(--dark-text);
+  font-size: 0.75rem;
+  margin-top: 1.25rem;
+}
+
 .name-column-date-subtitle {
   color: grey;
 }
@@ -13283,187 +13369,6 @@ button.btn-whitish[disabled] {
   height: 40px !important;
   width: 40px !important;
   margin: -11px !important;
-}
-
-.map-container {
-  opacity: 0;
-  transition: opacity 1000ms ease-in-out;
-}
-
-/* ===== Container & Grid Base ===== */
-.tile-container {
-  position: relative;
-  width: 100%;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.tile-container .grid-container {
-  overflow-y: auto; /* Enable scrolling within the container */
-  max-height: calc(100vh - 80px - 24px - 58px - 24px - 40px);
-}
-
-/* Responsive column config (defaults for big screens) */
-.tile-container .grid {
-  overflow-y: hidden;
-  overflow-x: hidden;
-  --cols: 8; /* Big displays → 8 tiles per row */
-  --gap: 16px; /* Space between tiles */
-  position: relative !important; /* Muuri container should be relative */
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* ===== Muuri Items ===== */
-.tile-container .grid .item {
-  position: absolute !important; /* Muuri positions items absolutely */
-  display: block !important;
-  box-sizing: border-box;
-  /* Exact width per column minus horizontal margins (gap) */
-  width: calc(100% / var(--cols) - var(--gap));
-  margin: calc(var(--gap) / 2);
-  height: 360px;
-  z-index: 1;
-  background: var(--muuri-tile);
-  border-radius: 5px; /* Rounded corners */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: none;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-}
-
-.tile-container .item-content {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  padding: 25px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  text-align: center;
-}
-
-.tile-container .item-title {
-  font-weight: bold;
-  font-size: 18px;
-  line-height: 1.3;
-  margin-bottom: 30px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3; /* Allow up to 3 lines */
-  -webkit-box-orient: vertical;
-}
-
-.tile-container .item-category {
-  color: #666;
-  font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 15px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.tile-container .item-date {
-  color: #888;
-  font-size: 14px;
-  font-weight: 500;
-  margin-top: auto; /* Push to bottom */
-  letter-spacing: 0.2px;
-}
-
-.tile-container .grid .item:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
-  cursor: pointer;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tile-container .grid .item {
-    transition: none;
-  }
-}
-/* ===== Breakpoints: only adjust column count ===== */
-@media (max-width: 1600px) {
-  .tile-container .grid {
-    --cols: 6;
-  }
-}
-@media (max-width: 1200px) {
-  .tile-container .grid {
-    --cols: 4;
-  }
-}
-@media (max-width: 992px) {
-  .tile-container .grid {
-    --cols: 3;
-  }
-}
-@media (max-width: 768px) {
-  .tile-container .grid {
-    --cols: 2;
-  }
-}
-@media (max-width: 480px) {
-  .tile-container .grid {
-    --cols: 1;
-  }
-}
-/* ===== Pagination (unchanged) ===== */
-.tile-pagination {
-  position: sticky;
-  bottom: 0;
-  height: 40px;
-  max-height: 40px;
-  background: #fff;
-  border-top: 1px solid #ddd;
-  padding: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-}
-
-.tile-pagination .pagination-info {
-  font-size: 14px;
-  color: #666;
-  margin: 0 15px;
-}
-
-.tile-pagination .pagination-controls {
-  display: flex;
-  gap: 5px;
-}
-
-.tile-pagination button {
-  padding: 3px 10px;
-  border: 1px solid #ddd;
-  background: #fff;
-  cursor: pointer;
-  border-radius: 3px;
-}
-
-.tile-pagination button:hover:not(:disabled) {
-  background: #f5f5f5;
-}
-
-.tile-pagination button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.tile-pagination button.active {
-  background: #007bff;
-  color: white;
-  border-color: #007bff;
-}
-
-.maplibregl-popup-content {
-  max-height: 50vh;
-  overflow-y: auto;
 }
 
 .model-wrapper {

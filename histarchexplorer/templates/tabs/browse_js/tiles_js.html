@@ -1,3 +1,143 @@
+<style>
+/* === Tile background image layer === */
+.tile-container .grid .item {
+  position: relative;
+  overflow: hidden;
+
+  /* defaults for our per-tile animation (JS overrides these) */
+  --bg-start: 118%; /* base (acts like cover) */
+  --bg-target: 100%; /* hover (acts like contain for most wide imgs) */
+}
+
+.tile-container .grid .item .item-bg {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: var(--bg-start);
+  opacity: 0;
+  transition: opacity .25s ease, background-size .35s ease;
+  z-index: 0; /* under overlay/content */
+}
+
+/* reveal image when loaded */
+.tile-container .grid .item.has-bg .item-bg { opacity: 1; }
+
+/* hover animates to computed "contain" percentage */
+.tile-container .grid .item:hover .item-bg { background-size: var(--bg-target); }
+
+/* Optional: readability overlay (doesn't block hover) */
+.tile-container .grid .item .item-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(241, 241, 241, 0.79);
+  opacity: 1;
+  transition: opacity .2s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+.tile-container .grid .item:hover .item-overlay { opacity: .4; }
+.tile-container .grid .item:hover .item-content { opacity: .4; }
+
+/* Content on top */
+.tile-container .grid .item .item-content { position: relative; z-index: 2; }
+
+/* === Sticky pagination, compact with spacing === */
+.tile-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;               /* ✅ prevent outer scroll */
+}
+
+.tile-container .grid {
+  flex: 1;
+  overflow: auto;                 /* ✅ only the grid scrolls */
+  padding-bottom: 48px;           /* keep space so pagination isn’t flush */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.tile-container .tile-pagination {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  border-top: 1px solid #ccc;
+  z-index: 5;
+  padding: 6px 8px;
+  font-size: 13px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;                 /* ✅ don’t collapse / push scroll */
+}
+
+/* Pager tiles (circle arrow + label centered with hover zoom) */
+.tile-container .grid .item.pager {
+  cursor: pointer;
+  user-select: none;
+  background: #fafafa;
+  transition: background .2s ease;
+  text-align: center;
+  display: block;
+}
+
+.tile-container .grid .item.pager:hover {
+  background: #f2f2f2;
+}
+
+.tile-container .grid .item.pager:active {
+  transform: scale(0.97);
+}
+
+.tile-container .grid .item.pager .pager-content {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.tile-container .grid .item.pager .pager-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  color: #444;
+  transition: transform .2s ease, color .2s ease;
+}
+
+.tile-container .grid .item.pager .pager-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #333;
+  background: white;
+  transition: transform .25s ease, border-color .2s ease, background .2s ease;
+}
+
+/* 🚀 Hover zoom effect */
+.tile-container .grid .item.pager:hover .pager-circle {
+  transform: scale(1.2);
+  border-color: #222;
+  background: #eee;
+}
+
+.tile-container .grid .item.pager:hover .pager-label {
+  transform: scale(1.1);
+  color: #222;
+}
+
+
+</style>
+
+
+
 <script>
     let filteredData{{ tab_name }} = [];
     // Declare the grid variable with template
@@ -104,7 +244,6 @@
             if (!el) return;
 
             const bg = el.querySelector('.item-bg');
-            console.log(bg);
             if (!bg) return;
 
             const iiifObj = iiifMap{{ tab_name }}.get(id);
@@ -160,57 +299,62 @@
             return;
         }
 
-        // ⚠️ NICHT sofort leeren, solange ein Muuri-Grid existiert!
-        // gridContainer.innerHTML = '';
+  // Remove existing items correctly
+  if (grid{{ tab_name }}) {
+    const items = grid{{ tab_name }}.getItems();
+    if (items.length) grid{{ tab_name }}.remove(items, {removeElements: true});
+  } else {
+    gridContainer.innerHTML = '';
+  }
 
-        // Bestehende Muuri-Items korrekt entfernen
-        if (grid{{ tab_name }}) {
-            const items = grid{{ tab_name }}.getItems();
-            if (items.length) {
-                grid{{ tab_name }}.remove(items, {removeElements: true});
-            }
-        } else {
-            // Nur wenn KEIN Grid existiert, darf hart geleert werden
-            gridContainer.innerHTML = '';
-        }
+  // Page calc
+  const allFilteredData = filteredData{{ tab_name }};
+  const pageSize = table{{ tab_name }}.getPageSize();
+  const currentPage = table{{ tab_name }}.getPage();
+  const totalPages = Math.max(1, Math.ceil(allFilteredData.length / pageSize));
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, allFilteredData.length);
+  const currentPageData = allFilteredData.slice(startIndex, endIndex);
 
-        // Datenseite bestimmen (unverändert)
-        const allFilteredData = filteredData{{ tab_name }};
-        const pageSize = table{{ tab_name }}.getPageSize();
-        const currentPage = table{{ tab_name }}.getPage();
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = Math.min(startIndex + pageSize, allFilteredData.length);
-        const currentPageData = allFilteredData.slice(startIndex, endIndex);
-        console.log('currentPageData')
-        console.log(currentPageData)
+  // Build nodes for real items
+  const newNodes = currentPageData.map(item => createGridItem{{ tab_name }}(item));
 
-        // Neue DOM-Knoten bauen (und in Array sammeln!)
-        const newNodes = currentPageData.map(item => createGridItem{{ tab_name }}(item));
+  // 🚀 Add pager tiles (so grid always visually invites nav)
+  // Put "Previous" at the *start* if we can go back
+  if (currentPage > 1) {
+    newNodes.unshift(createPagerTile{{ tab_name }}('prev', currentPage - 1, false));
+  } else {
+    // optional: show disabled prev tile or omit entirely; here we omit on first page:
+    // newNodes.unshift(createPagerTile{{ tab_name }}('prev', 1, true));
+  }
 
-        if (grid{{ tab_name }}) {
-            grid{{ tab_name }}.add(newNodes);
-            grid{{ tab_name }}.layout();
-        } else {
-            newNodes.forEach(node => gridContainer.appendChild(node));
-        }
+  // Put "Next" at the *end* if more pages exist
+  if (currentPage < totalPages) {
+    newNodes.push(createPagerTile{{ tab_name }}('next', currentPage + 1, false));
+  } else {
+    // optional: disabled last tile
+    // newNodes.push(createPagerTile{{ tab_name }}('next', totalPages, true));
+  }
 
-        //console.log('Items prepared for container:', newNodes.length);
+  // Add to DOM / Muuri
+  if (grid{{ tab_name }}) {
+    grid{{ tab_name }}.add(newNodes);
+    grid{{ tab_name }}.layout();
+  } else {
+    newNodes.forEach(node => gridContainer.appendChild(node));
+  }
 
-        // 🖼️ NEW: fetch & apply IIIF backgrounds for THIS page
-        const idsOnPage = currentPageData.map(d => d.id);
-        console.log(idsOnPage);
-        fetchDepictionsBatch{{ tab_name }}(idsOnPage).then(() => {
-            applyTileBackgrounds{{ tab_name }}(idsOnPage);
-        });
+  // 🖼️ IIIF only for real entity tiles
+  const idsOnPage = currentPageData.map(d => d.id);
+  fetchDepictionsBatch{{ tab_name }}(idsOnPage).then(() => {
+    applyTileBackgrounds{{ tab_name }}(idsOnPage);
+  });
 
-        // Optional kleines Refresh
-        setTimeout(() => {
-            if (grid{{ tab_name }}) {
-                grid{{ tab_name }}.refreshItems().layout();
-                //console.log('Muuri layout refreshed');
-            }
-        }, 50);
-    }
+  setTimeout(() => {
+    if (grid{{ tab_name }}) grid{{ tab_name }}.refreshItems().layout();
+  }, 50);
+}
+
 
     function initializeMuuriGrid{{ tab_name }}() {
         //console.log('initializeMuuriGrid called');
@@ -305,10 +449,9 @@
             if (!header || !tileContainer{{tab_name}}) return;
 
             const headerHeight = header.offsetHeight;
-            console.log('headerHeight')
-            console.log(headerHeight)
+
             const maxHeight = window.innerHeight - 96 - headerHeight - (3 * 16) - 40; // Same calculation as table
-            console.log(maxHeight)
+
 
             tileContainer{{tab_name}}.style.height = `${maxHeight}px`;
             tileContainer{{tab_name}}.style.maxHeight = `${maxHeight}px`;
@@ -374,6 +517,40 @@
       </div>
     `;
     }
+
+    function createPagerTile{{ tab_name }}(dir, targetPage, disabled=false) {
+  // dir: 'prev' or 'next'
+  const div = document.createElement('div');
+  div.className = `item pager pager-${dir}`;
+  div.setAttribute('role', 'button');
+  div.setAttribute('tabindex', disabled ? '-1' : '0');
+  div.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+  div.dataset.pager = dir;          // mark so we can skip IIIF, entity click etc.
+  div.dataset.targetPage = String(targetPage);
+
+  // No background/overlay layers; just content
+  const arrow = dir === 'prev' ? '←' : '→';
+  const label = dir === 'prev' ? 'Previous' : 'Next';
+  div.innerHTML = `
+  <div class="pager-content">
+    <div class="pager-label">${label}</div>
+    <div class="pager-circle">${arrow}</div>
+  </div>
+`;
+
+  if (!disabled) {
+    const go = () => goToTilePage{{ tab_name }}(targetPage);
+    div.addEventListener('click', go);
+    div.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+    });
+  } else {
+    div.style.opacity = '0.5';
+    div.style.pointerEvents = 'none';
+  }
+
+  return div;
+}
 
     filteredData{{ tab_name }} = table{{ tab_name }}.getData("active");
 
