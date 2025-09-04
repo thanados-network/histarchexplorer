@@ -72,6 +72,67 @@
   flex-shrink: 0;                 /* ✅ don’t collapse / push scroll */
 }
 
+/* Pager tiles (circle arrow + label centered with hover zoom) */
+.tile-container .grid .item.pager {
+  cursor: pointer;
+  user-select: none;
+  background: #fafafa;
+  transition: background .2s ease;
+  text-align: center;
+  display: block;
+}
+
+.tile-container .grid .item.pager:hover {
+  background: #f2f2f2;
+}
+
+.tile-container .grid .item.pager:active {
+  transform: scale(0.97);
+}
+
+.tile-container .grid .item.pager .pager-content {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.tile-container .grid .item.pager .pager-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  color: #444;
+  transition: transform .2s ease, color .2s ease;
+}
+
+.tile-container .grid .item.pager .pager-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #333;
+  background: white;
+  transition: transform .25s ease, border-color .2s ease, background .2s ease;
+}
+
+/* 🚀 Hover zoom effect */
+.tile-container .grid .item.pager:hover .pager-circle {
+  transform: scale(1.2);
+  border-color: #222;
+  background: #eee;
+}
+
+.tile-container .grid .item.pager:hover .pager-label {
+  transform: scale(1.1);
+  color: #222;
+}
+
 
 </style>
 
@@ -232,65 +293,65 @@
     // https://thanados.openatlas.eu/api/display/276877
     // https://thanados.openatlas.eu/api/query/?entities=276875&entities=50505&entities=3535&entities=75557&show=depictions&format=lpx
     function populateGridWithData{{ tab_name }}() {
-        //console.log('populateGridWithData called for {{ tab_name }}');
+  const gridContainer = document.querySelector('#tile-{{ tab_name }} .grid');
+  if (!gridContainer) return;
 
-        const gridContainer = document.querySelector('#tile-{{ tab_name }} .grid');
-        if (!gridContainer) {
-            //console.error('Grid container not found!');
-            return;
-        }
+  // Remove existing items correctly
+  if (grid{{ tab_name }}) {
+    const items = grid{{ tab_name }}.getItems();
+    if (items.length) grid{{ tab_name }}.remove(items, {removeElements: true});
+  } else {
+    gridContainer.innerHTML = '';
+  }
 
-        // ⚠️ NICHT sofort leeren, solange ein Muuri-Grid existiert!
-        // gridContainer.innerHTML = '';
+  // Page calc
+  const allFilteredData = filteredData{{ tab_name }};
+  const pageSize = table{{ tab_name }}.getPageSize();
+  const currentPage = table{{ tab_name }}.getPage();
+  const totalPages = Math.max(1, Math.ceil(allFilteredData.length / pageSize));
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, allFilteredData.length);
+  const currentPageData = allFilteredData.slice(startIndex, endIndex);
 
-        // Bestehende Muuri-Items korrekt entfernen
-        if (grid{{ tab_name }}) {
-            const items = grid{{ tab_name }}.getItems();
-            if (items.length) {
-                grid{{ tab_name }}.remove(items, {removeElements: true});
-            }
-        } else {
-            // Nur wenn KEIN Grid existiert, darf hart geleert werden
-            gridContainer.innerHTML = '';
-        }
+  // Build nodes for real items
+  const newNodes = currentPageData.map(item => createGridItem{{ tab_name }}(item));
 
-        // Datenseite bestimmen (unverändert)
-        const allFilteredData = filteredData{{ tab_name }};
-        const pageSize = table{{ tab_name }}.getPageSize();
-        const currentPage = table{{ tab_name }}.getPage();
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = Math.min(startIndex + pageSize, allFilteredData.length);
-        const currentPageData = allFilteredData.slice(startIndex, endIndex);
-        console.log('currentPageData')
-        console.log(currentPageData)
+  // 🚀 Add pager tiles (so grid always visually invites nav)
+  // Put "Previous" at the *start* if we can go back
+  if (currentPage > 1) {
+    newNodes.unshift(createPagerTile{{ tab_name }}('prev', currentPage - 1, false));
+  } else {
+    // optional: show disabled prev tile or omit entirely; here we omit on first page:
+    // newNodes.unshift(createPagerTile{{ tab_name }}('prev', 1, true));
+  }
 
-        // Neue DOM-Knoten bauen (und in Array sammeln!)
-        const newNodes = currentPageData.map(item => createGridItem{{ tab_name }}(item));
+  // Put "Next" at the *end* if more pages exist
+  if (currentPage < totalPages) {
+    newNodes.push(createPagerTile{{ tab_name }}('next', currentPage + 1, false));
+  } else {
+    // optional: disabled last tile
+    // newNodes.push(createPagerTile{{ tab_name }}('next', totalPages, true));
+  }
 
-        if (grid{{ tab_name }}) {
-            grid{{ tab_name }}.add(newNodes);
-            grid{{ tab_name }}.layout();
-        } else {
-            newNodes.forEach(node => gridContainer.appendChild(node));
-        }
+  // Add to DOM / Muuri
+  if (grid{{ tab_name }}) {
+    grid{{ tab_name }}.add(newNodes);
+    grid{{ tab_name }}.layout();
+  } else {
+    newNodes.forEach(node => gridContainer.appendChild(node));
+  }
 
-        //console.log('Items prepared for container:', newNodes.length);
+  // 🖼️ IIIF only for real entity tiles
+  const idsOnPage = currentPageData.map(d => d.id);
+  fetchDepictionsBatch{{ tab_name }}(idsOnPage).then(() => {
+    applyTileBackgrounds{{ tab_name }}(idsOnPage);
+  });
 
-        // 🖼️ NEW: fetch & apply IIIF backgrounds for THIS page
-        const idsOnPage = currentPageData.map(d => d.id);
-        console.log(idsOnPage);
-        fetchDepictionsBatch{{ tab_name }}(idsOnPage).then(() => {
-            applyTileBackgrounds{{ tab_name }}(idsOnPage);
-        });
+  setTimeout(() => {
+    if (grid{{ tab_name }}) grid{{ tab_name }}.refreshItems().layout();
+  }, 50);
+}
 
-        // Optional kleines Refresh
-        setTimeout(() => {
-            if (grid{{ tab_name }}) {
-                grid{{ tab_name }}.refreshItems().layout();
-                //console.log('Muuri layout refreshed');
-            }
-        }, 50);
-    }
 
     function initializeMuuriGrid{{ tab_name }}() {
         //console.log('initializeMuuriGrid called');
@@ -451,6 +512,40 @@
       </div>
     `;
     }
+
+    function createPagerTile{{ tab_name }}(dir, targetPage, disabled=false) {
+  // dir: 'prev' or 'next'
+  const div = document.createElement('div');
+  div.className = `item pager pager-${dir}`;
+  div.setAttribute('role', 'button');
+  div.setAttribute('tabindex', disabled ? '-1' : '0');
+  div.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+  div.dataset.pager = dir;          // mark so we can skip IIIF, entity click etc.
+  div.dataset.targetPage = String(targetPage);
+
+  // No background/overlay layers; just content
+  const arrow = dir === 'prev' ? '←' : '→';
+  const label = dir === 'prev' ? 'Previous' : 'Next';
+  div.innerHTML = `
+  <div class="pager-content">
+    <div class="pager-label">${label}</div>
+    <div class="pager-circle">${arrow}</div>
+  </div>
+`;
+
+  if (!disabled) {
+    const go = () => goToTilePage{{ tab_name }}(targetPage);
+    div.addEventListener('click', go);
+    div.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+    });
+  } else {
+    div.style.opacity = '0.5';
+    div.style.pointerEvents = 'none';
+  }
+
+  return div;
+}
 
     filteredData{{ tab_name }} = table{{ tab_name }}.getData("active");
 
