@@ -46,7 +46,7 @@
         // const url = `https://thanados.openatlas.eu/api/query/?${params.toString()}`;
         const url = `https://thanados.openatlas.eu/api/query/?${params.toString()}`;
 
-        console.log(url);
+        //console.log(url);
 
 
         try {
@@ -100,7 +100,7 @@
 
         idsOnPage.forEach(id => {
             const el = document.querySelector(`#tile-{{ tab_name }} .grid-container .grid .item[data-entity-id="${id}"]`);
-            console.log(el)
+            //console.(el)
             if (!el) return;
 
             const bg = el.querySelector('.item-bg');

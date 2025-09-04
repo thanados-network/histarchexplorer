@@ -203,7 +203,7 @@ function collectAndGroupMatchingData(jsonData, keysToMatch, categoriesToMatch, t
         result[combinedKey] = group.data;
     });
 
-    console.log(result);
+    //console.log(result);
 
     return result;
 }

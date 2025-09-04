@@ -12,13 +12,13 @@ function {{tab_name}}ToggleView(view) {
         if (!el) return;
         el.classList.toggle("d-none", v !== view);
         if (v === "tile") {
-            console.log('Tile view selected, refreshing grid');
+            //console.log('Tile view selected, refreshing grid');
             // Adjust tile container height
             adjustTileHeight{{ tab_name }}();
 
             // Always refresh the grid when switching to tile view
             if (grid{{ tab_name }}) {
-                console.log('Grid exists, destroying and recreating');
+                //console.log('Grid exists, destroying and recreating');
                 grid{{ tab_name }}.destroy();
                 grid{{ tab_name }} = null;
             }

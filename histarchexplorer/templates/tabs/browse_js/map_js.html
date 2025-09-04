@@ -122,7 +122,7 @@
         });
 
         if (!clickedFeatures.length) return;
-        console.log('clickedFeatures', clickedFeatures);
+        //console.log('clickedFeatures', clickedFeatures);
 
         const featureNames = clickedFeatures.map(f =>
             `<button class="map-popup-hoverlink" data-id="${f.properties.id}" onclick="window.location.href='/entity/${f.properties.id}'">
@@ -174,8 +174,8 @@
 table{{ tab_name }}.on("dataFiltered", function (filters, rows) {
     filteredIDdata{{ tab_name }} = rows.map(row => row.getData().id);
 
-    console.log('Stored filtered data:', filteredIDdata{{ tab_name }}.length);
-    console.log(filteredIDdata{{ tab_name }});
+    //console.log('Stored filtered data:', filteredIDdata{{ tab_name }}.length);
+    //console.log(filteredIDdata{{ tab_name }});
 
     const filteredFeatures{{ tab_name }} = featureCollection{{ tab_name }}.features.filter(
         f => filteredIDdata{{ tab_name }}.includes(f.properties.id)
