@@ -193,36 +193,6 @@ def get_entity(id_: int, tab_name=None) -> str:
     related_entities = {}
     catalogue_entities = []
 
-    # entities = Entity.get_linked_entities_by_properties_recursive(
-    #     id_,
-    #     get_parser_for_getentity(id_)
-    # )
-    # main_entity = get_main_entity(id_, entities)
-
-
-    def get_map_data():
-        geom_there = check_p46_geoms(id_)
-        if geom_there:
-            first_geom = get_first_geom(id_)
-            id_to_fetch = get_root_id(id_)
-            entities = Entity.get_linked_entities_by_properties_recursive(
-                id_to_fetch, Parser(show=['geometry'], properties=['P46']))
-            features = {'type': 'FeatureCollection', 'features': []}
-            for ent in entities:
-                property = {'id': ent.id, 'label': ent.name, 'class': ent.system_class}
-                if ent.id == first_geom and ent.system_class != 'Place':
-                    property['main'] = True
-                if ent.system_class in ['Feature', 'Place', 'Stratigraphic unit', 'Human remains',
-                                        'Artifact'] and ent.geometry:
-                    features['features'].append({
-                        'type': 'Feature',
-                        'geometry': ent.geometry,
-                        'properties': property,
-                    })
-            return features
-        return {'type': 'FeatureCollection', 'features': []}
-
-
     features = []
     main_image = None
     initial_images = []
@@ -230,124 +200,95 @@ def get_entity(id_: int, tab_name=None) -> str:
     more_images = False
     number_of_images = 0
     all_images = []
-    # related_entities_json = json.dumps({}, ensure_ascii=False, indent=4)
+
+    match tab_name:
+        case 'feature':
+
+            features = Entity.get_entity(id_, Parser())
+
+        # todo: test if really needed
+        #case 'features':
+        #    features = Entity.get_entity(
+        #        id_, Parser(
+        #            show=['when', 'types', 'names', 'depictions', 'description', 'relations']
+        #        )
+        #    )
+
+        case 'map':
+            map_data = get_map_data(id_)
+            if not map_data['features']:
+                abort(404)
+            data['spatial'] = map_data
+
+        case 'catalogue':
+            c_entities = Entity.get_linked_entities_by_properties_recursive(
+                id_,
+                get_parser_for_landing(id_))
+            catalogue_entities = build_entity_tree(c_entities)
+            for entity in catalogue_entities:
+                entity.all_child_depictions = collect_child_depictions(entity)
+
+        case'overview':
+            entities = Entity.get_linked_entities_by_properties_recursive(
+                id_,
+                get_parser_for_landing(id_))
+
+            main_entity= get_main_entity(id_, entities)
+
+            if isinstance(main_entity.geometry, dict) and main_entity.geometry.get("type") == "GeometryCollection":
+                main_entity.geometry["geometries"] = [
+                    geom for geom in main_entity.geometry.get("geometries", [])
+                    if geom.get("type") == "Point"
+                ]
+
+            related_entities = get_related_entities(main_entity, entities)
+
+            data = {
+                'entity': json.dumps(
+                    main_entity.to_serializable(),
+                    ensure_ascii=False,
+                    indent=4),
+                'categorized_types': json.dumps(
+                    categorized_types(main_entity),
+                    ensure_ascii=False,
+                    indent=4)
+            }
+
+            images = []
+
+            for image in main_entity.depictions:
+                if image.main_image:
+                    main_image = image
+                else:
+                    images.append(image)
+
+            if not main_image and images:
+                main_image = images.pop(0)
+
+            initial_images = images[:2]
+            remaining_images = images[2:]
+            more_images = len(remaining_images) > 0
+            number_of_images = len(images+[main_image])
 
 
 
-    if tab_name == 'feature':
-        entities = Entity.get_linked_entities_by_properties_recursive(
-            id_, Parser(
-                show=['when', 'types', 'names', 'depictions', 'description', 'relations'],
-                properties=['P46'],
-                relation_type=['P46'],
-                column='id',
-                sort='asc',
-                search=[str({
-                    "entitySystemClass": [{
-                        "logicalOperator": "and",
-                        "operator": "notEqual",
-                        "values": ["place"]}]})]
+        case 'media':
+            entities = Entity.get_linked_entities_by_properties_recursive(
+                id_,
+                get_parser_for_landing(id_)
             )
-        )
-        features = entities
+            main_entity = get_main_entity(id_, entities)
 
-    elif tab_name == 'features':
-        features = Entity.get_entity(
-            id_, Parser(
-                show=['when', 'types', 'names', 'depictions', 'description', 'relations']
-            )
-        )
+            all_images = main_entity.depictions
 
-    elif tab_name == 'map':
-        map_data = get_map_data()
-        if not map_data['features']:
-            #print('No spatial features found. Aborting with 404.')
-            abort(404)
-        data['spatial'] = map_data
-    elif tab_name == 'catalogue':
+            data = {
+                'entity': json.dumps(main_entity.to_serializable(), ensure_ascii=False),
+                'categorized_types': json.dumps(categorized_types(main_entity), ensure_ascii=False)
+            }
 
-        c_entities = Entity.get_linked_entities_by_properties_recursive(
-            id_,
-            get_parser_for_landing(id_))
-        catalogue_entities = build_entity_tree(c_entities)
-        for entity in catalogue_entities:
-            entity.all_child_depictions = collect_child_depictions(entity)
-
-    elif tab_name == 'overview':
-        # data = get_entity()
-        entities = Entity.get_linked_entities_by_properties_recursive(
-            id_,
-            get_parser_for_landing(id_))
-        main_entity= get_main_entity(id_, entities)
-
-        if isinstance(main_entity.geometry, dict) and main_entity.geometry.get("type") == "GeometryCollection":
-            main_entity.geometry["geometries"] = [
-                geom for geom in main_entity.geometry.get("geometries", [])
-                if geom.get("type") == "Point"
-            ]
-
-        #print(main_entity.geometry)
-        #print('=== DEBUG PERSON ENTITY ===')
-        #print('ID:', main_entity.id)
-        #print('Name:', main_entity.name)
-        #print('Class:', main_entity.system_class)
-        #print('Formated date:', main_entity.formated_date)
-        #print('Types (Chronology):', [(t.label, t.root) for t in main_entity.types if t.root == 'Chronology'])
-
-        related_entities = get_related_entities(main_entity, entities)
-
-        data = {
-            'entity': json.dumps(
-                main_entity.to_serializable(),
-                ensure_ascii=False,
-                indent=4),
-            'categorized_types': json.dumps(
-                categorized_types(main_entity),
-                ensure_ascii=False,
-                indent=4)
-        }
-
-        images = []
-
-        # related_entities_json = json.dumps(related_entities, ensure_ascii=False, indent=4)
-
-        for image in main_entity.depictions:
-            if image.main_image:
-                main_image = image
-            else:
-                images.append(image)
-
-        if not main_image and images:
-            main_image = images.pop(0)
-
-        initial_images = images[:2]
-        remaining_images = images[2:]
-        more_images = len(remaining_images) > 0
-        number_of_images = len(images+[main_image])
-
-
-    #Media-tab
-
-    elif tab_name == 'media':
-        entities = Entity.get_linked_entities_by_properties_recursive(
-            id_,
-            get_parser_for_landing(id_)
-        )
-        main_entity = get_main_entity(id_, entities)
-
-        all_images = main_entity.depictions
-
-        data = {
-            'entity': json.dumps(main_entity.to_serializable(), ensure_ascii=False),
-            'categorized_types': json.dumps(categorized_types(main_entity), ensure_ascii=False)
-        }
-
-    elif tab_name not in valid_routes:
-        if tab_name not in ['feature']:
+        case _ if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
             abort(404)
-    #print(all_images)
-    #print([img.iiif_manifest for img in all_images])
 
     return render_template(
         f'tabs/{tab_name}.html',
@@ -364,9 +305,31 @@ def get_entity(id_: int, tab_name=None) -> str:
         manifests=[img.iiif_manifest for img in all_images],
         related_entities=related_entities or {},
         cite_button=get_cite_button(main_entity),
-        catalogue_entities=catalogue_entities )
+        catalogue_entities=catalogue_entities)
 
-    # related_entities=related_entities_json)
+
+def get_map_data(id_):
+    geom_there = check_p46_geoms(id_)
+    if geom_there:
+        first_geom = get_first_geom(id_)
+        id_to_fetch = get_root_id(id_)
+        entities = Entity.get_linked_entities_by_properties_recursive(
+            id_to_fetch, Parser(show=['geometry'], properties=['P46']))
+        features = {'type': 'FeatureCollection', 'features': []}
+        for ent in entities:
+            property = {'id': ent.id, 'label': ent.name, 'class': ent.system_class}
+            if ent.id == first_geom and ent.system_class != 'Place':
+                property['main'] = True
+            if ent.system_class in ['Feature', 'Place', 'Stratigraphic unit', 'Human remains',
+                                    'Artifact'] and ent.geometry:
+                features['features'].append({
+                    'type': 'Feature',
+                    'geometry': ent.geometry,
+                    'properties': property,
+                })
+        return features
+    return {'type': 'FeatureCollection', 'features': []}
+
 
 def collect_child_depictions(entity: Entity) -> list[Depiction]:
     all_depictions = []

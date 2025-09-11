@@ -168,6 +168,7 @@ class Entity:
         return self
 
     @staticmethod
+    @cache.memoize()
     def get_entity(id_: int, parser: Parser) -> Entity:
         return Entity(ApiAccess.get_entity(id_, parser))
 
