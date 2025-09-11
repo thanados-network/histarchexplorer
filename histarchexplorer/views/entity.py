@@ -1,15 +1,19 @@
 
 import json
+import time
+from dataclasses import asdict
+
 from collections import defaultdict
 from typing import Any
 
 from flask import abort, g, render_template
 
-from histarchexplorer import app, cache
+from histarchexplorer import app
 from histarchexplorer.api.parser import Parser
-from histarchexplorer.database.entity import get_entity_by_id
 from histarchexplorer.models.depiction import Depiction
 from histarchexplorer.models.entity import Entity
+from histarchexplorer.models.presentation_view import EntityTypeModel, \
+    PresentationView
 from histarchexplorer.models.types import Types
 from histarchexplorer.utils.view_util import get_cite_button
 
@@ -175,7 +179,6 @@ def get_first_geom(id):
 def entity(id_: int, tab_name="overview") -> str:
     if tab_name not in valid_routes:
         abort(404)
-
     return render_template(
         'entity.html',
         sidebar_elements=[
@@ -183,8 +186,7 @@ def entity(id_: int, tab_name="overview") -> str:
             for item in sidebar_elements],
         page_name="landing",
         active_tab=tab_name,
-        entity_id=id_,
-        )
+        entity_id=id_)
 
 
 
@@ -194,8 +196,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     main_entity = None
     related_entities = {}
     catalogue_entities = []
-
-    features = []
+    categorized_types = None
     main_image = None
     initial_images = []
     remaining_images = []
@@ -203,12 +204,12 @@ def get_entity(id_: int, tab_name=None) -> str:
     number_of_images = 0
     all_images = []
     ancestor_entities = []
+    feature = None
 
+    main_entity = PresentationView.from_api(id_)
     match tab_name:
         case 'feature':
-
-            features = Entity.get_entity(id_, Parser())
-
+            feature = Entity.get_entity(id_, Parser())
         # todo: test if really needed
         #case 'features':
         #    features = Entity.get_entity(
@@ -227,46 +228,20 @@ def get_entity(id_: int, tab_name=None) -> str:
             c_entities = Entity.get_linked_entities_by_properties_recursive(
                 id_,
                 get_parser_for_landing(id_))
-            catalogue_entities = build_entity_tree(c_entities)
-            for entity in catalogue_entities:
-                entity.all_child_depictions = collect_child_depictions(entity)
+            if get_main_entity(id_, c_entities).system_class != 'Place':
+                catalogue_entities = []
+            else:
+                catalogue_entities = build_entity_tree(c_entities)
+                for entity_ in catalogue_entities:
+                    entity.all_child_depictions = collect_child_depictions(entity_)
 
-        case'overview':
+        case 'overview':
+            main_entity = PresentationView.from_api(id_)
 
-            entities = Entity.get_linked_entities_by_properties_recursive(
-                id_,
-                get_parser_for_landing(id_))
-
-            main_entity = get_main_entity(id_, entities)
-
-            ancestor_entities = get_ancestor_entities(main_entity, entities)
-
-            print("Ancestor entities:", ancestor_entities)
-
-
-
-            if isinstance(main_entity.geometry, dict) and main_entity.geometry.get("type") == "GeometryCollection":
-                main_entity.geometry["geometries"] = [
-                    geom for geom in main_entity.geometry.get("geometries", [])
-                    if geom.get("type") == "Point"
-                ]
-
-            related_entities = get_related_entities(main_entity, entities)
-
-            data = {
-                'entity': json.dumps(
-                    main_entity.to_serializable(),
-                    ensure_ascii=False,
-                    indent=4),
-                'categorized_types': json.dumps(
-                    categorized_types(main_entity),
-                    ensure_ascii=False,
-                    indent=4)
-            }
+            data = {'entity': main_entity.to_json()}
 
             images = []
-
-            for image in main_entity.depictions:
+            for image in main_entity.files:
                 if image.main_image:
                     main_image = image
                 else:
@@ -279,23 +254,20 @@ def get_entity(id_: int, tab_name=None) -> str:
             remaining_images = images[2:]
             more_images = len(remaining_images) > 0
             number_of_images = len(images+[main_image])
-
-
-
-        case 'media':
-            entities = Entity.get_linked_entities_by_properties_recursive(
-                id_,
-                get_parser_for_landing(id_)
-            )
-            main_entity = get_main_entity(id_, entities)
-
-            all_images = main_entity.depictions
-
-            data = {
-                'entity': json.dumps(main_entity.to_serializable(), ensure_ascii=False),
-                'categorized_types': json.dumps(categorized_types(main_entity), ensure_ascii=False)
-            }
-
+            categorized_types = get_categorized_types(main_entity)
+        #case 'media':
+        #    entities = Entity.get_linked_entities_by_properties_recursive(
+        #        id_,
+        #        get_parser_for_landing(id_))
+        #    main_entity = get_main_entity(id_, entities)
+#
+        #    all_images = main_entity.depictions
+#
+        #    data = {
+        #        'entity': json.dumps(
+        #            main_entity.to_serializable(),
+        #            ensure_ascii=False)}
+#
         case _ if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
             abort(404)
@@ -304,8 +276,8 @@ def get_entity(id_: int, tab_name=None) -> str:
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
         entity=main_entity,
-        categorized_types=categorized_types(main_entity) if main_entity else None,
-        features=features,
+        categorized_types=categorized_types,
+        features=feature,
         main_image=main_image,
         initial_images=initial_images,
         remaining_images=remaining_images,
@@ -320,6 +292,7 @@ def get_entity(id_: int, tab_name=None) -> str:
 
 
 def get_map_data(id_):
+
     geom_there = check_p46_geoms(id_)
     if geom_there:
         first_geom = get_first_geom(id_)
@@ -342,41 +315,9 @@ def get_map_data(id_):
     return {'type': 'FeatureCollection', 'features': []}
 
 
-def collect_child_depictions(entity: Entity) -> list[Depiction]:
-    all_depictions = []
-
-    def recurse(e: Entity):
-        if not hasattr(e, 'children'):
-            e.children = []
-        for child in e.children:
-            all_depictions.extend(child.depictions or [])
-            recurse(child)
-
-    if hasattr(entity, 'children'):
-        recurse(entity)
-    return all_depictions
-
-def build_entity_tree(entities: list[Entity]) -> list[Entity]:
-    entity_dict = {e.id: e for e in entities}
-
-    for entity in entities:
-        if entity.parent and entity.parent.relation_to_id in entity_dict:
-            parent_entity = entity_dict[entity.parent.relation_to_id]
-            if not hasattr(parent_entity, 'children'):
-                parent_entity.children = []
-            parent_entity.children.append(entity)
-
-    tree = []
-    for entity in entities:
-        if entity.parent and entity.parent.relation_to_id in entity_dict:
-            continue
-        if hasattr(entity, 'children'):
-            tree.extend(entity.children)
-    return tree
-
 def get_parser_for_landing(id_: int) -> Parser:
-    simple_entity = get_entity_by_id(id_)
-    match simple_entity.openatlas_class_name.capitalize():
+    simple_entity = Entity.get_entity(id_, Parser())
+    match simple_entity.system_class.capitalize():
         case 'Place' | 'Feature' | 'Stratigraphic unit':
             properties = ['P46', 'P67']
         case 'Human remains' | 'Artifact':
@@ -406,9 +347,9 @@ def get_parser_for_landing(id_: int) -> Parser:
 
 
 def get_main_entity(id_: int, entities: list[Entity]) -> Entity:
-    for entity in entities:
-        if entity.id == id_:
-            return entity
+    for entity_ in set(entities):
+        if entity_.id == id_:
+            return entity_
     raise ValueError(f"Entity with id {id_} not found.")
 
 
@@ -459,11 +400,11 @@ def get_related_entities(
     return related_entities
 
 
-def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
+def get_categorized_types(main_entity: PresentationView) -> dict[str, list[EntityTypeModel]]:
     divisions = defaultdict(list)
     for type_ in main_entity.types:
         divisions[type_.division['label'].replace(' ', '_')].append({
-            'type': type_.to_serializable(), 'icon': type_.division['icon']})
+            'type': type_.to_json(), 'icon': type_.division['icon']})
     sorted_divisions = dict(sorted(
         divisions.items(),
         key=lambda x: (x[0] == x[0] == 'case_study', 'other', x[0])
@@ -471,3 +412,37 @@ def categorized_types(main_entity: Entity) -> dict[str, list[Types]]:
 
     return sorted_divisions
 
+def collect_child_depictions(entity_: Entity) -> list[Depiction]:
+    all_depictions = []
+
+    def recurse(e: Entity):
+        if not hasattr(e, 'children'):
+            e.children = []
+        for child in e.children:
+            all_depictions.extend(child.depictions or [])
+            recurse(child)
+
+    if hasattr(entity, 'children'):
+        recurse(entity_)
+    return all_depictions
+
+
+def build_entity_tree(entities: list[Entity]) -> list[Entity]:
+    entity_dict = {e.id: e for e in entities}
+
+    for entity_ in entities:
+        if (entity_.parent
+                and 'P46' in entity_.parent.relation_type
+                and entity_.parent.relation_to_id in entity_dict):
+            parent_entity = entity_dict[entity_.parent.relation_to_id]
+            if not hasattr(parent_entity, 'children'):
+                parent_entity.children = []
+            parent_entity.children.append(entity_)
+
+    tree = []
+    for entity_ in entities:
+        if entity_.parent and entity_.parent.relation_to_id in entity_dict:
+            continue
+        if hasattr(entity_, 'children'):
+            tree.extend(entity_.children)
+    return tree

@@ -6,6 +6,7 @@ from flask_babel import lazy_gettext as _
 
 from histarchexplorer import app
 from histarchexplorer.models.entity import Entity
+from histarchexplorer.models.presentation_view import PresentationView
 
 _('entities')
 _('search')
@@ -51,7 +52,7 @@ def find_children_by_id(data, target_id):
     return result
 
 
-def get_cite_button(entity: Entity) -> dict[str, str]:
+def get_cite_button(entity: PresentationView) -> dict[str, str]:
     if not entity:
         return {'button_html': '', 'modal_html': ''}
     current_date = datetime.date.today().strftime("%Y-%m-%d")

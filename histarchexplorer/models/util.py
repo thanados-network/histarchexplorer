@@ -1,5 +1,7 @@
 from typing import Optional
 
+from flask import g
+
 
 def uc_first(string: str) -> str:
     return str(string)[0].upper() + str(string)[1:] if string else ''
@@ -58,3 +60,40 @@ def date_template_format(begin: Optional[str], end: Optional[str]) -> str:
     else:
         date = ''
     return date
+
+
+def get_render_type(mime_type: str) -> str:
+    if mime_type:
+        if (mime_type == "model/gltf-binary"
+                or mime_type == "model/glb"
+                or mime_type == "model/gltf+json"):
+            return '3d_model'
+        elif mime_type == "image/webp":
+            return 'webp'
+        elif mime_type == "application/pdf":
+            return 'pdf'
+        elif mime_type.startswith("image/"):
+            return 'image'
+    return 'unknown'
+
+
+def get_icon(id_: int, type_hierarchy: dict[str, str]) -> str:
+    icon = g.sidebar_icons.get(int(id_))
+    if not icon:
+        for type_ in type_hierarchy:
+            type_id = int(type_['identifier'].rsplit('/', 1)[-1])
+            if g.sidebar_icons.get(type_id):
+                icon = g.sidebar_icons.get(type_id)
+                break
+    return icon or g.sidebar_icons.get('other')
+
+def get_divisions(id_: int, type_hierarchy: dict[str, str]) -> dict[str, str]:
+    division = g.type_divisions.get(int(id_))
+    if not division:
+        for type_ in type_hierarchy:
+            type_id = int(type_['identifier'].rsplit('/', 1)[-1])
+            if g.type_divisions.get(type_id):
+                division = g.type_divisions.get(type_id)
+                break
+    return (division or
+            {'label': 'other', 'icon': '<i class="bi bi-boxes"></i>'})

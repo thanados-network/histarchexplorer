@@ -4,9 +4,12 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Optional
 
 import requests
+from flask import g
 
-from histarchexplorer import app
+from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import PROXIES
+from histarchexplorer.models.util import get_divisions, get_icon, \
+    get_render_type
 
 
 @dataclass
@@ -65,7 +68,11 @@ class EntityTypeModel:
     type_hierarchy: Optional[list[TypeHierarchyEntry]]
     value: Optional[str]
     unit: Optional[str]
+    icon: Optional[str]
+    division: Optional[dict[str, str]]
 
+    def to_json(self, *, indent: Optional[int] = 2) -> str:
+        return json.dumps(asdict(self), indent=indent, ensure_ascii=False)
 
 @dataclass
 class ExternalReferenceModel:
@@ -121,6 +128,8 @@ class File:
     mime_type: Optional[str] = None
     iiif_manifest: Optional[str] = None
     iiif_base_path: Optional[str] = None
+    main_image: int = None
+    render_type: str = None
 
 
 @dataclass
@@ -139,7 +148,7 @@ class Relation:
 @dataclass
 class PresentationView:
     id: int
-    systemClass: str
+    system_class: str
     title: str
     description: str
     aliases: list[str]
@@ -176,6 +185,7 @@ class PresentationView:
             return FeatureModel(
                 geometry=geometry_model,
                 properties=property_model)
+
         geometries = []
         if geometry_data.get('type') == 'FeatureCollection':
             for geom in geometry_data['features']:
@@ -210,7 +220,9 @@ class PresentationView:
                 is_standard=type_.get("isStandard"),
                 type_hierarchy=hierarchy,
                 value=type_.get("value"),
-                unit=type_.get("unit")))
+                unit=type_.get("unit"),
+                icon=get_icon(type_["id"], type_.get("typeHierarchy")),
+                division=get_divisions(type_["id"], type_.get("typeHierarchy"))))
         return types
 
     @staticmethod
@@ -236,7 +248,9 @@ class PresentationView:
                         is_standard=True,
                         type_hierarchy=[],
                         value=None,
-                        unit=None))
+                        unit=None,
+                        icon=None,
+                        division=None))
 
                 relation = Relation(
                     id=rel["id"],
@@ -257,7 +271,7 @@ class PresentationView:
         return grouped_relations
 
     @staticmethod
-    def parse_file(raw_file: dict) -> list[File]:
+    def parse_file(entity_id: int, raw_file: dict) -> list[File]:
         files = []
         for f in raw_file:
             if isinstance(f, dict):
@@ -271,10 +285,13 @@ class PresentationView:
                     url=f.get("url"),
                     mime_type=f.get("mimetype"),
                     iiif_manifest=f.get("iiifManifest"),
-                    iiif_base_path=f.get("iiifBasePath")))
+                    iiif_base_path=f.get("iiifBasePath"),
+                    main_image=g.main_images.get(entity_id) == entity_id,
+                    render_type=get_render_type(f.get("mimetype"))))
         return files
 
     @classmethod
+    @cache.memoize()
     def from_api(cls, entity_id: int) -> 'PresentationView':
         url = f"{app.config['API_URL']}entity_presentation_view/{entity_id}"
         response = requests.get(
@@ -286,7 +303,7 @@ class PresentationView:
 
         return cls(
             id=data["id"],
-            systemClass=data.get("systemClass", ""),
+            system_class=data.get("systemClass", ""),
             title=data.get("title", ""),
             description=data.get("description", ""),
             aliases=data.get("aliases", []),
@@ -301,7 +318,7 @@ class PresentationView:
                 Reference.from_dict(ref)
                 for ref in data.get("references", [])
                 if isinstance(ref, dict)],
-            files=cls.parse_file(data.get('files', [])),
+            files=cls.parse_file(data["id"], data.get('files', [])),
             relations=cls.parse_relations(data.get("relations", {})))
 
 
