@@ -183,7 +183,9 @@ def entity(id_: int, tab_name="overview") -> str:
             for item in sidebar_elements],
         page_name="landing",
         active_tab=tab_name,
-        entity_id=id_)
+        entity_id=id_,
+        )
+
 
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
@@ -200,6 +202,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     more_images = False
     number_of_images = 0
     all_images = []
+    ancestor_entities = []
 
     match tab_name:
         case 'feature':
@@ -229,11 +232,18 @@ def get_entity(id_: int, tab_name=None) -> str:
                 entity.all_child_depictions = collect_child_depictions(entity)
 
         case'overview':
+
             entities = Entity.get_linked_entities_by_properties_recursive(
                 id_,
                 get_parser_for_landing(id_))
 
-            main_entity= get_main_entity(id_, entities)
+            main_entity = get_main_entity(id_, entities)
+
+            ancestor_entities = get_ancestor_entities(main_entity, entities)
+
+            print("Ancestor entities:", ancestor_entities)
+
+
 
             if isinstance(main_entity.geometry, dict) and main_entity.geometry.get("type") == "GeometryCollection":
                 main_entity.geometry["geometries"] = [
@@ -305,7 +315,8 @@ def get_entity(id_: int, tab_name=None) -> str:
         manifests=[img.iiif_manifest for img in all_images],
         related_entities=related_entities or {},
         cite_button=get_cite_button(main_entity),
-        catalogue_entities=catalogue_entities)
+        catalogue_entities=catalogue_entities,
+        ancestor_entities=ancestor_entities)
 
 
 def get_map_data(id_):
