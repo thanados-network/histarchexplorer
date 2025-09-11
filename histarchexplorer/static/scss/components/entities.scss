@@ -96,24 +96,28 @@
 
 /* ===== Container & Grid Base ===== */
 .tile-container {
+
   position: relative;
   width: 100%;
-  height: calc(100vh - 100px - 4rem); /* Match table height */
-  max-height: 830px; /* Match table max-height */
-  overflow-y: auto; /* Enable scrolling within the container */
+  overflow-y: hidden;
   overflow-x: hidden;
-  padding: 20px;
+  padding: 0;
   box-sizing: border-box;
+}
+
+.tile-container .grid-container {
+  overflow-y: auto; /* Enable scrolling within the container */
+  max-height: calc(100vh - 80px - 24px - 58px - 24px - 40px);
 }
 
 /* Responsive column config (defaults for big screens) */
 .tile-container .grid {
+  overflow-y: hidden;
+  overflow-x: hidden;
   --cols: 8; /* Big displays → 8 tiles per row */
   --gap: 16px; /* Space between tiles */
   position: relative !important; /* Muuri container should be relative */
   width: 100%;
-  min-height: 100%;
-  padding: 0; /* gutters handled by item margins */
   box-sizing: border-box;
 }
 
@@ -223,11 +227,13 @@
 
 /* ===== Pagination (unchanged) ===== */
 .tile-pagination {
-  position: relative;
+  position: sticky;
+  bottom: 0;
+  height: 40px;
+  max-height: 40px;
   background: #fff;
   border-top: 1px solid #ddd;
   padding: 10px;
-  margin-top: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -246,7 +252,7 @@
 }
 
 .tile-pagination button {
-  padding: 5px 10px;
+  padding: 3px 10px;
   border: 1px solid #ddd;
   background: #fff;
   cursor: pointer;
@@ -272,3 +278,107 @@
   max-height: 50vh;
   overflow-y: auto;
 }
+
+/* Pager tiles (circle arrow + label centered with hover zoom) */
+.tile-container .grid .item.pager {
+  cursor: pointer;
+  user-select: none;
+  background: #fafafa;
+  transition: background .2s ease;
+  text-align: center;
+  display: block;
+}
+
+.tile-container .grid .item.pager:hover {
+  background: #f2f2f2;
+}
+
+.tile-container .grid .item.pager:active {
+  transform: scale(0.97);
+}
+
+.tile-container .grid .item.pager .pager-content {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.tile-container .grid .item.pager .pager-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  color: #444;
+  transition: transform .2s ease, color .2s ease;
+}
+
+.tile-container .grid .item.pager .pager-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #333;
+  background: white;
+  transition: transform .25s ease, border-color .2s ease, background .2s ease;
+}
+
+/* 🚀 Hover zoom effect */
+.tile-container .grid .item.pager:hover .pager-circle {
+  transform: scale(1.2);
+  border-color: #222;
+  background: #eee;
+}
+
+.tile-container .grid .item.pager:hover .pager-label {
+  transform: scale(1.1);
+  color: #222;
+}
+
+/* === Tile background image layer === */
+.tile-container .grid .item {
+  position: relative;
+  overflow: hidden;
+
+  /* defaults for our per-tile animation (JS overrides these) */
+  --bg-start: 118%; /* base (acts like cover) */
+  --bg-target: 100%; /* hover (acts like contain for most wide imgs) */
+}
+
+.tile-container .grid .item .item-bg {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: var(--bg-start);
+  opacity: 0;
+  transition: opacity .25s ease, background-size .35s ease;
+  z-index: 0; /* under overlay/content */
+}
+
+/* reveal image when loaded */
+.tile-container .grid .item.has-bg .item-bg { opacity: 1; }
+
+/* hover animates to computed "contain" percentage */
+.tile-container .grid .item:hover .item-bg { background-size: var(--bg-target); }
+
+/* Optional: readability overlay (doesn't block hover) */
+.tile-container .grid .item .item-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(241, 241, 241, 0.79);
+  opacity: 1;
+  transition: opacity .2s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+.tile-container .grid .item:hover .item-overlay { opacity: .4; }
+.tile-container .grid .item:hover .item-content { opacity: .4; }
+
+/* Content on top */
+.tile-container .grid .item .item-content { position: relative; z-index: 2; }

@@ -93,11 +93,14 @@
 
 <div id="table-{{ tab_name }}" class="tabulator-container"></div>
 <div id="tile-{{ tab_name }}" class="tile-container d-none">
-  <div class="grid" id="grid-{{ tab_name }}">
-    <!-- Items will be populated by JavaScript -->
-  </div>
-  <div id="tile-pagination-{{ tab_name }}" class="tile-pagination"></div>
+    <div id="grid-container-{{ tab_name }}" class="grid-container">
+        <div class="grid" id="grid-{{ tab_name }}">
+            <!-- Items will be populated by JavaScript -->
+        </div>
+    </div>
+    <div id="tile-pagination-{{ tab_name }}" class="tile-pagination"></div>
 </div>
+
 {% if tab_name in ['places', 'items'] %}
     <div id="map-{{ tab_name }}" class="map-container d-none"></div>
 {% endif %}
