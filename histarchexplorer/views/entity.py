@@ -191,18 +191,9 @@ def entity(id_: int, tab_name="overview") -> str:
 def get_entity(id_: int, tab_name=None) -> str:
     related_entities = {}
     catalogue_entities = []
-    categorized_types = None
-
     main_image = None
     initial_images = []
-    remaining_images = []
-    more_images = False
-    number_of_images = 0
-    ancestor_entities = []
     feature = None
-    hierarchy = None
-
-
 
     main_entity = PresentationView.from_api(id_)
     data = {'entity': main_entity.to_json()}
@@ -242,7 +233,7 @@ def get_entity(id_: int, tab_name=None) -> str:
                         geometry['properties']['id'] = item.id
                         geometry['properties']['label'] = item.name
                         geometry['properties']['class'] = item.system_class
-                        if first_geom.geometry.id == item.id:
+                        if first_geom and first_geom.geometry.id == item.id:
                             geometry['properties']['main'] = True
                         geometry['geometry']['shapeType'] = geometry['properties']['shapeType']
                         map_data_['features'].append(geometry)
@@ -272,9 +263,6 @@ def get_entity(id_: int, tab_name=None) -> str:
             if not main_image and images:
                 main_image = images.pop(0)
             initial_images = images[:2]
-            remaining_images = images[2:]
-            more_images = len(remaining_images) > 0
-            number_of_images = len(images+[main_image])
 
         case 'media':
             pass
@@ -292,14 +280,10 @@ def get_entity(id_: int, tab_name=None) -> str:
         features=feature,
         main_image=main_image,
         initial_images=initial_images,
-        remaining_images=remaining_images,
-        more_images=more_images,
-        total_images=number_of_images,
         manifests=[img.iiif_manifest for img in main_entity.files],
         related_entities=related_entities or {},
         cite_button=get_cite_button(main_entity),
         catalogue_entities=catalogue_entities,
-        ancestor_entities=ancestor_entities,
         hierarchy=hierarchy)
 
 
