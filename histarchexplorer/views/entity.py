@@ -206,7 +206,10 @@ def get_entity(id_: int, tab_name=None) -> str:
 
     main_entity = PresentationView.from_api(id_)
     data = {'entity': main_entity.to_json()}
-
+    categorized_types = get_categorized_types(main_entity)
+    hierarchy = {
+        'subs': get_sub_count(main_entity),
+        'root': get_hierarchy(main_entity)}
     match tab_name:
         case 'feature':
             # todo: core information about the feature are available in the main entity
@@ -221,6 +224,28 @@ def get_entity(id_: int, tab_name=None) -> str:
 
         case 'map':
             map_data = get_map_data(id_)
+            # todo: rewrite get_map_data
+            #   can bring the geometries on map, but they are not filled and clickable
+            map_data_= {'type': 'FeatureCollection', 'features': []}
+            first_geom = None
+            tmp_root = hierarchy['root'].copy()
+            tmp_root.reverse()
+            for entry in tmp_root:
+                if entry.geometries and entry.system_class != 'place':
+                    first_geom = entry.geometries[0]
+                    break
+            for k in ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains']:
+                for item in main_entity.relations.get(k, []):
+                    if item.geometries:
+                        # right now only the first geometry is taken, refactor for multiple
+                        geometry = item.geometries[0].to_dict()
+                        geometry['properties']['id'] = item.id
+                        geometry['properties']['label'] = item.name
+                        geometry['properties']['class'] = item.system_class
+                        if first_geom.geometry.id == item.id:
+                            geometry['properties']['main'] = True
+                        geometry['geometry']['shapeType'] = geometry['properties']['shapeType']
+                        map_data_['features'].append(geometry)
             if not map_data['features']:
                 abort(404)
             data['spatial'] = map_data
@@ -251,10 +276,6 @@ def get_entity(id_: int, tab_name=None) -> str:
             more_images = len(remaining_images) > 0
             number_of_images = len(images+[main_image])
 
-            categorized_types = get_categorized_types(main_entity)
-            hierarchy = {
-                'subs': get_sub_count(main_entity),
-                'root': get_hierarchy(main_entity)}
         case 'media':
             pass
 
@@ -336,37 +357,6 @@ def get_parser_for_landing(id_: int) -> Parser:
         centroid='true')
 
 
-
-
-def get_ancestor_entities(main_entity: Entity, entities: list[Entity]) -> list[dict]:
-    ancestor_entities = []
-    current_entity = main_entity
-
-    while current_entity:
-        # If there is a parent, get the actual entity it points to
-        if current_entity.parent:
-            parent_entity = next(
-                (entity for entity in entities if entity.id == current_entity.parent.relation_to_id),
-                None
-            )
-            if parent_entity:
-                ancestor_entities.append({
-                    'id': parent_entity.id,
-                    'name': parent_entity.name,
-                    'system_class': parent_entity.system_class
-                })
-                current_entity = parent_entity  # Move up to the next level
-            else:
-                break  # Exit if no parent entity
-        else:
-            break
-    ancestor_entities.reverse()
-    return ancestor_entities
-
-
-
-
-
 def get_categorized_types(main_entity: PresentationView) -> dict[str, list[EntityTypeModel]]:
     divisions = defaultdict(list)
     for type_ in main_entity.types:
@@ -415,7 +405,7 @@ def build_entity_tree(entities: list[Entity]) -> list[Entity]:
 
 
 
-def get_hierarchy(main_entity: PresentationView) -> list[Relation]:
+def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
     root = []
     match main_entity.system_class:
         case 'feature':
@@ -426,7 +416,7 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation]:
                     if relation['relationTo'] == main_entity.id:
                         root.append(feature)
             root.append(main_entity.relations['place'][0])
-        case 'artifact':
+        case 'artifact' | 'human_remains':
             stratigraphic_unit_id = None
             for feature in main_entity.relations.get('stratigraphic_unit', []):
                 for relation in feature.relation_types:
@@ -445,10 +435,10 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation]:
 def get_sub_count(main_entity: PresentationView) -> int:
     count = 0
     sub_relations_map = {
-        'place': ['feature', 'stratigraphic_unit', 'artifact'],
-        'feature': ['stratigraphic_unit', 'artifact'],
-        'stratigraphic_unit': ['artifact'],
-        'artifact': ['artifact']}
+        'place': ['feature', 'stratigraphic_unit', 'artifact', 'human_remains'],
+        'feature': ['stratigraphic_unit', 'artifact', 'human_remains'],
+        'stratigraphic_unit': ['artifact', 'human_remains'],
+        'artifact': ['artifact', 'human_remains']}
     for rel_type in sub_relations_map.get(main_entity.system_class, []):
         count += len(main_entity.relations.get(rel_type, []))
     return  count
