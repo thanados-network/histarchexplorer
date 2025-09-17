@@ -24,7 +24,6 @@ def check_timespan_date(date_from: str, date_to: str) -> bool:
 def format_date(
         date_from: str,
         date_to: str) -> Optional[str]:
-
     # Check if date is BC and remove leading '-'
     bc_date_from = '-' in date_from
     bc_date_to = '-' in date_to
@@ -89,6 +88,7 @@ def get_icon(id_: int, type_hierarchy: dict[str, str]) -> str:
                 break
     return icon or g.sidebar_icons.get('other')
 
+
 def get_divisions(id_: int, type_hierarchy: dict[str, str]) -> dict[str, str]:
     division = g.type_divisions.get(int(id_))
     if not division:
@@ -102,6 +102,9 @@ def get_divisions(id_: int, type_hierarchy: dict[str, str]) -> dict[str, str]:
 
 
 def get_description_translated(description: str) -> dict[str, str]:
+    if description == None:
+        return None
+
     matches = re.findall(r'##(\w+)_##(.*?)##_\1##', description, re.DOTALL)
     if matches:
         lang_dict = {lang: text.strip() for lang, text in matches}

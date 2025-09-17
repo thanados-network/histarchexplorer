@@ -404,13 +404,15 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
     root = []
     match main_entity.system_class:
         case 'feature':
-            root.append(main_entity.relations['place'][0])
+            if 'place' in main_entity.relations and main_entity.relations['place']: #nur wenn dict key place hat und liste nicht leer
+                root.append(main_entity.relations['place'][0])
         case 'stratigraphic_unit':
             for feature in main_entity.relations.get('feature', []):
                 for relation in feature.relation_types:
                     if relation['relationTo'] == main_entity.id:
                         root.append(feature)
-            root.append(main_entity.relations['place'][0])
+            if 'place' in main_entity.relations and main_entity.relations['place']:
+                root.append(main_entity.relations['place'][0])
         case 'artifact' | 'human_remains':
             stratigraphic_unit_id = None
             for feature in main_entity.relations.get('stratigraphic_unit', []):
@@ -422,7 +424,8 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
                 for relation in feature.relation_types:
                     if relation['relationTo'] == stratigraphic_unit_id:
                         root.append(feature)
-            root.append(main_entity.relations['place'][0])
+            if 'place' in main_entity.relations and main_entity.relations['place']:
+                root.append(main_entity.relations['place'][0])
     root.reverse()
     return root
 
