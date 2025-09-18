@@ -1,0 +1,277 @@
+:root {
+  --light-card: hsl(0, 0%, 85%);
+  --dark-card: hsl(0, 0%, 49%);
+  --light-card-hover: hsl(227, 33%, 91%);
+  --dark-card-hover: hsl(230, 19%, 36%);
+  --footer-bg-light: transparent;
+  --footer-bg-dark: hsl(0, 0%, 31%);
+  --light-muuri-tile: hsl(0, 20%, 97%, 0.3);
+  --dark-muuri-tile: hsla(0, 0%, 49%, 0.3);
+  --light-badge: hsl(230, 19%, 87%);
+  --dark-badge: hsl(0, 1%, 22%);
+  --ov-bg-light: none;
+  --ov-bg-dark: none;
+  --light-hierarchy-item: hsl(0, 0%, 83%);
+  --dark-hierarchy-item: hsl(0, 0%, 35%);
+  --light-label: black;
+  --dark-label: white;
+  --light-text: hsl(0, 0%, 33%);
+  --dark-text: hsl(0, 3%, 94%);
+  --card-hover: var(--light-card-hover);
+  --counters-bg-light: hsla(208, 34%, 60%, 0.75);
+  --counters-bg-dark: hsla(208, 24%, 44%, 0.74);
+  --light-text1: hsl(0, 0%, 0%);
+  --light-text2: hsl(230, 17%, 14%);
+  --logo-height: 132px;
+  --navbar-height: 96px;
+  --limegreen: hsl(163, 72%, 41%);
+  --brightred: hsl(356, 69%, 56%);
+  --blue: hsl(208, 92%, 53%);
+  --light-orange: hsl(37, 97%, 70%);
+  --pink: hsl(329, 70%, 58%);
+  --reddish-brown: hsl(349, 19%, 29%);
+  --dark-greyblue: hsl(232, 19%, 15%);
+  --text-color1: var(--light-text2);
+  --text-color2: var(--light-text1);
+  --card-bg: var(--light-card);
+  --card-hover: var(--light-card-hover);
+  --muuri-tile: var(--light-muuri-tile);
+}
+
+body.light {
+  --ov-bg: var(--ov-bg-light);
+  --counters-bg: var(--counters-bg-light);
+  --footer-bg: var(--footer-bg-light);
+  --card-bg: var(--light-card);
+  --card-hover: var(--light-card-hover);
+  --muuri-tile: var(--light-muuri-tile);
+  --hierarchy-item: var(--light-hierarchy-item);
+  --reference-label: var(--light-label);
+  --reference-text: var(--light-text);
+  --badge-color: var(--light-badge);
+}
+
+body.dark {
+  --counters-bg: var(--counters-bg-dark);
+  --footer-bg: var(--footer-bg-dark);
+  --card-bg: var(--dark-card);
+  --card-hover: var(--dark-card-hover);
+  --muuri-tile: var(--dark-muuri-tile);
+  --hierarchy-item: var(--dark-hierarchy-item);
+  --reference-label: var(--dark-label);
+  --reference-text: var(--dark-text);
+  --ov-bg: var(--ov-bg-dark);
+  --badge-color: var(--dark-badge);
+}
+
+:root {
+  --font-inter: "Inter", sans-serif;
+}
+
+body {
+  font-family: var(--font-inter);
+}
+
+.maxscreen-footer-nav {
+  height: calc(100vh - var(--navbar-height) - var(--logo-height));
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-top: var(--navbar-height);
+}
+
+.scrollable-container {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.MuiAppBar-positionAbsolute,
+.mirador-viewer {
+  top: 3.5rem;
+}
+
+.mosaic-tile {
+  margin: 0;
+}
+.mosaic-root {
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  position: absolute;
+}
+
+.mirador-canvas-nav {
+  display: none;
+}
+
+#loading-indicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+.content-container {
+  margin-top: var(--navbar-height);
+}
+
+.entity-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.875rem;
+}
+@media (min-width: 40em) {
+  .entity-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 40em) and (min-width: 71.875em) {
+  .entity-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.entity-card {
+  position: relative;
+  overflow: hidden;
+  margin: 1.25rem;
+  background: var(--card-bg);
+  color: var(--text-color2);
+  text-align: center;
+  padding: 1.25rem;
+  border-radius: 0.3125rem;
+  transition: backbround 150ms ease-in-out;
+  cursor: pointer;
+}
+@media (max-width: 35.9375em) {
+  .entity-card {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+.entity-card:hover {
+  background: var(--card-hover);
+}
+.entity-card--places {
+  border-top: 0.3125rem solid var(--limegreen);
+}
+.entity-card--actors {
+  border-top: 0.3125rem solid var(--pink);
+}
+.entity-card--events {
+  border-top: 0.3125rem solid var(--blue);
+}
+.entity-card--items {
+  border-top: 0.3125rem solid var(--light-orange);
+}
+.entity-card--sources {
+  border-top: 0.3125rem solid var(--reddish-brown);
+}
+.entity-card--files {
+  border-top: 0.3125rem solid var(--dark-greyblue);
+}
+.entity-card__icon img {
+  max-width: 70%; /* Set the width of the image */
+  height: auto;
+}
+.entity-card__label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.7vw;
+  font-weight: 600;
+  margin-bottom: 0.625rem;
+  text-transform: uppercase;
+  color: var(--text-color2);
+  letter-spacing: 0.0625rem;
+  padding: 0.5rem;
+}
+@media (max-width: 769px) {
+  .entity-card__label {
+    font-size: 2.5rem;
+  }
+}
+@media (min-width: 1921px) {
+  .entity-card__label {
+    font-size: 1.4rem;
+  }
+}
+.entity-card__description {
+  color: var(--text-color1);
+  font-weight: 300;
+  text-align: justify;
+}
+.entity-card__count {
+  color: var(--dark-text);
+  font-size: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.cards_home_container {
+  opacity: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  width: 100%;
+  overflow-y: visible;
+  align-items: center;
+  align-self: auto;
+  position: absolute;
+  bottom: 14.1875rem;
+  background: rgba(255, 255, 255, 0.65);
+  margin-top: var(--navbar-height);
+  pointer-events: none; /* Disable pointer events initially */
+}
+@media (max-width: 61.9375em) {
+  .cards_home_container {
+    grid-template-columns: repeat(3, minmax(135px, 1fr));
+  }
+}
+@media (max-width: 47.9375em) {
+  .cards_home_container {
+    grid-template-columns: 1fr;
+    position: sticky;
+    overflow-y: auto;
+    opacity: 1;
+    pointer-events: auto; /* Enable pointer events on small screens */
+  }
+}
+
+.cards_home_container:target {
+  padding-top: var(--navbar-height);
+  opacity: 1;
+  pointer-events: auto;
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+@media (min-width: 47.9375em) {
+  #counters:hover ~ .cards_home_container,
+  #mobileAnchor:hover ~ .cards_home_container,
+  .cards_home_container:hover {
+    opacity: 1;
+    pointer-events: auto; /* Enable pointer events when visible */
+  }
+}
+#entities_mobile {
+  display: none;
+  color: rgba(0, 0, 0, 0.7);
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 16px;
+}
+@media (max-width: 47.9375em) {
+  #entities_mobile {
+    display: inline-block;
+  }
+}
+#entities_mobile .bi-arrow-down-circle-fill {
+  font-size: 3.5rem;
+}
+
+/*# sourceMappingURL=home_entities.css.map */

@@ -45,14 +45,29 @@ def build_id_collection(ids):
     return result
 
 
-def get_browse_list_entities():
-    # This data can be removed, if the key aren't needed somewhere else
+def get_browse_list_entities(id=None):
+
+    #per default the whitelist ids are shown
+    shown_ids = g.settings.shown_ids
+
+    #if an id is given the p46 children are requested (Possible future dev: define another param - property code - to get other connections to be shown)
+    if id:
+        sql = """
+        SELECT range_id from model.link where property_code = 'P46'  AND domain_id = %(id)s
+        """
+        g.cursor.execute(sql, {'id': id})
+        shown_ids = g.cursor.fetchall()
+        if not shown_ids:
+            return None
+
+
+
     data = {
         'shown classes': g.settings.shown_classes,
         'hidden classes': g.settings.hidden_classes,
         'shown types': build_id_collection(g.settings.shown_types),
         'hidden types': build_id_collection(g.settings.hidden_types),
-        'shown ids': g.settings.shown_ids,
+        'shown ids': shown_ids,
         'hidden ids': g.settings.hidden_ids}
 
     # Build WHERE clauses dynamically
@@ -196,11 +211,9 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
     return data
 
 
-@app.route('/entities')
-@app.route('/entities/<tab_name>')
-def entities(tab_name="") -> str:
-
-    data = get_browse_list_entities()
+# get entities and return the template
+def return_entities(tab_name, id):
+    data = get_browse_list_entities(id)
 
     filtered_view_classes = {
         key: tuple(list(d.keys())[0] for d in value)
@@ -219,9 +232,6 @@ def entities(tab_name="") -> str:
     if tab_name == "" and sidebar_elements:
         tab_name = sidebar_elements[0]['route']
 
-    #print(type_tree())
-    print(data['geometries'])
-
     return render_template(
         'entity.html',
         view_classes=filtered_view_classes,
@@ -232,6 +242,15 @@ def entities(tab_name="") -> str:
         active_tab=tab_name,
         typetree_data=type_tree().json,
         main_image_json=g.main_images)
+
+
+@app.route('/entities')
+@app.route('/entities/<tab_name>')
+@app.route('/entities/<tab_name>/<id>')
+def entities(tab_name="", id=None) -> str:
+    return return_entities(tab_name, id)
+
+
 
 
 @app.route('/get_entities/<tab_name>')

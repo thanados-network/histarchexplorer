@@ -11,10 +11,13 @@
       const typeTreeData = {{ typetree_data|tojson}}
       const viewClasses = {{ view_classes|tojson }};
       const data = {{ data|tojson }}
+
       function getEntitiesForTab(tabName) {
-        const validClasses = viewClasses[tabName] || [];
-        return data.entities.filter(entity => validClasses.includes(entity.class));
+          const validClasses = viewClasses[tabName] || [];
+          return data.entities.filter(entity => validClasses.includes(entity.class));
       }
+        
+
 
       data.entities.forEach(entity => {
         entity.beginDBP = calculateTimeBP(entity.begin);

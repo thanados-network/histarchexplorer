@@ -1,5 +1,30 @@
 <script type="text/javascript" src="/static/js/mapfunctions.js"></script>
 
+<script>
+    {% if subunits %}
+      const typeTreeData = {{ typetree_data|tojson}}
+      const viewClasses = {{ view_classes|tojson }};
+      const data = {{ data|tojson }}
+      function getEntitiesForTab(tabName='') {
+        const validClasses = ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains'];
+        return data.entities.filter(entity => validClasses.includes(entity.class));
+      }
+
+      data.entities.forEach(entity => {
+        entity.beginDBP = calculateTimeBP(entity.begin);
+        entity.endDBP = calculateTimeBP(entity.end);
+        if (entity.begin) entity.beginString = makeLocalDate(entity.begin).localdate;
+        if (entity.end) entity.endString = makeLocalDate(entity.end).localdate;
+
+        entity.all = [entity.description, entity.class, entity.type, entity.name]
+            .filter(v => v !== null && v !== undefined && v !== '')
+            .map(v => v.replace(/[\r\n]+/g, ' '))  // <- Replace line breaks with spaces
+            .join(' ');
+      });
+
+    {% endif %}
+</script>
+
 <div id="{{ tab_name }}-header"
      class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3 mt-3 ms-3 me-3">
 

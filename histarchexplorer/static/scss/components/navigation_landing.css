@@ -1,0 +1,250 @@
+:root {
+  --light-card: hsl(0, 0%, 85%);
+  --dark-card: hsl(0, 0%, 49%);
+  --light-card-hover: hsl(227, 33%, 91%);
+  --dark-card-hover: hsl(230, 19%, 36%);
+  --footer-bg-light: transparent;
+  --footer-bg-dark: hsl(0, 0%, 31%);
+  --light-muuri-tile: hsl(0, 20%, 97%, 0.3);
+  --dark-muuri-tile: hsla(0, 0%, 49%, 0.3);
+  --light-badge: hsl(230, 19%, 87%);
+  --dark-badge: hsl(0, 1%, 22%);
+  --ov-bg-light: none;
+  --ov-bg-dark: none;
+  --light-hierarchy-item: hsl(0, 0%, 83%);
+  --dark-hierarchy-item: hsl(0, 0%, 35%);
+  --light-label: black;
+  --dark-label: white;
+  --light-text: hsl(0, 0%, 33%);
+  --dark-text: hsl(0, 3%, 94%);
+  --card-hover: var(--light-card-hover);
+  --counters-bg-light: hsla(208, 34%, 60%, 0.75);
+  --counters-bg-dark: hsla(208, 24%, 44%, 0.74);
+  --light-text1: hsl(0, 0%, 0%);
+  --light-text2: hsl(230, 17%, 14%);
+  --logo-height: 132px;
+  --navbar-height: 96px;
+  --limegreen: hsl(163, 72%, 41%);
+  --brightred: hsl(356, 69%, 56%);
+  --blue: hsl(208, 92%, 53%);
+  --light-orange: hsl(37, 97%, 70%);
+  --pink: hsl(329, 70%, 58%);
+  --reddish-brown: hsl(349, 19%, 29%);
+  --dark-greyblue: hsl(232, 19%, 15%);
+  --text-color1: var(--light-text2);
+  --text-color2: var(--light-text1);
+  --card-bg: var(--light-card);
+  --card-hover: var(--light-card-hover);
+  --muuri-tile: var(--light-muuri-tile);
+}
+
+body.light {
+  --ov-bg: var(--ov-bg-light);
+  --counters-bg: var(--counters-bg-light);
+  --footer-bg: var(--footer-bg-light);
+  --card-bg: var(--light-card);
+  --card-hover: var(--light-card-hover);
+  --muuri-tile: var(--light-muuri-tile);
+  --hierarchy-item: var(--light-hierarchy-item);
+  --reference-label: var(--light-label);
+  --reference-text: var(--light-text);
+  --badge-color: var(--light-badge);
+}
+
+body.dark {
+  --counters-bg: var(--counters-bg-dark);
+  --footer-bg: var(--footer-bg-dark);
+  --card-bg: var(--dark-card);
+  --card-hover: var(--dark-card-hover);
+  --muuri-tile: var(--dark-muuri-tile);
+  --hierarchy-item: var(--dark-hierarchy-item);
+  --reference-label: var(--dark-label);
+  --reference-text: var(--dark-text);
+  --ov-bg: var(--ov-bg-dark);
+  --badge-color: var(--dark-badge);
+}
+
+:root {
+  --font-inter: "Inter", sans-serif;
+}
+
+body {
+  font-family: var(--font-inter);
+}
+
+.maxscreen-footer-nav {
+  height: calc(100vh - var(--navbar-height) - var(--logo-height));
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-top: var(--navbar-height);
+}
+
+.scrollable-container {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.MuiAppBar-positionAbsolute,
+.mirador-viewer {
+  top: 3.5rem;
+}
+
+.mosaic-tile {
+  margin: 0;
+}
+.mosaic-root {
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  position: absolute;
+}
+
+.mirador-canvas-nav {
+  display: none;
+}
+
+#loading-indicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+/* Sidebar toggle in Navbar */
+#toggleSidebar {
+  background: none;
+  border: none;
+  padding-left: 1rem;
+}
+
+#toggleSidebar i {
+  font-size: 1.5rem;
+}
+
+/* Sidebar */
+:root {
+  --sidebar-width: 60px; /* Initial width */
+  --right-sidebar-width: 0px;
+}
+
+#nav-sidebar {
+  width: var(--sidebar-width);
+  overflow-x: hidden;
+  transition: width 0.3s ease;
+  color: var(--nav-sidebar);
+  height: calc(100vh - var(--navbar-height));
+  /* Sticky for larger screens */
+}
+@media (min-width: 765px) {
+  #nav-sidebar {
+    overflow-y: auto;
+    top: var(--navbar-height);
+  }
+}
+
+#right-sidebar {
+  position: absolute;
+  right: 0;
+  width: var(--right-sidebar-width);
+  transition: width 0.3s ease;
+  height: calc(100vh - var(--navbar-height));
+  overflow-y: auto;
+}
+
+#nav-sidebar.expanded {
+  width: 150px;
+  overflow-x: hidden;
+}
+
+#right-sidebar.right-expanded {
+  width: 600px;
+  overflow-x: hidden;
+}
+
+#nav-sidebar .nav-link span {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+#nav-sidebar.expanded .nav-link span {
+  display: inline;
+  opacity: 1;
+}
+
+#nav-sidebar .btn {
+  width: 100%;
+}
+
+#nav-sidebar .nav-link {
+  justify-content: flex-start;
+}
+
+#nav-sidebar.expanded .nav-link {
+  justify-content: flex-start;
+}
+
+@media (max-width: 1199px) {
+  #right-sidebar {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    --right-sidebar-width: 0;
+    top: var(--navbar-height);
+    right: 0;
+    width: 0;
+    height: calc(100vh - var(--navbar-height));
+    z-index: 200000;
+    transition: width 0.3s ease;
+  }
+  #right-sidebar.right-expanded {
+    width: calc(100vw - var(--sidebar-width));
+    overflow-x: hidden;
+    transform: translateX(0);
+  }
+}
+@media (max-width: 765px) {
+  #nav-sidebar {
+    --sidebar-width: 0;
+    top: var(--navbar-height);
+    left: 0;
+    width: 0;
+    height: 100vh;
+    z-index: 300000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  /* Sidebar shown when expanded */
+  #nav-sidebar.expanded {
+    width: 150px;
+    height: 100vh;
+    overflow-x: hidden;
+    transform: translateX(0);
+  }
+  #right-sidebar.right-expanded {
+    width: 100vw;
+  }
+}
+/* Sidebar icon, link style grey */
+.nav-link {
+  color: grey !important;
+  transition: color 0.3s ease;
+}
+.nav-link:hover {
+  color: black !important;
+}
+.nav-link:hover i {
+  color: black !important;
+}
+.nav-link i {
+  color: grey;
+  transition: color 0.3s ease;
+}
+
+/*# sourceMappingURL=navigation_landing.css.map */

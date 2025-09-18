@@ -102,7 +102,7 @@ def get_divisions(id_: int, type_hierarchy: dict[str, str]) -> dict[str, str]:
 
 
 def get_description_translated(description: str) -> dict[str, str]:
-    if description == None:
+    if not description:
         return None
 
     matches = re.findall(r'##(\w+)_##(.*?)##_\1##', description, re.DOTALL)

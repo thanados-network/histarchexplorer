@@ -98,4 +98,5 @@ SIDEBAR_OPTIONS = [
     {'order': 2, 'route': 'map', 'icon': 'bi bi-map'},
     {'order': 3, 'route': 'media', 'icon': 'bi bi-images'},
     {'order': 4, 'route': 'catalogue', 'icon': 'bi bi-journal-text'},
+    {'order': 5, 'route': 'subunits', 'icon': 'bi bi-diagram-3'},
 ]

@@ -59,10 +59,15 @@ function {{tab_name}}ToggleView(view) {
 
 //prepare data
 const {{ tab_name }}Data = {}
-
 {{ tab_name }}Data.tableData = getEntitiesForTab('{{ tab_name }}');
+console.log('what?')
+console.log({{ tab_name }}Data.tableData)
 {{ tab_name }}Data.typeIds = [...new Set({{ tab_name }}Data.tableData.map(item => item.type_id))];
-{{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, viewClasses.{{ tab_name }}, ["standard"], {{ tab_name }}Data.typeIds)
+if ('{{ tab_name }}' == 'subunits') {
+    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains'], ["standard"], {{ tab_name }}Data.typeIds)
+} else {
+    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, viewClasses.{{ tab_name }}, ["standard"], {{ tab_name }}Data.typeIds)
+}
 
 {{ tab_name }}Data.fields = getKeysWithValues({{ tab_name }}Data.tableData)
 {{ tab_name }}Data.classes = [...new Set({{ tab_name }}Data.tableData.map(item => item.class))];
@@ -71,6 +76,7 @@ const {{ tab_name }}Data = {}
 {{ tab_name }}Data.timelineEnd = getSortedDistinctTimeline({{ tab_name }}Data.tableData, "endString", "endDBP");
 
 const classList{{ tab_name }} = {{ tab_name }}Data.classes;
+console.log({{ tab_name }}Data)
 
 function adjustTableHeight{{ tab_name }}() {
     // small delay to ensure layout is ready

@@ -1,0 +1,12 @@
+.footercontent {
+  display: flex;
+  justify-content: space-around;
+  min-height: var(--logo-height);
+  background: var(--footer-bg);
+}
+
+.footerimg {
+  padding: 1rem;
+}
+
+/*# sourceMappingURL=footer.css.map */

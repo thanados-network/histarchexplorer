@@ -10,13 +10,14 @@ from histarchexplorer.models.entity import Entity
 from histarchexplorer.models.presentation_view import EntityTypeModel, \
     PresentationView, Relation
 from histarchexplorer.utils.view_util import get_cite_button
+from histarchexplorer.views.entities import get_browse_list_entities
+from histarchexplorer.views.views import type_tree
 
 sidebar_elements = app.config['SIDEBAR_OPTIONS']
 valid_routes = {item['route'] for item in sidebar_elements}
 
 
-def check_p46_geoms(
-        id):  # todo replace this check with API. Benchmark for 50505 local
+def check_p46_geoms(id):  # todo replace this check with API. Benchmark for 50505 local
     # postgres (1 row retrieved starting from 1 in 1 s 443 ms (execution: 1
     # s 147 ms, fetching: 296 ms)
     sql = """
@@ -55,8 +56,7 @@ def check_p46_geoms(
     return result[0] if result else False
 
 
-def get_root_id(
-        id):  # todo alternative with api: Benchmarl for 77841: 1 row
+def get_root_id(id):  # todo alternative with api: Benchmarl for 77841: 1 row
     # retrieved starting from 1 in 122 ms (execution: 80 ms, fetching: 42 ms)
     sql = """
           WITH RECURSIVE parent_chain AS (
@@ -70,8 +70,7 @@ def get_root_id(
 
               UNION ALL
 
-              -- Recursive part: find the parent link where the current 
-              domain_id is the new row's range_id
+              -- Recursive part: find the parent link where the current domain_id is the new row's range_id
               SELECT l.domain_id,
                      l.range_id,
                      pc.level + 1 AS level
@@ -107,9 +106,8 @@ def get_root_type(id):
 
                                           WHERE NOT EXISTS (SELECT 1
                                                             FROM model.link
-                                                            WHERE 
-                                                                property_code = 'P127'
-                                                              AND domain_id 
+                                                            WHERE property_code = 'P127'
+                                                              AND domain_id
                                                                 = %(id)s)
 
                                           UNION ALL
@@ -173,17 +171,42 @@ def get_first_geom(id):
         return get_first_geom(parent_id)  # Recursively check the parent
     return None  # No parent found with geometry
 
+def check_sidebarelements(tab, id):
+    if tab == 'map':
+        return get_first_geom(id) is not None
+    if tab in ('subunits', 'catalogue'):
+        g.cursor.execute("""
+                         SELECT range_id
+                         FROM model.link
+                         WHERE domain_id = %(id)s
+                           AND property_code = 'P46'
+                         LIMIT 1
+                         """, {"id": id})
+        return g.cursor.fetchone() is not None
+    if tab == 'media':
+        return False
+    if tab in ('overview'):
+        return True
+
+def build_sidebar(id, sidebarelements):
+    filtered_elements = [
+        item for item in sidebarelements
+        if check_sidebarelements(item['route'], id)
+    ]
+
+    return sorted(filtered_elements, key=lambda x: x['order'])
+
+
 
 @app.route('/entity/<int:id_>')
 @app.route('/entity/<int:id_>/<tab_name>')
 def entity(id_: int, tab_name="overview") -> str:
     if tab_name not in valid_routes:
         abort(404)
+
     return render_template(
         'entity.html',
-        sidebar_elements=[
-            {**item, 'order': 0} if item['route'] == tab_name else item
-            for item in sidebar_elements],
+        sidebar_elements=build_sidebar(id_, sidebar_elements),
         page_name="landing",
         active_tab=tab_name,
         entity_id=id_)
@@ -242,7 +265,7 @@ def get_entity(id_: int, tab_name=None) -> str:
                         if first_geom and first_geom.geometry.id == item.id:
                             geometry['properties']['main'] = True
                         geometry['geometry']['shapeType'] = \
-                        geometry['properties']['shapeType']
+                            geometry['properties']['shapeType']
                         map_data_['features'].append(geometry)
 
             map_data = get_map_data(id_)
@@ -276,6 +299,25 @@ def get_entity(id_: int, tab_name=None) -> str:
 
         case 'media':
             pass
+
+        case 'subunits':
+            data = get_browse_list_entities(id_)
+
+            filtered_view_classes = {
+                key: tuple(list(d.keys())[0] for d in value)
+                for key, value in data['counts'].items()
+            }
+
+
+            return render_template(
+                f'tabs/browse.html',
+                subunits=True,
+                view_classes=filtered_view_classes,
+                data=data,
+                active_tab=tab_name,
+                typetree_data=type_tree().json,
+                main_image_json=g.main_images,
+                tab_name='subunits')
 
         case _ if tab_name not in ['feature']:
             print('Invalid tab name provided. Aborting with 404.')
@@ -404,7 +446,8 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
     root = []
     match main_entity.system_class:
         case 'feature':
-            if 'place' in main_entity.relations and main_entity.relations['place']: #nur wenn dict key place hat und liste nicht leer
+            if 'place' in main_entity.relations and main_entity.relations[
+                'place']:  # nur wenn dict key place hat und liste nicht leer
                 root.append(main_entity.relations['place'][0])
         case 'stratigraphic_unit':
             for feature in main_entity.relations.get('feature', []):
