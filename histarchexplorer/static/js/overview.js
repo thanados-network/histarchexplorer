@@ -10,7 +10,7 @@ let resizeTimeout;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-        console.log('resize');
+        //console.log('resize');
         window.overviewGrid.refreshItems().layout();
     }, 500);
 });

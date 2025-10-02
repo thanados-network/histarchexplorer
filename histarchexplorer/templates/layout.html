@@ -2,28 +2,39 @@
 <html lang="{{ CURRENT_LANGUAGE }}">
 <head>
 
-    <link rel="icon" href="/static/images/favicons/favicon_thanados.ico">
-    <link rel="stylesheet" href="/static/node_modules/@fontsource/inter/index.css">
-    <link rel="stylesheet" href="/static/node_modules/bootstrap-icons/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/node_modules/quercus.js/src/treeview.css">
-    <script src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/node_modules/quercus.js/src/treeview.js"></script>
-    <script defer src="/static/js/darkLightMode.js"></script>
-    <link href="/static/node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
-    <script type="text/javascript" src="/static/node_modules/tabulator-tables/dist/js/tabulator.js"></script>
-    <link rel="stylesheet" href="/static/css/main.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Histarchexplorer</title>
+  <link rel="icon" href="/static/images/favicons/favicon_thanados.ico">
+
+  <!-- Fonts & CSS -->
+  <link href="/static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/node_modules/nouislider/dist/nouislider.min.css">
+  <link rel="stylesheet" href="/static/node_modules/@fontsource/inter/index.css">
+  <link rel="stylesheet" href="/static/node_modules/bootstrap-icons/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/node_modules/quercus.js/src/treeview.css">
+  <link href="/static/node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/main.css">
+
+  <!-- JS -->
+  <script src="/static/node_modules/muuri/dist/muuri.min.js"></script>
+  <script src="/static/node_modules/maplibre-gl/dist/maplibre-gl.js"></script>
+  <script src="/static/node_modules/@google/model-viewer/dist/model-viewer-umd.js"></script>
+  <script src="/static/node_modules/nouislider/dist/nouislider.min.js"></script>
+  <script src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/node_modules/quercus.js/src/treeview.js"></script>
+  <script defer src="/static/js/darkLightMode.js"></script>
+  <script type="text/javascript" src="/static/node_modules/tabulator-tables/dist/js/tabulator.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Histarchexplorer</title>
 </head>
 <body>
 {% import '_macros.html' as ui %}
 <header>
-    {% include 'navbar.html' %}
+  {% include 'navbar.html' %}
 </header>
 <main>
-    {% block content %}{% endblock %}
+  {% block content %}{% endblock %}
 </main>
 </body>
 </html>

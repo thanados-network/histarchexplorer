@@ -11,8 +11,7 @@
         );
 
         INSERT INTO tng.maps (name, display_name, tilestring, sortorder)
-            VALUES ('OpenStreetMap', 'Open Street Map', 'L.tileLayer(
-            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: ''&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors''});', 1);
+            VALUES ('OpenStreetMap', 'Open Street Map', 'https://demotiles.maplibre.org/style.json', 1);
 
         CREATE TABLE IF NOT EXISTS tng.config
         (

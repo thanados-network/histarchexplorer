@@ -1,6 +1,7 @@
 from typing import Any
 
 import requests
+from flask import g
 
 from histarchexplorer import app
 from histarchexplorer.api.parser import Parser
@@ -17,6 +18,7 @@ class ApiAccess:
         req = requests.get(
             f"{app.config['API_URL']}entity/{id_}",
             params=parser.__dict__,
+            headers=g.api_headers,
             proxies=PROXIES,
             timeout=60).json()
         return req
@@ -52,6 +54,7 @@ class ApiAccess:
         return requests.get(
             f"{url}{id_}",
             params=parser.__dict__,
+            headers=g.api_headers,
             proxies=PROXIES,
             timeout=30).json()['results']
 
@@ -72,5 +75,6 @@ class ApiAccess:
         return requests.get(
             f"{app.config['API_URL']}/system_class_count/",
             params=parser.__dict__,
+            headers=g.api_headers,
             proxies=PROXIES,
             timeout=30).json()

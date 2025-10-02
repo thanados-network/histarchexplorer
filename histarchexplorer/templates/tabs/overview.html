@@ -1,53 +1,25 @@
 {% import '_macros.html' as ui %}
-<link href="../../static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"/>
-<script src="../../static/node_modules/maplibre-gl/dist/maplibre-gl.js"></script>
-
-<script type="module" src="/static/node_modules/muuri/dist/muuri.min.js"></script>
-
 <script src="../../static/js/overview.js"></script>
 
-<script src="/static/node_modules/@google/model-viewer/dist/model-viewer-umd.js"></script>
-
-
 <script> const entity = JSON.parse(JSON.parse({{ data|tojson }}).entity)</script>
-<script> const categorized_types = JSON.parse(JSON.parse({{ data|tojson }}).categorized_types)</script>
-<script>
-    const data = {{ data | tojson }};
-
-    // asign array inside geometry collection to gisData; if array directly; single object -> array
-    let gisData = [];
-    if (entity.geometry) {
-        if (entity.geometry.type === "GeometryCollection" && Array.isArray(entity.geometry.geometries)) {
-            gisData = entity.geometry.geometries;
-        } else {
-            gisData = Array.isArray(entity.geometry) ? entity.geometry : [entity.geometry];
-        }
-    }
-
-</script>
-<script> const entityName = entity.name</script>
+<script> const overviewMap = JSON.parse(JSON.parse({{ data|tojson }}).overview_map)</script>
+<script> const entityName = entity.title</script>
 <script src="{{ url_for('static', filename='js/map_overview.js') }}"></script>
-<script>
-    const related_entities = JSON.parse(JSON.parse({{ data|tojson }}).related_entities || 'null');
-</script>
 
-
-<link rel="stylesheet" href="/static/css/main.css">
 
 <div class="col flex-column grid-muuri">
-
   <div class="item item-half hierarchy-item">
     <div class="cite-wrapper">
-    {{ cite_button.button_html | safe }}
-  </div>
-    {% if ancestor_entities %}
-      {% for entity in ancestor_entities %}
+      {{ cite_button.button_html | safe }}
+    </div>
+    {% if hierarchy.root %}
+      {% for entity in hierarchy.root %}
         <div class="hierarchy-button">
           <button type="button"
-                  class="btn btn-whitish rounded-5">
-            <a href="{{ url_for('landing', id_=entity.id) }}"
+                  class="btn btn-whitish rounded-5"
+                  title="{{ entity.types[0].title }}&#010;&#010;{{ entity.description[CURRENT_LANGUAGE] }}">
+            <a href="{{ url_for('entity', id_=entity.id) }}"
                class="nude-link text-decoration-none">
-              {{ entity.standard_type.icon | safe }}
               {{ entity.name }}
             </a>
           </button>
@@ -55,6 +27,7 @@
         </div>
       {% endfor %}
     {% endif %}
+    <!-- todo: can we move this in a .py file? Isn't this in VIEW_CLASSES? -->
     {% set system_class_map = {
                     'place': 'places',
                     'feature': 'places',
@@ -68,20 +41,20 @@
                     'event': 'events',
                     'artifact': 'items',
                     'source': 'sources',
-                    'file': 'files'
-                } %}
+                    'file': 'files'} %}
 
     {% if entity.system_class.lower() in ['group', 'person'] and main_image %}
       <div class="entity-card__icon">
-        <img src="{{ main_image.url }}" alt="{{ entity.name }}"/>
+        <img src="{{ main_image.url }}" alt="{{ entity.title }}"/>
       </div>
-      <div class="hierarchy-card-label" data-system-class="{{ entity.system_class.lower() }}">{{ entity.name }}</div>
+      <div class="hierarchy-card-label"
+           data-system-class="{{ entity.system_class.lower() }}">{{ entity.title }}</div>
       <div class="entity-date">
-        <p>{{ entity.formated_date }}</p>
+        <p>{{ ui.date_template_format(entity.start, entity.end) }}</p>
       </div>
     {% else %}
       <div
-          class="main-entity-ellipse main-entity-ellipse--{{ system_class_map.get(entity.system_class.lower(), '') }}">
+        class="main-entity-ellipse main-entity-ellipse--{{ system_class_map.get(entity.system_class.lower(), '') }}">
         <div class="entity-card__icon">
           {% if entity.system_class.lower() in ['feature', 'stratigraphic unit'] %}
             <img src="/static/images/entity_icons/place.png"
@@ -91,22 +64,23 @@
                  alt="{{ entity.system_class }}">
           {% else %}
             <img
-                src="/static/images/entity_icons/{{ entity.system_class | lower }}.png"
-                alt="{{ entity.system_class }}">
+              src="/static/images/entity_icons/{{ entity.system_class | lower }}.png"
+              alt="{{ entity.system_class }}">
           {% endif %}
         </div>
-        <div class="hierarchy-card-label mb-0">{{ entity.name }}</div>
+        <div class="hierarchy-card-label mb-0">{{ entity.title }}</div>
         <div class="entity-type mb-0 ">
-          {% if entity.standard_type %}
-            <p>{{ entity.standard_type.label | upper }}</p>
-          {% endif %}
+          {% for type in entity.types %}
+            {% if type.is_standard %}
+              <p>{{ type.title | upper }}</p>
+            {% endif %}
+          {% endfor %}
         </div>
-
-
         <div class="entity-date">
-          {% if entity.formated_date %}
-            <p>{{ entity.formated_date }}</p>
+          {% if entity.start or entity.end %}
+            <p>{{ ui.date_template_format(entity.start, entity.end) }}</p>
           {% elif entity.types %}
+            <!-- todo: chronology will not work, need to refactor (Bernhard will do this)-->
             {% for type in entity.types if type.root == 'Chronology' %}
               <p>{{ type.label or 'No date available' }}</p>
             {% endfor %}
@@ -116,36 +90,25 @@
     {% endif %}
 
     <!--  Subunits button -->
-    {% if entity.subunits %}
+    {% if hierarchy.subs %}
       <div class="hierarchy-button">
         <div class="hierarchy-line"></div>
         <button type="button" class="btn btn-whitish rounded-5" disabled>
           <i class="bi bi-diagram-3"></i>
           <span class="nude-link">
-                                    {{ entity.subunits | length }}
-            {{ "Subentity" if entity.subunits | length == 1 else "Subentities" }}</span>
+
+            {{ hierarchy.subs }}
+            {{ "Subentity" if hierarchy.subs == 1 else "Subentities" }}</span>
 
         </button>
       </div>
     {% endif %}
-    <!--
-    <div class="entity-country">
-      {% if entity.types %}
-        {% for type in entity.types %}
-          {% if type.hierarchy == 'Administrative unit' %}
-            <p>{{ type.label }}</p>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
-    </div>
-    </button>
-    -->
 
 
     <div class="attribute-area">
       <!-- Attributes -->
       {% if categorized_types %}
-        <span class="tile-label">ATTRIBUTES</span>
+        <span class="tile-label">{{ _('attributes') | upper }}</span>
         <div class="categorized-types">
           {% for label, value in categorized_types.items() %}
             <p class="tile-sub-label text-uppercase mt-3">
@@ -153,10 +116,10 @@
             {% for type in value %}
               <div class="badge custom-badge text-wrap m-1">
                 <h6 class="m-0 text-center">
-                  {{ type['type'].label }}
-                  {% if type['type'].value and type['type'].unit %}:
-                    {{ type['type'].value }}
-                    {{ type['type'].unit }}
+                  {{ type.type.title }}
+                  {% if type.type.value and type.type.unit %}:
+                    {{ type.type.value }}
+                    {{ type.type.unit }}
                   {% endif %}
                 </h6>
               </div>
@@ -169,48 +132,20 @@
 
   <!-- Description -->
   {% if entity.description %}
-    <div class="item {{ entity.description_class }}">
+    <div class="item {% if entity.description[CURRENT_LANGUAGE] | length > 1500 %}item-middle{% endif %}">
       <div class="item-content" data-type="description">
         <div class="muuri-description">
-          <span class="tile-label">DESCRIPTION</span>
-          <p>{{ entity.description }}</p>
+          <span class="tile-label">{{ _("description") | upper }}</span>
+          <p>{{ entity.description[CURRENT_LANGUAGE]  }}</p>
         </div>
       </div>
     </div>
-
   {% endif %}
 
-
-  <!--
-    {% if categorized_types %}
-      <div class="item-half">
-        <div class="item-content">
-          <span class="tile-label">ATTRIBUTES</span>
-          <div class="categorized-types">
-            {% for label, value in categorized_types.items() %}
-              <p class="tile-sub-label text-uppercase mt-3">
-                {{ value[0]['icon'] | safe }} {{ label }}</p>
-              {% for type in value %}
-                <div class="badge bg-dark-subtle text-wrap m-1">
-                  <h6 class="m-0 text-center">
-                    {{ type['type'].label }}
-                    {% if type['type'].value and type['type'].unit %}:
-                      {{ type['type'].value }}
-                      {{ type['type'].unit }}
-                    {% endif %}
-                  </h6>
-                </div>
-              {% endfor %}
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-    {% endif %}
-  Attributes -->
-
-
   <!-- Map Location -->
-  {% if entity.geometry %}
+  <!-- Todo: Map Location -->
+  <!--    Geoemtries are now in entity.geometries, and should be formated that it can be used right away -->
+  {% if entity.geometries %}
     <div class="item" data-type="map">
       <div class="map-wrapper">
         <div class="item-content item-content-full">
@@ -224,7 +159,6 @@
         </div>
       </div>
     </div>
-
   {% endif %}
 
 
@@ -263,51 +197,40 @@
     </div>
   {% endif %}
 
-
-
-
   <!-- Bibliography and External References -->
-  {% if related_entities.Bibliography or related_entities['External reference'] %}
+<!-- todo: get also the references from the root entity -->
+<!--    This is just a model thing, Bernhard will include this in the API call, so nothing to do here -->
+  {% if entity.references %}
     <div class="item item-5-6" data-type="reference">
       <div class="item-content">
         <div class="muuri-references">
           <p class="tile-label text-uppercase">References</p>
           <ul class="no-bullets">
-            {% for key, type_ in related_entities.items() %}
-              {% if key == "Bibliography" or key == "External reference" %}
-                {% for entity_ in type_.values() %}
-                  {% for item in entity_ %}
-                    <li>
-                      <div class="reference-content">
-                        <div class="reference-header">
-                          {% if key == "Bibliography" %}
-                            <i class="bi bi-book"></i>
-                            <a href="{{ url_for('entity', id_=item.id) }}" class="reference-name">
-                              {{ item.name }}
-                            </a>
-                          {% elif key == "External reference" %}
-                            <i class="bi bi-box-arrow-up-right"></i>
-                            {% set parts = item.name.split('/') %}
-                            {% set result = parts[:3] %}
-                            <a href="{{ item.name }}" class="reference-name">
-                              {{ result | join('/') }}
-                            </a>
-                          {% endif %}
-
-                        </div>
-                        <p class="reference-description">
-                          {{ item.description }}
-                          {% for relation in item.relations %}
-                            {% if entity.id == relation.relation_to_id %}
-                              {{ relation.relation_description }}
-                            {% endif %}
-                          {% endfor %}
-                        </p>
-                      </div>
-                    </li>
-
-                  {% endfor %}
-                {% endfor %}
+            {% for reference in entity.references %}
+              {% if reference.system_class in ["bibliography", "external_reference"] %}
+                <li>
+                  <div class="reference-content">
+                    <div class="reference-header">
+                      {% if reference.system_class == "bibliography" %}
+                        <i class="bi bi-book"></i>
+                        <a href="{{ url_for('entity', id_=reference.id) }}"
+                           class="reference-name">
+                          {{ reference.title }}
+                        </a>
+                      {% elif reference.system_class  == "external_reference" %}
+                        <i class="bi bi-box-arrow-up-right"></i>
+                        {% set parts = reference.title.split('/') %}
+                        {% set result = parts[:3] %}
+                        <a href="{{ reference.title }}" class="reference-name">
+                          {{ result | join('/') }}
+                        </a>
+                      {% endif %}
+                    </div>
+                    <p class="reference-description">
+                      {{ reference.citation }} {{ reference.pages }}
+                    </p>
+                  </div>
+                </li>
               {% endif %}
             {% endfor %}
           </ul>
@@ -316,24 +239,15 @@
     </div>
   {% endif %}
 </div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
 
 {{ cite_button.modal_html | safe }}
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-        setTimeout(() => {
-            window.grid.refreshItems().layout();
-        }, 100);
-    })
-
-
+  document.addEventListener('DOMContentLoaded', function () {
+    setTimeout(() => {
+      window.grid.refreshItems().layout();
+    }, 100);
+  })
 </script>
 
 

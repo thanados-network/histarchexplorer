@@ -98,9 +98,7 @@ INSERT INTO tng.links OVERRIDING SYSTEM VALUE VALUES
 --
 
 INSERT INTO tng.maps VALUES
-	(1, 'OpenStreetMap', 'Open Street Map', 'L.tileLayer(
-            "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: ''&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors''});', 1);
-
+	(1, 'OpenStreetMap', 'Open Street Map', 'https://api.maptiler.com/maps/bright/style.json?key=E7Jrgaazm79UlTuEI5f5', 1);
 
 --
 -- Data for Name: properties; Type: TABLE DATA; Schema: tng; Owner: openatlas

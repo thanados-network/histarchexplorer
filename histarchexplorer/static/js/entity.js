@@ -27,7 +27,7 @@ async function loadHTML(id, tab, index, totalTabs) {
     if (id === 0) urlbase =  `/get_entities/${tab}`
     //console.log(urlbase)
     if (id === 0) urlbase = `/get_entities/${tab}`
-    console.log(urlbase)
+    //console.log(urlbase)
 
     const response = await fetch(urlbase);
 
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (window[gridName]) {
                     window[gridName].refreshItems().layout();
                 }
-                console.log(gridName)
+                //console.log(gridName)
             }, 500);
 
         });

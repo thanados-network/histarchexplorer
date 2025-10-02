@@ -304,7 +304,7 @@
                         validSelections.forEach(id => treeview.selectNodeById(id, true));
                         window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = validSelections;
                     } catch (e) {
-                        console.log('Could not restore selections:', e);
+                        //console.log('Could not restore selections:', e);
                     }
                 }
             }
@@ -498,7 +498,7 @@
 
 
     const {{ tab_name }}TreesToBuild = Object.keys({{ tab_name }}Data.treeData);
-    console.log({{ tab_name }}TreesToBuild);
+    //console.log({{ tab_name }}TreesToBuild);
 
     const {{ tab_name }}CurrentContainer = document.getElementById("{{ tab_name }}-tree-container");
 
@@ -558,7 +558,7 @@
                 selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIds);
             }
         }
-        console.log(selectedNodes{{ tab_name }})
+        //console.log(selectedNodes{{ tab_name }})
         applyCombinedFilter{{ tab_name }}()
     }
 

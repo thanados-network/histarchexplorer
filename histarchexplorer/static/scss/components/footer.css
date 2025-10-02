@@ -1,6 +1,5 @@
 .footercontent {
   display: flex;
-  //flex-wrap: wrap;
   justify-content: space-around;
   min-height: var(--logo-height);
   background: var(--footer-bg);
@@ -10,4 +9,4 @@
   padding: 1rem;
 }
 
-
+/*# sourceMappingURL=footer.css.map */

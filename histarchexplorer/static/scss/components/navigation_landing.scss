@@ -19,6 +19,7 @@
 
 #nav-sidebar {
   width: var(--sidebar-width);
+  overflow-x: hidden;
   transition: width 0.3s ease;
   color: var(--nav-sidebar);
   height: calc(100vh - var(--navbar-height));

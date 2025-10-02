@@ -1,12 +1,15 @@
-# pragma: no cover
 import json
 from dataclasses import asdict, dataclass, field
 from typing import Any, Optional
 
 import requests
+from flask import g
 
-from histarchexplorer import app
+from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import PROXIES
+from histarchexplorer.models.util import format_date, \
+    get_description_translated, get_divisions, get_icon, \
+    get_render_type, split_date_string
 
 
 @dataclass
@@ -15,6 +18,25 @@ class GeometryModel:
     type: str
     coordinates: Any
 
+    def swap_latlng(self) -> "GeometryModel":
+        def flip(coord):
+            return [coord[1], coord[0]]
+
+        if self.type == "Point":
+            new_coords = flip(self.coordinates)
+
+        elif self.type == "LineString":
+            new_coords = [flip(c) for c in self.coordinates]
+
+        elif self.type == "Polygon":
+            # Polygons are lists of linear rings (outer ring + holes)
+            new_coords = [[flip(c) for c in ring] for ring in self.coordinates]
+
+        else:
+            # Leave untouched if unknown geometry type
+            new_coords = self.coordinates
+
+        return GeometryModel(id=self.id, type=self.type, coordinates=new_coords)
 
 @dataclass
 class PropertyModel:
@@ -35,6 +57,13 @@ class FeatureModel:
             "geometry": asdict(self.geometry),
             "properties": asdict(self.properties)}
 
+    def to_json(self, **kwargs) -> str:
+        return json.dumps(self.to_dict(), **kwargs)
+
+    def swap_latlng(self) -> "FeatureModel":
+        return FeatureModel(
+            geometry=self.geometry.swap_latlng(),
+            properties=self.properties)
 
 @dataclass
 class TimePointModel:
@@ -65,6 +94,11 @@ class EntityTypeModel:
     type_hierarchy: Optional[list[TypeHierarchyEntry]]
     value: Optional[str]
     unit: Optional[str]
+    icon: Optional[str]
+    division: Optional[dict[str, str]]
+
+    def to_json(self, *, indent: Optional[int] = 2) -> str:
+        return json.dumps(asdict(self), indent=indent, ensure_ascii=False)
 
 
 @dataclass
@@ -121,6 +155,8 @@ class File:
     mime_type: Optional[str] = None
     iiif_manifest: Optional[str] = None
     iiif_base_path: Optional[str] = None
+    main_image: int = None
+    render_type: str = None
 
 
 @dataclass
@@ -129,7 +165,7 @@ class Relation:
     name: str
     system_class: str
     relation_types: Optional[list[dict[str, Any]]] = None
-    description: Optional[str] = None
+    description: dict[str, str] | None = None
     aliases: Optional[list[str]] = None
     time_range: Optional[TimeRangeModel] = None
     geometries: list[FeatureModel] = field(default_factory=list)
@@ -139,10 +175,12 @@ class Relation:
 @dataclass
 class PresentationView:
     id: int
-    systemClass: str
+    system_class: str
     title: str
-    description: str
+    description: dict[str, str]
     aliases: list[str]
+    start: str
+    end: str
     geometries: list[FeatureModel] = field(default_factory=list)
     when: Optional[TimeRangeModel] = None
     types: list[EntityTypeModel] = field(default_factory=list)
@@ -176,6 +214,7 @@ class PresentationView:
             return FeatureModel(
                 geometry=geometry_model,
                 properties=property_model)
+
         geometries = []
         if geometry_data.get('type') == 'FeatureCollection':
             for geom in geometry_data['features']:
@@ -210,7 +249,10 @@ class PresentationView:
                 is_standard=type_.get("isStandard"),
                 type_hierarchy=hierarchy,
                 value=type_.get("value"),
-                unit=type_.get("unit")))
+                unit=type_.get("unit"),
+                icon=get_icon(type_["id"], type_.get("typeHierarchy")),
+                division=get_divisions(type_["id"],
+                                       type_.get("typeHierarchy"))))
         return types
 
     @staticmethod
@@ -236,14 +278,17 @@ class PresentationView:
                         is_standard=True,
                         type_hierarchy=[],
                         value=None,
-                        unit=None))
+                        unit=None,
+                        icon=None,
+                        division=None))
 
                 relation = Relation(
                     id=rel["id"],
                     name=rel.get("title"),
                     system_class=rel.get("systemClass", system_class),
                     relation_types=rel.get("relationTypes"),
-                    description=rel.get("description"),
+                    description=get_description_translated(
+                        rel.get("description")),
                     aliases=rel.get("aliases", []),
                     time_range=time_range,
                     geometries=rel_geometries,
@@ -257,7 +302,7 @@ class PresentationView:
         return grouped_relations
 
     @staticmethod
-    def parse_file(raw_file: dict) -> list[File]:
+    def parse_file(entity_id: int, raw_file: dict) -> list[File]:
         files = []
         for f in raw_file:
             if isinstance(f, dict):
@@ -270,28 +315,49 @@ class PresentationView:
                     public=f["publicShareable"],
                     url=f.get("url"),
                     mime_type=f.get("mimetype"),
-                    iiif_manifest=f.get("iiifManifest"),
-                    iiif_base_path=f.get("iiifBasePath")))
+                    iiif_manifest=f.get("IIIFManifest"),
+                    iiif_base_path=f.get("IIIFBasePath"),
+                    main_image=g.main_images.get(entity_id) == entity_id,
+                    render_type=get_render_type(f.get("mimetype"))))
         return files
 
     @classmethod
+    @cache.memoize()
     def from_api(cls, entity_id: int) -> 'PresentationView':
-        url = f"{app.config['API_URL']}entity_presentation_view/{entity_id}"
         response = requests.get(
-            url,
+            f"{app.config['API_URL']}entity_presentation_view/{entity_id}",
+            params={
+                'place_hierarchy': 'true',
+                'remove_empty_values': 'true',
+                'centroid': 'true'},
+            headers=g.api_headers,
             proxies=PROXIES,
             timeout=30)
         response.raise_for_status()
         data = response.json()
 
+        when_data = cls.parse_time_range(data.get("when"))
+
+        start_date = None
+        end_date = None
+        if when_data and when_data.start:
+            start_date = format_date(
+                split_date_string(when_data.start.earliest),
+                split_date_string(when_data.start.latest))
+        if when_data and when_data.end:
+            end_date = format_date(
+                split_date_string(when_data.end.earliest),
+                split_date_string(when_data.end.latest))
+
         return cls(
             id=data["id"],
-            systemClass=data.get("systemClass", ""),
+            system_class=data.get("systemClass", ""),
             title=data.get("title", ""),
-            description=data.get("description", ""),
+            description=get_description_translated(
+                data.get("description", "")),
             aliases=data.get("aliases", []),
             geometries=cls.parse_geometries(data.get("geometries", {})),
-            when=cls.parse_time_range(data.get("when")),
+            when=when_data,
             types=cls.parse_types(data.get("types", [])),
             externalReferenceSystems=[
                 ExternalReferenceModel.from_dict(er)
@@ -301,13 +367,7 @@ class PresentationView:
                 Reference.from_dict(ref)
                 for ref in data.get("references", [])
                 if isinstance(ref, dict)],
-            files=cls.parse_file(data.get('files', [])),
-            relations=cls.parse_relations(data.get("relations", {})))
-
-
-class Entity(PresentationView):
-    def __init__(self):
-        self.geometries_collection = {
-            'structure':
-                {},
-            'collection': []}
+            files=cls.parse_file(data["id"], data.get('files', [])),
+            relations=cls.parse_relations(data.get("relations", {})),
+            start=start_date,
+            end=end_date)

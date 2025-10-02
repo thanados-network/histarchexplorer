@@ -50,7 +50,8 @@ class Entity:
         self.standard_type = self.get_standard_type()
         self.alias = get_alias(data.get('names'))
         self.relations = get_relation_class(data.get('relations'))
-        self.depictions: list[Depiction] = self.get_depiction(data.get('depictions'))
+        self.depictions: list[Depiction] = self.get_depiction(
+            data.get('depictions'))
         self.reference_systems = data.get('links')
         self.begin_from = None
         self.begin_to = None
@@ -60,7 +61,7 @@ class Entity:
         self.begin = None
         self.end = None
         self.parent: Optional[Relation] = self.get_parent()
-        self.subunits: Optional[Relation]  = self.get_subunits()
+        self.subunits: Optional[Relation] = self.get_subunits()
         self.children = []
         self.geometry = data.get('geometry')
         if 'when' in data:
@@ -79,7 +80,8 @@ class Entity:
     def __repr__(self) -> str:  # pragma: no cover
         return str(self.__dict__)
 
-    def get_depiction(self, depictions: Optional[list[dict[str, str]]]) -> list[Depiction]:
+    def get_depiction(self, depictions: Optional[list[dict[str, str]]]) -> \
+    list[Depiction]:
         if not depictions:
             return []
         result = []
@@ -87,7 +89,8 @@ class Entity:
             id_ = int(data['@id'].rsplit('/', 1)[-1])
             mimetype = data.get("mimetype")
             render_type = (
-                "3d_model" if mimetype in {"model/gltf-binary", "model/glb", "model/gltf+json"}
+                "3d_model" if mimetype in {"model/gltf-binary", "model/glb",
+                                           "model/gltf+json"}
                 else "webp" if mimetype in {"image/webp", "image/webp"}
                 else "image" if mimetype and mimetype.startswith("image/")
                 else "pdf" if mimetype == "application/pdf"
@@ -96,7 +99,8 @@ class Entity:
             main_image = g.main_images.get(self.id) == id_
             iiif_manifest = ""
             if data.get("IIIFManifest"):
-                iiif_manifest = f'{data["IIIFManifest"]}?url={url_for("index", _external=True)}'
+                iiif_manifest = (f'{data["IIIFManifest"]}?url='
+                                 f'{url_for("index", _external=True)}')
             depiction = Depiction(
                 id_=id_,
                 link=data.get("@id"),
@@ -106,7 +110,8 @@ class Entity:
                 creator=data.get("creator"),
                 url=data.get("url"),
                 mimetype=mimetype,
-                iiif_manifest=iiif_manifest if mimetype.startswith("image/") else None,
+                iiif_manifest=iiif_manifest if mimetype.startswith(
+                    "image/") else None,
                 iiif_base_path=data.get("IIIFBasePath"),
                 entity_id=self.id,
                 main_image=main_image,
@@ -168,6 +173,7 @@ class Entity:
         return self
 
     @staticmethod
+    @cache.memoize()
     def get_entity(id_: int, parser: Parser) -> Entity:
         return Entity(ApiAccess.get_entity(id_, parser))
 

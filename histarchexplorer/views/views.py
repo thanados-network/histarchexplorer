@@ -34,5 +34,6 @@ def set_language(language: Optional[str] = None) -> Response:
 def type_tree():
     response = requests.get(
         f"{app.config['API_URL']}/type_by_view_class/",
+        headers=g.api_headers,
         timeout=20).json()
     return jsonify(response)

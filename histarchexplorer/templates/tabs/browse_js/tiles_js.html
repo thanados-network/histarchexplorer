@@ -1,65 +1,3 @@
-<style>
-    /* === Tile background image layer === */
-    .tile-container .grid .item {
-        position: relative;
-        overflow: hidden;
-
-        /* defaults for our per-tile animation (JS overrides these) */
-        --bg-start: 118%; /* base (acts like cover) */
-        --bg-target: 100%; /* hover (acts like contain for most wide imgs) */
-    }
-
-    .tile-container .grid .item .item-bg {
-        position: absolute;
-        inset: 0;
-        background-position: center;
-        background-repeat: no-repeat;
-
-        /* base uses computed "cover" percentage */
-        background-size: var(--bg-start);
-
-        opacity: 0;
-        transition: opacity .25s ease, background-size .35s ease;
-        z-index: 0; /* under overlay/content */
-    }
-
-    /* reveal image when loaded */
-    .tile-container .grid .item.has-bg .item-bg {
-        opacity: 1;
-    }
-
-    /* hover animates to computed "contain" percentage */
-    .tile-container .grid .item:hover .item-bg {
-        background-size: var(--bg-target);
-    }
-
-    /* Optional: readability overlay (doesn't block hover) */
-    .tile-container .grid .item .item-overlay {
-        position: absolute;
-        inset: 0;
-        background: rgba(241, 241, 241, 0.79);
-        opacity: 1;
-        transition: opacity .2s ease;
-        z-index: 1;
-        pointer-events: none;
-    }
-
-    .tile-container .grid .item:hover .item-overlay {
-        opacity: .4;
-    }
-
-    .tile-container .grid .item:hover .item-content {
-        opacity: .4;
-    }
-
-    /* Content on top */
-    .tile-container .grid .item .item-content {
-        position: relative;
-        z-index: 2;
-    }
-</style>
-
-
 <script>
     let filteredData{{ tab_name }} = [];
     // Declare the grid variable with template
@@ -86,6 +24,7 @@
         const base = typeof iiifObjOrBase === 'string' ? iiifObjOrBase : (iiifObjOrBase?.base || null);
         if (!base) return null;
         // request JPG as the rendered output format
+        //console.log( `${base}/full/!${w},${h}/0/default.jpg`);
         return `${base}/full/!${w},${h}/0/default.jpg`;
     }
 
@@ -100,11 +39,14 @@
         need.forEach(id => params.append('entities', id));
         params.set('show', 'depictions');
         params.set('format', 'lpx');
+        params.set('limit', '0');
 
         // If your app runs on thanados.openatlas.eu, this relative path works.
         // If not, switch to the absolute origin:
         // const url = `https://thanados.openatlas.eu/api/query/?${params.toString()}`;
         const url = `https://thanados.openatlas.eu/api/query/?${params.toString()}`;
+
+        //console.log(url);
 
 
         try {
@@ -146,7 +88,7 @@
         } catch (e) {
             // On error, mark pending ids as null for now
             need.forEach(id => iiifMap{{ tab_name }}.set(id, null));
-            console.warn('Depictions fetch failed:', e);
+            //console.warn('Depictions fetch failed:', e);
         }
     }
 
@@ -157,7 +99,8 @@
         const DPRCAP = (typeof DPR_CAP{{ tab_name }} !== 'undefined') ? DPR_CAP{{ tab_name }} : Math.min(window.devicePixelRatio || 1, 2);
 
         idsOnPage.forEach(id => {
-            const el = document.querySelector(`#tile-{{ tab_name }} .grid .item[data-entity-id="${id}"]`);
+            const el = document.querySelector(`#tile-{{ tab_name }} .grid-container .grid .item[data-entity-id="${id}"]`);
+            //console.(el)
             if (!el) return;
 
             const bg = el.querySelector('.item-bg');
@@ -207,69 +150,74 @@
     }
 
 
-    // https://iiif.bitem.at/iiif/2/276877.jpg/full/!200,200/0/default.jpg
-    // https://thanados.openatlas.eu/api/display/276877
-    // https://thanados.openatlas.eu/api/query/?entities=276875&entities=50505&entities=3535&entities=75557&show=depictions&format=lpx
     function populateGridWithData{{ tab_name }}() {
-        console.log('populateGridWithData called for {{ tab_name }}');
+        //console.log('populateGridWithData called for {{ tab_name }}');
 
         const gridContainer = document.querySelector('#tile-{{ tab_name }} .grid');
         if (!gridContainer) {
-            console.error('Grid container not found!');
+            //console.error('Grid container not found!');
             return;
         }
 
-        // ⚠️ NICHT sofort leeren, solange ein Muuri-Grid existiert!
-        // gridContainer.innerHTML = '';
+  // Remove existing items correctly
+  if (grid{{ tab_name }}) {
+    const items = grid{{ tab_name }}.getItems();
+    if (items.length) grid{{ tab_name }}.remove(items, {removeElements: true});
+  } else {
+    gridContainer.innerHTML = '';
+  }
 
-        // Bestehende Muuri-Items korrekt entfernen
-        if (grid{{ tab_name }}) {
-            const items = grid{{ tab_name }}.getItems();
-            if (items.length) {
-                grid{{ tab_name }}.remove(items, {removeElements: true});
-            }
-        } else {
-            // Nur wenn KEIN Grid existiert, darf hart geleert werden
-            gridContainer.innerHTML = '';
-        }
+  // Page calc
+  const allFilteredData = filteredData{{ tab_name }};
+  const pageSize = table{{ tab_name }}.getPageSize();
+  const currentPage = table{{ tab_name }}.getPage();
+  const totalPages = Math.max(1, Math.ceil(allFilteredData.length / pageSize));
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, allFilteredData.length);
+  const currentPageData = allFilteredData.slice(startIndex, endIndex);
 
-        // Datenseite bestimmen (unverändert)
-        const allFilteredData = filteredData{{ tab_name }};
-        const pageSize = table{{ tab_name }}.getPageSize();
-        const currentPage = table{{ tab_name }}.getPage();
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = Math.min(startIndex + pageSize, allFilteredData.length);
-        const currentPageData = allFilteredData.slice(startIndex, endIndex);
+  // Build nodes for real items
+  const newNodes = currentPageData.map(item => createGridItem{{ tab_name }}(item));
 
-        // Neue DOM-Knoten bauen (und in Array sammeln!)
-        const newNodes = currentPageData.map(item => createGridItem{{ tab_name }}(item));
+  // 🚀 Add pager tiles (so grid always visually invites nav)
+  // Put "Previous" at the *start* if we can go back
+  if (currentPage > 1) {
+    newNodes.unshift(createPagerTile{{ tab_name }}('prev', currentPage - 1, false));
+  } else {
+    // optional: show disabled prev tile or omit entirely; here we omit on first page:
+    // newNodes.unshift(createPagerTile{{ tab_name }}('prev', 1, true));
+  }
 
-        if (grid{{ tab_name }}) {
-            grid{{ tab_name }}.add(newNodes);
-            grid{{ tab_name }}.layout();
-        } else {
-            newNodes.forEach(node => gridContainer.appendChild(node));
-        }
+  // Put "Next" at the *end* if more pages exist
+  if (currentPage < totalPages) {
+    newNodes.push(createPagerTile{{ tab_name }}('next', currentPage + 1, false));
+  } else {
+    // optional: disabled last tile
+    // newNodes.push(createPagerTile{{ tab_name }}('next', totalPages, true));
+  }
 
-        console.log('Items prepared for container:', newNodes.length);
+  // Add to DOM / Muuri
+  if (grid{{ tab_name }}) {
+    grid{{ tab_name }}.add(newNodes);
+    grid{{ tab_name }}.layout();
+  } else {
+    newNodes.forEach(node => gridContainer.appendChild(node));
+  }
 
-        // 🖼️ NEW: fetch & apply IIIF backgrounds for THIS page
-        const idsOnPage = currentPageData.map(d => d.id);
-        fetchDepictionsBatch{{ tab_name }}(idsOnPage).then(() => {
-            applyTileBackgrounds{{ tab_name }}(idsOnPage);
-        });
+  // 🖼️ IIIF only for real entity tiles
+  const idsOnPage = currentPageData.map(d => d.id);
+  fetchDepictionsBatch{{ tab_name }}(idsOnPage).then(() => {
+    applyTileBackgrounds{{ tab_name }}(idsOnPage);
+  });
 
-        // Optional kleines Refresh
-        setTimeout(() => {
-            if (grid{{ tab_name }}) {
-                grid{{ tab_name }}.refreshItems().layout();
-                console.log('Muuri layout refreshed');
-            }
-        }, 50);
-    }
+  setTimeout(() => {
+    if (grid{{ tab_name }}) grid{{ tab_name }}.refreshItems().layout();
+  }, 50);
+}
+
 
     function initializeMuuriGrid{{ tab_name }}() {
-        console.log('initializeMuuriGrid called');
+        //console.log('initializeMuuriGrid called');
 
         // Always create a fresh grid
         populateGridWithData{{ tab_name }}();
@@ -280,13 +228,13 @@
         // Small delay before initializing Muuri to let DOM settle
         setTimeout(() => {
             grid{{ tab_name }} = new Muuri('#tile-{{ tab_name }} .grid');
-            console.log('Muuri initialized with items:', grid{{ tab_name }}.getItems().length);
+            //console.log('Muuri initialized with items:', grid{{ tab_name }}.getItems().length);
             grid{{ tab_name }}.refreshItems().layout();
         }, 100);
     }
 
     function createGridItem{{ tab_name }}(data) {
-        console.log('Creating grid item for:', data.name, data);
+        //console.log('Creating grid item for:', data.name, data);
 
         const item = document.createElement('div');
         item.className = 'item';
@@ -314,11 +262,10 @@
                 categoryString += (categoryString ? ' / ' : '') + data.type;
             }
 
-            console.log('Item data processed:', {
-                name: data.name,
-                dateString,
+            /*console.log('Item data processed:', {
+               dateString,
                 categoryString
-            });
+            });*/
 
             // NEW: add background layer element
             item.innerHTML = `
@@ -339,11 +286,11 @@
                 }
             });
 
-            console.log('Grid item created successfully for:', data.name);
+            //console.log('Grid item created successfully for:', data.name);
             return item;
 
         } catch (e) {
-            console.error('Error creating grid item for:', data.name, e);
+            //console.error('Error creating grid item for:', data.name, e);
             // Return a basic item even if there's an error
             item.innerHTML = `
         <div class="item-content">
@@ -357,12 +304,14 @@
     function adjustTileHeight{{ tab_name }}() {
         setTimeout(function () {
             const header = document.getElementById(`{{tab_name}}-header`);
-            tileContainer{{tab_name}} = document.getElementById(`tile-{{tab_name}}`);
+            tileContainer{{tab_name}} = document.getElementById(`grid-container-{{tab_name}}`);
 
             if (!header || !tileContainer{{tab_name}}) return;
 
             const headerHeight = header.offsetHeight;
-            const maxHeight = window.innerHeight - 96 - headerHeight - (3 * 16); // Same calculation as table
+
+            const maxHeight = window.innerHeight - 96 - headerHeight - (3 * 16) - 40; // Same calculation as table
+
 
             tileContainer{{tab_name}}.style.height = `${maxHeight}px`;
             tileContainer{{tab_name}}.style.maxHeight = `${maxHeight}px`;
@@ -374,14 +323,14 @@
     }
 
     function goToTilePage{{ tab_name }}(pageNum) {
-        console.log('Going to tile page:', pageNum);
+        //console.log('Going to tile page:', pageNum);
 
         // Change the table page (this will trigger our event listener)
         table{{ tab_name }}.setPage(pageNum);
 
         // Destroy and recreate the grid (same approach as toggle view)
         if (grid{{ tab_name }}) {
-            console.log('Destroying existing grid for page change');
+            //console.log('Destroying existing grid for page change');
             grid{{ tab_name }}.destroy();
             grid{{ tab_name }} = null;
         }
@@ -395,7 +344,7 @@
         // Initialize Muuri with delay
         setTimeout(() => {
             grid{{ tab_name }} = new Muuri('#tile-{{ tab_name }} .grid');
-            console.log('Muuri re-initialized with items:', grid{{ tab_name }}.getItems().length);
+            //console.log('Muuri re-initialized with items:', grid{{ tab_name }}.getItems().length);
             grid{{ tab_name }}.refreshItems().layout();
         }, 100);
     }
@@ -429,6 +378,40 @@
     `;
     }
 
+    function createPagerTile{{ tab_name }}(dir, targetPage, disabled=false) {
+  // dir: 'prev' or 'next'
+  const div = document.createElement('div');
+  div.className = `item pager pager-${dir}`;
+  div.setAttribute('role', 'button');
+  div.setAttribute('tabindex', disabled ? '-1' : '0');
+  div.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+  div.dataset.pager = dir;          // mark so we can skip IIIF, entity click etc.
+  div.dataset.targetPage = String(targetPage);
+
+  // No background/overlay layers; just content
+  const arrow = dir === 'prev' ? '<i class="bi bi-arrow-left"></i>' : '<i class="bi bi-arrow-right"></i>';
+  const label = dir === 'prev' ? 'Previous' : 'Next';
+  div.innerHTML = `
+  <div class="pager-content">
+    <div class="pager-label">${label}</div>
+    <div class="pager-circle">${arrow}</div>
+  </div>
+`;
+
+  if (!disabled) {
+    const go = () => goToTilePage{{ tab_name }}(targetPage);
+    div.addEventListener('click', go);
+    div.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+    });
+  } else {
+    div.style.opacity = '0.5';
+    div.style.pointerEvents = 'none';
+  }
+
+  return div;
+}
+
     filteredData{{ tab_name }} = table{{ tab_name }}.getData("active");
 
     table{{ tab_name }}.on("dataSorted", function (sorters, rows) {
@@ -444,7 +427,7 @@
     });
 
     table{{ tab_name }}.on("pageLoaded", function (pageno) {
-        console.log('Table page changed to:', pageno);
+        //console.log('Table page changed to:', pageno);
         // Update tile pagination if it exists
         if (document.getElementById('tile-pagination-{{ tab_name }}')) {
             createTilePagination{{ tab_name }}();
@@ -456,14 +439,14 @@
     });
 
     table{{ tab_name }}.on("dataFiltered", function (filters, rows) {
-        console.log('Table data filtered, rows count:', rows.length);
+        //console.log('Table data filtered, rows count:', rows.length);
         filteredData{{ tab_name }} = rows.map(row => row.getData());
-        console.log('Stored filtered data:', filteredData{{ tab_name }}.length);
+        //console.log('Stored filtered data:', filteredData{{ tab_name }}.length);
 
         // If grid exists and is visible, update it
         tileContainer{{tab_name}} = document.getElementById('tile-{{ tab_name }}');
         if (grid{{ tab_name }} && tileContainer{{tab_name}} && !tileContainer{{tab_name}}.classList.contains('d-none')) {
-            console.log('Updating grid due to filter change');
+            //console.log('Updating grid due to filter change');
             populateGridWithData{{ tab_name }}();
             createTilePagination{{ tab_name }}();
         }
@@ -472,7 +455,7 @@
     // If we're currently viewing tiles, rebuild the grid properly
     let tileContainer{{tab_name}} = document.getElementById('tile-{{ tab_name }}');
     if (grid{{ tab_name }} && tileContainer{{tab_name}} && !tileContainer{{tab_name}}.classList.contains('d-none')) {
-        console.log('Filter applied, rebuilding grid');
+        //console.log('Filter applied, rebuilding grid');
 
         grid{{ tab_name }}.destroy();
         grid{{ tab_name }} = null;
@@ -484,7 +467,7 @@
 
         setTimeout(() => {
             grid{{ tab_name }} = new Muuri('#tile-{{ tab_name }} .grid');
-            console.log('Grid rebuilt after filter with items:', grid{{ tab_name }}.getItems().length);
+            //console.log('Grid rebuilt after filter with items:', grid{{ tab_name }}.getItems().length);
             grid{{ tab_name }}.refreshItems().layout();
         }, 100);
     }

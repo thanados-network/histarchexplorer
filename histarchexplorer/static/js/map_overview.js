@@ -1,21 +1,10 @@
-const gisArray = Array.isArray(gisData) ? gisData : [gisData];
+
+const overviewMap_ = Array.isArray(overviewMap) ? overviewMap : [overviewMap];
 
 // Wrap gisArray into a FeatureCollection
 const featureCollection = {
   type: "FeatureCollection",
-  features: gisArray.map((item) => ({
-    type: "Feature",
-    geometry: {
-      type: item.type,
-      coordinates: item.coordinates
-    },
-    properties: {
-      title: item.title,
-      description: item.description,
-      shapeType: item.shapeType,
-      locationId: item.locationId
-    }
-  }))
+  features: overviewMap_
 };
 
 

@@ -29,7 +29,6 @@
     <div class="item-content item-content-full">
       <div class="muuri-images">
         <div class="image position-relative">
-
           {# 3D-Modell-Ansicht (GLB/GLTF) #}
           {% if image.render_type == '3d_model' %}
             <div class="model-wrapper" style="height: 300px; position: relative;">
@@ -58,4 +57,14 @@
       </div>
     </div>
   </div>
+{% endmacro %}
+
+{% macro date_template_format(begin, end) %}
+    {% if begin and end %}
+        {{ begin }} - {{ end }}
+    {% elif begin %}
+        {{ begin }}
+    {% elif end %}
+        {{ end }}
+    {% endif %}
 {% endmacro %}
