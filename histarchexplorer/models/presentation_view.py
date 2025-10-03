@@ -68,6 +68,13 @@ class FeatureModel:
             properties=self.properties)
 
     def change_to_map_libre_dict(self, main: Optional[bool] = False):
+        props = {
+            'id': self.properties.entityId,
+            'label': self.properties.title,
+            'class': self.properties.system_class}
+        if main:
+            props['main'] = True
+
         return {
             'type': 'Feature',
             'geometry': {
@@ -78,11 +85,7 @@ class FeatureModel:
                 'placeId': self.properties.entityId,
                 'locationId': self.properties.locationId,
                 'shapeType': self.properties.shapeType},
-            'properties': {
-                'id': self.properties.entityId,
-                'label': self.properties.title,
-                'class': self.properties.system_class,
-                'main': main}}
+            'properties': props}
 
 
 @dataclass

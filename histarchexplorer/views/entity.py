@@ -275,7 +275,7 @@ def get_entity(id_: int, tab_name=None) -> str:
 
             if not map_data['features']:
                 abort(404)
-            print(map_data)
+            print(get_map_data(id_))
             data['spatial'] = map_data
 
         # case 'catalogue':
