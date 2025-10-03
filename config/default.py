@@ -31,11 +31,12 @@ CLASSES_TO_SKIP = {  # Entity classes excluded from processing
 
 # Entity groups shown in views
 VIEW_CLASSES = {
-    'actors': ('person', 'group'),
+    'places': ('place',),
+    'features': ('feature','stratigraphic_unit'),
     'items': ('artifact', 'human_remains'),
+    'actors': ('person', 'group'),
     'events': ('acquisition', 'event', 'activity', 'creation', 'move',
                'production', 'modification'),
-    'places': ('place', 'stratigraphic_unit', 'feature'),
     'sources': ('source', 'bibliography', 'external_reference', 'edition'),
     'files': ('file',)
 }

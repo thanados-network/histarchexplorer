@@ -289,8 +289,10 @@ def return_entities(tab_name, id):
             'route': key,
             'label': f"{key.capitalize()} ({data['totals'][key]})"
         }
-        for i, key in enumerate(sorted(data['counts'].keys()))
+        for i, key in enumerate(data['counts'].keys())
     ]
+
+    print(sidebar_elements)
 
     if tab_name == "" and sidebar_elements:
         tab_name = sidebar_elements[0]['route']
