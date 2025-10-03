@@ -37,6 +37,7 @@ class GeometryModel:
 
         return GeometryModel(type=self.type, coordinates=new_coords)
 
+
 @dataclass
 class PropertyModel:
     locationId: int
@@ -44,6 +45,7 @@ class PropertyModel:
     title: str
     description: str
     shapeType: str
+    system_class: str
 
 
 @dataclass
@@ -64,6 +66,27 @@ class FeatureModel:
         return FeatureModel(
             geometry=self.geometry.swap_latlng(),
             properties=self.properties)
+
+    def change_to_map_libre_dict(self, main: Optional[bool] = False):
+        props = {
+            'id': self.properties.entityId,
+            'label': self.properties.title,
+            'class': self.properties.system_class}
+        if main:
+            props['main'] = True
+
+        return {
+            'type': 'Feature',
+            'geometry': {
+                'type': self.geometry.type,
+                'coordinates': self.geometry.coordinates,
+                'title': self.properties.title,
+                'description': self.properties.description,
+                'placeId': self.properties.entityId,
+                'locationId': self.properties.locationId,
+                'shapeType': self.properties.shapeType},
+            'properties': props}
+
 
 @dataclass
 class TimePointModel:
@@ -194,7 +217,9 @@ class PresentationView:
         return json.dumps(asdict(self), indent=indent, ensure_ascii=False)
 
     @staticmethod
-    def parse_geometries(geometry_data: Any) -> list["FeatureModel"]:
+    def parse_geometries(
+            geometry_data: Any,
+            system_class: str) -> list["FeatureModel"]:
 
         if not geometry_data:
             return []
@@ -208,7 +233,8 @@ class PresentationView:
                 entityId=data["properties"]["entityId"],
                 title=data["properties"]["title"],
                 description=data["properties"]["description"],
-                shapeType=data["properties"]["shapeType"])
+                shapeType=data["properties"]["shapeType"],
+                system_class=system_class)
             return FeatureModel(
                 geometry=geometry_model,
                 properties=property_model)
@@ -263,7 +289,8 @@ class PresentationView:
                     continue
 
                 rel_geometries = PresentationView.parse_geometries(
-                    rel.get("geometries"))
+                    rel.get("geometries"),
+                    system_class)
                 time_range = PresentationView.parse_time_range(rel.get("when"))
                 rel_types = []
 
@@ -354,7 +381,9 @@ class PresentationView:
             description=get_description_translated(
                 data.get("description", "")),
             aliases=data.get("aliases", []),
-            geometries=cls.parse_geometries(data.get("geometries", {})),
+            geometries=cls.parse_geometries(
+                data.get("geometries", {}),
+                data.get("systemClass", "")),
             when=when_data,
             types=cls.parse_types(data.get("types", [])),
             externalReferenceSystems=[
