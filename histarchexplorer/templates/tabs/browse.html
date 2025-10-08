@@ -1,5 +1,6 @@
-<script type="text/javascript" src="/static/js/mapfunctions.js"></script>
-
+{% if not subunits %}
+  <script type="text/javascript" src="/static/js/mapfunctions.js"></script>
+{% endif %}
 <script>
     {% if subunits %}
       const typeTreeData = {{ typetree_data|tojson}}
