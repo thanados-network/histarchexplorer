@@ -2,209 +2,26 @@ import json
 from collections import defaultdict
 from typing import Any, Optional
 
-from flask import abort, g, jsonify, render_template
+from flask import abort, g, render_template
 
 from histarchexplorer import app
 from histarchexplorer.api.parser import Parser
-from histarchexplorer.models.depiction import Depiction
+from histarchexplorer.database.entity import (
+    check_if_place_hierarchy, get_first_geom)
 from histarchexplorer.models.entity import Entity
-from histarchexplorer.models.presentation_view import EntityTypeModel, \
-    PresentationView, Relation
+from histarchexplorer.models.presentation_view import (
+    EntityTypeModel, PresentationView, Relation)
 from histarchexplorer.utils.view_util import get_cite_button
 from histarchexplorer.views.entities import get_browse_list_entities
 from histarchexplorer.views.views import type_tree
 
-sidebar_elements = app.config['SIDEBAR_OPTIONS']
-valid_routes = {item['route'] for item in sidebar_elements}
-
-
-def check_p46_geoms(id):  # todo replace this check with API. Benchmark for 50505 local
-    # postgres (1 row retrieved starting from 1 in 1 s 443 ms (execution: 1
-    # s 147 ms, fetching: 296 ms)
-    sql = """
-          WITH RECURSIVE
-              p46_links AS (SELECT *
-                            FROM model.link
-                            WHERE property_code = 'P46'
-                              AND (%(id)s = domain_id OR %(id)s = range_id)
-
-                            UNION
-
-                            SELECT l.*
-                            FROM model.link l
-                                     JOIN p46_links pl
-                                          ON l.property_code = 'P46'
-                                              AND (l.domain_id = pl.range_id OR
-                                                   l.range_id = pl.domain_id)),
-              all_ids AS (SELECT domain_id AS id
-                          FROM p46_links
-                          UNION
-                          SELECT range_id AS id
-                          FROM p46_links
-                          UNION
-                          SELECT %(id)s AS id)
-          SELECT EXISTS (SELECT 1
-                         FROM model.entity e
-                                  JOIN all_ids a ON e.id = a.id
-                                  JOIN model.link gl ON e.id = gl.domain_id
-                             AND gl.property_code = 'P53'
-                                  JOIN model.gis g ON gl.range_id = g.entity_id
-                         LIMIT 1) AS has_row; \
-          """
-    # Execute parameterized query
-    g.cursor.execute(sql, {'id': id})
-    result = g.cursor.fetchone()
-    return result[0] if result else False
-
-
-def get_root_id(id):  # todo alternative with api: Benchmarl for 77841: 1 row
-    # retrieved starting from 1 in 122 ms (execution: 80 ms, fetching: 42 ms)
-    sql = """
-          WITH RECURSIVE parent_chain AS (
-              -- Anchor: start with the link where 77841 is the range_id
-              SELECT domain_id,
-                     range_id,
-                     0 AS level
-              FROM model.link
-              WHERE property_code = 'P46'
-                AND range_id = %(id)s
-
-              UNION ALL
-
-              -- Recursive part: find the parent link where the current domain_id is the new row's range_id
-              SELECT l.domain_id,
-                     l.range_id,
-                     pc.level + 1 AS level
-              FROM model.link l
-                       JOIN parent_chain pc
-                            ON l.property_code = 'P46'
-                                AND l.range_id = pc.domain_id)
-          SELECT domain_id
-          FROM parent_chain
-          ORDER BY level DESC
-          LIMIT 1; \
-          """
-    # Execute parameterized query
-    g.cursor.execute(sql, {'id': id})
-    result = g.cursor.fetchone()
-    return result[0] if result else id
-
-
-def get_root_type(id):
-    sql = """
-          WITH RECURSIVE parent_chain AS (SELECT domain_id,
-                                                 range_id,
-                                                 0 AS level
-                                          FROM model.link
-                                          WHERE property_code = 'P127'
-                                            AND domain_id = %(id)s
-
-                                          UNION
-
-                                          SELECT %(id)s AS domain_id,
-                                                 %(id)s AS range_id,
-                                                 0      AS level
-
-                                          WHERE NOT EXISTS (SELECT 1
-                                                            FROM model.link
-                                                            WHERE property_code = 'P127'
-                                                              AND domain_id
-                                                                = %(id)s)
-
-                                          UNION ALL
-
-                                          SELECT l.domain_id,
-                                                 l.range_id,
-                                                 pc.level + 1 AS level
-                                          FROM model.link l
-                                                   JOIN parent_chain pc
-                                                        ON l.property_code =
-                                                           'P127' AND
-                                                           l.domain_id =
-                                                           pc.range_id)
-
-          SELECT range_id
-          FROM parent_chain
-          ORDER BY level DESC
-          LIMIT 1; \
-          """
-
-    g.cursor.execute(sql, {'id': id})
-    result = g.cursor.fetchone()
-    return result[0] if result else id
-
-
-def check_geom(id):
-    """Checks if an ID has geometry in model.gis via a linked entity."""
-    sql = """SELECT EXISTS (SELECT 1
-                            FROM model.gis
-                            WHERE entity_id = (SELECT range_id
-                                               FROM model.link
-                                               WHERE domain_id = %(id)s
-                                                 AND property_code = 'P53'
-                                               LIMIT 1)); \
-          """
-    g.cursor.execute(sql, {'id': id})
-    result = g.cursor.fetchone()
-    # print(id if result and result[0] else None)
-
-    return id if result and result[0] else None
-
-
-def get_first_geom(id):
-    """Recursively finds the first entity with geometry."""
-    id_to_return = check_geom(id)
-    if id_to_return:
-        return id_to_return
-
-    # Try to find the parent entity (domain_id)
-    sql = """SELECT domain_id
-             FROM model.link
-             WHERE range_id = %(id)s
-               AND property_code = 'P46'
-             LIMIT 1; \
-          """
-    g.cursor.execute(sql, {'id': id})
-    result = g.cursor.fetchone()
-
-    if result:
-        parent_id = result[0]
-        return get_first_geom(parent_id)  # Recursively check the parent
-    return None  # No parent found with geometry
-
-def check_sidebarelements(tab, id):
-    if tab == 'map':
-        return get_first_geom(id) is not None
-    if tab in ('subunits', 'catalogue'):
-        g.cursor.execute("""
-                         SELECT range_id
-                         FROM model.link
-                         WHERE domain_id = %(id)s
-                           AND property_code = 'P46'
-                         LIMIT 1
-                         """, {"id": id})
-        return g.cursor.fetchone() is not None
-    if tab == 'media':
-        return False
-    if tab in ('overview'):
-        return True
-
-def build_sidebar(id, sidebarelements):
-    filtered_elements = [
-        item for item in sidebarelements
-        if check_sidebarelements(item['route'], id)
-    ]
-
-    return sorted(filtered_elements, key=lambda x: x['order'])
-
-
 
 @app.route('/entity/<int:id_>')
 @app.route('/entity/<int:id_>/<tab_name>')
-def entity(id_: int, tab_name="overview") -> str:
-    if tab_name not in valid_routes:
+def entity(id_: int, tab_name: str = "overview") -> str:
+    sidebar_elements = app.config['SIDEBAR_OPTIONS']
+    if tab_name not in {item['route'] for item in sidebar_elements}:
         abort(404)
-
     return render_template(
         'entity.html',
         sidebar_elements=build_sidebar(id_, sidebar_elements),
@@ -222,7 +39,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     feature = None
 
     main_entity = PresentationView.from_api(id_)
-    categorized_types = get_categorized_types(main_entity)
+    categorized_types = get_categorized_types(main_entity.types)
     hierarchy = {
         'subs': get_sub_count(main_entity),
         'root': get_hierarchy(main_entity)}
@@ -230,73 +47,22 @@ def get_entity(id_: int, tab_name=None) -> str:
     overview_map_geometry = main_entity.geometry_json
     if not overview_map_geometry:
         overview_map_geometry = get_parent_geometry(hierarchy['root'])
-    data: dict[str, list[str] | dict[str, Any]] = {
+    data: dict[str, Any] = {
         'entity': main_entity.to_json(),
-        'overview_map': json.dumps(overview_map_geometry) }
+        'overview_map': json.dumps(overview_map_geometry)}
     match tab_name:
         case 'feature':
             # todo: core information about the feature are available in the
             #  main entity
             feature = Entity.get_entity(id_, Parser())
-        # todo: test if really needed
-        # case 'features':
-        #    features = Entity.get_entity(
-        #        id_, Parser(
-        #            show=['when', 'types', 'names', 'depictions',
-        #            'description', 'relations']
-        #        )
-        #    )
 
         case 'map':
-            map_data = {'type': 'FeatureCollection', 'features': []}
-
-
-            #first_geom = get_first_geom(id_)
-            #if main_entity.geometries:
-            #    map_data['features'].append(
-            #        main_entity.geometries[0].change_to_map_libre_dict(True))
-            #else:
-            #    first_geom = get_first_geom(id_)
-            first_geom = None
-            if main_entity.geometry_json:
-                map_data['features'].extend(adapt_map_dict(
-                            main_entity.geometry_json,
-                            main_entity.title,
-                            main_entity.id,
-                            main_entity.system_class,
-                            main_entity.id))
-            else:
-                first_geom = get_parent_geometry_id(hierarchy['root'])
-
-
-            for k in ['place', 'feature', 'stratigraphic_unit', 'artifact',
-                      'human_remains']:
-                for item in main_entity.relations.get(k, []):
-                    if item.geometry_json:
-                        map_data['features'].extend(adapt_map_dict(
-                            item.geometry_json,
-                            item.name,
-                            item.id,
-                            item.system_class,
-                            first_geom))
-
-            # map_data = get_map_data(id_)
+            map_data = {
+                'type': 'FeatureCollection',
+                'features': get_features_for_map(main_entity, hierarchy)}
             if not map_data['features']:
                 abort(404)
-            print(map_data)
             data['spatial'] = map_data
-
-        # case 'catalogue':
-        #     c_entities = Entity.get_linked_entities_by_properties_recursive(
-        #         id_,
-        #         get_parser_for_landing(id_))
-        #     if main_entity.system_class != 'place':
-        #         catalogue_entities = []
-        #     else:
-        #         catalogue_entities = build_entity_tree(c_entities)
-        #         for entity_ in catalogue_entities:
-        #             entity.all_child_depictions = collect_child_depictions(
-        #                 entity_)
 
         case 'overview':
             images = []
@@ -309,6 +75,7 @@ def get_entity(id_: int, tab_name=None) -> str:
             if not main_image and images:
                 main_image = images.pop(0)
             initial_images = images[:2]
+
         case 'media':
             pass
 
@@ -316,9 +83,7 @@ def get_entity(id_: int, tab_name=None) -> str:
             subunit_data = get_browse_list_entities(id_)
             filtered_view_classes = {
                 key: tuple(list(d.keys())[0] for d in value)
-                for key, value in subunit_data['counts'].items()
-            }
-
+                for key, value in subunit_data['counts'].items()}
 
             return render_template(
                 f'tabs/browse.html',
@@ -331,7 +96,6 @@ def get_entity(id_: int, tab_name=None) -> str:
                 tab_name='subunits')
 
         case _ if tab_name not in ['feature']:
-            print('Invalid tab name provided. Aborting with 404.')
             abort(404)
 
     return render_template(
@@ -349,11 +113,60 @@ def get_entity(id_: int, tab_name=None) -> str:
         hierarchy=hierarchy,
         overview_map_geometry=overview_map_geometry)
 
+
+def get_features_for_map(
+        e: PresentationView,
+        hierarchy: dict[str, Any]) -> list[dict[str, Any]]:
+    map_data = []
+    first_geom = None
+    if e.geometry_json:
+        map_data.extend(
+            adapt_map_dict(
+                e.geometry_json, e.title, e.id, e.system_class, e.id))
+    else:
+        first_geom = get_parent_geometry_id(hierarchy['root'])
+
+    for k in ['place',
+              'feature',
+              'stratigraphic_unit',
+              'artifact',
+              'human_remains']:
+        for rel in e.relations.get(k, []):
+            if rel.geometry_json:
+                map_data.extend(adapt_map_dict(
+                    rel.geometry_json,
+                    rel.name,
+                    rel.id,
+                    rel.system_class,
+                    first_geom))
+    return map_data
+
+
+def check_sidebar_elements(tab: str, id_: int) -> bool:
+    match tab:
+        case 'map':
+            return bool(get_first_geom(id_))
+        case 'subunits':
+            return bool(check_if_place_hierarchy(id_))
+        case 'overview':
+            return True
+        case 'media' | _:
+            return False
+
+
+def build_sidebar(id_: int, sidebar_elements: dict[str, Any]):
+    return sorted(
+        (item for item in sidebar_elements if check_sidebar_elements(
+            item.get('route'), id_)),
+        key=lambda item: item['order'])
+
+
 def get_parent_geometry(hierarchy: list[Relation]) -> dict[str, Any]:
     for root_element in reversed(hierarchy):
         if root_element.geometries:
             return root_element.geometry_json
     return {}
+
 
 def get_parent_geometry_id(hierarchy: list[Relation]) -> int | None:
     for root_element in reversed(hierarchy):
@@ -361,133 +174,53 @@ def get_parent_geometry_id(hierarchy: list[Relation]) -> int | None:
             return root_element.id
     return None
 
+
 def adapt_map_dict(
         geom: dict[str, Any] | None,
         name: str,
         id_: int,
         system_class: str,
         first_geom: Optional[int] = None) -> list[dict[str, Any]]:
-        if not geom:
-            return []
-        features = []
-        if geom.get('type') == 'FeatureCollection':
-            features.extend(geom['features'])
-        else:
-            features.append(geom)
-        output = []
-        for feature in features:
-            if '(autogenerated)' in feature['properties']['title']:
-                continue
-            if first_geom == int(id_):
-                feature['properties']['main'] = True
-            feature['properties']['class'] = system_class
-            feature['properties']['label'] = name
-            feature['properties']['id'] = int(id_)
-            output.append(feature)
+    if not geom:
+        return []
+    features = []
+    if geom.get('type') == 'FeatureCollection':
+        features.extend(geom['features'])
+    else:
+        features.append(geom)
+    output = []
+    for feature in features:
+        if '(autogenerated)' in feature['properties']['title']:
+            continue
+        if first_geom == int(id_):
+            feature['properties']['main'] = True
+        feature['properties']['class'] = system_class
+        feature['properties']['label'] = name
+        feature['properties']['id'] = int(id_)
+        output.append(feature)
 
-        return output
-
-def get_map_data(id_):
-    geom_there = check_p46_geoms(id_)
-    if geom_there:
-        first_geom = get_first_geom(id_)
-        id_to_fetch = get_root_id(id_)
-        entities = Entity.get_linked_entities_by_properties_recursive(
-            id_to_fetch, Parser(show=['geometry'], properties=['P46']))
-        features = {'type': 'FeatureCollection', 'features': []}
-        for ent in entities:
-            property = {'id': ent.id, 'label': ent.name,
-                        'class': ent.system_class}
-            if ent.id == first_geom and ent.system_class != 'Place':
-                property['main'] = True
-            if ent.system_class in ['Feature', 'Place', 'Stratigraphic unit',
-                                    'Human remains',
-                                    'Artifact'] and ent.geometry:
-                features['features'].append({
-                    'type': 'Feature',
-                    'geometry': ent.geometry,
-                    'properties': property,
-                })
-        return features
-    return {'type': 'FeatureCollection', 'features': []}
-
-
-def get_parser_for_landing(id_: int) -> Parser:
-    simple_entity = Entity.get_entity(id_, Parser())
-    match simple_entity.system_class.capitalize():
-        case 'Place' | 'Feature' | 'Stratigraphic unit':
-            properties = ['P46', 'P67']
-        case 'Human remains' | 'Artifact':
-            properties = ['P46', 'P67', 'P52']
-        case 'Source' | 'Source translation':
-            properties = ['P67', 'P73', 'P128']
-        case 'Event' | 'Acquisition' | 'Activity' | 'Creation' | 'Move' | \
-             'Production' | 'Modification':
-            properties = [
-                'P67', 'P11', 'P14', 'P22', 'P23', 'P25', 'P7',
-                'P26', 'P27', 'P24', 'P31', 'P25', 'P108', 'P9',
-                'P134']
-        case 'Bibliography' | 'Edition' | 'External reference':
-            properties = ['P67']
-        case 'Group' | 'Person':
-            properties = [
-                'OA7', 'OA8', 'OA9', 'P107', 'P74', 'P52', 'P11',
-                'P14', 'P22', 'P23', 'P25']
-        case _:
-            properties = []
-    return Parser(
-        properties=properties,
-        limit=0,
-        format='lpx',
-        centroid='true')
+    return output
 
 
 def get_categorized_types(
-        main_entity: PresentationView) -> dict[str, list[EntityTypeModel]]:
+        types: list[EntityTypeModel]) -> dict[str, list[EntityTypeModel]]:
+    def sort_key(item: tuple[str, list]) -> tuple[int, str]:
+        key = item[0]
+        match key:
+            case 'case_study':
+                return 0, key
+            case 'other':
+                return 2, key
+            case _:
+                return 1, key
+
     divisions = defaultdict(list)
-    for type_ in main_entity.types:
-        divisions[type_.division['label'].replace(' ', '_')].append({
-            'type': type_, 'icon': type_.division['icon']})
-    sorted_divisions = dict(sorted(
-        divisions.items(),
-        key=lambda x: (x[0] == x[0] == 'case_study', 'other', x[0])))
+    for type_ in types:
+        label = type_.division['label'].replace(' ', '_')
+        divisions[label].append(
+            {'type': type_, 'icon': type_.division['icon']})
+    sorted_divisions = dict(sorted(divisions.items(), key=sort_key))
     return sorted_divisions
-
-
-def collect_child_depictions(entity_: Entity) -> list[Depiction]:
-    all_depictions = []
-
-    def recurse(e: Entity):
-        if not hasattr(e, 'children'):
-            e.children = []
-        for child in e.children:
-            all_depictions.extend(child.depictions or [])
-            recurse(child)
-
-    if hasattr(entity, 'children'):
-        recurse(entity_)
-    return all_depictions
-
-
-def build_entity_tree(entities: list[Entity]) -> list[Entity]:
-    entity_dict = {e.id: e for e in entities}
-
-    for entity_ in entities:
-        if (entity_.parent
-                and 'P46' in entity_.parent.relation_type
-                and entity_.parent.relation_to_id in entity_dict):
-            parent_entity = entity_dict[entity_.parent.relation_to_id]
-            if not hasattr(parent_entity, 'children'):
-                parent_entity.children = []
-            parent_entity.children.append(entity_)
-
-    tree = []
-    for entity_ in entities:
-        if entity_.parent and entity_.parent.relation_to_id in entity_dict:
-            continue
-        if hasattr(entity_, 'children'):
-            tree.extend(entity_.children)
-    return tree
 
 
 def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
@@ -496,14 +229,16 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
         case 'feature':
             if 'place' in main_entity.relations and main_entity.relations[
                 'place']:  # nur wenn dict key place hat und liste nicht leer
-                # Bernhard: Wann passiert es, dass ein feature keinen Place hat? Das darf nicht vorkommen.
+                # Bernhard: Wann passiert es, dass ein feature keinen Place
+                # hat? Das darf nicht vorkommen.
                 root.append(main_entity.relations['place'][0])
         case 'stratigraphic_unit':
             for feature in main_entity.relations.get('feature', []):
                 for relation in feature.relation_types:
                     if relation['relationTo'] == main_entity.id:
                         root.append(feature)
-            if 'place' in main_entity.relations and main_entity.relations['place']:
+            if 'place' in main_entity.relations and main_entity.relations[
+                'place']:
                 # Bernhard: Kann mir bitte jemand sagen, wann das vorkommt?
                 root.append(main_entity.relations['place'][0])
         case 'artifact' | 'human_remains':
@@ -517,7 +252,8 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
                 for relation in feature.relation_types:
                     if relation['relationTo'] == stratigraphic_unit_id:
                         root.append(feature)
-            if 'place' in main_entity.relations and main_entity.relations['place']:
+            if 'place' in main_entity.relations and main_entity.relations[
+                'place']:
                 root.append(main_entity.relations['place'][0])
     root.reverse()
     return root
@@ -526,7 +262,7 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
 def get_sub_count(main_entity: PresentationView) -> int:
     count = 0
     # It was not wished to show all subunits, only direct ones
-    #sub_relations_map = {
+    # sub_relations_map = {
     #    'place': ['feature', 'stratigraphic_unit', 'artifact',
     #              'human_remains'],
     #    'feature': ['stratigraphic_unit', 'artifact', 'human_remains'],
