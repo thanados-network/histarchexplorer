@@ -72,6 +72,6 @@ def get_cite_button(entity: PresentationView) -> dict[str, str]:
         entity=entity,
         project_name=project_name,
         projects=case_studies,
-        current_url=url_for('entity', id_=entity.id, _external=True),
+        current_url=url_for('entity_view', id_=entity.id, _external=True),
         today_date=current_date)
     return {'button_html': button_html, 'modal_html': modal_html}

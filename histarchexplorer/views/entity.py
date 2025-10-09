@@ -18,7 +18,7 @@ from histarchexplorer.views.views import type_tree
 
 @app.route('/entity/<int:id_>')
 @app.route('/entity/<int:id_>/<tab_name>')
-def entity(id_: int, tab_name: str = "overview") -> str:
+def entity_view(id_: int, tab_name: str = "overview") -> str:
     sidebar_elements = app.config['SIDEBAR_OPTIONS']
     if tab_name not in {item['route'] for item in sidebar_elements}:
         abort(404)

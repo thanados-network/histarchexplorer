@@ -7,6 +7,7 @@ from histarchexplorer import app as flask_app_instance
 @pytest.fixture(scope='session')
 def flask_app():
     app = flask_app_instance
+    app.config.from_object('config.default')
     app.config.from_pyfile('testing.py', silent=False)
     fixture_conn = None
     try:

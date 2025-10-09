@@ -5,7 +5,7 @@ from histarchexplorer import app
 
 def test_entity(client):
     with app.app_context():
-        rv = client.get(url_for('entity', id_=50505))
+        rv = client.get(url_for('entity_view', id_=50505))
         assert rv.status_code == 200
         assert b"Loading" in rv.data
 

@@ -18,7 +18,7 @@
           <button type="button"
                   class="btn btn-whitish rounded-5"
                   title="{{ entity.types[0].title }}&#010;&#010;{{ entity.description[CURRENT_LANGUAGE] }}">
-            <a href="{{ url_for('entity', id_=entity.id) }}"
+            <a href="{{ url_for('entity_view', id_=entity.id) }}"
                class="nude-link text-decoration-none">
               {{ entity.name }}
             </a>
@@ -211,7 +211,7 @@
                     <div class="reference-header">
                       {% if reference.system_class == "bibliography" %}
                         <i class="bi bi-book"></i>
-                        <a href="{{ url_for('entity', id_=reference.id) }}"
+                        <a href="{{ url_for('entity_view', id_=reference.id) }}"
                            class="reference-name">
                           {{ reference.title }}
                         </a>
