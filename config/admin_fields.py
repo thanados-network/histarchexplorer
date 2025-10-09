@@ -1,4 +1,4 @@
-FIELD_CONFIGS = {
+ADMIN_FIELDS = {
     'nav-main-project': [
         {
             'key': 'name',

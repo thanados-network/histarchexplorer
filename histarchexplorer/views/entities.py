@@ -189,15 +189,12 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
     g.cursor.execute(count_query, tuple(params))
     results = g.cursor.fetchall()
 
-    # Load VIEW_CLASSES from app config
-    view_classes = app.config.get('VIEW_CLASSES', {})
-
     # Convert list of (class_name, count) to a dictionary for easy access
     class_count_map = {row[0]: row[1] for row in results}
 
     # Build categorized counts
     categorized_counts = {}
-    for category, class_names in view_classes.items():
+    for category, class_names in app.config['VIEW_CLASSES'].items():
         category_counts = [
             {cls: class_count_map[cls]} for cls in class_names if cls in class_count_map
         ]

@@ -5,7 +5,7 @@ from flask import g, render_template, url_for
 from flask_babel import lazy_gettext as _
 
 from histarchexplorer import app
-from histarchexplorer.models.presentation_view import PresentationView
+from histarchexplorer.api.presentation_view import PresentationView
 
 _('entities')
 _('search')

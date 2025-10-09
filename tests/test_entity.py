@@ -47,6 +47,11 @@ def test_entity(client):
         assert rv.status_code == 200
         assert b"Abbey Chiemsee" in rv.data
 
+        # Test minus dates
+        rv = client.get(url_for('get_entity', id_=230071, tab_name='overview'))
+        assert rv.status_code == 200
+        assert b"Mitterhof" in rv.data
+
         rv = client.get(url_for('entities'))
         assert rv.status_code == 200
         assert b"Name" in rv.data

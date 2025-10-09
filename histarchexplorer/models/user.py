@@ -2,7 +2,6 @@
 # licensing information
 from typing import Any, Optional
 
-from flask import g
 from flask_login import UserMixin
 
 from histarchexplorer.database.user import get_by_username, get_user_by_id

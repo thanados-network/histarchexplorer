@@ -8,13 +8,14 @@ from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
 from histarchexplorer.database.settings import get_main_image_table
-from histarchexplorer.services.config import ConfigEntity, Link, Properties, \
+from histarchexplorer.models.config import ConfigEntity, Link, Properties, \
     get_config_classes
-from histarchexplorer.services.search import SearchService
-from histarchexplorer.services.settings import Settings
+from histarchexplorer.models.search import SearchService
+from histarchexplorer.models.settings import Settings
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
+app.config.from_object('config.admin_fields')
 app.config.from_pyfile('production.py')
 babel = Babel(app)
 

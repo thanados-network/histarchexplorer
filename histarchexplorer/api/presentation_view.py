@@ -7,7 +7,7 @@ from flask import g
 
 from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import PROXIES
-from histarchexplorer.models.util import format_date, \
+from histarchexplorer.api.util import format_date, \
     get_description_translated, get_divisions, get_icon, \
     get_render_type, split_date_string
 

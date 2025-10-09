@@ -10,10 +10,9 @@ from flask_login import current_user, login_required
 from werkzeug import Response
 
 from histarchexplorer import app, cache
-from histarchexplorer.api.helpers import get_entities_count_by_case_study
-from histarchexplorer.config.admin_fields import FIELD_CONFIGS
+from histarchexplorer.api.api_access import get_entities_count_by_case_study
 from histarchexplorer.database.map import check_if_map_id_exist
-from histarchexplorer.services.admin import Admin, EntryNotFound
+from histarchexplorer.models.admin import Admin, EntryNotFound
 from histarchexplorer.utils.view_util import find_children_by_id
 from histarchexplorer.views.views import type_tree
 
@@ -75,7 +74,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         initial_case_study_type_id=initial_case_study_type_id,
         initial_case_study_type_name=initial_case_study_type_name,
         case_study_children=case_study_children,
-        FIELD_CONFIGS=FIELD_CONFIGS,
+        admin_fields=app.config['ADMIN_FIELDS'],
         view_classes=app.config['VIEW_CLASSES'])
 
 

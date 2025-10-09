@@ -7,7 +7,7 @@ from flask import abort, g, render_template
 from histarchexplorer import app
 from histarchexplorer.database.entity import (
     check_if_place_hierarchy, get_first_geom)
-from histarchexplorer.models.presentation_view import (
+from histarchexplorer.api.presentation_view import (
     EntityTypeModel, File, PresentationView, Relation)
 from histarchexplorer.utils.view_util import get_cite_button
 from histarchexplorer.views.entities import get_browse_list_entities
@@ -45,12 +45,7 @@ def get_entity_images(files: list[File]) -> tuple[File, list[File]]:
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
 def get_entity(id_: int, tab_name=None) -> str:
-    related_entities = {}
-    catalogue_entities = []
-    feature = None
-
     entity = PresentationView.from_api(id_)
-    categorized_types = get_categorized_types(entity.types)
     hierarchy = {
         'subs': get_sub_count(entity),
         'root': get_hierarchy(entity)}
@@ -98,14 +93,11 @@ def get_entity(id_: int, tab_name=None) -> str:
         f'tabs/{tab_name}.html',
         data=json.dumps(data),
         entity=entity,
-        categorized_types=categorized_types,
-        features=feature,
+        categorized_types=get_categorized_types(entity.types),
         main_image=main_image,
         initial_images=initial_images,
         manifests=[img.iiif_manifest for img in entity.files],
-        related_entities=related_entities or {},
         cite_button=get_cite_button(entity),
-        catalogue_entities=catalogue_entities,
         hierarchy=hierarchy,
         overview_map_geometry=overview_map_geometry)
 

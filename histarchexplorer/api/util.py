@@ -4,8 +4,8 @@ from typing import Optional
 from flask import g
 
 
-def uc_first(string: str) -> str:
-    return str(string)[0].upper() + str(string)[1:] if string else ''
+# def uc_first(string: str) -> str:
+#     return str(string)[0].upper() + str(string)[1:] if string else ''
 
 
 def split_date_string(data: Optional[str]) -> str:
@@ -51,16 +51,16 @@ def format_date(
     return date
 
 
-def date_template_format(begin: Optional[str], end: Optional[str]) -> str:
-    if begin and end:
-        date = f'{begin} - {end}'
-    elif begin:
-        date = begin
-    elif end:
-        date = end
-    else:
-        date = ''
-    return date
+# def date_template_format(begin: Optional[str], end: Optional[str]) -> str:
+#     if begin and end:
+#         date = f'{begin} - {end}'
+#     elif begin:
+#         date = begin
+#     elif end:
+#         date = end
+#     else:
+#         date = ''
+#     return date
 
 
 def get_render_type(mime_type: str) -> str:
