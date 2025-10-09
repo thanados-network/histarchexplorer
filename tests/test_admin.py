@@ -15,14 +15,21 @@ def test_admin_page(client):
         assert b"TOOLS" in rv.data
 
 
-        #client.get(url_for('clear_cache'))
         rv = client.get(url_for('clear_cache'), follow_redirects=True)
         assert b"cache cleared" in rv.data
+
+        rv = client.get(url_for('warm_cache'), follow_redirects=True)
+        assert b"cache warmed" in rv.data
 
 
         client.get(url_for('reset'))
         rv = client.get(url_for('admin'), follow_redirects=True)
         assert b"reset database" in rv.data
+
+
+        client.get(
+            url_for('check_case_study_id_ajax', entity_id=277452),
+            follow_redirects=True)
 
 
         client.post(
@@ -68,6 +75,53 @@ def test_admin_page(client):
                 entry='nav-persons2'),
             follow_redirects=True)
         assert b'Link deleted successfully' in rv.data
+
+        # rv = client.post(
+        #     url_for(
+        #     'add_entry',
+        #         category='persons',
+        #         name='test',
+        #         description='testing',
+        #         email= 'test@test.org',
+        #         orcid_id='2134',
+        #         image='https://test.at/'),
+        #     follow_redirects=True)
+        # assert b'Entry added successfully!' in rv.data
+
+        # rv = client.post(
+        #     url_for(
+        #     'add_entry',
+        #         category='institutions',
+        #         name='Institution',
+        #         description='desccription',
+        #         email= 'test@test.org',
+        #         address='Eichertweg 5',
+        #         image='https://test.at/',
+        #         website='https://nhm.at/'),
+        #     follow_redirects=True)
+        # assert b'Entry added successfully!' in rv.data
+
+        # rv = client.post(
+        #     url_for(
+        #     'add_entry',
+        #         category='projects',
+        #         name='Project',
+        #         description='Project description',
+        #         case_study= '277452',
+        #         website='https://nhm.at/'),
+        #     follow_redirects=True)
+        # assert b'Entry added successfully!' in rv.data
+
+        # rv = client.get(
+        #     url_for(
+        #     'add_entry',
+        #         category='main_project',
+        #         name='test',
+        #         description='testing',
+        #         email= 'test@test.org',
+        #         orcid_id='2134',
+        #         image='https://test.at/'))
+        # assert b'Only one main project allowed' in rv.data
 
         rv = client.get(url_for('logout'), follow_redirects=True)
         assert b'ENTITIES' in rv.data
