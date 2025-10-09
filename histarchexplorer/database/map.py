@@ -16,9 +16,9 @@ def get_maps() -> tuple[str]:
     return g.cursor.fetchall()
 
 
-def get_base_map_by_id(map_id: int) -> Any:
-    g.cursor.execute('SELECT * FROM tng.maps WHERE id = %s', (map_id,))
-    return g.cursor.fetchone()
+# def get_base_map_by_id(map_id: int) -> Any:
+#     g.cursor.execute('SELECT * FROM tng.maps WHERE id = %s', (map_id,))
+#     return g.cursor.fetchone()
 
 
 def check_if_map_id_exist(id_: int) -> bool:

@@ -17,6 +17,26 @@ def test_entity(client):
         assert rv.status_code == 200
         assert b"Thunau Obere Holzwiese" in rv.data
 
+        rv = client.get(url_for('get_entity', id_=50505, tab_name='subunits'))
+        assert rv.status_code == 200
+        assert b"Agilolf" in rv.data
+
+        rv = client.get(url_for('get_entity', id_=50505, tab_name='media'))
+        assert rv.status_code == 200
+        assert b"iiif_manifest" in rv.data
+
+        rv = client.get(url_for('get_entity', id_=59099, tab_name='overview'))
+        assert rv.status_code == 200
+        assert b"Grave 073" in rv.data
+
+        rv = client.get(url_for('get_entity', id_=77703, tab_name='map'))
+        assert rv.status_code == 200
+        assert b"G073S1" in rv.data
+
+        rv = client.get(url_for('get_entity', id_=102031, tab_name='overview'))
+        assert rv.status_code == 200
+        assert b"G043F01" in rv.data
+
         # Test main image
         rv = client.get(url_for('get_entity', id_=128351, tab_name='overview'))
         assert rv.status_code == 200
@@ -30,3 +50,7 @@ def test_entity(client):
         rv = client.get(url_for('entities'))
         assert rv.status_code == 200
         assert b"Name" in rv.data
+
+
+        rv = client.get(url_for('get_entity', id_=50505, tab_name='wrong'))
+        assert rv.status_code == 404

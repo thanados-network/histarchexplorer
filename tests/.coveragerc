@@ -4,3 +4,4 @@ skip_covered=True
 sort=cover
 [run]
 omit =
+    ..histarchexplorer/_deprecated_code/*

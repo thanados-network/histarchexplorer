@@ -247,8 +247,6 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
         g.cursor.execute(sql_get_cs_infos, {'language': g.language, 'preferred_language': app.config.get('PREFERRED_LANGUAGE')})
         cs_infos = g.cursor.fetchall()
 
-        print(cs_infos)
-
         sql_case_studies = """
             SELECT jsonb_agg(domain_id) as ids
             FROM model.link
@@ -292,7 +290,7 @@ def return_entities(tab_name, id):
         for i, key in enumerate(data['counts'].keys())
     ]
 
-    print(sidebar_elements)
+
 
     if tab_name == "" and sidebar_elements:
         tab_name = sidebar_elements[0]['route']
@@ -320,7 +318,6 @@ def entities(tab_name="", id=None) -> str:
 
 @app.route('/get_entities/<tab_name>')
 def get_entities(tab_name: str = None) -> str:
-    #print(tab_name)
     return render_template(
         f'tabs/browse.html',
         tab_name=tab_name)

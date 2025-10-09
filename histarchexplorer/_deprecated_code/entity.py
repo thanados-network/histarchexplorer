@@ -177,20 +177,20 @@ class Entity:
     def get_entity(id_: int, parser: Parser) -> Entity:
         return Entity(ApiAccess.get_entity(id_, parser))
 
-    # @staticmethod
-    # def get_entities_linked_to_entity(
-    #         id_: int,
-    #         parser: Parser) -> list[Entity]:
-    #     return [Entity(entity) for entity in
-    #             ApiAccess.get_entities_linked_to_entity(id_, parser)]
-    #
-    # @staticmethod
-    # def get_by_system_class(class_: str, parser: Parser) -> list[Entity]:
-    #     return [Entity(entity) for entity in
-    #             ApiAccess.get_by_system_class(class_, parser)]
+    @staticmethod
+    def get_entities_linked_to_entity(
+            id_: int,
+            parser: Parser) -> list[Entity]:
+        return [Entity(entity) for entity in
+                ApiAccess.get_entities_linked_to_entity(id_, parser)]
 
     @staticmethod
-    #@cache.memoize()
+    def get_by_system_class(class_: str, parser: Parser) -> list[Entity]:
+        return [Entity(entity) for entity in
+                ApiAccess.get_by_system_class(class_, parser)]
+
+    @staticmethod
+    @cache.memoize()
     def get_linked_entities_by_properties_recursive(
             id_: int,
             parser: Parser) -> list[Entity]:

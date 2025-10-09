@@ -14,14 +14,23 @@ PROXIES = {
 class ApiAccess:
 
     @staticmethod
-    def get_entity(id_: int, parser: Parser) -> dict[str, Any]:
-        req = requests.get(
-            f"{app.config['API_URL']}entity/{id_}",
+    def get_system_class_count(parser: Parser) -> dict[str, Any]:
+        return requests.get(
+            f"{app.config['API_URL']}/system_class_count/",
             params=parser.__dict__,
             headers=g.api_headers,
             proxies=PROXIES,
-            timeout=60).json()
-        return req
+            timeout=30).json()
+
+    # @staticmethod
+    # def get_entity(id_: int, parser: Parser) -> dict[str, Any]:
+    #     req = requests.get(
+    #         f"{app.config['API_URL']}entity/{id_}",
+    #         params=parser.__dict__,
+    #         headers=g.api_headers,
+    #         proxies=PROXIES,
+    #         timeout=60).json()
+    #     return req
 
     # @staticmethod
     # def get_by_system_class(
@@ -45,18 +54,18 @@ class ApiAccess:
     #         proxies=PROXIES,
     #         timeout=30).json()['results']
 
-    @staticmethod
-    def linked_entities_by_properties_recursive(
-            id_: int,
-            parser: Parser) -> list[dict[str, Any]]:
-        url = (f"{app.config['API_URL']}"
-               f"/linked_entities_by_properties_recursive/")
-        return requests.get(
-            f"{url}{id_}",
-            params=parser.__dict__,
-            headers=g.api_headers,
-            proxies=PROXIES,
-            timeout=30).json()['results']
+    # @staticmethod
+    # def linked_entities_by_properties_recursive(
+    #         id_: int,
+    #         parser: Parser) -> list[dict[str, Any]]:
+    #     url = (f"{app.config['API_URL']}"
+    #            f"/linked_entities_by_properties_recursive/")
+    #     return requests.get(
+    #         f"{url}{id_}",
+    #         params=parser.__dict__,
+    #         headers=g.api_headers,
+    #         proxies=PROXIES,
+    #         timeout=30).json()['results']
 
     # @staticmethod
     # def get_subunits(
@@ -70,11 +79,3 @@ class ApiAccess:
     #         timeout=30).json()
 
 
-    @staticmethod
-    def get_system_class_count(parser: Parser) -> dict[str, Any]:
-        return requests.get(
-            f"{app.config['API_URL']}/system_class_count/",
-            params=parser.__dict__,
-            headers=g.api_headers,
-            proxies=PROXIES,
-            timeout=30).json()

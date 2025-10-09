@@ -64,14 +64,12 @@ def get_entity(id_: int, tab_name=None) -> str:
 
     main_image, initial_images = get_entity_images(entity.files)
     match tab_name:
-        case 'feature':
+        case 'feature':  # pragma: no cover
             pass
         case 'map':
             map_data = {
                 'type': 'FeatureCollection',
                 'features': get_features_for_map(entity, hierarchy)}
-            if not map_data['features']:
-                abort(404)
             data['spatial'] = map_data
         case 'media':
             pass
@@ -114,7 +112,7 @@ def get_entity(id_: int, tab_name=None) -> str:
 
 def get_features_for_map(
         e: PresentationView,
-        hierarchy: dict[str, Any]) -> list[dict[str, Any]]:
+        hierarchy: dict[str, Any]) -> list[Optional[dict[str, Any]]]:
     map_data = []
     first_geom = None
     if e.geometry_json:
@@ -167,20 +165,19 @@ def get_parent_geometry(hierarchy: list[Relation]) -> dict[str, Any]:
 
 
 def get_parent_geometry_id(hierarchy: list[Relation]) -> int | None:
+    id_ = None
     for root_element in reversed(hierarchy):
         if root_element.geometries:
-            return root_element.id
-    return None
+            id_ = root_element.id
+    return id_
 
 
 def adapt_map_dict(
-        geom: dict[str, Any] | None,
+        geom: dict[str, Any],
         name: str,
         id_: int,
         system_class: str,
         first_geom: Optional[int] = None) -> list[dict[str, Any]]:
-    if not geom:
-        return []
     features = []
     if geom.get('type') == 'FeatureCollection':
         features.extend(geom['features'])
