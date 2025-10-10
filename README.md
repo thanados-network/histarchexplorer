@@ -128,3 +128,10 @@ Contributions are welcome! Please feel free to submit issues, feature requests, 
 ## 📜 License
 This project is released under the [MIT License](LICENSE).
 
+
+
+# Todo:
+Include this in the README:
+
+    npm install --production=false
+    npm run build

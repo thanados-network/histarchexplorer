@@ -52,3 +52,14 @@ node_modules/
 .sass-cache/
 
 tiles/
+
+
+# SCSS build output
+/static/css/main.css
+/static/*.map
+/static/node_modules/
+# Node dependencies
+/node_modules/
+
+# Python cache
+*.pyc

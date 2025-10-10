@@ -1,9 +1,13 @@
 {
   "name": "static",
   "version": "0.0.1",
+  "private": true,
   "description": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "sass --watch scss:css",
+    "build": "sass scss:css --style=compressed",
+    "test": "echo \"No tests defined\" && exit 0",
+    "postinstall": "bash ../.github/hooks/setup-hooks.sh"
   },
   "dependencies": {
     "@fontsource/inter": "^5.0.18",
@@ -23,5 +27,7 @@
     "type": "git",
     "url": "https://github.com/lisaldrian/histarchexplorer.git"
   },
-  "private": true
+  "devDependencies": {
+    "sass": "^1.79.0"
+  }
 }
