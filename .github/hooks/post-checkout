@@ -4,3 +4,6 @@ if [ -d "histarchexplorer/static/scss" ]; then
   echo "🧶 Rebuilding SCSS after branch checkout..."
   (cd static && npm run build)
 fi
+
+echo "✅ post-checkout triggered!" >> /tmp/git-hooks-debug.log
+(cd static && npm run build >> /tmp/git-hooks-debug.log 2>&1)

@@ -4,3 +4,6 @@ if [ -d "histarchexplorer/static/scss" ]; then
   echo "🧶 Rebuilding SCSS after merge..."
   (cd static && npm run build)
 fi
+#!/bin/bash
+echo "✅ post-merge triggered!" >> /tmp/git-hooks-debug.log
+(cd static && npm run build >> /tmp/git-hooks-debug.log 2>&1)
