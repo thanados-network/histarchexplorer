@@ -1,6 +1,6 @@
 #!/bin/bash
 # Rebuild SCSS after switching branches
-if [ -d "static/scss" ]; then
+if [ -d "histarchexplorer/static/scss" ]; then
   echo "🧶 Rebuilding SCSS after branch checkout..."
   (cd static && npm run build)
 fi
