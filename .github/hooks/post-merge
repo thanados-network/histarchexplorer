@@ -1,9 +1,13 @@
 #!/bin/bash
-# Rebuild SCSS after merging or pulling
-if [ -d "histarchexplorer/static/scss" ]; then
-  echo "🧶 Rebuilding SCSS after merge..."
-  (cd static && npm run build)
+echo "🧶 Rebuilding SCSS after merge..."
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+STATIC_DIR="$REPO_ROOT/histarchexplorer/static"
+
+if [ -d "$STATIC_DIR/scss" ]; then
+  echo "➡️  Building SCSS in $STATIC_DIR"
+  (cd "$STATIC_DIR" && npm run build || echo "❌ SCSS build failed.")
+else
+  echo "⚠️  SCSS directory not found at: $STATIC_DIR/scss"
 fi
-#!/bin/bash
-echo "✅ post-merge triggered!" >> /tmp/git-hooks-debug.log
-(cd static && npm run build >> /tmp/git-hooks-debug.log 2>&1)
+
