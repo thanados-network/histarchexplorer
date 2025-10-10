@@ -2,7 +2,6 @@ from histarchexplorer import app
 from flask import render_template, current_app
 import requests
 
-from histarchexplorer.api.parser import Parser
 from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.utils.view_util import get_cite_button
 
@@ -23,10 +22,6 @@ def vocabulary():
 @app.route("/vocabulary/<int:type_id>")
 def vocabulary_detail(type_id: int):
     entity = PresentationView.from_api(type, type_id)
-    # BEFORE:
-    # res = requests.get(current_app.config["VOCAB_TYPE_TREE_URL"])
-
-    # AFTER:
     res = requests.get(TYPE_TREE_API_URL)
 
     res.raise_for_status()
