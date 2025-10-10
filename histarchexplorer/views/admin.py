@@ -10,10 +10,9 @@ from flask_login import current_user, login_required
 from werkzeug import Response
 
 from histarchexplorer import app, cache
-from histarchexplorer.api.helpers import get_entities_count_by_case_study
-from histarchexplorer.config.admin_fields import FIELD_CONFIGS
+from histarchexplorer.api.api_access import get_entities_count_by_case_study
 from histarchexplorer.database.map import check_if_map_id_exist
-from histarchexplorer.services.admin import Admin, EntryNotFound
+from histarchexplorer.models.admin import Admin, EntryNotFound
 from histarchexplorer.utils.view_util import find_children_by_id
 from histarchexplorer.views.views import type_tree
 
@@ -75,7 +74,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         initial_case_study_type_id=initial_case_study_type_id,
         initial_case_study_type_name=initial_case_study_type_name,
         case_study_children=case_study_children,
-        FIELD_CONFIGS=FIELD_CONFIGS,
+        admin_fields=app.config['ADMIN_FIELDS'],
         view_classes=app.config['VIEW_CLASSES'])
 
 
@@ -110,6 +109,7 @@ def add_link() -> Response:
 @login_required
 def add_entry() -> Response:
     check_manager_user()
+    print( request.form)
     case_study_str = request.form.get('case_study')
     form_data = {
         'category': request.form.get('category', ''),
@@ -137,7 +137,6 @@ def add_entry() -> Response:
             'danger')
     except Exception as e:
         flash(f'Error adding entry {form_data["name"]}: {e}', 'danger')
-
     return redirect(redirect_base)
 
 
@@ -157,6 +156,7 @@ def delete_entry(id_: int, tab: str) -> Response:
 @login_required
 def edit_entry() -> Response:
     check_manager_user()
+    print(request.form)
     case_study_raw = request.form.get('case_study')
     case_study = int(case_study_raw) if case_study_raw else None
     form_data = {
@@ -271,7 +271,6 @@ def select_entities() -> Response:
 @login_required
 def deselect_entities() -> Response:
     check_manager_user()
-    print(request.form.getlist('selected_entities'))
     if request.method == 'POST':
         Admin.set_hidden_classes(request.form.getlist('selected_entities'))
         flash(_('set hidden entities'), 'info')

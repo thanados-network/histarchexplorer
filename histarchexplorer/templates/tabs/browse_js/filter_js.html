@@ -1,214 +1,258 @@
 <script> {# Filter Search Sort #}
-    //Filter/Sort/Search
-    const {{tab_name}}Modal = new bootstrap.Modal('#modal-{{ tab_name }}', {})
-    const {{tab_name}}TreeModal = new bootstrap.Modal('#modal-{{ tab_name }}-tree', {})
+//Filter/Sort/Search
+const {{tab_name}}Modal = new bootstrap.Modal('#modal-{{ tab_name }}', {})
+const {{tab_name}}TreeModal = new bootstrap.Modal('#modal-{{ tab_name }}-tree', {})
 
-    const sortLevelsContainer{{ tab_name }} = document.getElementById('sort-levels-{{ tab_name }}');
-    const addSortLevelBtn{{ tab_name }} = document.getElementById('add-sort-level-{{ tab_name }}');
+const sortLevelsContainer{{ tab_name }} = document.getElementById('sort-levels-{{ tab_name }}');
+const addSortLevelBtn{{ tab_name }} = document.getElementById('add-sort-level-{{ tab_name }}');
 
-    let sortLevelId{{ tab_name }} = 0;
+let sortLevelId{{ tab_name }} = 0;
 
-    function addSortLevel{{ tab_name }}() {
-        const level{{ tab_name }} = createSortLevel(sortLevelId{{ tab_name }}++, {{ tab_name }}Data.fields, {{ tab_name }}Data.classes, {{ tab_name }}Data.typeIds);
-        sortLevelsContainer{{ tab_name }}.appendChild(level{{ tab_name }});
+function addSortLevel{{ tab_name }}() {
+    const level{{ tab_name }} = createSortLevel(sortLevelId{{ tab_name }}++, {{ tab_name }}Data.fields, {{ tab_name }}Data.classes, {{ tab_name }}Data.typeIds);
+    sortLevelsContainer{{ tab_name }}.appendChild(level{{ tab_name }});
+}
+
+addSortLevelBtn{{ tab_name }}.addEventListener('click', () => {
+    addSortLevel{{ tab_name }}();
+});
+
+sortLevelsContainer{{ tab_name }}.addEventListener('click', (e) => {
+    if (e.target.classList.contains('remove-sort-level')) {
+        e.target.closest('.row').remove();
     }
+});
 
-    addSortLevelBtn{{ tab_name }}.addEventListener('click', () => {
+document.getElementById('includeNoBegin{{ tab_name }}').addEventListener('change', () => {
+    applyCombinedFilter{{ tab_name }}()
+})
+document.getElementById('includeNoEnd{{ tab_name }}').addEventListener('change', () => {
+    applyCombinedFilter{{ tab_name }}()
+})
+
+document.getElementById('apply-sort-btn-{{ tab_name }}').addEventListener('click', () => {
+    const sorters{{ tab_name }} = [];
+
+    const levels{{ tab_name }} = sortLevelsContainer{{ tab_name }}.querySelectorAll('.row');
+    levels{{ tab_name }}.forEach(level => {
+        const field{{ tab_name }} = level.querySelector('.sort-field').value;
+        const direction{{ tab_name }} = level.querySelector('.sort-direction').value;
+        if (field{{ tab_name }}) {
+            sorters{{ tab_name }}.push({column: field{{ tab_name }}, dir: direction{{tab_name}}});
+        }
+    });
+
+    table{{ tab_name }}.setSort(sorters{{ tab_name }});
+});
+
+document.getElementById('reset-sort-btn-{{ tab_name }}').addEventListener('click', () => {
+    table{{ tab_name }}.clearSort();
+    sortLevelsContainer{{ tab_name }}.innerHTML = '';  // Optionally clear UI
+    addSortLevel{{ tab_name }}();  // Optionally add one empty level back
+});
+
+document.getElementById('modal-{{ tab_name }}').addEventListener('shown.bs.modal', () => {
+    if (sortLevelsContainer{{ tab_name }}.children.length === 0) {
         addSortLevel{{ tab_name }}();
-    });
+    }
+});
 
-    sortLevelsContainer{{ tab_name }}.addEventListener('click', (e) => {
-        if (e.target.classList.contains('remove-sort-level')) {
-            e.target.closest('.row').remove();
-        }
-    });
+//simple filter input
+const filterInput{{ tab_name }} = document.getElementById("filterInput{{ tab_name }}");
+const clearButton{{ tab_name }} = document.getElementById("clearFilter{{ tab_name }}");
 
-    document.getElementById('includeNoBegin{{ tab_name }}').addEventListener('change', () => {
-        applyCombinedFilter{{ tab_name }}()
-    })
-    document.getElementById('includeNoEnd{{ tab_name }}').addEventListener('change', () => {
-        applyCombinedFilter{{ tab_name }}()
-    })
-
-    document.getElementById('apply-sort-btn-{{ tab_name }}').addEventListener('click', () => {
-        const sorters{{ tab_name }} = [];
-
-        const levels{{ tab_name }} = sortLevelsContainer{{ tab_name }}.querySelectorAll('.row');
-        levels{{ tab_name }}.forEach(level => {
-            const field{{ tab_name }} = level.querySelector('.sort-field').value;
-            const direction{{ tab_name }} = level.querySelector('.sort-direction').value;
-            if (field{{ tab_name }}) {
-                sorters{{ tab_name }}.push({column: field{{ tab_name }}, dir: direction{{tab_name}}});
-            }
-        });
-
-        table{{ tab_name }}.setSort(sorters{{ tab_name }});
-    });
-
-    document.getElementById('reset-sort-btn-{{ tab_name }}').addEventListener('click', () => {
-        table{{ tab_name }}.clearSort();
-        sortLevelsContainer{{ tab_name }}.innerHTML = '';  // Optionally clear UI
-        addSortLevel{{ tab_name }}();  // Optionally add one empty level back
-    });
-
-    document.getElementById('modal-{{ tab_name }}').addEventListener('shown.bs.modal', () => {
-        if (sortLevelsContainer{{ tab_name }}.children.length === 0) {
-            addSortLevel{{ tab_name }}();
-        }
-    });
-
-    //simple filter input
-    const filterInput{{ tab_name }} = document.getElementById("filterInput{{ tab_name }}");
-    const clearButton{{ tab_name }} = document.getElementById("clearFilter{{ tab_name }}");
-
-    clearButton{{ tab_name }}.addEventListener("click", function () {
-        filterInput{{ tab_name }}.value = "";
-        applyCombinedFilter{{ tab_name }}();
-        filterInput{{ tab_name }}.focus();
-    });
+clearButton{{ tab_name }}.addEventListener("click", function () {
+    filterInput{{ tab_name }}.value = "";
+    applyCombinedFilter{{ tab_name }}();
+    filterInput{{ tab_name }}.focus();
+});
 
 
-    if (classList{{ tab_name }}.length > 1) {
-        const classSelect{{ tab_name }} = document.getElementById("classSelect{{ tab_name }}");
-        const classDropdown = document.getElementById("classDropdown{{ tab_name }}");
-        classDropdown.classList.remove("d-none");
+if (classList{{ tab_name }}.length > 1) {
+    const classSelect{{ tab_name }} = document.getElementById("classSelect{{ tab_name }}");
+    const classDropdown = document.getElementById("classDropdown{{ tab_name }}");
+    classDropdown.classList.remove("d-none");
 
-        classList{{ tab_name }}.forEach(cls => {
-            const li = document.createElement("li");
-            li.classList.add("form-check");
+    classList{{ tab_name }}.forEach(cls => {
+        const li = document.createElement("li");
+        li.classList.add("form-check");
 
-            li.innerHTML = `
+        li.innerHTML = `
         <input class="form-check-input" type="checkbox" value="${cls}" id="check-${cls}">
         <label class="form-check-label" for="check-${cls}">${cls.replace('_', ' ')}</label>
     `;
 
-            classSelect{{ tab_name }}.appendChild(li);
+        classSelect{{ tab_name }}.appendChild(li);
+    });
+}
+
+let {{ tab_name}}CsIds = []
+
+document.addEventListener("change", function (e) {
+    if (e.target.matches(`#classSelect{{ tab_name }} input[type="checkbox"]`)) {
+        applyCombinedFilter{{ tab_name }}();
+    }
+    if (e.target.matches(`#csSelect{{ tab_name }} input[type="checkbox"]`)) {
+        applyCombinedFilter{{ tab_name }}();
+    }
+})
+
+if ({{ tab_name }}Data.caseStudies.length > 1) {
+    const csSelect{{ tab_name }} = document.getElementById("csSelect{{ tab_name }}");
+    const csDropdown = document.getElementById("csDropdown{{ tab_name }}");
+    csDropdown.classList.remove("d-none");
+
+    {{ tab_name }}Data.caseStudies.forEach(cls => {
+        const li = document.createElement("li");
+        li.classList.add("form-check");
+
+        li.innerHTML = `
+        <input class="form-check-input" type="checkbox" value="${cls.id}" id="check-${cls.id}">
+        <label class="form-check-label" for="check-${cls.id}">${cls.name.replace('_', ' ')}</label>`;
+
+        csSelect{{ tab_name }}.appendChild(li);
+    });
+}
+
+
+// DYNAMIC TREE FILTERING FUNCTIONS
+
+// Function to get filtered data based on current search
+function getFilteredTableData{{ tab_name }}() {
+    const textValue = document.getElementById(`filterInput{{tab_name}}`).value.trim();
+    const checkboxes = document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]:checked`);
+    const CsCheckboxes = document.querySelectorAll(`#csSelect{{tab_name}} input[type="checkbox"]:checked`);
+    const selectedClasses = Array.from(checkboxes).map(cb => cb.value);
+    const selectedCaseStudies = Array.from(CsCheckboxes).map(cb => cb.value);
+
+    let filteredData = {{ tab_name }}Data.tableData;
+
+    // Apply text filter
+    if (textValue) {
+        filteredData = filteredData.filter(item =>
+            item.all && item.all.toLowerCase().includes(textValue.toLowerCase())
+        );
+    }
+
+    // Apply class filter
+    if (selectedClasses.length > 0) {
+        filteredData = filteredData.filter(item =>
+            selectedClasses.includes(item.class)
+        );
+    }
+
+    //Apply Case Study Filter
+    let caseStudyEntIdArray = new Set(); // Initialize the Set outside the block if it's used globally
+
+    if (selectedCaseStudies.length > 0) {
+        const selectedCsIdSet = new Set(selectedCaseStudies.map(id => parseInt(id)));
+
+        const allEntityIds = data.cs_ids.flatMap((cs) => {
+            if (selectedCsIdSet.has(cs.id)) {
+                return cs.ids.flat();
+            }
+            return [];
+        });
+
+        caseStudyEntIdArray = Array.from(new Set(allEntityIds.map(id => Number(id))));
+        filteredData = filteredData.filter(item =>
+            caseStudyEntIdArray.includes(item.id)
+        );
+    }
+
+
+    // Apply date range filters if they exist
+    if ({{ tab_name }}Data.fields.includes("begin") && typeof sliderBegin{{ tab_name }} !== 'undefined' && sliderBegin{{ tab_name }}.noUiSlider) {
+        const beginSliderValues = sliderBegin{{ tab_name }}.noUiSlider.get();
+        const [beginMin, beginMax] = getDaysBPBfromString(beginSliderValues, {{ tab_name }}Data.timelineBegin);
+
+        if (!isNaN(beginMin) && !isNaN(beginMax)) {
+            filteredData = filteredData.filter(item =>
+                (item.beginDBP === null || item.beginDBP === undefined) ||
+                (item.beginDBP >= beginMin && item.beginDBP <= beginMax)
+            );
+        }
+    }
+
+    if ({{ tab_name }}Data.fields.includes("end") && typeof sliderEnd{{ tab_name }} !== 'undefined' && sliderEnd{{ tab_name }}.noUiSlider) {
+        const endSliderValues = sliderEnd{{ tab_name }}.noUiSlider.get();
+        const [endMin, endMax] = getDaysBPBfromString(endSliderValues, {{ tab_name }}Data.timelineEnd);
+
+        if (!isNaN(endMin) && !isNaN(endMax)) {
+            filteredData = filteredData.filter(item =>
+                (item.endDBP === null || item.endDBP === undefined) ||
+                (item.endDBP >= endMin && item.endDBP <= endMax)
+            );
+        }
+    }
+
+    return filteredData;
+}
+
+// Function to get type IDs that should be shown in tree (including ancestors)
+function getValidTypeIdsWithAncestors{{ tab_name }}(filteredData, treeData) {
+    const resultTypeIds = [...new Set(filteredData.map(item => item.type_id))];
+    const validTypeIds = new Set();
+
+    // Helper function to find all ancestors of a node
+    function findAncestors(nodeId, tree) {
+        for (const node of tree) {
+            if (node.id === nodeId) {
+                return [nodeId];
+            }
+            if (node.children && node.children.length > 0) {
+                const childResult = findAncestors(nodeId, node.children);
+                if (childResult.length > 0) {
+                    return [node.id, ...childResult];
+                }
+            }
+        }
+        return [];
+    }
+
+    // For each result type ID, find its ancestors and add them all
+    for (const tree in treeData) {
+        for (const typeId of resultTypeIds) {
+            const ancestors = findAncestors(typeId, treeData[tree]);
+            ancestors.forEach(ancestorId => validTypeIds.add(ancestorId));
+        }
+    }
+
+    return validTypeIds;
+}
+
+// Function to mark tree nodes as available/unavailable using selectable property
+function markTreeDataAvailability{{ tab_name }}(treeData, validTypeIds) {
+    function markNodes(nodes) {
+        return nodes.map(node => {
+            const nodeCopy = {...node}; // Create a copy
+
+            // Set selectable based on availability - library will handle the rest!
+            nodeCopy.selectable = validTypeIds.has(node.id);
+
+            // Process children recursively
+            if (node.children && node.children.length > 0) {
+                nodeCopy.children = markNodes(node.children);
+            }
+
+            return nodeCopy;
         });
     }
 
-    document.addEventListener("change", function (e) {
-        if (e.target.matches(`#classSelect{{ tab_name }} input[type="checkbox"]`)) {
-            applyCombinedFilter{{ tab_name }}();
-        }
-    });
-
-
-    // DYNAMIC TREE FILTERING FUNCTIONS
-
-    // Function to get filtered data based on current search
-    function getFilteredTableData{{ tab_name }}() {
-        const textValue = document.getElementById(`filterInput{{tab_name}}`).value.trim();
-        const checkboxes = document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]:checked`);
-        const selectedClasses = Array.from(checkboxes).map(cb => cb.value);
-
-        let filteredData = {{ tab_name }}Data.tableData;
-
-        // Apply text filter
-        if (textValue) {
-            filteredData = filteredData.filter(item =>
-                item.all && item.all.toLowerCase().includes(textValue.toLowerCase())
-            );
-        }
-
-        // Apply class filter
-        if (selectedClasses.length > 0) {
-            filteredData = filteredData.filter(item =>
-                selectedClasses.includes(item.class)
-            );
-        }
-
-        // Apply date range filters if they exist
-        if ({{ tab_name }}Data.fields.includes("begin") && typeof sliderBegin{{ tab_name }} !== 'undefined' && sliderBegin{{ tab_name }}.noUiSlider) {
-            const beginSliderValues = sliderBegin{{ tab_name }}.noUiSlider.get();
-            const [beginMin, beginMax] = getDaysBPBfromString(beginSliderValues, {{ tab_name }}Data.timelineBegin);
-
-            if (!isNaN(beginMin) && !isNaN(beginMax)) {
-                filteredData = filteredData.filter(item =>
-                    (item.beginDBP === null || item.beginDBP === undefined) ||
-                    (item.beginDBP >= beginMin && item.beginDBP <= beginMax)
-                );
-            }
-        }
-
-        if ({{ tab_name }}Data.fields.includes("end") && typeof sliderEnd{{ tab_name }} !== 'undefined' && sliderEnd{{ tab_name }}.noUiSlider) {
-            const endSliderValues = sliderEnd{{ tab_name }}.noUiSlider.get();
-            const [endMin, endMax] = getDaysBPBfromString(endSliderValues, {{ tab_name }}Data.timelineEnd);
-
-            if (!isNaN(endMin) && !isNaN(endMax)) {
-                filteredData = filteredData.filter(item =>
-                    (item.endDBP === null || item.endDBP === undefined) ||
-                    (item.endDBP >= endMin && item.endDBP <= endMax)
-                );
-            }
-        }
-
-        return filteredData;
+    const markedTreeData = {};
+    for (const tree in treeData) {
+        markedTreeData[tree] = markNodes(treeData[tree]);
     }
 
-    // Function to get type IDs that should be shown in tree (including ancestors)
-    function getValidTypeIdsWithAncestors{{ tab_name }}(filteredData, treeData) {
-        const resultTypeIds = [...new Set(filteredData.map(item => item.type_id))];
-        const validTypeIds = new Set();
+    return markedTreeData;
+}
 
-        // Helper function to find all ancestors of a node
-        function findAncestors(nodeId, tree) {
-            for (const node of tree) {
-                if (node.id === nodeId) {
-                    return [nodeId];
-                }
-                if (node.children && node.children.length > 0) {
-                    const childResult = findAncestors(nodeId, node.children);
-                    if (childResult.length > 0) {
-                        return [node.id, ...childResult];
-                    }
-                }
-            }
-            return [];
-        }
-
-        // For each result type ID, find its ancestors and add them all
-        for (const tree in treeData) {
-            for (const typeId of resultTypeIds) {
-                const ancestors = findAncestors(typeId, treeData[tree]);
-                ancestors.forEach(ancestorId => validTypeIds.add(ancestorId));
-            }
-        }
-
-        return validTypeIds;
-    }
-
-    // Function to mark tree nodes as available/unavailable using selectable property
-    function markTreeDataAvailability{{ tab_name }}(treeData, validTypeIds) {
-        function markNodes(nodes) {
-            return nodes.map(node => {
-                const nodeCopy = {...node}; // Create a copy
-
-                // Set selectable based on availability - library will handle the rest!
-                nodeCopy.selectable = validTypeIds.has(node.id);
-
-                // Process children recursively
-                if (node.children && node.children.length > 0) {
-                    nodeCopy.children = markNodes(node.children);
-                }
-
-                return nodeCopy;
-            });
-        }
-
-        const markedTreeData = {};
-        for (const tree in treeData) {
-            markedTreeData[tree] = markNodes(treeData[tree]);
-        }
-
-        return markedTreeData;
-    }
-
-    // Enhanced CSS to make unavailable nodes more visually distinct
-    function addEnhancedUnavailableStyles{{ tab_name }}() {
-        if (!document.getElementById('enhanced-unavailable-styles-{{ tab_name }}')) {
-            const styleElement = document.createElement('style');
-            styleElement.id = 'enhanced-unavailable-styles-{{ tab_name }}';
-            styleElement.textContent = `
+// Enhanced CSS to make unavailable nodes more visually distinct
+function addEnhancedUnavailableStyles{{ tab_name }}() {
+    if (!document.getElementById('enhanced-unavailable-styles-{{ tab_name }}')) {
+        const styleElement = document.createElement('style');
+        styleElement.id = 'enhanced-unavailable-styles-{{ tab_name }}';
+        styleElement.textContent = `
                 /* Enhance the existing .not-selectable class */
                 .custom-treeview-wrapper .treeview-node-content.not-selectable {
                     opacity: 0.6 !important; /* More faded than default 0.6 */
@@ -220,307 +264,63 @@
                     opacity: 0.4 !important;
                 }
             `;
-            document.head.appendChild(styleElement);
+        document.head.appendChild(styleElement);
+    }
+}
+
+// Function to rebuild tree with filtered data
+function rebuildTreeWithFilteredData{{ tab_name }}() {
+    const filteredData = getFilteredTableData{{ tab_name }}();
+    const validTypeIds = getValidTypeIdsWithAncestors{{ tab_name }}(filteredData, {{ tab_name }}Data.treeData);
+
+    // Mark unavailable nodes as non-selectable - library handles the styling!
+    const markedTreeData = markTreeDataAvailability{{ tab_name }}({{ tab_name }}Data.treeData, validTypeIds);
+
+    // Add our enhanced styling
+    addEnhancedUnavailableStyles{{ tab_name }}();
+
+    // Clear existing trees
+    const container = document.getElementById("{{ tab_name }}-tree-container");
+    if (!container) return; // Safety check
+
+    container.innerHTML = '';
+
+    // Store current selections before rebuilding
+    const currentSelections = {};
+    if (window.{{ tab_name }}TreeInstances) {
+        for (const tree in window.{{ tab_name }}TreeInstances) {
+            if (window.{{ tab_name }}TreeInstances[tree]) {
+                currentSelections[tree] = {
+                    selectedNodeIds: window.{{ tab_name }}TreeInstances[tree].selectedNodeIds || [],
+                    selectedNodeIdsWithChildren: window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren || []
+                };
+            }
         }
     }
 
-    // Function to rebuild tree with filtered data
-    function rebuildTreeWithFilteredData{{ tab_name }}() {
-        const filteredData = getFilteredTableData{{ tab_name }}();
-        const validTypeIds = getValidTypeIdsWithAncestors{{ tab_name }}(filteredData, {{ tab_name }}Data.treeData);
+    // Completely clear and reinitialize tree instances
+    window.{{ tab_name }}TreeInstances = {};
 
-        // Mark unavailable nodes as non-selectable - library handles the styling!
-        const markedTreeData = markTreeDataAvailability{{ tab_name }}({{ tab_name }}Data.treeData, validTypeIds);
+    // Rebuild trees - now ALL trees are shown, with unavailable nodes greyed out
+    const allOriginalTrees = Object.keys({{ tab_name }}Data.treeData);
 
-        // Add our enhanced styling
-        addEnhancedUnavailableStyles{{ tab_name }}();
-
-        // Clear existing trees
-        const container = document.getElementById("{{ tab_name }}-tree-container");
-        if (!container) return; // Safety check
-
-        container.innerHTML = '';
-
-        // Store current selections before rebuilding
-        const currentSelections = {};
-        if (window.{{ tab_name }}TreeInstances) {
-            for (const tree in window.{{ tab_name }}TreeInstances) {
-                if (window.{{ tab_name }}TreeInstances[tree]) {
-                    currentSelections[tree] = {
-                        selectedNodeIds: window.{{ tab_name }}TreeInstances[tree].selectedNodeIds || [],
-                        selectedNodeIdsWithChildren: window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren || []
-                    };
-                }
-            }
-        }
-
-        // Completely clear and reinitialize tree instances
-        window.{{ tab_name }}TreeInstances = {};
-
-        // Rebuild trees - now ALL trees are shown, with unavailable nodes greyed out
-        const allOriginalTrees = Object.keys({{ tab_name }}Data.treeData);
-
-        for (const tree of allOriginalTrees) {
-            const div = document.createElement('div');
-            div.id = `{{ tab_name }}Tree${tree}`;
-            div.classList.add('tree-container');
-            div.innerHTML = `
+    for (const tree of allOriginalTrees) {
+        const div = document.createElement('div');
+        div.id = `{{ tab_name }}Tree${tree}`;
+        div.classList.add('tree-container');
+        div.innerHTML = `
                 <div class="tree-header">
                     <h3 class="tree-header-title">${tree.charAt(0).toUpperCase()}${tree.slice(1)}</h3>
                 </div>
             `;
 
-            div.classList.add('typeTreeSelector');
-            container.appendChild(div);
-
-            // Create Treeview with marked data (unavailable nodes have selectable: false)
-            const treeview = new Treeview({
-                containerId: `{{ tab_name }}Tree${tree}`,
-                data: markedTreeData[tree], // Library will automatically apply .not-selectable class
-                searchEnabled: true,
-                nodeNameKey: 'label',
-                initiallyExpanded: false,
-                checkboxSelectionEnabled: true,
-                multiSelectEnabled: true,
-                showExpandCollapseAllButtons: true,
-                showSelectAllButton: true,
-                showInvertSelectionButton: true,
-                onSelectionChange: (selectedNodesData) => {
-                    // Only available nodes will be selectable, so no filtering needed here
-                    window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = selectedNodesData.map(node => node.id);
-                    window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = treeview.getSelectedNodesAndChildrenValues('id');
-                }
-            });
-
-            window.{{ tab_name }}TreeInstances[tree] = treeview;
-            window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = [];
-            window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = [];
-
-            // Restore selections that are still available
-            if (currentSelections[tree]?.selectedNodeIds.length > 0) {
-                const validSelections = currentSelections[tree].selectedNodeIds.filter(id => validTypeIds.has(id));
-                if (validSelections.length > 0) {
-                    try {
-                        validSelections.forEach(id => treeview.selectNodeById(id, true));
-                        window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = validSelections;
-                    } catch (e) {
-                        //console.log('Could not restore selections:', e);
-                    }
-                }
-            }
-        }
-    }
-
-
-    // applyCombinedFilter function
-    function applyCombinedFilter{{ tab_name }}() {
-        const textValue = document.getElementById(`filterInput{{tab_name}}`).value.trim();
-        const checkboxes = document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]:checked`);
-        const selectedClasses = Array.from(checkboxes).map(cb => cb.value);
-        const filters = [];
-
-        // Type filter
-        if (selectedNodes{{ tab_name }}.length > 0) {
-            filters.push({
-                field: "type_id",
-                type: "in",
-                value: selectedNodes{{ tab_name }}
-            });
-        }
-
-        // Text filter
-        if (textValue) {
-            filters.push({
-                field: "all",
-                type: "like",
-                value: textValue
-            });
-        }
-
-        // Class filter
-        if (selectedClasses.length > 0) {
-            filters.push({
-                field: "class",
-                type: "in",
-                value: selectedClasses
-            });
-        }
-
-        // Begin date filter
-        if (
-            {{ tab_name }}Data.fields.includes("begin") &&
-            typeof sliderBegin{{ tab_name }} !== 'undefined' &&
-            sliderBegin{{ tab_name }}.noUiSlider
-        ) {
-            const beginSliderValues = sliderBegin{{ tab_name }}.noUiSlider.get();
-            const [beginMin, beginMax] = getDaysBPBfromString(beginSliderValues, {{ tab_name }}Data.timelineBegin);
-            const includeNoBegin = document.getElementById('includeNoBegin{{ tab_name }}').checked;
-
-            if (!isNaN(beginMin) && !isNaN(beginMax)) {
-                if (includeNoBegin) {
-                    // OR group: (in range) OR (null)
-                    filters.push([
-                        {field: "beginDBP", type: ">=", value: beginMin},
-                        {field: "beginDBP", type: "=", value: null}
-                    ]);
-                    filters.push([
-                        {field: "beginDBP", type: "<=", value: beginMax},
-                        {field: "endDBP", type: "=", value: null}
-                    ]);
-                } else {
-                    filters.push({field: "beginDBP", type: ">=", value: beginMin});
-                    filters.push({field: "beginDBP", type: "<=", value: beginMax});
-                }
-            }
-        }
-
-        // End date filter
-        if (
-            {{ tab_name }}Data.fields.includes("end") &&
-            typeof sliderEnd{{ tab_name }} !== 'undefined' &&
-            sliderEnd{{ tab_name }}.noUiSlider
-        ) {
-            const endSliderValues = sliderEnd{{ tab_name }}.noUiSlider.get();
-            const [endMin, endMax] = getDaysBPBfromString(endSliderValues, {{ tab_name }}Data.timelineEnd);
-            const includeNoEnd = document.getElementById('includeNoEnd{{ tab_name }}').checked;
-
-            if (!isNaN(endMin) && !isNaN(endMax)) {
-                if (includeNoEnd) {
-                    // OR group: (in range) OR (null)
-                    filters.push([
-                        {field: "endDBP", type: ">=", value: endMin},
-                        {field: "endDBP", type: "=", value: null}
-                    ]);
-                    filters.push([
-                        {field: "endDBP", type: "<=", value: endMax},
-                        {field: "endDBP", type: "=", value: null}
-                    ]);
-                } else {
-                    filters.push({field: "endDBP", type: ">=", value: endMin});
-                    filters.push({field: "endDBP", type: "<=", value: endMax});
-                }
-            }
-        }
-
-        // Apply filters
-        if (filters.length > 0) {
-            table{{ tab_name }}.setFilter(filters);
-        } else {
-            table{{ tab_name }}.clearFilter();
-        }
-    }
-
-
-    // Filter input event listener
-    filterInput{{ tab_name }}.addEventListener("input", function () {
-        applyCombinedFilter{{ tab_name }}();
-    });
-
-    // Event listener for when tree modal is shown
-    document.getElementById('modal-{{ tab_name }}-tree').addEventListener('shown.bs.modal', () => {
-        rebuildTreeWithFilteredData{{ tab_name }}();
-    });
-
-    if ({{ tab_name }}Data.fields.includes("begin")) {
-
-        const sliderBegin{{ tab_name }} = document.getElementById('sliderBegin{{ tab_name }}');
-        const sliderBeginMin{{ tab_name }} = document.getElementById('sliderBeginMin{{ tab_name }}');
-        const sliderBeginMax{{ tab_name }} = document.getElementById('sliderBeginMax{{ tab_name }}');
-
-        const arbitraryValuesForSliderBegin{{ tab_name }} = {{ tab_name }}Data.timelineBegin.map(e => e.string);
-
-        noUiSlider.create(sliderBegin{{ tab_name }}, {
-            range: {min: 0, max: arbitraryValuesForSliderBegin{{ tab_name }}.length - 1},
-            start: [
-                arbitraryValuesForSliderBegin{{ tab_name }}[0],
-                arbitraryValuesForSliderBegin{{ tab_name }}[arbitraryValuesForSliderBegin{{ tab_name }}.length - 1]
-            ],
-            step: 1,
-            tooltips: false,
-            connect: true,
-            format: {
-                to: function (value) {
-                    return arbitraryValuesForSliderBegin{{ tab_name }}[Math.round(value)];
-                },
-                from: function (value) {
-                    return arbitraryValuesForSliderBegin{{ tab_name }}.indexOf(value);
-                }
-            }
-        });
-
-        sliderBegin{{ tab_name }}.noUiSlider.on("update", function (values) {
-            sliderBeginMin{{ tab_name }}.textContent = values[0];
-            sliderBeginMax{{ tab_name }}.textContent = values[1];
-        });
-
-        sliderBegin{{ tab_name }}.noUiSlider.on("change", function () {
-            applyCombinedFilter{{ tab_name }}();
-        });
-    }
-
-
-    if ({{ tab_name }}Data.fields.includes("end")) {
-
-        const sliderEnd{{ tab_name }} = document.getElementById('sliderEnd{{ tab_name }}');
-        const sliderEndMin{{ tab_name }} = document.getElementById('sliderEndMin{{ tab_name }}');
-        const sliderEndMax{{ tab_name }} = document.getElementById('sliderEndMax{{ tab_name }}');
-
-        const arbitraryValuesForSliderEnd{{ tab_name }} = {{ tab_name }}Data.timelineEnd.map(e => e.string);
-
-        noUiSlider.create(sliderEnd{{ tab_name }}, {
-            range: {min: 0, max: arbitraryValuesForSliderEnd{{ tab_name }}.length - 1},
-            start: [
-                arbitraryValuesForSliderEnd{{ tab_name }}[0],
-                arbitraryValuesForSliderEnd{{ tab_name }}[arbitraryValuesForSliderEnd{{ tab_name }}.length - 1]
-            ],
-            step: 1,
-            tooltips: false,
-            connect: true,
-            format: {
-                to: function (value) {
-                    return arbitraryValuesForSliderEnd{{ tab_name }}[Math.round(value)];
-                },
-                from: function (value) {
-                    return arbitraryValuesForSliderEnd{{ tab_name }}.indexOf(value);
-                }
-            }
-        });
-
-        sliderEnd{{ tab_name }}.noUiSlider.on("update", function (values) {
-            sliderEndMin{{ tab_name }}.textContent = values[0];
-            sliderEndMax{{ tab_name }}.textContent = values[1];
-        });
-
-        sliderEnd{{ tab_name }}.noUiSlider.on("change", function () {
-            applyCombinedFilter{{ tab_name }}();
-        });
-    }
-
-
-    const {{ tab_name }}TreesToBuild = Object.keys({{ tab_name }}Data.treeData);
-    //console.log({{ tab_name }}TreesToBuild);
-
-    const {{ tab_name }}CurrentContainer = document.getElementById("{{ tab_name }}-tree-container");
-
-    for (const tree of {{ tab_name }}TreesToBuild) {
-        const div = document.createElement('div');
-        div.id = `{{ tab_name }}Tree${tree}`;
-        div.classList.add('tree-container');
-        div.innerHTML = `
-        <div class="tree-header">
-            <h3 class="tree-header-title">${tree.charAt(0).toUpperCase()}${tree.slice(1)}</h3>
-        </div>
-    `;
-
         div.classList.add('typeTreeSelector');
-        {{ tab_name }}CurrentContainer.appendChild(div);
-        const {{ tab_name }}Checkbox = document.getElementById("include-subcategories-{{ tab_name }}");
+        container.appendChild(div);
 
-
-        // Create a Treeview instance – store it in an object instead of dynamic variable
+        // Create Treeview with marked data (unavailable nodes have selectable: false)
         const treeview = new Treeview({
-            containerId: `{{ tab_name }}Tree${tree}`,   // ID of the HTML element to render the tree into
-            data: {{ tab_name }}Data.treeData[tree],   // Use bracket notation to access the property
+            containerId: `{{ tab_name }}Tree${tree}`,
+            data: markedTreeData[tree], // Library will automatically apply .not-selectable class
             searchEnabled: true,
             nodeNameKey: 'label',
             initiallyExpanded: false,
@@ -530,36 +330,304 @@
             showSelectAllButton: true,
             showInvertSelectionButton: true,
             onSelectionChange: (selectedNodesData) => {
+                // Only available nodes will be selectable, so no filtering needed here
                 window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = selectedNodesData.map(node => node.id);
                 window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = treeview.getSelectedNodesAndChildrenValues('id');
             }
         });
 
-
-        if (!window.{{ tab_name }}TreeInstances) {
-            window.{{ tab_name }}TreeInstances = {};
-        }
         window.{{ tab_name }}TreeInstances[tree] = treeview;
-        window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = []
-        window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = []
+        window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = [];
+        window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = [];
 
-    }
-
-    let selectedNodes{{ tab_name }} = [];
-
-    function filtertypes{{ tab_name }}() {
-        selectedNodes{{ tab_name }} = [];
-        if (document.getElementById("include-subcategories-{{ tab_name }}").checked) {
-            for (const tree of {{ tab_name }}TreesToBuild) {
-                selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren);
-            }
-        } else {
-            for (const tree of {{ tab_name }}TreesToBuild) {
-                selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIds);
+        // Restore selections that are still available
+        if (currentSelections[tree]?.selectedNodeIds.length > 0) {
+            const validSelections = currentSelections[tree].selectedNodeIds.filter(id => validTypeIds.has(id));
+            if (validSelections.length > 0) {
+                try {
+                    validSelections.forEach(id => treeview.selectNodeById(id, true));
+                    window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = validSelections;
+                } catch (e) {
+                    //console.log('Could not restore selections:', e);
+                }
             }
         }
-        //console.log(selectedNodes{{ tab_name }})
-        applyCombinedFilter{{ tab_name }}()
+    }
+}
+
+
+// applyCombinedFilter function
+function applyCombinedFilter{{ tab_name }}() {
+    const textValue = document.getElementById(`filterInput{{tab_name}}`).value.trim();
+    const checkboxes = document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]:checked`);
+    const selectedClasses = Array.from(checkboxes).map(cb => cb.value);
+    const CsCheckboxes = document.querySelectorAll(`#csSelect{{tab_name}} input[type="checkbox"]:checked`);
+    const selectedCaseStudies = Array.from(CsCheckboxes).map(cb => cb.value);
+    const filters = [];
+
+    // Type filter
+    if (selectedNodes{{ tab_name }}.length > 0) {
+        filters.push({
+            field: "type_id",
+            type: "in",
+            value: selectedNodes{{ tab_name }}
+        });
     }
 
-    </script> {# Filter Search Sort #}
+    // Text filter
+    if (textValue) {
+        filters.push({
+            field: "all",
+            type: "like",
+            value: textValue
+        });
+    }
+
+    // Class filter
+    if (selectedClasses.length > 0) {
+        filters.push({
+            field: "class",
+            type: "in",
+            value: selectedClasses
+        });
+    }
+
+
+    //caseStudyFilter
+    let caseStudyEntIdArray = new Set(); // Initialize the Set outside the block if it's used globally
+
+    if (selectedCaseStudies.length > 0) {
+        const selectedCsIdSet = new Set(selectedCaseStudies.map(id => parseInt(id)));
+
+        const allEntityIds = data.cs_ids.flatMap((cs) => {
+            if (selectedCsIdSet.has(cs.id)) {
+                return cs.ids.flat();
+            }
+            return [];
+        });
+
+        caseStudyEntIdArray = Array.from(new Set(allEntityIds.map(id => Number(id))));
+        filters.push({
+            field: "id",
+            type: "in",
+            value: caseStudyEntIdArray
+        });
+    }
+
+    // Begin date filter
+    if (
+        {{ tab_name }}Data.fields.includes("begin") &&
+        typeof sliderBegin{{ tab_name }} !== 'undefined' &&
+        sliderBegin{{ tab_name }}.noUiSlider
+    ) {
+        const beginSliderValues = sliderBegin{{ tab_name }}.noUiSlider.get();
+        const [beginMin, beginMax] = getDaysBPBfromString(beginSliderValues, {{ tab_name }}Data.timelineBegin);
+        const includeNoBegin = document.getElementById('includeNoBegin{{ tab_name }}').checked;
+
+        if (!isNaN(beginMin) && !isNaN(beginMax)) {
+            if (includeNoBegin) {
+                // OR group: (in range) OR (null)
+                filters.push([
+                    {field: "beginDBP", type: ">=", value: beginMin},
+                    {field: "beginDBP", type: "=", value: null}
+                ]);
+                filters.push([
+                    {field: "beginDBP", type: "<=", value: beginMax},
+                    {field: "endDBP", type: "=", value: null}
+                ]);
+            } else {
+                filters.push({field: "beginDBP", type: ">=", value: beginMin});
+                filters.push({field: "beginDBP", type: "<=", value: beginMax});
+            }
+        }
+    }
+
+    // End date filter
+    if (
+        {{ tab_name }}Data.fields.includes("end") &&
+        typeof sliderEnd{{ tab_name }} !== 'undefined' &&
+        sliderEnd{{ tab_name }}.noUiSlider
+    ) {
+        const endSliderValues = sliderEnd{{ tab_name }}.noUiSlider.get();
+        const [endMin, endMax] = getDaysBPBfromString(endSliderValues, {{ tab_name }}Data.timelineEnd);
+        const includeNoEnd = document.getElementById('includeNoEnd{{ tab_name }}').checked;
+
+        if (!isNaN(endMin) && !isNaN(endMax)) {
+            if (includeNoEnd) {
+                // OR group: (in range) OR (null)
+                filters.push([
+                    {field: "endDBP", type: ">=", value: endMin},
+                    {field: "endDBP", type: "=", value: null}
+                ]);
+                filters.push([
+                    {field: "endDBP", type: "<=", value: endMax},
+                    {field: "endDBP", type: "=", value: null}
+                ]);
+            } else {
+                filters.push({field: "endDBP", type: ">=", value: endMin});
+                filters.push({field: "endDBP", type: "<=", value: endMax});
+            }
+        }
+    }
+
+    // Apply filters
+    if (filters.length > 0) {
+        table{{ tab_name }}.setFilter(filters);
+    } else {
+        table{{ tab_name }}.clearFilter();
+    }
+}
+
+
+// Filter input event listener
+filterInput{{ tab_name }}.addEventListener("input", function () {
+    applyCombinedFilter{{ tab_name }}();
+});
+
+// Event listener for when tree modal is shown
+document.getElementById('modal-{{ tab_name }}-tree').addEventListener('shown.bs.modal', () => {
+    rebuildTreeWithFilteredData{{ tab_name }}();
+});
+
+if ({{ tab_name }}Data.fields.includes("begin")) {
+
+    const sliderBegin{{ tab_name }} = document.getElementById('sliderBegin{{ tab_name }}');
+    const sliderBeginMin{{ tab_name }} = document.getElementById('sliderBeginMin{{ tab_name }}');
+    const sliderBeginMax{{ tab_name }} = document.getElementById('sliderBeginMax{{ tab_name }}');
+
+    const arbitraryValuesForSliderBegin{{ tab_name }} = {{ tab_name }}Data.timelineBegin.map(e => e.string);
+
+    noUiSlider.create(sliderBegin{{ tab_name }}, {
+        range: {min: 0, max: arbitraryValuesForSliderBegin{{ tab_name }}.length - 1},
+        start: [
+            arbitraryValuesForSliderBegin{{ tab_name }}[0],
+            arbitraryValuesForSliderBegin{{ tab_name }}[arbitraryValuesForSliderBegin{{ tab_name }}.length - 1]
+        ],
+        step: 1,
+        tooltips: false,
+        connect: true,
+        format: {
+            to: function (value) {
+                return arbitraryValuesForSliderBegin{{ tab_name }}[Math.round(value)];
+            },
+            from: function (value) {
+                return arbitraryValuesForSliderBegin{{ tab_name }}.indexOf(value);
+            }
+        }
+    });
+
+    sliderBegin{{ tab_name }}.noUiSlider.on("update", function (values) {
+        sliderBeginMin{{ tab_name }}.textContent = values[0];
+        sliderBeginMax{{ tab_name }}.textContent = values[1];
+    });
+
+    sliderBegin{{ tab_name }}.noUiSlider.on("change", function () {
+        applyCombinedFilter{{ tab_name }}();
+    });
+}
+
+
+if ({{ tab_name }}Data.fields.includes("end")) {
+
+    const sliderEnd{{ tab_name }} = document.getElementById('sliderEnd{{ tab_name }}');
+    const sliderEndMin{{ tab_name }} = document.getElementById('sliderEndMin{{ tab_name }}');
+    const sliderEndMax{{ tab_name }} = document.getElementById('sliderEndMax{{ tab_name }}');
+
+    const arbitraryValuesForSliderEnd{{ tab_name }} = {{ tab_name }}Data.timelineEnd.map(e => e.string);
+
+    noUiSlider.create(sliderEnd{{ tab_name }}, {
+        range: {min: 0, max: arbitraryValuesForSliderEnd{{ tab_name }}.length - 1},
+        start: [
+            arbitraryValuesForSliderEnd{{ tab_name }}[0],
+            arbitraryValuesForSliderEnd{{ tab_name }}[arbitraryValuesForSliderEnd{{ tab_name }}.length - 1]
+        ],
+        step: 1,
+        tooltips: false,
+        connect: true,
+        format: {
+            to: function (value) {
+                return arbitraryValuesForSliderEnd{{ tab_name }}[Math.round(value)];
+            },
+            from: function (value) {
+                return arbitraryValuesForSliderEnd{{ tab_name }}.indexOf(value);
+            }
+        }
+    });
+
+    sliderEnd{{ tab_name }}.noUiSlider.on("update", function (values) {
+        sliderEndMin{{ tab_name }}.textContent = values[0];
+        sliderEndMax{{ tab_name }}.textContent = values[1];
+    });
+
+    sliderEnd{{ tab_name }}.noUiSlider.on("change", function () {
+        applyCombinedFilter{{ tab_name }}();
+    });
+}
+
+
+const {{ tab_name }}TreesToBuild = Object.keys({{ tab_name }}Data.treeData);
+//console.log({{ tab_name }}TreesToBuild);
+
+const {{ tab_name }}CurrentContainer = document.getElementById("{{ tab_name }}-tree-container");
+
+for (const tree of {{ tab_name }}TreesToBuild) {
+    const div = document.createElement('div');
+    div.id = `{{ tab_name }}Tree${tree}`;
+    div.classList.add('tree-container');
+    div.innerHTML = `
+        <div class="tree-header">
+            <h3 class="tree-header-title">${tree.charAt(0).toUpperCase()}${tree.slice(1)}</h3>
+        </div>
+    `;
+
+    div.classList.add('typeTreeSelector');
+    {{ tab_name }}CurrentContainer.appendChild(div);
+    const {{ tab_name }}Checkbox = document.getElementById("include-subcategories-{{ tab_name }}");
+
+
+    // Create a Treeview instance – store it in an object instead of dynamic variable
+    const treeview = new Treeview({
+        containerId: `{{ tab_name }}Tree${tree}`,   // ID of the HTML element to render the tree into
+        data: {{ tab_name }}Data.treeData[tree],   // Use bracket notation to access the property
+        searchEnabled: true,
+        nodeNameKey: 'label',
+        initiallyExpanded: false,
+        checkboxSelectionEnabled: true,
+        multiSelectEnabled: true,
+        showExpandCollapseAllButtons: true,
+        showSelectAllButton: true,
+        showInvertSelectionButton: true,
+        onSelectionChange: (selectedNodesData) => {
+            window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = selectedNodesData.map(node => node.id);
+            window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = treeview.getSelectedNodesAndChildrenValues('id');
+        }
+    });
+
+
+    if (!window.{{ tab_name }}TreeInstances) {
+        window.{{ tab_name }}TreeInstances = {};
+    }
+    window.{{ tab_name }}TreeInstances[tree] = treeview;
+    window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = []
+    window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = []
+
+}
+
+let selectedNodes{{ tab_name }} = [];
+
+function filtertypes{{ tab_name }}() {
+    selectedNodes{{ tab_name }} = [];
+    if (document.getElementById("include-subcategories-{{ tab_name }}").checked) {
+        for (const tree of {{ tab_name }}TreesToBuild) {
+            selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren);
+        }
+    } else {
+        for (const tree of {{ tab_name }}TreesToBuild) {
+            selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIds);
+        }
+    }
+    //console.log(selectedNodes{{ tab_name }})
+    applyCombinedFilter{{ tab_name }}()
+}
+
+</script> {# Filter Search Sort #}

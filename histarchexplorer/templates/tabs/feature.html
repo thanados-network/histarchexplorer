@@ -1,13 +1,56 @@
-<div id="map-sidebar-content">
-    {% if features is iterable and features|length > 0 %}
-        {% for feature in features %}
-            {% if feature.system_class == 'Feature' %}
-                <h2 id="feature-{{ feature.id }}">{{ feature.name }}</h2>
-                <p>{{ feature.description }}</p>
-            {% endif %}
+{% import '_macros.html' as ui %}
+<div id="map-sidebar-content container-fluid ">
+  <div class="row">
+    <div class="col">
+      <h2 id="feature-{{ entity.id }}">
+        {{ entity.title }}
+        <a href="{{ url_for('entity_view', id_=entity.id) }}">
+          <i class="bi bi-box-arrow-up-right"></i>
+        </a>
+      </h2>
+      <h5>
+        {% for type in entity.types %}
+          {% if type.is_standard %}
+            <p>{{ type.title | upper }}</p>
+          {% endif %}
         {% endfor %}
-    {% elif features is not iterable %}
-        <h2 id="feature-{{ features.id }}">{{ features.name }}</h2>
-        <p>{{ features.description }}</p>
+      </h5>
+    </div>
+
+    <div class="row ">
+      <p>{{ entity.description[CURRENT_LANGUAGE] }}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-4">
+      {% if main_image %}
+        {{ ui.overview_image(main_image, manifests) }}
+      {% endif %}
+    </div>
+
+    {% if categorized_types %}
+      <div class="attribute-area col-8">
+        <!-- Attributes -->
+        <span class="tile-label">{{ _('attributes') | upper }}</span>
+        <div class="categorized-types">
+          {% for label, value in categorized_types.items() %}
+            <p class="tile-sub-label text-uppercase mt-3">
+              {{ value[0]['icon'] | safe }} {{ label.replace('_', ' ').title() }}</p>
+            {% for type in value %}
+              <div class="badge custom-badge text-wrap m-1">
+                <h6 class="m-0 text-center">
+                  {{ type.type.title }}
+                  {% if type.type.value and type.type.unit %}:
+                    {{ type.type.value }}
+                    {{ type.type.unit }}
+                  {% endif %}
+                </h6>
+              </div>
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
     {% endif %}
+  </div>
 </div>
+

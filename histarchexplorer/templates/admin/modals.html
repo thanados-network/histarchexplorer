@@ -12,14 +12,14 @@
                 class="needs-validation" novalidate>
             <input type="hidden" name="category" id="currentTab">
 
-            {# Dynamically render fields based on FIELD_CONFIGS for each tab #}
+            {# Dynamically render fields based on admin_fields for each tab #}
             {% for tab_item in tabs %}
               <div class="modal-category-fields {{ tab_item.target | replace('nav-', '') }}-show"
                    id="modal-fields-{{ tab_item.target }}"
                    {% if not loop.first %}style="display: none;"{% endif %}> {# Hide all but the first by default #}
 
                 <div class="row">
-                  {% for field in FIELD_CONFIGS[tab_item.target] %}
+                  {% for field in admin_fields[tab_item.target] %}
                     <div class="{{ field.col_class or 'col-md-6' }} mt-2 modal-input">
                       <label for="Input{{ field.key | capitalize }}Modal" class="form-label">
                         {{ _(field.label)|capitalize }}

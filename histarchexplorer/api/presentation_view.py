@@ -7,43 +7,45 @@ from flask import g
 
 from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import PROXIES
-from histarchexplorer.models.util import format_date, \
+from histarchexplorer.api.util import format_date, \
     get_description_translated, get_divisions, get_icon, \
     get_render_type, split_date_string
 
 
 @dataclass
 class GeometryModel:
-    id: int
     type: str
     coordinates: Any
 
-    def swap_latlng(self) -> "GeometryModel":
-        def flip(coord):
-            return [coord[1], coord[0]]
+    # def swap_latlng(self) -> "GeometryModel":
+    #     def flip(coord):
+    #         return [coord[1], coord[0]]
+#
+    #     if self.type == "Point":
+    #         new_coords = flip(self.coordinates)
+#
+    #     elif self.type == "LineString":
+    #         new_coords = [flip(c) for c in self.coordinates]
+#
+    #     elif self.type == "Polygon":
+    #         # Polygons are lists of linear rings (outer ring + holes)
+    #         new_coords = [[flip(c) for c in ring] for ring in self.coordinates]
+#
+    #     else:
+    #         # Leave untouched if unknown geometry type
+    #         new_coords = self.coordinates
+#
+    #     return GeometryModel(type=self.type, coordinates=new_coords)
 
-        if self.type == "Point":
-            new_coords = flip(self.coordinates)
-
-        elif self.type == "LineString":
-            new_coords = [flip(c) for c in self.coordinates]
-
-        elif self.type == "Polygon":
-            # Polygons are lists of linear rings (outer ring + holes)
-            new_coords = [[flip(c) for c in ring] for ring in self.coordinates]
-
-        else:
-            # Leave untouched if unknown geometry type
-            new_coords = self.coordinates
-
-        return GeometryModel(id=self.id, type=self.type, coordinates=new_coords)
 
 @dataclass
 class PropertyModel:
     locationId: int
+    entityId: int
     title: str
     description: str
     shapeType: str
+    system_class: str
 
 
 @dataclass
@@ -51,19 +53,40 @@ class FeatureModel:
     geometry: GeometryModel
     properties: PropertyModel
 
-    def to_dict(self) -> dict:
-        return {
-            "type": "Feature",
-            "geometry": asdict(self.geometry),
-            "properties": asdict(self.properties)}
+    # def to_dict(self) -> dict:
+    #     return {
+    #         "type": "Feature",
+    #         "geometry": asdict(self.geometry),
+    #         "properties": asdict(self.properties)}
+#
+    # def to_json(self, **kwargs) -> str:
+    #     return json.dumps(self.to_dict(), **kwargs)
+#
+    # def swap_latlng(self) -> "FeatureModel":
+    #     return FeatureModel(
+    #         geometry=self.geometry.swap_latlng(),
+    #         properties=self.properties)
+#
+    # def change_to_map_libre_dict(self, main: Optional[bool] = False):
+    #     props = {
+    #         'id': self.properties.entityId,
+    #         'label': self.properties.title,
+    #         'class': self.properties.system_class}
+    #     if main:
+    #         props['main'] = True
+#
+    #     return {
+    #         'type': 'Feature',
+    #         'geometry': {
+    #             'type': self.geometry.type,
+    #             'coordinates': self.geometry.coordinates,
+    #             'title': self.properties.title,
+    #             'description': self.properties.description,
+    #             'placeId': self.properties.entityId,
+    #             'locationId': self.properties.locationId,
+    #             'shapeType': self.properties.shapeType},
+    #         'properties': props}
 
-    def to_json(self, **kwargs) -> str:
-        return json.dumps(self.to_dict(), **kwargs)
-
-    def swap_latlng(self) -> "FeatureModel":
-        return FeatureModel(
-            geometry=self.geometry.swap_latlng(),
-            properties=self.properties)
 
 @dataclass
 class TimePointModel:
@@ -97,8 +120,8 @@ class EntityTypeModel:
     icon: Optional[str]
     division: Optional[dict[str, str]]
 
-    def to_json(self, *, indent: Optional[int] = 2) -> str:
-        return json.dumps(asdict(self), indent=indent, ensure_ascii=False)
+    # def to_json(self, *, indent: Optional[int] = 2) -> str:
+    #     return json.dumps(asdict(self), indent=indent, ensure_ascii=False)
 
 
 @dataclass
@@ -169,6 +192,7 @@ class Relation:
     aliases: Optional[list[str]] = None
     time_range: Optional[TimeRangeModel] = None
     geometries: list[FeatureModel] = field(default_factory=list)
+    geometry_json: dict[str, Any] = None
     types: list[EntityTypeModel] = field(default_factory=list)
 
 
@@ -176,12 +200,14 @@ class Relation:
 class PresentationView:
     id: int
     system_class: str
+    view_class: str
     title: str
     description: dict[str, str]
     aliases: list[str]
     start: str
     end: str
     geometries: list[FeatureModel] = field(default_factory=list)
+    geometry_json: dict[str, Any] = None
     when: Optional[TimeRangeModel] = None
     types: list[EntityTypeModel] = field(default_factory=list)
     externalReferenceSystems: list[ExternalReferenceModel] = field(
@@ -196,21 +222,22 @@ class PresentationView:
     @staticmethod
     def parse_geometries(
             geometry_data: Any,
-            relation_id: int = 0) -> list["FeatureModel"]:
+            system_class: str) -> list["FeatureModel"]:
 
         if not geometry_data:
             return []
 
         def parse_single(data: dict) -> "FeatureModel":
             geometry_model = GeometryModel(
-                id=relation_id,
                 type=data['geometry']["type"],
                 coordinates=data["geometry"]["coordinates"])
             property_model = PropertyModel(
                 locationId=data["properties"]["locationId"],
+                entityId=data["properties"]["entityId"],
                 title=data["properties"]["title"],
                 description=data["properties"]["description"],
-                shapeType=data["properties"]["shapeType"])
+                shapeType=data["properties"]["shapeType"],
+                system_class=system_class)
             return FeatureModel(
                 geometry=geometry_model,
                 properties=property_model)
@@ -251,7 +278,8 @@ class PresentationView:
                 value=type_.get("value"),
                 unit=type_.get("unit"),
                 icon=get_icon(type_["id"], type_.get("typeHierarchy")),
-                division=get_divisions(type_["id"],
+                division=get_divisions(
+                    type_["id"],
                                        type_.get("typeHierarchy"))))
         return types
 
@@ -261,11 +289,12 @@ class PresentationView:
         for system_class, relation_list in raw_relations.items():
             relations = []
             for rel in relation_list:
+                # todo: test if needed
                 if not isinstance(rel, dict):
                     continue
-
                 rel_geometries = PresentationView.parse_geometries(
-                    rel.get("geometries"), rel.get("id", 0))
+                    rel.get("geometries"),
+                    system_class)
                 time_range = PresentationView.parse_time_range(rel.get("when"))
                 rel_types = []
 
@@ -292,6 +321,7 @@ class PresentationView:
                     aliases=rel.get("aliases", []),
                     time_range=time_range,
                     geometries=rel_geometries,
+                    geometry_json=rel.get("geometries"),
                     types=rel_types)
 
                 relations.append(relation)
@@ -352,11 +382,15 @@ class PresentationView:
         return cls(
             id=data["id"],
             system_class=data.get("systemClass", ""),
+            view_class=data.get("viewClass", ""),
             title=data.get("title", ""),
             description=get_description_translated(
                 data.get("description", "")),
             aliases=data.get("aliases", []),
-            geometries=cls.parse_geometries(data.get("geometries", {})),
+            geometries=cls.parse_geometries(
+                data.get("geometries", {}),
+                data.get("systemClass", "")),
+            geometry_json=data.get("geometries", {}),
             when=when_data,
             types=cls.parse_types(data.get("types", [])),
             externalReferenceSystems=[

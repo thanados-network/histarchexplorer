@@ -1,66 +1,67 @@
 import re
+from datetime import datetime
 from typing import Optional
 
 from flask import g
 
 
-def uc_first(string: str) -> str:
-    return str(string)[0].upper() + str(string)[1:] if string else ''
+# def uc_first(string: str) -> str:
+#     return str(string)[0].upper() + str(string)[1:] if string else ''
 
 
-def split_date_string(data: Optional[str]) -> str:
-    date = ''
-    if data:
-        date = '.'.join(map(str, data.split('T')[0].split('-')[::-1]))
-    return date
+def split_date_string(date_str: Optional[str]) -> str:
+    if not date_str:
+        return ""
+    date_part = date_str.split("T")[0]
+    if date_part.startswith("-"):  # handle BC years manually
+        sign, date_part = "-", date_part[1:]
+        year, month, day = date_part.split("-")
+        return f"{sign}{day.zfill(2)}.{month.zfill(2)}.{year.lstrip('0') or '0'}"
+    try:
+        return datetime.fromisoformat(date_str).strftime("%d.%m.%Y")
+    except ValueError:  # pragma: no cover
+        return date_part  # fallback for malformed date strings
 
 
-def check_timespan_date(date_from: str, date_to: str) -> bool:
-    if '01.01.' in date_from and '31.12.' in date_to:
-        return True
-    return False
+def is_full_year_span(date_from: str, date_to: str) -> bool:
+    return date_from.startswith("01.01.") and date_to.startswith("31.12.")
 
 
-def format_date(
-        date_from: str,
-        date_to: str) -> Optional[str]:
-    # Check if date is BC and remove leading '-'
-    bc_date_from = '-' in date_from
-    bc_date_to = '-' in date_to
-    if bc_date_from:
-        date_from.replace('-', '', 1)
-    if bc_date_to:
-        date_to.replace('-', '', 1)
+def format_date(date_from: str, date_to: str) -> Optional[str]:
+    bc_from = date_from.startswith("-")
+    bc_to = date_to.startswith("-")
 
-    date = ''
+    # Remove '-' for formatting display
+    clean_from = date_from.lstrip("-")
+    clean_to = date_to.lstrip("-")
+
+    def year_part(date_: str) -> str:
+        return date_.split(".")[2].lstrip("0") if "." in date_ else date_
+
     if date_from and date_to:
-        if check_timespan_date(date_from, date_to) or date_from == date_to:
-            date = (date_from.split('.')[2]).lstrip('0')
-            date = f"{date} {'BC' if bc_date_from else 'AD'}"
+        if is_full_year_span(date_from, date_to) or date_from == date_to:
+            year = year_part(clean_from)
+            era = "BC" if bc_from else "AD"
+            return f"{year} {era}"
         else:
-            from_ = (f"{(date_from.split('.')[2]).lstrip('0')} "
-                     f"{'BC' if bc_date_from else 'AD'}")
-            to = (f"{(date_to.split('.')[2]).lstrip('0')} "
-                  f"{'BC' if bc_date_to else 'AD'}")
-            date = f'{from_} - {to}'
-    elif date_from or date_to:
-        string = [s.lstrip("0") for s in date_from.split('.')]
-        date = '.'.join(string)
+            return (f"{year_part(clean_from)} {'BC' if bc_from else 'AD'} "
+                    f"- {year_part(clean_to)} {'BC' if bc_to else 'AD'}")
 
-        date = f"{date} {'BC' if bc_date_from else ''}"
-    return date
+    # Only one side available
+    date = ".".join(s.lstrip("0") for s in clean_from.split(".")) if date_from else clean_to
+    return f"{date} {'BC' if bc_from else ''}".strip()
 
 
-def date_template_format(begin: Optional[str], end: Optional[str]) -> str:
-    if begin and end:
-        date = f'{begin} - {end}'
-    elif begin:
-        date = begin
-    elif end:
-        date = end
-    else:
-        date = ''
-    return date
+# def date_template_format(begin: Optional[str], end: Optional[str]) -> str:
+#     if begin and end:
+#         date = f'{begin} - {end}'
+#     elif begin:
+#         date = begin
+#     elif end:
+#         date = end
+#     else:
+#         date = ''
+#     return date
 
 
 def get_render_type(mime_type: str) -> str:

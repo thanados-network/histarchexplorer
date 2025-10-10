@@ -1,7 +1,7 @@
 from typing import Any
 
 from histarchexplorer import app
-from histarchexplorer.api.helpers import get_entities_count_by_case_study
+from histarchexplorer.api.api_access import get_entities_count_by_case_study
 from histarchexplorer.database.settings import get_shown_classes
 
 

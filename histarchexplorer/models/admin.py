@@ -3,7 +3,7 @@ from typing import Any, Optional
 
 from flask import g
 
-from histarchexplorer.config.admin_fields import FIELD_CONFIGS
+from histarchexplorer import app
 from histarchexplorer.database.admin import (
     add_entry, add_link, add_new_map,
     check_sortorder, delete_entry,
@@ -99,7 +99,7 @@ class Admin:
         for t_data in tabs:
             tab_id = t_data['id']
             tab_target = t_data['target']
-            fields_for_tab = FIELD_CONFIGS.get(tab_target, [])
+            fields_for_tab = app.config['ADMIN_FIELDS'].get(tab_target, [])
             filtered = []
             for entity in filter(
                     lambda e: e.class_id == tab_id, g.config_entities):

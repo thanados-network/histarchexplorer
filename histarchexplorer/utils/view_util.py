@@ -5,8 +5,7 @@ from flask import g, render_template, url_for
 from flask_babel import lazy_gettext as _
 
 from histarchexplorer import app
-from histarchexplorer.models.entity import Entity
-from histarchexplorer.models.presentation_view import PresentationView
+from histarchexplorer.api.presentation_view import PresentationView
 
 _('entities')
 _('search')
@@ -46,14 +45,14 @@ def find_children_by_id(data, target_id):
             for item in node:
                 if recursive_search(item):
                     return True
-        return False
+        return False  # pragma: no cover
 
     recursive_search(data)
     return result
 
 
 def get_cite_button(entity: PresentationView) -> dict[str, str]:
-    if not entity:
+    if not entity:  # pragma: no cover
         return {'button_html': '', 'modal_html': ''}
     current_date = datetime.date.today().strftime("%Y-%m-%d")
     projects = {e.case_study: e for e in g.config_entities if e.case_study}
@@ -72,6 +71,6 @@ def get_cite_button(entity: PresentationView) -> dict[str, str]:
         entity=entity,
         project_name=project_name,
         projects=case_studies,
-        current_url=url_for('entity', id_=entity.id, _external=True),
+        current_url=url_for('entity_view', id_=entity.id, _external=True),
         today_date=current_date)
     return {'button_html': button_html, 'modal_html': modal_html}

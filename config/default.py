@@ -31,21 +31,22 @@ CLASSES_TO_SKIP = {  # Entity classes excluded from processing
 
 # Entity groups shown in views
 VIEW_CLASSES = {
-    'actors': ('person', 'group'),
+    'places': ('place',),
+    'features': ('feature','stratigraphic_unit'),
     'items': ('artifact', 'human_remains'),
+    'actors': ('person', 'group'),
     'events': ('acquisition', 'event', 'activity', 'creation', 'move',
                'production', 'modification'),
-    'places': ('place', 'stratigraphic_unit', 'feature'),
     'sources': ('source', 'bibliography', 'external_reference', 'edition'),
     'files': ('file',)
 }
 
-# Commonly used standard entity types
-STANDARD_TYPES = [
-    'Source', 'Event', 'Actor function', 'Involvement', 'Bibliography',
-    'Edition', 'License', 'External reference',
-    'Source translation', 'Actor relation', 'Human remains', 'Artifact',
-    'Place', 'Feature', 'Stratigraphic unit']
+# # Commonly used standard entity types
+# STANDARD_TYPES = [
+#     'Source', 'Event', 'Actor function', 'Involvement', 'Bibliography',
+#     'Edition', 'License', 'External reference',
+#     'Source translation', 'Actor relation', 'Human remains', 'Artifact',
+#     'Place', 'Feature', 'Stratigraphic unit']
 
 # Categorization of entity types with icons
 TYPE_DIVISIONS = {

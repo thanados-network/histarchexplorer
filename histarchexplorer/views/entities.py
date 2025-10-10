@@ -60,13 +60,12 @@ def get_browse_list_entities(id=None):
         if not shown_ids:
             return None
 
-
-
     data = {
         'shown classes': g.settings.shown_classes,
         'hidden classes': g.settings.hidden_classes,
         'shown types': build_id_collection(g.settings.shown_types),
         'hidden types': build_id_collection(g.settings.hidden_types),
+        'shown case studies':  g.case_study_ids,
         'shown ids': shown_ids,
         'hidden ids': g.settings.hidden_ids}
 
@@ -85,6 +84,10 @@ def get_browse_list_entities(id=None):
     if shown_types:= data['shown types']:
         where_clauses.append("e.id IN (SELECT a.id FROM model.entity a JOIN model.link b ON a.id = b.domain_id WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
         params.append(shown_types)
+
+    if shown_case_studies:= data['shown case studies']:
+        where_clauses.append("e.id IN (SELECT a.id FROM model.entity a JOIN model.link b ON a.id = b.domain_id WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
+        params.append(shown_case_studies)
 
     if hidden_types:= data['hidden types']:
         where_clauses.append("e.id NOT IN (SELECT a.id FROM model.entity a JOIN model.link b ON a.id = b.domain_id WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
@@ -186,15 +189,12 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
     g.cursor.execute(count_query, tuple(params))
     results = g.cursor.fetchall()
 
-    # Load VIEW_CLASSES from app config
-    view_classes = app.config.get('VIEW_CLASSES', {})
-
     # Convert list of (class_name, count) to a dictionary for easy access
     class_count_map = {row[0]: row[1] for row in results}
 
     # Build categorized counts
     categorized_counts = {}
-    for category, class_names in view_classes.items():
+    for category, class_names in app.config['VIEW_CLASSES'].items():
         category_counts = [
             {cls: class_count_map[cls]} for cls in class_names if cls in class_count_map
         ]
@@ -205,6 +205,64 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
         category: sum(next(iter(d.values())) for d in items)
         for category, items in categorized_counts.items()
     }
+
+    data['cs_ids'] = []
+    #build id lists for case studies
+    if shown_case_studies:
+        sql_get_cs_infos = """
+        SELECT
+            -- --- Name Extraction Logic (Three-Level Fallback) ---
+            COALESCE(
+                -- 1. Try the requested language (e.g., 'fr')
+                t.name ->> %(language)s,
+        
+                -- 2. Try the preferred/fallback language (e.g., 'en')
+                t.name ->> %(preferred_language)s,
+        
+                -- 3. Try any available language key (gets the value of the first key found)
+                t.name ->> (SELECT key FROM jsonb_each(t.name) LIMIT 1)
+            ) AS name,
+        
+            -- --- Description Extraction Logic (Three-Level Fallback) ---
+            COALESCE(
+                -- 1. Try the requested language (e.g., 'fr')
+                t.description ->> %(language)s,
+        
+                -- 2. Try the preferred/fallback language (e.g., 'en')
+                t.description ->> %(preferred_language)s,
+        
+                -- 3. Try any available language key
+                t.description ->> (SELECT key FROM jsonb_each(t.description) LIMIT 1)
+            ) AS description,
+            t.case_study_type_id AS cs_id
+        FROM
+            tng.entities AS t
+        WHERE
+            t.case_study_type_id IS NOT NULL
+        """
+
+        g.cursor.execute(sql_get_cs_infos, {'language': g.language, 'preferred_language': app.config.get('PREFERRED_LANGUAGE')})
+        cs_infos = g.cursor.fetchall()
+
+        sql_case_studies = """
+            SELECT jsonb_agg(domain_id) as ids
+            FROM model.link
+            WHERE range_id = %(cs_id)s
+              AND property_code = 'P2';
+        """
+        for case_study in shown_case_studies:
+            g.cursor.execute(sql_case_studies, {'cs_id':case_study})
+            results = g.cursor.fetchone()
+            cs = {'id': case_study, 'ids': results}
+            for row in cs_infos:
+                if row.cs_id == cs['id']:
+                    if row.name:
+                        cs['name'] = row.name
+                    if row.description:
+                        cs['description'] = row.description
+            data['cs_ids'].append(cs)
+
+
 
     data['totals'] = category_totals
     data['counts'] = categorized_counts
@@ -226,8 +284,10 @@ def return_entities(tab_name, id):
             'route': key,
             'label': f"{key.capitalize()} ({data['totals'][key]})"
         }
-        for i, key in enumerate(sorted(data['counts'].keys()))
+        for i, key in enumerate(data['counts'].keys())
     ]
+
+
 
     if tab_name == "" and sidebar_elements:
         tab_name = sidebar_elements[0]['route']
@@ -255,7 +315,6 @@ def entities(tab_name="", id=None) -> str:
 
 @app.route('/get_entities/<tab_name>')
 def get_entities(tab_name: str = None) -> str:
-    #print(tab_name)
     return render_template(
         f'tabs/browse.html',
         tab_name=tab_name)

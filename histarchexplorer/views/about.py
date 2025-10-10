@@ -1,7 +1,7 @@
 from flask import g, render_template
 
 from histarchexplorer import app
-from histarchexplorer.services.config import ConfigEntity
+from histarchexplorer.models.config import ConfigEntity
 
 
 @app.route('/about')
