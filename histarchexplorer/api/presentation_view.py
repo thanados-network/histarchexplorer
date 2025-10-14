@@ -351,7 +351,7 @@ class PresentationView:
                     mime_type=f.get("mimetype"),
                     iiif_manifest=f.get("IIIFManifest"),
                     iiif_base_path=f.get("IIIFBasePath"),
-                    main_image=g.main_images.get(entity_id) == entity_id,
+                    main_image=g.main_images.get(entity_id) == f["id"],
                     render_type=get_render_type(f.get("mimetype"))))
         return files
 
