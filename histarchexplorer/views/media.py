@@ -9,6 +9,4 @@ def view_mirador() -> str:
     url_list = urls_param.split(',') if urls_param else []
 
     print(f'url_list: {url_list}')
-    return (render_template
-            ('iiif.html',
-             manifests=url_list))
+    return render_template('iiif.html',manifests=url_list)

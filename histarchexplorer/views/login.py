@@ -21,7 +21,7 @@ login_manager.login_view = 'login'
 
 
 @login_manager.user_loader
-def load_user(user_id: int) -> Optional[User]:
+def load_user(user_id: int) -> Optional[User]:  # pragma: no cover
     return User.get_by_id(user_id)
 
 
@@ -38,7 +38,7 @@ class LoginForm(FlaskForm):
 @app.route('/login', methods=["GET", "POST"])
 def login() -> str | Response:
     if current_user.is_authenticated:
-        return redirect('/')
+        return redirect(url_for('admin'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.get_by_username(request.form['username'])
@@ -52,15 +52,11 @@ def login() -> str | Response:
                     return redirect(
                         request.args.get('next') or url_for('index'))
                 flash('error inactive', 'error')
-            else:  # pragma: no cover
+            else:
                 flash('error wrong password', 'error')
         else:
             flash('error username', 'error')
-    error_html = ''
-    if form and hasattr(form, 'errors'):
-        for field_name, error_messages in form.errors.items():
-            error_html += field_name + ' - ' + error_messages[0] + '<br />'
-    return render_template('login.html', form=form, error_html=error_html)
+    return render_template('login.html', form=form)
 
 
 @app.route('/logout')

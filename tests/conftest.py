@@ -20,8 +20,7 @@ def flask_app():
         fixture_conn.autocommit = True
 
         with fixture_conn.cursor() as cursor:
-            sql_scripts = ['reset.sql', 'add_test_user.sql']
-            for script in sql_scripts:
+            for script in ['reset.sql', 'add_test_user.sql']:
                 sql_path = os.path.join(app.root_path, 'sql', script)
                 with open(sql_path, 'r', encoding='utf-8') as file:
                     sql_script = file.read()

@@ -293,9 +293,6 @@ class PresentationView:
         for system_class, relation_list in raw_relations.items():
             relations = []
             for rel in relation_list:
-                # todo: test if needed
-                # if not isinstance(rel, dict):
-                #     continue
                 rel_geometries = PresentationView.parse_geometries(
                     rel.get("geometries"),
                     system_class)
@@ -351,7 +348,7 @@ class PresentationView:
                     mime_type=f.get("mimetype"),
                     iiif_manifest=f.get("IIIFManifest"),
                     iiif_base_path=f.get("IIIFBasePath"),
-                    main_image=g.main_images.get(entity_id) == entity_id,
+                    main_image=g.main_images.get(entity_id) == f["id"],
                     render_type=get_render_type(f.get("mimetype"))))
         return files
 
@@ -403,9 +400,30 @@ class PresentationView:
                 if isinstance(er, dict)],
             references=[
                 Reference.from_dict(ref)
-                for ref in data.get("references", [])
+                for ref in PresentationView.merge_references(
+                    data.get("references", []))
                 if isinstance(ref, dict)],
             files=cls.parse_file(data["id"], data.get('files', [])),
             relations=cls.parse_relations(data.get("relations", {})),
             start=start_date,
             end=end_date)
+
+    @staticmethod
+    def merge_references(
+            references: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        merged = {}
+        for ref in references:
+            rid = ref["id"]
+            if rid not in merged:
+                merged[rid] = ref.copy()
+            else:
+                existing_pages = merged[rid].get("pages", "")
+                new_pages = ref.get("pages", "")
+                pages_set = {
+                    p.strip() for p in
+                    (existing_pages + "," + new_pages).split(",") if p.strip()}
+                merged[rid]["pages"] = (
+                    ", ".join(sorted(
+                        pages_set,
+                        key=lambda x: int(x) if x.isdigit() else x)))
+        return list(merged.values())
