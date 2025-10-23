@@ -47,6 +47,22 @@ def get_entity_images(files: list[File]) -> tuple[File, list[File]]:
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
 def get_entity(id_: int, tab_name=None) -> str:
+    if tab_name == 'subunits':
+        subunit_data = get_browse_list_entities(id_)
+        filtered_view_classes = {
+            key: tuple(list(d.keys())[0] for d in value)
+            for key, value in subunit_data['counts'].items()}
+
+        return render_template(
+            f'tabs/browse.html',
+            subunits=True,
+            view_classes=filtered_view_classes,
+            subunit_data=subunit_data,
+            active_tab=tab_name,
+            typetree_data=type_tree().json,
+            main_image_json=g.main_images,
+            tab_name='subunits')
+
     entity = PresentationView.from_api(id_)
     hierarchy = {
         'subs': get_sub_count(entity),
@@ -74,22 +90,6 @@ def get_entity(id_: int, tab_name=None) -> str:
             data['spatial'] = map_data
         case 'media':
             pass
-        case 'subunits':
-            subunit_data = get_browse_list_entities(id_)
-            filtered_view_classes = {
-                key: tuple(list(d.keys())[0] for d in value)
-                for key, value in subunit_data['counts'].items()}
-
-            return render_template(
-                f'tabs/browse.html',
-                subunits=True,
-                view_classes=filtered_view_classes,
-                subunit_data=subunit_data,
-                active_tab=tab_name,
-                typetree_data=type_tree().json,
-                main_image_json=g.main_images,
-                tab_name='subunits')
-
         case 'overview':
             pass
         case _ if tab_name not in ['feature']:

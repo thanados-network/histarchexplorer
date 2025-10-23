@@ -182,6 +182,7 @@ class File:
     mime_type: Optional[str] = None
     iiif_manifest: Optional[str] = None
     iiif_base_path: Optional[str] = None
+    overlay: Optional[str] = None
     main_image: int = None
     render_type: str = None
 
@@ -348,6 +349,7 @@ class PresentationView:
                     mime_type=f.get("mimetype"),
                     iiif_manifest=f.get("IIIFManifest"),
                     iiif_base_path=f.get("IIIFBasePath"),
+                    overlay=f.get('overlay'),
                     main_image=g.main_images.get(entity_id) == f["id"],
                     render_type=get_render_type(f.get("mimetype"))))
         return files
