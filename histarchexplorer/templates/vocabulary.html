@@ -234,6 +234,7 @@
     "use strict";
     const VOCAB_TABS = {{ vocab_tabs | tojson }};
     const TYPE_TREE  = {{ type_tree_ | tojson }};
+    const TYPE_MAP   = (TYPE_TREE && TYPE_TREE.typeTree) ? TYPE_TREE.typeTree : (TYPE_TREE || {});
 
     function buildTree(flatData, topLevelOrder = null) {
       const nodesById = {};
@@ -289,62 +290,47 @@
       return filtered;
     }
 
-    // ---- info panel logic ----
+    // ---- info panel logic: zero-fetch, show only basic fields ----
     async function onDetailClick(e) {
       e.preventDefault();
       e.stopPropagation();
-      const btn = e.currentTarget;
-      const typeId = btn.getAttribute('data-type-id');
-      if (!typeId) return;
 
+      const typeId = e.currentTarget.getAttribute('data-type-id');
       const panel = document.getElementById('info-panel');
       const body  = document.getElementById('info-body');
       const title = document.getElementById('info-title');
 
-      title.textContent = `Type ${typeId}`;
-      body.innerHTML = `<div class="placeholder">Loading…</div>`;
+      const t = TYPE_MAP?.[String(typeId)] || null;
+
+      title.textContent = t?.name || `Type ${typeId}`;
       panel.classList.add('open');
       panel.setAttribute('aria-hidden', 'false');
 
-      try {
-        const res = await fetch(`/vocabulary/${typeId}`, { credentials: 'same-origin' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const html = await res.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const h2 = doc.querySelector('.container h2')?.textContent ?? `Type ${typeId}`;
-        const pick = (starts) =>
-          Array.from(doc.querySelectorAll('.container p strong'))
-            .find(s => s.textContent.trim().startsWith(starts))?.parentElement;
-
-        const desc     = pick('Description:');
-        const cat      = pick('Category:');
-        const parents  = pick('Parent Types:');
-        const children = pick('Child Types:');
-        const exactHeader = doc.querySelector('h4:nth-of-type(1)');
-        const exactList   = doc.querySelector('details:nth-of-type(1) ul');
-        const subHeader   = doc.querySelector('h4:nth-of-type(2)');
-        const subList     = doc.querySelector('details:nth-of-type(2) ul');
-
-        title.textContent = h2;
+      if (!t) {
         body.innerHTML = `
-          ${desc ? `<p>${desc.innerHTML}</p>` : ''}
-          ${cat ? `<p>${cat.innerHTML}</p>` : ''}
-          ${parents ? `<p>${parents.innerHTML}</p>` : ''}
-          ${children ? `<p>${children.innerHTML}</p>` : ''}
-
-          ${exactHeader ? `<h4>${exactHeader.textContent}</h4>` : ''}
-          ${exactList ? `<ul>${exactList.innerHTML}</ul>` : `<p>No exact matches found.</p>`}
-
-          ${subHeader ? `<h4>${subHeader.textContent}</h4>` : ''}
-          ${subList ? `<ul>${subList.innerHTML}</ul>` : `<p>No subcategory matches found.</p>`}
-
-          <a class="open-full" href="/vocabulary/${typeId}" target="_blank" rel="noopener noreferrer">Open full detail page</a>
-        `;
-      } catch (err) {
-        body.innerHTML = `<div class="placeholder">Could not load details. ${String(err)}</div>
-                          <a class="open-full" href="/vocabulary/${typeId}">Open full detail page</a>`;
+          <p class="placeholder">No basic info available.</p>
+          <a class="open-full" href="/vocabulary/${typeId}" target="_blank" rel="noopener noreferrer">
+            Open full detail page
+          </a>`;
+        return;
       }
+
+      const childrenNames = (t.subs || [])
+        .map(id => TYPE_MAP[String(id)]?.name)
+        .filter(Boolean);
+
+      body.innerHTML = `
+        ${t.description ? `<p><strong>Description:</strong> ${t.description}</p>` : ''}
+        ${t.category    ? `<p><strong>Category:</strong> ${t.category}</p>`       : ''}
+        <p><strong>Child Types:</strong>
+          ${childrenNames.length
+            ? `<ul style="margin:.5rem 0 0 1rem; padding:0;">${childrenNames.map(n=>`<li>${n}</li>`).join('')}</ul>`
+            : 'None'}
+        </p>
+        <a class="open-full" href="/vocabulary/${typeId}" target="_blank" rel="noopener noreferrer">
+          Open full detail page
+        </a>
+      `;
     }
 
     function injectDetailIcons(containerId) {
