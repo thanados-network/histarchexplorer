@@ -20,22 +20,24 @@ class GeometryModel:
     # def swap_latlng(self) -> "GeometryModel":
     #     def flip(coord):
     #         return [coord[1], coord[0]]
+
+
 #
-    #     if self.type == "Point":
-    #         new_coords = flip(self.coordinates)
+#     if self.type == "Point":
+#         new_coords = flip(self.coordinates)
 #
-    #     elif self.type == "LineString":
-    #         new_coords = [flip(c) for c in self.coordinates]
+#     elif self.type == "LineString":
+#         new_coords = [flip(c) for c in self.coordinates]
 #
-    #     elif self.type == "Polygon":
-    #         # Polygons are lists of linear rings (outer ring + holes)
-    #         new_coords = [[flip(c) for c in ring] for ring in self.coordinates]
+#     elif self.type == "Polygon":
+#         # Polygons are lists of linear rings (outer ring + holes)
+#         new_coords = [[flip(c) for c in ring] for ring in self.coordinates]
 #
-    #     else:
-    #         # Leave untouched if unknown geometry type
-    #         new_coords = self.coordinates
+#     else:
+#         # Leave untouched if unknown geometry type
+#         new_coords = self.coordinates
 #
-    #     return GeometryModel(type=self.type, coordinates=new_coords)
+#     return GeometryModel(type=self.type, coordinates=new_coords)
 
 
 @dataclass
@@ -58,34 +60,36 @@ class FeatureModel:
     #         "type": "Feature",
     #         "geometry": asdict(self.geometry),
     #         "properties": asdict(self.properties)}
+
+
 #
-    # def to_json(self, **kwargs) -> str:
-    #     return json.dumps(self.to_dict(), **kwargs)
+# def to_json(self, **kwargs) -> str:
+#     return json.dumps(self.to_dict(), **kwargs)
 #
-    # def swap_latlng(self) -> "FeatureModel":
-    #     return FeatureModel(
-    #         geometry=self.geometry.swap_latlng(),
-    #         properties=self.properties)
+# def swap_latlng(self) -> "FeatureModel":
+#     return FeatureModel(
+#         geometry=self.geometry.swap_latlng(),
+#         properties=self.properties)
 #
-    # def change_to_map_libre_dict(self, main: Optional[bool] = False):
-    #     props = {
-    #         'id': self.properties.entityId,
-    #         'label': self.properties.title,
-    #         'class': self.properties.system_class}
-    #     if main:
-    #         props['main'] = True
+# def change_to_map_libre_dict(self, main: Optional[bool] = False):
+#     props = {
+#         'id': self.properties.entityId,
+#         'label': self.properties.title,
+#         'class': self.properties.system_class}
+#     if main:
+#         props['main'] = True
 #
-    #     return {
-    #         'type': 'Feature',
-    #         'geometry': {
-    #             'type': self.geometry.type,
-    #             'coordinates': self.geometry.coordinates,
-    #             'title': self.properties.title,
-    #             'description': self.properties.description,
-    #             'placeId': self.properties.entityId,
-    #             'locationId': self.properties.locationId,
-    #             'shapeType': self.properties.shapeType},
-    #         'properties': props}
+#     return {
+#         'type': 'Feature',
+#         'geometry': {
+#             'type': self.geometry.type,
+#             'coordinates': self.geometry.coordinates,
+#             'title': self.properties.title,
+#             'description': self.properties.description,
+#             'placeId': self.properties.entityId,
+#             'locationId': self.properties.locationId,
+#             'shapeType': self.properties.shapeType},
+#         'properties': props}
 
 
 @dataclass
@@ -280,7 +284,7 @@ class PresentationView:
                 icon=get_icon(type_["id"], type_.get("typeHierarchy")),
                 division=get_divisions(
                     type_["id"],
-                                       type_.get("typeHierarchy"))))
+                    type_.get("typeHierarchy"))))
         return types
 
     @staticmethod
@@ -289,9 +293,6 @@ class PresentationView:
         for system_class, relation_list in raw_relations.items():
             relations = []
             for rel in relation_list:
-                # todo: test if needed
-                if not isinstance(rel, dict):
-                    continue
                 rel_geometries = PresentationView.parse_geometries(
                     rel.get("geometries"),
                     system_class)
@@ -347,7 +348,7 @@ class PresentationView:
                     mime_type=f.get("mimetype"),
                     iiif_manifest=f.get("IIIFManifest"),
                     iiif_base_path=f.get("IIIFBasePath"),
-                    main_image=g.main_images.get(entity_id) == entity_id,
+                    main_image=g.main_images.get(entity_id) == f["id"],
                     render_type=get_render_type(f.get("mimetype"))))
         return files
 
@@ -399,9 +400,31 @@ class PresentationView:
                 if isinstance(er, dict)],
             references=[
                 Reference.from_dict(ref)
-                for ref in data.get("references", [])
+                for ref in PresentationView.merge_references(
+                    data.get("references", []))
                 if isinstance(ref, dict)],
             files=cls.parse_file(data["id"], data.get('files', [])),
             relations=cls.parse_relations(data.get("relations", {})),
             start=start_date,
             end=end_date)
+
+    @staticmethod
+    def merge_references(
+            references: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        merged = {}
+        for ref in references:
+            rid = ref["id"]
+            if rid not in merged:
+                merged[rid] = ref.copy()
+            else:
+                existing_pages = merged[rid].get("pages", "")
+                new_pages = ref.get("pages", "")
+                pages_set = {
+                    p.strip()
+                    for p in (existing_pages + "," + new_pages).split(",")
+                    if p.strip()}
+                merged[rid]["pages"] = ", ".join(sorted(
+                    pages_set,
+                    key=lambda x:
+                    (not x.isdigit(), int(x) if x.isdigit() else x)))
+        return list(merged.values())

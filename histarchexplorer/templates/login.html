@@ -2,6 +2,7 @@
 {% block content %}
 
 <div class="container-fluid mt-5 p-3">
+        {{ ui.flash_messages() }}
     <h4 class="pb-2">Login</h4>
     <form method="post">
         {{ form.csrf_token }}
@@ -15,7 +16,6 @@
             {{ form.save(class_='btn btn-secondary') }}
         </div>
     </form>
-    <h4>{{ error_html|safe }}</h4>
 </div>
 
 {% endblock %}

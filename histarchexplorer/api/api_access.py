@@ -22,6 +22,16 @@ class ApiAccess:
             proxies=PROXIES,
             timeout=30).json()
 
+    # todo: endpoint gets 414, URI to long
+    @staticmethod
+    def get_files_of_entities(parser: Parser) -> dict[str, Any]:
+        return requests.get(
+            f"{app.config['API_URL']}/files_of_entities/",
+            params=parser.__dict__,
+            headers=g.api_headers,
+            proxies=PROXIES,
+            timeout=30).json()
+
     # @staticmethod
     # def get_entity(id_: int, parser: Parser) -> dict[str, Any]:
     #     req = requests.get(

@@ -5,6 +5,8 @@ from typing import Any, Optional
 from flask import abort, g, render_template
 
 from histarchexplorer import app
+from histarchexplorer.api.api_access import ApiAccess
+from histarchexplorer.api.parser import Parser
 from histarchexplorer.database.entity import (
     check_if_place_hierarchy, get_first_geom)
 from histarchexplorer.api.presentation_view import (
@@ -49,10 +51,14 @@ def get_entity(id_: int, tab_name=None) -> str:
     hierarchy = {
         'subs': get_sub_count(entity),
         'root': get_hierarchy(entity)}
-
     overview_map_geometry = entity.geometry_json
     if not overview_map_geometry:
-        overview_map_geometry = get_parent_geometry(hierarchy['root'])
+        if hierarchy.get('root'):
+            overview_map_geometry = get_parent_geometry(hierarchy['root'])
+        else:
+            overview_map_geometry = {
+                'type': 'FeatureCollection',
+                'features': get_features_for_map(entity)}
     data: dict[str, Any] = {
         'entity': entity.to_json(),
         'overview_map': json.dumps(overview_map_geometry)}
@@ -104,14 +110,15 @@ def get_entity(id_: int, tab_name=None) -> str:
 
 def get_features_for_map(
         e: PresentationView,
-        hierarchy: dict[str, Any]) -> list[Optional[dict[str, Any]]]:
+        hierarchy: Optional[dict[str, Any]] = None) \
+        -> list[Optional[dict[str, Any]]]:
     map_data = []
     first_geom = None
     if e.geometry_json:
         map_data.extend(
             adapt_map_dict(
                 e.geometry_json, e.title, e.id, e.system_class, e.id))
-    else:
+    elif hierarchy:
         first_geom = get_parent_geometry_id(hierarchy['root'])
 
     for k in ['place',

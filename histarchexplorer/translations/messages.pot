@@ -1,270 +1,381 @@
 # Translations template for PROJECT.
-# Copyright (C) 2024 ORGANIZATION
+# Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-07-15 12:23+0200\n"
+"POT-Creation-Date: 2025-10-16 17:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.10.3\n"
 
-#: templates/about.html:5
+#: templates/about.html:10
 msgid "Project"
 msgstr ""
 
-#: templates/about.html:47
+#: templates/about.html:25
+msgid "Team"
+msgstr ""
+
+#: templates/about.html:27
+msgid "about us"
+msgstr ""
+
+#: templates/about.html:48 templates/about.html:55
+msgid "as"
+msgstr ""
+
+#: templates/about.html:55
+msgid "project"
+msgstr ""
+
+#: templates/about.html:76
 msgid "Sponsors"
 msgstr ""
 
-#: templates/about.html:47
+#: templates/about.html:78
 msgid "Cooperations"
 msgstr ""
 
-#: templates/about.html:70
+#: templates/about.html:116
 msgid "Legal Note"
 msgstr ""
 
-#: templates/about.html:75
+#: templates/about.html:122
 msgid "Imprint"
 msgstr ""
 
-#: templates/admin.html:6
+#: templates/admin.html:11
 msgid "admin options"
 msgstr ""
 
-#: templates/admin.html:6
+#: templates/admin.html:12
 msgid "DB Interface"
 msgstr ""
 
-#: templates/admin.html:10
+#: templates/admin.html:19
 msgid "tools"
 msgstr ""
 
-#: templates/admin.html:12
-msgid "Reset"
+#: templates/admin.html:28
+msgid "general settings"
 msgstr ""
 
-#: templates/admin.html:19
-msgid "maps"
+#: templates/admin.html:35
+msgid "case study hierarchy ID"
 msgstr ""
 
-#: templates/admin.html:28 templates/admin.html:42 templates/admin.html:168
-msgid "close"
+#: templates/admin.html:42
+msgid "Please enter a positive integer for the Case Study Hierarchy ID."
 msgstr ""
 
-#: templates/admin.html:74 templates/admin.html:224 templates/admin.html:482
-#: templates/admin.html:531
-msgid "name"
-msgstr ""
-
-#: templates/admin.html:80 templates/admin.html:91 templates/admin.html:230
-#: templates/admin.html:484 templates/admin.html:534
-msgid "Please provide a name"
-msgstr ""
-
-#: templates/admin.html:85 templates/admin.html:487
-msgid "Display Name"
-msgstr ""
-
-#: templates/admin.html:96 templates/admin.html:493
-msgid "order"
-msgstr ""
-
-#: templates/admin.html:102 templates/admin.html:496
-msgid "Please provide an order"
-msgstr ""
-
-#: templates/admin.html:109
-msgid "Leaflet Tile Layer String"
-msgstr ""
-
-#: templates/admin.html:121
-msgid "edit"
-msgstr ""
-
-#: templates/admin.html:129
-msgid "delete"
-msgstr ""
-
-#: templates/admin.html:133
-msgid "cancel"
-msgstr ""
-
-#: templates/admin.html:138 templates/admin.html:427 templates/admin.html:622
-msgid "save"
-msgstr ""
-
-#: templates/admin.html:151 templates/admin.html:440 templates/admin.html:523
-#: templates/admin.html:577
-msgid "add entry"
-msgstr ""
-
-#: templates/admin.html:159
-msgid "About Section content"
-msgstr ""
-
-#: templates/admin.html:236 templates/admin.html:537
-msgid "description"
-msgstr ""
-
-#: templates/admin.html:248 templates/admin.html:544
-msgid "address"
-msgstr ""
-
-#: templates/admin.html:254
-msgid "Please provide an address"
-msgstr ""
-
-#: templates/admin.html:262 templates/admin.html:548
-msgid "e-mail"
-msgstr ""
-
-#: templates/admin.html:269 templates/admin.html:550
-msgid "Please provide a valid mail address: someone@somemail.com"
-msgstr ""
-
-#: templates/admin.html:278
-msgid "website"
-msgstr ""
-
-#: templates/admin.html:285 templates/admin.html:556
-msgid "Please provide a valid website url: https://someurl.com"
-msgstr ""
-
-#: templates/admin.html:307 templates/admin.html:566
-msgid "imprint"
-msgstr ""
-
-#: templates/admin.html:315 templates/admin.html:570
-msgid "legal notice"
-msgstr ""
-
-#: templates/admin.html:329
-msgid "Edit"
-msgstr ""
-
-#: templates/admin.html:337 templates/admin.html:377
-msgid "Delete"
-msgstr ""
-
-#: templates/admin.html:341 templates/admin.html:461
-msgid "Cancel"
-msgstr ""
-
-#: templates/admin.html:346
+#: templates/admin.html:53 templates/admin.html:224
 msgid "Save"
 msgstr ""
 
-#: templates/admin.html:389
+#: templates/admin.html:62
+msgid "maps"
+msgstr ""
+
+#: templates/admin.html:69
+msgid "about section content"
+msgstr ""
+
+#: templates/admin.html:131 templates/admin.html:135
+msgid "no translation available"
+msgstr ""
+
+#: templates/admin.html:160 templates/admin/modals.html:41
+msgid "Select a value"
+msgstr ""
+
+#: templates/admin.html:181
+msgid "This entry has no translation for"
+msgstr ""
+
+#: templates/admin.html:187 templates/admin/modals.html:58
+msgid "Please provide a"
+msgstr ""
+
+#: templates/admin.html:205
+msgid "Edit"
+msgstr ""
+
+#: templates/admin.html:213 templates/admin.html:256
+#: templates/admin/modals.html:89
+msgid "Delete"
+msgstr ""
+
+#: templates/admin.html:218 templates/admin/modals.html:90
+msgid "Cancel"
+msgstr ""
+
+#: templates/admin.html:267
 msgid "select connection"
 msgstr ""
 
-#: templates/admin.html:402
+#: templates/admin.html:280
 msgid "select node"
 msgstr ""
 
-#: templates/admin.html:412
+#: templates/admin.html:293
 msgid "select role"
 msgstr ""
 
-#: templates/admin.html:413
+#: templates/admin.html:295
 msgid "not specified"
 msgstr ""
 
-#: templates/admin.html:454 templates/admin.html:462
-msgid "Confirm Delete"
+#: templates/admin.html:310 templates/admin/index_page_options.html:57
+#: templates/admin/maps.html:103
+msgid "save"
 msgstr ""
 
-#: templates/admin.html:458
-msgid "Are you sure you want to delete"
+#: templates/admin.html:322 templates/admin/maps.html:115
+#: templates/admin/modals.html:7 templates/admin/modals.html:68
+msgid "add entry"
 msgstr ""
 
-#: templates/admin.html:474 templates/admin.html:508
-msgid "Add Map"
+#: templates/admin.html:334
+msgid "index page options"
 msgstr ""
 
-#: templates/admin.html:490
-msgid "Please provide a display name"
-msgstr ""
-
-#: templates/admin.html:589
-msgid "Index Page Options"
-msgstr ""
-
-#: templates/login.html:9
+#: templates/login.html:10 views/login.py:30
 msgid "username"
 msgstr ""
 
-#: templates/login.html:13
+#: templates/login.html:14 views/login.py:33
 msgid "password"
 msgstr ""
 
-#: templates/navbar.html:3
+#: templates/navbar.html:7
 msgid "home"
 msgstr ""
 
-#: templates/navbar.html:30 templates/navbar.html:33
+#: templates/navbar.html:36 templates/navbar.html:40
 msgid "toggle dark/light mode"
 msgstr ""
 
-#: utils/view_util.py:8
-msgid "entities"
+#: templates/admin/index_page_options.html:4
+msgid "choose index background"
 msgstr ""
 
-#: utils/view_util.py:9
-msgid "search"
+#: templates/admin/index_page_options.html:18
+msgid "map options"
+msgstr ""
+
+#: templates/admin/index_page_options.html:20
+msgid "select map background"
+msgstr ""
+
+#: templates/admin/index_page_options.html:43
+msgid "image options"
+msgstr ""
+
+#: templates/admin/index_page_options.html:45
+msgid "define default background image"
+msgstr ""
+
+#: templates/admin/maps.html:28
+msgid "name"
+msgstr ""
+
+#: templates/admin/maps.html:36 templates/admin/maps.html:51
+msgid "Please provide a name"
+msgstr ""
+
+#: templates/admin/maps.html:41
+msgid "Display Name"
+msgstr ""
+
+#: templates/admin/maps.html:56
+msgid "order"
+msgstr ""
+
+#: templates/admin/maps.html:64
+msgid "Please provide an order"
+msgstr ""
+
+#: templates/admin/maps.html:72
+msgid "Leaflet Tile Layer String"
+msgstr ""
+
+#: templates/admin/maps.html:86
+msgid "edit"
+msgstr ""
+
+#: templates/admin/maps.html:94
+msgid "delete"
+msgstr ""
+
+#: templates/admin/maps.html:98
+msgid "cancel"
+msgstr ""
+
+#: templates/admin/modals.html:82
+msgid "Confirm Delete"
+msgstr ""
+
+#: templates/admin/modals.html:83
+msgid "Close"
+msgstr ""
+
+#: templates/admin/modals.html:86
+msgid "Are you sure you want to delete"
+msgstr ""
+
+#: templates/admin/tools.html:3
+msgid "Resets the entire database"
+msgstr ""
+
+#: templates/admin/tools.html:4
+msgid "reset"
+msgstr ""
+
+#: templates/admin/tools.html:9
+msgid "This warms the application cache"
+msgstr ""
+
+#: templates/admin/tools.html:10
+msgid "warm cache"
+msgstr ""
+
+#: templates/admin/tools.html:15
+msgid "Clear the cache to free up space"
+msgstr ""
+
+#: templates/admin/tools.html:16
+msgid "clear cache"
+msgstr ""
+
+#: templates/admin/tools.html:22 templates/admin/tools.html:23
+msgid "logout"
+msgstr ""
+
+#: templates/admin/tools.html:35
+msgid "show classes"
+msgstr ""
+
+#: templates/admin/tools.html:68 templates/admin/tools.html:118
+msgid "save selection"
+msgstr ""
+
+#: templates/admin/tools.html:81
+msgid "hidden classes"
+msgstr ""
+
+#: templates/tabs/feature.html:34 templates/tabs/overview.html:96
+#: views/admin.py:35
+msgid "attributes"
+msgstr ""
+
+#: templates/tabs/overview.html:124
+msgid "description"
 msgstr ""
 
 #: utils/view_util.py:10
-msgid "about"
+msgid "entities"
 msgstr ""
 
 #: utils/view_util.py:11
+msgid "search"
+msgstr ""
+
+#: utils/view_util.py:12
+msgid "about"
+msgstr ""
+
+#: utils/view_util.py:13
 msgid "test"
 msgstr ""
 
-#: utils/view_util.py:17
+#: utils/view_util.py:19
 msgid "browse/select/find all entities"
 msgstr ""
 
-#: utils/view_util.py:18
+#: utils/view_util.py:20
 msgid "detailed search"
 msgstr ""
 
-#: utils/view_util.py:19
+#: utils/view_util.py:21
 msgid "about the project"
 msgstr ""
 
-#: utils/view_util.py:20
-msgid "look at what is possible"
-msgstr ""
-
-#: views/admin.py:55
+#: views/admin.py:27
 msgid "main-project"
 msgstr ""
 
-#: views/admin.py:63
+#: views/admin.py:29
 msgid "projects"
 msgstr ""
 
-#: views/admin.py:71
+#: views/admin.py:31
 msgid "persons"
 msgstr ""
 
-#: views/admin.py:78
+#: views/admin.py:33
 msgid "institutions"
 msgstr ""
 
-#: views/admin.py:85
-msgid "attributes"
+#: views/admin.py:86
+msgid "Link deleted successfully"
+msgstr ""
+
+#: views/admin.py:100
+msgid "Link added successfully"
+msgstr ""
+
+#: views/admin.py:131
+msgid "Entry added successfully!"
+msgstr ""
+
+#: views/admin.py:148
+msgid "Main Project cannot be deleted"
+msgstr ""
+
+#: views/admin.py:266
+msgid "set shown entities"
+msgstr ""
+
+#: views/admin.py:276
+msgid "set hidden entities"
+msgstr ""
+
+#: views/admin.py:288
+msgid "updated case study id successfully"
+msgstr ""
+
+#: views/admin.py:290
+msgid ""
+"Invalid Case Study ID. Must be a positive integer and its entity type "
+"must be \"type\"."
+msgstr ""
+
+#: views/admin.py:309
+msgid "reset database"
+msgstr ""
+
+#: views/admin.py:328
+msgid "cache cleared"
+msgstr ""
+
+#: views/admin.py:335
+msgid "cache warmed"
+msgstr ""
+
+#: views/login.py:34
+msgid "show password"
+msgstr ""
+
+#: views/login.py:35
+msgid "login"
 msgstr ""
 

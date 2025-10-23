@@ -72,3 +72,23 @@
       </div>
     </div>
   </div>
+
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteModalLabel">{{ _('Confirm Delete') }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ _('Are you sure you want to delete') }} <strong id="deleteName"></strong>?</p>
+      </div>
+      <div class="modal-footer">
+        <a id="confirmedDelete" href="#" class="btn btn-danger">{{ _('Delete') }}</a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+      </div>
+    </div>
+  </div>
+</div>
