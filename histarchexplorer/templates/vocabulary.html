@@ -2,7 +2,6 @@
 {% block content %}
   <div style="padding-top: 100px;"></div>
 
-  <!-- Load Quercus first so our overrides below can win -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/quercus.css') }}">
 
   <style>
@@ -28,14 +27,12 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Left-anchored wrapper for tabs + panel */
     .vocab {
       margin-left: clamp(16px, 4vw, 32px);
       margin-right: auto;
       max-width: 1100px;
     }
 
-    /* Tabs strip (nav-tabs look) */
     .tabs {
       border-bottom: 1px solid var(--border);
       display: flex;
@@ -75,10 +72,10 @@
       color: var(--blue);
       text-decoration: none;
       transform: translateY(1px);
+      cursor: pointer;
     }
     .tabs .tab-icon:hover { background: #e9ecf1; }
 
-    /* Panel under tabs */
     .panel {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -89,25 +86,23 @@
       margin: 0;
     }
 
-    /* Tree containers */
     .tree-container {
       display: none;
       max-height: 70vh;
       overflow-y: auto;
       background: var(--surface);
       width: 100%;
-      margin: 0; /* keep flush left */
+      margin: 0;
     }
     .tree-container.active { display: block; }
 
-    /* === Hard overrides against quercus.css centering === */
     .vocab .tree-container .treeview {
       max-width: none !important;
       width: 100% !important;
       margin-left: 0 !important;
       margin-right: 0 !important;
-      display: block !important;       /* in case quercus uses flex */
-      text-align: left !important;     /* in case quercus centers via text-align */
+      display: block !important;
+      text-align: left !important;
       justify-content: flex-start !important;
     }
     .vocab .tree-container .treeview > ul {
@@ -115,7 +110,6 @@
       padding-left: 0 !important;
     }
 
-    /* Node look (rounded blocks like your screenshot) */
     .tree-container ul { list-style: none; margin: 0; padding-left: 0; }
     .tree-container li { margin: 10px 6px; }
 
@@ -157,6 +151,7 @@
       border-radius: 6px;
       background: var(--surface);
       color: var(--muted);
+      cursor: pointer;
     }
     .detail-btn:hover { opacity: 1; }
 
@@ -166,10 +161,43 @@
     .tree-container { scrollbar-width: thin; scrollbar-color: #d4d7dc transparent; }
 
     .placeholder { color: var(--muted); padding: 6px; }
+
+    /* --- info panel --- */
+    .info-panel {
+      position: fixed;
+      top: 80px;
+      right: 0;
+      height: calc(100vh - 80px);
+      width: min(700px, 50vw);
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      box-shadow: -8px 0 24px rgba(0,0,0,.08);
+      transform: translateX(100%);
+      transition: transform .25s ease;
+      z-index: 1050;
+      display: flex;
+      flex-direction: column;
+    }
+    .info-panel.open { transform: translateX(0); }
+    .info-panel-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+    }
+    .info-panel-body {
+      padding: 12px 14px; overflow-y: auto; flex:1;
+    }
+    .info-close {
+      appearance:none; background:transparent; border:1px solid var(--border);
+      border-radius:8px; padding:4px 8px; cursor:pointer; color:var(--muted);
+    }
+    .info-panel .open-full {
+      display:inline-block; margin-top: 10px; padding:6px 10px;
+      border:1px solid var(--border); border-radius:8px; text-decoration:none;
+      color: var(--blue); background: var(--surface-2);
+    }
   </style>
 
   <div class="vocab">
-    <!-- Tabs -->
     <div class="tabs" {% if vocab_tabs|length <= 1 %}style="display:none"{% endif %}>
       {% for t in vocab_tabs %}
         <button id="tab-{{ t.key }}" class="tab {% if loop.first %}active{% endif %}"
@@ -177,10 +205,9 @@
           {{ t.label }}
         </button>
       {% endfor %}
-      <a class="tab-icon" href="#" title="Search">🔍</a>
+      <a class="tab-icon" title="Search">🔍</a>
     </div>
 
-    <!-- Panel under tabs -->
     <div class="panel">
       {% for t in vocab_tabs %}
         <div id="tree-{{ t.key }}" class="tree-container {% if loop.first %}active{% endif %}">
@@ -190,13 +217,23 @@
     </div>
   </div>
 
-  <!-- Quercus JS -->
+  <!-- Info panel -->
+  <div id="info-panel" class="info-panel" aria-hidden="true">
+    <div class="info-panel-header">
+      <strong id="info-title">Details</strong>
+      <button class="info-close" id="info-close-btn" title="Close">✕</button>
+    </div>
+    <div class="info-panel-body" id="info-body">
+      <div class="placeholder">Select an item with 🔍.</div>
+    </div>
+  </div>
+
   <script src="{{ url_for('static', filename='js/quercus.js') }}"></script>
 
   <script>
     "use strict";
     const VOCAB_TABS = {{ vocab_tabs | tojson }};
-    const TYPE_TREE  = {{ type_tree_ | tojson }}; // plain dict from backend
+    const TYPE_TREE  = {{ type_tree_ | tojson }};
 
     function buildTree(flatData, topLevelOrder = null) {
       const nodesById = {};
@@ -252,6 +289,64 @@
       return filtered;
     }
 
+    // ---- info panel logic ----
+    async function onDetailClick(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const btn = e.currentTarget;
+      const typeId = btn.getAttribute('data-type-id');
+      if (!typeId) return;
+
+      const panel = document.getElementById('info-panel');
+      const body  = document.getElementById('info-body');
+      const title = document.getElementById('info-title');
+
+      title.textContent = `Type ${typeId}`;
+      body.innerHTML = `<div class="placeholder">Loading…</div>`;
+      panel.classList.add('open');
+      panel.setAttribute('aria-hidden', 'false');
+
+      try {
+        const res = await fetch(`/vocabulary/${typeId}`, { credentials: 'same-origin' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const html = await res.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const h2 = doc.querySelector('.container h2')?.textContent ?? `Type ${typeId}`;
+        const pick = (starts) =>
+          Array.from(doc.querySelectorAll('.container p strong'))
+            .find(s => s.textContent.trim().startsWith(starts))?.parentElement;
+
+        const desc     = pick('Description:');
+        const cat      = pick('Category:');
+        const parents  = pick('Parent Types:');
+        const children = pick('Child Types:');
+        const exactHeader = doc.querySelector('h4:nth-of-type(1)');
+        const exactList   = doc.querySelector('details:nth-of-type(1) ul');
+        const subHeader   = doc.querySelector('h4:nth-of-type(2)');
+        const subList     = doc.querySelector('details:nth-of-type(2) ul');
+
+        title.textContent = h2;
+        body.innerHTML = `
+          ${desc ? `<p>${desc.innerHTML}</p>` : ''}
+          ${cat ? `<p>${cat.innerHTML}</p>` : ''}
+          ${parents ? `<p>${parents.innerHTML}</p>` : ''}
+          ${children ? `<p>${children.innerHTML}</p>` : ''}
+
+          ${exactHeader ? `<h4>${exactHeader.textContent}</h4>` : ''}
+          ${exactList ? `<ul>${exactList.innerHTML}</ul>` : `<p>No exact matches found.</p>`}
+
+          ${subHeader ? `<h4>${subHeader.textContent}</h4>` : ''}
+          ${subList ? `<ul>${subList.innerHTML}</ul>` : `<p>No subcategory matches found.</p>`}
+
+          <a class="open-full" href="/vocabulary/${typeId}" target="_blank" rel="noopener noreferrer">Open full detail page</a>
+        `;
+      } catch (err) {
+        body.innerHTML = `<div class="placeholder">Could not load details. ${String(err)}</div>
+                          <a class="open-full" href="/vocabulary/${typeId}">Open full detail page</a>`;
+      }
+    }
+
     function injectDetailIcons(containerId) {
       const container = document.getElementById(containerId);
       if (!container) return;
@@ -260,12 +355,13 @@
         if (!id || li.querySelector('.detail-btn')) return;
         const nodeText = li.querySelector('.treeview-node-text');
         if (!nodeText) return;
-        const btn = document.createElement('a');
-        btn.href = `/vocabulary/${id}`;
-        btn.textContent = '🔍';
+        const btn = document.createElement('button');
+        btn.type = 'button';
         btn.className = 'detail-btn';
-        btn.title = 'View details';
-        btn.target = '_blank';
+        btn.title = 'Show info';
+        btn.setAttribute('data-type-id', id);
+        btn.textContent = '🔍';
+        btn.addEventListener('click', onDetailClick, { capture: true });
         nodeText.appendChild(btn);
       });
     }
@@ -282,7 +378,6 @@
       try {
         const payload  = TYPE_TREE;
         const typeTree = (payload && payload.typeTree) ? payload.typeTree : payload || {};
-
         VOCAB_TABS.forEach(tab => {
           const order    = Array.isArray(tab.roots) ? tab.roots : null;
           const filtered = filterByCategoryAndRoots(typeTree, tab);
@@ -292,7 +387,6 @@
           if (el) el.innerHTML = "";
           new Treeview({ containerId, data: treeData });
         });
-
         setTimeout(() => {
           VOCAB_TABS.forEach(tab => injectDetailIcons(`tree-${tab.key}`));
         }, 5);
@@ -304,5 +398,30 @@
         });
       }
     });
+
+    // Panel open/close + top search button
+    (()=>{
+      const panel = document.getElementById('info-panel');
+      const closeBtn = document.getElementById('info-close-btn');
+      if (!panel || !closeBtn) return;
+      function closePanel(){
+        panel.classList.remove('open');
+        panel.setAttribute('aria-hidden','true');
+      }
+      closeBtn.addEventListener('click', closePanel);
+      document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePanel(); }, {capture:true});
+      const topSearch = document.querySelector('.tabs .tab-icon');
+      if(topSearch){
+        topSearch.addEventListener('click', e=>{
+          e.preventDefault();
+          const body=document.getElementById('info-body');
+          const title=document.getElementById('info-title');
+          title.textContent='Search';
+          body.innerHTML='<div class="placeholder">Use the tree’s 🔍 icons to preview a term here.</div>';
+          panel.classList.add('open');
+          panel.setAttribute('aria-hidden','false');
+        },{capture:true});
+      }
+    })();
   </script>
 {% endblock %}
