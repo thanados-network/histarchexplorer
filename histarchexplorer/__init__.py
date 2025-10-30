@@ -7,6 +7,7 @@ from flask_caching import Cache
 from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
+
 from histarchexplorer.database.settings import get_main_image_table
 from histarchexplorer.models.config import ConfigEntity, Link, Properties, \
     get_config_classes
@@ -28,7 +29,7 @@ cache = Cache(app)
 from histarchexplorer.views import (
     admin, login, views, about, entity, entities, search, media)
 from histarchexplorer.utils import view_util
-
+from histarchexplorer.api.api_access import ApiAccess
 
 def connect() -> connection:
     try:
@@ -123,6 +124,7 @@ def before_request() -> None:
     g.search_service = SearchService(app)
     g.case_study_ids = [
         config.case_study for config in g.config_entities if config.case_study]
+    g.file_of_entities = ApiAccess.get_files_of_entities()
     return None
 
 

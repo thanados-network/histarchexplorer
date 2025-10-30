@@ -1,6 +1,6 @@
 {% import '_macros.html' as ui %}
-<script src="../../static/js/overview.js"></script>
 
+<script src="../../static/js/overview.js"></script>
 <script> const entity = JSON.parse(JSON.parse({{ data|tojson }}).entity)</script>
 <script> const overviewMap = JSON.parse(JSON.parse({{ data|tojson }}).overview_map)</script>
 <script> const entityName = entity.title</script>
@@ -129,7 +129,7 @@
   {% endif %}
 
   <!-- Map Location -->
-  {% if entity.geometries or overview_map_geometry %}
+  {% if entity.geometries or overview_map_geometry.features %}
     <div class="item" data-type="map">
       <div class="map-wrapper">
         <div class="item-content item-content-full">
@@ -153,32 +153,9 @@
 
   <!-- All initial images, split last one out -->
   {% if initial_images %}
-    {% set last_image = initial_images[-1] %}
-    {% set other_images = initial_images[:-1] %}
-
-    {% for depiction in other_images %}
-      {{ ui.overview_image(depiction, manifests) }}
+    {% for depiction in initial_images %}
+      {{ ui.overview_image(depiction, manifests, True if loop.last else False) }}
     {% endfor %}
-
-    <div class="item-half" data-type="image">
-      <div class="item-content item-content-full">
-        <div class="muuri-images">
-          <div class="image position-relative">
-            <a href="{{ last_image.iiif_base_path }}/full/max/0/default.jpg"
-               target="_blank"
-               class="hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
-               style="z-index: 10;">
-              <i class="bi bi-arrows-fullscreen"></i>
-            </a>
-            <img src="{{ last_image.url }}" alt="{{ last_image.title }}">
-            <button id="show-more-images"
-                    class="hover-max position-absolute bottom-0 start-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded">
-              More images
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   {% endif %}
 
   <!-- Bibliography and External References -->
