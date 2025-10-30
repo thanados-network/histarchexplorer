@@ -1,8 +1,8 @@
 // ======== INITIALIZATION ========
 (() =>  {
   const container = document.querySelector(".grid-media");
-
- const data = window.entityData || entityData;
+  const filterBar = document.getElementById("media-filters");
+  const data = window.entityData || entityData;
 
   if (!container) {
     console.warn("No .grid-media container found");
@@ -18,7 +18,9 @@
 
   // Build media grid dynamically
   images.forEach(image => {
-    container.appendChild(createMediaItem(image));
+    const item = createMediaItem(image);
+    item.dataset.renderType = image.render_type || "unknown";
+    container.appendChild(item);
   });
 
   // Initialize Muuri layout
@@ -26,9 +28,12 @@
     layout: { fillGaps: true }
   });
 
-  setTimeout(() => {
-    window.mediaGrid.refreshItems().layout();
-  }, 500);
+  setTimeout(() => window.mediaGrid.refreshItems().layout(), 500);
+
+  // Setup filters
+  if (filterBar) {
+    initFilterBar(filterBar, images);
+  }
 
   // Setup 3D model spinner handling
   handleModelViewers();
@@ -39,6 +44,7 @@
   // Setup “More images” button linking
   initMoreImagesButton();
 })();
+
 
 
 // ======== CREATE MEDIA ITEM ========
@@ -262,4 +268,46 @@ function initMoreImagesButton() {
       });
     }, 300);
   });
+}
+
+// ======== FILTERING ========
+
+function initFilterBar(container, images) {
+  // Collect unique render types
+  const types = [...new Set(images.map(img => img.render_type || "unknown"))];
+
+  // Add "All" button
+  const allBtn = createFilterButton("All", "all", true);
+  container.appendChild(allBtn);
+
+  // Add one button per type
+  types.forEach(type => {
+    const label = type.replace("_", " ");
+    container.appendChild(createFilterButton(label, type));
+  });
+
+  // Click handling
+  container.addEventListener("click", e => {
+    const btn = e.target.closest("button[data-filter]");
+    if (!btn) return;
+
+    // Update active state
+    container.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const filterType = btn.getAttribute("data-filter");
+    if (filterType === "all") {
+      window.mediaGrid.filter(() => true);
+    } else {
+      window.mediaGrid.filter(item => item.getElement().dataset.renderType === filterType);
+    }
+  });
+}
+
+function createFilterButton(label, type, active = false) {
+  const btn = document.createElement("button");
+  btn.className = `btn btn-sm ${active ? "btn-primary" : "btn-outline-primary"}`;
+  btn.textContent = label;
+  btn.dataset.filter = type;
+  return btn;
 }
