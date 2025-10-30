@@ -341,7 +341,7 @@ function addLayers() {
 }
 
 
-const mapVectorLayers = ['feature-polygon', 'feature-points', 'feature-points', 'stratigraphic-unit-polygon', 'stratigraphic-unit-points', 'stratigraphic-unit-points', 'entity-polygon', 'entity-linestring', 'entity-points',
+const mapVectorLayers = ['feature-polygon', 'feature-points', 'feature-linestring', 'stratigraphic-unit-polygon', 'stratigraphic-unit-points', 'stratigraphic-unit-linestring', 'entity-polygon', 'entity-linestring', 'entity-points',
     'artifact-polygon', 'artifact-linestring', 'artifact-points', 'human-remains-polygon', 'human-remains-linestring', 'human-remains-points']
 
 function addLayer({id, type, source, color, width = 1, opacity = 1, radius = 4, filterType, systemClass = null}) {
