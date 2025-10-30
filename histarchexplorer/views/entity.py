@@ -22,11 +22,13 @@ def entity_view(id_: int, tab_name: str = "overview") -> str:
     sidebar_elements = app.config['SIDEBAR_OPTIONS']
     if tab_name not in {item['route'] for item in sidebar_elements}:
         abort(404)
-    start_time = time.time()
     entity = PresentationView.from_api(id_)
     hierarchy = {
         'subs': get_sub_count(entity),
         'root': get_hierarchy(entity)}
+    for p in hierarchy['root']:
+        print("---")
+        print(p)
     overview_map_geometry = entity.geometry_json
     if not overview_map_geometry:
         if hierarchy.get('root'):
@@ -43,7 +45,6 @@ def entity_view(id_: int, tab_name: str = "overview") -> str:
             'features': get_features_for_map(entity, hierarchy)},
         'overview_map': overview_map_geometry}
 
-    print(f"Execution time: {time.time() - start_time:.6f} seconds")
     return render_template(
         'entity.html',
         sidebar_elements=build_sidebar(id_, sidebar_elements),
@@ -94,6 +95,7 @@ def get_entity(id_: int, tab_name=None) -> str:
     hierarchy = {
         'subs': get_sub_count(entity),
         'root': get_hierarchy(entity)}
+
     overview_map_geometry = entity.geometry_json
     if not overview_map_geometry:
         if hierarchy.get('root'):
@@ -192,6 +194,7 @@ def get_parent_geometry_id(hierarchy: list[Relation]) -> int | None:
     for root_element in reversed(hierarchy):
         if root_element.geometries:
             id_ = root_element.id
+            break
     return id_
 
 
