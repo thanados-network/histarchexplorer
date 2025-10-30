@@ -1,3 +1,15 @@
+// ======== CONFIG: COLORS + ICONS ========
+const renderTypeStyles = {
+  "all":       { color: "#6c757d", icon: "bi-grid-3x3-gap-fill" },
+  "3d_model": {color: "#c77dff", icon: "bi-box"},
+  "image": {color: "#06d6a0", icon: "bi-image"},
+  "video": {color: "#118ab2", icon: "bi-play-btn-fill"},
+  "pdf": {color: "#ef476f", icon: "bi-filetype-pdf"},
+  "svg": {color: "#ffd166", icon: "bi-vector-pen"},
+  "unknown": {color: "#adb5bd", icon: "bi-question-circle"}
+};
+
+
 // ======== INITIALIZATION ========
 (() => {
   const container = document.querySelector(".grid-media");
@@ -38,7 +50,7 @@
 
   // --- Step 4: Initialize Muuri layout ---
   window.mediaGrid = new Muuri(".grid-media", {
-    layout: { fillGaps: true },
+    layout: {fillGaps: true},
   });
 
   setTimeout(() => window.mediaGrid.refreshItems().layout(), 500);
@@ -49,8 +61,6 @@
   initPopovers();
   initMoreImagesButton();
 })();
-
-
 
 
 // ======== CREATE MEDIA ITEM ========
@@ -156,7 +166,6 @@ function create3DModel(image, alt, posterMap = {}) {
 
   return wrapper;
 }
-
 
 
 function createVideo(image) {
@@ -289,11 +298,12 @@ function initMoreImagesButton() {
   });
 }
 
-// ======== FILTERING ========
-
 function initFilterBar(container, images) {
   // Collect unique render types
   const types = [...new Set(images.map(img => img.render_type || "unknown"))];
+
+  // Style the filter bar itself
+  container.classList.add("d-flex", "justify-content-center", "flex-wrap", "gap-3", "mb-4");
 
   // Add "All" button
   const allBtn = createFilterButton("All", "all", true);
@@ -305,16 +315,28 @@ function initFilterBar(container, images) {
     container.appendChild(createFilterButton(label, type));
   });
 
-  // Click handling
+  // Handle click filtering
   container.addEventListener("click", e => {
     const btn = e.target.closest("button[data-filter]");
     if (!btn) return;
 
     // Update active state
-    container.querySelectorAll("button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+    container.querySelectorAll("button").forEach(b => {
+      b.classList.remove("active");
+      const t = b.dataset.filter;
+      const c = renderTypeStyles[t]?.color || "#adb5bd";
+      b.style.color = c;
+      b.style.background = "transparent";
+      b.style.opacity = "0.6";
+    });
 
-    const filterType = btn.getAttribute("data-filter");
+    btn.classList.add("active");
+    const activeColor = renderTypeStyles[btn.dataset.filter]?.color || "#adb5bd";
+    btn.style.color = activeColor;
+    btn.style.background = "transparent";
+    btn.style.opacity = "1";
+
+    const filterType = btn.dataset.filter;
     if (filterType === "all") {
       window.mediaGrid.filter(() => true);
     } else {
@@ -324,9 +346,36 @@ function initFilterBar(container, images) {
 }
 
 function createFilterButton(label, type, active = false) {
+  const {color, icon} = renderTypeStyles[type] || renderTypeStyles["unknown"];
   const btn = document.createElement("button");
-  btn.className = `btn btn-sm ${active ? "btn-primary" : "btn-outline-primary"}`;
-  btn.textContent = label;
+  btn.className = "btn btn-filter";
   btn.dataset.filter = type;
+
+  // Set up style
+  btn.style.background = "transparent";
+  btn.style.border = "none";
+  btn.style.color = color;
+  btn.style.fontSize = "2rem";
+  btn.style.lineHeight = "1";
+  btn.style.opacity = active ? "1" : "0.6";
+  btn.style.transition = "all 0.2s ease";
+
+  // Icon + label
+  btn.innerHTML = `
+    <i class="bi ${icon}" title="${label}" style="color:${color};"></i>
+  `;
+
+  // Hover behavior
+  btn.addEventListener("mouseenter", () => {
+    btn.style.transform = "scale(1.2)";
+    btn.style.opacity = "1";
+  });
+  btn.addEventListener("mouseleave", () => {
+    if (!btn.classList.contains("active")) btn.style.opacity = "0.6";
+    btn.style.transform = "scale(1)";
+  });
+
   return btn;
 }
+
+
