@@ -1,0 +1,52 @@
+{% import '_macros.html' as ui %}
+{% extends "layout.html" %}
+{% block content %}
+ {# todo: container is under the nav bar. Somehow fix that! Then workspace type can be 'mosaic' again #}
+
+  <div class="page-wrapper">
+    <div class="scrollable-container">
+      <div class="container-fluid">
+      {% if back_url %}
+        {{ ui.back_button(back_url) }}
+      {% endif %}
+        <div id="iiif-viewer">
+          <script
+            src="/static/node_modules/mirador/dist/mirador.min.js"></script>
+          <script>
+            const config = {
+              "id": "iiif-viewer",
+              "layout": "1x1",
+              "mainMenuSettings": {
+                "show": false
+              },
+              "workspaceControlPanel": {
+                "enabled": false
+              },
+              "window": {
+                "allowClose": false,
+                "defaultSideBarPanel": 'attribution',
+                "sideBarOpenByDefault": false,
+                "forceDrawAnnotations": true,
+                "highlightAllAnnotations": true,
+
+              },
+              "workspace": {
+                "type": "mosaic"
+              },
+              "language": "{{ session.language }}",
+              "availableLanguages": {
+                "de": "Deutsch",
+                "en": "English",
+                "fr": "Français"
+              },
+              "windows": [
+                {"loadedManifest": "{{ manifest }}"},
+              ]
+            };
+            Mirador.viewer(config);
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

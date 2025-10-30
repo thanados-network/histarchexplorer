@@ -5,6 +5,15 @@
   </button>
 {% endmacro %}
 
+{% macro back_button(url) %}
+  <div class="mb-3 text-start">
+    <a href="{{ url }}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back to the entity
+    </a>
+  </div>
+{% endmacro %}
+
+
 
 {% macro flash_messages() %}
   {% with messages = get_flashed_messages(with_categories=true) %}

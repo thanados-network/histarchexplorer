@@ -1,6 +1,6 @@
 // ======== CONFIG: COLORS + ICONS ========
 const renderTypeStyles = {
-  "all":       { color: "#6c757d", icon: "bi-grid-3x3-gap-fill" },
+  "all": {color: "#6c757d", icon: "bi-grid-3x3-gap-fill"},
   "3d_model": {color: "#c77dff", icon: "bi-box"},
   "image": {color: "#06d6a0", icon: "bi-image"},
   "video": {color: "#118ab2", icon: "bi-play-btn-fill"},
@@ -68,7 +68,7 @@ function createMediaItem(image, posterMap) {
   const alt = image.title || "Image";
 
   const item = document.createElement("div");
-  item.className = "item item-half";
+  item.className = "item item-half item-media";
 
   const content = document.createElement("div");
   content.className = "item-content item-content-full";
@@ -135,6 +135,27 @@ function createMediaItem(image, posterMap) {
 
     imageDiv.appendChild(caption);
   }
+// --- Add "resize" / full-view button ---
+  const viewBtn = document.createElement("button");
+  viewBtn.className = "btn btn-sm btn-light position-absolute top-0 end-0 m-2";
+  viewBtn.innerHTML = `<i class="bi bi-arrows-fullscreen"></i>`;
+  viewBtn.title = "Open full view";
+
+  viewBtn.addEventListener("click", () => {
+    const originId = window.entityData?.entity?.id;
+    const type = image.render_type;
+    let url = `/view/${type}/${image.id}/${originId || ''}`;
+
+    // If it's an IIIF image, attach the manifest URL
+    if (type === "image" && image.iiif_manifest) {
+      const encodedManifest = encodeURIComponent(image.iiif_manifest);
+      url += `?manifest=${encodedManifest}`;
+    }
+
+    window.open(url, "_blank");
+  });
+
+  imageDiv.appendChild(viewBtn);
 
   return item;
 }

@@ -7,7 +7,7 @@
 <script>
 // --- After Muuri init ---
 setTimeout(() => {
-  document.querySelectorAll(".item").forEach(el => {
+  document.querySelectorAll(".item-media").forEach(el => {
     const type = el.dataset.renderType || "unknown";
     const color = renderTypeStyles[type].color || "#ccc";
     el.style.border = `2px solid ${color}`;

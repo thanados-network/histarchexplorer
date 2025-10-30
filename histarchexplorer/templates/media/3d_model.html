@@ -1,0 +1,143 @@
+{% import '_macros.html' as ui %}
+{% extends "layout.html" %}
+{% block content %}
+<div class="page-wrapper">
+  <div class="scrollable-container">
+    <div class="container-fluid py-4 text-center">
+
+      {% if back_url %}
+        {{ ui.back_button(back_url) }}
+      {% endif %}
+
+      <div class="d-flex justify-content-center">
+        <div class="model-viewer-wrapper position-relative"
+             style="width: 90%; height: 80vh; max-width: 1200px;">
+
+          <div class="spinner position-absolute top-50 start-50 translate-middle">
+            <div class="spinner-border text-secondary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+
+          <model-viewer
+            id="mainModel"
+            src="{{ file_url }}"
+            alt="3D model {{ file_id }}"
+            camera-controls
+            ar
+            ar-modes="webxr scene-viewer quick-look"
+            shadow-intensity="1"
+            autoplay
+            auto-rotate
+            style="width: 100%; height: 100%; background-color: #f8f9fa;">
+          </model-viewer>
+
+          <!-- ===== TOOLBOX ===== -->
+          <div id="toolbox" class="position-absolute top-0 end-0 m-3 d-flex flex-column gap-2">
+            <button class="btn btn-light btn-sm" id="btn-reset" title="Reset Camera">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+            <button class="btn btn-light btn-sm" id="btn-rotate" title="Toggle Auto-Rotate">
+              <i class="bi bi-repeat"></i>
+            </button>
+            <button class="btn btn-light btn-sm" id="btn-light" title="Toggle Lighting">
+              <i class="bi bi-brightness-high"></i>
+            </button>
+            <button class="btn btn-light btn-sm" id="btn-bg" title="Toggle Background">
+              <i class="bi bi-square-half"></i>
+            </button>
+            <button class="btn btn-light btn-sm" id="btn-download" title="Download Model">
+              <i class="bi bi-download"></i>
+            </button>
+          </div>
+          <!-- =================== -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const viewer = document.getElementById("mainModel");
+    const spinner = document.querySelector(".spinner");
+
+    // Spinner control
+    viewer.addEventListener("poster-dismissed", () => spinner?.remove());
+    setTimeout(() => spinner?.remove(), 5000);
+
+    // --- Toolbox actions ---
+    const btnReset = document.getElementById("btn-reset");
+    const btnRotate = document.getElementById("btn-rotate");
+    const btnLight = document.getElementById("btn-light");
+    const btnBg = document.getElementById("btn-bg");
+    const btnDownload = document.getElementById("btn-download");
+    const btnAR = document.getElementById("btn-ar");
+
+    // Reset camera
+    btnReset.addEventListener("click", () => viewer.cameraOrbit = "0deg 75deg auto");
+
+    // Toggle auto-rotate
+    btnRotate.addEventListener("click", () => {
+      viewer.autoRotate = !viewer.autoRotate;
+      btnRotate.classList.toggle("active", viewer.autoRotate);
+    });
+
+    // Toggle lighting
+    let isBright = true;
+    btnLight.addEventListener("click", () => {
+      isBright = !isBright;
+      viewer.shadowIntensity = isBright ? 1 : 0.2;
+      viewer.environmentImage = isBright ? "neutral" : "legacy";
+      btnLight.innerHTML = isBright
+        ? '<i class="bi bi-brightness-high"></i>'
+        : '<i class="bi bi-moon"></i>';
+    });
+
+    // Toggle background
+    let darkMode = false;
+    btnBg.addEventListener("click", () => {
+      darkMode = !darkMode;
+      viewer.style.backgroundColor = darkMode ? "#212529" : "#f8f9fa";
+      btnBg.innerHTML = darkMode
+        ? '<i class="bi bi-square"></i>'
+        : '<i class="bi bi-square-half"></i>';
+    });
+
+    // Download model
+    btnDownload.addEventListener("click", () => {
+      const a = document.createElement("a");
+      a.href = "{{ file_url }}";
+      a.download = "model.glb";
+      a.click();
+    });
+
+  });
+</script>
+
+<style>
+  #toolbox .btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    opacity: 0.9;
+    transition: all 0.2s ease;
+  }
+  #toolbox .btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  #toolbox .btn.active {
+    background-color: #0d6efd;
+    color: #fff;
+  }
+  .model-viewer-wrapper {
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  }
+</style>
+
+{% endblock %}
