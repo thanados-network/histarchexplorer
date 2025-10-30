@@ -13621,4 +13621,17 @@ button.btn-whitish[disabled] {
   border-radius: 0.5rem;
 }
 
+.btn-filter {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#media-filters i {
+  cursor: pointer;
+}
+
 /*# sourceMappingURL=main.css.map */
