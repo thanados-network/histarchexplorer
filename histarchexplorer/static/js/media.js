@@ -58,4 +58,26 @@ function observeModelSizeChanges() {
 }
 
 
+// Link for more images
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('#show-more-images[data-target="#tab-pane-media"]');
+  if (!btn) return;
+
+  // Find the tab trigger that controls #tab-pane-media
+  const tabTrigger = document.querySelector(`[data-bs-toggle="tab"][data-bs-target="#tab-pane-media"]`);
+  if (!tabTrigger) {
+    console.warn('No tab trigger found for #tab-pane-media');
+    return;
+  }
+
+  // Activate the tab using Bootstrap’s API
+  const tab = new bootstrap.Tab(tabTrigger);
+  tab.show();
+
+  // Smooth scroll into view once active
+  setTimeout(() => {
+    document.querySelector('#tab-pane-media')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 300);
+});
+
 

@@ -3,3 +3,11 @@
   position: relative;
 }
 
+.video-wrapper video {
+  object-fit: cover;
+  background: #000;
+}
+.video-wrapper {
+  border-radius: 0.5rem;
+}
+

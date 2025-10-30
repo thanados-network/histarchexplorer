@@ -154,7 +154,7 @@
   <!-- All initial images, split last one out -->
   {% if initial_images %}
     {% for depiction in initial_images %}
-      {{ ui.overview_image(depiction, manifests, True if loop.last else False) }}
+      {{ ui.overview_image(depiction, False, True if loop.last else False) }}
     {% endfor %}
   {% endif %}
 

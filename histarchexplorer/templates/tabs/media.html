@@ -5,3 +5,35 @@
 {#    {{ ui.overview_image(image) }}#}
 {#  {% endfor %}#}
 {#</div>#}
+
+<script src="{{ url_for('static', filename='js/media.js') }}"></script>
+
+<div class="col flex-column grid-media">
+  {% if images %}
+    {% for depiction in images %}
+      {{ ui.overview_image(depiction, True) }}
+    {% endfor %}
+  {% endif %}
+
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Delegated popovers: one manager handles all matching elements (now and future)
+  new bootstrap.Popover(document.body, {
+    selector: '[data-bs-toggle="popover"]',
+    html: true,
+    container: 'body',
+    trigger: 'focus',
+    placement: 'top',
+    sanitize: false, // we control the HTML (from hidden div)
+    content: function () {
+      const sel = this.getAttribute('data-popover-content');
+      const node = sel ? document.querySelector(sel) : null;
+      return node ? node.innerHTML : (this.getAttribute('data-bs-content') || '');
+    },
+    title: function () {
+      return this.getAttribute('data-bs-title') || '';
+    }
+  });
+});
+</script>

@@ -24,78 +24,106 @@
 {% endmacro %}
 
 
-{% macro overview_image(image, manifests, last=None) %}
+{% macro overview_image(image, information=False, last=False) %}
   {% set base_classes = "hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded" %}
   {% set icon_style = "font-size: 1.5em;" %}
   {% set alt = image.title or "Image" %}
-  <div class="item-half">
+  <div class="item item-half">
     <div class="item-content item-content-full">
       <div class="muuri-images">
         <div class="image position-relative">
-          {# Todo: handle webp. If a webp has the same name as the 3d_model, use it as image for the model until it is loaded. Otherwise, webp will not be displayed #}
-          {% if image.render_type == '3d_model' %}
-            <div class="model-wrapper"
-                 style="height: 300px; position: relative;">
-              <div class="spinner"></div>
-              <model-viewer
-                src="{{ image.url }}"
-                alt="{{ alt }}"
-                camera-controls
-                ar ar-modes="webxr scene-viewer quick-look"
-                shadow-intensity="1"
-                autoplay
-                style="width: 100%; height: 100%;">
-              </model-viewer>
-            </div>
 
+          {# --- media block (unchanged) --- #}
+          {% if image.render_type == '3d_model' %}
+            <div class="model-wrapper" style="height:300px;position:relative;">
+              <div class="spinner"></div>
+              <model-viewer src="{{ image.url }}" alt="{{ alt }}" camera-controls
+                            ar ar-modes="webxr scene-viewer quick-look"
+                            shadow-intensity="1" autoplay
+                            style="width:100%;height:100%;"></model-viewer>
+            </div>
+          {% elif image.render_type == 'video' %}
+            <div class="video-wrapper position-relative" style="height:300px;overflow:hidden;">
+              <video class="w-100 h-100 rounded shadow-sm" src="{{ image.url }}" controls preload="metadata">
+                Your browser does not support the video tag.
+              </video>
+              <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2" type="button"
+                      onclick="this.previousElementSibling.requestFullscreen();">
+                <i class="bi bi-arrows-fullscreen"></i>
+              </button>
+            </div>
           {% elif image.render_type == 'image' %}
-            {% if image.iiif_base_path and image.render_type == 'image' %}
-              <a
-                href="{{ url_for('view_mirador') }}?urls={{ image.iiif_manifest | urlencode }}"
-                target="_blank"
-                class="{{ base_classes }}"
-                style="z-index: 10;">
+            {% if image.iiif_base_path %}
+              <a href="{{ url_for('view_mirador') }}?urls={{ image.iiif_manifest | urlencode }}"
+                 target="_blank" class="{{ base_classes }}" style="z-index:10;">
                 <i class="bi bi-arrows-fullscreen"></i>
               </a>
-              <img src="{{ image.iiif_base_path }}/full/400,/0/default.jpg"
-                   alt="{{ alt }}">
+              <img src="{{ image.iiif_base_path }}/full/400,/0/default.jpg" alt="{{ alt }}">
             {% else %}
               <img src="{{ image.url }}" alt="{{ alt }}">
             {% endif %}
-
           {% elif image.render_type == 'pdf' and image.iiif_base_path %}
-            <a href="{{ url_for('render_pdf', id_=image.id) }}"
-               target="_blank"
-               class="{{ base_classes }}"
-               style="z-index: 10;">
+            <a href="{{ url_for('render_pdf', id_=image.id) }}" target="_blank"
+               class="{{ base_classes }}" style="z-index:10;">
               <i class="bi bi-filetype-pdf" style="{{ icon_style }}"></i>
             </a>
-            <img src="{{ image.iiif_base_path }}/full/400,/0/default.jpg"
-                 alt="{{ alt }}">
+            <img src="{{ image.iiif_base_path }}/full/400,/0/default.jpg" alt="{{ alt }}">
           {% elif image.render_type == 'svg' %}
-            <object type="image/svg+xml"
-                    data="{{ image.url }}"
-                    class="w-100 h-100 border-0"
-                    style="height:300px;">
-            </object>
-
+            <object type="image/svg+xml" data="{{ image.url }}" class="w-100 h-100 border-0" style="height:300px;"></object>
           {% else %}
-            <img src="{{ image.url or '/static/img/placeholder.png' }}"
-                 alt="{{ alt }}">
+            <img src="{{ image.url or '/static/img/placeholder.png' }}" alt="{{ alt }}">
+          {% endif %}
+
+          {# --- caption + info popover --- #}
+          {% if information %}
+            <div class="mt-2 text-center small text-muted">
+              {{ image.title }}
+
+              {% if image.description or image.license or image.creator or image.license_holder %}
+                {# Hidden HTML the popover will read #}
+                <div id="popover-content-{{ image.id }}" class="d-none">
+                  {% if image.description %}
+                    <div class="mb-2">{{ image.description }}</div>
+                  {% endif %}
+                  {% if image.license %}
+                    <div><b>License:</b> {{ image.license }}</div>
+                  {% endif %}
+                  {% if image.creator %}
+                    <div><b>Creator:</b> {{ image.creator }}</div>
+                  {% endif %}
+                  {% if image.license_holder %}
+                    <div><b>License holder:</b> {{ image.license_holder }}</div>
+                  {% endif %}
+                </div>
+
+                <button type="button"
+                        class="btn btn-sm btn-light ms-2"
+                        data-bs-toggle="popover"
+                        data-bs-container="body"
+                        data-bs-trigger="focus"
+                        data-bs-placement="top"
+                        data-bs-title="{{ image.title }}"
+                        data-popover-content="#popover-content-{{ image.id }}">
+                  <i class="bi bi-info-circle"></i>
+                </button>
+              {% endif %}
+            </div>
           {% endif %}
 
           {% if last %}
             <button id="show-more-images"
-                    class="hover-max position-absolute bottom-0 start-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded">
+                    class="hover-max position-absolute bottom-0 start-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
+                    type="button" data-target="#tab-pane-media">
               More images
             </button>
           {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
 
+        </div>{# .image #}
+      </div>{# .muuri-images #}
+    </div>{# .item-content #}
+  </div>{# .item #}
 {% endmacro %}
+
 
 
 {% macro date_template_format(begin, end) %}

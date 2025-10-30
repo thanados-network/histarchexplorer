@@ -28,7 +28,7 @@ def entity_view(id_: int, tab_name: str = "overview") -> str:
         entity_id=id_)
 
 
-def get_entity_images(files: list[File]) -> tuple[File, list[File]]:
+def get_entity_images(files: list[File]) -> tuple[File, list[File], list[File]]:
     images = []
     main_image = None
     for image in files:
@@ -42,7 +42,8 @@ def get_entity_images(files: list[File]) -> tuple[File, list[File]]:
     if not main_image and images:
         main_image = images.pop(0)
     initial_images = images[:2]
-    return main_image, initial_images
+    images.append(main_image)
+    return main_image, initial_images, images
 
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
@@ -79,7 +80,7 @@ def get_entity(id_: int, tab_name=None) -> str:
         'entity': entity.to_json(),
         'overview_map': json.dumps(overview_map_geometry)}
 
-    main_image, initial_images = get_entity_images(entity.files)
+    main_image, initial_images, images = get_entity_images(entity.files)
 
     match tab_name:
         case 'feature':  # pragma: no cover
@@ -101,9 +102,9 @@ def get_entity(id_: int, tab_name=None) -> str:
         data=json.dumps(data),
         entity=entity,
         categorized_types=get_categorized_types(entity.types),
+        images=images,
         main_image=main_image,
         initial_images=initial_images,
-        manifests=[img.iiif_manifest for img in entity.files],
         cite_button=get_cite_button(entity),
         hierarchy=hierarchy,
         overview_map_geometry=overview_map_geometry)
@@ -275,41 +276,3 @@ def get_sub_count(main_entity: PresentationView) -> int:
     for rel_type in sub_relations_map.get(main_entity.system_class, []):
         count += len(main_entity.relations.get(rel_type, []))
     return count
-
-
-def get_files_for_id(id:int) -> dict[str, list[str]]:
-    sql="""
-    
-    SELECT JSONB_AGG(
-           jsonb_build_object(
-               'id', a.id,
-               'name', a.name,
-               'description', a.description,
-               'bbox', a.bounding_box::JSONB
-           )
-       ) AS images
-    FROM (
-        SELECT e.id,
-               e.name,
-               e.description,
-               o.image_id,
-               o.bounding_box 
-        FROM model.entity e
-                 JOIN model.link l ON e.id = l.domain_id
-                 JOIN web.map_overlay o ON o.image_id = e.id
-        WHERE e.openatlas_class_name = 'file'
-          AND l.range_id = %(id)s
-          AND l.property_code = 'P67'
-    ) a;
-    """
-
-    g.cursor.execute(sql, {'id': id})
-    result = g.cursor.fetchone()
-    return result
-
-
-
-
-@app.route('/get_rastermaps/<int:id>')
-def get_rastermaps(id: int) -> str:
-    return json.dumps(get_files_for_id(id))
