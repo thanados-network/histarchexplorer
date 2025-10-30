@@ -8,6 +8,7 @@
         const entityId = {{ entity_id }};
         const entityData = {{ data|tojson }};
         {% if entity_id == 0 %}
+            const data = {{ data|tojson }};
             const typeTreeData = {{ typetree_data|tojson}};
             const viewClasses = {{ view_classes|tojson }};
 

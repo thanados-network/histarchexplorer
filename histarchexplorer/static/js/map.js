@@ -603,41 +603,45 @@ class LayerControl {
             });
         });
 
-        const imagesSection = document.createElement('div');
-        imagesSection.className = 'legend-group';
-        imagesSection.innerHTML = `
-              <div class="legend-group-header">Images</div>
-              <div class="legend-group-content" id="legend-images"></div>
-            `;
-        panel.appendChild(imagesSection);
-
         const imagesGroup = document.createElement('div');
         imagesGroup.className = 'layer-group';
 
         const imagesHeader = document.createElement('div');
         imagesHeader.className = 'group-header';
         imagesHeader.innerHTML = `
-          <label>
-            <input type="checkbox" checked data-group="images">
-            Images
-          </label>
-          <button class="edit-btn" title="Show images">▶</button>
-        `;
+              <label>
+                <input type="checkbox" checked data-group="images">
+                Images 
+                <span id="imagecount" class="count">
+                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                    <span class="visually-hidden" role="status">Loading...</span>
+                </span>
+            </div>
+              </label>
+              <button class="edit-btn" title="Toggle images">▼</button>
+            `;
 
         imagesGroup.appendChild(imagesHeader);
 
+// ✅ The real working legend container
         const imagesMenu = document.createElement('div');
-        imagesMenu.className = 'edit-menu hidden';
-        imagesMenu.id = 'legend-images'; // container for individual image entries
+        imagesMenu.className = 'edit-menu';
+        imagesMenu.id = 'legend-images'; // This is where addRasterMaps() appends items
         imagesGroup.appendChild(imagesMenu);
 
         panel.appendChild(imagesGroup);
 
-// Event listener to toggle the collapsible menu
-        imagesHeader.querySelector('.edit-btn').addEventListener('click', () => {
-            const isOpen = !imagesMenu.classList.contains('hidden');
-            imagesMenu.classList.toggle('hidden');
-            imagesHeader.querySelector('.edit-btn').textContent = isOpen ? '▶' : '▼';
+        imagesMenu.classList.add('hidden');
+        imagesHeader.querySelector('.edit-btn').textContent = '▶';
+
+
+        const toggleBtn = imagesHeader.querySelector('.edit-btn');
+        toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // prevent event bubbling to parent groups
+            const imagesMenu = imagesHeader.nextElementSibling; // select the actual menu
+            if (!imagesMenu) return;
+            const isHidden = imagesMenu.classList.toggle('hidden');
+            toggleBtn.textContent = isHidden ? '▶' : '▼';
         });
 
         panel.addEventListener('change', (e) => this._handleCheckboxChange(e));
@@ -682,13 +686,14 @@ class LayerControl {
         const item = document.createElement('div');
         item.className = 'legend-item d-flex align-items-center justify-content-between my-1';
         item.innerHTML = `
-      <label class="d-flex align-items-center gap-2 flex-grow-1">
-        <input type="checkbox" checked data-layer="${layerId}">
-        <span>${img.name || 'Image ' + img.id}</span>
-      </label>
-      <input type="range" min="0" max="1" step="0.05" value="${opacity}" data-opacity="${layerId}" style="width:80px;">
-    `;
+              <label class="d-flex align-items-center gap-2 flex-grow-1">
+                <input type="checkbox" checked data-layer="${layerId}">
+                <span>${img.name || 'Image ' + img.id}</span>
+              </label><br>
+              <input type="range" min="0" max="1" step="0.05" value="${opacity}" data-opacity="${layerId}" style="width:80px;">
+            `;
         itemsContainer.appendChild(item);
+
 
         const checkbox = item.querySelector('input[data-layer]');
         checkbox.addEventListener('change', (e) => {
@@ -709,6 +714,18 @@ class LayerControl {
         const group = target.dataset.group;
         const geom = target.dataset.geom;
         const layerGroups = this._getLayerGroups();
+
+        if (group === 'images' && !geom) {
+            const checkboxes = this.container.querySelectorAll('#legend-images input[type="checkbox"][data-layer]');
+            checkboxes.forEach(cb => {
+                cb.checked = target.checked;
+                const layerId = cb.dataset.layer;
+                if (this.map.getLayer(layerId)) {
+                    this.map.setLayoutProperty(layerId, 'visibility', target.checked ? 'visible' : 'none');
+                }
+            });
+            return; // stop further processing
+        }
 
         if (group && !geom) {
             ["Polygon", "LineString", "Point"].forEach(childGeom => {
@@ -899,40 +916,46 @@ async function addRasterMaps(map, ids) {
 
             const data = await response.json();
             if (data[0]) {
-            console.log(data.length)
-            const images = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
+                console.log(data.length)
+                const images = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
 
-            for (const img of images) {
-                await addImageToMap(map, img);
+                for (const img of images) {
+                    await addImageToMap(map, img);
 
-                // ✅ Add to legend
-                const layerId = `image_layer_${img.id}`;
-                const item = document.createElement('div');
-                item.className = 'image-legend-item';
-                item.innerHTML = `
+                    // ✅ Add to legend
+                    const layerId = `image_layer_${img.id}`;
+                    const item = document.createElement('div');
+                    item.className = 'image-legend-item';
+                    item.innerHTML = `
                     <label>
                         <input type="checkbox" checked data-layer="${layerId}">
                         ${img.name}
                     </label>
                     <input type="range" min="0" max="1" step="0.1" value="0.9" data-layer="${layerId}" title="Opacity">
                 `;
-                legendContainer.appendChild(item);
+                    legendContainer.appendChild(item);
 
-                // Toggle visibility
-                item.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
-                    const visible = e.target.checked ? 'visible' : 'none';
-                    if (map.getLayer(layerId)) map.setLayoutProperty(layerId, 'visibility', visible);
-                });
+                    // Toggle visibility
+                    item.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+                        const visible = e.target.checked ? 'visible' : 'none';
+                        if (map.getLayer(layerId)) map.setLayoutProperty(layerId, 'visibility', visible);
+                    });
 
-                // Adjust opacity
-                item.querySelector('input[type="range"]').addEventListener('input', (e) => {
-                    const opacity = parseFloat(e.target.value);
-                    if (map.getLayer(layerId)) map.setPaintProperty(layerId, 'raster-opacity', opacity);
-                });
-            }}
+                    // Adjust opacity
+                    item.querySelector('input[type="range"]').addEventListener('input', (e) => {
+                        const opacity = parseFloat(e.target.value);
+                        if (map.getLayer(layerId)) map.setPaintProperty(layerId, 'raster-opacity', opacity);
+                    });
+                }
+            }
         } catch (err) {
             console.error(`Fehler beim Laden von ID ${id}:`, err);
         }
+    }
+    const imageCountElement = document.getElementById('imagecount');
+    if (imageCountElement) {
+        const currentCount = map.getStyle().layers.filter(l => l.id.startsWith('image_layer_')).length;
+        imageCountElement.innerHTML = `(${currentCount})`;
     }
 }
 
