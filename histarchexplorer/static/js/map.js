@@ -528,11 +528,11 @@ class LayerControl {
             if (isThisGroup) {
                 label = "Selection: " + entityData.entity.title;
 
-                 ["Polygon", "LineString", "Point"].forEach(geomType => {
-                totalCount += mapData.features.filter(f => f.properties?.id === entityId && f.geometry.type === geomType).length;
-                            console.log(groupName)
-                console.log(totalCount)
-            });
+                ["Polygon", "LineString", "Point"].forEach(geomType => {
+                    totalCount += mapData.features.filter(f => f.properties?.id === entityId && f.geometry.type === geomType).length;
+                    console.log(groupName)
+                    console.log(totalCount)
+                });
 
             }
 
@@ -608,11 +608,20 @@ class LayerControl {
               <input type="checkbox" ${layerExists ? 'checked' : ''} data-geom="${geomType}" data-group="${groupName}">
               ${geomType}<span class="geom-count">(${featureCount})</span>
             </label>
-            <span class="symbol">${symbol}</span>
+                    <button class="style-btn btn btn-sm btn-light d-flex align-items-center" data-group="${groupName}" data-geom="${geomType}">
+          <span class="symbol" data-group="${groupName}" data-geom="${geomType}">${symbol}</span>
+        </button>
           </div>
         `;
                 if (featureCount > 0) editMenu.appendChild(geomDiv);
             });
+            /*                    Sortable.create(editMenu, {
+                        handle: '.geom-header', // Drag by geometry header
+                        animation: 150,
+                        onEnd: (evt) => {
+                            this._updateMapLayerOrder();
+                        }
+                    });*/
         });
 
         const imagesGroup = document.createElement('div');
@@ -644,6 +653,7 @@ class LayerControl {
 
         panel.appendChild(imagesGroup);
 
+
         imagesMenu.classList.add('hidden');
         imagesHeader.querySelector('.edit-btn').textContent = '▶';
 
@@ -657,8 +667,48 @@ class LayerControl {
             toggleBtn.textContent = isHidden ? '▶' : '▼';
         });
 
+
         panel.addEventListener('change', (e) => this._handleCheckboxChange(e));
         panel.addEventListener('click', (e) => this._handleClick(e));
+
+        /*Sortable.create(panel, {
+            handle: '.group-header', // Drag by the header
+            animation: 150,
+            onEnd: (evt) => {
+                this._updateMapLayerOrder();
+            }
+        });*/
+
+    }
+
+    _updateMapLayerOrder() {
+        const panel = this.container.querySelector('.layer-panel');
+        const layerGroups = this._getLayerGroups();
+
+        // Iterate over groups in DOM order (top to bottom)
+        panel.querySelectorAll('.layer-group').forEach(groupDiv => {
+            const groupName = groupDiv.querySelector('input[type="checkbox"]').dataset.group;
+            const editMenu = groupDiv.querySelector('.edit-menu');
+
+            // Collect child layers in DOM order
+            const layerIds = [];
+            editMenu.querySelectorAll('input[data-geom]').forEach(cb => {
+                const geom = cb.dataset.geom;
+                const layers = (geom === 'Polygon')
+                    ? [...(layerGroups[groupName]['Polygon'] || []), ...(layerGroups[groupName]['Outline'] || [])]
+                    : layerGroups[groupName][geom];
+                layerIds.push(...layers);
+            });
+
+            // Move each layer on map from bottom to top
+            layerIds.forEach((layerId, idx) => {
+                if (this.map.getLayer(layerId)) {
+                    // Move layer above the next layer in array, or top if last
+                    const nextLayer = layerIds[idx + 1] || undefined;
+                    this.map.moveLayer(layerId, nextLayer);
+                }
+            });
+        });
     }
 
     // --- New: Add "Images" Section Dynamically ---
@@ -766,15 +816,206 @@ class LayerControl {
     }
 
     _handleClick(e) {
-        const btn = e.target.closest('.edit-btn');
-        if (!btn) return;
-        const menu = btn.closest('.layer-group').querySelector('.edit-menu');
-        menu.classList.toggle('hidden');
-        btn.textContent = menu.classList.contains('hidden') ? '▶' : '▼';
+        const btn = e.target;
+        if (btn.classList.contains('edit-btn')) {
+            const menu = btn.closest('.layer-group').querySelector('.edit-menu');
+            const isOpen = !menu.classList.contains('hidden');
+            menu.classList.toggle('hidden');
+            btn.textContent = isOpen ? '▶' : '▼';
+        }
+
+        if (btn.classList.contains('style-btn')) {
+            this._openStyleModal(btn.dataset.group, btn.dataset.geom);
+        }
+    }
+
+    _openStyleModal(group, geom) {
+        if (!this.modalInitialized) this._initModal();
+
+        const modal = document.getElementById('styleModal');
+        modal.dataset.group = group;
+        modal.dataset.geom = geom;
+
+        document.querySelectorAll('.style-field').forEach(el => el.classList.add('d-none'));
+
+        const layers = this._getLayerGroups()[group];
+        let fillColor = '#888', outlineColor = '#000', width = 2, opacity = 1, radius = 8;
+
+        if (geom === 'Polygon') {
+            const fillLayer = this.map.getLayer(layers['Polygon']?.[0]);
+            const outlineLayer = this.map.getLayer(layers['Outline']?.[0]);
+            if (fillLayer) {
+                fillColor = this._getLayerColor(layers['Polygon'][0]);
+                opacity = this.map.getPaintProperty(layers['Polygon'][0], 'fill-opacity') ?? 1;
+            }
+            if (outlineLayer) {
+                outlineColor = this._getLayerColor(layers['Outline'][0]);
+                width = this.map.getPaintProperty(layers['Outline'][0], 'line-width') ?? 1;
+            }
+            document.getElementById('polygon-fields').classList.remove('d-none');
+        } else if (geom === 'LineString') {
+            const lineLayer = this.map.getLayer(layers['LineString']?.[0]);
+            if (lineLayer) {
+                fillColor = this._getLayerColor(layers['LineString'][0]);
+                width = this.map.getPaintProperty(layers['LineString'][0], 'line-width') ?? 2;
+                opacity = this.map.getPaintProperty(layers['LineString'][0], 'line-opacity') ?? 1;
+            }
+            document.getElementById('line-fields').classList.remove('d-none');
+        } else if (geom === 'Point') {
+            const pointLayer = this.map.getLayer(layers['Point']?.[0]);
+            if (pointLayer) {
+                fillColor = this._getLayerColor(layers['Point'][0]);
+                outlineColor = this.map.getPaintProperty(layers['Point'][0], 'circle-stroke-color') ?? '#000';
+                radius = this.map.getPaintProperty(layers['Point'][0], 'circle-radius') ?? 8;
+                width = this.map.getPaintProperty(layers['Point'][0], 'circle-stroke-width') ?? 1;
+                opacity = this.map.getPaintProperty(layers['Point'][0], 'circle-opacity') ?? 1;
+            }
+            document.getElementById('point-fields').classList.remove('d-none');
+        }
+
+        document.getElementById('fillColor').value = fillColor;
+        document.getElementById('outlineColor').value = outlineColor;
+        document.getElementById('outlineWidth').value = width;
+        document.getElementById('fillOpacity').value = opacity;
+
+        document.getElementById('lineColor').value = fillColor;
+        document.getElementById('lineWidth').value = width;
+        document.getElementById('lineOpacity').value = opacity;
+
+        document.getElementById('pointColor').value = fillColor;
+        document.getElementById('pointOutlineColor').value = outlineColor;
+        document.getElementById('pointRadius').value = radius;
+        document.getElementById('pointOutlineWidth').value = width;
+        document.getElementById('pointOpacity').value = opacity;
+
+        new bootstrap.Modal(modal).show();
+    }
+
+    _applyStyleChanges(group, geom) {
+        const layers = this._getLayerGroups()[group];
+
+        let fillColor, outlineColor, width, opacity, radius;
+
+        if (geom === 'Polygon') {
+            fillColor = document.getElementById('fillColor').value;
+            outlineColor = document.getElementById('outlineColor').value;
+            width = parseFloat(document.getElementById('outlineWidth').value);
+            opacity = parseFloat(document.getElementById('fillOpacity').value);
+
+            (layers['Polygon'] || []).forEach(id => {
+                if (this.map.getLayer(id)) {
+                    this.map.setPaintProperty(id, 'fill-color', fillColor);
+                    this.map.setPaintProperty(id, 'fill-opacity', opacity);
+                }
+            });
+            (layers['Outline'] || []).forEach(id => {
+                if (this.map.getLayer(id)) {
+                    this.map.setPaintProperty(id, 'line-color', outlineColor);
+                    this.map.setPaintProperty(id, 'line-width', width);
+                }
+            });
+        } else if (geom === 'LineString') {
+            fillColor = document.getElementById('lineColor').value;
+            width = parseFloat(document.getElementById('lineWidth').value);
+            opacity = parseFloat(document.getElementById('lineOpacity').value);
+
+            (layers['LineString'] || []).forEach(id => {
+                if (this.map.getLayer(id)) {
+                    this.map.setPaintProperty(id, 'line-color', fillColor);
+                    this.map.setPaintProperty(id, 'line-width', width);
+                    this.map.setPaintProperty(id, 'line-opacity', opacity);
+                }
+            });
+        } else if (geom === 'Point') {
+            fillColor = document.getElementById('pointColor').value;
+            outlineColor = document.getElementById('pointOutlineColor').value;
+            radius = parseFloat(document.getElementById('pointRadius').value);
+            width = parseFloat(document.getElementById('pointOutlineWidth').value);
+            opacity = parseFloat(document.getElementById('pointOpacity').value);
+
+            (layers['Point'] || []).forEach(id => {
+                const layer = this.map.getLayer(id);
+                if (!layer) return;
+                if (layer.type === 'circle') {
+                    this.map.setPaintProperty(id, 'circle-radius', radius);
+                    this.map.setPaintProperty(id, 'circle-color', fillColor);
+                    this.map.setPaintProperty(id, 'circle-stroke-color', outlineColor);
+                    this.map.setPaintProperty(id, 'circle-stroke-width', width);
+                    this.map.setPaintProperty(id, 'circle-opacity', opacity);
+                }
+            });
+        }
+
+        // Update legend symbol
+        const symbolEl = this.container.querySelector(`.symbol[data-group="${group}"][data-geom="${geom}"]`);
+        if (symbolEl) {
+            if (geom === 'Point') symbolEl.innerHTML = this._getSymbolForGeom(geom, fillColor, outlineColor, radius, opacity);
+            else symbolEl.innerHTML = this._getSymbolForGeom(geom, fillColor, outlineColor, width, opacity);
+        }
+
+        bootstrap.Modal.getInstance(document.getElementById('styleModal')).hide();
+    }
+
+    _initModal() {
+        const modalHTML = `
+      <div class="modal fade" id="styleModal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Edit Style</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <div id="polygon-fields" class="style-field">
+                <label>Fill Color <input type="color" id="fillColor"></label><br>
+                <label>Fill Opacity <input type="number" id="fillOpacity" min="0" max="1" step="0.05"></label><br>
+                <label>Outline Color <input type="color" id="outlineColor"></label><br>
+                <label>Outline Width <input type="number" id="outlineWidth" min="0" max="10" step="0.1"></label>
+              </div>
+            
+              <div id="line-fields" class="style-field d-none">
+                <label>Line Color <input type="color" id="lineColor"></label><br>
+                <label>Line Width <input type="number" id="lineWidth" min="0" max="10" step="0.1"></label><br>
+                <label>Line Opacity <input type="number" id="lineOpacity" min="0" max="1" step="0.05"></label>
+              </div>
+            
+              <div id="point-fields" class="style-field d-none">
+                <label>Point Color <input type="color" id="pointColor"></label><br>
+                <label>Outline Color <input type="color" id="pointOutlineColor"></label><br>
+                <label>Radius <input type="number" id="pointRadius" min="1" max="20" step="0.5"></label><br>
+                <label>Outline Width <input type="number" id="pointOutlineWidth" min="0" max="10" step="0.1"></label><br>
+                <label>Opacity <input type="number" id="pointOpacity" min="0" max="1" step="0.05"></label>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" id="applyStyle" class="btn btn-primary">Apply</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        document.getElementById('applyStyle').addEventListener('click', () => {
+            const modal = document.getElementById('styleModal');
+            const group = modal.dataset.group;
+            const geom = modal.dataset.geom;
+            this._applyStyleChanges(group, geom);
+        });
+
+        this.modalInitialized = true;
     }
 
     _isVisible(id) {
         return this.map.getLayoutProperty(id, 'visibility') !== 'none';
+    }
+
+    _getLayerColor(layerId) {
+        const layer = this.map.getLayer(layerId);
+        if (!layer) return '#000';
+        const prop = layer.type === 'fill' ? 'fill-color' : layer.type === 'line' ? 'line-color' : 'circle-color';
+        const val = this.map.getPaintProperty(layerId, prop);
+        return typeof val === 'string' ? val : '#000';
     }
 
     _getSymbolForGeom(type, fillColor, outlineColor = '#000', width = 2, opacity = 1) {
