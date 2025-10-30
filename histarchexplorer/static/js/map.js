@@ -379,9 +379,6 @@ map.on('click', (e) => {
 
 
 function highlightFeatures(featureIds = []) {
-    console.log("Highlighting IDs:", featureIds);
-    console.log("Layers available:", map.getStyle().layers.map(l => l.id));
-
     const layerConfigs = {
         'highlight-polygon': 'Polygon',
         'highlight-polygon-outline': 'Polygon',
@@ -526,15 +523,29 @@ class LayerControl {
             ["Polygon", "LineString", "Point"].forEach(geomType => {
                 totalCount += mapData.features.filter(f => f.properties?.class === groupName && f.geometry.type === geomType).length;
             });
+            let label = groupName + 's';
+
+            if (isThisGroup) {
+                label = "Selection: " + entityData.entity.title;
+
+                 ["Polygon", "LineString", "Point"].forEach(geomType => {
+                totalCount += mapData.features.filter(f => f.properties?.id === entityId && f.geometry.type === geomType).length;
+                            console.log(groupName)
+                console.log(totalCount)
+            });
+
+            }
+
+
             if (!isThisGroup && totalCount === 0) return;
 
             const groupDiv = document.createElement('div');
             groupDiv.className = 'layer-group';
             const visible = Object.values(geometries).flat().some(id => this._isVisible(id));
 
-            let label = groupName + 's';
+
             label = label[0].toUpperCase() + label.slice(1);
-            if (isThisGroup) label = entityData.entity.title;
+
 
             groupDiv.innerHTML = `
         <div class="group-header">
@@ -553,7 +564,8 @@ class LayerControl {
             ["Polygon", "LineString", "Point"].forEach(geomType => {
                 const layers = geometries[geomType] || [];
                 const layerExists = layers.some(id => this.map.getLayer(id));
-                const featureCount = mapData.features.filter(f => f.properties?.class === groupName && f.geometry.type === geomType).length;
+                let featureCount = mapData.features.filter(f => f.properties?.class === groupName && f.geometry.type === geomType).length;
+                if (isThisGroup) featureCount = mapData.features.filter(f => f.properties?.id === entityId && f.geometry.type === geomType).length;
                 if (!isThisGroup && featureCount === 0) return;
 
                 let fillColor = '#888', outlineColor = '#000', width = 2, opacity = 1, radius = 8;
@@ -599,7 +611,7 @@ class LayerControl {
             <span class="symbol">${symbol}</span>
           </div>
         `;
-                editMenu.appendChild(geomDiv);
+                if (featureCount > 0) editMenu.appendChild(geomDiv);
             });
         });
 
@@ -607,7 +619,8 @@ class LayerControl {
         imagesGroup.className = 'layer-group';
 
         const imagesHeader = document.createElement('div');
-        imagesHeader.className = 'group-header';
+        imagesHeader.id = 'images-header';
+        imagesHeader.className = 'group-header d-none';
         imagesHeader.innerHTML = `
               <label>
                 <input type="checkbox" checked data-group="images">
@@ -858,7 +871,7 @@ async function addImageToMap(map, img, maxSize = 2048) {
     if (!coords || coords.length < 2) return;
 
     let coordinates;
-    console.log(coords);
+
     if (coords.length === 2) {
         coordinates = getNormalizedCorners(coords);
     } else if (coords.length === 3) {
@@ -891,6 +904,14 @@ async function addImageToMap(map, img, maxSize = 2048) {
             'raster-opacity': 0.9
         }
     });
+
+    const imageCountElement = document.getElementById('imagecount');
+    const imagesHeader = document.getElementById('images-header');
+    if (imageCountElement) {
+        const currentCount = map.getStyle().layers.filter(l => l.id.startsWith('image_layer_')).length;
+        imageCountElement.innerHTML = `(${currentCount})`;
+        if (currentCount > 0) imagesHeader.classList.remove('d-none');
+    }
 }
 
 async function addRasterMaps(map, ids) {
@@ -916,7 +937,7 @@ async function addRasterMaps(map, ids) {
 
             const data = await response.json();
             if (data[0]) {
-                console.log(data.length)
+
                 const images = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
 
                 for (const img of images) {
@@ -930,7 +951,8 @@ async function addRasterMaps(map, ids) {
                     <label>
                         <input type="checkbox" checked data-layer="${layerId}">
                         ${img.name}
-                    </label>
+                    </label> <br>
+                    Opacity: 
                     <input type="range" min="0" max="1" step="0.1" value="0.9" data-layer="${layerId}" title="Opacity">
                 `;
                     legendContainer.appendChild(item);
@@ -951,11 +973,6 @@ async function addRasterMaps(map, ids) {
         } catch (err) {
             console.error(`Fehler beim Laden von ID ${id}:`, err);
         }
-    }
-    const imageCountElement = document.getElementById('imagecount');
-    if (imageCountElement) {
-        const currentCount = map.getStyle().layers.filter(l => l.id.startsWith('image_layer_')).length;
-        imageCountElement.innerHTML = `(${currentCount})`;
     }
 }
 
@@ -985,7 +1002,7 @@ async function getIiifImageUrl(manifestUrl, maxSize = 2048) {
     // Construct IIIF URL with max size constraint and proper format
     const iiifUrl = `${serviceId}/full/!${maxSize},${maxSize}/0/default.${format}`;
 
-    console.log('IIIF image URL:', iiifUrl);
+
     return iiifUrl;
 }
 
