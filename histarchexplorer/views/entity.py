@@ -326,7 +326,9 @@ def get_files_for_id(id: int) -> dict[str, list[str]]:
 
     g.cursor.execute(sql, {'id': id})
     result = g.cursor.fetchone()
-    return result
+    if result:
+        return result
+    return None
 
 
 @app.route('/get_rastermaps/<int:id>')

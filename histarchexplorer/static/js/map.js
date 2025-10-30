@@ -898,6 +898,8 @@ async function addRasterMaps(map, ids) {
             }
 
             const data = await response.json();
+            if (data[0]) {
+            console.log(data.length)
             const images = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
 
             for (const img of images) {
@@ -927,7 +929,7 @@ async function addRasterMaps(map, ids) {
                     const opacity = parseFloat(e.target.value);
                     if (map.getLayer(layerId)) map.setPaintProperty(layerId, 'raster-opacity', opacity);
                 });
-            }
+            }}
         } catch (err) {
             console.error(`Fehler beim Laden von ID ${id}:`, err);
         }
