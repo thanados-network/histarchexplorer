@@ -68,7 +68,7 @@ function createMediaItem(image, posterMap) {
   const alt = image.title || "Image";
 
   const item = document.createElement("div");
-  item.className = "item item-half";
+  item.className = "item item-half item-media";
 
   const content = document.createElement("div");
   content.className = "item-content item-content-full";
