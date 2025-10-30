@@ -534,7 +534,7 @@ class LayerControl {
 
             let label = groupName + 's';
             label = label[0].toUpperCase() + label.slice(1);
-            if (isThisGroup) label = entity.title;
+            if (isThisGroup) label = data.entity.title;
 
             groupDiv.innerHTML = `
         <div class="group-header">

@@ -1,9 +1,9 @@
 {% import '_macros.html' as ui %}
 
 <script src="../../static/js/overview.js"></script>
-<script> const entity = JSON.parse(JSON.parse({{ data|tojson }}).entity)</script>
-<script> const overviewMap = JSON.parse(JSON.parse({{ data|tojson }}).overview_map)</script>
-<script> const entityName = entity.title</script>
+
+
+<script> const entityName = data.entity.title</script>
 <script src="{{ url_for('static', filename='js/map_overview.js') }}"></script>
 
 
