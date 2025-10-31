@@ -13644,6 +13644,64 @@ button.btn-whitish[disabled] {
   opacity: 0.85;
 }
 
+#toolbox .btn {
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  opacity: 0.9;
+  transition: all 0.2s ease;
+}
+
+#toolbox .btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+#toolbox .btn.active {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+.svg-viewer-wrapper {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  background-color: #f8f9fa;
+}
+
+.model-viewer-wrapper {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.pdf-viewer-wrapper {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.video-viewer-wrapper {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  background-color: #000;
+}
+
+#iiif-viewer {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 70px);
+  background-color: #111;
+  overflow: hidden;
+}
+
+#iiif-viewer > div {
+  position: absolute !important;
+  inset: 0;
+}
+
 .layer-control-ctrl {
   position: relative;
 }

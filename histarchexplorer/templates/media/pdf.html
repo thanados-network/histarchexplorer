@@ -1,39 +1,23 @@
-{% import '_macros.html' as ui %}
 {% extends "layout.html" %}
 {% block content %}
+  <script>
+    const file_id = {{ file_id|tojson }};
+  </script>
   <div class="page-wrapper">
     <div class="scrollable-container">
       <div class="container-fluid py-4 text-center">
-
-        {% if back_url %}
-          {{ ui.back_button(back_url) }}
-        {% endif %}
-
         <div class="d-flex justify-content-center">
           <div class="pdf-viewer-wrapper position-relative w-100"
                style="height: 90vh;">
-
             <iframe id="mainPdf"
                     src="{{ file_url }}"
                     class="w-100 h-100 rounded shadow border-0"
                     style="background-color: #fff;"></iframe>
-
           </div>
         </div>
-
       </div>
     </div>
   </div>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const iframe = document.getElementById("mainPdf");
-      const spinner = document.querySelector(".spinner");
-
-      iframe.addEventListener("load", () => spinner?.remove());
-      setTimeout(() => spinner?.remove(), 5000);
-    });
-  </script>
-
+  <script src="{{ url_for('static', filename='js/viewer/pdf.js') }}"></script>
 
 {% endblock %}

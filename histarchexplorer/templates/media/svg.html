@@ -1,15 +1,11 @@
-{% import '_macros.html' as ui %}
 {% extends "layout.html" %}
 {% block content %}
-
+  <script>
+  const file_id = {{ file_id|tojson }};
+  </script>
   <div class="page-wrapper">
     <div class="scrollable-container">
       <div class="container-fluid py-4 text-center">
-
-        {% if back_url %}
-          {{ ui.back_button(back_url) }}
-        {% endif %}
-
         <div class="d-flex justify-content-center">
           <div class="svg-viewer-wrapper position-relative w-100"
                style="height: 90vh;">
@@ -53,57 +49,5 @@
   </div>
   <script
     src="{{ url_for('static', filename='node_modules/svg-pan-zoom/dist/svg-pan-zoom.js') }}"></script>
-
-
-  <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const spinner = document.querySelector(".spinner");
-      const container = document.getElementById("svgContainer");
-      let panZoomInstance;
-
-      try {
-        const response = await fetch("{{ file_url }}");
-        container.innerHTML = await response.text();
-
-        const svgEl = container.querySelector("svg");
-
-        // Fix viewBox / size if missing
-        svgEl.setAttribute("width", "100%");
-        svgEl.setAttribute("height", "100%");
-        svgEl.style.maxWidth = "100%";
-        svgEl.style.maxHeight = "100%";
-
-        spinner?.remove();
-
-        panZoomInstance = svgPanZoom(svgEl, {
-          zoomEnabled: true,
-          panEnabled: true,
-          controlIconsEnabled: false,
-          fit: true,
-          center: true,
-          maxZoom: 20,
-          minZoom: 0.5,
-          zoomScaleSensitivity: 0.3,
-        });
-
-        // Toolbox actions
-        document.getElementById("btn-zoom-in").addEventListener("click", () => panZoomInstance.zoomIn());
-        document.getElementById("btn-zoom-out").addEventListener("click", () => panZoomInstance.zoomOut());
-        document.getElementById("btn-reset").addEventListener("click", () => panZoomInstance.reset());
-        document.getElementById("btn-download").addEventListener("click", () => {
-          const a = document.createElement("a");
-          a.href = "{{ file_url }}?download=true";
-          a.download = "graphic.svg";
-          a.click();
-        });
-
-      } catch (err) {
-        console.error("SVG load error:", err);
-        spinner?.remove();
-        container.innerHTML = `<p class="text-danger">Failed to load SVG</p>`;
-      }
-    });
-
-  </script>
-
+  <script src="{{ url_for('static', filename='js/viewer/svg.js') }}"></script>
 {% endblock %}

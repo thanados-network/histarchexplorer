@@ -1,18 +1,14 @@
-{% import '_macros.html' as ui %}
 {% extends "layout.html" %}
 {% block content %}
+  <script>
+    const file_id = {{ file_id|tojson }};
+  </script>
   <div class="page-wrapper">
     <div class="scrollable-container">
       <div class="container-fluid py-4 text-center">
-
-        {% if back_url %}
-          {{ ui.back_button(back_url) }}
-        {% endif %}
-
         <div class="d-flex justify-content-center">
           <div class="video-viewer-wrapper position-relative"
                style="width: 90%; height: 80vh; max-width: 1200px;">
-
 
             <!-- Video player -->
             <video id="mainVideo"
@@ -50,73 +46,12 @@
                 <i class="bi bi-download"></i>
               </button>
             </div>
-
           </div>
         </div>
-
       </div>
     </div>
   </div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const video = document.getElementById("mainVideo");
-
-
-      const btnPlay = document.getElementById("btn-play");
-      const btnMute = document.getElementById("btn-mute");
-      const btnSpeed = document.getElementById("btn-speed");
-      const btnFullscreen = document.getElementById("btn-fullscreen");
-      const btnDownload = document.getElementById("btn-download");
-
-      // --- Play / Pause ---
-      btnPlay.addEventListener("click", () => {
-        if (video.paused) {
-          video.play();
-          btnPlay.innerHTML = '<i class="bi bi-pause-fill"></i>';
-        } else {
-          video.pause();
-          btnPlay.innerHTML = '<i class="bi bi-play-fill"></i>';
-        }
-      });
-
-      // --- Mute / Unmute ---
-      btnMute.addEventListener("click", () => {
-        video.muted = !video.muted;
-        btnMute.innerHTML = video.muted
-          ? '<i class="bi bi-volume-up-fill"></i>'
-          : '<i class="bi bi-volume-mute-fill"></i>';
-      });
-
-      // --- Playback speed toggle ---
-      const speeds = [1, 1.5, 2, 0.5];
-      let currentSpeedIndex = 0;
-      btnSpeed.addEventListener("click", () => {
-        currentSpeedIndex = (currentSpeedIndex + 1) % speeds.length;
-        video.playbackRate = speeds[currentSpeedIndex];
-        btnSpeed.title = `Speed: ${video.playbackRate}x`;
-        btnSpeed.innerHTML = `<i class="bi bi-speedometer"></i><small>${video.playbackRate}x</small>`;
-      });
-
-      // --- Fullscreen ---
-      btnFullscreen.addEventListener("click", () => {
-        if (!document.fullscreenElement) {
-          video.requestFullscreen().catch(console.error);
-        } else {
-          document.exitFullscreen();
-        }
-      });
-
-      // --- Download video ---
-      btnDownload.addEventListener("click", () => {
-        const a = document.createElement("a");
-        a.href = "{{ file_url }}?download=true";
-        a.download = "video.mp4";
-        a.click();
-      });
-    });
-  </script>
-
-
-
+  <script
+    src="{{ url_for('static', filename='js/viewer/video.js') }}"></script>
 {% endblock %}

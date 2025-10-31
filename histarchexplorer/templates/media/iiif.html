@@ -1,68 +1,20 @@
-{% import '_macros.html' as ui %}
 {% extends "layout.html" %}
 {% block content %}
-  <style>
-
-      /* Your viewer container */
-      #iiif-viewer {
-          position: relative;
-          width: 100%;
-          height: calc(100vh - 70px); /* subtract your navbar height */
-          background-color: #111;
-          overflow: hidden;
-      }
-
-      /* Mirador attaches its own <div> inside here */
-      #iiif-viewer > div {
-          position: absolute !important;
-          inset: 0;
-      }
-  </style>
-
+  <script>
+    const file_id = {{ file_id|tojson }};
+    const sessionLanguage = {{ session.language|tojson }};
+  </script>
   <div class="page-wrapper">
     <div class="scrollable-container">
       <div class="container-fluid">
-        {% if back_url %}
-          {{ ui.back_button(back_url) }}
-        {% endif %}
         <div id="iiif-viewer" class="mirador-container">
           <script
             src="/static/node_modules/mirador/dist/mirador.min.js"></script>
-          <script>
-            document.addEventListener("DOMContentLoaded", () => {
-              const config = {
-                id: "iiif-viewer",
-                layout: "1x1",
-                mainMenuSettings: {show: false},
-                workspaceControlPanel: {enabled: false},
-                window: {
-                  allowClose: false,
-                  defaultSideBarPanel: 'info',
-                  sideBarOpenByDefault: false,
-                  allowMaximize: false,
-                  allowTopMenuButton: false,
-                  defaultView: 'single',
-                  sideBarOpen: true,
-                },
-                workspace: {
-                  type: "mosaic"
-                },
-                language: "{{ session.language }}",
-                availableLanguages: {
-                  de: "Deutsch",
-                  en: "English"
-                },
-                windows: [
-                  {loadedManifest: "{{ manifest }}"},
-                ]
-              };
-              Mirador.viewer(config);
-            });
-          </script>
-
+          <script
+            src="{{ url_for('static', filename='js/viewer/iiif.js') }}"></script>
         </div>
       </div>
     </div>
-    {% include 'footer.html' %}
   </div>
+
 {% endblock %}

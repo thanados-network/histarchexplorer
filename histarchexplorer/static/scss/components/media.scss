@@ -61,24 +61,38 @@
   background-color: #f8f9fa;
 }
 
-  .model-viewer-wrapper {
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-  }
+.model-viewer-wrapper {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
 
 
-      .pdf-viewer-wrapper {
-          border-radius: 1rem;
-          overflow: hidden;
-          box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-          background-color: #fff;
-      }
+.pdf-viewer-wrapper {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
 
 
-  .video-viewer-wrapper {
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    background-color: #000;
-  }
+.video-viewer-wrapper {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  background-color: #000;
+}
+
+
+#iiif-viewer {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 70px);
+  background-color: #111;
+  overflow: hidden;
+}
+
+#iiif-viewer > div {
+  position: absolute !important;
+  inset: 0;
+}

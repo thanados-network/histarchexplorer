@@ -1,25 +1,20 @@
-{% import '_macros.html' as ui %}
 {% extends "layout.html" %}
 {% block content %}
+  <script>
+    const file_id = {{ file_id|tojson }};
+  </script>
   <div class="page-wrapper">
     <div class="scrollable-container">
       <div class="container-fluid py-4 text-center">
-
-        {% if back_url %}
-          {{ ui.back_button(back_url) }}
-        {% endif %}
-
         <div class="d-flex justify-content-center">
           <div class="model-viewer-wrapper position-relative"
                style="width: 90%; height: 80vh; max-width: 1200px;">
-
             <div
               class="spinner position-absolute top-50 start-50 translate-middle">
               <div class="spinner-border text-secondary" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
             </div>
-
             <model-viewer
               id="mainModel"
               src="{{ file_url }}"
@@ -63,63 +58,7 @@
     </div>
   </div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const viewer = document.getElementById("mainModel");
-      const spinner = document.querySelector(".spinner");
-
-      // Spinner control
-      viewer.addEventListener("poster-dismissed", () => spinner?.remove());
-      setTimeout(() => spinner?.remove(), 5000);
-
-      // --- Toolbox actions ---
-      const btnReset = document.getElementById("btn-reset");
-      const btnRotate = document.getElementById("btn-rotate");
-      const btnLight = document.getElementById("btn-light");
-      const btnBg = document.getElementById("btn-bg");
-      const btnDownload = document.getElementById("btn-download");
-      const btnAR = document.getElementById("btn-ar");
-
-      // Reset camera
-      btnReset.addEventListener("click", () => viewer.cameraOrbit = "0deg 75deg auto");
-
-      // Toggle auto-rotate
-      btnRotate.addEventListener("click", () => {
-        viewer.autoRotate = !viewer.autoRotate;
-        btnRotate.classList.toggle("active", viewer.autoRotate);
-      });
-
-      // Toggle lighting
-      let isBright = true;
-      btnLight.addEventListener("click", () => {
-        isBright = !isBright;
-        viewer.shadowIntensity = isBright ? 1 : 0.2;
-        viewer.environmentImage = isBright ? "neutral" : "legacy";
-        btnLight.innerHTML = isBright
-          ? '<i class="bi bi-brightness-high"></i>'
-          : '<i class="bi bi-moon"></i>';
-      });
-
-      // Toggle background
-      let darkMode = false;
-      btnBg.addEventListener("click", () => {
-        darkMode = !darkMode;
-        viewer.style.backgroundColor = darkMode ? "#212529" : "#f8f9fa";
-        btnBg.innerHTML = darkMode
-          ? '<i class="bi bi-square"></i>'
-          : '<i class="bi bi-square-half"></i>';
-      });
-
-      // Download model
-      btnDownload.addEventListener("click", () => {
-        const a = document.createElement("a");
-        a.href = "{{ file_url }}?download=true";
-        a.download = "model.glb";
-        a.click();
-      });
-
-    });
-  </script>
-
+  <script
+    src="{{ url_for('static', filename='js/viewer/3d_model.js') }}"></script>
 
 {% endblock %}
