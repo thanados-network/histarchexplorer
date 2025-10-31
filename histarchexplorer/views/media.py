@@ -49,8 +49,13 @@ def view_media(render_type: str, id_: int, origin_id: Optional[int] = None):
                 "media/pdf.html",
                 file_id=id_,
                 file_url=f"{app.config['API_URL']}display/{id_}",
-                back_url=back_url
-    )
+                back_url=back_url)
+        case 'svg':
+            return render_template(
+                "media/svg.html",
+                file_id=id_,
+                file_url=f"{app.config['API_URL']}display/{id_}",
+                back_url=back_url)
         case _:
             template = f"Unsupported render type: {render_type}", 400
 

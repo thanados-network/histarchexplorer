@@ -5,7 +5,7 @@ const renderTypeStyles = {
   "image": {color: "#06d6a0", icon: "bi-image"},
   "video": {color: "#118ab2", icon: "bi-play-btn-fill"},
   "pdf": {color: "#ef476f", icon: "bi-filetype-pdf"},
-  "svg": {color: "#ffd166", icon: "bi-vector-pen"},
+  "svg": {color: "#ffd166", icon: "bi-filetype-svg"},
   "unknown": {color: "#adb5bd", icon: "bi-question-circle"}
 };
 
@@ -218,13 +218,7 @@ function createImage(image, alt) {
 
 function createPDF(image, alt) {
   const wrapper = document.createElement("div");
-  const link = document.createElement("a");
-  link.href = `/render_pdf/${image.id}`;
-  link.target = "_blank";
-  link.className =
-    "hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded";
-  link.innerHTML = `<i class="bi bi-filetype-pdf" style="font-size:1.5em;"></i>`;
-  wrapper.appendChild(link);
+
 
   const img = document.createElement("img");
   img.src = `${image.iiif_base_path}/full/400,/0/default.jpg`;

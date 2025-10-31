@@ -71,12 +71,12 @@
             {% else %}
               <img src="{{ image.url }}" alt="{{ alt }}">
             {% endif %}
-          {% elif image.render_type == 'pdf' and image.iiif_base_path %}
+          {#{% elif image.render_type == 'pdf' and image.iiif_base_path %}
             <a href="{{ url_for('render_pdf', id_=image.id) }}" target="_blank"
                class="{{ base_classes }}" style="z-index:10;">
               <i class="bi bi-filetype-pdf" style="{{ icon_style }}"></i>
             </a>
-            <img src="{{ image.iiif_base_path }}/full/400,/0/default.jpg" alt="{{ alt }}">
+            <img src="{{ image.iiif_base_path }}/full/400,/0/default.jpg" alt="{{ alt }}">#}
           {% elif image.render_type == 'svg' %}
             <object type="image/svg+xml" data="{{ image.url }}" class="w-100 h-100 border-0" style="height:300px;"></object>
           {% else %}

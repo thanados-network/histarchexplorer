@@ -108,7 +108,7 @@
     // Download model
     btnDownload.addEventListener("click", () => {
       const a = document.createElement("a");
-      a.href = "{{ file_url }}";
+      a.href = "{{ file_url }}?download=true";
       a.download = "model.glb";
       a.click();
     });
