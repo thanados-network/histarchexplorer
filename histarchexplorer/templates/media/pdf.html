@@ -13,7 +13,6 @@
           <div class="pdf-viewer-wrapper position-relative w-100"
                style="height: 90vh;">
 
-            <!-- PDF Viewer -->
             <iframe id="mainPdf"
                     src="{{ file_url }}"
                     class="w-100 h-100 rounded shadow border-0"
@@ -36,13 +35,5 @@
     });
   </script>
 
-  <style>
-      .pdf-viewer-wrapper {
-          border-radius: 1rem;
-          overflow: hidden;
-          box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-          background-color: #fff;
-      }
-  </style>
 
 {% endblock %}

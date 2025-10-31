@@ -1,52 +1,68 @@
 {% import '_macros.html' as ui %}
 {% extends "layout.html" %}
 {% block content %}
- {# todo: container is under the nav bar. Somehow fix that! Then workspace type can be 'mosaic' again #}
+  <style>
+
+      /* Your viewer container */
+      #iiif-viewer {
+          position: relative;
+          width: 100%;
+          height: calc(100vh - 70px); /* subtract your navbar height */
+          background-color: #111;
+          overflow: hidden;
+      }
+
+      /* Mirador attaches its own <div> inside here */
+      #iiif-viewer > div {
+          position: absolute !important;
+          inset: 0;
+      }
+  </style>
 
   <div class="page-wrapper">
     <div class="scrollable-container">
       <div class="container-fluid">
-      {% if back_url %}
-        {{ ui.back_button(back_url) }}
-      {% endif %}
-        <div id="iiif-viewer">
+        {% if back_url %}
+          {{ ui.back_button(back_url) }}
+        {% endif %}
+        <div id="iiif-viewer" class="mirador-container">
           <script
             src="/static/node_modules/mirador/dist/mirador.min.js"></script>
           <script>
-            const config = {
-              "id": "iiif-viewer",
-              "layout": "1x1",
-              "mainMenuSettings": {
-                "show": false
-              },
-              "workspaceControlPanel": {
-                "enabled": false
-              },
-              "window": {
-                "allowClose": false,
-                "defaultSideBarPanel": 'attribution',
-                "sideBarOpenByDefault": false,
-                "forceDrawAnnotations": true,
-                "highlightAllAnnotations": true,
-
-              },
-              "workspace": {
-                "type": "mosaic"
-              },
-              "language": "{{ session.language }}",
-              "availableLanguages": {
-                "de": "Deutsch",
-                "en": "English",
-                "fr": "Français"
-              },
-              "windows": [
-                {"loadedManifest": "{{ manifest }}"},
-              ]
-            };
-            Mirador.viewer(config);
+            document.addEventListener("DOMContentLoaded", () => {
+              const config = {
+                id: "iiif-viewer",
+                layout: "1x1",
+                mainMenuSettings: {show: false},
+                workspaceControlPanel: {enabled: false},
+                window: {
+                  allowClose: false,
+                  defaultSideBarPanel: 'info',
+                  sideBarOpenByDefault: false,
+                  allowMaximize: false,
+                  allowTopMenuButton: false,
+                  defaultView: 'single',
+                  sideBarOpen: true,
+                },
+                workspace: {
+                  type: "mosaic"
+                },
+                language: "{{ session.language }}",
+                availableLanguages: {
+                  de: "Deutsch",
+                  en: "English"
+                },
+                windows: [
+                  {loadedManifest: "{{ manifest }}"},
+                ]
+              };
+              Mirador.viewer(config);
+            });
           </script>
+
         </div>
       </div>
     </div>
+    {% include 'footer.html' %}
   </div>
 {% endblock %}

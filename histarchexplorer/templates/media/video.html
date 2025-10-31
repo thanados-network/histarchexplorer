@@ -1,140 +1,122 @@
 {% import '_macros.html' as ui %}
 {% extends "layout.html" %}
 {% block content %}
-<div class="page-wrapper">
-  <div class="scrollable-container">
-    <div class="container-fluid py-4 text-center">
+  <div class="page-wrapper">
+    <div class="scrollable-container">
+      <div class="container-fluid py-4 text-center">
 
-      {% if back_url %}
-        {{ ui.back_button(back_url) }}
-      {% endif %}
+        {% if back_url %}
+          {{ ui.back_button(back_url) }}
+        {% endif %}
 
-      <div class="d-flex justify-content-center">
-        <div class="video-viewer-wrapper position-relative"
-             style="width: 90%; height: 80vh; max-width: 1200px;">
+        <div class="d-flex justify-content-center">
+          <div class="video-viewer-wrapper position-relative"
+               style="width: 90%; height: 80vh; max-width: 1200px;">
 
 
+            <!-- Video player -->
+            <video id="mainVideo"
+                   class="w-100 h-100 rounded shadow"
+                   src="{{ file_url }}"
+                   controls
+                   autoplay
+                   muted
+                   preload="metadata"
+                   style="object-fit: contain; background-color: #000;">
+              Your browser does not support the video tag.
+            </video>
 
-          <!-- Video player -->
-          <video id="mainVideo"
-                 class="w-100 h-100 rounded shadow"
-                 src="{{ file_url }}"
-                 controls
-                 autoplay
-                 muted
-                 preload="metadata"
-                 style="object-fit: contain; background-color: #000;">
-            Your browser does not support the video tag.
-          </video>
+            <!-- ===== TOOLBOX ===== -->
+            <div id="toolbox"
+                 class="position-absolute top-0 end-0 m-3 d-flex flex-column gap-2">
+              <button class="btn btn-light btn-sm" id="btn-play"
+                      title="Play / Pause">
+                <i class="bi bi-play-fill"></i>
+              </button>
+              <button class="btn btn-light btn-sm" id="btn-mute"
+                      title="Toggle Mute">
+                <i class="bi bi-volume-mute-fill"></i>
+              </button>
+              <button class="btn btn-light btn-sm" id="btn-speed"
+                      title="Change Speed">
+                <i class="bi bi-speedometer"></i>
+              </button>
+              <button class="btn btn-light btn-sm" id="btn-fullscreen"
+                      title="Fullscreen">
+                <i class="bi bi-arrows-fullscreen"></i>
+              </button>
+              <button class="btn btn-light btn-sm" id="btn-download"
+                      title="Download Video">
+                <i class="bi bi-download"></i>
+              </button>
+            </div>
 
-          <!-- ===== TOOLBOX ===== -->
-          <div id="toolbox" class="position-absolute top-0 end-0 m-3 d-flex flex-column gap-2">
-            <button class="btn btn-light btn-sm" id="btn-play" title="Play / Pause">
-              <i class="bi bi-play-fill"></i>
-            </button>
-            <button class="btn btn-light btn-sm" id="btn-mute" title="Toggle Mute">
-              <i class="bi bi-volume-mute-fill"></i>
-            </button>
-            <button class="btn btn-light btn-sm" id="btn-speed" title="Change Speed">
-              <i class="bi bi-speedometer"></i>
-            </button>
-            <button class="btn btn-light btn-sm" id="btn-fullscreen" title="Fullscreen">
-              <i class="bi bi-arrows-fullscreen"></i>
-            </button>
-            <button class="btn btn-light btn-sm" id="btn-download" title="Download Video">
-              <i class="bi bi-download"></i>
-            </button>
           </div>
-          <!-- =================== -->
-
         </div>
-      </div>
 
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const video = document.getElementById("mainVideo");
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const video = document.getElementById("mainVideo");
 
 
-    const btnPlay = document.getElementById("btn-play");
-    const btnMute = document.getElementById("btn-mute");
-    const btnSpeed = document.getElementById("btn-speed");
-    const btnFullscreen = document.getElementById("btn-fullscreen");
-    const btnDownload = document.getElementById("btn-download");
+      const btnPlay = document.getElementById("btn-play");
+      const btnMute = document.getElementById("btn-mute");
+      const btnSpeed = document.getElementById("btn-speed");
+      const btnFullscreen = document.getElementById("btn-fullscreen");
+      const btnDownload = document.getElementById("btn-download");
 
-    // --- Play / Pause ---
-    btnPlay.addEventListener("click", () => {
-      if (video.paused) {
-        video.play();
-        btnPlay.innerHTML = '<i class="bi bi-pause-fill"></i>';
-      } else {
-        video.pause();
-        btnPlay.innerHTML = '<i class="bi bi-play-fill"></i>';
-      }
+      // --- Play / Pause ---
+      btnPlay.addEventListener("click", () => {
+        if (video.paused) {
+          video.play();
+          btnPlay.innerHTML = '<i class="bi bi-pause-fill"></i>';
+        } else {
+          video.pause();
+          btnPlay.innerHTML = '<i class="bi bi-play-fill"></i>';
+        }
+      });
+
+      // --- Mute / Unmute ---
+      btnMute.addEventListener("click", () => {
+        video.muted = !video.muted;
+        btnMute.innerHTML = video.muted
+          ? '<i class="bi bi-volume-up-fill"></i>'
+          : '<i class="bi bi-volume-mute-fill"></i>';
+      });
+
+      // --- Playback speed toggle ---
+      const speeds = [1, 1.5, 2, 0.5];
+      let currentSpeedIndex = 0;
+      btnSpeed.addEventListener("click", () => {
+        currentSpeedIndex = (currentSpeedIndex + 1) % speeds.length;
+        video.playbackRate = speeds[currentSpeedIndex];
+        btnSpeed.title = `Speed: ${video.playbackRate}x`;
+        btnSpeed.innerHTML = `<i class="bi bi-speedometer"></i><small>${video.playbackRate}x</small>`;
+      });
+
+      // --- Fullscreen ---
+      btnFullscreen.addEventListener("click", () => {
+        if (!document.fullscreenElement) {
+          video.requestFullscreen().catch(console.error);
+        } else {
+          document.exitFullscreen();
+        }
+      });
+
+      // --- Download video ---
+      btnDownload.addEventListener("click", () => {
+        const a = document.createElement("a");
+        a.href = "{{ file_url }}?download=true";
+        a.download = "video.mp4";
+        a.click();
+      });
     });
+  </script>
 
-    // --- Mute / Unmute ---
-    btnMute.addEventListener("click", () => {
-      video.muted = !video.muted;
-      btnMute.innerHTML = video.muted
-        ? '<i class="bi bi-volume-up-fill"></i>'
-        : '<i class="bi bi-volume-mute-fill"></i>';
-    });
 
-    // --- Playback speed toggle ---
-    const speeds = [1, 1.5, 2, 0.5];
-    let currentSpeedIndex = 0;
-    btnSpeed.addEventListener("click", () => {
-      currentSpeedIndex = (currentSpeedIndex + 1) % speeds.length;
-      video.playbackRate = speeds[currentSpeedIndex];
-      btnSpeed.title = `Speed: ${video.playbackRate}x`;
-      btnSpeed.innerHTML = `<i class="bi bi-speedometer"></i><small>${video.playbackRate}x</small>`;
-    });
-
-    // --- Fullscreen ---
-    btnFullscreen.addEventListener("click", () => {
-      if (!document.fullscreenElement) {
-        video.requestFullscreen().catch(console.error);
-      } else {
-        document.exitFullscreen();
-      }
-    });
-
-    // --- Download video ---
-    btnDownload.addEventListener("click", () => {
-      const a = document.createElement("a");
-      a.href = "{{ file_url }}?download=true";
-      a.download = "video.mp4";
-      a.click();
-    });
-  });
-</script>
-
-<style>
-  #toolbox .btn {
-    width: 40px;
-    height: 40px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    opacity: 0.9;
-    transition: all 0.2s ease;
-  }
-  #toolbox .btn:hover {
-    opacity: 1;
-    transform: scale(1.1);
-  }
-  #toolbox .btn.active {
-    background-color: #0d6efd;
-    color: #fff;
-  }
-  .video-viewer-wrapper {
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    background-color: #000;
-  }
-</style>
 
 {% endblock %}

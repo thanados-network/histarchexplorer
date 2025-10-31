@@ -152,7 +152,10 @@ function createMediaItem(image, posterMap) {
       url += `?manifest=${encodedManifest}`;
     }
 
-    window.open(url, "_blank");
+    window.open(
+      url,
+    //  "_blank"
+    );
   });
 
   imageDiv.appendChild(viewBtn);

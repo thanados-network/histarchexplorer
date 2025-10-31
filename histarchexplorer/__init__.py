@@ -1,3 +1,4 @@
+import time
 from typing import Any
 
 import psycopg2.extras
@@ -105,6 +106,7 @@ def before_request() -> None:
     g.api_headers = {}
     if app.config['API_TOKEN']:
         g.api_headers["Authorization"] = f"Bearer {app.config['API_TOKEN']}"
+    start_time = time.time()
     g.main_images = get_main_image_table()
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
@@ -124,7 +126,9 @@ def before_request() -> None:
     g.search_service = SearchService(app)
     g.case_study_ids = [
         config.case_study for config in g.config_entities if config.case_study]
-    g.file_of_entities = ApiAccess.get_files_of_entities()
+    # g.file_of_entities = ApiAccess.get_files_of_entities()
+
+    print(f"Execution time: {time.time() - start_time:.6f} seconds")
     return None
 
 
