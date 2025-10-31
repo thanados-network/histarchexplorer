@@ -1055,7 +1055,7 @@ function setSidebarContent(id, mode = 'toggle') {
             </div>
         </div>
     `;
-
+    // Todo: sidebar conntect can be loaded directly with /presentation_view/${ids},
     fetch(`/get_entity/${id}/feature`)
         .then(response => {
             if (!response.ok) {
