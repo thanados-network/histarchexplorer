@@ -615,13 +615,13 @@ class LayerControl {
         `;
                 if (featureCount > 0) editMenu.appendChild(geomDiv);
             });
-            /*                    Sortable.create(editMenu, {
+                                Sortable.create(editMenu, {
                         handle: '.geom-header', // Drag by geometry header
                         animation: 150,
                         onEnd: (evt) => {
                             this._updateMapLayerOrder();
                         }
-                    });*/
+                    });
         });
 
         const imagesGroup = document.createElement('div');
@@ -671,13 +671,13 @@ class LayerControl {
         panel.addEventListener('change', (e) => this._handleCheckboxChange(e));
         panel.addEventListener('click', (e) => this._handleClick(e));
 
-        /*Sortable.create(panel, {
+        Sortable.create(panel, {
             handle: '.group-header', // Drag by the header
             animation: 150,
             onEnd: (evt) => {
                 this._updateMapLayerOrder();
             }
-        });*/
+        });
 
     }
 
