@@ -130,8 +130,8 @@ function addLayers() {
             id: 'feature-polygon',
             type: 'fill',
             source: 'feature-data',
-            color: '#ffffff',
-            opacity: 1,
+            color: '#2E5F5F',
+            opacity: 0.6,
             filterType: 'Polygon',
             systemClass: 'feature'
         },
