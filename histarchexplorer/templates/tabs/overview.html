@@ -8,28 +8,7 @@
 
 {{ ui.breadcrumbs(hierarchy, entity, hierarchy.root) }}
 
-<div class="col flex-column grid-muuri">
-  <div class="item item-half hierarchy-item">
-    <div class="cite-wrapper">
-      {{ cite_button.button_html | safe }}
-    </div>
-    {% if hierarchy.root %}
-      {% for entity in hierarchy.root %}
-        <div class="hierarchy-button">
-          <button type="button"
-                  class="btn btn-whitish rounded-5"
-                  title="{{ entity.types[0].title }}&#010;&#010;{{ entity.description[CURRENT_LANGUAGE] }}">
-            <a href="{{ url_for('entity', id_=entity.id) }}"
-               class="nude-link text-decoration-none">
-              {{ entity.name }}
-            </a>
-          </button>
-          <!--<div class="hierarchy-line"></div>-->
-        </div>
-      {% endfor %}
-    {% endif %}
-    <!-- todo: can we move this in a .py file? Isn't this in VIEW_CLASSES ? use view classes - default - colors-->
-    {% set system_class_map = {
+{% set system_class_map = {
                     'place': 'places',
                     'feature': 'places',
                     'stratigraphic_unit': 'places',
@@ -44,71 +23,59 @@
                     'source': 'sources',
                     'file': 'files'} %}
 
-    {% if entity.system_class.lower() in ['group', 'person'] and main_image %}
-      <div class="entity-card__icon">
-        <img src="{{ main_image.url }}" alt="{{ entity.title }}"/>
-      </div>
-      <div class="hierarchy-card-label"
-           data-system-class="{{ entity.system_class.lower() }}">{{ entity.title }}</div>
-      <div class="entity-date">
-        <p>{{ ui.date_template_format(entity.start, entity.end) }}</p>
-      </div>
-    {% else %}
-      <div
-          class="main-entity-ellipse main-entity-ellipse--{{ system_class_map.get(entity.system_class.lower(), '') }}">
-        <div class="entity-card__icon">
-          {% if entity.system_class.lower() in ['feature', 'stratigraphic unit'] %}
-            <img src="/static/images/entity_icons/place.png"
-                 alt="{{ entity.system_class }}">
-          {% elif entity.system_class.lower() in ['move', 'acquisition', 'modification', 'activity'] %}
-            <img src="/static/images/entity_icons/event.png"
-                 alt="{{ entity.system_class }}">
-          {% else %}
-            <img
-                src="/static/images/entity_icons/{{ entity.system_class | lower }}.png"
-                alt="{{ entity.system_class }}">
-          {% endif %}
-        </div>
-        <div class="hierarchy-card-label mb-0">{{ entity.title }}</div>
-        <div class="entity-type mb-0 ">
-          {% for type in entity.types %}
-            {% if type.is_standard %}
-              <p>{{ type.title | upper }}</p>
-            {% endif %}
-          {% endfor %}
-        </div>
-        <div class="entity-date">
-          {% if entity.start or entity.end %}
-            <p>{{ ui.date_template_format(entity.start, entity.end) }}</p>
-          {% elif entity.types %}
-            <!-- todo: chronology will not work, need to refactor (Bernhard will do this)-->
-            {% for type in entity.types if type.root == 'Chronology' %}
-              <p>{{ type.label or 'No date available' }}</p>
-            {% endfor %}
-          {% endif %}
-        </div>
-      </div>
-    {% endif %}
-
-    <!--  Subunits button -->
-    {% if hierarchy.subs %}
-      <div class="hierarchy-button">
-        <div class="hierarchy-line"></div>
-        <button type="button" class="btn btn-whitish rounded-5" disabled>
-          <i class="bi bi-diagram-3"></i>
-          <span class="nude-link">
-
-            {{ hierarchy.subs }}
-            {{ "Subentity" if hierarchy.subs == 1 else "Subentities" }}</span>
-
-        </button>
-      </div>
-    {% endif %}
-  </div>
-
-  <!-- Description -->
+<div class="col flex-column grid-muuri">
+  <!-- ALL-IN_ONE-Muuri -->
   {% if entity.description %}
-    <div class="item {% if entity.description[CURRENT_LANGUAGE] | length > 1500 %}item-middle{% endif %}">
+    <div class="item">
+      <div class="cite-wrapper">
+        {{ cite_button.button_html | safe }}
+      </div>
+      {% if entity.system_class.lower() in ['group', 'person'] and main_image %}
+        <div class="entity-card__icon">
+          <img src="{{ main_image.url }}" alt="{{ entity.title }}"/>
+        </div>
+        <div class="hierarchy-card-label"
+             data-system-class="{{ entity.system_class.lower() }}">{{ entity.title }}</div>
+        <div class="entity-date">
+          <p>{{ ui.date_template_format(entity.start, entity.end) }}</p>
+        </div>
+      {% else %}
+        <div
+            class="main-entity-ellipse main-entity-ellipse--{{ system_class_map.get(entity.system_class.lower(), '') }}">
+          <div class="entity-card__icon">
+            {% if entity.system_class.lower() in ['feature', 'stratigraphic unit'] %}
+              <img src="/static/images/entity_icons/place.png"
+                   alt="{{ entity.system_class }}">
+            {% elif entity.system_class.lower() in ['move', 'acquisition', 'modification', 'activity'] %}
+              <img src="/static/images/entity_icons/event.png"
+                   alt="{{ entity.system_class }}">
+            {% else %}
+              <img
+                  src="/static/images/entity_icons/{{ entity.system_class | lower }}.png"
+                  alt="{{ entity.system_class }}">
+            {% endif %}
+          </div>
+
+          <div class="hierarchy-card-label mb-0">{{ entity.title }}</div>
+          <div class="entity-type mb-0 ">
+            {% for type in entity.types %}
+              {% if type.is_standard %}
+                <p>{{ type.title | upper }}</p>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <div class="entity-date">
+            {% if entity.start or entity.end %}
+              <p>{{ ui.date_template_format(entity.start, entity.end) }}</p>
+            {% elif entity.types %}
+              <!-- todo: chronology will not work, need to refactor (Bernhard will do this)-->
+              {% for type in entity.types if type.root == 'Chronology' %}
+                <p>{{ type.label or 'No date available' }}</p>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
       <div class="item-content" data-type="description">
         <div class="muuri-description">
           <span class="tile-label">{{ _("description") | upper }}</span>
@@ -118,7 +85,29 @@
     </div>
   {% endif %}
 
-
+  <!-- Atrributes -->
+  {% if categorized_types %}
+    <div class="item-half item-attributes">
+      <span class="tile-label">{{ _('attributes') | upper }}</span>
+      <div class="categorized-types">
+        {% for label, value in categorized_types.items() %}
+          <p class="tile-sub-label text-uppercase mt-3">
+            {{ value[0]['icon'] | safe }} {{ label.replace('_', ' ').title() }}</p>
+          {% for type in value %}
+            <div class="badge custom-badge text-wrap m-1">
+              <h6 class="m-0 text-center">
+                {{ type.type.title }}
+                {% if type.type.value and type.type.unit %}:
+                  {{ type.type.value }}
+                  {{ type.type.unit }}
+                {% endif %}
+              </h6>
+            </div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
   <!-- First image -->
   {% if main_image and (entity.system_class.lower() not in ['actor', 'person']) %}
     {{ ui.overview_image(main_image, manifests) }}
@@ -171,29 +160,7 @@
     </div>
   {% endif %}
 
-  <!-- Atrributes -->
-  {% if categorized_types %}
-    <div class="item-half item-attributes">
-      <span class="tile-label">{{ _('attributes') | upper }}</span>
-      <div class="categorized-types">
-        {% for label, value in categorized_types.items() %}
-          <p class="tile-sub-label text-uppercase mt-3">
-            {{ value[0]['icon'] | safe }} {{ label.replace('_', ' ').title() }}</p>
-          {% for type in value %}
-            <div class="badge custom-badge text-wrap m-1">
-              <h6 class="m-0 text-center">
-                {{ type.type.title }}
-                {% if type.type.value and type.type.unit %}:
-                  {{ type.type.value }}
-                  {{ type.type.unit }}
-                {% endif %}
-              </h6>
-            </div>
-          {% endfor %}
-        {% endfor %}
-      </div>
-    </div>
-  {% endif %}
+
 
   <!-- Bibliography and External References -->
   <!-- todo: get also the references from the root entity -->

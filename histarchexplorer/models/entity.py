@@ -143,8 +143,8 @@ class Entity:
 
     def get_description_class(self) -> str:
         description_class = "item"
-        if self.description and len(self.description) > 1500:
-            description_class = "item-middle"
+        #if self.description and len(self.description) > 1500:
+            #description_class = "item-middle"
         return description_class
 
     def get_subunits(self) -> Optional[list[Relation]]:

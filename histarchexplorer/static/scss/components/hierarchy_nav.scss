@@ -7,7 +7,6 @@
   padding-bottom: rem(5);
   max-width: 80%;
   margin: auto;
-  margin-top: 1rem;
   //display: grid;
 
   @media (min-width: 1921px) or (max-width: 769px) {
@@ -189,6 +188,7 @@ button.btn-whitish[disabled] {
   border-radius: 0.25rem;
   color: #444;
   margin-right: 0.5rem;
+  margin-top:0.5rem;
 
   i {
     font-size: 1rem;

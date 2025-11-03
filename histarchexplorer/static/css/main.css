@@ -12648,7 +12648,7 @@ textarea.form-control-lg {
 }
 
 .entity-card__icon img {
-  max-width: 80%;
+  max-width: 40%;
   height: auto;
   border-radius: 10px;
 }
@@ -12689,10 +12689,6 @@ textarea.form-control-lg {
     font-size: 1em;
   }
 }
-.entity-type {
-  margin-top: 2rem;
-}
-
 .entity-type p {
   margin-bottom: 0;
 }
@@ -12767,7 +12763,6 @@ textarea.form-control-lg {
   padding-bottom: 0.3125rem;
   max-width: 80%;
   margin: auto;
-  margin-top: 1rem;
   border-top: 0.3125rem solid transparent;
   border-bottom: 0.3125rem solid transparent;
 }
@@ -12931,6 +12926,7 @@ button.btn-whitish[disabled] {
   border-radius: 0.25rem;
   color: #444;
   margin-right: 0.5rem;
+  margin-top: 0.5rem;
 }
 .cite-button i {
   font-size: 1rem;

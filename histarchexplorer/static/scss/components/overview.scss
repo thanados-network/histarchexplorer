@@ -354,7 +354,7 @@
 }
 
 .entity-card__icon img {
-  max-width: 80%; //ev. change here to extra card, so that on entity page this can stay on 80-100%
+  max-width: 40%; //ev. change here to extra card, so that on entity page this can stay on 80-100%
   height: auto;
   border-radius: 10px;
 }
@@ -400,7 +400,7 @@
 }
 
 .entity-type {
-  margin-top: 2rem;
+  //margin-top: 0.5rem;
 }
 
 .entity-type p {
