@@ -34,17 +34,23 @@ def entity_view(id_: int, tab_name: str = "overview") -> str:
             overview_map_geometry = {
                 'type': 'FeatureCollection',
                 'features': get_features_for_map(entity)}
-
+    main_image, initial_images, images = get_entity_images(entity.files)
     data: dict[str, Any] = {
         'entity': asdict(entity),
         'spatial': {
             'type': 'FeatureCollection',
             'features': get_features_for_map(entity, hierarchy)},
-        'overview_map': overview_map_geometry}
+        'overviewMap': overview_map_geometry,
+        'categorizedTypes': get_categorized_types(entity.types),
+        'citeButton': get_cite_button(entity),
+        'mainImage': main_image,
+        'initialImage': initial_images,
+        'images': images}
 
     return render_template(
         'entity.html',
         sidebar_elements=build_sidebar(id_, sidebar_elements),
+        categorized_types=get_categorized_types(entity.types),
         data=data,
         page_name="landing",
         active_tab=tab_name,
@@ -88,23 +94,6 @@ def get_entity(id_: int, tab_name=None) -> str:
             main_image_json=g.main_images,
             tab_name='subunits')
 
-    entity = PresentationView.from_api(id_)
-    hierarchy = {
-        'subs': get_sub_count(entity),
-        'root': get_hierarchy(entity)}
-
-    overview_map_geometry = entity.geometry_json
-    if not overview_map_geometry:
-        if hierarchy.get('root'):
-            overview_map_geometry = get_parent_geometry(hierarchy['root'])
-        else:
-            overview_map_geometry = {
-                'type': 'FeatureCollection',
-                'features': get_features_for_map(entity)}
-    data: dict[str, Any] = {
-        'overview_map': json.dumps(overview_map_geometry)}
-
-    main_image, initial_images, images = get_entity_images(entity.files)
 
     match tab_name:
         case 'feature':  # pragma: no cover
@@ -118,17 +107,7 @@ def get_entity(id_: int, tab_name=None) -> str:
         case _ if tab_name not in ['feature']:
             abort(404)
 
-    return render_template(
-        f'tabs/{tab_name}.html',
-        data=json.dumps(data),
-        entity=entity,
-        categorized_types=get_categorized_types(entity.types),
-        images=images,
-        main_image=main_image,
-        initial_images=initial_images,
-        cite_button=get_cite_button(entity),
-        hierarchy=hierarchy,
-        overview_map_geometry=overview_map_geometry)
+    return render_template(f'tabs/{tab_name}.html')
 
 
 def get_features_for_map(
