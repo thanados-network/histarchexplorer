@@ -26,7 +26,7 @@
 <div class="col flex-column grid-muuri">
   <!-- ALL-IN_ONE-Muuri -->
   {% if entity.description %}
-    <div class="item">
+    <div class="item hierarchy-item">
       <div class="cite-wrapper">
         {{ cite_button.button_html | safe }}
       </div>
@@ -166,7 +166,7 @@
   <!-- todo: get also the references from the root entity -->
   <!--    This is just a model thing, Bernhard will include this in the API call, so nothing to do here -->
   {% if entity.references %}
-    <div class="item item-5-6" data-type="reference">
+    <div class="item item-wide" data-type="reference">
       <div class="item-content">
         <div class="muuri-references">
           <p class="tile-label text-uppercase">References</p>

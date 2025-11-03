@@ -12370,6 +12370,7 @@ textarea.form-control-lg {
 .item-middle,
 .item-fit,
 .item-5-6 {
+  margin: 2.5px;
   border-radius: 5px; /* Rounded corners */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: none;
@@ -12378,9 +12379,8 @@ textarea.form-control-lg {
 
 .item {
   display: block;
-  margin: 5px;
   position: absolute;
-  width: calc((100% - 20px) / 3);
+  width: calc((100% - 15px) / 3);
   background: var(--muuri-tile);
   overflow: hidden;
 }
@@ -12429,9 +12429,8 @@ textarea.form-control-lg {
 }
 .item-half {
   display: block;
-  margin: 2.5px;
   position: absolute;
-  width: calc(((100% - 30px) / 3 - 10px) / 2);
+  width: calc(((100% - 15px) / 3 - 10px) / 2);
   max-height: fit-content;
   background: var(--muuri-tile);
   overflow: hidden;
@@ -12451,7 +12450,7 @@ textarea.form-control-lg {
   }
 }
 .item-wide {
-  width: calc(100% - 30px);
+  width: 100%;
 }
 
 @media (max-width: 1400px) {
@@ -12472,7 +12471,7 @@ textarea.form-control-lg {
     width: calc((100% - 20px) / 2);
   }
   .item-wide {
-    width: calc(100% - 10px);
+    width: 100%;
   }
   .item-5-6 {
     width: calc(100% - 10px);
@@ -12482,7 +12481,7 @@ textarea.form-control-lg {
   .item,
   .item-half,
   .item-middle,
-  .item-fit {
+  .item-wide .item-fit {
     border-radius: 0;
     padding-bottom: 0.625rem;
   }
@@ -12523,7 +12522,6 @@ textarea.form-control-lg {
   max-width: 100%;
   height: auto;
   display: block;
-  margin: 0 auto;
   position: relative;
 }
 
@@ -12887,7 +12885,6 @@ button.btn-whitish[disabled] {
 .hierarchy-item {
   background-color: var(--hierarchy-item);
   padding-top: 1rem;
-  min-height: calc(100vh - 106px);
 }
 
 .attribute-area {
