@@ -40,6 +40,7 @@ def entity_view(id_: int, tab_name: str = "overview") -> str:
         'spatial': {
             'type': 'FeatureCollection',
             'features': get_features_for_map(entity, hierarchy)},
+        'hierarchy': hierarchy,
         'overviewMap': overview_map_geometry,
         'categorizedTypes': get_categorized_types(entity.types),
         'citeButton': get_cite_button(entity),
