@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     // Fetch PresentationView JSON from API
     const viewEntity = await fetchPresentationView(file_id);
-    console.log("Loaded viewEntity:", viewEntity);
 
     // Extract the 3D model file (you said always one)
     const file_data = viewEntity.files[0];

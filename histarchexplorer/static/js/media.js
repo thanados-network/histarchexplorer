@@ -26,7 +26,6 @@ const renderTypeStyles = {
   }
 
   const files = data.entity.files;
-  console.log("Found media files:", files.length);
 
   // --- Step 1: Create a map of webp posters by ID ---
   const posterMap = {};
@@ -35,8 +34,6 @@ const renderTypeStyles = {
     .forEach(f => {
       posterMap[f.title] = f.url;
     });
-
-  console.log("Poster map:", posterMap);
 
   // --- Step 2: Filter out webp files from rendering ---
   const visibleFiles = files.filter(f => f.render_type !== "webp");

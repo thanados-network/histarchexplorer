@@ -1,88 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
 
-{# Minimal scaffold. JS will render into the placeholders below. #}
-<div class="col flex-column grid-muuri" id="overview-root">
-  <!-- Top / header tile: cite + main entity card -->
-  <div class="item item-half" id="tile-hero">
-    <div class="item-content item-content-full">
-      <div class="cite-wrapper" id="js-cite-button"></div>
-
-      <!-- Dummy hierarchy buttons (replace later if needed) -->
-      <div id="js-hierarchy-buttons" class="d-flex flex-column gap-2 mt-2"></div>
-
-      <!-- Main entity card -->
-      <div id="js-entity-card" class="mt-3"></div>
-    </div>
+  <div class="container-fluid py-4">
+    <div class="grid-muuri" id="overview-root"></div>
   </div>
 
-  <!-- Description -->
-  <div class="item" id="tile-description" hidden>
-    <div class="item-content" data-type="description">
-      <div class="muuri-description">
-        <span class="tile-label text-uppercase">Description</span>
-        <div id="js-description"></div>
-      </div>
-    </div>
-  </div>
+  <script src="{{ url_for('static', filename='js/overview.js') }}"></script>
+  <script
+    src="{{ url_for('static', filename='js/map_overview.js') }}"></script>
 
-  <!-- Map Location -->
-  <div class="item" id="tile-map" hidden>
-    <div class="map-wrapper">
-      <div class="item-content item-content-full">
-        <div class="location position-relative">
-          <div id="muuri-map"></div>
-          <button id="expand-button" class="btn btn-light btn-sm position-absolute top-0 end-0 m-2"
-                  title="Open Map Tab">
-            <i class="bi bi-box-arrow-up-right"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (typeof Muuri === "undefined") {
+        console.warn("⚠️ Muuri not loaded!");
+        return;
+      }
 
-  <!-- First (main) image -->
-  <div class="item" id="tile-main-image" hidden>
-    <div class="item-content item-content-full">
-      <div id="js-main-image"></div>
-    </div>
-  </div>
+      window.overviewGrid = new Muuri(".grid-muuri", {
+        layout: {fillGaps: true},
+        dragEnabled: false,
+        layoutDuration: 0
+      });
 
-  <!-- Initial images (rest) -->
-  <div class="item" id="tile-initial-images" hidden>
-    <div class="item-content item-content-full">
-      <div id="js-initial-images" class="d-flex flex-wrap gap-3"></div>
-    </div>
-  </div>
-
-  <!-- Attributes -->
-  <div class="item" id="tile-attributes" hidden>
-    <div class="item-content">
-      <div class="attribute-area">
-        <span class="tile-label text-uppercase">Attributes</span>
-        <div id="js-attributes" class="categorized-types"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- References -->
-  <div class="item item-5-6" id="tile-references" hidden>
-    <div class="item-content">
-      <div class="muuri-references">
-        <p class="tile-label text-uppercase">References</p>
-        <ul id="js-references" class="no-bullets"></ul>
-      </div>
-    </div>
-  </div>
-</div>
-
-{# The cite modal HTML (if provided) will be injected by JS. #}
-
-<script>
-  // Expose a few globals for the JS files (mirrors your previous approach)
-  const { entity, overviewMap, categorizedTypes, citeButton, mainImage, initialImage, images } = window.entityData || {};
-  window.entityName = entity?.title || '';
-  window.overviewMap = overviewMap || null;
-
-  // This file does all rendering + Muuri lifecycle
-</script>
-<script src="{{ url_for('static', filename='js/overview.js') }}"></script>
-<script src="{{ url_for('static', filename='js/map_overview.js') }}"></script>
+      window.relayout = (delay = 0) => {
+        if (!window.overviewGrid) return;
+        setTimeout(() => window.overviewGrid.refreshItems().layout(), delay);
+      };
+    });
+  </script>
+{% endblock %}
