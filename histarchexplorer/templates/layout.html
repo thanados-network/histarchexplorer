@@ -26,7 +26,10 @@
   <script
     src="{{ url_for('static', filename='js/global_functions.js') }}"></script>
   <script>
-      const language="{{ current_language | tojson }}"
+      window.language="{{ current_language }}"
+      window.availableLanguages="{{ available_languages }}"
+      window.preferredLanguage="{{ preferred_language }}"
+      window.currentLanguage="{{ current_language }}"
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

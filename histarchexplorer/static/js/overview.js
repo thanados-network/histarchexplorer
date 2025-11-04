@@ -47,7 +47,7 @@ function capitalizeWords(s) {
 }
 function pickDescription(descObj) {
   if (!descObj) return null;
-  const preferred = ['current_language', 'en', 'de'];
+  const preferred = ['en', 'de'];
   for (const key of preferred) if (descObj[key]) return descObj[key];
   for (const v of Object.values(descObj)) if (v) return v;
   return null;

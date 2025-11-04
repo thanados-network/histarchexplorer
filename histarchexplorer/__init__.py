@@ -102,7 +102,6 @@ def before_request() -> None:
     g.language = session.get(
         'language',
         request.accept_languages.best_match(g.available_languages.keys()))
-
     g.preferred_langauge = app.config['PREFERRED_LANGUAGE']
     g.view_classes = app.config['VIEW_CLASSES']
     g.admin_fields = app.config['ADMIN_FIELDS']
