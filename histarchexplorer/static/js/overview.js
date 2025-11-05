@@ -364,7 +364,18 @@ function startOverview() {
   if (Array.isArray(initialImages)) files.push(...initialImages);
   renderOverviewMediaTiles(files, additionalFilesOverview);
 
+  window.mediaGrid = new Muuri(".grid-overview", {
+    layout: {
+      fillGaps: true,
+      horizontal: false,
+      rounding: true
+    },
+    dragEnabled: false,
+    layoutDuration: 300,
+    layoutEasing: "ease-out"
+  });
 
+  setTimeout(() => window.mediaGrid.refreshItems().layout(), 500);
 }
 
 if (document.readyState === "loading")
