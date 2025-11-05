@@ -5,6 +5,15 @@
   </button>
 {% endmacro %}
 
+{% macro back_button(url) %}
+  <div class="mb-3 text-start">
+    <a href="{{ url }}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back to the entity
+    </a>
+  </div>
+{% endmacro %}
+
+
 
 {% macro flash_messages() %}
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -24,47 +33,139 @@
 {% endmacro %}
 
 
-{% macro overview_image(image, manifests) %}
-  <div class="item-half">
+{% macro overview_image(image, information=False, last=False) %}
+  {% set base_classes = "hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded" %}
+  {% set icon_style = "font-size: 1.5em;" %}
+  {% set alt = image.title or "Image" %}
+  <div class="item item-half">
     <div class="item-content item-content-full">
       <div class="muuri-images">
         <div class="image position-relative">
-          {# 3D-Modell-Ansicht (GLB/GLTF) #}
-          {% if image.render_type == '3d_model' %}
-            <div class="model-wrapper" style="height: 300px; position: relative;">
-              <div class="spinner"></div>
-              <model-viewer
-                  src="{{ image.url }}" alt="{{ image.title }}"
-                  camera-controls style="width: 100%; height: 100%;"
-                  ar ar-modes="webxr scene-viewer quick-look"
-                  shadow-intensity="1" autoplay></model-viewer>
-            </div>
 
-            {# IIIF-Bild, wenn kein WebP #}
-          {% elif image.iiif_base_path and image.mimetype|lower != 'image/webp' %}
-            <a href="{{ url_for('view_mirador') }}?urls={{ manifests | join(',') | urlencode }}"
-               target="_blank"
-               class="hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
-               style="z-index: 10;">
-              <i class="bi bi-arrows-fullscreen"></i>
+          {# --- media block (unchanged) --- #}
+          {% if image.render_type == '3d_model' %}
+            <div class="model-wrapper" style="height:300px;position:relative;">
+              <div class="spinner"></div>
+              <model-viewer src="{{ image.url }}" alt="{{ alt }}" camera-controls
+                            ar ar-modes="webxr scene-viewer quick-look"
+                            shadow-intensity="1" autoplay
+                            style="width:100%;height:100%;"></model-viewer>
+            </div>
+          {% elif image.render_type == 'video' %}
+            <div class="video-wrapper position-relative" style="height:300px;overflow:hidden;">
+              <video class="w-100 h-100 rounded shadow-sm" src="{{ image.url }}" controls preload="metadata">
+                Your browser does not support the video tag.
+              </video>
+              <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2" type="button"
+                      onclick="this.previousElementSibling.requestFullscreen();">
+                <i class="bi bi-arrows-fullscreen"></i>
+              </button>
+            </div>
+          {% elif image.render_type == 'image' %}
+            {% if image.iiif_base_path %}
+              <a href="{{ url_for('view_mirador') }}?urls={{ image.iiif_manifest | urlencode }}"
+                 target="_blank" class="{{ base_classes }}" style="z-index:10;">
+                <i class="bi bi-arrows-fullscreen"></i>
+              </a>
+              <img src="{{ image.iiif_base_path }}/full/400,/0/default.jpg" alt="{{ alt }}">
+            {% else %}
+              <img src="{{ image.url }}" alt="{{ alt }}">
+            {% endif %}
+          {#{% elif image.render_type == 'pdf' and image.iiif_base_path %}
+            <a href="{{ url_for('render_pdf', id_=image.id) }}" target="_blank"
+               class="{{ base_classes }}" style="z-index:10;">
+              <i class="bi bi-filetype-pdf" style="{{ icon_style }}"></i>
             </a>
-            <img src="{{ image.iiif_base_path }}/full/400,/0/default.jpg" alt="{{ image.title }}">
-          {% elif image.mimetype|lower != 'image/webp' %}
-            <img src="{{ image.url }}" alt="{{ image.title }}">
+            <img src="{{ image.iiif_base_path }}/full/400,/0/default.jpg" alt="{{ alt }}">#}
+          {% elif image.render_type == 'svg' %}
+            <object type="image/svg+xml" data="{{ image.url }}" class="w-100 h-100 border-0" style="height:300px;"></object>
+          {% else %}
+            <img src="{{ image.url or '/static/img/placeholder.png' }}" alt="{{ alt }}">
           {% endif %}
 
+          {# --- caption + info popover --- #}
+          {% if information %}
+            <div class="mt-2 text-center small text-muted">
+              {{ image.title }}
+
+              {% if image.description or image.license or image.creator or image.license_holder %}
+                {# Hidden HTML the popover will read #}
+                <div id="popover-content-{{ image.id }}" class="d-none">
+                  {% if image.description %}
+                    <div class="mb-2">{{ image.description }}</div>
+                  {% endif %}
+                  {% if image.license %}
+                    <div><b>License:</b> {{ image.license }}</div>
+                  {% endif %}
+                  {% if image.creator %}
+                    <div><b>Creator:</b> {{ image.creator }}</div>
+                  {% endif %}
+                  {% if image.license_holder %}
+                    <div><b>License holder:</b> {{ image.license_holder }}</div>
+                  {% endif %}
+                </div>
+
+                <button type="button"
+                        class="btn btn-sm btn-light ms-2"
+                        data-bs-toggle="popover"
+                        data-bs-container="body"
+                        data-bs-trigger="focus"
+                        data-bs-placement="top"
+                        data-bs-title="{{ image.title }}"
+                        data-popover-content="#popover-content-{{ image.id }}">
+                  <i class="bi bi-info-circle"></i>
+                </button>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          {% if last %}
+            <button id="show-more-images"
+                    class="hover-max position-absolute bottom-0 start-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
+                    type="button" data-target="#tab-pane-media">
+              More images
+            </button>
+          {% endif %}
+
+        </div>{# .image #}
+      </div>{# .muuri-images #}
+    </div>{# .item-content #}
+  </div>{# .item #}
+{% endmacro %}
+
+
+
+{% macro date_template_format(begin, end) %}
+  {% if begin and end %}
+    {{ begin }} - {{ end }}
+  {% elif begin %}
+    {{ begin }}
+  {% elif end %}
+    {{ end }}
+  {% endif %}
+{% endmacro %}
+
+
+{% macro viewer_wrapper(content_block) %}
+  <div class="page-wrapper">
+    <div class="scrollable-container">
+      <div class="container-fluid py-4 text-center">
+        <div class="d-flex justify-content-center">
+          <div class="position-relative w-100"
+               style="height: 85vh; max-width: 1200px;">
+
+            <div class="spinner position-absolute top-50 start-50 translate-middle">
+              <div class="spinner-border text-secondary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+
+            {{ content_block() }}
+
+          </div>
         </div>
       </div>
     </div>
   </div>
 {% endmacro %}
 
-{% macro date_template_format(begin, end) %}
-    {% if begin and end %}
-        {{ begin }} - {{ end }}
-    {% elif begin %}
-        {{ begin }}
-    {% elif end %}
-        {{ end }}
-    {% endif %}
-{% endmacro %}

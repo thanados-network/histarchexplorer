@@ -1,4 +1,5 @@
-from typing import Optional
+from dataclasses import asdict
+from typing import Any, Optional
 
 import requests
 from flask import g, jsonify, redirect, render_template, request, \
@@ -6,6 +7,8 @@ from flask import g, jsonify, redirect, render_template, request, \
 from werkzeug import Response
 
 from histarchexplorer import app, cache
+from histarchexplorer.api.api_access import ApiAccess
+from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.database.map import get_map_tilestring
 from histarchexplorer.utils.cerberos import get_view_class_count
 
@@ -37,3 +40,14 @@ def type_tree():
         headers=g.api_headers,
         timeout=20).json()
     return jsonify(response)
+
+
+@app.route('/files_of_entities')
+def files_of_entities() -> Response:
+    return jsonify(ApiAccess.get_files_of_entities())
+
+
+@app.route('/presentation_view/<int:id_>')
+def presentation_view(id_: int) -> dict[str, Any]:
+    return asdict(PresentationView.from_api(id_))
+

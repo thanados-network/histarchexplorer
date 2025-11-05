@@ -3,7 +3,7 @@ from typing import Any
 import requests
 from flask import g
 
-from histarchexplorer import app
+from histarchexplorer import app, cache
 from histarchexplorer.api.parser import Parser
 
 PROXIES = {
@@ -21,6 +21,24 @@ class ApiAccess:
             headers=g.api_headers,
             proxies=PROXIES,
             timeout=30).json()
+
+
+    @staticmethod
+    @cache.memoize()
+    def get_files_of_entities() -> dict[str, Any]:
+        return requests.get(
+            f"{app.config['API_URL']}/files_of_entities/",
+            headers=g.api_headers,
+            proxies=PROXIES,
+            timeout=30).json()
+
+    @staticmethod
+    @cache.memoize()
+    def get_type_tree() -> dict[str, Any]:
+        return requests.get(
+            f"{app.config['API_URL']}/type_by_view_class/",
+            headers=g.api_headers,
+            timeout=20).json()
 
     # @staticmethod
     # def get_entity(id_: int, parser: Parser) -> dict[str, Any]:

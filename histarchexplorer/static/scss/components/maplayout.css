@@ -1,0 +1,221 @@
+@charset "UTF-8";
+.layer-control-ctrl {
+  position: relative;
+}
+
+.image-legend-item {
+  margin: 20px 0;
+}
+
+.group-header label,
+.geom-header label,
+.geom-header label,
+.image-legend-item label {
+  cursor: grab;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  border-radius: 4px;
+}
+
+.group-header label:hover,
+.image-legend-item label:hover,
+.geom-header label:hover {
+  background-color: #f0f0f0;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.group-header label:active,
+.image-legend-item label:active,
+.geom-header label:active {
+  cursor: grabbing;
+  background-color: #e0e0e0;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.15);
+}
+
+.sortable-chosen {
+  opacity: 0.9;
+  background: #f5f5f5;
+  border: 1px dashed #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.sortable-ghost {
+  opacity: 0.4;
+  border: 2px dashed #888;
+  background: #fafafa;
+}
+
+.layer-group.sortable-chosen {
+  background: #eee;
+}
+
+.edit-geom.sortable-chosen {
+  background: #f9f9f9;
+}
+
+.layer-panel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: white;
+  padding: 25px 2px 2px 2px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  width: 340px;
+  max-height: 80vh;
+  overflow-y: auto;
+  font-size: 13px;
+  z-index: 2;
+}
+
+.layer-panel.hidden,
+.hidden {
+  display: none;
+}
+
+.layer-toggle-btn {
+  background: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.layer-close-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: none;
+  border: none;
+  color: #444;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.layer-close-btn:hover {
+  color: #000;
+}
+
+.edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  margin-left: 8px;
+  padding: 0 4px;
+  transition: color 0.2s ease;
+}
+
+.edit-btn:hover {
+  color: #000;
+}
+
+.layer-group {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: whitesmoke !important;
+  margin: 5px;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  margin: 6px 0;
+  font-weight: bold;
+}
+
+.group-header input[type=checkbox] {
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.count {
+  font-weight: normal;
+  color: #666;
+  font-size: 12px;
+}
+
+.edit-menu {
+  margin-left: 20px;
+  padding-left: 6px;
+  margin-top: 2px;
+  transition: all 0.2s ease;
+}
+
+.edit-geom {
+  margin-left: 12px;
+  margin-bottom: 6px;
+}
+
+.geom-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-style: italic;
+  color: #333;
+  margin: 3px 0;
+  cursor: pointer;
+}
+
+.geom-header input[type=color] {
+  margin-left: auto;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+}
+
+.layer-panel .geom-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.symbol {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  pointer-events: none;
+}
+
+.layer-sub,
+.layer-list {
+  margin-left: 20px;
+  margin-top: 4px;
+}
+
+.edit-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 3px 0;
+}
+
+.edit-item .geom-label {
+  width: 80px;
+  font-size: 13px;
+}
+
+.layer-item {
+  font-size: 0.9em;
+}
+
+.layer-item strong {
+  color: #b30000;
+}
+
+.layer-item strong::before {
+  content: "★ ";
+  color: #ff5555;
+}
+
+/*# sourceMappingURL=maplayout.css.map */

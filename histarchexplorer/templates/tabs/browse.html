@@ -5,13 +5,13 @@
     {% if subunits %}
       const typeTreeData = {{ typetree_data|tojson}}
       const viewClasses = {{ view_classes|tojson }};
-      const subunit_data = {{ subunit_data|tojson }}
+      const data = {{ subunit_data|tojson }}
       function getEntitiesForTab(tabName='') {
         const validClasses = ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains'];
-        return subunit_data.entities.filter(entity => validClasses.includes(entity.class));
+        return data.entities.filter(entity => validClasses.includes(entity.class));
       }
 
-      subunit_data.entities.forEach(entity => {
+      data.entities.forEach(entity => {
         entity.beginDBP = calculateTimeBP(entity.begin);
         entity.endDBP = calculateTimeBP(entity.end);
         if (entity.begin) entity.beginString = makeLocalDate(entity.begin).localdate;

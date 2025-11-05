@@ -65,18 +65,22 @@ def format_date(date_from: str, date_to: str) -> Optional[str]:
 
 
 def get_render_type(mime_type: str) -> str:
-    if mime_type:
-        if (mime_type == "model/gltf-binary"
-                or mime_type == "model/glb"
-                or mime_type == "model/gltf+json"):
-            return '3d_model'
-        elif mime_type == "image/webp":
-            return 'webp'
-        elif mime_type == "application/pdf":
-            return 'pdf'
-        elif mime_type.startswith("image/"):
-            return 'image'
-    return 'unknown'
+    match mime_type:
+        case "model/gltf-binary" | "model/glb" | "model/gltf+json":
+            render_type = '3d_model'
+        case "image/webp":
+            render_type = 'webp'
+        case "application/pdf":
+            render_type = 'pdf'
+        case 'image/svg+xml':
+            render_type = 'svg'
+        case _ if mime_type.startswith("video/"):
+            render_type = 'video'
+        case _ if mime_type.startswith("image/"):
+            render_type = 'image'
+        case _:
+            render_type = 'unknown'
+    return render_type
 
 
 def get_icon(id_: int, type_hierarchy: dict[str, str]) -> str:

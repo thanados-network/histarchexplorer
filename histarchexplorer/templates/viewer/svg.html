@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block content %}
+  <script>
+  const file_id = {{ file_id|tojson }};
+  </script>
+  <div class="page-wrapper">
+    <div class="scrollable-container">
+      <div class="container-fluid py-4 text-center">
+        <div class="d-flex justify-content-center">
+          <div class="svg-viewer-wrapper position-relative w-100"
+               style="height: 90vh;">
+
+            <div
+              class="spinner position-absolute top-50 start-50 translate-middle">
+              <div class="spinner-border text-secondary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+
+            <!-- SVG container -->
+            <div id="svgContainer" class="w-100 h-100 rounded shadow border-0"
+                 style="background-color: #f8f9fa;"></div>
+
+            <!-- ===== TOOLBOX ===== -->
+            <div id="toolbox"
+                 class="position-absolute top-0 end-0 m-3 d-flex flex-column gap-2">
+              <button class="btn btn-light btn-sm" id="btn-zoom-in"
+                      title="Zoom In">
+                <i class="bi bi-zoom-in"></i>
+              </button>
+              <button class="btn btn-light btn-sm" id="btn-zoom-out"
+                      title="Zoom Out">
+                <i class="bi bi-zoom-out"></i>
+              </button>
+              <button class="btn btn-light btn-sm" id="btn-reset"
+                      title="Reset View">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+              <button class="btn btn-light btn-sm" id="btn-info"
+                      title="Show information">
+                <i class="bi bi-info-circle"></i>
+              </button>
+              <button class="btn btn-light btn-sm" id="btn-download"
+                      title="Download SVG">
+                <i class="bi bi-download"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <script
+    src="{{ url_for('static', filename='node_modules/svg-pan-zoom/dist/svg-pan-zoom.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/viewer/svg.js') }}"></script>
+<script src="{{ url_for('static', filename='js/viewer/viewer_info.js') }}"></script>
+{% endblock %}

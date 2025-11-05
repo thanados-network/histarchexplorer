@@ -1,14 +1,16 @@
 import json
+import time
 from collections import defaultdict
+from dataclasses import asdict
 from typing import Any, Optional
 
 from flask import abort, g, render_template
 
 from histarchexplorer import app
-from histarchexplorer.database.entity import (
-    check_if_place_hierarchy, get_first_geom)
 from histarchexplorer.api.presentation_view import (
     EntityTypeModel, File, PresentationView, Relation)
+from histarchexplorer.database.entity import (
+    check_if_place_hierarchy, get_first_geom)
 from histarchexplorer.utils.view_util import get_cite_button
 from histarchexplorer.views.entities import get_browse_list_entities
 from histarchexplorer.views.views import type_tree
@@ -20,18 +22,42 @@ def entity_view(id_: int, tab_name: str = "overview") -> str:
     sidebar_elements = app.config['SIDEBAR_OPTIONS']
     if tab_name not in {item['route'] for item in sidebar_elements}:
         abort(404)
+    entity = PresentationView.from_api(id_)
+    hierarchy = {
+        'subs': get_sub_count(entity),
+        'root': get_hierarchy(entity)}
+    overview_map_geometry = entity.geometry_json
+    if not overview_map_geometry:
+        if hierarchy.get('root'):
+            overview_map_geometry = get_parent_geometry(hierarchy['root'])
+        else:
+            overview_map_geometry = {
+                'type': 'FeatureCollection',
+                'features': get_features_for_map(entity)}
+
+    data: dict[str, Any] = {
+        'entity': asdict(entity),
+        'spatial': {
+            'type': 'FeatureCollection',
+            'features': get_features_for_map(entity, hierarchy)},
+        'overview_map': overview_map_geometry}
+
     return render_template(
         'entity.html',
         sidebar_elements=build_sidebar(id_, sidebar_elements),
+        data=data,
         page_name="landing",
         active_tab=tab_name,
         entity_id=id_)
 
 
-def get_entity_images(files: list[File]) -> tuple[File, list[File]]:
+def get_entity_images(files: list[File]) -> tuple[
+    File, list[File], list[File]]:
     images = []
     main_image = None
     for image in files:
+        if image.render_type in ['unknown', 'webp']:
+            continue
         if image.main_image:
             main_image = image
         else:
@@ -40,11 +66,28 @@ def get_entity_images(files: list[File]) -> tuple[File, list[File]]:
     if not main_image and images:
         main_image = images.pop(0)
     initial_images = images[:2]
-    return main_image, initial_images
+    images.append(main_image)
+    return main_image, initial_images, images
 
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
 def get_entity(id_: int, tab_name=None) -> str:
+    if tab_name == 'subunits':
+        subunit_data = get_browse_list_entities(id_)
+        filtered_view_classes = {
+            key: tuple(list(d.keys())[0] for d in value)
+            for key, value in subunit_data['counts'].items()}
+
+        return render_template(
+            f'tabs/browse.html',
+            subunits=True,
+            view_classes=filtered_view_classes,
+            subunit_data=subunit_data,
+            active_tab=tab_name,
+            typetree_data=type_tree().json,
+            main_image_json=g.main_images,
+            tab_name='subunits')
+
     entity = PresentationView.from_api(id_)
     hierarchy = {
         'subs': get_sub_count(entity),
@@ -59,36 +102,17 @@ def get_entity(id_: int, tab_name=None) -> str:
                 'type': 'FeatureCollection',
                 'features': get_features_for_map(entity)}
     data: dict[str, Any] = {
-        'entity': entity.to_json(),
         'overview_map': json.dumps(overview_map_geometry)}
 
-    main_image, initial_images = get_entity_images(entity.files)
+    main_image, initial_images, images = get_entity_images(entity.files)
+
     match tab_name:
         case 'feature':  # pragma: no cover
             pass
         case 'map':
-            map_data = {
-                'type': 'FeatureCollection',
-                'features': get_features_for_map(entity, hierarchy)}
-            data['spatial'] = map_data
+            pass
         case 'media':
             pass
-        case 'subunits':
-            subunit_data = get_browse_list_entities(id_)
-            filtered_view_classes = {
-                key: tuple(list(d.keys())[0] for d in value)
-                for key, value in subunit_data['counts'].items()}
-
-            return render_template(
-                f'tabs/browse.html',
-                subunits=True,
-                view_classes=filtered_view_classes,
-                subunit_data=subunit_data,
-                active_tab=tab_name,
-                typetree_data=type_tree().json,
-                main_image_json=g.main_images,
-                tab_name='subunits')
-
         case 'overview':
             pass
         case _ if tab_name not in ['feature']:
@@ -99,9 +123,9 @@ def get_entity(id_: int, tab_name=None) -> str:
         data=json.dumps(data),
         entity=entity,
         categorized_types=get_categorized_types(entity.types),
+        images=images,
         main_image=main_image,
         initial_images=initial_images,
-        manifests=[img.iiif_manifest for img in entity.files],
         cite_button=get_cite_button(entity),
         hierarchy=hierarchy,
         overview_map_geometry=overview_map_geometry)
@@ -142,9 +166,9 @@ def check_sidebar_elements(tab: str, id_: int) -> bool:
             return bool(get_first_geom(id_))
         case 'subunits':
             return bool(check_if_place_hierarchy(id_))
-        case 'overview':
+        case 'overview' | 'media':
             return True
-        case 'media' | _:
+        case _:
             return False
 
 
@@ -167,6 +191,7 @@ def get_parent_geometry_id(hierarchy: list[Relation]) -> int | None:
     for root_element in reversed(hierarchy):
         if root_element.geometries:
             id_ = root_element.id
+            break
     return id_
 
 
@@ -273,3 +298,39 @@ def get_sub_count(main_entity: PresentationView) -> int:
     for rel_type in sub_relations_map.get(main_entity.system_class, []):
         count += len(main_entity.relations.get(rel_type, []))
     return count
+
+
+def get_files_for_id(id: int) -> dict[str, list[str]]:
+    sql = """
+
+          SELECT JSONB_AGG(
+                         jsonb_build_object(
+                                 'id', a.id,
+                                 'name', a.name,
+                                 'description', a.description,
+                                 'bbox', a.bounding_box::JSONB
+                         )
+                 ) AS images
+          FROM (SELECT e.id,
+                       e.name,
+                       e.description,
+                       o.image_id,
+                       o.bounding_box
+                FROM model.entity e
+                         JOIN model.link l ON e.id = l.domain_id
+                         JOIN web.map_overlay o ON o.image_id = e.id
+                WHERE e.openatlas_class_name = 'file'
+                  AND l.range_id = %(id)s
+                  AND l.property_code = 'P67') a; \
+          """
+
+    g.cursor.execute(sql, {'id': id})
+    result = g.cursor.fetchone()
+    if result:
+        return result
+    return None
+
+
+@app.route('/get_rastermaps/<int:id>')
+def get_rastermaps(id: int) -> str:
+    return json.dumps(get_files_for_id(id))

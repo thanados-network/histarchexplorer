@@ -3,7 +3,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Optional
 
 import requests
-from flask import g
+from flask import g, url_for
 
 from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import PROXIES
@@ -182,6 +182,7 @@ class File:
     mime_type: Optional[str] = None
     iiif_manifest: Optional[str] = None
     iiif_base_path: Optional[str] = None
+    overlay: Optional[str] = None
     main_image: int = None
     render_type: str = None
 
@@ -346,8 +347,11 @@ class PresentationView:
                     public=f["publicShareable"],
                     url=f.get("url"),
                     mime_type=f.get("mimetype"),
-                    iiif_manifest=f.get("IIIFManifest"),
+                    iiif_manifest=(
+                        f"{f.get('IIIFManifest')}"
+                        f"?url={url_for('index', _external=True)}entity/"),
                     iiif_base_path=f.get("IIIFBasePath"),
+                    overlay=f.get('overlay'),
                     main_image=g.main_images.get(entity_id) == f["id"],
                     render_type=get_render_type(f.get("mimetype"))))
         return files
@@ -360,7 +364,8 @@ class PresentationView:
             params={
                 'place_hierarchy': 'true',
                 'remove_empty_values': 'true',
-                'centroid': 'true'},
+                'centroid': 'true',
+                'map_overlay': 'true'},
             headers=g.api_headers,
             proxies=PROXIES,
             timeout=30)
@@ -420,10 +425,11 @@ class PresentationView:
                 existing_pages = merged[rid].get("pages", "")
                 new_pages = ref.get("pages", "")
                 pages_set = {
-                    p.strip() for p in
-                    (existing_pages + "," + new_pages).split(",") if p.strip()}
-                merged[rid]["pages"] = (
-                    ", ".join(sorted(
-                        pages_set,
-                        key=lambda x: int(x) if x.isdigit() else x)))
+                    p.strip()
+                    for p in (existing_pages + "," + new_pages).split(",")
+                    if p.strip()}
+                merged[rid]["pages"] = ", ".join(sorted(
+                    pages_set,
+                    key=lambda x:
+                    (not x.isdigit(), int(x) if x.isdigit() else x)))
         return list(merged.values())
