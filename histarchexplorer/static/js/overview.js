@@ -370,11 +370,10 @@ function startOverview() {
       horizontal: false,
       rounding: true
     },
-    dragEnabled: false,
-    layoutDuration: 300,
-    layoutEasing: "ease-out"
+    layoutDuration: 200,
+    layoutEasing: "ease-out",
+    dragEnabled: false
   });
-
   setTimeout(() => window.mediaGrid.refreshItems().layout(), 500);
 }
 

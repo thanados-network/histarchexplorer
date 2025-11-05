@@ -265,3 +265,33 @@ body.dark .entity-date p {
   border-color: rgba(0, 0, 0, 0.15);
   transform: translateY(-1px);
 }
+
+
+// ===== GRID SPACING FIX =====
+.grid-overview {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem !important; // tighter but still airy
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+
+  .item {
+    flex: 1 1 320px;
+    margin: 0 !important; // remove old gaps from Muuri
+    padding: 0.5rem !important;
+    box-sizing: border-box;
+
+    .item-content {
+      padding: 0.75rem;
+      background: #fff;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 0.2s ease;
+    }
+
+    .item-content:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+  }
+}
