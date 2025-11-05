@@ -334,8 +334,8 @@ function startOverview() {
         ]),
     ]);
     const mapTile = h("div", {class: "item", id: "tile-map", hidden: true}, [
-        h("div", {class: "item-content item-content-full"}, [
-            h("div", {id: "muuri-map", style: "height:300px;"}),
+        h("div", {class: "item-content-full location"}, [
+            h("div", {id: "muuri-map", style: "height: 100%;"}),
         ]),
     ]);
     const refTile = h("div", {

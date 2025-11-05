@@ -661,6 +661,7 @@ body {
 
 .item-content-full {
   padding: 0;
+  height: 100%;
 }
 
 .image img {
