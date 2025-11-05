@@ -1,3 +1,5 @@
+//zoom factor for points/polygons!
+//
 // ============================================================
 //  MAP_OVERVIEW.JS — self-contained mini map for overview tile
 // ============================================================
