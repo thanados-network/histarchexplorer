@@ -15,3 +15,12 @@
 @forward 'media.scss';
 @forward 'maplayout.scss';
 @forward 'breadcrumbs.scss';
+
+// ======================================================
+// _index.scss — central component registry
+// ======================================================
+
+// Forward each component to be accessible from main.scss
+@forward "custom";
+@forward "entity";
+@forward "hierarchy_nav";

@@ -212,7 +212,6 @@ function renderReferences(entity) {
 // BOOTSTRAP
 // ---------------------------------------------------------------------------
 function startOverview() {
-  console.log("🚀 Starting overview render");
 
   const root = window.entityData || {};
   const entity = root.entity || {};

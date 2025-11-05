@@ -1,3 +1,8 @@
+
+@use "sass:math";
+@use "sass:color";
+@use "../../node_modules/bootstrap/scss/mixins" as *;
+
 .entity-container {
   position: absolute;
   top: var(--navbar-height);
@@ -13,8 +18,10 @@
     width: 100vw;
     position: fixed;
     left: 0;
+    & {
+      transition: width 0.3s ease;
+    }
   }
-  transition: width 0.3s ease;
 
   .fade:not(.show) {
     display: none;
