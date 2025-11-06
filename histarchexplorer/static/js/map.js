@@ -919,53 +919,7 @@ class LayerControl {
 
     _initModal() {
         const modalHTML = `
-  <style>
-    /* --- Keep the custom layout and form styles --- */
-    .style-field {
-      display: grid;
-      gap: 0.75rem;
-    }
-
-    .style-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-    }
-
-    .style-row label {
-      flex: 1;
-      font-weight: 500;
-      color: #333;
-    }
-
-    .style-row input[type="color"] {
-      width: 50px;
-      height: 34px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background: none;
-    }
-
-    .style-row input[type="number"] {
-      width: 70px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      padding: 4px 6px;
-    }
-
-    .opacity-control {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .opacity-control input[type="range"] {
-      flex: 1;
-      accent-color: #007bff;
-    }
-  </style>
+  
 
   <div class="modal fade" id="styleModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">

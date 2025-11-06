@@ -2018,23 +2018,23 @@ body.dark .grid-media .text-muted {
   color: #ff5555;
 }
 
-#styleEditModal .style-field {
+#styleModal .style-field {
   display: grid;
   gap: 0.75rem;
 }
-#styleEditModal .style-row {
+#styleModal .style-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
 }
-#styleEditModal .style-row label {
+#styleModal .style-row label {
   flex: 1;
   font-weight: 500;
   color: var(--bs-body-color);
   margin-bottom: 0;
 }
-#styleEditModal .style-row input[type=color] {
+#styleModal .style-row input[type=color] {
   width: 50px;
   height: 34px;
   border: none;
@@ -2043,7 +2043,7 @@ body.dark .grid-media .text-muted {
   background: none;
   padding: 0;
 }
-#styleEditModal .style-row input[type=number] {
+#styleModal .style-row input[type=number] {
   width: 70px;
   border-radius: 6px;
   border: 1px solid var(--bs-border-color);
@@ -2051,16 +2051,16 @@ body.dark .grid-media .text-muted {
   background-color: var(--bs-body-bg);
   color: var(--bs-body-color);
 }
-#styleEditModal .opacity-control {
+#styleModal .opacity-control {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
-#styleEditModal .opacity-control input[type=range] {
+#styleModal .opacity-control input[type=range] {
   flex: 1;
   accent-color: var(--bs-primary);
 }
-#styleEditModal .opacity-control input[type=number] {
+#styleModal .opacity-control input[type=number] {
   width: 60px;
   text-align: center;
 }
