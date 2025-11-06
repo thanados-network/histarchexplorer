@@ -48,7 +48,23 @@ dmypy.json
 **/node_modules
 node_modules/
 
+**/static/css/main.css
+
 .sass-cache
 .sass-cache/
 
 tiles/
+
+
+# SCSS build output
+histarchexplorer/static/css/main.css
+/static/*.map
+/static/node_modules/
+/static/css/components/
+/static/css/gloabls/
+
+# Node dependencies
+/node_modules/
+
+# Python cache
+*.pyc

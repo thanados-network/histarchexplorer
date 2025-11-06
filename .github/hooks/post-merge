@@ -1,0 +1,13 @@
+#!/bin/bash
+echo "🧶 Rebuilding SCSS after merge..."
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+STATIC_DIR="$REPO_ROOT/histarchexplorer/static"
+
+if [ -d "$STATIC_DIR/scss" ]; then
+  echo "➡️  Building SCSS in $STATIC_DIR"
+  (cd "$STATIC_DIR" && npm run build || echo "❌ SCSS build failed.")
+else
+  echo "⚠️  SCSS directory not found at: $STATIC_DIR/scss"
+fi
+

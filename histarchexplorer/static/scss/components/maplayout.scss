@@ -79,7 +79,7 @@
   cursor: pointer;
   width: 32px;
   height: 32px;
-  font-size: 18px;
+  font-size: 23px;
   text-align: center;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
@@ -216,4 +216,60 @@
 .layer-item strong::before {
   content: "★ ";
   color: #ff5555;
+}
+
+#styleModal {
+  .style-field {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .style-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+
+    label {
+      flex: 1;
+      font-weight: 500;
+      color: var(--bs-body-color); // use Bootstrap variable
+      margin-bottom: 0; // consistent label spacing
+    }
+
+    input[type="color"] {
+      width: 50px;
+      height: 34px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+    }
+
+    input[type="number"] {
+      width: 70px;
+      border-radius: 6px;
+      border: 1px solid var(--bs-border-color);
+      padding: 4px 6px;
+      background-color: var(--bs-body-bg);
+      color: var(--bs-body-color);
+    }
+  }
+
+  .opacity-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    input[type="range"] {
+      flex: 1;
+      accent-color: var(--bs-primary);
+    }
+
+    input[type="number"] {
+      width: 60px;
+      text-align: center;
+    }
+  }
 }
