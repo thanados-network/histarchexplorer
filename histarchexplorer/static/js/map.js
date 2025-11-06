@@ -449,6 +449,9 @@ class LayerControl {
         panel.classList.remove('hidden');
         button.style.display = 'none';
 
+        const heading = document.createElement('div');
+        heading.className = 'layer-heading';
+        heading.innerHTML = '<h6 class="ms-3 mb-3">Layers</h6>'
         const closeBtn = document.createElement('button');
         closeBtn.className = 'layer-close-btn';
         closeBtn.innerHTML = '×';
@@ -456,7 +459,8 @@ class LayerControl {
             panel.classList.add('hidden');
             button.style.display = 'block';
         };
-        panel.appendChild(closeBtn);
+        heading.appendChild(closeBtn);
+        panel.appendChild(heading);
 
         button.onclick = () => {
             panel.classList.remove('hidden');
@@ -910,48 +914,181 @@ class LayerControl {
             else symbolEl.innerHTML = this._getSymbolForGeom(geom, fillColor, outlineColor, width, opacity);
         }
 
-        bootstrap.Modal.getInstance(document.getElementById('styleModal')).hide();
+        //bootstrap.Modal.getInstance(document.getElementById('styleModal')).hide();
     }
 
     _initModal() {
         const modalHTML = `
-      <div class="modal fade" id="styleModal" tabindex="-1">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Edit Style</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <style>
+    /* --- Keep the custom layout and form styles --- */
+    .style-field {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .style-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .style-row label {
+      flex: 1;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .style-row input[type="color"] {
+      width: 50px;
+      height: 34px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: none;
+    }
+
+    .style-row input[type="number"] {
+      width: 70px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      padding: 4px 6px;
+    }
+
+    .opacity-control {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .opacity-control input[type="range"] {
+      flex: 1;
+      accent-color: #007bff;
+    }
+  </style>
+
+  <div class="modal fade" id="styleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+
+        <!-- Native Bootstrap header -->
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Style</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <!-- POLYGON -->
+          <div id="polygon-fields" class="style-field">
+            <div class="style-row">
+              <label>Fill Color</label>
+              <input type="color" id="fillColor">
             </div>
-            <div class="modal-body">
-              <div id="polygon-fields" class="style-field">
-                <label>Fill Color <input type="color" id="fillColor"></label><br>
-                <label>Fill Opacity <input type="number" id="fillOpacity" min="0" max="1" step="0.05"></label><br>
-                <label>Outline Color <input type="color" id="outlineColor"></label><br>
-                <label>Outline Width <input type="number" id="outlineWidth" min="0" max="10" step="0.1"></label>
-              </div>
-            
-              <div id="line-fields" class="style-field d-none">
-                <label>Line Color <input type="color" id="lineColor"></label><br>
-                <label>Line Width <input type="number" id="lineWidth" min="0" max="10" step="0.1"></label><br>
-                <label>Line Opacity <input type="number" id="lineOpacity" min="0" max="1" step="0.05"></label>
-              </div>
-            
-              <div id="point-fields" class="style-field d-none">
-                <label>Point Color <input type="color" id="pointColor"></label><br>
-                <label>Outline Color <input type="color" id="pointOutlineColor"></label><br>
-                <label>Radius <input type="number" id="pointRadius" min="1" max="20" step="0.5"></label><br>
-                <label>Outline Width <input type="number" id="pointOutlineWidth" min="0" max="10" step="0.1"></label><br>
-                <label>Opacity <input type="number" id="pointOpacity" min="0" max="1" step="0.05"></label>
+            <div class="style-row">
+              <label>Fill Opacity</label>
+              <div class="opacity-control">
+                <input type="range" id="fillOpacityRange" min="0" max="1" step="0.05">
+                <input type="number" id="fillOpacity" min="0" max="1" step="0.05">
               </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="button" id="applyStyle" class="btn btn-primary">Apply</button>
+            <div class="style-row">
+              <label>Outline Color</label>
+              <input type="color" id="outlineColor">
+            </div>
+            <div class="style-row">
+              <label>Outline Width</label>
+              <input type="number" id="outlineWidth" min="0" max="10" step="0.1">
             </div>
           </div>
+
+          <!-- LINE -->
+          <div id="line-fields" class="style-field d-none">
+            <div class="style-row">
+              <label>Line Color</label>
+              <input type="color" id="lineColor">
+            </div>
+            <div class="style-row">
+              <label>Line Width</label>
+              <input type="number" id="lineWidth" min="0" max="10" step="0.1">
+            </div>
+            <div class="style-row">
+              <label>Line Opacity</label>
+              <div class="opacity-control">
+                <input type="range" id="lineOpacityRange" min="0" max="1" step="0.05">
+                <input type="number" id="lineOpacity" min="0" max="1" step="0.05">
+              </div>
+            </div>
+          </div>
+
+          <!-- POINT -->
+          <div id="point-fields" class="style-field d-none">
+            <div class="style-row">
+              <label>Point Color</label>
+              <input type="color" id="pointColor">
+            </div>
+            <div class="style-row">
+              <label>Outline Color</label>
+              <input type="color" id="pointOutlineColor">
+            </div>
+            <div class="style-row">
+              <label>Radius</label>
+              <input type="number" id="pointRadius" min="1" max="20" step="0.5">
+            </div>
+            <div class="style-row">
+              <label>Outline Width</label>
+              <input type="number" id="pointOutlineWidth" min="0" max="10" step="0.1">
+            </div>
+            <div class="style-row">
+              <label>Opacity</label>
+              <div class="opacity-control">
+                <input type="range" id="pointOpacityRange" min="0" max="1" step="0.05">
+                <input type="number" id="pointOpacity" min="0" max="1" step="0.05">
+              </div>
+            </div>
+          </div>
+
         </div>
-      </div>`;
+
+        <!-- Native Bootstrap footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" id="applyStyle" class="btn btn-primary">Apply</button>
+        </div>
+
+      </div>
+    </div>
+  </div>`;
+
         document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        const syncPairs = [
+            ['fillOpacityRange', 'fillOpacity'],
+            ['lineOpacityRange', 'lineOpacity'],
+            ['pointOpacityRange', 'pointOpacity']
+        ];
+
+        // Keep range + number fields synced
+        syncPairs.forEach(([rangeId, numId]) => {
+            const range = document.getElementById(rangeId);
+            const num = document.getElementById(numId);
+            if (range && num) {
+                range.addEventListener('input', () => (num.value = range.value));
+                num.addEventListener('input', () => (range.value = num.value));
+            }
+        });
+
+        // Initialize range values correctly when modal opens
+        const styleModal = document.getElementById('styleModal');
+        styleModal.addEventListener('show.bs.modal', () => {
+            syncPairs.forEach(([rangeId, numId]) => {
+                const range = document.getElementById(rangeId);
+                const num = document.getElementById(numId);
+                if (range && num && num.value !== '') {
+                    range.value = num.value;
+                }
+            });
+        });
 
         document.getElementById('applyStyle').addEventListener('click', () => {
             const modal = document.getElementById('styleModal');
@@ -961,7 +1098,9 @@ class LayerControl {
         });
 
         this.modalInitialized = true;
+        makeModalDraggable('styleModal');
     }
+
 
     _isVisible(id) {
         return this.map.getLayoutProperty(id, 'visibility') !== 'none';
@@ -994,6 +1133,59 @@ class LayerControl {
         return '';
     }
 }
+
+function makeModalDraggable(modalId) {
+    const modal = document.getElementById(modalId);
+    const dialog = modal.querySelector('.modal-dialog');
+    const header = modal.querySelector('.modal-header');
+
+    header.style.cursor = 'grab';
+
+    let isDragging = false;
+    let startX, startY, startLeft, startTop, startWidth;
+
+    header.addEventListener('mousedown', (e) => {
+        // Only left mouse button
+        if (e.button !== 0) return;
+
+        isDragging = true;
+        header.style.cursor = 'grabbing'; // 🖐️ visually show it's held
+
+        const rect = dialog.getBoundingClientRect();
+        startX = e.clientX;
+        startY = e.clientY;
+        startLeft = rect.left;
+        startTop = rect.top;
+
+        // Capture the width before switching to fixed positioning
+        startWidth = rect.width;
+        dialog.style.width = `${startWidth}px`;
+
+        dialog.style.position = 'fixed';
+        dialog.style.margin = '0';
+        dialog.style.left = `${startLeft}px`;
+        dialog.style.top = `${startTop}px`;
+
+        // Prevent text selection during drag
+        document.body.style.userSelect = 'none';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        dialog.style.left = `${startLeft + dx}px`;
+        dialog.style.top = `${startTop + dy}px`;
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        header.style.cursor = 'grab'; // revert back
+        document.body.style.userSelect = ''; // restore normal text selection
+    });
+}
+
 
 function setSidebarContent(id, mode = 'toggle') {
     if (!rightSidebarcontent.map.opened) {
