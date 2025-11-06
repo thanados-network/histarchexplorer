@@ -48,6 +48,8 @@ dmypy.json
 **/node_modules
 node_modules/
 
+**/static/css/main.css
+
 .sass-cache
 .sass-cache/
 
