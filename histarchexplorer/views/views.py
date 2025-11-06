@@ -32,6 +32,7 @@ def set_language(language: Optional[str] = None) -> Response:
 
 
 @cache.memoize()
+@app.route('/type-tree')
 def type_tree():
     response = requests.get(
         f"{app.config['API_URL']}/type_by_view_class/",

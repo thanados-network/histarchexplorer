@@ -376,7 +376,7 @@ function renderReferences(entity) {
   }
 
   // === MUURI GRID INIT ===
-  window.mediaGrid = new Muuri(".grid-overview", {
+  window.overviewGrid = new Muuri(".grid-overview", {
     layout: { fillGaps: true, horizontal: false, rounding: true },
     layoutDuration: 200,
     layoutEasing: "ease-out",
