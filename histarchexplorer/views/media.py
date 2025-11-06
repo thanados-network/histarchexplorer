@@ -1,4 +1,4 @@
-from flask import render_template, request
+from flask import render_template
 
 from histarchexplorer import app
 
@@ -23,15 +23,3 @@ def view_media(render_type: str, id_: int):
             template = f"Unsupported render type: {render_type}", 400
 
     return template
-
-
-# todo: remove when overview is done
-@app.route('/iiif_viewer')
-def view_mirador() -> str:
-    urls_param = request.args.get('urls')  # comma-separated string
-    url_list = urls_param.split(',') if urls_param else []
-
-    print(f'url_list: {url_list}')
-    return (render_template
-            ('iiif.html',
-             manifests=url_list))

@@ -237,9 +237,10 @@ function renderReferences(entity) {
   const entity = data.entity || {};
   const categorizedTypes = data.categorizedTypes || {};
   const citeButton = data.citeButton || {};
-  const mainImage = entity.main_image || data.mainImage;
-  const initialImages = entity.initial_images || data.initialImage;
-  const additionalFilesOverview = data.additionalFilesOverview || 0;
+  const mainImage = data.mainImage;
+  const initialImages =  data.initialImage;
+  const allImages =  data.images;
+  const additionalFilesOverview = window.additionalFilesOverview || 0;
 
   const grid = document.querySelector(".grid-overview");
   if (!grid) {
@@ -361,7 +362,7 @@ function renderReferences(entity) {
   if (mainImage) files.push(mainImage);
   if (Array.isArray(initialImages)) files.push(...initialImages);
   if (typeof renderOverviewMediaTiles === "function") {
-    renderOverviewMediaTiles(files, additionalFilesOverview);
+    renderOverviewMediaTiles(files, allImages, additionalFilesOverview);
   }
 
   // === MUURI GRID INIT ===

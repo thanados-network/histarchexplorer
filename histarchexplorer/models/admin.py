@@ -99,7 +99,7 @@ class Admin:
         for t_data in tabs:
             tab_id = t_data['id']
             tab_target = t_data['target']
-            fields_for_tab = app.config['ADMIN_FIELDS'].get(tab_target, [])
+            fields_for_tab = g.admin_fields.get(tab_target, [])
             filtered = []
             for entity in filter(
                     lambda e: e.class_id == tab_id, g.config_entities):

@@ -4,7 +4,7 @@
 // ============================================================
 //  MAIN ENTRY POINT — renderOverviewMediaTiles()
 // ============================================================
-window.renderOverviewMediaTiles = function (files, additionalFilesOverview = 0) {
+window.renderOverviewMediaTiles = function (files, allImages, additionalFilesOverview = 0) {
   const grid = document.querySelector(".grid-overview, .grid-muuri");
   if (!grid || !Array.isArray(files) || !files.length) return;
 
@@ -12,11 +12,9 @@ window.renderOverviewMediaTiles = function (files, additionalFilesOverview = 0) 
   const visibleCount = Math.min(files.length, additionalFilesOverview + 1);
 
   // total media count (prefer entityData.images if you maintain it)
-  const totalCount =
-    (window.entityData?.images?.length ?? files.length);
+  const totalCount = (allImages.length ?? files.length);
 
   const showMore = totalCount > visibleCount;
-
   files.slice(0, visibleCount).forEach((file, idx) => {
     const tile = createOverviewMediaTile(file);
 
