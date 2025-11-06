@@ -1,469 +1,297 @@
-@use '../globals'as *;
+/* ============================================================
+   OVERVIEW PAGE — Modernized SCSS
+   Structure:
+     1. Theme Variables
+     2. Global Layout
+     3. Grid Layout
+     4. Tiles & Content Blocks
+     5. Entity Card (Ellipse)
+     6. Map, Media & References
+   ============================================================ */
 
-//Muuri-general
+/* ------------------------------------------------------------
+   1. THEME VARIABLES
+------------------------------------------------------------ */
+:root {
+  --font-body: "Inter", sans-serif;
+
+  /* Colors */
+  --color-light-bg: #f9f9f9;
+  --color-dark-bg: #1e1e1e;
+  --color-tile-light: rgba(255, 255, 255, 0.7);
+  --color-tile-dark: rgba(40, 40, 40, 0.7);
+  --color-accent: hsl(208, 92%, 53%);
+  --color-text-light: #222;
+  --color-text-dark: #eee;
+  --color-border: rgba(0, 0, 0, 0.05);
+  --color-shadow: rgba(0, 0, 0, 0.1);
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-text-light);
+  background: var(--color-light-bg);
+}
+
+body.dark {
+  color: var(--color-text-dark);
+  background: var(--color-dark-bg);
+}
+
+/* ------------------------------------------------------------
+   2. GLOBAL LAYOUT
+------------------------------------------------------------ */
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-top: var(--navbar-height, 96px);
+}
+
+.scrollable-container {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+/* ------------------------------------------------------------
+   3. GRID LAYOUT
+------------------------------------------------------------ */
+.grid-overview,
 .grid-muuri {
-  width: 100%;
-  position: relative;
-}
-
-.item.muuri-item-dragging {
-  z-index: 3;
-}
-
-.item.muuri-item-releasing {
-  z-index: 2;
-}
-
-.item.muuri-item-hidden {
-  z-index: 0;
-}
-
-.hidden { //leave at this position!
-  display: none !important;
-}
-
-//**Muuri-tiles**
-.item,
-.item-half,
-.item-middle,
-.item-fit,
-.item-5-6 {
-  border-radius: 5px;   /* Rounded corners */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  border: none;
-  transition: box-shadow .3s ease, transform .3s ease;}
-
-.item {
-  display: block;
-  margin: 5px;
-  position: absolute;
-  width: calc((100% - 20px) / 3);
-  background: var(--muuri-tile);
-  overflow: hidden;
-}
-
-@media (max-width: 1400px) { // Below col-md breakpoint
-  .item {
-    width: calc((100% - 20px ) / 2); // 2 tiles
-  }
-}
-
-@media (max-width: 766px) { // Mobile
-  .item {
-    width: calc(100%); // 1 tile
-    margin: 0px;
-    padding: 0px;
-  }
-}
-
-.item-middle {
-  width: calc(((100%) / 3) * 2); //2 tiles width
-}
-
-@media (max-width: 1400px) { // two tiles
-  .item-middle {
-     width: calc(((100%) / 4) * 3);
-  }
-}
-
-@media (max-width: 766px) { // one tile
-  .item-middle {
-    width: calc(100% - 10px);
-  }
-}
-
-.item-5-6 {
-  width: calc(((((100% - 20px) / 3) / 2) * 5 + 10px));
-}
-@media (max-width: 1400px) {
-   .item-5-6 {
-    width: calc(((100% - 20px)/4)*3);
-  }
-}
-@media (max-width: 766px) {
-   .item-5-6 {
-    width: 100%; // 1 tile
-    margin: 0px;
-    padding: 0px;
-  }
-}
-
-.item-half {
-  display: block;
-  margin: 2.5px;
-  //margin-top: 5px;
-  position: absolute;
-  width: calc((((100% - 30px) / 3) - 10px) / 2);
-  max-height: fit-content;
-  background: var(--muuri-tile);
-  overflow: hidden;
-  border-radius: 7.5px;
-}
-
-@media (max-width: 1400px) {
-  .item-half {
-    width: calc(((100% - 25px) / 2) / 2);
-  }
-}
-
-@media (max-width: 766px) { // Mobile
-  .item-half {
-    width: calc(100%); // 1 tile
-    margin: 0px;
-    padding: 0px;
-  }
-}
-
-.item-wide {
-  width: calc(100% - 30px); // full width of three tiles
-}
-
-@media (max-width: 1400px) { // two tiles
-  .item-wide {
-    width: calc(100% - 20px);
-  }
-}
-
-@media (max-width: 766px) { // one tile
-  .item-wide {
-    width: calc(100% - 10px);
-  }
-}
-
-@media (min-width: 767px) and (max-width: 992px) {
-  .item,
-  .item-half,
-  .item-middle,
-  .item-fit {
-    width: calc((100% - 20px) / 2); // zwei Spalten
-  }
-
-  .item-wide {
-    width: calc(100% - 10px); // volle Breite
-  }
-    .item-5-6 {
-    width: calc(100% - 10px); // volle Breite
-  }
-}
-
-
-@media (max-width: 766px) {
-  .item,
-  .item-half,
-  .item-middle,
-  .item-fit {
-    border-radius:0;
-    padding-bottom: rem(10);
-  }}
-
-.item-fit {
-  display: block;
-  margin: 5px;
-  position: absolute;
-  width: calc((100% - 30px) / 3);
-  background: var(--muuri-tile);
-  overflow: hidden;
-  max-height: fit-content;
-}
-
-.item-content {
-  padding: 1rem;
-  align-items: center;
-  width: auto;
-  height: auto;
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  height: 100%;
-
-}
-
-.item-content-full {
-  padding: 0;
-}
-
-//Images
-
-.image img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-  position: relative;
-}
-
-
-.image {
-  position: relative;
-
-  .hover-max {
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-  }
-
-  &:hover {
-    .hover-max {
-      opacity: 1;
-    }
-  }
-}
-
-
-.tile-label {
-  font-size: 1.3em;
-  font-weight: bold;
-  position: relative;
-}
-
-.tile-sub-label {
-  font-size: 1em;
-  margin-bottom: 5px;
-  padding-left: 0.3em;
-  //font-weight: lighter;
-}
-
-
-.muuri-description {
-  max-height: calc(100vh - var(--navbar-height));
-
-  p {
-    margin-top: 1.5rem;
-
-    // These are technically the same, but use both
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-
-    // This is for IE
-    -ms-word-break: break-all;
-    // Dangerous in WebKit as it breaks words anywhere
-    word-break: break-all;
-    // Better alternative (non-standard)
-    word-break: break-word;
-
-    // Adds hyphens where words break, if supported (No Blink)
-    -ms-hyphens: auto;
-    -moz-hyphens: auto;
-    -webkit-hyphens: auto;
-    hyphens: auto;
-  }
-}
-
-
-
-
-//Categorized-types
-.badge.bg-secondary.text-wrap {
-  font-size: 1.1rem;
-  line-height: 1.5;
-}
-
-
-//Related Entities/Subentities
-.related-entities {
-  max-height: 700px;
-}
-
-.no-bullets {
-  list-style: none;
-}
-
-.entity-list {
-  font-size: 1em;
-  font-weight: lighter;
-}
-
-
-//Map-Style
-.location {
-  width: 100%;
-  height: calc(66.6vh - 106px);
-}
-
-@media (max-width: 766px) {
-  .location {
-    width: 100%;
-    height: calc(100vh - 106px);
-  }
-}
-
-#muuri-map {
-  // margin-top: 1.5rem;
-  height: 100%;
-  width: 100%;
-}
-
-.map-wrapper {
-  position: relative;
-  heigth: 100%;
-}
-
-.location:hover #expand-button {
-  opacity: 1;
-}
-
-#expand-button {
-  position: absolute;
-  top: 1rem;
-  right: 10px;
-  background: rgba(255, 255, 255, 0.7);
-  border: none;
-  z-index: 1000;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  opacity: 0;
-  transition: ease-in 0.3s;
-
-  .expanded-map {
-    width: 100%;
-    height: calc(100vh - 96px);
-    padding: 0rem;
-  }
-
-  //References/Bib
-  .muuri-references {
-    p {
-      max-height: 700px;
-      overflow: auto;
-      margin-top: 1.5rem;
-    }
-  }
-  @media (max-height: 766px) {
-    margin-top: 0px;
-  }
-
-
-
-  // Icon styling
-  i {
-    font-size: 1.2rem;
-  }
-}
-
-.entity-card__icon {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.entity-card__icon img {
-  max-width: 80%; //ev. change here to extra card, so that on entity page this can stay on 80-100%
-  height: auto;
-  border-radius: 10px;
-}
-
-
-
-
-.super-entity {
-  font-weight: lighter;
-}
-
-.nude-link {
-  color: inherit;
-  font-size: small;
-}
-
-.entity-country {
-  color:black;
-  margin-top: 1rem;
-}
-
-.entity-type,
-.entity-date {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1em;
-  color: black;
-  text-align: center;
-  padding: 0.5rem;
-}
-
-.entity-country {
-  text-align: center;
-  heigth:auto;
+  display: grid;
+  grid-template-columns: 28vw repeat(auto-fit, minmax(350px, 1fr));
+  grid-auto-rows: auto;
+  gap: 1rem;
+  align-items: start;
+  padding-bottom: 2rem;
 }
 
 @media (max-width: 992px) {
-  .entity-type,
-  .entity-date {
-    font-size: 1em;
+  .grid-overview,
+  .grid-muuri {
+    grid-template-columns: 1fr;
   }
 }
 
-.entity-type {
-  margin-top: 2rem;
+/* Scoped tile styling */
+.grid-overview .item,
+.grid-muuri .item {
+  background: var(--color-tile-light);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px var(--color-shadow);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.entity-type p {
-  margin-bottom: 0;
+body.dark .grid-overview .item,
+body.dark .grid-muuri .item {
+  background: var(--color-tile-dark);
 }
 
-.entity-class {
-  color: #000000;
-  font-weight: lighter;
+.grid-overview .item:hover,
+.grid-muuri .item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
 }
 
+.grid-overview .item-content,
+.grid-muuri .item-content {
+  padding: 1rem;
+  width: 100%;
+  height: auto;
+}
 
-#entity-link-buttons {
+.grid-overview .hierarchy-item,
+.grid-muuri .hierarchy-item {
+  grid-row: span 2;
+  height: 100vh;
+  min-width: 360px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ------------------------------------------------------------
+   4. TILE COMPONENTS
+------------------------------------------------------------ */
+.tile-label {
+  font-size: 1rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.muuri-description {
+  max-height: calc(100vh - 150px);
+  overflow-y: auto;
+  line-height: 1.5;
+  color: inherit;
+
+  p {
+    margin-top: 1rem;
+    word-break: break-word;
+  }
+}
+
+/* ------------------------------------------------------------
+   5. ENTITY CARD (Ellipse)
+------------------------------------------------------------ */
+.main-entity-ellipse {
+  position: relative;
+  border-radius: 50%;
+  background: var(--color-tile-light);
+  box-shadow: 0 2px 6px var(--color-shadow);
+  width: 280px;
+  height: 280px;
+  margin: 1.5rem auto;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
 }
 
-#entity-link-buttons button {
-  margin-top: 1.5rem;
-  width: 70%;
-  padding-right: 0.2rem;
-  padding-left: 0.2rem;
-  font-size: 1rem;
-  overflow: hidden; // Hide content that overflows the button boundary
-  text-overflow: ellipsis;
+body.dark .main-entity-ellipse {
+  background: var(--color-tile-dark);
 }
 
-.main-content {
-  //margin-left: 16.6667%;
-  overflow-y: auto;
-
-  @media (max-width: 766px) {
-    margin-left: 0;
-    margin-right: 0;
-    padding: 0;
-    overflow-y: visible;
-  }
+.entity-card__icon img {
+  width: 60%;
+  height: auto;
+  opacity: 0.9;
+  user-select: none;
 }
 
+.hierarchy-card-label {
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-top: 0.8rem;
+}
 
-.reference-content {
-  padding: 0;
+.entity-type p,
+.entity-date p {
+  margin: 0.2rem 0;
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  opacity: 0.8;
+  text-align: center;
+}
+
+body.dark .entity-type p,
+body.dark .entity-date p {
+  color: var(--color-text-dark);
+}
+
+/* ------------------------------------------------------------
+   6. MAP, MEDIA & REFERENCES
+------------------------------------------------------------ */
+#muuri-map {
+  width: 100%;
+  height: 50vh;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.image img {
+  max-width: 100%;
+  border-radius: 8px;
+  display: block;
 }
 
 .reference-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-
-  .bi {
-    font-size: 1.2rem;
-  }
+  gap: 0.4rem;
 
   .reference-name {
-    font-weight: bold;
-    color: var(--reference-label);
+    font-weight: 500;
+    color: var(--color-accent);
     text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 
 .reference-description {
-  font-size: 0.875rem;
-  font-weight: 300;
-  color: var(--reference-text);
-  margin-left: 1.75rem;
-  margin-top: 0.25rem;
+  font-size: 0.9rem;
   line-height: 1.4;
+  opacity: 0.9;
+  margin-left: 1.75rem;
 }
 
-.custom-badge {
-  background-color: var(--badge-color);
+.no-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ------------------------------------------------------------
+   7. UTILITIES
+------------------------------------------------------------ */
+.badge.custom-badge {
+  background-color: var(--color-accent);
+  color: white;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+
+/* ------------------------------------------------------------
+   OVERVIEW MEDIA BUTTON
+------------------------------------------------------------ */
+/* Caption under media tile (overview) */
+.ov-caption {
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+/* "View all X files" button below caption */
+.btn-more-files {
+  margin-top: 0.25rem;
+  background: #f8f9fa;
+  color: #333;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.4rem 0.75rem;
+  transition: all 0.2s ease;
+}
+.btn-more-files i { font-size: 1rem; }
+.btn-more-files:hover {
+  background: #e9ecef;
+  border-color: rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+
+// ===== GRID SPACING FIX =====
+.grid-overview {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem !important; // tighter but still airy
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+
+  .item {
+    flex: 1 1 320px;
+    margin: 0 !important; // remove old gaps from Muuri
+    padding: 0.5rem !important;
+    box-sizing: border-box;
+
+    .item-content {
+      padding: 0.75rem;
+      background: #fff;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 0.2s ease;
+    }
+
+    .item-content:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+  }
 }

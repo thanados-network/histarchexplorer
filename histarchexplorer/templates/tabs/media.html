@@ -1,27 +1,7 @@
+<div class="breadcrumbs mb-3"></div>
+
 <div id="media-filters" class="mb-3 d-flex flex-wrap gap-2"></div>
 <div class="col flex-column grid-media"></div>
 
 <script src="{{ url_for('static', filename='js/media.js') }}"></script>
 
-<script>
-// --- After Muuri init ---
-setTimeout(() => {
-  document.querySelectorAll(".item-media").forEach(el => {
-    const type = el.dataset.renderType || "unknown";
-    const color = renderTypeStyles[type].color || "#ccc";
-    el.style.border = `2px solid ${color}`;
-    el.style.borderRadius = "0.5rem";
-  });
-
-  // Group/sort tiles by render_type
-  window.mediaGrid.sort((a, b) => {
-    const typeA = a.getElement().dataset.renderType || "";
-    const typeB = b.getElement().dataset.renderType || "";
-    return typeA.localeCompare(typeB);
-  });
-
-  window.mediaGrid.refreshItems().layout();
-}, 600);
-
-
-</script>

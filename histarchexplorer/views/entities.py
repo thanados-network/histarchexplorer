@@ -294,7 +294,7 @@ def return_entities(tab_name, id):
 
     return render_template(
         'entity.html',
-        view_classes=filtered_view_classes,
+        filtered_view_classes=filtered_view_classes,
         data=data,
         sidebar_elements=sidebar_elements,
         entity_id=0,

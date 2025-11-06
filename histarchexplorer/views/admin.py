@@ -62,8 +62,6 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         processed_properties_by_tab=Admin.process_properties_by_tab(tabs),
         processed_roles=Admin.process_roles(),
         processed_target_nodes=Admin.process_target_nodes(),
-        current_language=g.language,
-        available_languages=app.config['LANGUAGES'],
         maps=Admin.get_maps(),
         settings=g.settings.get_map_settings(),
         class_items={
@@ -73,9 +71,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         hidden_classes=g.settings.hidden_classes,
         initial_case_study_type_id=initial_case_study_type_id,
         initial_case_study_type_name=initial_case_study_type_name,
-        case_study_children=case_study_children,
-        admin_fields=app.config['ADMIN_FIELDS'],
-        view_classes=app.config['VIEW_CLASSES'])
+        case_study_children=case_study_children)
 
 
 @app.route('/admin/delete_link/<int:link_id>/<tab>/<entry>', methods=['GET'])

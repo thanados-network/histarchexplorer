@@ -48,6 +48,9 @@ VIEW_CLASSES = {
 #     'Source translation', 'Actor relation', 'Human remains', 'Artifact',
 #     'Place', 'Feature', 'Stratigraphic unit']
 
+ADD_FILES_FOR_OVERVIEW = 2
+
+
 # Categorization of entity types with icons
 TYPE_DIVISIONS = {
     'administrative unit': {

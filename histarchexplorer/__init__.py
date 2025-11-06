@@ -30,6 +30,7 @@ from histarchexplorer.views import (
 from histarchexplorer.utils import view_util
 from histarchexplorer.api.api_access import ApiAccess
 
+
 def connect() -> connection:
     try:
         connection_ = psycopg2.connect(
@@ -96,14 +97,21 @@ def before_request() -> None:
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
     if request.path.startswith('/reset'):
         return None
+
     session['language'] = get_locale()
+    g.available_languages = app.config['LANGUAGES']
     g.language = session.get(
         'language',
-        request.accept_languages.best_match(app.config['LANGUAGES'].keys()))
+        request.accept_languages.best_match(g.available_languages.keys()))
     g.preferred_langauge = app.config['PREFERRED_LANGUAGE']
+    g.view_classes = app.config['VIEW_CLASSES']
+    g.admin_fields = app.config['ADMIN_FIELDS']
+    g.additional_files_for_overview = app.config['ADD_FILES_FOR_OVERVIEW']
+
     g.api_headers = {}
     if app.config['API_TOKEN']:
         g.api_headers["Authorization"] = f"Bearer {app.config['API_TOKEN']}"
+
     g.main_images = get_main_image_table()
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
@@ -129,14 +137,30 @@ def before_request() -> None:
 
 
 @app.context_processor
-def inject_conf_var() -> dict[str, Any]:
+def inject_globals() -> dict[str, Any]:
     return {
-        'AVAILABLE_LANGUAGES': app.config['LANGUAGES'],
-        'PREFERRED_LANGUAGE': app.config['PREFERRED_LANGUAGE'],
-        'CURRENT_LANGUAGE': session.get(
-            'language',
-            request.accept_languages.best_match(
-                app.config['LANGUAGES'].keys()))}
+        'available_languages': g.available_languages,
+        'preferred_language': g.preferred_langauge,
+        'current_language': g.language,
+        'view_classes': g.view_classes,
+        'admin_fields': g.admin_fields,
+        'additional_files_for_overview': g.additional_files_for_overview,
+        'system_class_map': {
+            "place": "places",
+            "feature": "places",
+            "stratigraphic_unit": "places",
+            "move": "events",
+            "acquisition": "events",
+            "modification": "events",
+            "activity": "events",
+            "group": "actors",
+            "person": "actors",
+            "event": "events",
+            "artifact": "items",
+            "source": "sources",
+            "file": "files"
+        }}
+
 
 @app.after_request
 def apply_caching(response: Response) -> Response:

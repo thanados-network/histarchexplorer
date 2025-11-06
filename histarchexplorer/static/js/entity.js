@@ -277,3 +277,22 @@ document.querySelectorAll('#nav-sidebar .nav-link').forEach(button => {
 if (tabsToLoad?.length > 0 && rightSidebarcontent[tabsToLoad[0]]?.content) {
     setRightSidebarContent(rightSidebarcontent[tabsToLoad[0]].content);
 }
+
+// ===== Breadcrumbs (global renderer) =====
+document.addEventListener("DOMContentLoaded", () => {
+  // === Initial render for the first visible tab ===
+  if (window.entityData) renderAllBreadcrumbs(window.entityData);
+
+  // === Re-render whenever a Bootstrap tab becomes visible ===
+  document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+    tab.addEventListener("shown.bs.tab", () => {
+      if (window.entityData) renderAllBreadcrumbs(window.entityData);
+    });
+  });
+
+  // === Optional: also re-render when custom events fire (e.g., AJAX reloads) ===
+  document.addEventListener("entityUpdated", e => {
+    const data = e.detail?.entityData || window.entityData;
+    if (data) renderAllBreadcrumbs(data);
+  });
+});
