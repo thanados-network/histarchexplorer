@@ -69,3 +69,6 @@ histarchexplorer/static/css/main.css
 
 # Python cache
 *.pyc
+
+
+cache_ids.txt
