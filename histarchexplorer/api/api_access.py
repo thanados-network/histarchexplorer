@@ -14,6 +14,7 @@ PROXIES = {
 class ApiAccess:
 
     @staticmethod
+    @cache.memoize()
     def get_system_class_count(parser: Parser) -> dict[str, Any]:
         return requests.get(
             f"{app.config['API_URL']}/system_class_count/",

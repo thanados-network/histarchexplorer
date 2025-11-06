@@ -10,7 +10,6 @@ from histarchexplorer.api.presentation_view import PresentationView
 _('entities')
 _('search')
 _('about')
-_('test')
 
 
 @app.context_processor

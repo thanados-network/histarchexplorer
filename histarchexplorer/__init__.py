@@ -1,3 +1,4 @@
+import time
 from typing import Any
 
 import psycopg2.extras
@@ -119,8 +120,6 @@ def before_request() -> None:
     g.config_properties = Properties.get_all()
     g.config_links = Link.get_all()
     g.settings = Settings.initialize_settings()
-    # Todo: this is basically the same as
-    #   config_classes but with 's' and attributes instead of attribute
     g.config_classes_map = {
         'projects': 1,  # option for config_class=2 project vs 1=main_project?
         'persons': 2,
@@ -131,6 +130,7 @@ def before_request() -> None:
     g.search_service = SearchService(app)
     g.case_study_ids = [
         config.case_study for config in g.config_entities if config.case_study]
+    # Way to large
     # g.file_of_entities = ApiAccess.get_files_of_entities()
 
     return None

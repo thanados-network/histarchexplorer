@@ -18,6 +18,7 @@ def index() -> str:
     if index_map := map_data['map']:
         map_ = get_map_tilestring(index_map).tilestring
     view_classes = get_view_class_count()
+    print(view_classes)
     return render_template(
         'index.html',
         map=map_,
