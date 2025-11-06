@@ -185,6 +185,9 @@ function renderReferences(entity) {
     const list = document.getElementById("js-references");
     if (!tile || !list || !Array.isArray(entity?.references) || !entity.references.length) return;
     list.innerHTML = "";
+    list.append(h('h4', {
+      class: "",
+      html: `References`}))
     entity.references.forEach((ref) => {
         if (!["bibliography", "external_reference"].includes(ref.system_class)) return;
         const isBibl = ref.system_class === "bibliography";
@@ -218,7 +221,8 @@ function renderReferences(entity) {
 (async function initOverview() {
   // --- Wait until DOM is ready ---
   if (document.readyState === "loading") {
-    await new Promise(resolve => document.addEventListener("DOMContentLoaded", resolve));
+    await new Promise(resolve =>
+      document.addEventListener("DOMContentLoaded", resolve));
   }
 
   // --- Wait for entityData Promise ---
@@ -228,7 +232,7 @@ function renderReferences(entity) {
     return;
   }
 
-  console.log("✅ Overview tab: entityData ready", data);
+  // console.log("✅ Overview tab: entityData ready", data);
 
   const entity = data.entity || {};
   const categorizedTypes = data.categorizedTypes || {};
@@ -264,23 +268,8 @@ function renderReferences(entity) {
   const infoTile = h("div", { class: "item hierarchy-item" }, [
     h("div", { class: "cite-wrapper", id: "js-cite-button" }),
     (() => {
-      const sysMap = {
-        place: "places",
-        feature: "places",
-        stratigraphic_unit: "places",
-        move: "events",
-        acquisition: "events",
-        modification: "events",
-        activity: "events",
-        group: "actors",
-        person: "actors",
-        event: "events",
-        artifact: "items",
-        source: "sources",
-        file: "files",
-      };
       const sc = (entity.system_class || "").toLowerCase();
-      const section = sysMap[sc] || "";
+      const section = systemClassMap[sc] || "";
       const isPersonOrGroup = ["group", "person"].includes(sc);
       const cardInner = isPersonOrGroup
         ? `

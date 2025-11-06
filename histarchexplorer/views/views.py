@@ -1,8 +1,8 @@
 from typing import Optional
 
 import requests
-from flask import g, jsonify, redirect, render_template, request, \
-    session
+from flask import (
+    g, jsonify, redirect, render_template, request, session)
 from werkzeug import Response
 
 from histarchexplorer import app, cache
@@ -44,6 +44,3 @@ def type_tree():
 @app.route('/files_of_entities')
 def files_of_entities() -> Response:
     return jsonify(ApiAccess.get_files_of_entities())
-
-
-

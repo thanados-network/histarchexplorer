@@ -23,7 +23,7 @@ const renderTypeStyles = {
     return;
   }
 
-  console.log("✅ Media tab: entityData ready", data);
+  // console.log("✅ Media tab: entityData ready", data);
 
   const container = document.querySelector(".grid-media");
   const filterBar = document.getElementById("media-filters");

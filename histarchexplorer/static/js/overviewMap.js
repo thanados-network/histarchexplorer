@@ -19,8 +19,8 @@
 
   const entity = data.entity;
   const mapData = data.overviewMap;
-  const name = entity.title || "Entity";
-  console.log("✅ overviewMap.js: entity ready", name);
+  // const name = entity.title || "Entity";
+  // console.log("✅ overviewMap.js: entity ready", name);
 
   const container = document.getElementById("muuri-map");
   if (!mapData || !container) {
@@ -40,7 +40,7 @@
   }
 
   // === MapLibre setup ===
-  const map = new maplibregl.Map({
+  const overviewMap = new maplibregl.Map({
     container,
     style:
       "https://api.maptiler.com/maps/topo-v2/style.json?key=E7Jrgaazm79UlTuEI5f5",
@@ -50,8 +50,8 @@
     maxZoom: 22,
   });
 
-  map.addControl(new maplibregl.NavigationControl(), "top-right");
-  map.addControl(new maplibregl.ScaleControl(), "bottom-left");
+  overviewMap.addControl(new maplibregl.NavigationControl(), "top-right");
+  overviewMap.addControl(new maplibregl.ScaleControl(), "bottom-left");
 
   const bounds = new maplibregl.LngLatBounds();
   const extendBounds = geometry => {
@@ -75,9 +75,9 @@
   };
 
   // === Once map style is ready ===
-  map.on("load", () => {
+  overviewMap.on("load", () => {
     // GeoJSON source
-    map.addSource("overview-geojson", {
+    overviewMap.addSource("overview-geojson", {
       type: "geojson",
       data: { type: "FeatureCollection", features },
     });
@@ -121,7 +121,7 @@
           : l.type === "circle"
           ? { "circle-color": l.color, "circle-radius": l.radius }
           : { "line-color": l.color, "line-width": l.width };
-      map.addLayer({
+      overviewMap.addLayer({
         id: l.id,
         type: l.type,
         source: "overview-geojson",
@@ -133,7 +133,7 @@
     // Fit bounds
     features.forEach(f => extendBounds(f.geometry));
     if (!bounds.isEmpty()) {
-      map.fitBounds(bounds, { padding: 50, duration: 0 });
+      overviewMap.fitBounds(bounds, { padding: 50, duration: 0 });
     }
 
     // Optional markers
@@ -148,13 +148,13 @@
               `<b>${f.properties?.title || name}</b><br>${f.properties?.description || ""}`
             )
           )
-          .addTo(map);
+          .addTo(overviewMap);
       });
 
     // Cursor hover
     ["overview-polygons", "overview-lines", "overview-points"].forEach(layer => {
-      map.on("mouseenter", layer, () => (map.getCanvas().style.cursor = "pointer"));
-      map.on("mouseleave", layer, () => (map.getCanvas().style.cursor = ""));
+      overviewMap.on("mouseenter", layer, () => (overviewMap.getCanvas().style.cursor = "pointer"));
+      overviewMap.on("mouseleave", layer, () => (overviewMap.getCanvas().style.cursor = ""));
     });
   });
 

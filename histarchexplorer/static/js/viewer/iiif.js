@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         sideBarOpen: true,
       },
       workspace: { type: "mosaic" },
-      language: sessionLanguage || "en",
+      language: language || "en",
       availableLanguages: {
         de: "Deutsch",
         en: "English",
