@@ -294,6 +294,21 @@ document.getElementById('warmEntityCache')?.addEventListener('click', function (
     window.location.href = '/admin/warm-entity-cache';
   }
 });
+document.getElementById('clearEntityCache')?.addEventListener('click', function () {
+  if (confirm('Are you sure you want to clear the entity cache?')) {
+    window.location.href = '/admin/clear-entity-cache';
+  }
+});
+document.getElementById('warmSystemCache')?.addEventListener('click', function () {
+  if (confirm('Are you sure you want to warm the whole system cache?')) {
+    window.location.href = '/admin/warm-system-cache';
+  }
+});
+document.getElementById('clearSystemCache')?.addEventListener('click', function () {
+  if (confirm('Are you sure you want to clear the system cache?')) {
+    window.location.href = '/admin/clear-system-cache';
+  }
+});
 
 document.getElementById('logoutButton')?.addEventListener('click', function () {
   if (confirm('Are you sure you want to logout?')) {

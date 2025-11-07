@@ -13,10 +13,16 @@ from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import ApiAccess, \
     get_entities_count_by_case_study
 from histarchexplorer.api.parser import Parser
+from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.models.admin import Admin, EntryNotFound
 from histarchexplorer.utils.view_util import find_children_by_id
-from histarchexplorer.views.views import type_tree_by_view
+from histarchexplorer.views.views import get_files_of_entities, type_tree
+
+
+def check_manager_user() -> None:
+    if current_user.group not in ['admin', 'manager']:
+        abort(403)
 
 
 @app.route('/admin/')
@@ -50,11 +56,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         if details:
             initial_case_study_type_name = details.name
 
-
     case_study_children = find_children_by_id(
-        type_tree_by_view().get_json(),
+        type_tree().get_json(),
         initial_case_study_type_id)
-
 
     return render_template(
         "admin.html",
@@ -107,7 +111,7 @@ def add_link() -> Response:
 @login_required
 def add_entry() -> Response:
     check_manager_user()
-    print( request.form)
+    print(request.form)
     case_study_str = request.form.get('case_study')
     form_data = {
         'category': request.form.get('category', ''),
@@ -307,6 +311,7 @@ def reset() -> Response:
     flash(_('reset database'), 'info')
     return redirect(url_for('admin'))
 
+
 def make_reset():
     env = os.environ.copy()
     env['PGPASSWORD'] = current_app.config['DATABASE_PASS']
@@ -320,6 +325,7 @@ def make_reset():
         env=env,
         check=True)
 
+
 @app.route('/admin/clear-cache')
 @login_required
 def clear_cache():
@@ -331,13 +337,18 @@ def clear_cache():
 @app.route('/admin/warm-cache')
 @login_required
 def warm_cache():
-    type_tree_by_view()
+    warm_system_cache()
+    trigger_cache_warmup()
     flash(_('cache warmed'), 'success')
     return redirect(url_for('admin'))
 
-def check_manager_user() -> None:
-    if current_user.group not in ['admin', 'manager']:
-        abort(403)
+
+@app.route('/admin/clear-entity-cache')
+@login_required
+def clear_entity_cache():
+    cache.delete_memoized(PresentationView.from_api)
+    flash(_('entity cache cleared'), 'success')
+    return redirect(url_for('admin'))
 
 
 @app.route("/admin/warm-entity-cache", methods=["GET"])
@@ -363,3 +374,23 @@ def trigger_cache_warmup():
             "message": "Cache warmup started in background."})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app.route('/admin/clear-system-cache')
+@login_required
+def clear_system_cache():
+    cache.delete_memoized(type_tree)
+    cache.delete_memoized(get_files_of_entities)
+    cache.delete_memoized(get_entities_count_by_case_study)
+    flash(_('system cache cleared'), 'success')
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin/warm-system-cache')
+@login_required
+def warm_system_cache():
+    type_tree()
+    get_files_of_entities()
+    get_entities_count_by_case_study()
+    flash(_('system cache warmed'), 'success')
+    return redirect(url_for('admin'))
