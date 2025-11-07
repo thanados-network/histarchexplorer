@@ -31,6 +31,7 @@
         searchEnabled: true,          // Enable the search bar (default: true)
         initiallyExpanded: false,     // Start with nodes collapsed (default: false)
         multiSelectEnabled: true,     // Enable multi-selection by clicking nodes
+        nodeSelectionEnabled: false,
         onSelectionChange: (selectedNodesData) => { // Callback when selection changes
             console.log('Selected Nodes (Tree 1):', selectedNodesData);
             // Example: Update a display area with selected nodes
@@ -45,6 +46,7 @@
         searchEnabled: true,          // Enable the search bar (default: true)
         initiallyExpanded: false,     // Start with nodes collapsed (default: false)
         multiSelectEnabled: true,     // Enable multi-selection by clicking nodes
+        nodeSelectionEnabled: false,
         onSelectionChange: (selectedNodesData) => { // Callback when selection changes
             console.log('Selected Nodes (Tree 1):', selectedNodesData);
             // Example: Update a display area with selected nodes
@@ -59,6 +61,7 @@
         searchEnabled: true,          // Enable the search bar (default: true)
         initiallyExpanded: false,     // Start with nodes collapsed (default: false)
         multiSelectEnabled: true,     // Enable multi-selection by clicking nodes
+        nodeSelectionEnabled: false,
         onSelectionChange: (selectedNodesData) => { // Callback when selection changes
             console.log('Selected Nodes (Tree 1):', selectedNodesData);
             // Example: Update a display area with selected nodes
@@ -73,6 +76,7 @@
         searchEnabled: true,          // Enable the search bar (default: true)
         initiallyExpanded: false,     // Start with nodes collapsed (default: false)
         multiSelectEnabled: true,     // Enable multi-selection by clicking nodes
+        nodeSelectionEnabled: false,
         onSelectionChange: (selectedNodesData) => { // Callback when selection changes
             console.log('Selected Nodes (Tree 1):', selectedNodesData);
             // Example: Update a display area with selected nodes
@@ -86,12 +90,14 @@
         data: typeTree.system,             // Your hierarchical data
         searchEnabled: true,          // Enable the search bar (default: true)
         initiallyExpanded: false,     // Start with nodes collapsed (default: false)
-        multiSelectEnabled: true,     // Enable multi-selection by clicking nodes
+        multiSelectEnabled: true,
+        nodeSelectionEnabled: false,
         onSelectionChange: (selectedNodesData) => { // Callback when selection changes
             console.log('Selected Nodes (Tree 1):', selectedNodesData);
             // Example: Update a display area with selected nodes
             // document.getElementById('output-area').textContent = JSON.stringify(selectedNodesData, null, 2);
         }
+
     });
 
 
