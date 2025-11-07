@@ -9,9 +9,12 @@ from histarchexplorer.api.api_access import ApiAccess
 
 @app.route("/vocabulary")
 def vocabulary():
+    #todo: just for dev, delete in production
+    hidden_types = [8240]
     return render_template(
         "vocabulary.html",
         type_tree=ApiAccess.get_type_tree_overview(),
+        hidden_types=hidden_types,
     )
 
 

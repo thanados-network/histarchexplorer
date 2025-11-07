@@ -46,28 +46,24 @@
         <div class="tabs">
           <ul class="tab-links">
             <li class="active"><a href="#standard">Standard</a></li>
-            <li><a href="#place">Place</a></li>
             <li><a href="#custom">Custom</a></li>
             <li><a href="#value">Value</a></li>
-            <li><a href="#system">System</a></li>
           </ul>
 
           <div class="tab-content">
+
             <div id="standard" class="tab active">
               <div id="standardTree"></div>
             </div>
-            <div id="place" class="tab">
-              <div id="placeTree"></div>
-            </div>
+
             <div id="custom" class="tab">
               <div id="customTree"></div>
             </div>
+
             <div id="value" class="tab">
               <div id="valueTree"></div>
             </div>
-            <div id="system" class="tab">
-              <div id="systemTree"></div>
-            </div>
+
           </div>
         </div>
 
@@ -97,23 +93,9 @@
           }
       });
 
-      const treeviewContainer2 = document.getElementById('placeTree');
-      const tree2 = new Treeview({
-          containerId: 'placeTree',   // ID of the HTML element to render the tree into
-          data: typeTree.place,             // Your hierarchical data
-          searchEnabled: true,          // Enable the search bar (default: true)
-          initiallyExpanded: false,     // Start with nodes collapsed (default: false)
-          multiSelectEnabled: true,     // Enable multi-selection by clicking nodes
-          nodeSelectionEnabled: false,
-          onSelectionChange: (selectedNodesData) => { // Callback when selection changes
-              console.log('Selected Nodes (Tree 1):', selectedNodesData);
-              // Example: Update a display area with selected nodes
-              // document.getElementById('output-area').textContent = JSON.stringify(selectedNodesData, null, 2);
-          }
-      });
 
-      const treeviewContainer3 = document.getElementById('customTree');
-      const tree3 = new Treeview({
+      const treeviewContainer2 = document.getElementById('customTree');
+      const tree2 = new Treeview({
           containerId: 'customTree',   // ID of the HTML element to render the tree into
           data: typeTree.custom,             // Your hierarchical data
           searchEnabled: true,          // Enable the search bar (default: true)
@@ -127,8 +109,8 @@
           }
       });
 
-      const treeviewContainer4 = document.getElementById('valueTree');
-      const tree4 = new Treeview({
+      const treeviewContainer3 = document.getElementById('valueTree');
+      const tree3 = new Treeview({
           containerId: 'valueTree',   // ID of the HTML element to render the tree into
           data: typeTree.value,             // Your hierarchical data
           searchEnabled: true,          // Enable the search bar (default: true)
@@ -142,21 +124,6 @@
           }
       });
 
-      const treeviewContainer5 = document.getElementById('systemTree');
-      const tree5 = new Treeview({
-          containerId: 'systemTree',   // ID of the HTML element to render the tree into
-          data: typeTree.system,             // Your hierarchical data
-          searchEnabled: true,          // Enable the search bar (default: true)
-          initiallyExpanded: false,     // Start with nodes collapsed (default: false)
-          multiSelectEnabled: true,
-          nodeSelectionEnabled: false,
-          onSelectionChange: (selectedNodesData) => { // Callback when selection changes
-              console.log('Selected Nodes (Tree 1):', selectedNodesData);
-              // Example: Update a display area with selected nodes
-              // document.getElementById('output-area').textContent = JSON.stringify(selectedNodesData, null, 2);
-          }
-
-      });
 
 
       document.querySelectorAll('.tab-links a').forEach(link => {
