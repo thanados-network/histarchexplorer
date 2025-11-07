@@ -42,6 +42,14 @@ class ApiAccess:
             timeout=20).json()
 
     @staticmethod
+    @cache.memoize()
+    def get_type_tree_overview() -> dict[str, Any]:
+        return requests.get(
+            f"{app.config['API_URL']}/type_overview/",
+            headers=g.api_headers,
+            timeout=20).json()
+
+    @staticmethod
     def get_by_system_class(
             class_: str,
             parser: Parser) -> list[dict[str, Any]]:

@@ -34,17 +34,19 @@ def set_language(language: Optional[str] = None) -> Response:
     return redirect(request.referrer)
 
 
-@cache.memoize()
 @app.route('/type-tree')
 def type_tree():
     return jsonify(ApiAccess.get_type_tree())
 
-@cache.memoize()
+@app.route('/type-tree-overview')
+def type_tree_overview():
+    return jsonify(ApiAccess.get_type_tree_overview())
+
+
 @app.route('/files-of-entities')
 def get_files_of_entities():
     return jsonify(ApiAccess.get_files_of_entities())
 
-@cache.memoize()
 @app.route('/entities-count')
 def get_entities_count_by_case_study():
     return jsonify(get_entities_count_by_case_study())

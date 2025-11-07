@@ -1,22 +1,17 @@
 from histarchexplorer import app
-from flask import render_template, current_app
+from flask import render_template
 import requests
 
 from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.utils.view_util import get_cite_button
-from histarchexplorer.views.views import type_tree
+from histarchexplorer.api.api_access import ApiAccess
 
-TYPE_TREE_API_URL = "https://thanados.openatlas.eu/api/0.4/type_tree/"
 
 @app.route("/vocabulary")
 def vocabulary():
-    vocab_tabs = current_app.config["VOCAB_TREES"]
-    type_tree_payload = type_tree().get_json()   # <- dict
     return render_template(
         "vocabulary.html",
-        vocab_tabs=vocab_tabs,
-        type_tree_api_url=TYPE_TREE_API_URL,     # keep if needed elsewhere
-        type_tree_=type_tree_payload,            # <- pass dict
+        type_tree=ApiAccess.get_type_tree_overview(),
     )
 
 
@@ -25,10 +20,7 @@ def vocabulary():
 @app.route("/vocabulary/<int:type_id>")
 def vocabulary_detail(type_id: int):
     entity = PresentationView.from_api(type_id)
-    res = requests.get(TYPE_TREE_API_URL)
-
-    res.raise_for_status()
-    type_tree = res.json().get("typeTree", {})
+    type_tree = ApiAccess.get_type_tree()
 
     type_ = type_tree.get(str(type_id))
     if not type_:
