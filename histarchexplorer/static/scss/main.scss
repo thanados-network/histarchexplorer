@@ -1,2 +1,19 @@
 @use 'globals';
 @use 'components';
+
+// ======================================================
+// main.scss — root stylesheet entry
+// Modernized for Dart Sass 3
+// ======================================================
+
+// Sass core modules
+@use "sass:meta";
+@use "sass:math";
+@use "sass:map";
+@use "sass:color";
+
+// Bootstrap (modern @use syntax)
+@use "../node_modules/bootstrap/scss/bootstrap" as *;
+
+// Project components
+@use "components/index" as *;

@@ -72,6 +72,10 @@ def get_render_type(mime_type: str) -> str:
             render_type = 'webp'
         case "application/pdf":
             render_type = 'pdf'
+        case 'image/svg+xml':
+            render_type = 'svg'
+        case _ if mime_type.startswith("video/"):
+            render_type = 'video'
         case _ if mime_type.startswith("image/"):
             render_type = 'image'
         case _:

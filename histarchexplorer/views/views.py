@@ -1,11 +1,14 @@
 from typing import Optional
 
 import requests
-from flask import g, jsonify, redirect, render_template, abort, request, \
-    session, current_app
+from flask import (
+    g, jsonify, redirect, render_template, request, session, url_for)
+from flask_login import login_required
 from werkzeug import Response
 
 from histarchexplorer import app, cache
+from histarchexplorer.api.api_access import ApiAccess
+from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.database.map import get_map_tilestring
 from histarchexplorer.utils.cerberos import get_view_class_count
 
@@ -31,6 +34,7 @@ def set_language(language: Optional[str] = None) -> Response:
 
 
 @cache.memoize()
+@app.route('/type-tree')
 def type_tree_by_view():
     response = requests.get(
         f"{app.config['API_URL']}/type_by_view_class/",
@@ -39,10 +43,17 @@ def type_tree_by_view():
     return jsonify(response)
 
 
-@cache.memoize()
-def type_tree():
-    response = requests.get(
-        f"{app.config['API_URL']}/type_tree/",
-        headers=g.api_headers,
-        timeout=20).json()
-    return jsonify(response)
+@app.route('/files-of-entities')
+def files_of_entities() -> Response:
+    return jsonify(ApiAccess.get_files_of_entities())
+
+
+@app.route("/refresh-cache/<int:id_>", methods=["POST"])
+@login_required
+def refresh_cache(id_: int):
+    """Clear memoized cache for this entity."""
+    try:
+        cache.delete_memoized(PresentationView.from_api, PresentationView, id_)
+        return redirect(url_for('entity_view', id_=id_))
+    except Exception as e:
+        return jsonify({"message": f"Failed to clear cache: {e}"}), 500

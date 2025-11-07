@@ -9,7 +9,7 @@ class SearchService:
 
     def __init__(self, app):
         self.api_url = app.config['API_URL']
-        self.view_classes = app.config['VIEW_CLASSES']
+        self.view_classes = g.view_classes
         self.app_logger = app.logger
 
     def _make_api_call(self, url: str) -> list:

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ CURRENT_LANGUAGE }}">
+<html lang="{{ current_language }}">
 <head>
 
   <link rel="icon" href="/static/images/favicons/favicon_thanados.ico">
@@ -12,7 +12,8 @@
   <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/static/node_modules/quercus.js/src/treeview.css">
   <link href="/static/node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
 
   <!-- JS -->
   <script src="/static/node_modules/muuri/dist/muuri.min.js"></script>
@@ -23,7 +24,17 @@
   <script src="/static/node_modules/quercus.js/src/treeview.js"></script>
   <script defer src="/static/js/darkLightMode.js"></script>
   <script type="text/javascript" src="/static/node_modules/tabulator-tables/dist/js/tabulator.js"></script>
-
+  <script
+    src="{{ url_for('static', filename='js/globalFunctions.js') }}"></script>
+  <script>
+      window.language="{{ current_language }}"
+      window.availableLanguages="{{ available_languages }}"
+      window.preferredLanguage="{{ preferred_language }}"
+      window.currentLanguage="{{ current_language }}"
+      window.systemClassMap={{ system_class_map | tojson | safe }}
+      window.additionalFilesOverview={{ additional_files_for_overview }}
+      window.adminFields={{ admin_fields | tojson | safe }}
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Histarchexplorer</title>

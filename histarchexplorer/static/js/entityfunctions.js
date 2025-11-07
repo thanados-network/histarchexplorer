@@ -25,8 +25,8 @@ function makeLocalDate(dateString) {
         return result
     }
 
-// Format the date based on the user's locale
 
+// Format the date based on the user's locale
     if (isValidDate(date)) {
         const formattedDate = new Intl.DateTimeFormat(language).format(date);
         result.localdate = formattedDate + addition

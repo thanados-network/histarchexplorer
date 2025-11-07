@@ -1,0 +1,36 @@
+
+/**
+ * Fetches a PresentationView model from the Flask backend.
+ * @param {number} id - The entity ID.
+ * @returns {Promise<Object>} The JSON response.
+ */
+async function fetchPresentationView(id) {
+  try {
+    const response = await fetch(`/presentation-view/${id}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch PresentationView ${id}: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching presentation view:", error);
+    return null;
+  }
+}
+
+/**
+ * Fetches a entityData from the Flask backend.
+ * @param {number} id - The entity ID.
+ * @returns {Promise<Object>} The JSON response.
+ */
+async function fetchEntityData(id) {
+  try {
+    const response = await fetch(`/entity-data/${id}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch entityData ${id}: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching entityData view:", error);
+    return null;
+  }
+}

@@ -1,4 +1,37 @@
-<div id="mymap"></div>
-<script> const mapData = (JSON.parse({{ data|tojson }})).spatial</script>
+<script
+  src="{{ url_for('static', filename='node_modules/sortablejs/Sortable.min.js') }}"></script>
+<div>
+  <div id="mymap"></div>
+</div>
+
+
+
 
 <script src="../../static/js/map.js"></script>
+
+<div class="modal fade" id="styleEditModal" tabindex="-1"
+     aria-labelledby="styleEditLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="styleEditLabel">Edit Style</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="styleEditForm">
+          <div id="styleEditFields"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary"
+                data-bs-dismiss="modal">Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="styleEditSave">
+          Apply
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

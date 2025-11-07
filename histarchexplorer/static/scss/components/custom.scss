@@ -1,9 +1,12 @@
-@import '../../node_modules/bootstrap/scss/mixins';
+@use "sass:math";
+@use "sass:color";
+@use "../../node_modules/bootstrap/scss/mixins" as *;
+@use "../../node_modules/bootstrap/scss/functions" as *;
 
 $nav-link-color: #559f55;
 $nav-pills-link-active-bg: #559f55;
 
-@import '../../node_modules/bootstrap/scss/bootstrap';
+
 
 $btn-bg: #559f55;
 

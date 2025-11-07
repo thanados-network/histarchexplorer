@@ -1,4 +1,5 @@
 # Don't edit this file. To override settings please use instance/production.py
+from pathlib import Path
 
 # Application metadata
 VERSION = '0.1.0'
@@ -19,10 +20,16 @@ SESSION_COOKIE_SECURE = False  # Use HTTPS for session cookie
 REMEMBER_COOKIE_SECURE = True  # Use HTTPS for "remember me" cookie
 SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection mode
 
+ROOT_PATH = Path(__file__).parent.parent
+
 # API configuration
 API_URL = 'https://thanados.openatlas.eu/api/'
 API_PROXY = ''  # Optional proxy for API requests
 API_TOKEN = ''
+
+CACHE_DIR = '/var/tmp/flask-cache'
+CACHE_TYPE = 'FileSystemCache'
+CACHE_DEFAULT_TIMEOUT = 3600
 
 # Data handling
 CLASSES_TO_SKIP = {  # Entity classes excluded from processing
@@ -47,6 +54,9 @@ VIEW_CLASSES = {
 #     'Edition', 'License', 'External reference',
 #     'Source translation', 'Actor relation', 'Human remains', 'Artifact',
 #     'Place', 'Feature', 'Stratigraphic unit']
+
+ADD_FILES_FOR_OVERVIEW = 2
+
 
 # Categorization of entity types with icons
 TYPE_DIVISIONS = {

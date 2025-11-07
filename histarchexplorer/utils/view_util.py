@@ -3,6 +3,7 @@ from typing import Any
 
 from flask import g, render_template, url_for
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 
 from histarchexplorer import app
 from histarchexplorer.api.presentation_view import PresentationView
@@ -10,7 +11,6 @@ from histarchexplorer.api.presentation_view import PresentationView
 _('entities')
 _('search')
 _('about')
-_('test')
 
 
 @app.context_processor
@@ -65,12 +65,20 @@ def get_cite_button(entity: PresentationView) -> dict[str, str]:
                         if e.class_id == g.config_classes['main-project']]
     project_name = '/'.join(
         [cs.name['display']['label'] for cs in case_studies])
-    button_html = render_template('cite/button.html')
+    button_html = render_template('util/cite/button.html')
     modal_html = render_template(
-        'cite/modal.html',
+        'util/cite/modal.html',
         entity=entity,
         project_name=project_name,
         projects=case_studies,
         current_url=url_for('entity_view', id_=entity.id, _external=True),
         today_date=current_date)
     return {'button_html': button_html, 'modal_html': modal_html}
+
+
+
+def get_refresh_button(id_: int) -> str | None:
+    """Return HTML for the refresh cache button if user is logged in."""
+    if not current_user.is_authenticated:
+        return None
+    return render_template('util/clear_entity_cache.html', id_=id_)

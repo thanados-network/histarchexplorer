@@ -51,10 +51,10 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-globe me-2"></i><span id="language">{{ CURRENT_LANGUAGE }}</span>
+                        <i class="bi bi-globe me-2"></i><span id="language">{{ current_language }}</span>
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        {% for lang in AVAILABLE_LANGUAGES.items() %}
+                        {% for lang in available_languages.items() %}
                             <li><a class="dropdown-item"
                                    href="{{ url_for('set_language', language=lang[0] ) }}">{{ lang[0] }}</a>
                             </li>
@@ -65,6 +65,4 @@
         </div>
     </div>
 </nav>
-<script>
-    const language="{{ CURRENT_LANGUAGE }}"
-</script>
+

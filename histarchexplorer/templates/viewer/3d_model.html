@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+{% block content %}
+  <script>
+    const file_id = {{ file_id|tojson }};
+  </script>
+  <div class="page-wrapper">
+    <div class="scrollable-container">
+      <div class="container-fluid py-4 text-center">
+        <div class="d-flex justify-content-center">
+          <div class="model-viewer-wrapper position-relative"
+               style="width: 90%; height: 80vh; max-width: 1200px;">
+            <div
+              class="spinner position-absolute top-50 start-50 translate-middle">
+              <div class="spinner-border text-secondary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+            <model-viewer
+              id="mainModel"
+              src="{{ file_url }}"
+              alt="3D model {{ file_id }}"
+              camera-controls
+              ar
+              ar-modes="webxr scene-viewer quick-look"
+              shadow-intensity="1"
+              autoplay
+              auto-rotate
+              style="width: 100%; height: 100%; background-color: #f8f9fa;">
+            </model-viewer>
+
+            <!-- ===== TOOLBOX ===== -->
+            <div id="toolbox"
+                 class="position-absolute top-0 end-0 m-3 d-flex flex-column gap-2">
+              <button class="btn btn-light btn-sm" id="btn-reset"
+                      title="Reset Camera">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+              <button class="btn btn-light btn-sm" id="btn-rotate"
+                      title="Toggle Auto-Rotate">
+                <i class="bi bi-repeat"></i>
+              </button>
+              <button class="btn btn-light btn-sm" id="btn-light"
+                      title="Toggle Lighting">
+                <i class="bi bi-brightness-high"></i>
+              </button>
+              <button class="btn btn-light btn-sm" id="btn-bg"
+                      title="Toggle Background">
+                <i class="bi bi-square-half"></i>
+              </button>
+              <button class="btn btn-light btn-sm" id="btn-info"
+                      title="Show information">
+                <i class="bi bi-info-circle"></i>
+              </button>
+              <button class="btn btn-light btn-sm" id="btn-download"
+                      title="Download Model">
+                <i class="bi bi-download"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script
+    src="{{ url_for('static', filename='js/viewer/3d_model.js') }}"></script>
+<script src="{{ url_for('static', filename='js/viewer/viewer_info.js') }}"></script>
+
+{% endblock %}

@@ -279,13 +279,19 @@ document.getElementById('resetButton')?.addEventListener('click', function () {
 
 document.getElementById('clearCacheButton')?.addEventListener('click', function () {
   if (confirm('Are you sure you want to clear the cache?')) {
-    window.location.href = '/clear-cache';
+    window.location.href = '/admin/clear-cache';
   }
 });
 
 document.getElementById('warmCacheButton')?.addEventListener('click', function () {
   if (confirm('Are you sure you want to warm the cache? This can take some time.')) {
-    window.location.href = '/warm-cache';
+    window.location.href = '/admin/warm-cache';
+  }
+});
+
+document.getElementById('warmEntityCache')?.addEventListener('click', function () {
+  if (confirm('Are you sure you want to warm the whole entity cache? This will take some time.')) {
+    window.location.href = '/admin/warm-entity-cache';
   }
 });
 

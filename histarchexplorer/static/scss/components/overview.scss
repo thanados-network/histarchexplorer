@@ -1,7 +1,7 @@
 @use '../globals'as *;
 
 //Muuri-general
-.grid-muuri {
+.grid-overview {
   width: 100%;
   position: relative;
 }
@@ -28,6 +28,7 @@
 .item-middle,
 .item-fit,
 .item-5-6 {
+  margin: 2.5px;
   border-radius: 5px;   /* Rounded corners */
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   border: none;
@@ -35,9 +36,8 @@
 
 .item {
   display: block;
-  margin: 5px;
   position: absolute;
-  width: calc((100% - 20px) / 3);
+  width: calc((100% - 15px) / 3);
   background: var(--muuri-tile);
   overflow: hidden;
 }
@@ -90,10 +90,9 @@
 
 .item-half {
   display: block;
-  margin: 2.5px;
-  //margin-top: 5px;
+  //margin: 2.5px;
   position: absolute;
-  width: calc((((100% - 30px) / 3) - 10px) / 2);
+  width: calc((((100% - 15px) / 3) - 10px) / 2);
   max-height: fit-content;
   background: var(--muuri-tile);
   overflow: hidden;
@@ -115,7 +114,7 @@
 }
 
 .item-wide {
-  width: calc(100% - 30px); // full width of three tiles
+  width: calc(100% - 10px); // full width of three tiles
 }
 
 @media (max-width: 1400px) { // two tiles
@@ -139,7 +138,7 @@
   }
 
   .item-wide {
-    width: calc(100% - 10px); // volle Breite
+    width: 100%; // volle Breite
   }
     .item-5-6 {
     width: calc(100% - 10px); // volle Breite
@@ -151,6 +150,7 @@
   .item,
   .item-half,
   .item-middle,
+  .item-wide
   .item-fit {
     border-radius:0;
     padding-bottom: rem(10);
@@ -178,6 +178,13 @@
 
 }
 
+.item-attributes {
+  padding: 1rem;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
 .item-content-full {
   padding: 0;
 }
@@ -188,7 +195,7 @@
   max-width: 100%;
   height: auto;
   display: block;
-  margin: 0 auto;
+  //margin: 0 auto;
   position: relative;
 }
 
@@ -272,7 +279,6 @@
   font-weight: lighter;
 }
 
-
 //Map-Style
 .location {
   width: 100%;
@@ -347,7 +353,7 @@
 }
 
 .entity-card__icon img {
-  max-width: 80%; //ev. change here to extra card, so that on entity page this can stay on 80-100%
+  max-width: 40%; //ev. change here to extra card, so that on entity page this can stay on 80-100%
   height: auto;
   border-radius: 10px;
 }
@@ -393,7 +399,7 @@
 }
 
 .entity-type {
-  margin-top: 2rem;
+  //margin-top: 0.5rem;
 }
 
 .entity-type p {
@@ -466,4 +472,19 @@
 
 .custom-badge {
   background-color: var(--badge-color);
+}
+
+
+.entity-toolbox {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+
+  button {
+    transition: transform 0.2s ease;
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
 }

@@ -23,6 +23,16 @@
           </div>
         </div>
 
+
+        <div class="card mt-5 mb-5">
+          <div class="card-body">
+            <h5 class="card-title">{{ _('cache options') | upper }}</h5>
+            <div class="d-flex justify-content-start align-items-start">
+              {% include 'admin/cache.html' %}
+            </div>
+          </div>
+        </div>
+
         <div class="card mt-5 mb-5">
           <div class="card-body">
             <h5 class="card-title">{{ _('general settings') | upper }}</h5>
@@ -50,19 +60,13 @@
                 </div>
                 <button
                   type="submit"
-                        class="btn btn-primary">{{ _('Save') }}
+                  class="btn btn-primary">{{ _('Save') }}
                 </button>
               </form>
             </div>
           </div>
         </div>
 
-        <div class="card mt-5 mb-5">
-          <div class="card-body">
-            <h5 class="card-title">{{ _('maps') |upper }}</h5>
-            {% include 'admin/maps.html' %}
-          </div>
-        </div>
 
         <div class="card mt-5 mb-5">
           <div class="card-body">
@@ -95,9 +99,11 @@
                           <button
                             class="accordion-button {% if entity.is_collapsed_entry %}collapsed{% endif %}"
                             type="button" data-bs-toggle="collapse"
-                            data-bs-target="#{{ tab_item.target }}{{ entity.id }}"
+                            data-bs-target="#
+                              {{ tab_item.target }}{{ entity.id }}"
                             aria-expanded="{{ entity.is_active_entry | string | lower }}"
-                            aria-controls="{{ tab_item.target }}{{ entity.id }}">
+                            aria-controls="
+                              {{ tab_item.target }}{{ entity.id }}">
                             {{ entity.name_display_label or '' }}
                           </button>
                         </h2>
@@ -115,13 +121,16 @@
                               <input type="hidden" name="current_tab"
                                      value="{{ tab_item.target }}">
                               <input type="hidden" name="current_entry"
-                                     value="{{ tab_item.target }}{{ entity.id }}">
+                                     value="
+                                       {{ tab_item.target }}{{ entity.id }}">
 
                               <div class="row needs-validation">
                                 {% for field in entity.fields_config %}
                                   <div
                                     class="{{ field.col_class or 'col-md-6' }} mt-2">
-                                    <label for="Input{{ field.key | capitalize }}{{ entity.id }}"
+                                    <label for="Input
+
+                                      {{ field.key | capitalize }}{{ entity.id }}"
                                            class="form-label">
                                       {{ _(field.label)|capitalize }}
                                       {% if field.translatable and not entity[field.key + '_has_current_translation'] %}
@@ -140,7 +149,9 @@
 
                                     {% if field.type == 'textarea' %}
                                       <textarea class="form-control"
-                                                id="Input {{ field.key | capitalize }}{{ entity.id }}"
+                                                id="Input
+
+                                                  {{ field.key | capitalize }}{{ entity.id }}"
                                                 name="{{ field.key }}"
                                                 aria-describedby="{{ field.key }}Help{{ entity.id }}"
                                                 {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
@@ -150,6 +161,8 @@
                                     {% elif field.type == 'select' %}
                                       <select class="form-select"
                                               id="Input
+
+
                                                 {{ field.key | capitalize }}{{ entity.id }}"
                                               name="{{ field.key }}"
                                               aria-describedby="{{ field.key }}Help{{ entity.id }}"
@@ -166,7 +179,9 @@
                                     {% else %}
                                       <input type="{{ field.type }}"
                                              class="form-control"
-                                             id="Input{{ field.key | capitalize }}{{ entity.id }}"
+                                             id="Input
+
+                                               {{ field.key | capitalize }}{{ entity.id }}"
                                              name="{{ field.key }}"
                                              value="{{ entity[field.key + '_display_label'] or '' }}"
                                              aria-describedby="{{ field.key }}Help{{ entity.id }}"
@@ -327,6 +342,15 @@
             </div>
           </div>
         </div>
+
+
+        <div class="card mt-5 mb-5">
+          <div class="card-body">
+            <h5 class="card-title">{{ _('maps') |upper }}</h5>
+            {% include 'admin/maps.html' %}
+          </div>
+        </div>
+
 
         <div class="card mt-5 mb-5">
           <div class="card-body">

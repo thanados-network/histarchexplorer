@@ -1,14 +1,18 @@
 {
   "name": "static",
   "version": "0.0.1",
+  "private": true,
   "description": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "sass scss/main.scss css/main.css --watch --quiet-deps",
+    "build": "sass scss/main.scss css/main.css --style=compressed --no-source-map --quiet-deps",
+    "test": "echo \"No tests defined\" && exit 0",
+    "postinstall": "bash ../../.github/hooks/setup-hooks.sh"
   },
   "dependencies": {
     "@fontsource/inter": "^5.0.18",
     "@google/model-viewer": "^3.1.1",
-    "bootstrap": "^5.3.3",
+    "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.11.3",
     "choices.js": "^11.1.0",
     "maplibre-gl": "^5.1.1",
@@ -17,11 +21,14 @@
     "nouislider": "^15.8.1",
     "quercus.js": "^0.3.2",
     "sortablejs": "^1.15.2",
+    "svg-pan-zoom": "^3.6.2",
     "tabulator-tables": "^6.3.1"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/lisaldrian/histarchexplorer.git"
   },
-  "private": true
+  "devDependencies": {
+    "sass": "^1.79.0"
+  }
 }
