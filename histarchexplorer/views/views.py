@@ -7,7 +7,8 @@ from flask_login import login_required
 from werkzeug import Response
 
 from histarchexplorer import app, cache
-from histarchexplorer.api.api_access import ApiAccess
+from histarchexplorer.api.api_access import ApiAccess, \
+    get_entities_count_by_case_study
 from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.database.map import get_map_tilestring
 from histarchexplorer.utils.cerberos import get_view_class_count
@@ -36,16 +37,19 @@ def set_language(language: Optional[str] = None) -> Response:
 @cache.memoize()
 @app.route('/type-tree')
 def type_tree():
-    response = requests.get(
-        f"{app.config['API_URL']}/type_by_view_class/",
-        headers=g.api_headers,
-        timeout=20).json()
-    return jsonify(response)
+    return jsonify(ApiAccess.get_type_tree())
 
-
+@cache.memoize()
 @app.route('/files-of-entities')
-def files_of_entities() -> Response:
+def get_files_of_entities():
     return jsonify(ApiAccess.get_files_of_entities())
+
+@cache.memoize()
+@app.route('/entities-count')
+def get_entities_count_by_case_study():
+    return jsonify(get_entities_count_by_case_study())
+
+
 
 
 @app.route("/refresh-cache/<int:id_>", methods=["POST"])
