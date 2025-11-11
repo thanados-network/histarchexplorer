@@ -98,18 +98,18 @@
                         <h2 class="accordion-header">
                           <button
                             class="accordion-button {% if entity.is_collapsed_entry %}collapsed{% endif %}"
-                            type="button" data-bs-toggle="collapse"
-                            data-bs-target="#
-                              {{ tab_item.target }}{{ entity.id }}"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#{{ tab_item.target }}{{ entity.id }}"
                             aria-expanded="{{ entity.is_active_entry | string | lower }}"
-                            aria-controls="
-                              {{ tab_item.target }}{{ entity.id }}">
+                            aria-controls="{{ tab_item.target }}{{ entity.id }}">
                             {{ entity.name_display_label or '' }}
                           </button>
+
                         </h2>
-                        <div id="{{ tab_item.target }}{{ entity.id }}"
-                             class="accordion-collapse collapse {% if entity.is_active_entry %} show {% endif %}"
-                             data-bs-parent="#{{ tab_item.label }}accordion">
+                          <div id="{{ tab_item.target }}{{ entity.id }}"
+                               class="accordion-collapse collapse {% if entity.is_active_entry %} show {% endif %}"
+                               data-bs-parent="#{{ tab_item.label }}accordion">
                           <div class="accordion-body">
                             <form method="POST"
                                   action="{{ url_for('edit_entry') }}"
