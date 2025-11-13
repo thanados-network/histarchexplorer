@@ -1,7 +1,11 @@
 # Don't edit this file. To override settings please use instance/production.py
 from pathlib import Path
 
-import redis
+try:
+    import redis
+except ImportError:
+    redis = None  # type: ignore
+
 
 # Application metadata
 VERSION = '0.1.0'
@@ -32,21 +36,15 @@ API_TOKEN = ''
 CACHE_DEFAULT_TIMEOUT = 360000
 
 def redis_available(url="redis://127.0.0.1:6379/0"):
+    if redis is None:
+        return False
+
     try:
         r = redis.from_url(url)
         r.ping()
         return True
     except Exception:
         return False
-
-if redis_available():
-    CACHE_TYPE = "RedisCache"
-    CACHE_REDIS_URL = "redis://127.0.0.1:6379/0"
-else:
-    CACHE_TYPE = "FileSystemCache"
-    CACHE_DIR = '/tmp/flask-cache'
-    CACHE_THRESHOLD = 200000
-    CACHE_DEFAULT_TIMEOUT = 360000
 
 
 # Data handling
