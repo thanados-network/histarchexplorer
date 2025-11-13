@@ -41,11 +41,19 @@ def connect() -> connection:
         raise DatabaseError("Database connection error.") from e
 
 
-@babel.localeselector
 def get_locale() -> str:
     if 'language' in session:
         return session['language']
     return request.accept_languages.best_match(app.config['LANGUAGES']) or 'en'
+
+
+# ✅ Support both Flask-Babel <3.0 and ≥3.0
+if hasattr(babel, 'localeselector'):
+    # Old Flask-Babel (pre-3.0)
+    babel.localeselector(get_locale)
+else:
+    # New Flask-Babel (3.0+)
+    babel.locale_selector_func = get_locale
 
 
 def create_icon(css_class: str) -> str:
