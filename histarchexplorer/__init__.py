@@ -1,6 +1,7 @@
 from typing import Any
 
 import psycopg2.extras
+import redis
 from flask import Flask, Response, g, request, session, url_for
 from flask_babel import Babel
 from flask_caching import Cache
@@ -18,7 +19,20 @@ app.config.from_object('config.default')
 app.config.from_object('config.admin_fields')
 app.config.from_pyfile('production.py')
 babel = Babel(app)
-cache = Cache(app)
+
+
+def init_cache(app: Any):
+    try:
+        redis.from_url("redis://127.0.0.1:6379/0").ping()
+        app.config["CACHE_TYPE"] = "RedisCache"
+        app.config["CACHE_REDIS_URL"] = "redis://127.0.0.1:6379/0"
+    except:
+        app.config["CACHE_TYPE"] = "FileSystemCache"
+        app.config["CACHE_DIR"] = "/tmp/flask-cache"
+
+    return Cache(app)
+
+cache = init_cache(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer.views import (
@@ -173,3 +187,5 @@ def apply_caching(response: Response) -> Response:
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['X-XSS-Protection'] = '1; mode=block'
     return response
+
+

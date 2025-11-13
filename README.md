@@ -172,8 +172,44 @@ DATABASE_USER = ''
 DATABASE_PASS = ''
 ```
 
----
+## Redis Installation (Optional but Recommended)
 
+Histarchexplorer can use **Redis** as a high-performance backend for Flask-Caching (memoize). Redis is optional, but strongly recommended for production environments.
+
+### Install Redis on Debian 12
+
+```bash
+sudo apt update
+sudo apt install redis-server python3-redis
+```
+
+This installs:
+- **redis-server** → the Redis database
+- **python3-redis** → required for Flask to connect to Redis
+
+### Enable and start Redis
+
+```bash
+sudo systemctl enable redis-server
+sudo systemctl start redis-server
+```
+
+Check if Redis is running:
+
+```bash
+redis-cli ping
+# → PONG
+```
+
+### Redis default security
+On Debian 12, Redis binds **only to 127.0.0.1** by default:
+```
+bind 127.0.0.1 ::1
+protected-mode yes
+```
+This is ideal for local caching and does **not** expose Redis to the internet.
+
+---
 ## 📂 Project Structure
 
 ```
