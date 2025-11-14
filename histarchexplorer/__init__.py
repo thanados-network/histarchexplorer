@@ -19,20 +19,7 @@ app.config.from_object('config.default')
 app.config.from_object('config.admin_fields')
 app.config.from_pyfile('production.py')
 babel = Babel(app)
-
-
-def init_cache(app: Any):
-    try:
-        redis.from_url("redis://127.0.0.1:6379/0").ping()
-        app.config["CACHE_TYPE"] = "RedisCache"
-        app.config["CACHE_REDIS_URL"] = "redis://127.0.0.1:6379/0"
-    except:
-        app.config["CACHE_TYPE"] = "FileSystemCache"
-        app.config["CACHE_DIR"] = "/tmp/flask-cache"
-
-    return Cache(app)
-
-cache = init_cache(app)
+cache = Cache(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer.views import (

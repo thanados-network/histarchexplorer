@@ -46,6 +46,14 @@ def redis_available(url="redis://127.0.0.1:6379/0"):
     except Exception:
         return False
 
+if redis_available():
+    CACHE_TYPE = "RedisCache"
+    CACHE_REDIS_URL = "redis://127.0.0.1:6379/0"
+else:
+    CACHE_TYPE = "FileSystemCache"
+    CACHE_DIR = '/tmp/flask-cache'
+    CACHE_THRESHOLD = 200000
+    CACHE_DEFAULT_TIMEOUT = 360000  # ensure fallback uses same TTL
 
 # Data handling
 CLASSES_TO_SKIP = {  # Entity classes excluded from processing
