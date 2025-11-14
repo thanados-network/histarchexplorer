@@ -1,6 +1,12 @@
 # Don't edit this file. To override settings please use instance/production.py
 from pathlib import Path
 
+try:
+    import redis
+except ImportError:
+    redis = None  # type: ignore
+
+
 # Application metadata
 VERSION = '0.1.0'
 LANGUAGES = {'de': 'Deutsch', 'en': 'English'}  # Supported languages
@@ -27,9 +33,19 @@ API_URL = 'https://thanados.openatlas.eu/api/'
 API_PROXY = ''  # Optional proxy for API requests
 API_TOKEN = ''
 
-CACHE_DIR = '/var/tmp/flask-cache'
-CACHE_TYPE = 'FileSystemCache'
-CACHE_DEFAULT_TIMEOUT = 3600
+CACHE_DEFAULT_TIMEOUT = 360000
+
+def redis_available(url="redis://127.0.0.1:6379/0"):
+    if redis is None:
+        return False
+
+    try:
+        r = redis.from_url(url)
+        r.ping()
+        return True
+    except Exception:
+        return False
+
 
 # Data handling
 CLASSES_TO_SKIP = {  # Entity classes excluded from processing

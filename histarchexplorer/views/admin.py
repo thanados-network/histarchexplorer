@@ -13,11 +13,10 @@ from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import ApiAccess, \
     get_entities_count_by_case_study
 from histarchexplorer.api.parser import Parser
-from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.models.admin import Admin, EntryNotFound
 from histarchexplorer.utils.view_util import find_children_by_id
-from histarchexplorer.views.views import get_files_of_entities, type_tree
+from histarchexplorer.views.views import type_tree
 
 
 def check_manager_user() -> None:
@@ -334,63 +333,57 @@ def clear_cache():
     return redirect(url_for('admin'))
 
 
-@app.route('/admin/warm-cache')
+@app.route("/admin/warm-entity-cache")
 @login_required
-def warm_cache():
-    warm_system_cache()
-    trigger_cache_warmup()
-    flash(_('cache warmed'), 'success')
+def warm_entity_cache():
+    trigger_cache_warmup(False)
+    flash(_("Cache warmup started in background (refresh mode)"), 'success')
     return redirect(url_for('admin'))
 
 
-@app.route('/admin/clear-entity-cache')
+@app.route("/admin/refresh-entity-cache")
 @login_required
-def clear_entity_cache():
-    cache.delete_memoized(PresentationView.from_api)
-    flash(_('entity cache cleared'), 'success')
+def refresh_entity_cache():
+    trigger_cache_warmup(True)
+    flash(_("Cache warmup started in background."), 'success')
     return redirect(url_for('admin'))
 
 
-@app.route("/admin/warm-entity-cache", methods=["GET"])
-@login_required
-def trigger_cache_warmup():
+def trigger_cache_warmup(refresh: bool = False):
     """Trigger external cache warm-up process."""
     entities = ApiAccess.get_by_system_class(
-        'all',
-        Parser(type_id=g.case_study_ids, limit=0, show=['none'], format='lpx'))
-    ids = []
-    for entity in entities:
-        ids.append(entity['features'][0]['@id'].rsplit('/', 1)[-1])
-    with open(app.config['ROOT_PATH'] / 'cache_ids.txt', mode='w') as file:
-        for id_ in ids:
-            file.write(f"{id_}\n")
+        "all",
+        Parser(type_id=g.case_study_ids, limit=0, show=["none"], format="lpx"))
+    ids = [
+        entity["features"][0]["@id"].rsplit("/", 1)[-1]
+        for entity in entities]
+
+    cache_file = app.config["ROOT_PATH"] / "cache_ids.txt"
+    with open(cache_file, mode="w") as file:
+        file.write("\n".join(ids))
     try:
+        args = ["python3", "warm_entity_cache.py"]
+        if refresh:
+            args.append("--refresh")
         subprocess.Popen(
-            ["python3", "warm_entity_cache.py"],
+            args,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL)
-        return jsonify({
-            "status": "started",
-            "message": "Cache warmup started in background."})
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+        flash(str(e), "error")
+        return abort(404)
 
 
-@app.route('/admin/clear-system-cache')
+@app.route('/admin/refresh-system-cache')
 @login_required
-def clear_system_cache():
-    cache.delete_memoized(type_tree)
-    cache.delete_memoized(get_files_of_entities)
-    cache.delete_memoized(get_entities_count_by_case_study)
-    flash(_('system cache cleared'), 'success')
-    return redirect(url_for('admin'))
+def refresh_system_cache():
+    cache.delete_memoized(ApiAccess.get_type_tree)
+    cache.delete_memoized(ApiAccess.get_files_of_entities)
+    cache.delete_memoized(ApiAccess.get_system_class_count)
 
-
-@app.route('/admin/warm-system-cache')
-@login_required
-def warm_system_cache():
-    type_tree()
-    get_files_of_entities()
+    ApiAccess.get_type_tree()
+    ApiAccess.get_files_of_entities()
     get_entities_count_by_case_study()
-    flash(_('system cache warmed'), 'success')
+
+    flash(_('system cache refreshed'), 'success')
     return redirect(url_for('admin'))

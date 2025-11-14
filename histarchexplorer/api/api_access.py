@@ -31,7 +31,7 @@ class ApiAccess:
             f"{app.config['API_URL']}/files_of_entities/",
             headers=g.api_headers,
             proxies=PROXIES,
-            timeout=30).json()
+            timeout=60).json()
 
     @staticmethod
     @cache.memoize()

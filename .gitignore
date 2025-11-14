@@ -58,8 +58,10 @@ tiles/
 
 # SCSS build output
 histarchexplorer/static/css/main.css
+histarchexplorer/static/css/main.css.map
 /static/*.map
 /static/css/*.map
+/static/css/*.css.map
 /static/node_modules/
 /static/css/components/
 /static/css/gloabls/

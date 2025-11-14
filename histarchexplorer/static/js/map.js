@@ -7,19 +7,22 @@
 
     const data = await window.entityData;
     const entityData = await window.entityData;
-    console.log('data');
-    console.log(data);
-    if (!data) {
-        console.error("❌ entityData failed to load");
-        return;
-    }
-
     const mapData = data.spatial
-
 
     const bounds = new maplibregl.LngLatBounds();
 
     const geomFeatureIds = [...new Set(mapData.features.map(f => f.properties.id))];
+
+    let geomId = entityId;
+    if (!geomFeatureIds.includes(entityId)) {
+        //check for first geometry
+        geomId = data.hierarchy.root
+            .slice()
+            .reverse()
+            .find(item => item.geometry_json)?.id || null;
+    }
+
+    console.log(geomId);
 
     function extendBounds(feature) {
         const {type, coordinates} = feature.geometry;
@@ -550,7 +553,7 @@
                     label = "Selection: " + entityData.entity.title;
 
                     ["Polygon", "LineString", "Point"].forEach(geomType => {
-                        totalCount += mapData.features.filter(f => f.properties?.id === entityId && f.geometry.type === geomType).length;
+                        totalCount += mapData.features.filter(f => f.properties?.id === geomId && f.geometry.type === geomType).length;
                         console.log(groupName)
                         console.log(totalCount)
                     });
@@ -584,7 +587,7 @@
                     const layers = geometries[geomType] || [];
                     const layerExists = layers.some(id => this.map.getLayer(id));
                     let featureCount = mapData.features.filter(f => f.properties?.class === groupName && f.geometry.type === geomType).length;
-                    if (isThisGroup) featureCount = mapData.features.filter(f => f.properties?.id === entityId && f.geometry.type === geomType).length;
+                    if (isThisGroup) featureCount = mapData.features.filter(f => f.properties?.id === geomId && f.geometry.type === geomType).length;
                     if (!isThisGroup && featureCount === 0) return;
 
                     let fillColor = '#888', outlineColor = '#000', width = 2, opacity = 1, radius = 8;

@@ -1,37 +1,30 @@
-
 <div class="button-card me-3">
-  <button id="warmCacheButton" class="btn btn-info" data-bs-toggle="tooltip" title="{{ _('This warms the application cache') }}">
-    {{ _('warm cache') | upper }}
+  <button id="refreshSystemCache" class="btn btn-info"
+          data-bs-toggle="tooltip"
+          title="{{ _('Refreshes the system cache.') }}">
+    {{ _('refresh system cache') | upper }}
   </button>
 </div>
 
 <div class="button-card me-3">
-  <button id="clearCacheButton" class="btn btn-secondary" data-bs-toggle="tooltip" title="{{ _('Clear the cache to free up space') }}">
-    {{ _('clear cache') | upper }}
-  </button>
-</div>
-
-<div class="button-card me-3">
-  <button id="warmEntityCache" class="btn btn-warning" data-bs-toggle="tooltip" title="{{ _('This warms every entity') }}">
+  <button id="warmEntityCache" class="btn btn-warning" data-bs-toggle="tooltip"
+          title="{{ _('This will cache all not cached entities.') }}">
     {{ _('warm entity cache') | upper }}
   </button>
 </div>
 
 <div class="button-card me-3">
-  <button id="clearEntityCache" class="btn btn-warning" data-bs-toggle="tooltip" title="{{ _('Clear the entity cache to free up space') }}">
-    {{ _('clear entity cache') | upper }}
-  </button>
-</div>
-
-
-<div class="button-card me-3">
-  <button id="warmSystemCache" class="btn btn-warning" data-bs-toggle="tooltip" title="{{ _('This warms every entity') }}">
-    {{ _('warm system cache') | upper }}
+  <button id="refreshEntityCache" class="btn btn-danger" data-bs-toggle="tooltip"
+          title="{{ _('This completely refreshes the cache.') }}">
+    {{ _('refresh entity cache') | upper }}
   </button>
 </div>
 
 <div class="button-card me-3">
-  <button id="clearSystemCache" class="btn btn-warning" data-bs-toggle="tooltip" title="{{ _('Clear the entity cache to free up space') }}">
-    {{ _('clear system cache') | upper }}
+  <button id="clearCacheButton" class="btn btn-warning"
+          data-bs-toggle="tooltip"
+          title="{{ _('Clear the cache to free up space') }}">
+    {{ _('clear cache') | upper }}
   </button>
 </div>
+

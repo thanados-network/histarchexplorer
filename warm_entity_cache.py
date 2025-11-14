@@ -1,36 +1,54 @@
 #!/usr/bin/env python3
+import argparse
+import time
+
 import requests
 import concurrent.futures
 from pathlib import Path
 
-API_BASE = "http://127.0.0.1:5000/presentation-view/"
-INPUT_FILE = Path("cache_ids.txt")  # one ID per line
-MAX_WORKERS = 8  # number of concurrent requests
+# Configuration
+API_BASE = "http://127.0.0.1:5000"
+INPUT_FILE = Path("cache_ids.txt")
+MAX_WORKERS = 2
 
 
-def warm_cache_for_id(entity_id: int):
-    url = f"{API_BASE}{entity_id}"
+def refresh_entity_cache(entity_id: int):
+    """Clear and rebuild cache for one entity via admin endpoint."""
+    time.sleep(0.2)
+    url = f"{API_BASE}/refresh-cache/{entity_id}"
     try:
-        r = requests.get(url, timeout=60)
-        #  if r.ok:
-        #      print(f"✅ Cached {entity_id}")
-        #  else:
-        #      print(f"⚠️ Failed {entity_id}: {r.status_code}")
+        requests.post(url, timeout=60)
     except Exception as e:
-        print(f"❌ Error {entity_id}: {e}")
+        print(f"Error refreshing {entity_id}: {e}")
+
+
+def warm_entity_cache(entity_id: int):
+    """Just trigger the cached endpoint."""
+    time.sleep(0.2)
+    url = f"{API_BASE}/presentation-view/{entity_id}"
+    try:
+        requests.get(url, timeout=60)
+    except Exception as e:
+        print(f"Error warming {entity_id}: {e}")
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description="Warm or refresh entity cache.")
+    parser.add_argument(
+        "--refresh",
+        action="store_true",
+        help="Clear and rebuild cache before warming.")
+    args = parser.parse_args()
     ids = [
-        int(line.strip())
-        for line in INPUT_FILE.read_text().splitlines() if line.strip()]
-    #print(f"🌡️ Warming cache for {len(ids)} entities")
+        int(line.strip()) for line in
+        INPUT_FILE.read_text().splitlines() if line.strip()]
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        executor.map(warm_cache_for_id, ids)
+    func = refresh_entity_cache if args.refresh else warm_entity_cache
 
-    print("🔥 Cache warmup completed")
-
+    with concurrent.futures.ThreadPoolExecutor(
+            max_workers=MAX_WORKERS) as executor:
+        executor.map(func, ids)
 
 if __name__ == "__main__":
     main()
