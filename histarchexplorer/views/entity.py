@@ -13,7 +13,7 @@ from histarchexplorer.database.entity import (
 from histarchexplorer.utils.view_util import get_cite_button, \
     get_refresh_button
 from histarchexplorer.views.entities import get_browse_list_entities
-from histarchexplorer.views.views import type_tree_by_view
+from histarchexplorer.views.views import type_tree
 
 
 @app.route('/entity/<int:id_>')
@@ -64,7 +64,7 @@ def get_entity(id_: int, tab_name=None) -> str:
             filtered_view_classes=filtered_view_classes,
             subunit_data=subunit_data,
             active_tab=tab_name,
-            typetree_data=type_tree_by_view().json,
+            typetree_data=type_tree().json,
             main_image_json=g.main_images,
             tab_name='subunits')
 
