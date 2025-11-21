@@ -12,7 +12,6 @@ from werkzeug import Response
 from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import ApiAccess, \
     get_entities_count_by_case_study
-from histarchexplorer.api.parser import Parser
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.models.admin import Admin, EntryNotFound
 from histarchexplorer.utils.view_util import find_children_by_id
@@ -351,20 +350,13 @@ def refresh_entity_cache():
 
 def trigger_cache_warmup(refresh: bool = False):
     """Trigger external cache warm-up process."""
-    entities = ApiAccess.get_by_system_class(
-        "all",
-        Parser(type_id=g.case_study_ids, limit=0, show=["none"], format="lpx"))
-    ids = [
-        entity["features"][0]["@id"].rsplit("/", 1)[-1]
-        for entity in entities]
-
-    cache_file = app.config["ROOT_PATH"] / "cache_ids.txt"
-    with open(cache_file, mode="w") as file:
-        file.write("\n".join(ids))
     try:
         args = ["python3", "warm_entity_cache.py"]
+        print(' '.join([str(ids) for ids in g.case_study_ids]))
         if refresh:
             args.append("--refresh")
+        if g.case_study_ids:
+            args.append(f"--case-studies {' '.join([str(ids) for ids in g.case_study_ids])}")
         subprocess.Popen(
             args,
             stdout=subprocess.DEVNULL,

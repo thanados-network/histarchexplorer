@@ -5,10 +5,6 @@ from typing import Optional
 from flask import g
 
 
-# def uc_first(string: str) -> str:
-#     return str(string)[0].upper() + str(string)[1:] if string else ''
-
-
 def split_date_string(date_str: Optional[str]) -> str:
     if not date_str:
         return ""
@@ -16,7 +12,8 @@ def split_date_string(date_str: Optional[str]) -> str:
     if date_part.startswith("-"):  # handle BC years manually
         sign, date_part = "-", date_part[1:]
         year, month, day = date_part.split("-")
-        return f"{sign}{day.zfill(2)}.{month.zfill(2)}.{year.lstrip('0') or '0'}"
+        return (f"{sign}{day.zfill(2)}.{month.zfill(2)}."
+                f"{year.lstrip('0') or '0'}")
     try:
         return datetime.fromisoformat(date_str).strftime("%d.%m.%Y")
     except ValueError:  # pragma: no cover
@@ -48,7 +45,8 @@ def format_date(date_from: str, date_to: str) -> Optional[str]:
                     f"- {year_part(clean_to)} {'BC' if bc_to else 'AD'}")
 
     # Only one side available
-    date = ".".join(s.lstrip("0") for s in clean_from.split(".")) if date_from else clean_to
+    date = ".".join(s.lstrip("0") for s in
+                    clean_from.split(".")) if date_from else clean_to
     return f"{date} {'BC' if bc_from else ''}".strip()
 
 
@@ -66,6 +64,8 @@ def format_date(date_from: str, date_to: str) -> Optional[str]:
 
 def get_render_type(mime_type: str) -> str:
     match mime_type:
+        case None:
+            render_type = 'unknown'
         case "model/gltf-binary" | "model/glb" | "model/gltf+json":
             render_type = '3d_model'
         case "image/webp":
@@ -106,7 +106,7 @@ def get_divisions(id_: int, type_hierarchy: dict[str, str]) -> dict[str, str]:
             {'label': 'other', 'icon': '<i class="bi bi-boxes"></i>'})
 
 
-def get_description_translated(description: str) -> dict[str, str]:
+def get_description_translated(description: str) -> None | dict[str, str]:
     if not description:
         return None
 
