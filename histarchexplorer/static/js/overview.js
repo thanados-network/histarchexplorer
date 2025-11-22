@@ -385,11 +385,14 @@ function renderReferences(entity) {
         ]),
     ]);
     const attrTile = h("div", {
-        class: "item item-half",
+        class: "item item-half item-attributes",
         id: "tile-attributes",
         hidden: true
     }, [
-        h("div", {class: "item-content"}, [h("div", {id: "js-attributes"})]),
+        h("div", {class: "item-content"}, [
+            h("span", {class: "tile-label", text: "ATTRIBUTES"}),
+            h("div", {id: "js-attributes", class: "categorized-types"})
+        ])
     ]);
     const mapTile = h("div", {class: "item", id: "tile-map", hidden: true}, [
         h("div", {class: "item-content item-content-full"}, [
