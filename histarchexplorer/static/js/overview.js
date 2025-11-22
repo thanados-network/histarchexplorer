@@ -405,7 +405,7 @@ function renderReferences(entity) {
         hidden: true
     }, [
         h("div", {class: "item-content"}, [
-            h("ul", {id: "js-references", class: "no-bullets"}),
+            h("div", {id: "js-references", class: "no-bullets"}),
         ]),
     ]);
 
