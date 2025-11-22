@@ -227,10 +227,10 @@ function renderReferences(entity) {
     const list = document.getElementById("js-references");
     if (!tile || !list || !Array.isArray(entity?.references) || !entity.references.length) return;
     list.innerHTML = "";
-    list.append(h('h4', {
-        class: "",
-        html: `References`
-    }))
+    list.appendChild(h("span", {
+        class: "tile-label",
+        text: "REFERENCES"
+    }));
     entity.references.forEach((ref) => {
         if (!["bibliography", "external_reference"].includes(ref.system_class)) return;
         const isBibl = ref.system_class === "bibliography";
