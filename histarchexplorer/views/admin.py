@@ -354,7 +354,9 @@ def trigger_cache_warmup(refresh: bool = False):
         if refresh:
             args.append("--refresh")
         if g.case_study_ids:
-            args.append(f"--case-studies {' '.join([str(ids) for ids in g.case_study_ids])}")
+            args.append(
+                "--case-studies "
+                f"{' '.join([str(ids) for ids in g.case_study_ids])}")
         subprocess.Popen(
             args,
             stdout=subprocess.DEVNULL,

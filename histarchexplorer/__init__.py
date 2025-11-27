@@ -1,4 +1,5 @@
 from typing import Any
+from urllib.parse import urlsplit
 
 import psycopg2.extras
 from flask import Flask, Response, g, request, session, url_for
@@ -175,3 +176,6 @@ def apply_caching(response: Response) -> Response:
     return response
 
 
+@app.template_filter("domain")
+def domain_filter(url):
+    return urlsplit(url).netloc

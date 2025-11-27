@@ -103,10 +103,25 @@
   }
 
   .about-project-img {
-    max-height: 140px;
+    max-height: 100%;
+    max-width: 100%;
     object-fit: contain;
-    padding: 1rem;
+    image-rendering: auto;
+    display: block;
+  }
+
+  .about-project-img-wrapper {
+    width: 100%;
+    height: clamp(120px, 14vw, 160px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     background: #f7f7f7;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    overflow: hidden;
   }
 
   .about-project-body {
@@ -172,5 +187,80 @@
     text-decoration: none;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     transform: translateY(-1px);
+  }
+}
+
+html[data-bs-theme="dark"],
+body.dark {
+
+  .about-sidebar {
+    background: var(--about-bg);
+    border-color: var(--about-border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.45);
+  }
+
+  .about-person,
+  .about-institution {
+    border-bottom-color: var(--about-border-soft);
+  }
+
+  .about-name {
+    color: var(--about-text);
+  }
+
+  .about-role {
+    color: var(--about-text-muted);
+  }
+
+  .about-avatar {
+    border-color: var(--about-border-soft);
+  }
+
+  .about-icon {
+    filter: brightness(0.85);
+  }
+
+  /* PROJECT CARDS */
+  .about-project-card {
+    background: var(--about-bg);
+    border-color: var(--about-border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.55);
+  }
+
+  .about-project-card:hover {
+    border-color: var(--about-border-soft);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  }
+
+  .about-project-img-wrapper {
+    background: var(--about-bg-soft);
+    border-bottom-color: var(--about-border-soft);
+  }
+
+  .about-project-title {
+    color: var(--about-text);
+  }
+
+  .about-project-text {
+    color: var(--about-text-muted);
+  }
+
+  .about-project-footer {
+    background: var(--about-bg-soft);
+    color: var(--about-text-muted);
+    border-top-color: var(--about-border-soft);
+  }
+
+  .about-website-pill {
+    background: #283046;
+    border-color: #3c4458;
+    color: #d5dfff;
+
+    &:hover {
+      background: #303a52;
+      border-color: #4a5570;
+      color: #e6ecff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.45);
+    }
   }
 }

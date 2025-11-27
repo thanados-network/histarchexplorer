@@ -1,6 +1,5 @@
 from typing import Optional
 
-import requests
 from flask import (
     g, jsonify, redirect, render_template, request, session, url_for)
 from flask_login import login_required
@@ -34,7 +33,6 @@ def set_language(language: Optional[str] = None) -> Response:
     return redirect(request.referrer)
 
 
-
 @app.route('/type-tree')
 def type_tree():
     return jsonify(ApiAccess.get_type_tree())
@@ -48,7 +46,6 @@ def get_files_of_entities():
 @app.route('/entities-count')
 def get_entities_count_by_case_study():
     return jsonify(get_entities_count_by_case_study())
-
 
 
 @app.route("/refresh-cache/<int:id_>", methods=["POST"])

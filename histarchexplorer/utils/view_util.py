@@ -76,7 +76,6 @@ def get_cite_button(entity: PresentationView) -> dict[str, str]:
     return {'button_html': button_html, 'modal_html': modal_html}
 
 
-
 def get_refresh_button(id_: int) -> str | None:
     """Return HTML for the refresh cache button if user is logged in."""
     if not current_user.is_authenticated:

@@ -28,38 +28,23 @@
                 <p style="white-space:pre-wrap;">{{ desc }}</p>
               {% endif %}
 
-
             </div>
 
             <div class="col-3 about-sidebar">
-
-              {# Prepare containers (Flask-compatible trick) #}
-              {% set ns = namespace(people=[], institutions=[]) %}
-
-              {% for link in active.links %}
-                {% set target = config_entities_mapped.get(link.end_id) %}
-                {% if target %}
-                  {% set role = best_label(link.role) %}
-                  {% if target.class_name == 'person' %}
-                    {% set _ = ns.people.append({'entity': target, 'role': role}) %}
-                  {% elif target.class_name == 'institution' %}
-                    {% set _ = ns.institutions.append({'entity': target, 'role': role}) %}
-                  {% endif %}
-                {% endif %}
-              {% endfor %}
 
               {% if people %}
                 <h5 class="about-section-title">{{ _('persons') }}</h5>
                 <ul class="list-unstyled">
                   {% for person in people %}
                     <li class="about-person">
-                      {% if person.entity.image %}
-                        <img src="{{ person.entity.image }}"
+                    {# Todo: delete "or True" if placeholder are unwanted #}
+                      {% if person.entity.image or True %}
+                        <img src="{{ person.entity.image
+                        or url_for('static', filename='images/team/cool_chick1.jpg') }}"
                              class="about-avatar"
                              alt="{{ best_label(person.entity.name) }}"
                              style="width:32px;height:32px;object-fit:cover;">
                       {% endif %}
-
                       <div>
                         {{ best_label(person.entity.name) }}
                         {% if person.roles %}
@@ -71,10 +56,10 @@
                     </li>
                   {% endfor %}
                 </ul>
+              <hr class="my-3">
               {% endif %}
 
-              <hr class="my-3">
-              {% if ns.institutions %}
+              {% if institutions %}
                 <h5 class="about-section-title">{{ _('institutions') }}</h5>
                 <ul class="list-unstyled">
                   {% for institution in institutions %}
@@ -97,28 +82,21 @@
                     </li>
                   {% endfor %}
                 </ul>
+                <hr class="my-3">
               {% endif %}
-              <hr class="my-3">
 
               {% if active.website %}
-                {% set short = active.website
-                   | replace("https://", "")
-                   | replace("http://", "")
-                   | replace("www.", "") %}
 
                 <a href="{{ active.website }}"
                    target="_blank"
                    rel="noopener"
                    class="about-website-pill">
-                  {{ short }}
+                  {{ active.website | domain }}
                   <i class="bi bi-box-arrow-up-right ms-1"></i>
                 </a>
               {% endif %}
-
-
             </div>
           </div>
-
 
           {% if sub_projects %}
             <hr class="my-5">
@@ -131,11 +109,13 @@
                      class="text-decoration-none text-dark">
                     <div class="about-project-card">
                       {% if p.image %}
-                        <img src="{{ p.image }}"
-                             class="about-project-img"
-                             alt="{{ best_label(p.name) }} logo"
-                             style="max-height:120px;object-fit:contain;">
+                        <div class="about-project-img-wrapper">
+                          <img src="{{ p.image }}"
+                               class="about-project-img"
+                               alt="{{ best_label(p.name) }} logo">
+                        </div>
                       {% endif %}
+
                       <div class="about-project-body">
                         <h5
                           class="about-project-title">{{ best_label(p.name) }}</h5>

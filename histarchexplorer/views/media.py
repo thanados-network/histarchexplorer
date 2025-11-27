@@ -4,10 +4,7 @@ from histarchexplorer import app
 
 
 @app.route('/view/<string:render_type>/<int:id_>')
-def view_media(render_type: str, id_: int):
-    """
-    Generic media viewer for all render types.
-    """
+def view_media(render_type: str, id_: int) -> str:
     match render_type:
         case 'image':
             template = render_template('viewer/iiif.html', file_id=id_)
