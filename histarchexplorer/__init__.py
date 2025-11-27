@@ -161,8 +161,7 @@ def inject_globals() -> dict[str, Any]:
             "event": "events",
             "artifact": "items",
             "source": "sources",
-            "file": "files"
-        }}
+            "file": "files"}}
 
 
 @app.after_request
@@ -173,5 +172,3 @@ def apply_caching(response: Response) -> Response:
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['X-XSS-Protection'] = '1; mode=block'
     return response
-
-
