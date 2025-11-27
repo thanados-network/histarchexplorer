@@ -109,7 +109,6 @@ def add_link() -> Response:
 @login_required
 def add_entry() -> Response:
     check_manager_user()
-    print(request.form)
     case_study_str = request.form.get('case_study')
     form_data = {
         'category': request.form.get('category', ''),
@@ -156,7 +155,6 @@ def delete_entry(id_: int, tab: str) -> Response:
 @login_required
 def edit_entry() -> Response:
     check_manager_user()
-    print(request.form)
     case_study_raw = request.form.get('case_study')
     case_study = int(case_study_raw) if case_study_raw else None
     form_data = {
