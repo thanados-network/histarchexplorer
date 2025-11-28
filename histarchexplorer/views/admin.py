@@ -5,7 +5,7 @@ from typing import Optional
 from flask import (
     abort, current_app, flash, g, jsonify, redirect, render_template,
     request, url_for)
-from flask_babel import format_date, lazy_gettext as _
+from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from werkzeug import Response
 

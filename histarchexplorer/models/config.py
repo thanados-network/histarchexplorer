@@ -1,3 +1,4 @@
+import html
 from dataclasses import dataclass
 from typing import Any
 
@@ -177,6 +178,8 @@ def add_display(data: dict[str, Any] | None) -> dict[str, Any]:
 
     result = data.copy()
     label = localize(data)
+    if isinstance(label, str):
+        label = html.unescape(label)
 
     for lang, value in data.items():
         if value == label:

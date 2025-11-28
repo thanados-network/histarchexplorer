@@ -42,59 +42,62 @@ function toggleMapButtons(mapId, isEditing) {
   });
 }
 // --- Rich text helpers for description field ---
-
 function initRichText(entryId) {
   if (typeof tinymce === 'undefined') {
     return;
   }
 
-  const textareaId = `Input Description${entryId}`;
-  const textarea = document.getElementById(textareaId);
-  if (!textarea) {
-    return;
-  }
+  // Select ALL richtext-enabled textareas within this form
+  const form = document.getElementById(`form${entryId}`);
+  const textareas = form.querySelectorAll('.js-richtext-rich');
 
-  // Avoid double-init
-  if (tinymce.get(textareaId)) {
-    tinymce.get(textareaId).setMode('design');
-    return;
-  }
+  textareas.forEach(textarea => {
+    const id = textarea.id;
 
-  tinymce.init({
-    target: textarea,
-    license_key: 'gpl',
-    menubar: false,
-    branding: false,
-    height: 220,
-    plugins: 'link lists image',
-    toolbar: 'bold italic underline | bullist numlist | link image',
-    // Keep URLs as entered; no rewriting
-    convert_urls: false,
-    default_link_target: '_blank',
-    rel_list: [{ title: 'No referrer', value: 'noreferrer noopener' }],
-
-    setup: function (editor) {
-      // Ensure underlying <textarea> stays in sync
-      editor.on('change keyup', function () {
-        editor.save();
-      });
+    // Avoid double init
+    if (tinymce.get(id)) {
+      tinymce.get(id).setMode('design');
+      return;
     }
+
+    tinymce.init({
+      target: textarea,
+      license_key: 'gpl',
+      menubar: false,
+      branding: false,
+      height: 220,
+      plugins: 'link lists image',
+      toolbar: 'bold italic underline | bullist numlist | link image',
+      convert_urls: false,
+      default_link_target: '_blank',
+      rel_list: [{ title: 'No referrer', value: 'noreferrer noopener' }],
+
+      setup: function (editor) {
+        editor.on('change keyup', function () {
+          editor.save();
+        });
+      }
+    });
   });
 }
-
 function destroyRichText(entryId) {
   if (typeof tinymce === 'undefined') {
     return;
   }
 
-  const textareaId = `Input Description${entryId}`;
-  const editor = tinymce.get(textareaId);
-  if (editor) {
-    // Push current content into <textarea>
-    editor.save();
-    editor.remove();
-  }
+  const form = document.getElementById(`form${entryId}`);
+  const textareas = form.querySelectorAll('.js-richtext-rich');
+
+  textareas.forEach(textarea => {
+    const id = textarea.id;
+    const editor = tinymce.get(id);
+    if (editor) {
+      editor.save();
+      editor.remove();
+    }
+  });
 }
+
 
 function changeEdit(entryId, enabled) {
   const form = document.getElementById(`form${entryId}`);

@@ -205,20 +205,14 @@
             </div>
           {% endif %}
           <div class="row">
-            {% if active.imprint %}
-              {% set imprint = best_label(main_project.imprint) %}
-              {% if imprint %}
-                <h5 class="mt-4">Imprint</h5>
-                <p style="white-space:pre-wrap;">{{ imprint }}</p>
-              {% endif %}
+            {% if main_project.imprint %}
+                <h5 class="mt-4">{{ _('Imprint') | capitalize }}</h5>
+                <p>{{ main_project.imprint.display.label | safe  }}</p>
             {% endif %}
 
-            {% if active.legal_notice %}
-              {% set legal = best_label(main_project.legal_notice) %}
-              {% if legal %}
-                <h5 class="mt-4">Legal Notice</h5>
-                <p style="white-space:pre-wrap;">{{ legal }}</p>
-              {% endif %}
+            {% if main_project.legal_notice %}
+                <h5 class="mt-4">{{ _('legal notice') | capitalize}}</h5>
+                <p >{{ main_project.legal_notice.display.label | safe}}</p>
             {% endif %}
           </div>
         </div>

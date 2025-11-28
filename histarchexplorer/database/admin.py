@@ -225,7 +225,7 @@ def _upsert_jsonb_fields(config_id: int, data: dict) -> None:
     valid_cols = {'address', 'description', 'imprint', 'legal_notice', 'name'}
     for col in valid_cols:
         val = data.get(col, '')
-        if col == 'description' and val:
+        if col in ('description', 'imprint', 'legal_notice') and val:
             val = sanitize_richtext(val)
         if val:
             g.cursor.execute(
