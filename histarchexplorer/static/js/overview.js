@@ -433,5 +433,6 @@ function renderReferences(entity) {
     overviewGrid.move(refTileItem, overviewGrid.getItems().length - 1);
 
     setTimeout(() => window.overviewGrid.refreshItems().layout(), 500);
+    renderAllBreadcrumbs(data);
 })();
 

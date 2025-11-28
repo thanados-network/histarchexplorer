@@ -6,7 +6,7 @@
   --dark-card-hover: hsl(230, 19%, 36%);
   --footer-bg-light: transparent;
   --footer-bg-dark: hsl(0, 0%, 31%);
-  --light-muuri-tile: hsl(0, 20%, 97%, 0.3);
+  --light-muuri-tile: hsla(0, 0%, 73%, 0.3);
   --dark-muuri-tile: hsla(0, 0%, 49%, 0.3);
   --light-badge: hsl(220, 2%, 65%);
   --dark-badge: hsl(0, 1%, 22%);
@@ -499,6 +499,7 @@ body {
 .grid-overview {
   width: 100%;
   position: relative;
+  margin: 5px;
 }
 
 .item.muuri-item-dragging {

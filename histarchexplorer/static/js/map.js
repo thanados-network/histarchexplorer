@@ -1376,5 +1376,7 @@
             [minLon, minLat]
         ];
     }
+    
+    renderAllBreadcrumbs(entityData);
 
 })();
