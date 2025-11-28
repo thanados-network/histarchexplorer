@@ -74,6 +74,7 @@ class Properties:
 class ConfigEntity:
     id: int
     name: dict[str, str | dict[str, str]]
+    acronym: str
     description: dict[str, str | dict[str, str]]
     website: str
     legal_notice: dict[str, str | dict[str, str]]
@@ -96,6 +97,7 @@ class ConfigEntity:
             entities.append(ConfigEntity(
                 id=entry.id,
                 name=add_display(entry.name),
+                acronym=entry.acronym,
                 description=add_display(entry.description),
                 website=entry.website,
                 legal_notice=add_display(entry.legal_notice),

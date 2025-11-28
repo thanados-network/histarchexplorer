@@ -130,6 +130,7 @@ ALTER TABLE tng.classes ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 CREATE TABLE tng.entities (
     id integer NOT NULL,
     name jsonb,
+    acronym text,
     description jsonb,
     address jsonb,
     class_id integer,

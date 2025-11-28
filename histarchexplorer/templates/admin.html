@@ -121,17 +121,13 @@
                               <input type="hidden" name="current_tab"
                                      value="{{ tab_item.target }}">
                               <input type="hidden" name="current_entry"
-                                     value="
-                                       {{ tab_item.target }}{{ entity.id }}">
+                                     value="{{ tab_item.target }}{{ entity.id }}">
 
                               <div class="row needs-validation">
                                 {% for field in entity.fields_config %}
                                   <div
                                     class="{{ field.col_class or 'col-md-6' }} mt-2">
-                                    <label for="Input
-
-                                      {{ field.key | capitalize }}{{ entity.id }}"
-                                           class="form-label">
+                                    <label for="Input {{ field.key | capitalize }}{{ entity.id }}" class="form-label">
                                       {{ _(field.label)|capitalize }}
                                       {% if field.translatable and not entity[field.key + '_has_current_translation'] %}
                                         {% set original_language_info = entity[field.key] if entity[field.key] is mapping and 'display' in entity[field.key] else none %}

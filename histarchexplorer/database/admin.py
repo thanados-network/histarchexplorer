@@ -151,13 +151,14 @@ def add_entry(data: dict) -> int:
     g.cursor.execute(
         """
         INSERT INTO tng.entities
-            (email, website, orcid_id, image, case_study_type_id, class_id)
+            (email, website, orcid_id, image, case_study_type_id, class_id, acronym)
         VALUES (NULLIF(%(email)s, ''),
                 NULLIF(%(website)s, ''),
                 NULLIF(%(orcid_id)s, ''),
                 NULLIF(%(image)s, ''),
                 NULLIF(%(case_study)s, NULL),
-                %(class_id)s)
+                %(class_id)s,
+                %(acronym)s)
         RETURNING id
         """, {
             'email': data.get('email'),
@@ -165,6 +166,7 @@ def add_entry(data: dict) -> int:
             'orcid_id': data.get('orcid_id'),
             'image': data.get('image'),
             'case_study':  data.get('case_study'),
+            'acronym':  data.get('acronym'),
             'class_id': config_class})
 
     id_ = g.cursor.fetchone()[0]
@@ -185,7 +187,8 @@ def update_config_entry(data: dict) -> None:
             website  = NULLIF(%(website)s, ''),
             orcid_id = NULLIF(%(orcid_id)s, ''),
             image    = NULLIF(%(image)s, ''),
-            case_study_type_id = %(case_study)s
+            case_study_type_id = %(case_study)s,
+            acronym = %(acronym)s
         WHERE id = %(config_id)s
         """,
         data)

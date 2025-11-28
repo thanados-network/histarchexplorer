@@ -5,7 +5,7 @@ from typing import Optional
 from flask import (
     abort, current_app, flash, g, jsonify, redirect, render_template,
     request, url_for)
-from flask_babel import lazy_gettext as _
+from flask_babel import format_date, lazy_gettext as _
 from flask_login import current_user, login_required
 from werkzeug import Response
 
@@ -113,6 +113,7 @@ def add_entry() -> Response:
     form_data = {
         'category': request.form.get('category', ''),
         'name': request.form.get('name', ''),
+        'acronym': request.form.get('acronym', ''),
         'email': request.form.get('mail', ''),
         'website': request.form.get('website', ''),
         'orcid_id': request.form.get('orcid', ''),
@@ -157,9 +158,11 @@ def edit_entry() -> Response:
     check_manager_user()
     case_study_raw = request.form.get('case_study')
     case_study = int(case_study_raw) if case_study_raw else None
+    print(request.form)
     form_data = {
         'config_id': request.form.get('config_id', type=int),
         'name': request.form.get('name', ''),
+        'acronym': request.form.get('acronym', ''),
         'email': request.form.get('mail', ''),
         'website': request.form.get('website', ''),
         'orcid_id': request.form.get('orcid', ''),

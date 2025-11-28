@@ -1,6 +1,14 @@
 ADMIN_FIELDS = {
     'nav-main-project': [
         {
+            'key': 'acronym',
+            'label': 'acronym',
+            'type': 'text',
+            'translatable': False,
+            'required': True,
+            'col_class': 'col-md-2'
+            },
+        {
             'key': 'name',
             'label': 'name',
             'type': 'text',
@@ -9,11 +17,24 @@ ADMIN_FIELDS = {
             'col_class': 'col-md-4'
             },
         {
+            'key': 'website',
+            'label': 'website',
+            'type': 'url',
+            'placeholder': 'https://someurl.com',
+            'col_class': 'col-md-2'
+            },
+        {
+            'key': 'case_study',
+            'label': 'Case Study',
+            'type': 'select',
+            'col_class': 'col-md-4'
+            },
+        {
             'key': 'description',
             'label': 'description',
             'type': 'textarea',
             'translatable': True,
-            'col_class': 'col-md-8'
+            'col_class': 'col-md-12'
             },
         {
             'key': 'imprint',
@@ -30,19 +51,6 @@ ADMIN_FIELDS = {
             'col_class': 'col-md-6'
             },
         {
-            'key': 'website',
-            'label': 'website',
-            'type': 'url',
-            'placeholder': 'https://someurl.com',
-            'col_class': 'col-lg col-md-12'
-            },
-        {
-            'key': 'case_study',
-            'label': 'Case Study',
-            'type': 'select',
-            'col_class': 'col-lg col-md-4'
-            },
-        {
             'key': 'image',
             'label': 'Image URL',
             'type': 'text',
@@ -53,6 +61,14 @@ ADMIN_FIELDS = {
         ],
     'nav-projects': [
         {
+            'key': 'acronym',
+            'label': 'acronym',
+            'type': 'text',
+            'translatable': False,
+            'required': True,
+            'col_class': 'col-md-2'
+            },
+        {
             'key': 'name',
             'label': 'name',
             'type': 'text',
@@ -61,31 +77,31 @@ ADMIN_FIELDS = {
             'col_class': 'col-md-4'
             },
         {
-            'key': 'description',
-            'label': 'description',
-            'type': 'textarea',
-            'translatable': True,
-            'col_class': 'col-md-8'
-            },
-        {
             'key': 'website',
             'label': 'website',
             'type': 'url',
             'placeholder': 'https://someurl.com',
-            'col_class': 'col-lg col-md-6'
+            'col_class': 'col-md-2'
             },
         {
             'key': 'case_study',
             'label': 'Case Study',
             'type': 'select',
-            'col_class': 'col-lg col-md-4'
+            'col_class': 'col-md-4'
+            },
+        {
+            'key': 'description',
+            'label': 'description',
+            'type': 'textarea',
+            'translatable': True,
+            'col_class': 'col-md-12'
             },
         {
             'key': 'image',
             'label': 'Image URL',
             'type': 'text',
             'placeholder': 'Please provide a square image',
-            'col_class': 'col-lg col-md-4',
+            'col_class': 'col-md-4',
             'display_image': True
             }
         ],
