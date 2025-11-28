@@ -41,17 +41,79 @@ function toggleMapButtons(mapId, isEditing) {
     }
   });
 }
+// --- Rich text helpers for description field ---
+
+function initRichText(entryId) {
+  if (typeof tinymce === 'undefined') {
+    return;
+  }
+
+  const textareaId = `Input Description${entryId}`;
+  const textarea = document.getElementById(textareaId);
+  if (!textarea) {
+    return;
+  }
+
+  // Avoid double-init
+  if (tinymce.get(textareaId)) {
+    tinymce.get(textareaId).setMode('design');
+    return;
+  }
+
+  tinymce.init({
+    target: textarea,
+    license_key: 'gpl',
+    menubar: false,
+    branding: false,
+    height: 220,
+    plugins: 'link lists image',
+    toolbar: 'bold italic underline | bullist numlist | link image',
+    // Keep URLs as entered; no rewriting
+    convert_urls: false,
+    default_link_target: '_blank',
+    rel_list: [{ title: 'No referrer', value: 'noreferrer noopener' }],
+
+    setup: function (editor) {
+      // Ensure underlying <textarea> stays in sync
+      editor.on('change keyup', function () {
+        editor.save();
+      });
+    }
+  });
+}
+
+function destroyRichText(entryId) {
+  if (typeof tinymce === 'undefined') {
+    return;
+  }
+
+  const textareaId = `Input Description${entryId}`;
+  const editor = tinymce.get(textareaId);
+  if (editor) {
+    // Push current content into <textarea>
+    editor.save();
+    editor.remove();
+  }
+}
 
 function changeEdit(entryId, enabled) {
   const form = document.getElementById(`form${entryId}`);
   if (form) {
+    if (!enabled) {
+      destroyRichText(entryId);
+    }
+
     toggleFields(form, enabled);
     toggleButtons(entryId, enabled);
+
     if (enabled) {
+      // Initialize richtext editor when user enters edit mode
+      initRichText(entryId);
       form.classList.remove('was-validated');
     }
   }
 }
+
 
 function editMap(mapId, enabled) {
   const form = document.getElementById(`mapForm${mapId}`);
@@ -110,6 +172,11 @@ function addEntry(category) {
 
   forms.forEach(form => {
     form.addEventListener('submit', event => {
+      // Sync TinyMCE editors -> textareas
+      if (typeof tinymce !== 'undefined') {
+        tinymce.triggerSave();
+      }
+
       const saveButton = form.querySelector('button[type="submit"]');
       if (saveButton && !saveButton.classList.contains('d-none') && form.id !== 'caseStudyForm') {
         if (!form.checkValidity()) {
@@ -123,6 +190,7 @@ function addEntry(category) {
       }
     });
   });
+
 
   const caseStudyForm = document.getElementById('caseStudyForm');
   const caseStudyInputField = document.getElementById('caseStudyHierarchyID');

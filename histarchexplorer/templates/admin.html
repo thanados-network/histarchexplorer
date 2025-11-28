@@ -2,7 +2,8 @@
 {% block content %}
   <script
     src="{{ url_for('static', filename='node_modules/sortablejs/Sortable.min.js') }}"></script>
-
+  <script
+    src="{{ url_for('static', filename='node_modules/tinymce/tinymce.min.js') }}"></script>
 
   <div class="page-wrapper">
     <div class="scrollable-container">
@@ -144,15 +145,16 @@
                                     </label>
 
                                     {% if field.type == 'textarea' %}
-                                      <textarea class="form-control"
-                                                id="Input {{ field.key | capitalize }}{{ entity.id }}"
-                                                name="{{ field.key }}"
-                                                aria-describedby="{{ field.key }}Help{{ entity.id }}"
-                                                {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
-                                                {% if field.required %}required
-                                                data-required-field{% endif %}
-                                                disabled>{{ entity[field.key + '_display_label'] or '' }}</textarea>
+                                      <textarea
+                                        class="form-control{% if field.key == 'description' %} js-richtext-description{% endif %}"
+                                        id="Input {{ field.key | capitalize }}{{ entity.id }}"
+                                        name="{{ field.key }}"
+                                        aria-describedby="{{ field.key }}Help{{ entity.id }}"
+                                        {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
+                                        {% if field.required %}required data-required-field{% endif %}
+                                        disabled>{{ entity[field.key + '_display_label'] or '' }}</textarea>
                                     {% elif field.type == 'select' %}
+
                                       <select class="form-select"
                                               id="Input {{ field.key | capitalize }}{{ entity.id }}"
                                               name="{{ field.key }}"

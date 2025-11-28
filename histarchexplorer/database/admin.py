@@ -2,6 +2,31 @@ import json
 from typing import Any, NamedTuple
 
 from flask import g
+import bleach
+
+ALLOWED_HTML_TAGS = [
+    'b', 'strong', 'i', 'em', 'u',
+    'a',
+    'ul', 'ol', 'li',
+    'p', 'br',
+    'span',
+    'img']
+
+ALLOWED_HTML_ATTRIBUTES = {
+    'a': ['href', 'title', 'target', 'rel'],
+    'img': ['src', 'alt']}
+
+ALLOWED_HTML_PROTOCOLS = ['http', 'https', 'mailto']
+
+
+def sanitize_richtext(html: str) -> str:
+    """Sanitize user-provided HTML for rich text fields."""
+    return bleach.clean(
+        html,
+        tags=ALLOWED_HTML_TAGS,
+        attributes=ALLOWED_HTML_ATTRIBUTES,
+        protocols=ALLOWED_HTML_PROTOCOLS,
+        strip=True)
 
 
 def get_config_links() -> Any:
@@ -151,7 +176,8 @@ def add_entry(data: dict) -> int:
     g.cursor.execute(
         """
         INSERT INTO tng.entities
-            (email, website, orcid_id, image, case_study_type_id, class_id, acronym)
+        (email, website, orcid_id, image, case_study_type_id, class_id,
+         acronym)
         VALUES (NULLIF(%(email)s, ''),
                 NULLIF(%(website)s, ''),
                 NULLIF(%(orcid_id)s, ''),
@@ -165,8 +191,8 @@ def add_entry(data: dict) -> int:
             'website': data.get('website'),
             'orcid_id': data.get('orcid_id'),
             'image': data.get('image'),
-            'case_study':  data.get('case_study'),
-            'acronym':  data.get('acronym'),
+            'case_study': data.get('case_study'),
+            'acronym': data.get('acronym'),
             'class_id': config_class})
 
     id_ = g.cursor.fetchone()[0]
@@ -179,16 +205,15 @@ def update_config_entry(data: dict) -> None:
     config_id = data['config_id']
     if not check_if_config_entry_exist(config_id):
         raise 404
-
     g.cursor.execute(
         """
         UPDATE tng.entities
-        SET email    = NULLIF(%(email)s, ''),
-            website  = NULLIF(%(website)s, ''),
-            orcid_id = NULLIF(%(orcid_id)s, ''),
-            image    = NULLIF(%(image)s, ''),
+        SET email              = NULLIF(%(email)s, ''),
+            website            = NULLIF(%(website)s, ''),
+            orcid_id           = NULLIF(%(orcid_id)s, ''),
+            image              = NULLIF(%(image)s, ''),
             case_study_type_id = %(case_study)s,
-            acronym = %(acronym)s
+            acronym            = %(acronym)s
         WHERE id = %(config_id)s
         """,
         data)
@@ -200,6 +225,8 @@ def _upsert_jsonb_fields(config_id: int, data: dict) -> None:
     valid_cols = {'address', 'description', 'imprint', 'legal_notice', 'name'}
     for col in valid_cols:
         val = data.get(col, '')
+        if col == 'description' and val:
+            val = sanitize_richtext(val)
         if val:
             g.cursor.execute(
                 f"""
@@ -237,14 +264,17 @@ def check_sortorder() -> int:
 def get_openatlas_entity(id_) -> NamedTuple:
     g.cursor.execute(
         '''
-        SELECT id, name, openatlas_class_name FROM model.entity
+        SELECT id, name, openatlas_class_name
+        FROM model.entity
         WHERE id = %(id)s''', {'id': id_})
     return g.cursor.fetchone()
+
 
 def update_case_study_type_hierarchy(id_: int) -> None:
     g.cursor.execute(
         'UPDATE tng.settings SET case_study_type_id = %s',
         (id_,))
+
 
 def add_link(data: dict[str, Any]) -> None:
     g.cursor.execute(

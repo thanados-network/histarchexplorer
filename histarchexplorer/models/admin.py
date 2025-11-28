@@ -3,7 +3,6 @@ from typing import Any, Optional
 
 from flask import g
 
-from histarchexplorer import app
 from histarchexplorer.database.admin import (
     add_entry, add_link, add_new_map,
     check_sortorder, delete_entry,

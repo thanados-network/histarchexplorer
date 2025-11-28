@@ -48,7 +48,7 @@
               {% endif %}
               {% set desc = best_label(active.description) %}
               {% if desc %}
-                <p style="white-space:pre-wrap;">{{ desc | safe }}</p>
+                <p>{{ active.description.display.label | safe }}</p>
               {% endif %}
             </div>
 
@@ -61,7 +61,11 @@
                 <h5 class="about-section-title">{{ _('persons') }}</h5>
                 <ul class="list-unstyled">
                   {% for person in people %}
-                    <li class="about-person">
+                    <li class="about-person"
+                        data-id="{{ person.entity.id }}"
+                        data-type="person"
+                        data-bs-toggle="modal"
+                        data-bs-target="#entityModal">
                       {# Todo: delete "or True" if placeholder are unwanted #}
                       {% if person.entity.image or True %}
                         <img src="{{ person.entity.image
@@ -113,7 +117,12 @@
                   <h5 class="about-section-title">{{ role }}</h5>
                   <ul class="list-unstyled">
                     {% for inst in institutions %}
-                      <li class="about-person">
+                      <li class="about-person"
+                          data-id="{{ inst.id }}"
+                          data-type="institution"
+                          data-bs-toggle="modal"
+                          data-bs-target="#entityModal">
+
                         {% if inst.image %}
                           <img src="{{ inst.image }}"
                                class="about-avatar"
@@ -216,6 +225,108 @@
       </div>
     </div>
   </div>
+
+  <!-- Shared Entity Modal -->
+  <div class="modal fade" id="entityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="entityModalLabel">Loading...</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <div id="entityModalImage" class="text-center mb-3"></div>
+
+          <p id="entityModalDescription"></p>
+
+          <div id="entityModalMeta"></div>
+
+          <div id="entityModalLinks"></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const ENTITY_DATA = {{ config_entities_mapped | tojson }};
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+      function bestLabel(obj) {
+        if (!obj) return "";
+
+        if (obj.display && typeof obj.display.label === "string") {
+          return obj.display.label;
+        }
+
+        for (const [k, v] of Object.entries(obj)) {
+          if (typeof v === "string") {
+            return v;
+          }
+        }
+
+        return "";
+      }
+
+      const modalLabel = document.getElementById("entityModalLabel");
+      const modalImage = document.getElementById("entityModalImage");
+      const modalDescription = document.getElementById("entityModalDescription");
+      const modalMeta = document.getElementById("entityModalMeta");
+      const modalLinks = document.getElementById("entityModalLinks");
+
+      document.querySelectorAll("[data-bs-target='#entityModal']").forEach(el => {
+        el.addEventListener("click", function () {
+
+          const id = this.dataset.id;
+          const entity = ENTITY_DATA[id];
+
+          modalLabel.textContent = bestLabel(entity.name);
+
+          // Image
+          if (entity.image) {
+            modalImage.innerHTML = `<img src="${entity.image}" class="img-fluid" style="max-height:200px;">`;
+          } else {
+            modalImage.innerHTML = "";
+          }
+
+          // Description
+          const desc = entity.description?.display?.label || "";
+          modalDescription.innerHTML = desc;
+
+          // Meta fields (website, email, address, ORCID…)
+          let metaHtml = "<ul class='list-unstyled'>";
+          if (entity.website) metaHtml += `<li><strong>Website:</strong> <a href="${entity.website}" target="_blank">${entity.website}</a></li>`;
+          if (entity.email) metaHtml += `<li><strong>Email:</strong> ${entity.email}</li>`;
+          if (entity.orcid_id) metaHtml += `<li><strong>ORCID:</strong> ${entity.orcid_id}</li>`;
+          if (entity.address && entity.address.display && entity.address.display.label) {
+            metaHtml += `<li><strong>Address:</strong> ${entity.address.display.label.replace(/\n/g, '<br>')}</li>`;
+          }
+          metaHtml += "</ul>";
+
+          modalMeta.innerHTML = metaHtml;
+
+          // Links (roles / affiliations)
+          let linkHtml = "";
+          if (entity.links && entity.links.length) {
+            linkHtml = "<hr><h6>{{ _('relations') | capitalize }}</h6><ul>";
+            entity.links.forEach(l => {
+              const role = l.role?.display?.label || "";
+              const endName = bestLabel(l.end_name);
+              linkHtml += `<li>${role ? role + " – " : ""}${endName}</li>`;
+            });
+            linkHtml += "</ul>";
+          }
+
+          modalLinks.innerHTML = linkHtml;
+        });
+      });
+    });
+  </script>
+
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const counters = document.querySelectorAll(".vcounter-number");
@@ -223,7 +334,7 @@
       counters.forEach(counter => {
         const target = +counter.dataset.target;
         const duration = 800;
-        const steps = 40;
+        const steps = 200;
         const increment = target / steps;
         let current = 0;
 
