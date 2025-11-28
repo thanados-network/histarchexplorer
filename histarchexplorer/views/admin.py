@@ -375,10 +375,13 @@ def refresh_system_cache():
     cache.delete_memoized(ApiAccess.get_type_tree)
     cache.delete_memoized(ApiAccess.get_files_of_entities)
     cache.delete_memoized(ApiAccess.get_system_class_count)
+    cache.delete_memoized(ApiAccess.get_entities_count_by_case_studies)
 
     ApiAccess.get_type_tree()
     ApiAccess.get_files_of_entities()
     ApiAccess.get_entities_count_by_case_studies()
+    for case_study in g.case_study_ids:
+        ApiAccess.get_entities_count_by_case_studies(case_study)
 
     flash(_('system cache refreshed'), 'success')
     return redirect(url_for('admin'))

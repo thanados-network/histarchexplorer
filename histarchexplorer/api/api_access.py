@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 import requests
 from flask import g
@@ -14,7 +14,6 @@ PROXIES = {
 class ApiAccess:
 
     @staticmethod
-    @cache.memoize()
     def get_system_class_count(parser: Parser) -> dict[str, Any]:
         return requests.get(
             f"{app.config['API_URL']}/system_class_count/",
@@ -24,8 +23,10 @@ class ApiAccess:
             timeout=30).json()
 
     @staticmethod
-    def get_entities_count_by_case_studies() -> dict[str, Any]:
-        parser = Parser(type_id=g.case_study_ids)
+    @cache.memoize()
+    def get_entities_count_by_case_studies(
+            type_ids: Optional[list[int]] = None) -> dict[str, Any]:
+        parser = Parser(type_id=type_ids or g.case_study_ids)
         return ApiAccess.get_system_class_count(parser)
 
     @staticmethod

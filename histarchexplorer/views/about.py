@@ -6,6 +6,7 @@ from flask import g, redirect, render_template, url_for
 
 from histarchexplorer import app
 from histarchexplorer.models.config import ConfigEntity
+from histarchexplorer.utils.view_util import get_view_class_count
 
 
 def slugify(value: str) -> str:
@@ -72,7 +73,6 @@ def about(slug: Optional[str] = None):
             if role:
                 institutions_map[target.id]["roles"].append(role)
                 institutions_by_role.setdefault(role, []).append(target)
-
     return render_template(
         "about.html",
         active=active,
@@ -81,4 +81,5 @@ def about(slug: Optional[str] = None):
         config_entities_mapped=config_entities_mapped,
         people=list(people_map.values()),
         institutions_by_role=institutions_by_role,
-        slugify=slugify)
+        slugify=slugify,
+        view_class_count=get_view_class_count(active.case_study))

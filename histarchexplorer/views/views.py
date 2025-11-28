@@ -9,7 +9,7 @@ from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.database.map import get_map_tilestring
-from histarchexplorer.utils.cerberos import get_view_class_count
+from histarchexplorer.utils.view_util import get_view_class_count
 
 
 @app.route('/')
@@ -18,12 +18,11 @@ def index() -> str:
     map_ = None
     if index_map := map_data['map']:
         map_ = get_map_tilestring(index_map).tilestring
-    view_classes = get_view_class_count()
     return render_template(
         'index.html',
         map=map_,
         map_data=map_data,
-        view_classes=view_classes)
+        view_class_count=get_view_class_count())
 
 
 @app.route('/language=<language>')

@@ -1,5 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
+  {% set icons = {
+  'places': 'bi-geo-alt',
+  'features': 'bi-layers',
+  'items': 'bi-box',
+  'events': 'bi-calendar-event',
+  'sources': 'bi-book',
+  'files': 'bi-file-earmark'
+} %}
+
   <div class="page-wrapper">
 
     <div class="about-page">
@@ -9,12 +18,27 @@
           {% macro best_label(obj) %}
             {{ obj.display.label }}
           {% endmacro %}
+          <div class="row">
+            <div class="col">
+              <h1 class="h3 about-title">{{ best_label(active.name) }}</h1>
 
-          <h1 class="h3 about-title">{{ best_label(active.name) }}</h1>
+            </div>
+            <div class="col-3 ">
+              {% if active.website %}
+                <a href="{{ active.website }}"
+                   target="_blank"
+                   rel="noopener"
+                   class="about-website-pill">
+                  {{ active.website | domain }}
+                  <i class="bi bi-box-arrow-up-right ms-1"></i>
+                </a>
+              {% endif %}
+            </div>
+
+          </div>
 
           <div class="row">
             <div class="col-9">
-
               {% if active.image %}
                 <div class="mb-3">
                   <img src="{{ active.image }}"
@@ -22,16 +46,17 @@
                        style="max-height:140px;">
                 </div>
               {% endif %}
-
               {% set desc = best_label(active.description) %}
               {% if desc %}
                 <p style="white-space:pre-wrap;">{{ desc | safe }}</p>
               {% endif %}
-
             </div>
 
             <div class="col-3 about-sidebar">
-
+              {% if active.acronym %}
+                <h5 class="about-section-title">{{ active.acronym }}</h5>
+                <hr class="my-3">
+              {% endif %}
               {% if people %}
                 <h5 class="about-section-title">{{ _('persons') }}</h5>
                 <ul class="list-unstyled">
@@ -58,7 +83,7 @@
                 <hr class="my-3">
               {% endif %}
 
-{#              {% if institutions %}
+              {#              {% if institutions %}
                 <h5 class="about-section-title">{{ _('institutions') }}</h5>
                 <ul class="list-unstyled">
                   {% for institution in institutions %}
@@ -101,18 +126,38 @@
                 {% endfor %}
                 <hr class="my-3">
               {% endif %}
-              {% if active.website %}
-
-                <a href="{{ active.website }}"
-                   target="_blank"
-                   rel="noopener"
-                   class="about-website-pill">
-                  {{ active.website | domain }}
-                  <i class="bi bi-box-arrow-up-right ms-1"></i>
-                </a>
-              {% endif %}
             </div>
           </div>
+
+          {# todo: link with entities browse #}
+          {% if view_class_count %}
+            <hr class="my-5 border-top">
+            <h4 class="mb-4 text-center">
+              {% if active.class_id == 5 %}
+                {{ _('data overview') | capitalize }}
+              {% else %}
+                {{ _('project data overview') | capitalize }}
+              {% endif %}
+            </h4>
+            <div class="row text-center g-4">
+              {% for key, data in view_class_count.items() %}
+                <div class="col-6 col-md-4 col-lg-2">
+                  <div class="vcounter-item">
+                    <div class="vcounter-icon mb-2">
+                      <i class="bi {{ icons.get(key, 'bi-archive') }}"></i>
+                    </div>
+                    <div class="vcounter-number"
+                         data-target="{{ data.count }}">0
+                    </div>
+                    <div class="vcounter-label text-uppercase small mt-1">
+                      {{ key }}
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
 
           {% if sub_projects and active.class_id == 5 %}
             <hr class="my-5">
@@ -171,4 +216,26 @@
       </div>
     </div>
   </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const counters = document.querySelectorAll(".vcounter-number");
+
+      counters.forEach(counter => {
+        const target = +counter.dataset.target;
+        const duration = 800;
+        const steps = 40;
+        const increment = target / steps;
+        let current = 0;
+
+        const tick = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            current = target;
+            clearInterval(tick);
+          }
+          counter.textContent = Math.floor(current);
+        }, duration / steps);
+      });
+    });
+  </script>
 {% endblock %}

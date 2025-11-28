@@ -264,3 +264,23 @@ body.dark {
     }
   }
 }
+.vcounter-item {
+  padding: 10px 5px;
+}
+
+.vcounter-icon i {
+  font-size: 28px;
+  color: #3a2333; /* adjust to your color */
+}
+
+.vcounter-number {
+  font-size: 26px;
+  font-weight: 700;
+  color: #3a2333;
+  line-height: 1.2;
+}
+
+.vcounter-label {
+  color: #6c6c6c;
+  letter-spacing: 0.07em;
+}
