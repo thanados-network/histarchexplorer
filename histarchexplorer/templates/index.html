@@ -18,30 +18,30 @@
           <i class="bi bi-arrow-down-circle-fill"></i>
         </a>
       </div>
-
-      <div id="project-cards" class="project-carousel">
-        {% for p in project_cards %}
-          <div class="project-card-wrapper">
-            <a href="{{ url_for('about', slug=p.slug) }}"
-               class="text-decoration-none">
-              <div class="project-card">
-                {% if p.image %}
-                  <div class="project-card-img">
-                    <img src="{{ p.image }}" alt="{{ p.name }}">
-                  </div>
-                {% else %}
-                  <div class="project-card-placeholder">{{ p.acronym }}</div>
-                {% endif %}
-                {% if p.description %}
-                  <div
-                    class="project-card-desc">{{ p.description | safe }}</div>
-                {% endif %}
-              </div>
-            </a>
-          </div>
-        {% endfor %}
+      <div id="carousel-overlay">
+        <div id="project-cards" class="project-carousel">
+          {% for p in project_cards %}
+            <div class="project-card-wrapper">
+              <a href="{{ url_for('about', slug=p.slug) }}"
+                 class="text-decoration-none">
+                <div class="project-card">
+                  {% if p.image %}
+                    <div class="project-card-img">
+                      <img src="{{ p.image }}" alt="{{ p.name }}">
+                    </div>
+                  {% else %}
+                    <div class="project-card-placeholder">{{ p.acronym }}</div>
+                  {% endif %}
+                  {% if p.description %}
+                    <div
+                      class="project-card-desc">{{ p.description | safe }}</div>
+                  {% endif %}
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
       </div>
-
 
       <div id="map"
            class="{% if map_data.greyscale %}map-gray{% endif %}"></div>
