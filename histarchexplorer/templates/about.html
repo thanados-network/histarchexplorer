@@ -51,8 +51,12 @@
                 <p>{{ active.description.display.label | safe }}</p>
               {% endif %}
             </div>
-
-            <div class="col-3 about-sidebar">
+            <button class="btn btn-outline-secondary d-lg-none mb-3"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#aboutSidebar">
+              {{ _('Show details') }}
+            </button>
+            <div class="col-3 about-sidebar collapse show" id="aboutSidebar">
               {% if active.acronym %}
                 <h5 class="about-section-title">{{ active.acronym }}</h5>
                 <hr class="my-3">
@@ -186,13 +190,12 @@
                         </div>
                       {% endif %}
 
-                      <div class="about-project-body">
+                      <div class="about-project-body pt-2">
                         <h5
                           class="about-project-title">{{ best_label(p.name) }}</h5>
-                        {% set d = best_label(p.description) %}
-                        {% if d %}
+                        {% if p.description %}
                           <p
-                            class="about-project-text">{{ d|truncate(180) }}</p>
+                            class="about-project-text">{{ p.description.display.label | safe |truncate(180) }}</p>
                         {% endif %}
                       </div>
                       <div class="about-project-footer">
@@ -206,13 +209,13 @@
           {% endif %}
           <div class="row">
             {% if main_project.imprint %}
-                <h5 class="mt-4">{{ _('imprint') | capitalize }}</h5>
-                <p>{{ main_project.imprint.display.label | safe  }}</p>
+              <h5 class="mt-4">{{ _('imprint') | capitalize }}</h5>
+              <p>{{ main_project.imprint.display.label | safe }}</p>
             {% endif %}
 
             {% if main_project.legal_notice %}
-                <h5 class="mt-4">{{ _('legal notice') | capitalize}}</h5>
-                <p >{{ main_project.legal_notice.display.label | safe}}</p>
+              <h5 class="mt-4">{{ _('legal notice') | capitalize }}</h5>
+              <p>{{ main_project.legal_notice.display.label | safe }}</p>
             {% endif %}
           </div>
         </div>
