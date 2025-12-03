@@ -74,7 +74,6 @@
   opacity: 0.6;
   transform: scale(0.85);
   transition: transform .4s ease, opacity .4s ease, filter .4s ease;
-  filter: blur(1px);
 }
 
 /* Center card enlarged */
@@ -88,7 +87,6 @@
 .project-card-wrapper.side {
   transform: scale(1.0);
   opacity: 0.8;
-  filter: blur(0.3px);
 }
 
 .project-card {
@@ -97,7 +95,6 @@
   border-radius: 10px;
   background: white;
   text-align: center;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, .12);
 }
 
 .project-card-img {
@@ -143,8 +140,8 @@
   display: flex;
   flex-wrap: nowrap;
   overflow-x: scroll;
-  gap: 5rem;                   /* your chosen spacing */
-  padding: 40px 20%;           /* this keeps center alignment */
+  gap: 5rem;
+  padding: 40px 20%;
   scroll-behavior: smooth;
   position: relative;
   background: transparent !important;
@@ -162,6 +159,6 @@
 
 .project-carousel::before,
 .project-carousel::after {
-  opacity: 0.7;   /* fade edges work fine */
+  opacity: 0.7; /* fade edges work fine */
 }
 
