@@ -40,7 +40,7 @@
           <div class="row">
             <div class="col-9">
               {% if active.image %}
-                <div class="mb-3">
+                <div class="mb-3 p-5">
                   <img src="{{ active.image }}"
                        alt="{{ best_label(active.name) }}" class="img-fluid"
                        style="max-height:140px;">
@@ -62,7 +62,8 @@
                 <hr class="my-3">
               {% endif %}
               {% if people %}
-                <h5 class="about-section-title">{{ _('persons') }}</h5>
+                <h5
+                  class="about-section-title">{{ _('persons') | capitalize }}</h5>
                 <ul class="list-unstyled">
                   {% for person in people %}
                     <li class="about-person"
@@ -91,34 +92,9 @@
                 <hr class="my-3">
               {% endif %}
 
-              {#              {% if institutions %}
-                <h5 class="about-section-title">{{ _('institutions') }}</h5>
-                <ul class="list-unstyled">
-                  {% for institution in institutions %}
-                    <li class="about-person">
-                      {% if institution.entity.image %}
-                        <img src="{{ institution.entity.image }}"
-                             class="about-avatar"
-                             alt="{{ best_label(institution.entity.name) }}">
-                      {% endif %}
-
-                      <div>
-                        {{ best_label(institution.entity.name) }}
-                        {% if institution.roles %}
-                          {% for r in institution.roles %}
-                            <div class="text-muted small">{{ r }}</div>
-                          {% endfor %}
-                        {% endif %}
-                      </div>
-                    </li>
-                  {% endfor %}
-                </ul>
-                <hr class="my-3">
-              {% endif %}#}
-
               {% if institutions_by_role %}
                 {% for role, institutions in institutions_by_role.items() %}
-                  <h5 class="about-section-title">{{ role }}</h5>
+                  <h5 class="about-section-title">{{ role | capitalize }}</h5>
                   <ul class="list-unstyled">
                     {% for inst in institutions %}
                       <li class="about-person"
@@ -297,8 +273,11 @@
           // Meta fields (website, email, address, ORCID…)
           let metaHtml = "<ul class='list-unstyled'>";
           if (entity.website) metaHtml += `<li><strong>Website:</strong> <a href="${entity.website}" target="_blank">${entity.website}</a></li>`;
-          if (entity.email) metaHtml += `<li><strong>Email:</strong> ${entity.email}</li>`;
-          if (entity.orcid_id) metaHtml += `<li><strong>ORCID:</strong> ${entity.orcid_id}</li>`;
+          if (entity.email) metaHtml += `<li><strong>Email:</strong> <a href="mailto:${entity.email}">${entity.email}</a></li>`;
+          if (entity.orcid_id) {
+            const cleanOrcid = entity.orcid_id.trim().replace(/\s/g, '');
+            metaHtml += `<li><strong>ORCID:</strong> <a href="https://orcid.org/${cleanOrcid}" target="_blank">${entity.orcid_id}</a></li>`;
+          }
           if (entity.address && entity.address.display && entity.address.display.label) {
             metaHtml += `<li><strong>Address:</strong> ${entity.address.display.label.replace(/\n/g, '<br>')}</li>`;
           }

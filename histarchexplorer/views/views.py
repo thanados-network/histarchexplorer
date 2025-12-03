@@ -30,9 +30,11 @@ def index() -> str:
         slug = slugify(p.acronym)
 
         # ensure description is safe + truncated server-side
-        desc_label = p.description.get("display", {}).get("label") if p.description['display']['label'] else ""
+        desc_label = p.description.get("display", {}).get("label") \
+            if p.description['display']['label'] else ""
         if desc_label:
-            short_desc = desc_label[:200] + "…" if len(desc_label) > 120 else desc_label
+            short_desc = desc_label[:200] + "…" if len(desc_label) > 120 \
+                else desc_label
         else:
             short_desc = ""
 
@@ -42,10 +44,10 @@ def index() -> str:
             "acronym": p.acronym,
             "slug": slug,
             "image": p.image,
-            "description": short_desc,
-        })
+            "description": short_desc})
 
-    project_cards = project_cards[:12]  # but allow carousel to rotate them
+    # This is just for the carousal
+    project_cards = project_cards[:12]
 
     return render_template(
         'index.html',

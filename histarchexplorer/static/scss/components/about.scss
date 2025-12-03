@@ -40,8 +40,8 @@
 }
 
 .about-avatar {
-  width: 42px;
-  height: 42px;
+  width: 60px;
+  height: 60px;
   object-fit: cover;
   border-radius: 50%;
   box-shadow: 0 0 3px rgba(0,0,0,.2);
@@ -86,8 +86,8 @@
 
   /* Slightly larger avatar on mobile for easier tap */
   .about-avatar {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
   }
 
   /* Titles centered for mobile friendliness */
