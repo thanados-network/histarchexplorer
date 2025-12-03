@@ -182,7 +182,7 @@ function renderDescription(entity) {
 function renderMapTile(entity) {
     const tile = document.getElementById("tile-map");
     if (!tile) return;
-    if (!entity?.geometries?.length) return;
+    if (!entity?.geometries?.length && !entity?.overviewMap.features?.length);
     tile.hidden = false;
     relayout(10);
 }
@@ -269,6 +269,7 @@ function renderReferences(entity) {
     // console.log("✅ Overview tab: entityData ready", data);
 
     const entity = data.entity || {};
+    entity.overviewMap = data.overviewMap || {};
     const categorizedTypes = data.categorizedTypes || {};
     const citeButton = data.citeButton || {};
     const refreshButton = data.refreshButton || {};
