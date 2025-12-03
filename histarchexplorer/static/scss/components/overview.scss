@@ -295,6 +295,11 @@
   }
 }
 
+#js-description {
+    overflow-y: auto;
+    max-height: 33vh;
+}
+
 #muuri-map {
   // margin-top: 1.5rem;
   height: 100%;
