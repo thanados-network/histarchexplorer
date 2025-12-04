@@ -246,13 +246,6 @@ function renderReferences(entity) {
     relayout(10);
 }
 
-// ---------------------------------------------------------------------------
-// BOOTSTRAP
-// ---------------------------------------------------------------------------
-// ============================================================
-//  OVERVIEW.JS — async SPA-safe version using window.entityData
-// ============================================================
-
 (async function initOverview() {
     // --- Wait until DOM is ready ---
     if (document.readyState === "loading") {
