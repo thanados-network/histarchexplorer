@@ -10,8 +10,7 @@ from flask_login import current_user, login_required
 from werkzeug import Response
 
 from histarchexplorer import app, cache
-from histarchexplorer.api.api_access import ApiAccess, \
-    get_entities_count_by_case_study
+from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.models.admin import Admin, EntryNotFound
 from histarchexplorer.utils.view_util import find_children_by_id
@@ -69,7 +68,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         maps=Admin.get_maps(),
         settings=g.settings.get_map_settings(),
         class_items={
-            k: v for k, v in get_entities_count_by_case_study().items()
+            k: v for k, v in
+            ApiAccess.get_entities_count_by_case_studies().items()
             if k not in app.config['CLASSES_TO_SKIP']},
         shown_classes=g.settings.shown_classes,
         hidden_classes=g.settings.hidden_classes,
@@ -109,19 +109,19 @@ def add_link() -> Response:
 @login_required
 def add_entry() -> Response:
     check_manager_user()
-    print(request.form)
     case_study_str = request.form.get('case_study')
     form_data = {
         'category': request.form.get('category', ''),
         'name': request.form.get('name', ''),
-        'email': request.form.get('mail', ''),
+        'acronym': request.form.get('acronym', ''),
+        'email': request.form.get('email', ''),
         'website': request.form.get('website', ''),
-        'orcid_id': request.form.get('orcid', ''),
+        'orcid_id': request.form.get('orcid_id', ''),
         'image': request.form.get('image', ''),
         'address': request.form.get('address', ''),
         'description': request.form.get('description', ''),
         'imprint': request.form.get('imprint', ''),
-        'legal_notice': request.form.get('legalnotice', ''),
+        'legal_notice': request.form.get('legal_notice', ''),
         'case_study': int(case_study_str)
         if case_study_str and case_study_str.isdigit() else 0}
     current_tab = 'nav-' + form_data['category']
@@ -156,20 +156,21 @@ def delete_entry(id_: int, tab: str) -> Response:
 @login_required
 def edit_entry() -> Response:
     check_manager_user()
-    print(request.form)
     case_study_raw = request.form.get('case_study')
     case_study = int(case_study_raw) if case_study_raw else None
+    print(request.form)
     form_data = {
         'config_id': request.form.get('config_id', type=int),
         'name': request.form.get('name', ''),
-        'email': request.form.get('mail', ''),
+        'acronym': request.form.get('acronym', ''),
+        'email': request.form.get('email', ''),
         'website': request.form.get('website', ''),
-        'orcid_id': request.form.get('orcid', ''),
+        'orcid_id': request.form.get('orcid_id', ''),
         'image': request.form.get('image', ''),
         'address': request.form.get('address', ''),
         'description': request.form.get('description', ''),
         'imprint': request.form.get('imprint', ''),
-        'legal_notice': request.form.get('legalnotice', ''),
+        'legal_notice': request.form.get('legal_notice', ''),
         'case_study': case_study}
     try:
         Admin.edit_entry(form_data)
@@ -356,7 +357,9 @@ def trigger_cache_warmup(refresh: bool = False):
         if refresh:
             args.append("--refresh")
         if g.case_study_ids:
-            args.append(f"--case-studies {' '.join([str(ids) for ids in g.case_study_ids])}")
+            args.append(
+                "--case-studies "
+                f"{' '.join([str(ids) for ids in g.case_study_ids])}")
         subprocess.Popen(
             args,
             stdout=subprocess.DEVNULL,
@@ -372,10 +375,13 @@ def refresh_system_cache():
     cache.delete_memoized(ApiAccess.get_type_tree)
     cache.delete_memoized(ApiAccess.get_files_of_entities)
     cache.delete_memoized(ApiAccess.get_system_class_count)
+    cache.delete_memoized(ApiAccess.get_entities_count_by_case_studies)
 
     ApiAccess.get_type_tree()
     ApiAccess.get_files_of_entities()
-    get_entities_count_by_case_study()
+    ApiAccess.get_entities_count_by_case_studies()
+    for case_study in g.case_study_ids:
+        ApiAccess.get_entities_count_by_case_studies(case_study)
 
     flash(_('system cache refreshed'), 'success')
     return redirect(url_for('admin'))

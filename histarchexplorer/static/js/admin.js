@@ -41,17 +41,82 @@ function toggleMapButtons(mapId, isEditing) {
     }
   });
 }
+// --- Rich text helpers for description field ---
+function initRichText(entryId) {
+  if (typeof tinymce === 'undefined') {
+    return;
+  }
+
+  // Select ALL richtext-enabled textareas within this form
+  const form = document.getElementById(`form${entryId}`);
+  const textareas = form.querySelectorAll('.js-richtext-rich');
+
+  textareas.forEach(textarea => {
+    const id = textarea.id;
+
+    // Avoid double init
+    if (tinymce.get(id)) {
+      tinymce.get(id).setMode('design');
+      return;
+    }
+
+    tinymce.init({
+      target: textarea,
+      license_key: 'gpl',
+      menubar: false,
+      branding: false,
+      height: 220,
+      plugins: 'link lists image',
+      toolbar: 'bold italic underline | bullist numlist | link image',
+      convert_urls: false,
+      default_link_target: '_blank',
+      rel_list: [{ title: 'No referrer', value: 'noreferrer noopener' }],
+
+      setup: function (editor) {
+        editor.on('change keyup', function () {
+          editor.save();
+        });
+      }
+    });
+  });
+}
+function destroyRichText(entryId) {
+  if (typeof tinymce === 'undefined') {
+    return;
+  }
+
+  const form = document.getElementById(`form${entryId}`);
+  const textareas = form.querySelectorAll('.js-richtext-rich');
+
+  textareas.forEach(textarea => {
+    const id = textarea.id;
+    const editor = tinymce.get(id);
+    if (editor) {
+      editor.save();
+      editor.remove();
+    }
+  });
+}
+
 
 function changeEdit(entryId, enabled) {
   const form = document.getElementById(`form${entryId}`);
   if (form) {
+    if (!enabled) {
+      destroyRichText(entryId);
+    }
+
     toggleFields(form, enabled);
     toggleButtons(entryId, enabled);
+
     if (enabled) {
+      // Initialize richtext editor when user enters edit mode
+      initRichText(entryId);
       form.classList.remove('was-validated');
     }
   }
 }
+
 
 function editMap(mapId, enabled) {
   const form = document.getElementById(`mapForm${mapId}`);
@@ -110,6 +175,11 @@ function addEntry(category) {
 
   forms.forEach(form => {
     form.addEventListener('submit', event => {
+      // Sync TinyMCE editors -> textareas
+      if (typeof tinymce !== 'undefined') {
+        tinymce.triggerSave();
+      }
+
       const saveButton = form.querySelector('button[type="submit"]');
       if (saveButton && !saveButton.classList.contains('d-none') && form.id !== 'caseStudyForm') {
         if (!form.checkValidity()) {
@@ -123,6 +193,7 @@ function addEntry(category) {
       }
     });
   });
+
 
   const caseStudyForm = document.getElementById('caseStudyForm');
   const caseStudyInputField = document.getElementById('caseStudyHierarchyID');

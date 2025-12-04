@@ -4,6 +4,7 @@
 .grid-overview {
   width: 100%;
   position: relative;
+  margin: 5px;
 }
 
 .item.muuri-item-dragging {
@@ -29,10 +30,11 @@
 .item-fit,
 .item-5-6 {
   margin: 2.5px;
-  border-radius: 5px;   /* Rounded corners */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 5px; /* Rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
   border: none;
-  transition: box-shadow .3s ease, transform .3s ease;}
+  transition: box-shadow .3s ease, transform .3s ease;
+}
 
 .item {
   display: block;
@@ -44,7 +46,7 @@
 
 @media (max-width: 1400px) { // Below col-md breakpoint
   .item {
-    width: calc((100% - 20px ) / 2); // 2 tiles
+    width: calc((100% - 20px) / 2); // 2 tiles
   }
 }
 
@@ -62,7 +64,7 @@
 
 @media (max-width: 1400px) { // two tiles
   .item-middle {
-     width: calc(((100%) / 4) * 3);
+    width: calc(((100%) / 4) * 3);
   }
 }
 
@@ -75,13 +77,15 @@
 .item-5-6 {
   width: calc(((((100% - 20px) / 3) / 2) * 5 + 10px));
 }
+
 @media (max-width: 1400px) {
-   .item-5-6 {
-    width: calc(((100% - 20px)/4)*3);
+  .item-5-6 {
+    width: calc(((100% - 20px) / 4) * 3);
   }
 }
+
 @media (max-width: 766px) {
-   .item-5-6 {
+  .item-5-6 {
     width: 100%; // 1 tile
     margin: 0px;
     padding: 0px;
@@ -140,7 +144,7 @@
   .item-wide {
     width: 100%; // volle Breite
   }
-    .item-5-6 {
+  .item-5-6 {
     width: calc(100% - 10px); // volle Breite
   }
 }
@@ -152,9 +156,10 @@
   .item-middle,
   .item-wide
   .item-fit {
-    border-radius:0;
+    border-radius: 0;
     padding-bottom: rem(10);
-  }}
+  }
+}
 
 .item-fit {
   display: block;
@@ -256,8 +261,6 @@
 }
 
 
-
-
 //Categorized-types
 .badge.bg-secondary.text-wrap {
   font-size: 1.1rem;
@@ -290,6 +293,34 @@
     width: 100%;
     height: calc(100vh - 106px);
   }
+}
+
+#js-description {
+    overflow-y: auto;
+    max-height: 33vh;
+    padding-right: 6px; /* etwas Platz für Scrollbar */
+
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #999 transparent;
+}
+
+/* Chrome, Edge, Safari */
+#js-description::-webkit-scrollbar {
+    width: 8px;
+}
+
+#js-description::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#js-description::-webkit-scrollbar-thumb {
+    background: #bbb;
+    border-radius: 8px;
+}
+
+#js-description::-webkit-scrollbar-thumb:hover {
+    background: #999;
 }
 
 #muuri-map {
@@ -334,10 +365,16 @@
       margin-top: 1.5rem;
     }
   }
+
   @media (max-height: 766px) {
     margin-top: 0px;
   }
 
+  #tile-references,
+  #tile-references .item-content {
+    padding-left: 0 !important;
+    padding-inline-start: 0 !important;
+  }
 
 
   // Icon styling
@@ -359,8 +396,6 @@
 }
 
 
-
-
 .super-entity {
   font-weight: lighter;
 }
@@ -371,7 +406,7 @@
 }
 
 .entity-country {
-  color:black;
+  color: black;
   margin-top: 1rem;
 }
 
@@ -388,7 +423,7 @@
 
 .entity-country {
   text-align: center;
-  heigth:auto;
+  heigth: auto;
 }
 
 @media (max-width: 992px) {
@@ -483,6 +518,7 @@
 
   button {
     transition: transform 0.2s ease;
+
     &:hover {
       transform: scale(1.05);
     }

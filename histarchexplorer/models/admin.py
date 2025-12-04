@@ -3,7 +3,6 @@ from typing import Any, Optional
 
 from flask import g
 
-from histarchexplorer import app
 from histarchexplorer.database.admin import (
     add_entry, add_link, add_new_map,
     check_sortorder, delete_entry,
@@ -156,8 +155,8 @@ class Admin:
         return dict(result)
 
     @staticmethod
-    def process_properties_by_tab(tabs: list[dict]) -> dict[
-        str, list[dict[str, Any]]]:
+    def process_properties_by_tab(
+            tabs: list[dict]) -> dict[str, list[dict[str, Any]]]:
         result = {}
         for t_data in tabs:
             tab_id = t_data['id']

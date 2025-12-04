@@ -1,75 +1,157 @@
-.team-card {
-  padding: 1.5rem;
-  border-radius: 10px;
-  background: var(--card-bg);
-  color: black;
+/* ------------------------------
+   Responsive ABOUT PAGE
+--------------------------------*/
 
-  .col-lg-4 {
-    padding-top: 2rem;
+.about-page {
+  padding-bottom: 3rem;
+}
+
+/* Image at top */
+.about-page img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Title */
+.about-title {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* --- Sidebar layout --- */
+
+.about-sidebar {
+  padding-left: 1.5rem;
+}
+
+/* Persons / institutions list */
+.about-person {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .4rem 0;
+  cursor: pointer;
+}
+
+.about-person:hover {
+  opacity: .8;
+}
+
+.about-avatar {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 0 3px rgba(0,0,0,.2);
+}
+
+/* Section title */
+.about-section-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: .8rem;
+}
+
+/* Meta section on the right */
+.about-sidebar hr {
+  opacity: .2;
+}
+
+
+/* ---------------------------------------------------
+   MOBILE RESPONSIVE BREAKPOINTS
+------------------------------------------------------*/
+
+@media (max-width: 992px) {
+
+  /* Stack main content + sidebar */
+  .about-page .row > .col-9,
+  .about-page .row > .col-3 {
+    width: 100%;
+    max-width: 100%;
   }
 
-  &__member {
-    font-size: 1.8em;
-    padding-top: 0.5rem;
+  /* Sidebar spacing */
+  .about-sidebar {
+    margin-top: 2rem;
+    padding-left: 0;
   }
 
-  p {
-    margin-bottom: 0;
+  /* Persons list becomes grid */
+  .about-person {
+    padding: .6rem 0;
+  }
+
+  /* Slightly larger avatar on mobile for easier tap */
+  .about-avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  /* Titles centered for mobile friendliness */
+  .about-title,
+  .about-section-title {
+    text-align: center;
+  }
+
+  /* Description text easier to read */
+  .about-page p {
+    font-size: 1rem;
+    line-height: 1.5;
   }
 }
 
-.legal-card {
+
+/* ---------------------------------------------------
+   EXTRA-SMALL (PHONE) IMPROVEMENTS
+------------------------------------------------------*/
+@media (max-width: 576px) {
+
+  /* Add padding so text isn't edge-to-edge */
+  .about-page .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Persons grid look */
+  .about-person {
+    padding: .8rem 0;
+  }
+
+  .about-avatar {
+    width: 56px;
+    height: 56px;
+  }
+}
+/* --- Card backgrounds for about page --- */
+
+/* Light page background */
+.about-page {
+  background: #f3f4f6;
+}
+
+/* Main content card: description + sidebar */
+.about-page .container {
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem 1.75rem;
+}
+
+/* Sub-project “cards” at the bottom */
+.about-project-card {
+  background: #ffffff;
   padding: 1rem;
-  border-radius: 10px;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.sponsor-container {
-  padding-top: 1rem;
-
-  .row {
-    > .col-md-3 {
-      img {
-        max-width: 100%;
-        height: auto;
-        transition: transform 0.3s ease;
-
-        &:hover {
-          transform: scale(0.9);
-        }
-      }
-    }
-
-    > div {
-      padding: 1.5rem;
-      text-align: left;
-      position: relative;
-      overflow: hidden;
-
-      &::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        right: 0;
-        width: 1px;
-        height: calc(100% - 4rem);
-        background-color: grey;
-      }
-
-      &:nth-child(4n)::before {
-        display: none;
-      }
-
-      @media (max-width: 767px) {
-        &::before {
-          display: none;
-        }
-        border-bottom: 1px solid grey;
-
-        &:last-child {
-          border-bottom: none;
-        }
-      }
-    }
-  }
+.about-project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10);
 }
+

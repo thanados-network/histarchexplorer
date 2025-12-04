@@ -11,12 +11,20 @@ $navbar-height: 80px;
   margin-right: 1.5rem;
 
   #logo {
+    width: 100%;
     max-width: 260px;
+    height: auto;
   }
 
   @media (max-width: 576px) {
     margin-right: 0;
     margin-left: 0;
+  }
+
+  @media (max-width: 420px) {
+    #logo {
+      max-width: 200px;
+    }
   }
 }
 

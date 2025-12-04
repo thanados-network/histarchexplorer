@@ -6,7 +6,7 @@
   --dark-card-hover: hsl(230, 19%, 36%);
   --footer-bg-light: transparent;
   --footer-bg-dark: hsl(0, 0%, 31%);
-  --light-muuri-tile: hsl(0, 20%, 97%, 0.3);
+  --light-muuri-tile: hsla(0, 0%, 73%, 0.3);
   --dark-muuri-tile: hsla(0, 0%, 49%, 0.3);
   --light-badge: hsl(220, 2%, 65%);
   --dark-badge: hsl(0, 1%, 22%);
@@ -128,12 +128,19 @@ body {
   margin-right: 1.5rem;
 }
 .navbar-brand #logo {
+  width: 100%;
   max-width: 260px;
+  height: auto;
 }
 @media (max-width: 576px) {
   .navbar-brand {
     margin-right: 0;
     margin-left: 0;
+  }
+}
+@media (max-width: 420px) {
+  .navbar-brand #logo {
+    max-width: 200px;
   }
 }
 
@@ -164,68 +171,145 @@ body {
   overflow: hidden;
 }
 
-.team-card {
-  padding: 1.5rem;
-  border-radius: 10px;
-  background: var(--card-bg);
-  color: black;
-}
-.team-card .col-lg-4 {
-  padding-top: 2rem;
-}
-.team-card__member {
-  font-size: 1.8em;
-  padding-top: 0.5rem;
-}
-.team-card p {
-  margin-bottom: 0;
+/* ------------------------------
+   Responsive ABOUT PAGE
+--------------------------------*/
+.about-page {
+  padding-bottom: 3rem;
 }
 
-.legal-card {
-  padding: 1rem;
-  border-radius: 10px;
-}
-
-.sponsor-container {
-  padding-top: 1rem;
-}
-.sponsor-container .row > .col-md-3 img {
+/* Image at top */
+.about-page img {
   max-width: 100%;
   height: auto;
-  transition: transform 0.3s ease;
+  object-fit: contain;
+  display: block;
 }
-.sponsor-container .row > .col-md-3 img:hover {
-  transform: scale(0.9);
+
+/* Title */
+.about-title {
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
-.sponsor-container .row > div {
-  padding: 1.5rem;
-  text-align: left;
-  position: relative;
-  overflow: hidden;
+
+/* --- Sidebar layout --- */
+.about-sidebar {
+  padding-left: 1.5rem;
 }
-.sponsor-container .row > div::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  right: 0;
-  width: 1px;
-  height: calc(100% - 4rem);
-  background-color: grey;
+
+/* Persons / institutions list */
+.about-person {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  cursor: pointer;
 }
-.sponsor-container .row > div:nth-child(4n)::before {
-  display: none;
+
+.about-person:hover {
+  opacity: 0.8;
 }
-@media (max-width: 767px) {
-  .sponsor-container .row > div {
-    border-bottom: 1px solid grey;
+
+.about-avatar {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Section title */
+.about-section-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+/* Meta section on the right */
+.about-sidebar hr {
+  opacity: 0.2;
+}
+
+/* ---------------------------------------------------
+   MOBILE RESPONSIVE BREAKPOINTS
+------------------------------------------------------*/
+@media (max-width: 992px) {
+  /* Stack main content + sidebar */
+  .about-page .row > .col-9,
+  .about-page .row > .col-3 {
+    width: 100%;
+    max-width: 100%;
   }
-  .sponsor-container .row > div::before {
-    display: none;
+  /* Sidebar spacing */
+  .about-sidebar {
+    margin-top: 2rem;
+    padding-left: 0;
   }
-  .sponsor-container .row > div:last-child {
-    border-bottom: none;
+  /* Persons list becomes grid */
+  .about-person {
+    padding: 0.6rem 0;
   }
+  /* Slightly larger avatar on mobile for easier tap */
+  .about-avatar {
+    width: 60px;
+    height: 60px;
+  }
+  /* Titles centered for mobile friendliness */
+  .about-title,
+  .about-section-title {
+    text-align: center;
+  }
+  /* Description text easier to read */
+  .about-page p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+}
+/* ---------------------------------------------------
+   EXTRA-SMALL (PHONE) IMPROVEMENTS
+------------------------------------------------------*/
+@media (max-width: 576px) {
+  /* Add padding so text isn't edge-to-edge */
+  .about-page .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  /* Persons grid look */
+  .about-person {
+    padding: 0.8rem 0;
+  }
+  .about-avatar {
+    width: 56px;
+    height: 56px;
+  }
+}
+/* --- Card backgrounds for about page --- */
+/* Light page background */
+.about-page {
+  background: #f3f4f6;
+}
+
+/* Main content card: description + sidebar */
+.about-page .container {
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem 1.75rem;
+}
+
+/* Sub-project “cards” at the bottom */
+.about-project-card {
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.about-project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 
 .footercontent {
@@ -311,6 +395,114 @@ body {
   background-size: cover;
   background-position: center;
   max-height: 100%;
+}
+
+.project-carousel {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: scroll;
+  gap: 5rem;
+  padding: 40px 20%;
+  scroll-behavior: smooth;
+  position: relative;
+}
+
+/* Hide scrollbars */
+.project-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Card wrapper */
+.project-card-wrapper {
+  flex: 0 0 500px;
+  opacity: 0.6;
+  transform: scale(0.85);
+  transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
+}
+
+/* Center card enlarged */
+.project-card-wrapper.active {
+  transform: scale(1.15);
+  opacity: 1;
+  filter: none;
+}
+
+/* Side cards slightly enlarged */
+.project-card-wrapper.side {
+  transform: scale(1);
+  opacity: 0.8;
+}
+
+.project-card {
+  height: 150px;
+  padding: 10px;
+  border-radius: 10px;
+  background: white;
+  text-align: center;
+}
+
+.project-card-img {
+  width: 100%;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.project-card-img img {
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.project-card-desc {
+  font-size: 12px;
+  color: #777;
+  margin-top: 6px;
+  line-height: 1.1;
+}
+
+#carousel-overlay {
+  position: absolute;
+  top: 80px;
+  left: 0;
+  width: 100%;
+  z-index: 500;
+  pointer-events: none;
+}
+
+#carousel-overlay .project-card-wrapper,
+#carousel-overlay .project-card,
+#carousel-overlay .project-card * {
+  pointer-events: auto;
+}
+
+.project-carousel {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: scroll;
+  gap: 5rem;
+  padding: 40px 20%;
+  scroll-behavior: smooth;
+  position: relative;
+  background: transparent !important;
+}
+
+.project-carousel {
+  background: transparent !important;
+}
+
+#carousel-overlay {
+  padding: 10px 0;
+  backdrop-filter: blur(3px);
+}
+
+.project-carousel::before,
+.project-carousel::after {
+  opacity: 0.7; /* fade edges work fine */
 }
 
 .btn-primary {
@@ -492,6 +684,7 @@ body {
 .grid-overview {
   width: 100%;
   position: relative;
+  margin: 5px;
 }
 
 .item.muuri-item-dragging {
@@ -738,6 +931,33 @@ body {
     height: calc(100vh - 106px);
   }
 }
+#js-description {
+  overflow-y: auto;
+  max-height: 33vh;
+  padding-right: 6px; /* etwas Platz für Scrollbar */
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #999 transparent;
+}
+
+/* Chrome, Edge, Safari */
+#js-description::-webkit-scrollbar {
+  width: 8px;
+}
+
+#js-description::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#js-description::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 8px;
+}
+
+#js-description::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
 #muuri-map {
   height: 100%;
   width: 100%;
@@ -779,6 +999,11 @@ body {
   #expand-button {
     margin-top: 0px;
   }
+}
+#expand-button #tile-references,
+#expand-button #tile-references .item-content {
+  padding-left: 0 !important;
+  padding-inline-start: 0 !important;
 }
 #expand-button i {
   font-size: 1.2rem;
@@ -1030,7 +1255,6 @@ button.btn-whitish[disabled] {
 .hierarchy-item {
   background-color: var(--hierarchy-item);
   padding-top: 1rem;
-  min-height: calc(100vh - 106px);
 }
 
 .attribute-area {
@@ -2256,6 +2480,12 @@ nav[aria-label=breadcrumb] ol.breadcrumb li.breadcrumb-item.active {
 }
 nav[aria-label=breadcrumb] ol.breadcrumb li.breadcrumb-item.active span {
   transform: skew(21deg);
+}
+
+.head-breadcrumb {
+  background: #5b5658 !important;
+  color: #fff !important;
+  cursor: default !important;
 }
 
 @media (max-width: 1000px) {

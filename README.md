@@ -64,7 +64,8 @@ sudo apt install postgresql postgresql-15-postgis-3 postgresql-15-postgis-3-scri
 ```bash
 sudo apt install python3-bcrypt python3-flask python3-flask-babel \
     python3-flask-login python3-mypy python3-numpy python3-psycopg2 \
-    python3-werkzeug python3-wtforms python3-flask-caching python3-requests
+    python3-werkzeug python3-wtforms python3-flask-caching python3-requests \
+    redis-server python3-redis python3-bleach 
 ```
 
 #### Development dependencies (optional)
@@ -84,14 +85,18 @@ git clone https://github.com/thanados-network/histarchexplorer.git
 
 ### 4. Frontend setup (SCSS → CSS)
 
-```bash
-cd histarchexplorer/histarchexplorer/static
-sass --watch scss/main.scss:css/main.css
-```
+    cd histarchexplorer/static
+    npm install --production=true
 
 ### 5. Development Setup
 
 If you are working on frontend styles (SCSS), follow these steps.
+
+
+```bash
+cd histarchexplorer/histarchexplorer/static
+sass --watch scss/main.scss:css/main.css
+```
 
 #### Install Node dependencies
 

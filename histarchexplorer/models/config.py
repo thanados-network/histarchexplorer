@@ -1,3 +1,4 @@
+import html
 from dataclasses import dataclass
 from typing import Any
 
@@ -74,6 +75,7 @@ class Properties:
 class ConfigEntity:
     id: int
     name: dict[str, str | dict[str, str]]
+    acronym: str
     description: dict[str, str | dict[str, str]]
     website: str
     legal_notice: dict[str, str | dict[str, str]]
@@ -96,6 +98,7 @@ class ConfigEntity:
             entities.append(ConfigEntity(
                 id=entry.id,
                 name=add_display(entry.name),
+                acronym=entry.acronym,
                 description=add_display(entry.description),
                 website=entry.website,
                 legal_notice=add_display(entry.legal_notice),
@@ -109,15 +112,14 @@ class ConfigEntity:
                 case_study=entry.case_study_type_id,
                 main_project=(entry.class_name == 'main-project'),
                 links=[l_ for l_ in g.config_links if l_.start_id == entry.id]
-            ))
+                ))
 
         return entities
 
     @classmethod
     def group_by_class_name(
             cls,
-            entities: list['ConfigEntity']) \
-            -> dict[str, list['ConfigEntity']]:
+            entities: list['ConfigEntity']) -> dict[str, list['ConfigEntity']]:
         grouped = {}
         for entity in entities:
             grouped.setdefault(entity.class_name, []).append(entity)
@@ -172,10 +174,12 @@ def localize(data: dict[str, str] | None) -> str | None:
 
 def add_display(data: dict[str, Any] | None) -> dict[str, Any]:
     if not data:
-        return {'display': {'language': None, 'label': None}}
+        return {'display': {'language': None, 'label': ''}}
 
     result = data.copy()
     label = localize(data)
+    if isinstance(label, str):
+        label = html.unescape(label)
 
     for lang, value in data.items():
         if value == label:

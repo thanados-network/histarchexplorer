@@ -1,16 +1,26 @@
 import datetime
-from typing import Any
+import re
+from typing import Any, Optional
+from unicodedata import normalize
+from urllib.parse import urlsplit
 
 from flask import g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
 from histarchexplorer import app
+from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.presentation_view import PresentationView
+from histarchexplorer.database.settings import get_shown_classes
 
 _('entities')
 _('search')
 _('about')
+
+
+@app.template_filter("domain")
+def domain_filter(url):
+    return urlsplit(url).netloc
 
 
 @app.context_processor
@@ -76,9 +86,36 @@ def get_cite_button(entity: PresentationView) -> dict[str, str]:
     return {'button_html': button_html, 'modal_html': modal_html}
 
 
-
 def get_refresh_button(id_: int) -> str | None:
     """Return HTML for the refresh cache button if user is logged in."""
     if not current_user.is_authenticated:
         return None
     return render_template('util/clear_entity_cache.html', id_=id_)
+
+
+def get_view_class_count(type_id: Optional[int] = None) -> dict[str, Any]:
+    entities_count = ApiAccess.get_entities_count_by_case_studies(type_id)
+
+    for key in entities_count.copy():
+        if key not in get_shown_classes():
+            del entities_count[key]
+
+    return_classes: dict[str, dict[str, Any]] = {}
+    for view_class in g.view_classes:
+        for key, value in entities_count.items():
+            if key in g.view_classes[view_class]:
+                if view_class not in return_classes:
+                    return_classes[view_class] = {'count': 0, 'subunits': []}
+                return_classes[view_class]['subunits'].append({key: value})
+                return_classes[view_class]['count'] += value
+
+    return return_classes
+
+
+def slugify(value: str) -> str:
+    if not value:
+        return ""
+    value = normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
+    value = value.lower()
+    value = re.sub(r"[^a-z0-9]+", "-", value)
+    return value.strip("-")

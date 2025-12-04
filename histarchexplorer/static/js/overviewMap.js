@@ -47,7 +47,7 @@
     center: [0, 0],
     zoom: 5,
     attributionControl: false,
-    maxZoom: 22,
+    maxZoom: 18,
   });
 
   overviewMap.addControl(new maplibregl.NavigationControl(), "top-right");
@@ -132,6 +132,7 @@
 
     // Fit bounds
     features.forEach(f => extendBounds(f.geometry));
+    console.log(bounds)
     if (!bounds.isEmpty()) {
       overviewMap.fitBounds(bounds, { padding: 50, duration: 0 });
     }

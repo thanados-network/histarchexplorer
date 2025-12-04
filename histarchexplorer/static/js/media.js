@@ -64,6 +64,7 @@ const renderTypeStyles = {
   handleModelViewers();
   initPopovers();
   initMoreImagesButton();
+  renderAllBreadcrumbs(data);
 })();
 
 // ======== POST-LAYOUT BEAUTIFICATION ========

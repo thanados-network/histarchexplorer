@@ -7,7 +7,7 @@
 
     <script>
 
-        const tabsToLoad = {{ sidebar_elements | sort(attribute='order') | map(attribute='route') | list | tojson }};
+        let tabsToLoad = {{ sidebar_elements | sort(attribute='order') | map(attribute='route') | list | tojson }};
         const entityId = {{ entity_id }};
 
         {% if entity_id == 0 %}
@@ -34,6 +34,10 @@
             });
 
         {% else %}
+            console.log(tabsToLoad)
+
+
+
             window.entityData = fetchEntityData({{ entity_id }});
             (async function initializeEntity() {
                 // Wait until the entity data is fetched

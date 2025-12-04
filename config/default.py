@@ -35,6 +35,7 @@ API_TOKEN = ''
 
 CACHE_DEFAULT_TIMEOUT = 360000
 
+
 def redis_available(url="redis://127.0.0.1:6379/0"):
     if redis is None:
         return False
@@ -45,6 +46,7 @@ def redis_available(url="redis://127.0.0.1:6379/0"):
         return True
     except Exception:
         return False
+
 
 if redis_available():
     CACHE_TYPE = "RedisCache"
@@ -63,14 +65,13 @@ CLASSES_TO_SKIP = {  # Entity classes excluded from processing
 # Entity groups shown in views
 VIEW_CLASSES = {
     'places': ('place',),
-    'features': ('feature','stratigraphic_unit'),
+    'features': ('feature', 'stratigraphic_unit'),
     'items': ('artifact', 'human_remains'),
     'actors': ('person', 'group'),
     'events': ('acquisition', 'event', 'activity', 'creation', 'move',
                'production', 'modification'),
     'sources': ('source', 'bibliography', 'external_reference', 'edition'),
-    'files': ('file',)
-}
+    'files': ('file',)}
 
 # # Commonly used standard entity types
 # STANDARD_TYPES = [
@@ -86,8 +87,7 @@ ADD_FILES_FOR_OVERVIEW = 2
 TYPE_DIVISIONS = {
     'administrative unit': {
         'ids': [86],
-        'icon': ('css', 'bi bi-map')
-    },
+        'icon': ('css', 'bi bi-map')},
     'dimensions': {
         'ids': [15678],
         'icon': ('css', 'bi bi-rulers')},
@@ -119,8 +119,7 @@ TYPE_DIVISIONS = {
 SIDEBAR_ICONS = {
     'images': {
         'grave.svg': [
-            26204, 26205, 26208, 26206, 26207, 219910, 174459, 198713],
-    },
+            26204, 26205, 26208, 26206, 26207, 219910, 174459, 198713]},
     'css_icon_class': {
         'bi bi-geo-alt-fill': [22378, 73],
         'bi bi-house-door': [26197],

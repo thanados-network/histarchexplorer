@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.13 (Debian 15.13-0+deb12u1)
--- Dumped by pg_dump version 15.13 (Debian 15.13-0+deb12u1)
+-- Dumped from database version 15.14 (Debian 15.14-0+deb12u1)
+-- Dumped by pg_dump version 15.14 (Debian 15.14-0+deb12u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -139,7 +139,8 @@ CREATE TABLE tng.entities (
     website text,
     legal_notice jsonb,
     imprint jsonb,
-    case_study_type_id integer
+    case_study_type_id integer,
+    acronym text
 );
 
 

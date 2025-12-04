@@ -2,59 +2,167 @@
 
 {% block content %}
 
-<script>
-  //console.log('{{ map }}')
+  <script>
+    //console.log('{{ map }}')
     const mapStyle = '{{ map  | safe }}'
     const chosenMap = '{{ map | safe }}'
     const imgString = '{{ map_data.index_img | safe }}'
     const imgOrMap = '{{ map_data.img_map | safe }}'
-</script>
+  </script>
 
 
-<div>
-<div id="index-container">
-    <div class="button-container">
+  <div>
+    <div id="index-container">
+      <div class="button-container">
         <a id="entities_mobile" class="text-center" href="#mobileAnchor">
-            <i class="bi bi-arrow-down-circle-fill"></i>
+          <i class="bi bi-arrow-down-circle-fill"></i>
         </a>
-    </div>
-    <div id="index-image"></div>
-    <div id="map" class="{% if map_data.greyscale %}map-gray{% endif %}"></div>
-</div>
+      </div>
+      <div id="carousel-overlay">
+        <div id="project-cards" class="project-carousel">
+          {% for p in project_cards %}
+            <div class="project-card-wrapper">
+              <a href="{{ url_for('about', slug=p.slug) }}"
+                 class="text-decoration-none">
+                <div class="project-card">
+                  {% if p.image %}
+                    <div class="project-card-img">
+                      <img src="{{ p.image }}" alt="{{ p.name }}">
+                    </div>
+                  {% else %}
+                    <div class="project-card-placeholder">{{ p.acronym }}</div>
+                  {% endif %}
+                  {% if p.description %}
+                    <div
+                      class="project-card-desc">{{ p.description | safe }}</div>
+                  {% endif %}
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
 
-<div id="counters" class="text-center pt-3">
-    <div class="row gx-0">
-        {% for view_class, details in view_classes.items() %}
-        <div class="col-lg col-md-4">
+      <div id="map"
+           class="{% if map_data.greyscale %}map-gray{% endif %}"></div>
+    </div>
+
+    <div id="counters" class="text-center pt-3">
+      <div class="row gx-0">
+        {% for view_class, details in view_class_count.items() %}
+          <div class="col-lg col-md-4">
             <h5 class="statistic-counter">{{ details['count'] }}</h5>
-            <p>{{view_class | capitalize}}</p>
-        </div>
+            <p>{{ view_class | capitalize }}</p>
+          </div>
         {% endfor %}
+      </div>
     </div>
-</div>
 
-<!-- Hover cards_home-->
-<div id="mobileAnchor" class="cards_home_container">
-    {% for view_class, details in view_classes.items() %}
-      <a href="{{ url_for('entities', tab_name=view_class) }}" class="text-decoration-none">
-    <div id="{{ view_class | lower }}-card" class="entity-card entity-card--{{ view_class | lower }}">
-        <div class="entity-card__icon">
-            <img src="/static/images/entity_icons/{{ view_class[:-1] | lower }}.png" alt="{{ view_class }}">
-        </div>
-        <div class="entity-card__label">{{ view_class | capitalize }}</div>
-        <div class="entity-card__description">Lorem ipsum dolor sit amet consectetur. Risus malesuada feugiat
-            sit integer non. Nisl blandit at scelerisque id arcu nisi nisl lacus.
-        </div>
+    <!-- Hover cards_home-->
+    <div id="mobileAnchor" class="cards_home_container">
+      {% for view_class, details in view_class_count.items() %}
+        <a href="{{ url_for('entities', tab_name=view_class) }}"
+           class="text-decoration-none">
+          <div id="{{ view_class | lower }}-card"
+               class="entity-card entity-card--{{ view_class | lower }}">
+            <div class="entity-card__icon">
+              <img
+                src="/static/images/entity_icons/{{ view_class[:-1] | lower }}.png"
+                alt="{{ view_class }}">
+            </div>
+            <div class="entity-card__label">{{ view_class | capitalize }}</div>
+            <div class="entity-card__description">Lorem ipsum dolor sit amet
+              consectetur. Risus malesuada feugiat
+              sit integer non. Nisl blandit at scelerisque id arcu nisi nisl
+              lacus.
+            </div>
+          </div>
+        </a>
+      {% endfor %}
     </div>
-      </a>
-    {% endfor %}
-</div>
 
-</div>
+  </div>
 
-{% include 'footer.html' %}
+  {% include 'footer.html' %}
 
 
-<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const container = document.getElementById("project-cards");
+      let cards = [...container.querySelectorAll(".project-card-wrapper")];
+
+      if (cards.length === 0) return;
+
+      const CLONE_COUNT = 4;  // how many cards are visible at once
+
+      // --- STEP 1: Clone first and last cards for infinite loop ---
+      const firstClones = cards.slice(0, CLONE_COUNT).map(c => c.cloneNode(true));
+      const lastClones = cards.slice(-CLONE_COUNT).map(c => c.cloneNode(true));
+
+      lastClones.forEach(cl => container.insertBefore(cl, container.firstChild));
+      firstClones.forEach(cl => container.appendChild(cl));
+
+      // Update cards list
+      cards = [...container.querySelectorAll(".project-card-wrapper")];
+
+      const style = getComputedStyle(container);
+      const gap = parseInt(style.columnGap || style.gap || "0", 10);
+      const cardWidth = cards[0].offsetWidth + gap;
+
+      // --- STEP 2: Start at the real first card (offset by the clone zone) ---
+      let index = CLONE_COUNT;
+      let scrollX = index * cardWidth;
+      container.scrollLeft = scrollX;
+
+      // --- Highlight center card ---
+      function highlightCards() {
+        const center = container.scrollLeft + container.offsetWidth / 2;
+
+        cards.forEach((card, i) => {
+          const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+          const dist = Math.abs(center - cardCenter);
+
+          card.classList.remove("active", "side");
+
+          if (dist < cardWidth * 0.6) {
+            card.classList.add("active");
+          } else if (dist < cardWidth * 1.6) {
+            card.classList.add("side");
+          }
+        });
+      }
+
+      // --- Auto-rotating infinite scroll ---
+      function rotate() {
+        index++;
+        const maxIndex = cards.length - CLONE_COUNT - 1;
+
+        if (index > maxIndex) {
+          // jump back to the real section
+          index = CLONE_COUNT + 1;
+          container.scrollLeft = (index - 1) * cardWidth;
+        }
+
+        const newScrollX = index * cardWidth;
+
+        container.scrollTo({
+          left: newScrollX,
+          behavior: "smooth"
+        });
+
+        setTimeout(highlightCards, 300);
+      }
+
+      // Scroll event keeps highlighting in sync
+      container.addEventListener("scroll", highlightCards);
+
+      highlightCards();
+      setInterval(rotate, 5000);
+    });
+  </script>
+
 
 {% endblock %}

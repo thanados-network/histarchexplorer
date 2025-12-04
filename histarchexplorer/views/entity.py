@@ -113,6 +113,7 @@ def get_features_for_map(
 
 
 def check_sidebar_elements(tab: str, id_: int) -> bool:
+    return True
     match tab:
         case 'map':
             return bool(get_first_geom(id_))
@@ -288,6 +289,7 @@ def entity_data(id_: int) -> dict[str, Any]:
         'subs': get_sub_count(entity),
         'root': get_hierarchy(entity)}
     overview_map_geometry = entity.geometry_json
+
     if not overview_map_geometry:
         if hierarchy.get('root'):
             overview_map_geometry = get_parent_geometry(hierarchy['root'])

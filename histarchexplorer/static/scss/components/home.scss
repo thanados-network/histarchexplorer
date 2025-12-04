@@ -7,6 +7,7 @@
   }
 
 }
+
 .button-container {
   position: absolute;
   top: 92%;
@@ -16,6 +17,7 @@
   width: 100%;
   text-align: center;
 }
+
 #counters {
   background-color: var(--counters-bg);
   min-height: 95px;
@@ -36,8 +38,8 @@
 }
 
 .map-gray .maplibregl-canvas {
-    -webkit-filter: grayscale(100%) opacity(0.9);
-    filter: grayscale(100%) opacity(0.9);
+  -webkit-filter: grayscale(100%) opacity(0.9);
+  filter: grayscale(100%) opacity(0.9);
 }
 
 #index-image {
@@ -49,5 +51,114 @@
   background-size: cover;
   background-position: center;
   max-height: 100%;
+}
+
+.project-carousel {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: scroll;
+  gap: 5rem;
+  padding: 40px 20%;
+  scroll-behavior: smooth;
+  position: relative;
+}
+
+/* Hide scrollbars */
+.project-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Card wrapper */
+.project-card-wrapper {
+  flex: 0 0 500px;
+  opacity: 0.6;
+  transform: scale(0.85);
+  transition: transform .4s ease, opacity .4s ease, filter .4s ease;
+}
+
+/* Center card enlarged */
+.project-card-wrapper.active {
+  transform: scale(1.15);
+  opacity: 1;
+  filter: none;
+}
+
+/* Side cards slightly enlarged */
+.project-card-wrapper.side {
+  transform: scale(1.0);
+  opacity: 0.8;
+}
+
+.project-card {
+  height: 150px;
+  padding: 10px;
+  border-radius: 10px;
+  background: white;
+  text-align: center;
+}
+
+.project-card-img {
+  width: 100%;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.project-card-img img {
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.project-card-desc {
+  font-size: 12px;
+  color: #777;
+  margin-top: 6px;
+  line-height: 1.1;
+}
+
+#carousel-overlay {
+  position: absolute;
+  top: 80px;
+  left: 0;
+  width: 100%;
+  z-index: 500;
+  pointer-events: none;
+}
+
+#carousel-overlay .project-card-wrapper,
+#carousel-overlay .project-card,
+#carousel-overlay .project-card * {
+  pointer-events: auto;
+}
+
+.project-carousel {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: scroll;
+  gap: 5rem;
+  padding: 40px 20%;
+  scroll-behavior: smooth;
+  position: relative;
+  background: transparent !important;
+}
+
+.project-carousel {
+  background: transparent !important;
+}
+
+
+#carousel-overlay {
+  padding: 10px 0;
+  backdrop-filter: blur(3px);
+}
+
+.project-carousel::before,
+.project-carousel::after {
+  opacity: 0.7; /* fade edges work fine */
 }
 

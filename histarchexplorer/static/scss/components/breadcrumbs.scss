@@ -57,6 +57,7 @@ nav[aria-label="breadcrumb"] {
 
       &.active {
         cursor: default;
+
         span {
           transform: skew(21deg);
         }
@@ -64,6 +65,13 @@ nav[aria-label="breadcrumb"] {
     }
   }
 }
+
+.head-breadcrumb {
+  background: #5b5658!important;
+  color: #fff!important;
+  cursor: default!important;
+}
+
 
 @media (max-width: 1000px) {
   nav[aria-label="breadcrumb"] ol.breadcrumb li.breadcrumb-item {

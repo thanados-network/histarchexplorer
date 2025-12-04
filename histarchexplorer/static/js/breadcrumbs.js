@@ -1,5 +1,5 @@
 function renderAllBreadcrumbs(entityData, show = true) {
-  if (!show || !entityData?.entity || !entityData?.hierarchy?.root) return;
+  if (!show || !entityData?.entity || !entityData?.hierarchy?.root) {console.log('hallöle'); return;}
 
   const entity = entityData.entity;
   const hierarchy = entityData.hierarchy;
@@ -10,6 +10,16 @@ function renderAllBreadcrumbs(entityData, show = true) {
   const ol = document.createElement("ol");
   ol.className = "breadcrumb";
   ol.style.setProperty("--bs-breadcrumb-divider", "''");
+
+  const li = document.createElement("li");
+    li.className = "breadcrumb-item head-breadcrumb";
+
+    const a = document.createElement("a");
+    a.className = "text-decoration-none";
+    a.textContent = (entity.system_class).toUpperCase().replace('_', ' ') + ':';
+
+    li.appendChild(a);
+    ol.appendChild(li);
 
   // Ancestors: now actual links
   hierarchy.root.forEach(ancestor => {
@@ -37,6 +47,7 @@ function renderAllBreadcrumbs(entityData, show = true) {
 
   // Insert into every .breadcrumbs container
   document.querySelectorAll(".breadcrumbs").forEach(container => {
+      console.log(container);
     container.innerHTML = "";
     container.appendChild(nav.cloneNode(true));
   });

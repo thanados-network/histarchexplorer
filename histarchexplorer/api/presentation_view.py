@@ -184,6 +184,7 @@ class File:
     iiif_base_path: Optional[str] = None
     overlay: Optional[str] = None
     main_image: int = None
+    from_super_entity: bool = False
     render_type: str = None
 
 
@@ -337,23 +338,25 @@ class PresentationView:
     def parse_file(entity_id: int, raw_file: dict) -> list[File]:
         files = []
         for f in raw_file:
-            if isinstance(f, dict):
-                files.append(File(
-                    id=f["id"],
-                    title=f["title"],
-                    license=f.get("license"),
-                    creator=f.get("creator"),
-                    license_holder=f.get("licenseHolder"),
-                    public=f["publicShareable"],
-                    url=f.get("url"),
-                    mime_type=f.get("mimetype"),
-                    iiif_manifest=(
-                        f"{f.get('IIIFManifest')}"
-                        f"?url={url_for('index', _external=True)}entity/"),
-                    iiif_base_path=f.get("IIIFBasePath"),
-                    overlay=f.get('overlay'),
-                    main_image=g.main_images.get(entity_id) == f["id"],
-                    render_type=get_render_type(f.get("mimetype"))))
+            if not f["publicShareable"] or not f.get("license"):
+                continue
+            files.append(File(
+                id=f["id"],
+                title=f["title"],
+                license=f.get("license"),
+                creator=f.get("creator"),
+                license_holder=f.get("licenseHolder"),
+                public=f["publicShareable"],
+                url=f.get("url"),
+                mime_type=f.get("mimetype"),
+                iiif_manifest=(
+                    f"{f.get('IIIFManifest')}"
+                    f"?url={url_for('index', _external=True)}entity/"),
+                iiif_base_path=f.get("IIIFBasePath"),
+                overlay=f.get('overlay'),
+                from_super_entity=f.get('fromSuperEntity'),
+                main_image=g.main_images.get(entity_id) == f["id"],
+                render_type=get_render_type(f.get("mimetype"))))
         return files
 
     @classmethod
