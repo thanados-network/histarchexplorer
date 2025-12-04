@@ -184,6 +184,7 @@ class File:
     iiif_base_path: Optional[str] = None
     overlay: Optional[str] = None
     main_image: int = None
+    from_super_entity: bool = False
     render_type: str = None
 
 
@@ -353,6 +354,7 @@ class PresentationView:
                     f"?url={url_for('index', _external=True)}entity/"),
                 iiif_base_path=f.get("IIIFBasePath"),
                 overlay=f.get('overlay'),
+                from_super_entity=f.get('fromSuperEntity'),
                 main_image=g.main_images.get(entity_id) == f["id"],
                 render_type=get_render_type(f.get("mimetype"))))
         return files
