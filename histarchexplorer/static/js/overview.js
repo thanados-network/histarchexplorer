@@ -237,7 +237,7 @@ function renderReferences(entity) {
             }),
             h("p", {
                 class: "reference-description",
-                text: `${ref.citation || ""} ${ref.pages || ""}`.trim()
+                text: `${ref.citation || ""} ${ref.pages.replace("##main", "") || ""}`.trim()
             })
         ]));
         list.appendChild(li);

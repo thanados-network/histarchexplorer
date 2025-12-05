@@ -10,3 +10,5 @@
     renderAllBreadcrumbs(entityData);
 
 })();
+
+subunitsToggleView('tile')
