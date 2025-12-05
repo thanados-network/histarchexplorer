@@ -36,7 +36,7 @@ const renderTypeStyles = {
     return;
   }
 
-  const files = data.entity.files.filter(t => !t.from_super_entity);
+  const files = (data.entity.files || []).filter(f => f?.from_super_entity === false);
 
   const posterMap = {};
   files

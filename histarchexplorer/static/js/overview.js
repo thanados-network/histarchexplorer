@@ -269,7 +269,7 @@ function renderReferences(entity) {
     const refreshButton = data.refreshButton || {};
     const mainImage = data.mainImage;
     const initialImages = data.initialImage;
-    const allImages = data.images.filter(t => !t.from_super_entity);
+    const allImages = (data.images || []).filter(img => img?.from_super_entity === false);
     const additionalFilesOverview = window.additionalFilesOverview || 0;
 
     const grid = document.querySelector(".grid-overview");
@@ -411,7 +411,7 @@ function renderReferences(entity) {
     let files = [];
     if (mainImage) files.push(mainImage);
     if (Array.isArray(initialImages)) files.push(...initialImages);
-    files = files.filter(t => !t.from_super_entity);
+    files = (files || []).filter(f => f?.from_super_entity === false);
     if (typeof renderOverviewMediaTiles === "function") {
         renderOverviewMediaTiles(files, allImages, additionalFilesOverview);
     }
