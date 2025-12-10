@@ -277,7 +277,7 @@ function getColumnIndex(systemClass) {
 
 function getChartData(source, labels) {
     // Helper: map system_class + type title to column index
-    const CHART_LABELS = ['Features', 'Stratigraphic Units', 'Artifacts', 'Human Remains'];
+    const CHART_LABELS = ['Feature', 'Stratigraphic Unit', 'Artifact', 'Human Remains'];
     const newLabels = []
     for (const label of CHART_LABELS) {
         console.log(label)
@@ -321,7 +321,7 @@ function getChartData(source, labels) {
     });
 
     return {
-        labels: CHART_LABELS,
+        labels: newLabels,
         datasets: Array.from(datasetsByType.values())
     };
 }
