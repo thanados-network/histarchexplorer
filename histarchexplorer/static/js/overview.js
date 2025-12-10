@@ -200,53 +200,43 @@ function renderSubTile(entity) {
             datasets: [
                 {
                     label: 'Graves',
-                    data: [12, 0, 0, 0],
-                    stack: 'stack1'
+                    data: [12, 0, 0, 0]
                 },
                 {
                     label: 'Pits',
-                    data: [7, 0, 0, 0],
-                    stack: 'stack1'
+                    data: [7, 0, 0, 0]
                 },
                 {
                     label: 'Backfillings',
-                    data: [5, 0, 0, 0],
-                    stack: 'stack1'
+                    data: [5, 0, 0, 0]
                 },
                 {
                     label: 'Layers',
-                    data: [0, 12, 0, 0],
-                    stack: 'stack1'
+                    data: [0, 12, 0, 0]
                 },
                 {
                     label: 'Fillings',
-                    data: [0, 18, 0, 0],
-                    stack: 'stack1'
+                    data: [0, 18, 0, 0]
                 },
                 {
                     label: 'Shards',
-                    data: [0, 0, 34, 0],
-                    stack: 'stack1'
+                    data: [0, 0, 34, 0]
                 },
                 {
                     label: 'Metal Objects',
-                    data: [0, 0, 3, 0],
-                    stack: 'stack1'
+                    data: [0, 0, 3, 0]
                 },
                 {
                     label: 'Coins',
-                    data: [0, 0, 7, 0],
-                    stack: 'stack1'
+                    data: [0, 0, 7, 0]
                 },
                 {
                     label: 'Femurs',
-                    data: [0, 0, 0, 7],
-                    stack: 'stack1'
+                    data: [0, 0, 0, 7]
                 },
                 {
                     label: 'Craniums',
-                    data: [0, 0, 0, 6],
-                    stack: 'stack1'
+                    data: [0, 0, 0, 6]
                 }
             ]
         },
