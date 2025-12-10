@@ -241,7 +241,6 @@ function renderSubTile(entity) {
             ]
         },
         options: {
-
                 plugins: {
                     legend: {
                         display: false
@@ -270,7 +269,6 @@ function renderSubTile(entity) {
             }
         });
     tile.hidden = false;
-    relayout(10);
 }
 
 
