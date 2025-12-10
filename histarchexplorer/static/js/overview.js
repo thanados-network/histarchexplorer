@@ -216,51 +216,7 @@ function renderSubTile(entity) {
 
     new Chart(ctx, {
         type: 'bar',
-        data: {
-            labels: ['Features', 'Stratigraphic Units', 'Finds', 'Human Remains'],
-            datasets: [
-                {
-                    label: 'Graves',
-                    data: [12, 0, 0, 0]
-                },
-                {
-                    label: 'Pits',
-                    data: [7, 0, 0, 0]
-                },
-                {
-                    label: 'Backfillings',
-                    data: [5, 0, 0, 0]
-                },
-                {
-                    label: 'Layers',
-                    data: [0, 12, 0, 0]
-                },
-                {
-                    label: 'Fillings',
-                    data: [0, 18, 0, 0]
-                },
-                {
-                    label: 'Shards',
-                    data: [0, 0, 34, 0]
-                },
-                {
-                    label: 'Metal Objects',
-                    data: [0, 0, 3, 0]
-                },
-                {
-                    label: 'Coins',
-                    data: [0, 0, 7, 0]
-                },
-                {
-                    label: 'Femurs',
-                    data: [0, 0, 0, 7]
-                },
-                {
-                    label: 'Craniums',
-                    data: [0, 0, 0, 6]
-                }
-            ]
-        },
+        data: getChartData(entity.relations, checkRelations(entity)),
         options: {
                 plugins: {
                     legend: {
@@ -291,6 +247,87 @@ function renderSubTile(entity) {
         });
     tile.hidden = false;
 }
+
+
+function checkRelations(entity) {
+    const relations = entity.relations;
+    const labels = [];
+    if (!relations) return false;
+    console.log(relations);
+    const keys = Object.keys(relations);
+    for (const key of keys) {
+        console.log(key);
+        const order = getColumnIndex(key);
+        console.log(order);
+        if (!(order === -1)) {console.log("order"); labels.push(key)}
+    }
+    console.log(labels);
+    return labels;
+}
+
+function getColumnIndex(systemClass) {
+        if (systemClass === 'feature') return 0;                // "Features"
+        if (systemClass === 'stratigraphic_unit') return 1;               // "Artifacts"
+        if (systemClass === 'artifact') return 2;               // "Artifacts"
+        if (systemClass === 'human_remains') return 3;               // "Artifacts"
+
+        // unknown -> ignore
+        return -1;
+}
+
+function getChartData(source, labels) {
+    // Helper: map system_class + type title to column index
+    const CHART_LABELS = ['Features', 'Stratigraphic Units', 'Artifacts', 'Human Remains'];
+    const newLabels = []
+    for (const label of CHART_LABELS) {
+        console.log(label)
+        console.log(label.toLowerCase().replace(' ', '_'))
+        if (labels.includes((label.toLowerCase().replace(' ', '_')))) newLabels.push(label)
+}
+    console.log(labels)
+    console.log(newLabels)
+
+    // We collect datasets by type title (e.g. "Single Grave", "Pot", "Beaded Necklace", "Skeleton")
+    const datasetsByType = new Map();
+
+    // iterate through the three top-level groups
+    labels.forEach(groupKey => {
+        const items = source[groupKey] || [];
+
+        items.forEach(item => {
+            const systemClass = item.system_class; // "feature" | "stratigraphic_unit" | "artifact"
+
+            (item.types || []).forEach(t => {
+                // only standard types
+                if (!t.is_standard) return;
+
+                const colIdx = getColumnIndex(systemClass, t.title);
+                if (colIdx === -1) return;
+
+                const typeTitle = t.title;
+
+                // create dataset if it doesn't exist yet
+                if (!datasetsByType.has(typeTitle)) {
+                    datasetsByType.set(typeTitle, {
+                        label: typeTitle,
+                        data: [0, 0, 0, 0] // [Features, Stratigraphic Units, Artifacts, Human Remains]
+                    });
+                }
+
+                const ds = datasetsByType.get(typeTitle);
+                ds.data[colIdx] += 1; // count 1 occurrence of this type in that column
+            });
+        });
+    });
+
+    return {
+        labels: CHART_LABELS,
+        datasets: Array.from(datasetsByType.values())
+    };
+}
+
+
+
 
 
 function renderAttributes(categorizedTypes) {
@@ -525,7 +562,7 @@ function renderReferences(entity) {
   if (typeof renderEntityCard === "function") renderEntityCard(entity, mainImage);
   if (typeof renderDescription === "function") renderDescription(entity);
   if (typeof renderMapTile === "function") renderMapTile(entity);
-  if (typeof renderSubTile === "function") renderSubTile(entity);
+  if (typeof renderSubTile === "function" && (checkRelations(entity).length) > 0) renderSubTile(entity);
   if (typeof renderAttributes === "function") renderAttributes(categorizedTypes);
   if (typeof renderReferences === "function") renderReferences(entity);
 
