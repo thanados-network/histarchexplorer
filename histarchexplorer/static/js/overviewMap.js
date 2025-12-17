@@ -177,7 +177,6 @@
 
     document.getElementById("tile-map").addEventListener("click", () => {
     const tab = document.getElementById("tab-map");
-    console.log(tab)
     const tabTrigger = new bootstrap.Tab(tab);
     tabTrigger.show();
 });

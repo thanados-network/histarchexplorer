@@ -326,7 +326,6 @@ class PresentationView:
                     geometries=rel_geometries,
                     geometry_json=rel.get("geometries"),
                     types=rel_types)
-
                 relations.append(relation)
 
             if relations:

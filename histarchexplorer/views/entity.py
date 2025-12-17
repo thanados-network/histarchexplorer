@@ -239,7 +239,9 @@ def get_sub_count(main_entity: PresentationView, ent_id) -> int:
     }
 
     count = 0
+    ids = []
 
+    print(ent_id)
     for rel_type in sub_relations_map.get(main_entity.system_class, []):
         for rel in main_entity.relations.get(rel_type, []):
             count += sum(
@@ -248,9 +250,12 @@ def get_sub_count(main_entity: PresentationView, ent_id) -> int:
                 if rt.get("relationTo") == ent_id
                 and rt.get("property") == "crm:P46i_forms_part_of"
             )
-
-    return count
-
+            for rt in rel.relation_types:
+                if rt.get("relationTo") == ent_id and rt.get("property") == "crm:P46i_forms_part_of":
+                    print(rt)
+                    ids.append(rel.id)
+    data = {'count': count, 'ids': ids}
+    return data
 
 
 def get_files_for_id(id: int) -> dict[str, list[str]]:
@@ -293,11 +298,16 @@ def get_rastermaps(id: int) -> str:
 def presentation_view(id_: int) -> dict[str, Any]:
     return asdict(PresentationView.from_api(id_))
 
+
 @app.route('/entity-data/<int:id_>')
 def entity_data(id_: int) -> dict[str, Any]:
     entity = PresentationView.from_api(id_)
+    data = get_sub_count(entity, id_)
+    count = data['count']
+    sub_ids = data['ids']
     hierarchy = {
-        'subs': get_sub_count(entity, id_),
+        'ids': sub_ids,
+        'subs': count,
         'root': get_hierarchy(entity)}
     overview_map_geometry = entity.geometry_json
 
