@@ -258,7 +258,8 @@ function renderSubTile(entity) {
         tabTrigger.show();
         setTimeout(() => {
     if (gridsubunits) gridsubunits.refreshItems().layout();
-  }, 50);
+      console.log("hallihallo");
+  }, 500);
     })
 
 }
