@@ -1,9 +1,10 @@
 from typing import Any
 
 import psycopg2.extras
-from flask import Flask, Response, g, request, session, url_for
+from flask import Flask, Response, g, request, session, url_for, redirect
 from flask_babel import Babel
 from flask_caching import Cache
+#from flask_login import current_user
 from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
@@ -101,6 +102,11 @@ def before_request() -> None:
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
     if request.path.startswith('/reset'):
         return None
+    #quick login for preliminary prototype page
+    #if request.endpoint == 'static':
+    #    return
+    #if not current_user.is_authenticated and request.endpoint != 'login':
+    #    return redirect(url_for('login'))
 
     session['language'] = get_locale()
     g.available_languages = app.config['LANGUAGES']
