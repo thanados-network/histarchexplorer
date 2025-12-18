@@ -4,7 +4,7 @@ import psycopg2.extras
 from flask import Flask, Response, g, request, session, url_for, redirect
 from flask_babel import Babel
 from flask_caching import Cache
-#from flask_login import current_user
+from flask_login import current_user
 from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
@@ -103,10 +103,10 @@ def before_request() -> None:
     if request.path.startswith('/reset'):
         return None
     #quick login for preliminary prototype page
-    #if request.endpoint == 'static':
-    #    return
-    #if not current_user.is_authenticated and request.endpoint != 'login':
-    #    return redirect(url_for('login'))
+    if request.endpoint == 'static':
+        return
+    if not current_user.is_authenticated and request.endpoint != 'login':
+        return redirect(url_for('login'))
 
     session['language'] = get_locale()
     g.available_languages = app.config['LANGUAGES']
