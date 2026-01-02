@@ -1,5 +1,5 @@
 function renderAllBreadcrumbs(entityData, show = true) {
-  if (!show || !entityData?.entity || !entityData?.hierarchy?.root) {console.log('hallöle'); return;}
+  if (!show || !entityData?.entity || !entityData?.hierarchy?.root) {return;}
 
   const entity = entityData.entity;
   const hierarchy = entityData.hierarchy;
@@ -47,7 +47,6 @@ function renderAllBreadcrumbs(entityData, show = true) {
 
   // Insert into every .breadcrumbs container
   document.querySelectorAll(".breadcrumbs").forEach(container => {
-      console.log(container);
     container.innerHTML = "";
     container.appendChild(nav.cloneNode(true));
   });

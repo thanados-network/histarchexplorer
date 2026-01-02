@@ -117,6 +117,8 @@ function adjustTableHeight{{ tab_name }}() {
     setTimeout(function () {
         const header = document.getElementById(`{{tab_name}}-header`);
         const table = document.getElementById(`table-{{tab_name}}`);
+        const breadcrumbCont = document.getElementById(`{{tab_name}}-breadcrumbs`);
+
         {% if tab_name in ['places','items'] %}
             const mapContainer{{tab_name}} = document.getElementById(`map-{{tab_name}}`);
         {% endif %}
@@ -124,9 +126,10 @@ function adjustTableHeight{{ tab_name }}() {
         if (!header || !table) return;
 
         const headerHeight = header.offsetHeight;
+        const breadcrumbHeight = breadcrumbCont.offsetHeight;
 
         // 100vh - 96px - headerHeight - 3rem
-        const maxHeight = window.innerHeight - 96 - headerHeight - (3 * 16); // 3rem = 48px
+        const maxHeight = window.innerHeight - 96 - headerHeight - breadcrumbHeight - (3 * 16); // 3rem = 48px
         table.style.maxHeight = `${maxHeight}px`;
         {% if tab_name in ['places','items'] %}
             mapContainer{{tab_name}}.style.height = `${maxHeight + 16}px`;

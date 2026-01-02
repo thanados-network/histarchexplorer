@@ -1,4 +1,6 @@
 {% extends "layout.html" %}
+
+
 {% block content %}
     <script src="{{ url_for('static', filename='js/breadcrumbs.js') }}"></script>
 
@@ -7,7 +9,7 @@
 
     <script>
 
-        const tabsToLoad = {{ sidebar_elements | sort(attribute='order') | map(attribute='route') | list | tojson }};
+        let tabsToLoad = {{ sidebar_elements | sort(attribute='order') | map(attribute='route') | list | tojson }};
         const entityId = {{ entity_id }};
 
         {% if entity_id == 0 %}

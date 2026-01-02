@@ -382,3 +382,9 @@
 
 /* Content on top */
 .tile-container .grid .item .item-content { position: relative; z-index: 2; }
+
+.custom-treeview-wrapper {
+  max-width: 100%;
+  border: none;
+  box-shadow: none;
+}

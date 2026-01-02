@@ -295,10 +295,43 @@
   }
 }
 
+#js-description {
+    overflow-y: auto;
+    max-height: 33vh;
+    padding-right: 6px; /* etwas Platz für Scrollbar */
+
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #999 transparent;
+}
+
+/* Chrome, Edge, Safari */
+#js-description::-webkit-scrollbar {
+    width: 8px;
+}
+
+#js-description::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#js-description::-webkit-scrollbar-thumb {
+    background: #bbb;
+    border-radius: 8px;
+}
+
+#js-description::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
 #muuri-map {
   // margin-top: 1.5rem;
   height: 100%;
   width: 100%;
+  cursor: pointer;
+}
+
+#muuri-map * {
+  cursor: pointer!important;
 }
 
 .map-wrapper {
@@ -495,4 +528,9 @@
       transform: scale(1.05);
     }
   }
+}
+
+#tile-sub {
+  height: 300px!important;
+  cursor: pointer;
 }

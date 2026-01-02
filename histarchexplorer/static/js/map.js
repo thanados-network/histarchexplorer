@@ -22,8 +22,6 @@
             .find(item => item.geometry_json)?.id || null;
     }
 
-    console.log(geomId);
-
     function extendBounds(feature) {
         const {type, coordinates} = feature.geometry;
         switch (type) {
@@ -554,8 +552,6 @@
 
                     ["Polygon", "LineString", "Point"].forEach(geomType => {
                         totalCount += mapData.features.filter(f => f.properties?.id === geomId && f.geometry.type === geomType).length;
-                        console.log(groupName)
-                        console.log(totalCount)
                     });
 
                 }
@@ -746,8 +742,6 @@
                     ids.forEach(id => this.map.getLayer(id) && orderedLayerIds.push(id));
                 });
             });
-
-            console.log("Computed layer order (legend top → bottom):", orderedLayerIds);
 
             for (let i = orderedLayerIds.length - 1; i >= 0; i--) {
                 const layerId = orderedLayerIds[i];

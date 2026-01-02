@@ -113,6 +113,7 @@ def get_features_for_map(
 
 
 def check_sidebar_elements(tab: str, id_: int) -> bool:
+    return True
     match tab:
         case 'map':
             return bool(get_first_geom(id_))
@@ -228,17 +229,33 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
     return root
 
 
-def get_sub_count(main_entity: PresentationView) -> int:
-    count = 0
+def get_sub_count(main_entity: PresentationView, ent_id) -> int:
     sub_relations_map = {
         'place': ['feature'],
         'feature': ['stratigraphic_unit'],
         'stratigraphic_unit': ['artifact', 'human_remains'],
         'artifact': ['artifact'],
-        'human_remains': ['human_remains']}
+        'human_remains': ['human_remains'],
+    }
+
+    count = 0
+    ids = []
+
+    print(ent_id)
     for rel_type in sub_relations_map.get(main_entity.system_class, []):
-        count += len(main_entity.relations.get(rel_type, []))
-    return count
+        for rel in main_entity.relations.get(rel_type, []):
+            count += sum(
+                1
+                for rt in rel.relation_types
+                if rt.get("relationTo") == ent_id
+                and rt.get("property") == "crm:P46i_forms_part_of"
+            )
+            for rt in rel.relation_types:
+                if rt.get("relationTo") == ent_id and rt.get("property") == "crm:P46i_forms_part_of":
+                    print(rt)
+                    ids.append(rel.id)
+    data = {'count': count, 'ids': ids}
+    return data
 
 
 def get_files_for_id(id_: int) -> dict[str, list[str]] | None:
@@ -285,8 +302,12 @@ def presentation_view(id_: int) -> dict[str, Any]:
 @app.route('/entity-data/<int:id_>')
 def entity_data(id_: int) -> dict[str, Any]:
     entity = PresentationView.from_api(id_)
+    data = get_sub_count(entity, id_)
+    count = data['count']
+    sub_ids = data['ids']
     hierarchy = {
-        'subs': get_sub_count(entity),
+        'ids': sub_ids,
+        'subs': count,
         'root': get_hierarchy(entity)}
     overview_map_geometry = entity.geometry_json
 

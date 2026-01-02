@@ -5,8 +5,30 @@
     let type_id{{tab_name}} = null
     let type_value{{tab_name}} = false
 
-    if ({{ tab_name }}Data.fields.includes("begin")) {
-        document.getElementById("begin-{{ tab_name }}-container").classList.remove("d-none")
+
+    const {{ tab_name }}data = {{ tab_name }}Data;
+
+    const {{ tab_name }}hasBeginField = Array.isArray({{ tab_name }}data.fields) && {{ tab_name }}data.fields.includes("begin");
+    const {{ tab_name }}hasEndField = Array.isArray({{ tab_name }}data.fields) && {{ tab_name }}data.fields.includes("end");
+
+    const {{ tab_name }}timeline = {{ tab_name }}data.timelineBegin;
+    const {{ tab_name }}timelineEnd = {{ tab_name }}data.timelineEnd;
+
+    const {{ tab_name }}hasDifferentBeginValues =
+        Array.isArray({{ tab_name }}timeline) &&
+        {{ tab_name }}timeline.length > 1 &&
+        {{ tab_name }}timeline[0]?.string !== {{ tab_name }}timeline[{{ tab_name }}timeline.length - 1]?.string;
+
+    const {{ tab_name }}hasDifferentEndValues =
+        Array.isArray({{ tab_name }}timelineEnd) &&
+        {{ tab_name }}timelineEnd.length > 1 &&
+        {{ tab_name }}timelineEnd[0]?.string !== {{ tab_name }}timelineEnd[{{ tab_name }}timelineEnd.length - 1]?.string;
+
+
+    if ({{ tab_name }}hasBeginField && {{ tab_name }}hasDifferentBeginValues) {
+        document
+            .getElementById(`begin-{{ tab_name }}-container`)
+            ?.classList.remove("d-none");
     }
     if ({{ tab_name }}Data.fields.includes("end")) {
         document.getElementById("end-{{ tab_name }}-container").classList.remove("d-none")
@@ -155,6 +177,15 @@
         }
     ];
 
+    function update{{ tab_name }}Counter() {
+        const total = table{{ tab_name }}.getDataCount();
+        const visible = table{{ tab_name }}.getDataCount("active");
+
+        const el = document.getElementById("{{ tab_name }}-subcount");
+        if (el) {
+            el.textContent = ` (${visible} of ${total})`;
+        }
+    }
 
     const table{{ tab_name }} = new Tabulator("#table-{{ tab_name }}", {
         layout: "fitColumns",
@@ -165,7 +196,18 @@
         paginationSize: 50,
         paginationSizeSelector: [20, 50, 100],
         columns: columns{{ tab_name }},
+        initialSort: [
+        { column: "name", dir: "asc" }
+        ],
+        dataLoaded: function () {
+            update{{ tab_name }}Counter();
+        },
     });
+
+    table{{ tab_name }}.on("dataFiltered", update{{ tab_name }}Counter);
+    table{{ tab_name }}.on("dataSorted", update{{ tab_name }}Counter);
+    table{{ tab_name }}.on("pageLoaded", update{{ tab_name }}Counter);
+    table{{ tab_name }}.on("tableBuilt", update{{ tab_name }}Counter);
 
     table{{ tab_name }}.on("rowClick", function (e, row) {
         const rowData = row.getData();

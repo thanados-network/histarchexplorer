@@ -139,7 +139,7 @@ FROM model.entity a JOIN model.link l1 ON l1.domain_id = a.id
 JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id WHERE l1.property_code = 'P2')) e {where_sql}
     """
 
-    print((query, tuple(params)))
+    #print((query, tuple(params)))
     g.cursor.execute(query, tuple(params))
     data['entities'] = g.cursor.fetchone()[0] or []
 
