@@ -8,7 +8,7 @@ except ImportError:
 
 
 # Application metadata
-VERSION = '0.2.0'
+VERSION = '0.3.0'
 LANGUAGES = {'de': 'Deutsch', 'en': 'English'}  # Supported languages
 PREFERRED_LANGUAGE = 'en'  # Default language
 DEBUG = False  # Debug mode toggle
