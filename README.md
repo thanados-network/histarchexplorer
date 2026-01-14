@@ -65,7 +65,7 @@ sudo apt install postgresql postgresql-15-postgis-3 postgresql-15-postgis-3-scri
 sudo apt install python3-bcrypt python3-flask python3-flask-babel \
     python3-flask-login python3-mypy python3-numpy python3-psycopg2 \
     python3-werkzeug python3-wtforms python3-flask-caching python3-requests \
-    redis-server python3-redis python3-bleach 
+    redis-server python3-redis python3-bleach python3-libsass
 ```
 
 #### Development dependencies (optional)
