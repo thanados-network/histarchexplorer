@@ -41,6 +41,7 @@ function toggleMapButtons(mapId, isEditing) {
     }
   });
 }
+
 // --- Rich text helpers for description field ---
 function initRichText(entryId) {
   if (typeof tinymce === 'undefined') {
@@ -65,12 +66,20 @@ function initRichText(entryId) {
       license_key: 'gpl',
       menubar: false,
       branding: false,
-      height: 220,
-      plugins: 'link lists image',
-      toolbar: 'bold italic underline | bullist numlist | link image',
+      height: 300, // Etwas mehr Platz für Tabellen
+      // Plugins erweitert: table, code und lists (lists hattest du schon)
+      plugins: 'link lists image table code',
+      // Toolbar gruppiert für bessere Übersicht
+      toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
+        'superscript subscript | alignleft aligncenter alignright | ' +
+        'bullist numlist | table link image | removeformat code',
       convert_urls: false,
       default_link_target: '_blank',
-      rel_list: [{ title: 'No referrer', value: 'noreferrer noopener' }],
+      rel_list: [{title: 'No referrer', value: 'noreferrer noopener'}],
+      // Erlaubt das Einfügen von Bildern als Base64 (optional, falls kein Upload-Handler da ist)
+      image_advtab: true,
+      // Verhindert, dass unnötige span-Tags beim Pasten entstehen
+      paste_as_text: false,
 
       setup: function (editor) {
         editor.on('change keyup', function () {
@@ -80,6 +89,7 @@ function initRichText(entryId) {
     });
   });
 }
+
 function destroyRichText(entryId) {
   if (typeof tinymce === 'undefined') {
     return;

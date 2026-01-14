@@ -31,8 +31,8 @@ def entity_view(id_: int, tab_name: str = "overview") -> str:
         entity_id=id_)
 
 
-def get_entity_images(files: list[File]) -> tuple[
-    File, list[File], list[File]]:
+def get_entity_images(
+        files: list[File]) -> tuple[File, list[File], list[File]]:
     images = []
     main_image = None
     for image in files:
@@ -200,16 +200,16 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
     root = []
     match main_entity.system_class:
         case 'feature':
-            if 'place' in main_entity.relations and main_entity.relations[
-                'place']:
+            if ('place' in main_entity.relations
+                    and main_entity.relations['place']):
                 root.append(main_entity.relations['place'][0])
         case 'stratigraphic_unit':
             for feature in main_entity.relations.get('feature', []):
                 for relation in feature.relation_types:
                     if relation['relationTo'] == main_entity.id:
                         root.append(feature)
-            if 'place' in main_entity.relations and main_entity.relations[
-                'place']:
+            if ('place' in main_entity.relations
+                    and main_entity.relations['place']):
                 root.append(main_entity.relations['place'][0])
         case 'artifact' | 'human_remains':
             stratigraphic_unit_id = None
@@ -222,8 +222,8 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
                 for relation in feature.relation_types:
                     if relation['relationTo'] == stratigraphic_unit_id:
                         root.append(feature)
-            if 'place' in main_entity.relations and main_entity.relations[
-                'place']:
+            if ('place' in main_entity.relations
+                    and main_entity.relations['place']):
                 root.append(main_entity.relations['place'][0])
     root.reverse()
     return root
@@ -258,7 +258,7 @@ def get_sub_count(main_entity: PresentationView, ent_id) -> int:
     return data
 
 
-def get_files_for_id(id: int) -> dict[str, list[str]]:
+def get_files_for_id(id_: int) -> dict[str, list[str]] | None:
     sql = """
 
           SELECT JSONB_AGG(
@@ -282,7 +282,7 @@ def get_files_for_id(id: int) -> dict[str, list[str]]:
                   AND l.property_code = 'P67') a; \
           """
 
-    g.cursor.execute(sql, {'id': id})
+    g.cursor.execute(sql, {'id': id_})
     result = g.cursor.fetchone()
     if result:
         return result
@@ -290,8 +290,8 @@ def get_files_for_id(id: int) -> dict[str, list[str]]:
 
 
 @app.route('/get_rastermaps/<int:id>')
-def get_rastermaps(id: int) -> str:
-    return json.dumps(get_files_for_id(id))
+def get_rastermaps(id_: int) -> str:
+    return json.dumps(get_files_for_id(id_))
 
 
 @app.route('/presentation-view/<int:id_>')

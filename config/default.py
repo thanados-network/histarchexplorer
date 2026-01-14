@@ -8,7 +8,7 @@ except ImportError:
 
 
 # Application metadata
-VERSION = '0.1.0'
+VERSION = '0.3.0'
 LANGUAGES = {'de': 'Deutsch', 'en': 'English'}  # Supported languages
 PREFERRED_LANGUAGE = 'en'  # Default language
 DEBUG = False  # Debug mode toggle
@@ -19,7 +19,7 @@ DATABASE_NAME = 'openatlas'
 DATABASE_USER = 'openatlas'
 DATABASE_HOST = 'localhost'
 DATABASE_PORT = 5432
-DATABASE_PASS = 'CHANGE ME'  # ⚠️ Must be changed in production
+DATABASE_PASS = 'CHANGE ME'  # Must be changed in production
 
 # Security settings
 SESSION_COOKIE_SECURE = False  # Use HTTPS for session cookie
