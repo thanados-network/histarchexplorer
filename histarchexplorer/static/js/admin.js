@@ -66,19 +66,15 @@ function initRichText(entryId) {
       license_key: 'gpl',
       menubar: false,
       branding: false,
-      height: 300, // Etwas mehr Platz für Tabellen
-      // Plugins erweitert: table, code und lists (lists hattest du schon)
+      height: 300,
       plugins: 'link lists image table code',
-      // Toolbar gruppiert für bessere Übersicht
       toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
-        'superscript subscript | alignleft aligncenter alignright | ' +
+        'superscript subscript | alignleft aligncenter alignright alignjustify | ' +
         'bullist numlist | table link image | removeformat code',
       convert_urls: false,
       default_link_target: '_blank',
       rel_list: [{title: 'No referrer', value: 'noreferrer noopener'}],
-      // Erlaubt das Einfügen von Bildern als Base64 (optional, falls kein Upload-Handler da ist)
       image_advtab: true,
-      // Verhindert, dass unnötige span-Tags beim Pasten entstehen
       paste_as_text: false,
 
       setup: function (editor) {
