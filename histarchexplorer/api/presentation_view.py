@@ -1,4 +1,5 @@
 import json
+from curses.ascii import isdigit
 from dataclasses import asdict, dataclass, field
 from typing import Any, Optional
 
@@ -100,7 +101,7 @@ class ExternalReferenceModel:
     reference_url: Optional[str]
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data: dict[str, str | int]):
         return cls(
             id=data["id"],
             type=data.get("type"),
@@ -121,7 +122,7 @@ class Reference:
     pages: Optional[str] = None
 
     @classmethod
-    def from_dict(cls, data) -> 'Reference':
+    def from_dict(cls, data: dict[str, str | int]) -> 'Reference':
         return cls(
             id=data["id"],
             title=data.get("title"),
@@ -136,18 +137,18 @@ class Reference:
 class File:
     id: int
     title: str
-    license: Optional[str] = None
-    creator: Optional[str] = None
-    license_holder: Optional[str] = None
+    license: str | int | None = None
+    creator: str | int | None = None
+    license_holder: str | int | None = None
     public: bool = False
-    url: Optional[str] = None
-    mime_type: Optional[str] = None
-    iiif_manifest: Optional[str] = None
-    iiif_base_path: Optional[str] = None
-    overlay: Optional[str] = None
-    main_image: int = None
+    url: str | int | None = None
+    mime_type: str | int | None = None
+    iiif_manifest: str | int | None = None
+    iiif_base_path: str | int | None = None
+    overlay: str | int | None = None
+    main_image: str | int | None = None
     from_super_entity: bool = False
-    render_type: str = None
+    render_type: str | int | None = None
 
 
 @dataclass
@@ -171,10 +172,10 @@ class PresentationView:
     system_class: str
     view_class: str
     title: str
-    description: dict[str, str]
-    aliases: list[str]
-    start: str
-    end: str
+    description: dict[str, str] | None
+    aliases: list[str] | None
+    start: Optional[str]
+    end: Optional[str]
     geometries: list[FeatureModel] = field(default_factory=list)
     geometry_json: dict[str, Any] = None
     when: Optional[TimeRangeModel] = None
@@ -233,7 +234,9 @@ class PresentationView:
             if when.get("end") else None)
 
     @staticmethod
-    def parse_types(types_data: list[dict]) -> list[EntityTypeModel]:
+    def parse_types(
+            types_data: list[dict[str, str | int | list[dict[str, str]]]]) \
+            -> list[EntityTypeModel]:
         types = []
         for type_ in types_data:
             hierarchy = []
@@ -241,17 +244,18 @@ class PresentationView:
                 hierarchy = [
                     TypeHierarchyEntry(**th)
                     for th in type_.get("typeHierarchy", [])]
+            id_ = int(type_["id"]) if isdigit(type_["id"]) else 0
             types.append(EntityTypeModel(
-                id=type_["id"],
+                id=id_,
                 title=type_.get("title", ""),
                 descriptions=type_.get("descriptions"),
                 is_standard=type_.get("isStandard"),
                 type_hierarchy=hierarchy,
                 value=type_.get("value"),
                 unit=type_.get("unit"),
-                icon=get_icon(type_["id"], type_.get("typeHierarchy")),
+                icon=get_icon(id_, type_.get("typeHierarchy")),
                 division=get_divisions(
-                    type_["id"],
+                    id_,
                     type_.get("typeHierarchy"))))
         return types
 
@@ -300,18 +304,20 @@ class PresentationView:
         return grouped_relations
 
     @staticmethod
-    def parse_file(entity_id: int, raw_file: dict) -> list[File]:
+    def parse_file(
+            entity_id: int,
+            raw_file: list[dict[str, str | int | bool | None]]) -> list[File]:
         files = []
         for f in raw_file:
-            if not f["publicShareable"] or not f.get("license"):
+            if not f.get("publicShareable") or not f.get("license"):
                 continue
             files.append(File(
-                id=f["id"],
-                title=f["title"],
+                id=f.get("id"),
+                title=f.get("title"),
                 license=f.get("license"),
                 creator=f.get("creator"),
                 license_holder=f.get("licenseHolder"),
-                public=f["publicShareable"],
+                public=f.get("publicShareable"),
                 url=f.get("url"),
                 mime_type=f.get("mimetype"),
                 iiif_manifest=(
@@ -320,7 +326,7 @@ class PresentationView:
                 iiif_base_path=f.get("IIIFBasePath"),
                 overlay=f.get('overlay'),
                 from_super_entity=f.get('fromSuperEntity'),
-                main_image=g.main_images.get(entity_id) == f["id"],
+                main_image=g.main_images.get(entity_id) == f.get("id"),
                 render_type=get_render_type(f.get("mimetype"))))
         return files
 

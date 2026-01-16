@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, NamedTuple
 
 from flask import g
 
@@ -32,6 +32,6 @@ def get_main_image_table() -> dict[int, int]:
     return main_image
 
 
-def get_settings():
+def get_settings() -> NamedTuple:
     g.cursor.execute("SELECT * FROM tng.settings LIMIT 1")
     return g.cursor.fetchone()

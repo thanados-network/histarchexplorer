@@ -1,13 +1,16 @@
 # pylint: disable=redefined-outer-name
 import os
+from typing import Any, Generator
 
 import pytest
 import psycopg2
+from flask import Flask
+
 from histarchexplorer import app as flask_app_instance
 
 
 @pytest.fixture(scope='session')
-def flask_app():
+def flask_app() -> Generator[Flask, Any, None]:
     app = flask_app_instance
     app.config.from_object('config.default')
     app.config.from_pyfile('testing.py', silent=False)
@@ -47,7 +50,7 @@ def flask_app():
 
 
 @pytest.fixture(scope='function')
-def client(flask_app):
+def client(flask_app: Any) -> Generator[Any, Any, None]:
     """A test client for the app."""
     with flask_app.test_client() as c_instance:
         with c_instance.session_transaction() as sess:

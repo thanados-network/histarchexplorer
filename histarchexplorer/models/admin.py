@@ -3,6 +3,7 @@ from typing import Any, Optional
 
 from flask import g
 
+from histarchexplorer.models.config import ConfigEntity
 from histarchexplorer.database.admin import (
     add_entry, add_link, add_new_map,
     check_sortorder, delete_entry,
@@ -50,11 +51,11 @@ class Admin:
         return update_map(data)
 
     @staticmethod
-    def add_entry(data: dict[str, str]) -> int:
+    def add_entry(data: dict[str, str | int]) -> int:
         return add_entry(data)
 
     @staticmethod
-    def edit_entry(data: dict[str, str]) -> None:
+    def edit_entry(data: dict[str, str | int]) -> None:
         return update_config_entry(data)
 
     @staticmethod
@@ -82,7 +83,7 @@ class Admin:
         return get_maps()
 
     @staticmethod
-    def _has_translation(entity, field_key) -> bool:
+    def _has_translation(entity: ConfigEntity, field_key: str) -> bool:
         value_attr = getattr(entity, field_key, None)
 
         if isinstance(value_attr, dict) and 'display' in value_attr:
@@ -164,7 +165,7 @@ class Admin:
 
     @staticmethod
     def process_properties_by_tab(
-            tabs: list[dict]) -> dict[str, list[dict[str, Any]]]:
+            tabs: list[dict[str, str]]) -> dict[str, list[dict[str, Any]]]:
         result = {}
         for t_data in tabs:
             tab_id = t_data['id']

@@ -4,13 +4,12 @@ import psycopg2.extras
 from flask import Flask, Response, g, request, session, url_for, redirect
 from flask_babel import Babel
 from flask_caching import Cache
-#from flask_login import current_user
 from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
 from histarchexplorer.database.settings import get_main_image_table
-from histarchexplorer.models.config import (ConfigEntity, Link, Properties,
-                                            get_config_classes)
+from histarchexplorer.models.config import (
+    ConfigEntity, Link, Properties, get_config_classes)
 from histarchexplorer.models.search import SearchService
 from histarchexplorer.models.settings import Settings
 

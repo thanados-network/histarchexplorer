@@ -22,9 +22,9 @@ class Settings:
     def initialize_settings(cls) -> "Settings":
         return cls(**get_settings()._asdict())
 
-    def get_map_settings(self) -> dict[str, str]:
-        return  {
-        'img': self.index_img,
-        'map': self.index_map,
-        'img_map': self.img_map,
-        'greyscale': self.greyscale}
+    def get_map_settings(self) -> dict[str, str | int]:
+        return {
+            'img': self.index_img,
+            'map': self.index_map,
+            'img_map': self.img_map,
+            'greyscale': self.greyscale}

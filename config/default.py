@@ -35,7 +35,7 @@ API_TOKEN = ''
 CACHE_DEFAULT_TIMEOUT = 360000
 
 
-def redis_available(url="redis://127.0.0.1:6379/0") -> bool:
+def redis_available(url: str = "redis://127.0.0.1:6379/0") -> bool:
     if redis is None:
         return False
 

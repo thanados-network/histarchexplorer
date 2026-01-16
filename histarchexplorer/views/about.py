@@ -1,6 +1,7 @@
 from typing import Any, Optional
 
 from flask import Response, g, redirect, render_template, url_for
+from flask.typing import ResponseValue
 
 from histarchexplorer import app
 from histarchexplorer.models.config import ConfigEntity
@@ -9,8 +10,7 @@ from histarchexplorer.utils.view_util import get_view_class_count, slugify
 
 @app.route('/about', strict_slashes=False)
 @app.route('/about/<slug>')
-def about(slug: Optional[str] = None) -> Response | str:
-
+def about(slug: Optional[str] = None) -> Response | str | ResponseValue:
     grouped = ConfigEntity.group_by_class_name(g.config_entities)
     main_project = grouped['main-project'][0]
     sub_projects = grouped.get('project', [])
@@ -49,7 +49,7 @@ def about(slug: Optional[str] = None) -> Response | str:
 
         role = None
         if link.role and link.role['display']:
-            role = link.role['display']['label']
+            role = link.role['display'].get('label', '')
 
         if target.class_name == "person":
             if target.id not in people_map:

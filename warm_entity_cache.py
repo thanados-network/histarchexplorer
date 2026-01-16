@@ -15,16 +15,23 @@ MAX_WORKERS = 2
 
 def get_by_system_class(
         case_study_ids: Optional[list[int]] = None) -> list[dict[str, Any]]:
-    req = requests.get(
-        f"{API_URL}system_class/all",
-        params={
-            'type_id': case_study_ids or [],
-            'limit': 0,
-            'show': ["none"],
-            'format': "lpx"},
-        timeout=60).json()
+    query_params: dict[str, str | int | list[str] | list[int]] = {
+        'type_id': case_study_ids if case_study_ids is not None else [],
+        'limit': 0,
+        'show': ["none"],
+        'format': "lpx"}
+    try:
+        response = requests.get(
+            f"{API_URL}system_class/all",
+            params=query_params,
+            timeout=60)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('results', [])
 
-    return req['results']
+    except requests.RequestException as e:
+        print(f"API Error: {e}")
+        return []
 
 
 def refresh_entity_cache(entity_id: int) -> None:

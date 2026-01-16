@@ -2,12 +2,14 @@ from typing import Optional
 
 from flask import (
     Response, g, jsonify, redirect, render_template, request, session, url_for)
+from flask.typing import ResponseValue
 from flask_login import login_required
 
-from histarchexplorer import ConfigEntity, app, cache
+from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.database.map import get_map_tilestring
+from histarchexplorer.models.config import ConfigEntity
 from histarchexplorer.utils.view_util import get_view_class_count, slugify
 
 
@@ -28,7 +30,6 @@ def index() -> str:
     for p in projects:
         slug = slugify(p.acronym)
 
-        # ensure description is safe + truncated server-side
         desc_label = p.description.get("display", {}).get("label") \
             if p.description['display']['label'] else ""
         if desc_label:
@@ -57,7 +58,7 @@ def index() -> str:
 
 
 @app.route('/language=<language>')
-def set_language(language: Optional[str] = None) -> Response:
+def set_language(language: Optional[str] = None) -> ResponseValue:
     session['language'] = language
     return redirect(request.referrer)
 
@@ -79,7 +80,7 @@ def get_entities_count_by_case_study() -> Response:
 
 @app.route("/refresh-cache/<int:id_>", methods=["POST"])
 @login_required
-def refresh_cache(id_: int) -> Response | tuple[Response, int]:
+def refresh_cache(id_: int) -> ResponseValue | tuple[ResponseValue, int]:
     try:
         cache.delete_memoized(PresentationView.from_api, PresentationView, id_)
         return redirect(url_for('entity_view', id_=id_))

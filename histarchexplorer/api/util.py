@@ -82,7 +82,9 @@ def get_render_type(mime_type: str) -> str:
     return render_type
 
 
-def get_icon(id_: int, type_hierarchy: dict[str, str]) -> str:
+def get_icon(
+        id_: int,
+        type_hierarchy: list[dict[str, str]]) -> str:
     icon = g.sidebar_icons.get(int(id_))
     if not icon:
         for type_ in type_hierarchy:
@@ -93,7 +95,9 @@ def get_icon(id_: int, type_hierarchy: dict[str, str]) -> str:
     return icon or g.sidebar_icons.get('other')
 
 
-def get_divisions(id_: int, type_hierarchy: dict[str, str]) -> dict[str, str]:
+def get_divisions(
+        id_: int,
+        type_hierarchy: list[dict[str, str]]) -> dict[str, str]:
     division = g.type_divisions.get(int(id_))
     if not division:
         for type_ in type_hierarchy:

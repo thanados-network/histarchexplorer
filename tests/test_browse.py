@@ -1,9 +1,10 @@
 from flask import url_for
+from flask.testing import FlaskClient
 
 from histarchexplorer import app
 
 
-def test_browse(client) -> None:
+def test_browse(client: FlaskClient) -> None:
     with app.app_context():
 
         rv = client.get(url_for('entities'))

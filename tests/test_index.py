@@ -1,10 +1,13 @@
-def test_index_page(client) -> None:
+from flask.testing import FlaskClient
+
+
+def test_index_page(client: FlaskClient) -> None:
     rv = client.get('/')
     assert rv.status_code == 200
     assert b"SEARCH" in rv.data
 
 
-def test_set_language_view(client) -> None:
+def test_set_language_view(client: FlaskClient) -> None:
     test_language = 'de'
     referrer_url = '/'
     response = client.get(

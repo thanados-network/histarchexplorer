@@ -49,7 +49,7 @@ def get_entity_images(
 
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
-def get_entity(id_: int, tab_name: str = None) -> str:
+def get_entity(id_: int, tab_name: str) -> str:
     if tab_name == 'subunits':
         subunit_data = get_browse_list_entities(id_)
         filtered_view_classes = {
@@ -84,8 +84,8 @@ def get_entity(id_: int, tab_name: str = None) -> str:
 def get_features_for_map(
         e: PresentationView,
         hierarchy: Optional[dict[str, Any]] = None) \
-        -> list[dict[str, Any] | None]:
-    map_data = []
+        -> list[dict[str, str | int] | None]:
+    map_data: list[Optional[dict[str, str | int]]] = []
     first_geom = None
     if e.geometry_json:
         map_data.extend(
@@ -94,11 +94,13 @@ def get_features_for_map(
     elif hierarchy:
         first_geom = get_parent_geometry_id(hierarchy['root'])
 
-    for k in ['place',
-              'feature',
-              'stratigraphic_unit',
-              'artifact',
-              'human_remains']:
+    sub_relations = [
+        'place',
+        'feature',
+        'stratigraphic_unit',
+        'artifact',
+        'human_remains']
+    for k in sub_relations:
         for rel in e.relations.get(k, []):
             if rel.geometry_json:
                 map_data.extend(adapt_map_dict(
@@ -131,7 +133,7 @@ def adapt_map_dict(
         name: str,
         id_: int,
         system_class: str,
-        first_geom: Optional[int] = None) -> list[dict[str, Any]]:
+        first_geom: Optional[int] = None) -> list[dict[str, str | int]]:
     features = []
     if geom.get('type') == 'FeatureCollection':
         features.extend(geom['features'])
@@ -175,7 +177,7 @@ def get_categorized_types(
 
 
 def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
-    root = []
+    root: list[Optional[Relation]] = []
     match main_entity.system_class:
         case 'feature':
             if ('place' in main_entity.relations

@@ -6,7 +6,7 @@ from histarchexplorer import app
 from histarchexplorer.views.views import type_tree
 
 
-def get_recursive_type_ids(id_) -> dict[str, Any]:
+def get_recursive_type_ids(id_: int) -> dict[str, Any]:
     sql = """
             (WITH RECURSIVE children_chain AS (
             -- Anchor: start with the given id as the root
@@ -32,7 +32,7 @@ def get_recursive_type_ids(id_) -> dict[str, Any]:
     return g.cursor.fetchall()
 
 
-def build_id_collection(ids) -> list[int]:
+def build_id_collection(ids: list[int]) -> list[str]:
     if not ids:
         return []
 
@@ -47,7 +47,8 @@ def build_id_collection(ids) -> list[int]:
 
 
 # pylint: disable=too-many-locals
-def get_browse_list_entities(id_: int = None) -> dict[str, Any] | None:
+def get_browse_list_entities(
+        id_: int) -> dict[str, str | int | list[Any] | dict[str, Any]] | None:
 
     #per default the whitelist ids are shown
     shown_ids = g.settings.shown_ids
@@ -278,7 +279,7 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
 
 
 # get entities and return the template
-def return_entities(tab_name, id_):
+def return_entities(tab_name: str, id_: int) -> str:
     data = get_browse_list_entities(id_)
 
     filtered_view_classes = {
@@ -295,7 +296,7 @@ def return_entities(tab_name, id_):
         for i, key in enumerate(data['counts'].keys())
     ]
 
-    if tab_name == "" and sidebar_elements:
+    if not tab_name and sidebar_elements:
         tab_name = sidebar_elements[0]['route']
 
     return render_template(
@@ -312,8 +313,8 @@ def return_entities(tab_name, id_):
 
 @app.route('/entities')
 @app.route('/entities/<tab_name>')
-@app.route('/entities/<tab_name>/<id_>')
-def entities(tab_name="", id_=None) -> str:
+@app.route('/entities/<tab_name>/<int:id_>')
+def entities(tab_name: str | None = None, id_: int | None = None) -> str:
     return return_entities(tab_name, id_)
 
 

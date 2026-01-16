@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 import requests
 from flask import g
@@ -7,12 +8,12 @@ from flask import g
 class SearchService:
     """Service layer for handling search-related business logic."""
 
-    def __init__(self, app) -> None:
+    def __init__(self, app: Any) -> None:
         self.api_url = app.config['API_URL']
         self.view_classes = g.view_classes
         self.app_logger = app.logger
 
-    def _make_api_call(self, url: str) -> list:
+    def _make_api_call(self, url: str) -> list[str]:
         """
         Internal helper to make an API call and handle responses.
         Args:
@@ -98,7 +99,10 @@ class SearchService:
                 f"An unexpected error occurred for entity {entity_id}: {e}")
             return None
 
-    def perform_live_search(self, query: str, system_classes: list) -> list:
+    def perform_live_search(
+            self,
+            query: str,
+            system_classes: list[str]) -> list[str]:
         """
         Performs a live search (e.g., for autocomplete).
         Args:
