@@ -237,7 +237,8 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
                 -- 3. Try any available language key
                 t.description ->> (SELECT key FROM jsonb_each(t.description) LIMIT 1)
             ) AS description,
-            t.case_study_type_id AS cs_id
+            t.case_study_type_id AS cs_id,
+            t.acronym AS acronym
         FROM
             tng.entities AS t
         WHERE
@@ -253,6 +254,7 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
             WHERE range_id = %(cs_id)s
               AND property_code = 'P2';
         """
+
         for case_study in shown_case_studies:
             g.cursor.execute(sql_case_studies, {'cs_id':case_study})
             results = g.cursor.fetchone()
@@ -261,6 +263,9 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
                 if row.cs_id == cs['id']:
                     if row.name:
                         cs['name'] = row.name
+                        cs['acronym'] = row.name
+                    if row.acronym:
+                        cs['acronym'] = row.acronym
                     if row.description:
                         cs['description'] = row.description
             data['cs_ids'].append(cs)
