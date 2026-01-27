@@ -134,7 +134,7 @@
 
 /* Main content card: description + sidebar */
 .about-page .container {
-  background: #ffffff;
+  background: var(--about-bg);
   border-radius: 1rem;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   padding: 1.5rem 1.75rem;
@@ -153,5 +153,14 @@
 .about-project-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10);
+}
+
+.about-imprint-card {
+  background: #dad8d8;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
