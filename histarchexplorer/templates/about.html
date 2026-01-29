@@ -63,7 +63,7 @@
               {% endif %}
               {% if people %}
                 <h5
-                  class="about-section-title">{{ _('persons') | capitalize }}</h5>
+                    class="about-section-title">{{ _('persons') | capitalize }}</h5>
                 <ul class="list-unstyled">
                   {% for person in people %}
                     <li class="about-person"
@@ -168,10 +168,10 @@
 
                       <div class="about-project-body pt-2">
                         <h5
-                          class="about-project-title">{{ best_label(p.name) }}</h5>
+                            class="about-project-title">{{ best_label(p.name) }}</h5>
                         {% if p.description %}
                           <p
-                            class="about-project-text">{{ p.description.display.label | safe |truncate(180) }}</p>
+                              class="about-project-text">{{ p.description.display.label | safe |truncate(180) }}</p>
                         {% endif %}
                       </div>
                       <div class="about-project-footer">
@@ -184,14 +184,35 @@
             </div>
           {% endif %}
           <div class="row">
-            {% if main_project.imprint %}
-              <h5 class="mt-4">{{ _('imprint') | capitalize }}</h5>
-              <p>{{ main_project.imprint.display.label | safe }}</p>
-            {% endif %}
+            {% if main_project.imprint or main_project.legal_notice %}
+              <hr class="my-5">
+              <div class="row g-3">
+                {% if main_project.imprint %}
+                  <div class="col-12 col-lg-6">
+                    <div class="about-imprint-card h-100">
+                      <div class="about-project-body">
+                        <h5 class="about-project-title mb-3">{{ _('imprint') | capitalize }}</h5>
+                        <div class="about-project-text">
+                          {{ main_project.imprint.display.label | safe }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
 
-            {% if main_project.legal_notice %}
-              <h5 class="mt-4">{{ _('legal notice') | capitalize }}</h5>
-              <p>{{ main_project.legal_notice.display.label | safe }}</p>
+                {% if main_project.legal_notice %}
+                  <div class="col-12 col-lg-6">
+                    <div class="about-imprint-card h-100">
+                      <div class="about-project-body">
+                        <h5 class="about-project-title mb-3">{{ _('legal notice') | capitalize }}</h5>
+                        <div class="about-project-text">
+                          {{ main_project.legal_notice.display.label | safe }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
             {% endif %}
           </div>
         </div>

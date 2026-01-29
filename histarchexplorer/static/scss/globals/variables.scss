@@ -46,10 +46,14 @@
   --card-bg: var(--light-card);
   --card-hover: var(--light-card-hover);
   --muuri-tile: var(--light-muuri-tile);
+
+  --about-light: white;
+  --about-dark: #2B3035;
 }
 
 
 body.light {
+  --about-bg: var(--about-light);
   --ov-bg: var(--ov-bg-light);
   --counters-bg: var(--counters-bg-light);
   --footer-bg: var(--footer-bg-light);
@@ -63,6 +67,7 @@ body.light {
 }
 
 body.dark {
+  --about-bg: var(--about-dark);
   --counters-bg: var(--counters-bg-dark);
   --footer-bg: var(--footer-bg-dark);
   --card-bg: var(--dark-card);
