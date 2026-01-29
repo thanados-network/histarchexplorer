@@ -78,7 +78,7 @@ def get_entities_count_by_case_study() -> Response:
     return jsonify(ApiAccess.get_entities_count_by_case_studies())
 
 
-@app.route("/refresh-cache/<int:id_>", methods=["POST"])
+@app.route("/refresh-cache/<int:id_>", methods=["GET", "POST"])
 @login_required
 def refresh_cache(id_: int) -> ResponseValue | tuple[ResponseValue, int]:
     try:
