@@ -1,26 +1,27 @@
+from typing import NamedTuple
+
 from flask import g
 
 
-def get_config_entities() -> tuple[str]:
+def get_config_entities() -> NamedTuple:
     g.cursor.execute(
-        f"""SELECT 
-            c.id,
-            c.name,
-            c.acronym,
-            c.description,
-            c.website,
-            c.legal_notice,
-            c.imprint,
-            c.class_id,
-            c.address, 
-            c.email,
-            c.image,      
-            c.orcid_id,
-            c.case_study_type_id,
-            cc.name as class_name 
-        FROM 
-            tng.entities as c
-        JOIN  tng.classes as cc ON c.class_id = cc.id;""")
+        """
+        SELECT c.id,
+               c.name,
+               c.acronym,
+               c.description,
+               c.website,
+               c.legal_notice,
+               c.imprint,
+               c.class_id,
+               c.address,
+               c.email,
+               c.image,
+               c.orcid_id,
+               c.case_study_type_id,
+               cc.name as class_name
+        FROM tng.entities as c
+                 JOIN tng.classes as cc ON c.class_id = cc.id;""")
     return g.cursor.fetchall()
 
 

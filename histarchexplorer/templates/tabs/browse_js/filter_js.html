@@ -108,7 +108,7 @@ if ({{ tab_name }}Data.caseStudies.length > 1) {
 
         li.innerHTML = `
         <input class="form-check-input" type="checkbox" value="${cls.id}" id="check-${cls.id}">
-        <label class="form-check-label" for="check-${cls.id}">${cls.name.replace('_', ' ')}</label>`;
+        <label class="form-check-label" for="check-${cls.id}">${cls.acronym.replace('_', ' ')}</label>`;
 
         csSelect{{ tab_name }}.appendChild(li);
     });

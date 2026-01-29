@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import argparse
+import concurrent.futures
 import time
 from typing import Any, Optional
 
 import requests
-import concurrent.futures
 
 from config.default import API_URL
 
@@ -15,19 +15,26 @@ MAX_WORKERS = 2
 
 def get_by_system_class(
         case_study_ids: Optional[list[int]] = None) -> list[dict[str, Any]]:
-    req = requests.get(
-        f"{API_URL}system_class/all",
-        params={
-            'type_id': case_study_ids or [],
-            'limit': 0,
-            'show': ["none"],
-            'format': "lpx"},
-        timeout=60).json()
+    query_params: dict[str, str | int | list[str] | list[int]] = {
+        'type_id': case_study_ids if case_study_ids is not None else [],
+        'limit': 0,
+        'show': ["none"],
+        'format': "lpx"}
+    try:
+        response = requests.get(
+            f"{API_URL}system_class/all",
+            params=query_params,
+            timeout=60)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('results', [])
 
-    return req['results']
+    except requests.RequestException as e:
+        print(f"API Error: {e}")
+        return []
 
 
-def refresh_entity_cache(entity_id: int):
+def refresh_entity_cache(entity_id: int) -> None:
     """Clear and rebuild cache for one entity via admin endpoint."""
     time.sleep(1)
     url = f"{API_BASE}/refresh-cache/{entity_id}"
@@ -37,7 +44,7 @@ def refresh_entity_cache(entity_id: int):
         print(f"Error refreshing {entity_id}: {e}")
 
 
-def warm_entity_cache(entity_id: int):
+def warm_entity_cache(entity_id: int) -> None:
     """Just trigger the cached endpoint."""
     time.sleep(1)
     url = f"{API_BASE}/presentation-view/{entity_id}"
@@ -47,7 +54,7 @@ def warm_entity_cache(entity_id: int):
         print(f"Error warming {entity_id}: {e}")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Warm or refresh entity cache.")
     parser.add_argument(

@@ -1,6 +1,6 @@
 import os
 import subprocess
-from typing import Optional
+from typing import Any, Optional
 
 from flask import (
     abort, current_app, flash, g, jsonify, redirect, render_template,
@@ -42,20 +42,25 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     if not tab and tabs:
         tab = tabs[0]['target']
-    for tab_ in tabs:
-        tab_['is_active'] = (tab_['target'] == tab)
+    for tab_item in tabs:
+        tab_item['is_active'] = tab_item['target'] == tab
 
-    initial_case_study_type_id = None
-    initial_case_study_type_name = None
+    cs_type_id: Optional[int] = None
+    cs_type_name: Optional[str] = None
+    case_study_children: list[dict[str, str]] | None = []
+
     if g.settings.case_study_type_id:
-        initial_case_study_type_id = int(g.settings.case_study_type_id)
-        details = Admin.get_openatlas_entity(initial_case_study_type_id)
-        if details:
-            initial_case_study_type_name = details.name
+        try:
+            cs_type_id = int(g.settings.case_study_type_id)
+            details = Admin.get_openatlas_entity(cs_type_id)
+            if details:
+                cs_type_name = details.name
 
-    case_study_children = find_children_by_id(
-        type_tree().get_json(),
-        initial_case_study_type_id)
+            case_study_children = find_children_by_id(
+                type_tree().get_json(),
+                cs_type_id)
+        except (ValueError, TypeError) as e:
+            app.logger.error(f"Error processing case study type ID: {e}")
 
     return render_template(
         "admin.html",
@@ -73,8 +78,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             if k not in app.config['CLASSES_TO_SKIP']},
         shown_classes=g.settings.shown_classes,
         hidden_classes=g.settings.hidden_classes,
-        initial_case_study_type_id=initial_case_study_type_id,
-        initial_case_study_type_name=initial_case_study_type_name,
+        initial_case_study_type_id=cs_type_id,
+        initial_case_study_type_name=cs_type_name,
         case_study_children=case_study_children)
 
 
@@ -91,13 +96,33 @@ def delete_link(link_id: int, tab: str, entry: str) -> Response:
 @login_required
 def add_link() -> Response:
     check_manager_user()
-    Admin.add_link({
-        'domain': int(request.args.get('domain')),
-        'range': int(request.args.get('range')),
-        'prop': int(request.args.get('property')),
-        'role': int(request.args.get('role')),
-        'sortorder': Admin.check_sortorder()})
-    flash(_('Link added successfully'), 'success')
+
+    try:
+        raw_domain = request.args.get('domain')
+        raw_range = request.args.get('range')
+        raw_prop = request.args.get('property')
+        raw_role = request.args.get('role', '0')
+
+        if (raw_domain is not None and
+                raw_range is not None and
+                raw_prop is not None):
+
+            link_data = {
+                'domain': int(raw_domain),
+                'range': int(raw_range),
+                'prop': int(raw_prop),
+                'role': int(raw_role),
+                'sortorder': Admin.check_sortorder()}
+
+            Admin.add_link(link_data)
+            flash(_('Link added successfully'), 'success')
+        else:
+            raise ValueError("Missing required link parameters")
+
+    except (ValueError, TypeError) as e:
+        app.logger.warning(f"Invalid link attempt: {e}")
+        flash(_('Failed to add link: Invalid data provided'), 'error')
+
     return redirect(
         url_for(
             'admin',
@@ -110,7 +135,7 @@ def add_link() -> Response:
 def add_entry() -> Response:
     check_manager_user()
     case_study_str = request.form.get('case_study')
-    form_data = {
+    form_data: dict[str, str | int] = {
         'category': request.form.get('category', ''),
         'name': request.form.get('name', ''),
         'acronym': request.form.get('acronym', ''),
@@ -124,7 +149,7 @@ def add_entry() -> Response:
         'legal_notice': request.form.get('legal_notice', ''),
         'case_study': int(case_study_str)
         if case_study_str and case_study_str.isdigit() else 0}
-    current_tab = 'nav-' + form_data['category']
+    current_tab = f'nav-{form_data["category"]}'
     redirect_base = url_for('admin') + current_tab
     try:
         new_id = Admin.add_entry(form_data)
@@ -156,12 +181,20 @@ def delete_entry(id_: int, tab: str) -> Response:
 @login_required
 def edit_entry() -> Response:
     check_manager_user()
-    case_study_raw = request.form.get('case_study')
-    case_study = int(case_study_raw) if case_study_raw else None
-    print(request.form)
-    form_data = {
-        'config_id': request.form.get('config_id', type=int),
-        'name': request.form.get('name', ''),
+
+    config_id = request.form.get('config_id', type=int)
+    name = request.form.get('name', '')
+    cs_raw = request.form.get('case_study')
+    case_study: int | None = int(cs_raw) \
+        if cs_raw and cs_raw.isdigit() else None
+
+    if config_id is None:
+        flash(_('Configuration ID is required'), 'danger')
+        return redirect(url_for('admin'))
+
+    form_data: dict[str, str | int] = {
+        'config_id': config_id,
+        'name': name,
         'acronym': request.form.get('acronym', ''),
         'email': request.form.get('email', ''),
         'website': request.form.get('website', ''),
@@ -172,14 +205,15 @@ def edit_entry() -> Response:
         'imprint': request.form.get('imprint', ''),
         'legal_notice': request.form.get('legal_notice', ''),
         'case_study': case_study}
+
     try:
         Admin.edit_entry(form_data)
-        flash(f'"{form_data["name"]}" updated successfully', 'success')
-    except EntryNotFound:
-        flash(f'No config entry found with ID {form_data["config_id"]}',
-              'danger')
+        flash(_('"%(name)s" updated successfully', name=name), 'success')
     except Exception as e:
-        flash(f'Error updating "{form_data["name"]}": {e}', 'danger')
+        app.logger.error(f"Entry update failed: {e}")
+        flash(
+            _('Error updating "%(name)s": %(error)s',
+              name=name, error=str(e)), 'danger')
 
     return redirect(
         url_for(
@@ -192,25 +226,39 @@ def edit_entry() -> Response:
 @login_required
 def edit_map() -> Response:
     check_manager_user()
-    form_data = {
-        'name': request.form.get('name'),
-        'display_name': request.form.get('displayname'),
-        'sortorder': request.form.get('inputorder'),
-        'tilestring': request.form.get('description'),
-        'map_id': request.form.get('map_id')}
 
-    if not form_data['map_id']:
-        flash('Map ID is required', 'danger')
-        return redirect(url_for('admin'))
-    if not check_if_map_id_exist(int(form_data['map_id'])):
-        flash(f'Map with ID {form_data["map_id"]} not found', 'danger')
+    raw_map_id = request.form.get('map_id')
+    name = request.form.get('name', '')
+    display_name = request.form.get('displayname', '')
+    sort_order = request.form.get('inputorder', '0')
+    tile_string = request.form.get('description', '')
+
+    if not raw_map_id:
+        flash(_('Map ID is required'), 'danger')
         return redirect(url_for('admin'))
 
     try:
+        map_id = int(raw_map_id)
+        if not check_if_map_id_exist(map_id):
+            flash(_(f'Map with ID {map_id} not found'), 'danger')
+            return redirect(url_for('admin'))
+
+        form_data: dict[str, str] = {
+            'name': name,
+            'display_name': display_name,
+            'sortorder': sort_order,
+            'tilestring': tile_string,
+            'map_id': str(map_id)}
+
         Admin.update_map(form_data)
-        flash('Map updated successfully', 'success')
+        flash(_('Map updated successfully'), 'success')
+
+    except ValueError:
+        flash(_('Invalid Map ID format'), 'danger')
     except Exception as e:
-        flash(f'Error updating map {form_data["map_id"]}: {e}', 'danger')
+        app.logger.error(f"Map update failed: {e}")
+        flash(_('Error updating map: %(error)s', error=str(e)), 'danger')
+
     return redirect(url_for('admin'))
 
 
@@ -218,18 +266,32 @@ def edit_map() -> Response:
 @login_required
 def add_map() -> Response:
     check_manager_user()
-    data = {
-        'name': request.form.get('name'),
-        'display_name': request.form.get('displayname'),
-        'sort_order': request.form.get('inputorder'),
-        'tile_string': request.form.get('description')}
+
+    name = request.form.get('name')
+    display_name = request.form.get('displayname')
+    sort_order = request.form.get('inputorder', '0')
+    tile_string = request.form.get('description')
+
+    if not name or not display_name or not tile_string:
+        flash(
+            _('Error: Name, Display Name and Description are required'),
+            'danger')
+        return redirect(url_for('admin'))
+
+    data: dict[str, str] = {
+        'name': name,
+        'display_name': display_name,
+        'sort_order': sort_order,
+        'tile_string': tile_string}
     try:
         map_id = Admin.add_new_map(data)
         flash(
             f"Map {data['name']} with ID {map_id} added successfully!",
             'success')
     except Exception as e:
+        app.logger.error(f"Failed to add map: {e}")
         flash(f"Error adding map {data['name']}: {e}", 'danger')
+
     return redirect(url_for('admin'))
 
 
@@ -249,12 +311,24 @@ def delete_map(map_id: int) -> Response:
 @login_required
 def choose_index_background() -> Response:
     check_manager_user()
-    settings = {
-        'index_map': request.form.get('mapselection'),
-        'index_img': request.form.get('default_img'),
-        'img_map': request.form.get('imgmap'),
-        'greyscale': request.form.get('greyscale') == 'on'}
-    Admin.set_index_background(settings)
+
+    index_map = request.form.get('mapselection', '')
+    index_img = request.form.get('default_img', '')
+    img_map = request.form.get('imgmap', '')
+    greyscale = request.form.get('greyscale') == 'on'
+
+    settings: dict[str, Any] = {
+        'index_map': index_map,
+        'index_img': index_img,
+        'img_map': img_map,
+        'greyscale': greyscale}
+    try:
+        Admin.set_index_background(settings)
+        flash(_('Index background updated successfully'), 'success')
+    except Exception as e:
+        app.logger.error(f"Failed to set index background: {e}")
+        flash(_('Error updating settings'), 'error')
+
     return redirect(url_for('admin'))
 
 
@@ -311,7 +385,7 @@ def reset() -> Response:
     return redirect(url_for('admin'))
 
 
-def make_reset():
+def make_reset() -> None:
     env = os.environ.copy()
     env['PGPASSWORD'] = current_app.config['DATABASE_PASS']
     subprocess.run([
@@ -327,7 +401,7 @@ def make_reset():
 
 @app.route('/admin/clear-cache')
 @login_required
-def clear_cache():
+def clear_cache() -> Response:
     cache.clear()
     flash(_('cache cleared'), 'success')
     return redirect(url_for('admin'))
@@ -335,7 +409,7 @@ def clear_cache():
 
 @app.route("/admin/warm-entity-cache")
 @login_required
-def warm_entity_cache():
+def warm_entity_cache() -> Response:
     trigger_cache_warmup(False)
     flash(_("Cache warmup started in background (refresh mode)"), 'success')
     return redirect(url_for('admin'))
@@ -343,35 +417,34 @@ def warm_entity_cache():
 
 @app.route("/admin/refresh-entity-cache")
 @login_required
-def refresh_entity_cache():
+def refresh_entity_cache() -> Response:
     trigger_cache_warmup(True)
     flash(_("Cache warmup started in background."), 'success')
     return redirect(url_for('admin'))
 
 
-def trigger_cache_warmup(refresh: bool = False):
+def trigger_cache_warmup(refresh: bool = False) -> None:
     """Trigger external cache warm-up process."""
     try:
-        args = ["python3", "warm_entity_cache.py"]
-        print(' '.join([str(ids) for ids in g.case_study_ids]))
+        args: list[str] = ["python3", "warm_entity_cache.py"]
         if refresh:
             args.append("--refresh")
-        if g.case_study_ids:
-            args.append(
-                "--case-studies "
-                f"{' '.join([str(ids) for ids in g.case_study_ids])}")
-        subprocess.Popen(
-            args,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL)
+        if hasattr(g, "case_study_ids") and g.case_study_ids:
+            ids_str: str = " ".join(str(i) for i in g.case_study_ids)
+            args.extend(["--case-studies", ids_str])
+        with subprocess.Popen(
+                args,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL) as _proc:
+            pass
     except Exception as e:
         flash(str(e), "error")
-        return abort(404)
+        abort(404)
 
 
 @app.route('/admin/refresh-system-cache')
 @login_required
-def refresh_system_cache():
+def refresh_system_cache() -> Response:
     cache.delete_memoized(ApiAccess.get_type_tree)
     cache.delete_memoized(ApiAccess.get_files_of_entities)
     cache.delete_memoized(ApiAccess.get_system_class_count)

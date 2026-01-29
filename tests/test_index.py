@@ -1,12 +1,13 @@
+from flask.testing import FlaskClient
 
-def test_index_page(client):
+
+def test_index_page(client: FlaskClient) -> None:
     rv = client.get('/')
     assert rv.status_code == 200
     assert b"SEARCH" in rv.data
 
 
-
-def test_set_language_view(client):
+def test_set_language_view(client: FlaskClient) -> None:
     test_language = 'de'
     referrer_url = '/'
     response = client.get(
@@ -16,5 +17,3 @@ def test_set_language_view(client):
     assert response.location == referrer_url
     with client.session_transaction() as session:
         assert session['language'] == test_language
-
-

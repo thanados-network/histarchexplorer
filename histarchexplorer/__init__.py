@@ -9,8 +9,8 @@ from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
 from histarchexplorer.database.settings import get_main_image_table
-from histarchexplorer.models.config import (ConfigEntity, Link, Properties,
-                                            get_config_classes)
+from histarchexplorer.models.config import (
+    ConfigEntity, Link, Properties, get_config_classes)
 from histarchexplorer.models.search import SearchService
 from histarchexplorer.models.settings import Settings
 
@@ -82,7 +82,7 @@ def get_sidebar_icons() -> dict[int, str]:
     return icons
 
 
-def get_type_divisions():
+def get_type_divisions() -> dict[Any, dict[str, Any]]:
     out = {}
     for label, value in app.config['TYPE_DIVISIONS'].items():
         icon = ''

@@ -3,6 +3,7 @@ from typing import Any, Optional
 
 from flask import g
 
+from histarchexplorer.models.config import ConfigEntity
 from histarchexplorer.database.admin import (
     add_entry, add_link, add_new_map,
     check_sortorder, delete_entry,
@@ -20,6 +21,7 @@ class EntryNotFound(Exception):
     pass
 
 
+# pylint: disable=too-many-public-methods
 class Admin:
     class TooManyMainProjects(Exception):
         pass
@@ -49,11 +51,11 @@ class Admin:
         return update_map(data)
 
     @staticmethod
-    def add_entry(data: dict) -> int:
+    def add_entry(data: dict[str, str | int]) -> int:
         return add_entry(data)
 
     @staticmethod
-    def edit_entry(data: dict) -> None:
+    def edit_entry(data: dict[str, str | int]) -> None:
         return update_config_entry(data)
 
     @staticmethod
@@ -81,55 +83,62 @@ class Admin:
         return get_maps()
 
     @staticmethod
-    def _has_translation(entity, field_key) -> bool:
+    def _has_translation(entity: ConfigEntity, field_key: str) -> bool:
         value_attr = getattr(entity, field_key, None)
 
         if isinstance(value_attr, dict) and 'display' in value_attr:
             return bool(value_attr['display'].get(g.language))
-        elif value_attr is not None:
+        if value_attr is not None:
             return True
         return False
 
+    # Todo: "This entry has no translation for" is always shown, even if there
+    #   is a translation
     @staticmethod
     def process_entities_by_tab(
-            tabs: list[dict],
+            tabs: list[dict[str, str]],
             entry: Optional[str]) -> dict[str, list[dict[str, Any]]]:
-        result = {}
+        result: dict[str, list[dict[str, Any]]] = {}
         for t_data in tabs:
             tab_id = t_data['id']
             tab_target = t_data['target']
             fields_for_tab = g.admin_fields.get(tab_target, [])
-            filtered = []
-            for entity in filter(
-                    lambda e: e.class_id == tab_id, g.config_entities):
-                entity_dict = {'id': entity.id, 'class_id': entity.class_id}
+            filtered: list[dict[str, Any]] = []
+            relevant_entities = [
+                e for e in g.config_entities if e.class_id == tab_id]
+
+            for entity in relevant_entities:
+                entity_dict: dict[str, Any] = {
+                    'id': entity.id,
+                    'class_id': entity.class_id}
+
                 for field_config in fields_for_tab:
                     field_key = field_config['key']
-                    is_translatable = field_config.get('translatable', False)
-                    if is_translatable:
-                        entity_dict[f"{field_key}_has_current_translation"] = \
-                            Admin._has_translation(entity, field_key)
+                    is_trans = field_config.get('translatable', False)
+
+                    if is_trans:
+                        has_trans = Admin._has_translation(entity, field_key)
                     else:
-                        entity_dict[
-                            f"{field_key}_has_current_translation"] = bool(
-                            getattr(entity, field_key, None))
+                        has_trans = bool(getattr(entity, field_key, None))
 
-                    raw_field_value = getattr(entity, field_key, None)
+                    entity_dict[
+                        f"{field_key}_has_current_translation"] = has_trans
 
-                    if (is_translatable and isinstance(raw_field_value, dict)
-                            and 'display' in raw_field_value):
+                    raw_val = getattr(entity, field_key, None)
+
+                    if (is_trans and isinstance(raw_val, dict)
+                            and 'display' in raw_val):
                         entity_dict[f"{field_key}_display_label"] = (
-                            raw_field_value['display'].get('label', ''))
-                        entity_dict[field_key] = raw_field_value
-                    elif raw_field_value is not None:
-                        entity_dict[f"{field_key}_display_label"] = \
-                            raw_field_value
-                        entity_dict[field_key] = raw_field_value
+                            raw_val['display'].get('label', ''))
+                        entity_dict[field_key] = raw_val
+                    elif raw_val is not None:
+                        entity_dict[f"{field_key}_display_label"] = raw_val
+                        entity_dict[field_key] = raw_val
                     else:
                         entity_dict[f"{field_key}_display_label"] = ''
                         entity_dict[field_key] = None
 
-                is_active = (tab_target + str(entity.id) == entry)
+                is_active = tab_target + str(entity.id) == entry
                 entity_dict.update({
                     'is_active_entry': is_active,
                     'is_collapsed_entry': not is_active,
@@ -137,7 +146,7 @@ class Admin:
 
                 filtered.append(entity_dict)
             result[tab_target] = filtered
-        return dict(result)
+        return result
 
     @staticmethod
     def process_links_by_entity() -> dict[int, list[dict[str, Any]]]:
@@ -156,7 +165,7 @@ class Admin:
 
     @staticmethod
     def process_properties_by_tab(
-            tabs: list[dict]) -> dict[str, list[dict[str, Any]]]:
+            tabs: list[dict[str, str]]) -> dict[str, list[dict[str, Any]]]:
         result = {}
         for t_data in tabs:
             tab_id = t_data['id']

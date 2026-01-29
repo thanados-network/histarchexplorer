@@ -1,10 +1,12 @@
+from typing import Any
+
 from flask import g, render_template
 
 from histarchexplorer import app
 from histarchexplorer.views.views import type_tree
 
 
-def get_recursive_type_ids(id):
+def get_recursive_type_ids(id_: int) -> dict[str, Any]:
     sql = """
             (WITH RECURSIVE children_chain AS (
             -- Anchor: start with the given id as the root
@@ -24,14 +26,13 @@ def get_recursive_type_ids(id):
         FROM children_chain
         ORDER BY level, id)
     """
-    g.cursor.execute(sql, {'id': id})
-    result = g.cursor.fetchall()
+    g.cursor.execute(sql, {'id': id_})
     #print('result get_recursive_type_ids(id)')
     #print(result)
-    return result
+    return g.cursor.fetchall()
 
 
-def build_id_collection(ids):
+def build_id_collection(ids: list[int]) -> list[str]:
     if not ids:
         return []
 
@@ -45,17 +46,20 @@ def build_id_collection(ids):
     return result
 
 
-def get_browse_list_entities(id=None):
+# pylint: disable=too-many-locals
+def get_browse_list_entities(
+        id_: int) -> dict[str, str | int | list[Any] | dict[str, Any]] | None:
 
     #per default the whitelist ids are shown
     shown_ids = g.settings.shown_ids
 
     #if an id is given the p46 children are requested (Possible future dev: define another param - property code - to get other connections to be shown)
-    if id:
+    if id_:
         sql = """
-        SELECT range_id from model.link where property_code = 'P46'  AND domain_id = %(id)s
+        SELECT range_id from model.link 
+        WHERE property_code = 'P46'  AND domain_id = %(id)s
         """
-        g.cursor.execute(sql, {'id': id})
+        g.cursor.execute(sql, {'id': id_})
         shown_ids = g.cursor.fetchall()
         if not shown_ids:
             return None
@@ -234,7 +238,8 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
                 -- 3. Try any available language key
                 t.description ->> (SELECT key FROM jsonb_each(t.description) LIMIT 1)
             ) AS description,
-            t.case_study_type_id AS cs_id
+            t.case_study_type_id AS cs_id,
+            t.acronym AS acronym
         FROM
             tng.entities AS t
         WHERE
@@ -250,6 +255,7 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
             WHERE range_id = %(cs_id)s
               AND property_code = 'P2';
         """
+
         for case_study in shown_case_studies:
             g.cursor.execute(sql_case_studies, {'cs_id':case_study})
             results = g.cursor.fetchone()
@@ -258,6 +264,9 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
                 if row.cs_id == cs['id']:
                     if row.name:
                         cs['name'] = row.name
+                        cs['acronym'] = row.name
+                    if row.acronym:
+                        cs['acronym'] = row.acronym
                     if row.description:
                         cs['description'] = row.description
             data['cs_ids'].append(cs)
@@ -270,8 +279,8 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
 
 
 # get entities and return the template
-def return_entities(tab_name, id):
-    data = get_browse_list_entities(id)
+def return_entities(tab_name: str, id_: int) -> str:
+    data = get_browse_list_entities(id_)
 
     filtered_view_classes = {
         key: tuple(list(d.keys())[0] for d in value)
@@ -287,9 +296,7 @@ def return_entities(tab_name, id):
         for i, key in enumerate(data['counts'].keys())
     ]
 
-
-
-    if tab_name == "" and sidebar_elements:
+    if not tab_name and sidebar_elements:
         tab_name = sidebar_elements[0]['route']
 
     return render_template(
@@ -306,15 +313,13 @@ def return_entities(tab_name, id):
 
 @app.route('/entities')
 @app.route('/entities/<tab_name>')
-@app.route('/entities/<tab_name>/<id>')
-def entities(tab_name="", id=None) -> str:
-    return return_entities(tab_name, id)
-
-
+@app.route('/entities/<tab_name>/<int:id_>')
+def entities(tab_name: str | None = None, id_: int | None = None) -> str:
+    return return_entities(tab_name, id_)
 
 
 @app.route('/get_entities/<tab_name>')
 def get_entities(tab_name: str) -> str:
     return render_template(
-        f'tabs/browse.html',
+        'tabs/browse.html',
         tab_name=tab_name)

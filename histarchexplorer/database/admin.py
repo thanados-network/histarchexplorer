@@ -1,7 +1,7 @@
 import json
 from typing import Any, NamedTuple
 
-from flask import g
+from flask import abort, g
 import bleach
 
 ALLOWED_HTML_TAGS = [
@@ -167,12 +167,12 @@ def delete_entry(id_: int) -> None:
         {'id': id_})
 
 
-def add_entry(data: dict) -> int:
+def add_entry(data: dict[str, str | int]) -> int:
     config_class = g.config_classes_map.get(data['category'])
     if config_class is None:
         raise ValueError(f"Unknown category {data['category']}")
     if config_class == 5 and check_if_main_project_exist():
-        raise 404
+        abort(404)
     g.cursor.execute(
         """
         INSERT INTO tng.entities
@@ -201,10 +201,10 @@ def add_entry(data: dict) -> int:
     return id_
 
 
-def update_config_entry(data: dict) -> None:
+def update_config_entry(data: dict[str, str | int]) -> None:
     config_id = data['config_id']
-    if not check_if_config_entry_exist(config_id):
-        raise 404
+    if not check_if_config_entry_exist(int(config_id)):
+        abort(404)
     g.cursor.execute(
         """
         UPDATE tng.entities
@@ -217,16 +217,16 @@ def update_config_entry(data: dict) -> None:
         WHERE id = %(config_id)s
         """,
         data)
-    _upsert_jsonb_fields(config_id, data)
+    _upsert_jsonb_fields(int(config_id), data)
 
 
-def _upsert_jsonb_fields(config_id: int, data: dict) -> None:
+def _upsert_jsonb_fields(config_id: int, data: dict[str, str | int]) -> None:
     language = g.language
     valid_cols = {'address', 'description', 'imprint', 'legal_notice', 'name'}
     for col in valid_cols:
         val = data.get(col, '')
         if col in ('description', 'imprint', 'legal_notice') and val:
-            val = sanitize_richtext(val)
+            val = sanitize_richtext(str(val))
         if val:
             g.cursor.execute(
                 f"""
@@ -261,7 +261,7 @@ def check_sortorder() -> int:
     return g.cursor.fetchone()[0]
 
 
-def get_openatlas_entity(id_) -> NamedTuple:
+def get_openatlas_entity(id_: int) -> NamedTuple:
     g.cursor.execute(
         '''
         SELECT id, name, openatlas_class_name

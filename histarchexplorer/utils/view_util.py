@@ -19,7 +19,7 @@ _('about')
 
 
 @app.template_filter("domain")
-def domain_filter(url):
+def domain_filter(url: str) -> str:
     return urlsplit(url).netloc
 
 
@@ -32,30 +32,43 @@ def inject_menu() -> dict[str, Any]:
     return {'navbar': navbar}
 
 
-def find_children_by_id(data, target_id):
-    result = []
+def find_children_by_id(
+        data: dict[str, Any],
+        target_id: Optional[int]) -> list[dict[str, str]] | None:
+    result: list[dict[str, str]] = []
 
-    def collect_descendants(children, depth=1):
+    if target_id is None:
+        return result
+
+    def collect_descendants(
+            children: list[dict[str, Any]],
+            depth: int = 1) -> None:
         for child in children:
             prefix = '-' * depth
-            name = child['name']
-            result.append({'id': child['id'], 'name': f"{prefix}{name}"})
-            if 'children' in child and child['children']:
-                collect_descendants(child['children'], depth + 1)
+            name = child.get('name', 'Unknown')
+            result.append({'id': str(child['id']), 'name': f"{prefix}{name}"})
+            sub_children = child.get('children')
+            if isinstance(sub_children, list) and sub_children:
+                collect_descendants(sub_children, depth + 1)
 
-    def recursive_search(node):
+    def recursive_search(node: Any) -> bool:
         if isinstance(node, dict):
-            if node.get('id') == target_id:
-                collect_descendants(node.get('children', []), depth=1)
+            node_id = node.get('id')
+            if node_id is not None and int(node_id) == target_id:
+                children = node.get('children')
+                if isinstance(children, list):
+                    collect_descendants(children)
                 return True
-            for key in node:
-                if recursive_search(node[key]):
+
+            for value in node.values():
+                if recursive_search(value):
                     return True
+
         elif isinstance(node, list):
             for item in node:
                 if recursive_search(item):
                     return True
-        return False  # pragma: no cover
+        return False
 
     recursive_search(data)
     return result

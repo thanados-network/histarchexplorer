@@ -104,6 +104,7 @@ for (const csId of {{ tab_name }}matchingCsIds) {
         {{ tab_name }}Data.caseStudies.push({
             id: csObject.id,
             name: csObject.name,
+            acronym: csObject.acronym || null,
             description: csObject.description || null // Description is optional
         });
     }

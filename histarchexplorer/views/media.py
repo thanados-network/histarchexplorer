@@ -13,10 +13,9 @@ def view_media(render_type: str, id_: int) -> str:
         case 'video':
             template = render_template('viewer/video.html', file_id=id_)
         case 'pdf':
-            return render_template("viewer/pdf.html", file_id=id_)
+            template = render_template("viewer/pdf.html", file_id=id_)
         case 'svg':
-            return render_template("viewer/svg.html", file_id=id_)
+            template = render_template("viewer/svg.html", file_id=id_)
         case _:
-            template = f"Unsupported render type: {render_type}", 400
-
+            template = f"Unsupported render type: {render_type}"
     return template

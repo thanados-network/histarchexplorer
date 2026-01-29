@@ -5,8 +5,8 @@ from typing import Any
 from flask import g
 
 from histarchexplorer.database.about import get_config_entities
-from histarchexplorer.database.admin import get_config_links, \
-    get_config_properties
+from histarchexplorer.database.admin import (get_config_links,
+                                             get_config_properties)
 from histarchexplorer.database.config_classes import get_config_classes_sql
 
 
@@ -22,13 +22,13 @@ class Link:
     link_id: int
     sortorder: int
     start_id: int
-    start_name: dict[str, str | dict[str, str]]
-    config_property: dict[str, str | dict[str, str]]
+    start_name: dict[str, dict[str, str | None]]
+    config_property: dict[str, dict[str, str | None]]
     property_id: int
     direction: str
-    end_name: dict[str, str | dict[str, str]]
+    end_name: dict[str, dict[str, str | None]]
     end_id: int
-    role: dict[str, str | dict[str, str]]
+    role: dict[str, dict[str, str | None]]
     role_id: int
 
     @classmethod
@@ -53,7 +53,7 @@ class Link:
 @dataclass()
 class Properties:
     id: int
-    name: dict[str, str | dict[str, str]]
+    name: dict[str, dict[str, str | None]]
     domain: int
     range: int
     direction: str
@@ -71,17 +71,18 @@ class Properties:
         return properties
 
 
+# pylint: disable=too-many-instance-attributes
 @dataclass()
 class ConfigEntity:
     id: int
-    name: dict[str, str | dict[str, str]]
+    name: dict[str, dict[str, str | None]]
     acronym: str
-    description: dict[str, str | dict[str, str]]
+    description: dict[str, dict[str, str | None]]
     website: str
-    legal_notice: dict[str, str | dict[str, str]]
-    imprint: dict[str, str | dict[str, str]]
+    legal_notice: dict[str, dict[str, str | None]]
+    imprint: dict[str, dict[str, str | None]]
     class_id: int
-    address: dict[str, str | dict[str, str]]
+    address: dict[str, dict[str, str | None]]
     email: str
     image: str
     orcid_id: str
@@ -120,7 +121,7 @@ class ConfigEntity:
     def group_by_class_name(
             cls,
             entities: list['ConfigEntity']) -> dict[str, list['ConfigEntity']]:
-        grouped = {}
+        grouped: dict[str, list[ConfigEntity]] = {}
         for entity in entities:
             grouped.setdefault(entity.class_name, []).append(entity)
         return grouped
@@ -134,7 +135,8 @@ class ConfigEntity:
 #     for domain_id, attribute in attributes:
 #         if attribute:
 #             result[domain_id].append(localize(attribute))
-#     for range_id, attribute in get_project_attributes_sql_inverse(id_, config_class_id):
+#     for range_id, attribute in get_project_attributes_sql_inverse(id_,
+#     config_class_id):
 #         if attribute:
 #             result[range_id].append(localize(attribute))
 #     return dict(result)
@@ -172,7 +174,8 @@ def localize(data: dict[str, str] | None) -> str | None:
     return None
 
 
-def add_display(data: dict[str, Any] | None) -> dict[str, Any]:
+def add_display(data: dict[str, Any] | None) \
+        -> dict[str, dict[str, str | None]]:
     if not data:
         return {'display': {'language': None, 'label': ''}}
 

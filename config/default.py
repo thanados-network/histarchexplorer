@@ -6,7 +6,6 @@ try:
 except ImportError:
     redis = None  # type: ignore
 
-
 # Application metadata
 VERSION = '0.3.0'
 LANGUAGES = {'de': 'Deutsch', 'en': 'English'}  # Supported languages
@@ -36,12 +35,12 @@ API_TOKEN = ''
 CACHE_DEFAULT_TIMEOUT = 360000
 
 
-def redis_available(url="redis://127.0.0.1:6379/0"):
+def redis_available(url: str = "redis://127.0.0.1:6379/0") -> bool:
     if redis is None:
         return False
 
     try:
-        r = redis.from_url(url)
+        r = redis.from_url(url)  # type: ignore
         r.ping()
         return True
     except Exception:
@@ -82,7 +81,6 @@ VIEW_CLASSES = {
 
 ADD_FILES_FOR_OVERVIEW = 2
 
-
 # Categorization of entity types with icons
 TYPE_DIVISIONS = {
     'administrative unit': {
@@ -112,8 +110,8 @@ TYPE_DIVISIONS = {
     'case study': {
         'ids': [8240],
         'icon': ('css', 'bi bi-house')
+        }
     }
-}
 
 # Icons displayed in sidebar, mapped to entity IDs
 SIDEBAR_ICONS = {
@@ -124,8 +122,9 @@ SIDEBAR_ICONS = {
         'bi bi-geo-alt-fill': [22378, 73],
         'bi bi-house-door': [26197],
         'bi bi-geo-yelp': [13362],
-        # 'bi bi-person-arms-up': [218963, 213216, 119444, 119334], # Anthropology
-    }}
+        # 'bi bi-person-arms-up': [218963, 213216, 119444, 119334],
+        # Anthropology
+        }}
 
 # Sidebar menu items and order
 SIDEBAR_OPTIONS = [
@@ -134,6 +133,4 @@ SIDEBAR_OPTIONS = [
     {'order': 3, 'route': 'media', 'icon': 'bi bi-images'},
     {'order': 4, 'route': 'catalogue', 'icon': 'bi bi-journal-text'},
     {'order': 5, 'route': 'subunits', 'icon': 'bi bi-diagram-3'},
-]
-
-
+    ]

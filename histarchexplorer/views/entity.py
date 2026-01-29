@@ -8,10 +8,8 @@ from flask import abort, g, render_template
 from histarchexplorer import app
 from histarchexplorer.api.presentation_view import (
     EntityTypeModel, File, PresentationView, Relation)
-from histarchexplorer.database.entity import (
-    check_if_place_hierarchy, get_first_geom)
-from histarchexplorer.utils.view_util import get_cite_button, \
-    get_refresh_button
+from histarchexplorer.utils.view_util import (
+    get_cite_button, get_refresh_button)
 from histarchexplorer.views.entities import get_browse_list_entities
 from histarchexplorer.views.views import type_tree
 
@@ -19,12 +17,12 @@ from histarchexplorer.views.views import type_tree
 @app.route('/entity/<int:id_>')
 @app.route('/entity/<int:id_>/<tab_name>')
 def entity_view(id_: int, tab_name: str = "overview") -> str:
-    sidebar_elements = app.config['SIDEBAR_OPTIONS']
-    if tab_name not in {item['route'] for item in sidebar_elements}:
+    sidebar = app.config['SIDEBAR_OPTIONS']
+    if tab_name not in {item['route'] for item in sidebar}:
         abort(404)
     return render_template(
         'entity.html',
-        sidebar_elements=build_sidebar(id_, sidebar_elements),
+        sidebar_elements=sorted(sidebar, key=lambda item: item['order']),
         data=entity_data(id_),
         page_name="landing",
         active_tab=tab_name,
@@ -51,7 +49,7 @@ def get_entity_images(
 
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
-def get_entity(id_: int, tab_name=None) -> str:
+def get_entity(id_: int, tab_name: str) -> str:
     if tab_name == 'subunits':
         subunit_data = get_browse_list_entities(id_)
         filtered_view_classes = {
@@ -59,7 +57,7 @@ def get_entity(id_: int, tab_name=None) -> str:
             for key, value in subunit_data['counts'].items()}
 
         return render_template(
-            f'tabs/browse.html',
+            'tabs/browse.html',
             subunits=True,
             filtered_view_classes=filtered_view_classes,
             subunit_data=subunit_data,
@@ -69,7 +67,7 @@ def get_entity(id_: int, tab_name=None) -> str:
             tab_name='subunits')
 
     match tab_name:
-        case 'feature':  # pragma: no cover
+        case 'feature':
             pass
         case 'map':
             pass
@@ -86,8 +84,8 @@ def get_entity(id_: int, tab_name=None) -> str:
 def get_features_for_map(
         e: PresentationView,
         hierarchy: Optional[dict[str, Any]] = None) \
-        -> list[Optional[dict[str, Any]]]:
-    map_data = []
+        -> list[dict[str, str | int] | None]:
+    map_data: list[Optional[dict[str, str | int]]] = []
     first_geom = None
     if e.geometry_json:
         map_data.extend(
@@ -96,11 +94,13 @@ def get_features_for_map(
     elif hierarchy:
         first_geom = get_parent_geometry_id(hierarchy['root'])
 
-    for k in ['place',
-              'feature',
-              'stratigraphic_unit',
-              'artifact',
-              'human_remains']:
+    sub_relations = [
+        'place',
+        'feature',
+        'stratigraphic_unit',
+        'artifact',
+        'human_remains']
+    for k in sub_relations:
         for rel in e.relations.get(k, []):
             if rel.geometry_json:
                 map_data.extend(adapt_map_dict(
@@ -110,26 +110,6 @@ def get_features_for_map(
                     rel.system_class,
                     first_geom))
     return map_data
-
-
-def check_sidebar_elements(tab: str, id_: int) -> bool:
-    return True
-    match tab:
-        case 'map':
-            return bool(get_first_geom(id_))
-        case 'subunits':
-            return bool(check_if_place_hierarchy(id_))
-        case 'overview' | 'media':
-            return True
-        case _:
-            return False
-
-
-def build_sidebar(id_: int, sidebar_elements: dict[str, Any]):
-    return sorted(
-        (item for item in sidebar_elements if check_sidebar_elements(
-            item.get('route'), id_)),
-        key=lambda item: item['order'])
 
 
 def get_parent_geometry(hierarchy: list[Relation]) -> dict[str, Any]:
@@ -153,7 +133,7 @@ def adapt_map_dict(
         name: str,
         id_: int,
         system_class: str,
-        first_geom: Optional[int] = None) -> list[dict[str, Any]]:
+        first_geom: Optional[int] = None) -> list[dict[str, str | int]]:
     features = []
     if geom.get('type') == 'FeatureCollection':
         features.extend(geom['features'])
@@ -197,7 +177,7 @@ def get_categorized_types(
 
 
 def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
-    root = []
+    root: list[Optional[Relation]] = []
     match main_entity.system_class:
         case 'feature':
             if ('place' in main_entity.relations
@@ -229,33 +209,27 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
     return root
 
 
-def get_sub_count(main_entity: PresentationView, ent_id) -> int:
+def get_sub_count(main_entity: PresentationView) -> dict[str, int | list[int]]:
     sub_relations_map = {
         'place': ['feature'],
         'feature': ['stratigraphic_unit'],
         'stratigraphic_unit': ['artifact', 'human_remains'],
         'artifact': ['artifact'],
-        'human_remains': ['human_remains'],
-    }
-
+        'human_remains': ['human_remains']}
     count = 0
     ids = []
-
-    print(ent_id)
     for rel_type in sub_relations_map.get(main_entity.system_class, []):
         for rel in main_entity.relations.get(rel_type, []):
             count += sum(
                 1
                 for rt in rel.relation_types
-                if rt.get("relationTo") == ent_id
-                and rt.get("property") == "crm:P46i_forms_part_of"
-            )
+                if rt.get("relationTo") == main_entity.id
+                and rt.get("property") == "crm:P46i_forms_part_of")
             for rt in rel.relation_types:
-                if rt.get("relationTo") == ent_id and rt.get("property") == "crm:P46i_forms_part_of":
-                    print(rt)
+                if rt.get("relationTo") == main_entity.id \
+                        and rt.get("property") == "crm:P46i_forms_part_of":
                     ids.append(rel.id)
-    data = {'count': count, 'ids': ids}
-    return data
+    return {'count': count, 'ids': ids}
 
 
 def get_files_for_id(id_: int) -> dict[str, list[str]] | None:
@@ -289,7 +263,7 @@ def get_files_for_id(id_: int) -> dict[str, list[str]] | None:
     return None
 
 
-@app.route('/get_rastermaps/<int:id>')
+@app.route('/get_rastermaps/<int:id_>')
 def get_rastermaps(id_: int) -> str:
     return json.dumps(get_files_for_id(id_))
 
@@ -302,12 +276,10 @@ def presentation_view(id_: int) -> dict[str, Any]:
 @app.route('/entity-data/<int:id_>')
 def entity_data(id_: int) -> dict[str, Any]:
     entity = PresentationView.from_api(id_)
-    data = get_sub_count(entity, id_)
-    count = data['count']
-    sub_ids = data['ids']
+    data = get_sub_count(entity)
     hierarchy = {
-        'ids': sub_ids,
-        'subs': count,
+        'ids': data['ids'],
+        'subs': data['count'],
         'root': get_hierarchy(entity)}
     overview_map_geometry = entity.geometry_json
 

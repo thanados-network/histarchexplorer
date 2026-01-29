@@ -1,4 +1,5 @@
 import json
+from curses.ascii import isdigit
 from dataclasses import asdict, dataclass, field
 from typing import Any, Optional
 
@@ -7,9 +8,10 @@ from flask import g, url_for
 
 from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import PROXIES
-from histarchexplorer.api.util import format_date, \
-    get_description_translated, get_divisions, get_icon, \
-    get_render_type, split_date_string
+from histarchexplorer.api.util import (dict_to_camel_case, format_date,
+                                       get_description_translated,
+                                       get_divisions, get_icon,
+                                       get_render_type, split_date_string)
 
 
 @dataclass
@@ -42,11 +44,11 @@ class GeometryModel:
 
 @dataclass
 class PropertyModel:
-    locationId: int
-    entityId: int
+    location_id: int
+    entity_id: int
     title: str
     description: str
-    shapeType: str
+    shape_type: str
     system_class: str
 
 
@@ -54,42 +56,6 @@ class PropertyModel:
 class FeatureModel:
     geometry: GeometryModel
     properties: PropertyModel
-
-    # def to_dict(self) -> dict:
-    #     return {
-    #         "type": "Feature",
-    #         "geometry": asdict(self.geometry),
-    #         "properties": asdict(self.properties)}
-
-
-#
-# def to_json(self, **kwargs) -> str:
-#     return json.dumps(self.to_dict(), **kwargs)
-#
-# def swap_latlng(self) -> "FeatureModel":
-#     return FeatureModel(
-#         geometry=self.geometry.swap_latlng(),
-#         properties=self.properties)
-#
-# def change_to_map_libre_dict(self, main: Optional[bool] = False):
-#     props = {
-#         'id': self.properties.entityId,
-#         'label': self.properties.title,
-#         'class': self.properties.system_class}
-#     if main:
-#         props['main'] = True
-#
-#     return {
-#         'type': 'Feature',
-#         'geometry': {
-#             'type': self.geometry.type,
-#             'coordinates': self.geometry.coordinates,
-#             'title': self.properties.title,
-#             'description': self.properties.description,
-#             'placeId': self.properties.entityId,
-#             'locationId': self.properties.locationId,
-#             'shapeType': self.properties.shapeType},
-#         'properties': props}
 
 
 @dataclass
@@ -124,9 +90,6 @@ class EntityTypeModel:
     icon: Optional[str]
     division: Optional[dict[str, str]]
 
-    # def to_json(self, *, indent: Optional[int] = 2) -> str:
-    #     return json.dumps(asdict(self), indent=indent, ensure_ascii=False)
-
 
 @dataclass
 class ExternalReferenceModel:
@@ -138,7 +101,7 @@ class ExternalReferenceModel:
     reference_url: Optional[str]
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data: dict[str, str | int]):
         return cls(
             id=data["id"],
             type=data.get("type"),
@@ -159,7 +122,7 @@ class Reference:
     pages: Optional[str] = None
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data: dict[str, str | int]) -> 'Reference':
         return cls(
             id=data["id"],
             title=data.get("title"),
@@ -174,18 +137,18 @@ class Reference:
 class File:
     id: int
     title: str
-    license: Optional[str] = None
-    creator: Optional[str] = None
-    license_holder: Optional[str] = None
+    license: str | int | None = None
+    creator: str | int | None = None
+    license_holder: str | int | None = None
     public: bool = False
-    url: Optional[str] = None
-    mime_type: Optional[str] = None
-    iiif_manifest: Optional[str] = None
-    iiif_base_path: Optional[str] = None
-    overlay: Optional[str] = None
-    main_image: int = None
+    url: str | int | None = None
+    mime_type: str | int | None = None
+    iiif_manifest: str | int | None = None
+    iiif_base_path: str | int | None = None
+    overlay: str | int | None = None
+    main_image: str | int | None = None
     from_super_entity: bool = False
-    render_type: str = None
+    render_type: str | int | None = None
 
 
 @dataclass
@@ -202,28 +165,32 @@ class Relation:
     types: list[EntityTypeModel] = field(default_factory=list)
 
 
+# pylint: disable=too-many-instance-attributes
 @dataclass
 class PresentationView:
     id: int
     system_class: str
     view_class: str
     title: str
-    description: dict[str, str]
-    aliases: list[str]
-    start: str
-    end: str
+    description: dict[str, str] | None
+    aliases: list[str] | None
+    start: Optional[str]
+    end: Optional[str]
     geometries: list[FeatureModel] = field(default_factory=list)
     geometry_json: dict[str, Any] = None
     when: Optional[TimeRangeModel] = None
     types: list[EntityTypeModel] = field(default_factory=list)
-    externalReferenceSystems: list[ExternalReferenceModel] = field(
+    external_reference_systems: list[ExternalReferenceModel] = field(
         default_factory=list)
     references: list[Reference] = field(default_factory=list)
     files: list[File] = field(default_factory=list)
     relations: dict[str, list[Relation]] = field(default_factory=dict)
 
     def to_json(self, *, indent: Optional[int] = 2) -> str:
-        return json.dumps(asdict(self), indent=indent, ensure_ascii=False)
+        """Serialize the model to camelCase JSON for the frontend."""
+        data_dict = asdict(self)
+        camel_case_data = dict_to_camel_case(data_dict)
+        return json.dumps(camel_case_data, indent=indent, ensure_ascii=False)
 
     @staticmethod
     def parse_geometries(
@@ -238,11 +205,11 @@ class PresentationView:
                 type=data['geometry']["type"],
                 coordinates=data["geometry"]["coordinates"])
             property_model = PropertyModel(
-                locationId=data["properties"]["locationId"],
-                entityId=data["properties"]["entityId"],
+                location_id=data["properties"]["locationId"],
+                entity_id=data["properties"]["entityId"],
                 title=data["properties"]["title"],
                 description=data["properties"]["description"],
-                shapeType=data["properties"]["shapeType"],
+                shape_type=data["properties"]["shapeType"],
                 system_class=system_class)
             return FeatureModel(
                 geometry=geometry_model,
@@ -267,7 +234,9 @@ class PresentationView:
             if when.get("end") else None)
 
     @staticmethod
-    def parse_types(types_data: list[dict]) -> list[EntityTypeModel]:
+    def parse_types(
+            types_data: list[dict[str, str | int | list[dict[str, str]]]]) \
+            -> list[EntityTypeModel]:
         types = []
         for type_ in types_data:
             hierarchy = []
@@ -275,17 +244,18 @@ class PresentationView:
                 hierarchy = [
                     TypeHierarchyEntry(**th)
                     for th in type_.get("typeHierarchy", [])]
+            id_ = int(type_["id"]) if isdigit(type_["id"]) else 0
             types.append(EntityTypeModel(
-                id=type_["id"],
+                id=id_,
                 title=type_.get("title", ""),
                 descriptions=type_.get("descriptions"),
                 is_standard=type_.get("isStandard"),
                 type_hierarchy=hierarchy,
                 value=type_.get("value"),
                 unit=type_.get("unit"),
-                icon=get_icon(type_["id"], type_.get("typeHierarchy")),
+                icon=get_icon(id_, type_.get("typeHierarchy")),
                 division=get_divisions(
-                    type_["id"],
+                    id_,
                     type_.get("typeHierarchy"))))
         return types
 
@@ -334,18 +304,20 @@ class PresentationView:
         return grouped_relations
 
     @staticmethod
-    def parse_file(entity_id: int, raw_file: dict) -> list[File]:
+    def parse_file(
+            entity_id: int,
+            raw_file: list[dict[str, str | int | bool | None]]) -> list[File]:
         files = []
         for f in raw_file:
-            if not f["publicShareable"] or not f.get("license"):
+            if not f.get("publicShareable") or not f.get("license"):
                 continue
             files.append(File(
-                id=f["id"],
-                title=f["title"],
+                id=f.get("id"),
+                title=f.get("title"),
                 license=f.get("license"),
                 creator=f.get("creator"),
                 license_holder=f.get("licenseHolder"),
-                public=f["publicShareable"],
+                public=f.get("publicShareable"),
                 url=f.get("url"),
                 mime_type=f.get("mimetype"),
                 iiif_manifest=(
@@ -354,7 +326,7 @@ class PresentationView:
                 iiif_base_path=f.get("IIIFBasePath"),
                 overlay=f.get('overlay'),
                 from_super_entity=f.get('fromSuperEntity'),
-                main_image=g.main_images.get(entity_id) == f["id"],
+                main_image=g.main_images.get(entity_id) == f.get("id"),
                 render_type=get_render_type(f.get("mimetype"))))
         return files
 
@@ -401,7 +373,7 @@ class PresentationView:
             geometry_json=data.get("geometries", {}),
             when=when_data,
             types=cls.parse_types(data.get("types", [])),
-            externalReferenceSystems=[
+            external_reference_systems=[
                 ExternalReferenceModel.from_dict(er)
                 for er in data.get("externalReferenceSystems", [])
                 if isinstance(er, dict)],

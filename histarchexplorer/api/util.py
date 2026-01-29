@@ -1,6 +1,6 @@
 import re
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 from flask import g
 
@@ -24,7 +24,7 @@ def is_full_year_span(date_from: str, date_to: str) -> bool:
     return date_from.startswith("01.01.") and date_to.startswith("31.12.")
 
 
-def format_date(date_from: str, date_to: str) -> Optional[str]:
+def format_date(date_from: str, date_to: str) -> str:
     bc_from = date_from.startswith("-")
     bc_to = date_to.startswith("-")
 
@@ -40,9 +40,8 @@ def format_date(date_from: str, date_to: str) -> Optional[str]:
             year = year_part(clean_from)
             era = "BC" if bc_from else "AD"
             return f"{year} {era}"
-        else:
-            return (f"{year_part(clean_from)} {'BC' if bc_from else 'AD'} "
-                    f"- {year_part(clean_to)} {'BC' if bc_to else 'AD'}")
+        return (f"{year_part(clean_from)} {'BC' if bc_from else 'AD'} "
+                f"- {year_part(clean_to)} {'BC' if bc_to else 'AD'}")
 
     # Only one side available
     date = ".".join(s.lstrip("0") for s in
@@ -83,7 +82,9 @@ def get_render_type(mime_type: str) -> str:
     return render_type
 
 
-def get_icon(id_: int, type_hierarchy: dict[str, str]) -> str:
+def get_icon(
+        id_: int,
+        type_hierarchy: list[dict[str, str]]) -> str:
     icon = g.sidebar_icons.get(int(id_))
     if not icon:
         for type_ in type_hierarchy:
@@ -94,7 +95,9 @@ def get_icon(id_: int, type_hierarchy: dict[str, str]) -> str:
     return icon or g.sidebar_icons.get('other')
 
 
-def get_divisions(id_: int, type_hierarchy: dict[str, str]) -> dict[str, str]:
+def get_divisions(
+        id_: int,
+        type_hierarchy: list[dict[str, str]]) -> dict[str, str]:
     division = g.type_divisions.get(int(id_))
     if not division:
         for type_ in type_hierarchy:
@@ -125,3 +128,20 @@ def get_description_translated(description: str) -> None | dict[str, str]:
 
     fallback_text = description.strip()
     return {'en': fallback_text, 'de': fallback_text}
+
+
+def to_camel_case(snake_str: str) -> str:
+    """Convert snake_case string to camelCase."""
+    components = snake_str.split("_")
+    return components[0] + "".join(x.title() for x in components[1:])
+
+
+def dict_to_camel_case(data: Any) -> Any:
+    """Recursively transform dictionary keys to camelCase."""
+    if isinstance(data, list):
+        return [dict_to_camel_case(i) for i in data]
+    if isinstance(data, dict):
+        return {
+            to_camel_case(k): dict_to_camel_case(v)
+            for k, v in data.items()}
+    return data

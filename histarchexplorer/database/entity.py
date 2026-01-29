@@ -1,7 +1,7 @@
 from flask import g
 
 
-def check_geom(id_: int):
+def check_geom(id_: int) -> int | None:
     """Checks if an ID has geometry in model.gis via a linked entity."""
     g.cursor.execute(
         """

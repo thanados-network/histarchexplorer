@@ -1,10 +1,10 @@
-from flask import g, jsonify, render_template, request
+from flask import Response, g, jsonify, render_template, request
 
 from histarchexplorer import app
 
 
 @app.route('/search', methods=['GET', 'POST'])
-def search():
+def search() -> str:
     """
     Handles the main search page, displaying results from the search service.
     """
@@ -34,7 +34,7 @@ def search():
 
 
 @app.route('/search_live')
-def search_live():
+def search_live() -> Response:
     """
     Provides live search results for autocomplete features.
     """

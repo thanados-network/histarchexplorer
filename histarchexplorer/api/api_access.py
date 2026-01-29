@@ -112,5 +112,3 @@ class ApiAccess:
     #         params=parser.__dict__,
     #         proxies=PROXIES,
     #         timeout=30).json()
-
-

@@ -2,33 +2,34 @@ from dataclasses import dataclass
 from typing import Optional
 
 
+# pylint: disable=too-many-instance-attributes
 @dataclass
 class Parser:
-    search: list[str] = None
-    entities: list[str] = None
-    linked_entities: list[str] = None
-    cidoc_classes: list[str] = None
-    view_classes: list[str] = None
-    system_classes: list[str] = None
-    type_id: list[int] = None
-    show: list[str] = None
+    search: list[str] | None = None
+    entities: list[str] | None = None
+    linked_entities: list[str] | None = None
+    cidoc_classes: list[str] | None = None
+    view_classes: list[str] | None = None
+    system_classes: list[str] | None = None
+    type_id: list[int] | None = None
+    show: list[str] | None = None
+    first: int | None = None
+    last: int | None = None
+    page: int | None = None
+    export: str | None = None
+    relation_type: int | None = None
+    geometry: list[str] | None = None
+    file_id: int | None = None
+    properties: list[str] | None = None
     download: bool = False
     count: bool = False
     locale: str = 'en'
     sort: str = 'asc'
     column: str = 'name'
     limit: int = 0
-    first: int = None
-    last: int = None
-    page: int = None
-    export: str = None
     format: str = 'lpx'
-    relation_type: int = None
     centroid: str = 'false'
-    geometry: list[str] = None
     image_size: str = ''
-    file_id: int = None
-    properties: list[str] = None
 
     def __setattr__(
             self,
