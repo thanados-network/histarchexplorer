@@ -3,7 +3,7 @@ import subprocess
 from typing import Any, Optional
 
 from flask import (
-    abort, current_app, flash, g, jsonify, redirect, render_template,
+    Response, abort, current_app, flash, g, jsonify, redirect, render_template,
     request, url_for)
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
@@ -11,6 +11,7 @@ from werkzeug import Response
 
 from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import ApiAccess
+from histarchexplorer.database.admin import update_sort_order
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.models.admin import Admin, EntryNotFound
 from histarchexplorer.utils.view_util import find_children_by_id
@@ -350,6 +351,38 @@ def deselect_entities() -> Response:
         Admin.set_hidden_classes(request.form.getlist('selected_entities'))
         flash(_('set hidden entities'), 'info')
     return redirect(url_for('admin'))
+
+
+from flask import request, jsonify, g
+
+
+@app.route('/sortlinks', methods=['POST'])
+@login_required
+def sort_links() -> tuple[Response, int] | Response:
+    check_manager_user()
+
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No JSON data received'}), 400
+
+        table = data.get('table')
+        if table not in {'links', 'maps'}:
+            return jsonify({'error': f'Invalid table: {table}'}), 400
+
+        criteria = data.get('criteria')
+        if not isinstance(criteria, list):
+            return jsonify({'error': 'Criteria must be a list'}), 400
+
+        update_sort_order(
+            table,
+            [{'order': int(row['order']), 'id': int(row['id'])}
+             for row in criteria])
+    except (ValueError, KeyError):
+        return jsonify({'error': 'Invalid data format.'}), 400
+    except Exception as e:
+        return jsonify({'error': 'Database error occurred'}), 500
+    return jsonify({'status': 'ok'})
 
 
 @app.route('/admin/update_case_study_id/<int:id_>', methods=['POST'])

@@ -13,7 +13,8 @@ from histarchexplorer.database.admin import (
     set_hidden_classes,
     set_index_background,
     set_shown_classes,
-    update_case_study_type_hierarchy, update_config_entry, update_map)
+    update_case_study_type_hierarchy, update_config_entry, update_map,
+    update_sort_order)
 from histarchexplorer.database.map import get_maps
 
 
@@ -65,6 +66,10 @@ class Admin:
     @staticmethod
     def delete_link(id_: int) -> None:
         return delete_link(id_)
+
+    @staticmethod
+    def update_sort_order(table: str, params: list[dict[str, int]]) -> None:
+        return update_sort_order(table, params)
 
     @staticmethod
     def check_sortorder() -> int:
