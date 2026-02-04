@@ -75,7 +75,7 @@ function styleAndSortMediaTiles() {
   document.querySelectorAll(".item-media").forEach(el => {
     const type = el.dataset.renderType || "unknown";
     const color = renderTypeStyles[type]?.color || "#ccc";
-    el.style.border = `2px solid ${color}`;
+    //el.style.border = `2px solid ${color}`;
     el.style.borderRadius = "0.5rem";
   });
 
