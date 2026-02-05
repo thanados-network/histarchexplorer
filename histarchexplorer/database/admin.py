@@ -251,11 +251,11 @@ def _upsert_jsonb_fields(config_id: int, data: dict[str, str | int]) -> None:
                     'key': language,
                     'config_id': config_id})
 
-def update_sort_order(table: str, params: list[dict[str, int]]) -> None:
-      g.cursor.executemany(
-            f"UPDATE tng.{table} SET sortorder = %(order)s WHERE id = %(id)s",
-          params)
 
+def update_sort_order(table: str, params: list[dict[str, int]]) -> None:
+    g.cursor.executemany(
+        f"UPDATE tng.{table} SET sortorder = %(order)s WHERE id = %(id)s",
+        params)
 
 
 def check_sortorder() -> int:
