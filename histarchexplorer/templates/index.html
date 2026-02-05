@@ -9,9 +9,16 @@
     const imgOrMap = '{{ map_data.img_map | safe }}'
   </script>
 
+    <style>
+    .button-container, #carousel-overlay, #map {
+        display: none!important;
+    }
+
+    </style>
 
   <div>
     <div id="index-container">
+
       <div class="button-container">
         <a id="entities_mobile" class="text-center" href="#mobileAnchor">
           <i class="bi bi-arrow-down-circle-fill"></i>
