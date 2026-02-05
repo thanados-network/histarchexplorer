@@ -5,7 +5,7 @@ from unicodedata import normalize
 from urllib.parse import urlsplit
 
 from flask import g, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_login import current_user
 
 from histarchexplorer import app

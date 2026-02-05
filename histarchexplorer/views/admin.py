@@ -3,9 +3,9 @@ import subprocess
 from typing import Any, Optional
 
 from flask import (
-    Response, abort, current_app, flash, g, jsonify, redirect, render_template,
+    abort, current_app, flash, g, jsonify, redirect, render_template,
     request, url_for)
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_login import current_user, login_required
 from werkzeug import Response
 
@@ -13,7 +13,7 @@ from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.database.admin import update_sort_order
 from histarchexplorer.database.map import check_if_map_id_exist
-from histarchexplorer.models.admin import Admin, EntryNotFound
+from histarchexplorer.models.admin import Admin
 from histarchexplorer.utils.view_util import find_children_by_id
 from histarchexplorer.views.views import type_tree
 
@@ -61,7 +61,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                 type_tree().get_json(),
                 cs_type_id)
         except (ValueError, TypeError) as e:
-            app.logger.error(f"Error processing case study type ID: {e}")
+            app.logger.error('Error processing case study type ID: %s', e)
 
     return render_template(
         "admin.html",
@@ -121,7 +121,7 @@ def add_link() -> Response:
             raise ValueError("Missing required link parameters")
 
     except (ValueError, TypeError) as e:
-        app.logger.warning(f"Invalid link attempt: {e}")
+        app.logger.warning("Invalid link attempt: %s", e)
         flash(_('Failed to add link: Invalid data provided'), 'error')
 
     return redirect(
@@ -211,7 +211,7 @@ def edit_entry() -> Response:
         Admin.edit_entry(form_data)
         flash(_('"%(name)s" updated successfully', name=name), 'success')
     except Exception as e:
-        app.logger.error(f"Entry update failed: {e}")
+        app.logger.error("Entry update failed: %s", e)
         flash(
             _('Error updating "%(name)s": %(error)s',
               name=name, error=str(e)), 'danger')
@@ -257,7 +257,7 @@ def edit_map() -> Response:
     except ValueError:
         flash(_('Invalid Map ID format'), 'danger')
     except Exception as e:
-        app.logger.error(f"Map update failed: {e}")
+        app.logger.error("Map update failed: %s", e)
         flash(_('Error updating map: %(error)s', error=str(e)), 'danger')
 
     return redirect(url_for('admin'))
@@ -290,7 +290,7 @@ def add_map() -> Response:
             f"Map {data['name']} with ID {map_id} added successfully!",
             'success')
     except Exception as e:
-        app.logger.error(f"Failed to add map: {e}")
+        app.logger.error("Failed to add map: %s", e)
         flash(f"Error adding map {data['name']}: {e}", 'danger')
 
     return redirect(url_for('admin'))
@@ -327,7 +327,7 @@ def choose_index_background() -> Response:
         Admin.set_index_background(settings)
         flash(_('Index background updated successfully'), 'success')
     except Exception as e:
-        app.logger.error(f"Failed to set index background: {e}")
+        app.logger.error("Failed to set index background: %s", e)
         flash(_('Error updating settings'), 'error')
 
     return redirect(url_for('admin'))
@@ -351,9 +351,6 @@ def deselect_entities() -> Response:
         Admin.set_hidden_classes(request.form.getlist('selected_entities'))
         flash(_('set hidden entities'), 'info')
     return redirect(url_for('admin'))
-
-
-from flask import request, jsonify, g
 
 
 @app.route('/sortlinks', methods=['POST'])
@@ -380,7 +377,7 @@ def sort_links() -> tuple[Response, int] | Response:
              for row in criteria])
     except (ValueError, KeyError):
         return jsonify({'error': 'Invalid data format.'}), 400
-    except Exception as e:
+    except Exception as _:
         return jsonify({'error': 'Database error occurred'}), 500
     return jsonify({'status': 'ok'})
 

@@ -93,7 +93,7 @@ class EntityTypeModel:
 
 @dataclass
 class ExternalReferenceModel:
-    id: int
+    id: str
     type: str
     identifier: str
     reference_system: str
@@ -101,7 +101,7 @@ class ExternalReferenceModel:
     reference_url: Optional[str]
 
     @classmethod
-    def from_dict(cls, data: dict[str, str | int]):
+    def from_dict(cls, data: dict[str, str]):
         return cls(
             id=data["id"],
             type=data.get("type"),
@@ -113,7 +113,7 @@ class ExternalReferenceModel:
 
 @dataclass
 class Reference:
-    id: int
+    id: str
     title: str
     system_class: str
     type: Optional[str] = None
@@ -122,7 +122,7 @@ class Reference:
     pages: Optional[str] = None
 
     @classmethod
-    def from_dict(cls, data: dict[str, str | int]) -> 'Reference':
+    def from_dict(cls, data: dict[str, str]) -> 'Reference':
         return cls(
             id=data["id"],
             title=data.get("title"),

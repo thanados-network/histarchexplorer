@@ -2,7 +2,7 @@ from typing import Optional
 
 from bcrypt import hashpw
 from flask import flash, render_template, request, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_login import (
     LoginManager, current_user, login_required, login_user, logout_user)
 from flask_wtf import FlaskForm
