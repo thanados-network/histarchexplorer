@@ -26,10 +26,10 @@ from histarchexplorer.utils import view_util
 from histarchexplorer.api.api_access import ApiAccess
 
 
-def connect() -> connection:
+def connect(db_name: str) -> connection:
     try:
         connection_ = psycopg2.connect(
-            database=app.config['DATABASE_NAME'],
+            database=db_name,
             user=app.config['DATABASE_USER'],
             password=app.config['DATABASE_PASS'],
             port=app.config['DATABASE_PORT'],
@@ -96,8 +96,14 @@ def get_type_divisions() -> dict[Any, dict[str, Any]]:
 
 @app.before_request
 def before_request() -> None:
-    g.db = connect()
+    # todo: maybe change the cursor_factory to psycopg2.extras.RealDictCursor
+    g.db = connect(app.config['DATABASE_NAME'])
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
+
+    g.openatlas_db = connect(app.config['OPENATLAS_DATABASE_NAME'])
+    g.openatlas_cursor = g.openatlas_db.cursor(
+        cursor_factory=psycopg2.extras.NamedTupleCursor)
+
     if request.path.startswith('/reset'):
         return None
     #quick login for preliminary prototype page
@@ -173,3 +179,14 @@ def apply_caching(response: Response) -> Response:
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['X-XSS-Protection'] = '1; mode=block'
     return response
+
+
+@app.teardown_request
+def teardown_request(exception: Exception | None) -> None:
+    db = getattr(g, 'db', None)
+    if db is not None:
+        db.close()
+
+    oa_db = getattr(g, 'openatlas_db', None)
+    if oa_db is not None:
+        oa_db.close()

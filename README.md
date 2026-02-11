@@ -145,10 +145,12 @@ configured).
 
 ### 5. Database setup
 
-Histarchexplorer requires an existing **OpenAtlas PostgreSQL database**. To
-install the additional structures for presentation:
+Histarchexplorer requires an existing **OpenAtlas PostgreSQL database** and 
+a new standalone **PostgreSQL** database. As *postgres* user please follow the 
+commands:
 
 ```bash
+createdb <DATABASE_NAME> -O openatlas
 cd install
 cat 1_structure.sql 2_data_model.sql | psql -d <DATABASE_NAME> -f -
 ```

@@ -26,10 +26,10 @@ def get_recursive_type_ids(id_: int) -> dict[str, Any]:
         FROM children_chain
         ORDER BY level, id)
     """
-    g.cursor.execute(sql, {'id': id_})
+    g.openatlas_cursor.execute(sql, {'id': id_})
     #print('result get_recursive_type_ids(id)')
     #print(result)
-    return g.cursor.fetchall()
+    return g.openatlas_cursor.fetchall()
 
 
 def build_id_collection(ids: list[int]) -> list[str]:
@@ -59,8 +59,8 @@ def get_browse_list_entities(
         SELECT range_id from model.link 
         WHERE property_code = 'P46'  AND domain_id = %(id)s
         """
-        g.cursor.execute(sql, {'id': id_})
-        shown_ids = g.cursor.fetchall()
+        g.openatlas_cursor.execute(sql, {'id': id_})
+        shown_ids = g.openatlas_cursor.fetchall()
         if not shown_ids:
             return None
 
@@ -108,7 +108,8 @@ def get_browse_list_entities(
     where_sql = " AND ".join(where_clauses)
     if where_sql:
         where_sql = "WHERE " + where_sql
-
+    # Todo: figure out how to handle tng.getdates()
+    #   maybe don't make a JSON in SQL, but handle the data in python
     query = f"""
         SELECT jsonb_agg(
             jsonb_build_object(
@@ -144,8 +145,8 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
     """
 
     #print((query, tuple(params)))
-    g.cursor.execute(query, tuple(params))
-    data['entities'] = g.cursor.fetchone()[0] or []
+    g.openatlas_cursor.execute(query, tuple(params))
+    data['entities'] = g.openatlas_cursor.fetchone()[0] or []
 
     geom_query = f"""
             SELECT jsonb_build_object(
@@ -180,8 +181,8 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
               );
 """
 
-    g.cursor.execute(geom_query, tuple(params))
-    data['geometries'] = g.cursor.fetchone()[0] or []
+    g.openatlas_cursor.execute(geom_query, tuple(params))
+    data['geometries'] = g.openatlas_cursor.fetchone()[0] or []
 
     count_query = f"""
                      SELECT e.openatlas_class_name, COUNT(*) AS count
@@ -190,8 +191,8 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
                      GROUP BY e.openatlas_class_name
                      """
 
-    g.cursor.execute(count_query, tuple(params))
-    results = g.cursor.fetchall()
+    g.openatlas_cursor.execute(count_query, tuple(params))
+    results = g.openatlas_cursor.fetchall()
 
     # Convert list of (class_name, count) to a dictionary for easy access
     class_count_map = {row[0]: row[1] for row in results}
@@ -257,8 +258,8 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
         """
 
         for case_study in shown_case_studies:
-            g.cursor.execute(sql_case_studies, {'cs_id':case_study})
-            results = g.cursor.fetchone()
+            g.openatlas_cursor.execute(sql_case_studies, {'cs_id':case_study})
+            results = g.openatlas_cursor.fetchone()
             cs = {'id': case_study, 'ids': results}
             for row in cs_infos:
                 if row.cs_id == cs['id']:

@@ -14,7 +14,8 @@ DEBUG = False  # Debug mode toggle
 SECRET_KEY = 'secretkey'  # Secret key for sessions and security
 
 # Database configuration
-DATABASE_NAME = 'openatlas'
+DATABASE_NAME = 'histarchexplorer'  # todo: create better name
+OPENATLAS_DATABASE_NAME = 'thanados'
 DATABASE_USER = 'openatlas'
 DATABASE_HOST = 'localhost'
 DATABASE_PORT = 5432

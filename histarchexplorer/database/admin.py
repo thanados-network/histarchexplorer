@@ -268,12 +268,12 @@ def check_sortorder() -> int:
 
 
 def get_openatlas_entity(id_: int) -> NamedTuple:
-    g.cursor.execute(
+    g.openatlas_cursor.execute(
         '''
         SELECT id, name, openatlas_class_name
         FROM model.entity
         WHERE id = %(id)s''', {'id': id_})
-    return g.cursor.fetchone()
+    return g.openatlas_cursor.fetchone()
 
 
 def update_case_study_type_hierarchy(id_: int) -> None:

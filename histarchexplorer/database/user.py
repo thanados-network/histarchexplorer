@@ -19,11 +19,11 @@ SQL = """
 
 
 def get_user_by_id(user_id: int) -> dict[str, Any]:
-    g.cursor.execute(f'{SQL} WHERE u.id = %(id)s;', {'id': user_id})
-    return g.cursor.fetchone()
+    g.openatlas_cursor.execute(f'{SQL} WHERE u.id = %(id)s;', {'id': user_id})
+    return g.openatlas_cursor.fetchone()
 
 def get_by_username(username: str) -> dict[str, Any]:
-    g.cursor.execute(
+    g.openatlas_cursor.execute(
         f'{SQL} WHERE LOWER(u.username) = LOWER(%(username)s);',
         {'username': username})
-    return g.cursor.fetchone()
+    return g.openatlas_cursor.fetchone()

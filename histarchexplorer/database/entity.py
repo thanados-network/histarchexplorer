@@ -14,7 +14,7 @@ def check_geom(id_: int) -> int | None:
                                          AND property_code = 'P53'
                                        LIMIT 1)); \
         """, {'id': id_})
-    result = g.cursor.fetchone()
+    result = g.openatlas_cursor.fetchone()
     return id_ if result and result[0] else None
 
 
@@ -26,7 +26,7 @@ def get_first_geom(id_: int) -> int | None:
 
     # Try to find the parent entity (domain_id)
     sql = """SELECT domain_id
-             FROM model.link
+             FROM openatlas_cursor.link
              WHERE range_id = %(id)s
                AND property_code = 'P46'
              LIMIT 1; \
@@ -44,7 +44,7 @@ def check_if_place_hierarchy(id_: int) -> int:
     g.cursor.execute(
         """
         SELECT range_id
-        FROM model.link
+        FROM openatlas_cursor.link
         WHERE domain_id = %(id)s
           AND property_code = 'P46'
         LIMIT 1

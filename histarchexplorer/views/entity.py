@@ -256,8 +256,8 @@ def get_files_for_id(id_: int) -> dict[str, list[str]] | None:
                   AND l.property_code = 'P67') a; \
           """
 
-    g.cursor.execute(sql, {'id': id_})
-    result = g.cursor.fetchone()
+    g.openatlas_cursor.execute(sql, {'id': id_})
+    result = g.openatlas_cursor.fetchone()
     if result:
         return result
     return None
