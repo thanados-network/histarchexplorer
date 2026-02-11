@@ -28,7 +28,13 @@ def inject_menu() -> dict[str, Any]:
     navbar = [
         {'entities': _('browse/select/find all entities')},
         {'search': _('detailed search')},
-        {'about': _('about the project')}]
+        ]
+
+    for page in g.individual_pages:
+        if page not in ['index', 'about']:
+            navbar.append({page: page})
+
+    navbar.append({'about': _('about the project')})
     return {'navbar': navbar}
 
 

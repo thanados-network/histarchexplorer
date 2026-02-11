@@ -42,6 +42,8 @@ def connect() -> connection:
 
 
 def get_locale() -> str:
+    if app.config['LANGUAGE_OVERRIDE']:
+        return app.config['PREFERRED_LANGUAGE'] or 'en'
     if 'language' in session:
         return session['language']
     return request.accept_languages.best_match(app.config['LANGUAGES']) or 'en'
@@ -116,6 +118,9 @@ def before_request() -> None:
     g.view_classes = app.config['VIEW_CLASSES']
     g.admin_fields = app.config['ADMIN_FIELDS']
     g.additional_files_for_overview = app.config['ADD_FILES_FOR_OVERVIEW']
+    g.language_override = app.config['LANGUAGE_OVERRIDE']
+    g.darkmode_override = app.config['DARKMODE_OVERRIDE']
+    g.individual_pages = app.config['INDIVIDUAL_PAGES']
 
     g.api_headers = {}
     if app.config['API_TOKEN']:
@@ -150,9 +155,15 @@ def inject_globals() -> dict[str, Any]:
         'available_languages': g.available_languages,
         'preferred_language': g.preferred_langauge,
         'current_language': g.language,
+        'darkmode_override': g.darkmode_override,
+        'language_override': g.language_override,
         'view_classes': g.view_classes,
         'admin_fields': g.admin_fields,
         'additional_files_for_overview': g.additional_files_for_overview,
+                'individual_pages': [
+            p for p in g.individual_pages
+            if p not in ('index', 'about')
+        ],
         'system_class_map': {
             "place": "places",
             "feature": "places",

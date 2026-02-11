@@ -11,6 +11,11 @@ from histarchexplorer.utils.view_util import get_view_class_count, slugify
 @app.route('/about', strict_slashes=False)
 @app.route('/about/<slug>')
 def about(slug: Optional[str] = None) -> Response | str | ResponseValue:
+
+
+    if 'about' in app.config['INDIVIDUAL_PAGES']:
+        return render_template("individual/content.html", content="about")
+
     grouped = ConfigEntity.group_by_class_name(g.config_entities)
     main_project = grouped['main-project'][0]
     sub_projects = grouped.get('project', [])
