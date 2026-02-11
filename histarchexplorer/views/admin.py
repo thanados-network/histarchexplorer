@@ -193,7 +193,7 @@ def edit_entry() -> Response:
         flash(_('Configuration ID is required'), 'danger')
         return redirect(url_for('admin'))
 
-    form_data: dict[str, str | int] = {
+    form_data: dict[str, str | int | None] = {
         'config_id': config_id,
         'name': name,
         'acronym': request.form.get('acronym', ''),

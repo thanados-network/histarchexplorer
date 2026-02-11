@@ -20,17 +20,6 @@ def get_hidden_classes() -> Any:
     result = g.cursor.fetchone()
     return result[0] or []
 
-def get_main_image_table() -> dict[int, int]:
-    main_image = {}
-    g.cursor.execute(
-        'SELECT '
-        '   entity_id,'
-        '   image_id '
-        'FROM web.entity_profile_image')
-    for row in g.cursor.fetchall():
-        main_image[row[0]] = row[1]
-    return main_image
-
 
 def get_settings() -> NamedTuple:
     g.cursor.execute("SELECT * FROM tng.settings LIMIT 1")

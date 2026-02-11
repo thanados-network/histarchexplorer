@@ -307,8 +307,7 @@ def return_entities(tab_name: str, id_: int) -> str:
         entity_id=0,
         page_name="landing",
         active_tab=tab_name,
-        typetree_data=type_tree().json,
-        main_image_json=g.main_images)
+        typetree_data=type_tree().json)
 
 
 @app.route('/entities')

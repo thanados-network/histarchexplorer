@@ -2,12 +2,15 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.14 (Debian 15.14-0+deb12u1)
--- Dumped by pg_dump version 15.14 (Debian 15.14-0+deb12u1)
+\restrict 3J2qy3FgOqncfOK3OYBpWPRt9kdthOIw7ugIWznRoV0mRntg3yoahn64xAadmKy
+
+-- Dumped from database version 17.7 (Debian 17.7-0+deb13u1)
+-- Dumped by pg_dump version 17.7 (Debian 17.7-0+deb13u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -189,7 +192,7 @@ CREATE SEQUENCE tng.links_id_seq
     CACHE 1;
 
 
-ALTER TABLE tng.links_id_seq OWNER TO openatlas;
+ALTER SEQUENCE tng.links_id_seq OWNER TO openatlas;
 
 --
 -- Name: links_id_seq; Type: SEQUENCE OWNED BY; Schema: tng; Owner: openatlas
@@ -240,7 +243,7 @@ CREATE SEQUENCE tng.maps_id_seq
     CACHE 1;
 
 
-ALTER TABLE tng.maps_id_seq OWNER TO openatlas;
+ALTER SEQUENCE tng.maps_id_seq OWNER TO openatlas;
 
 --
 -- Name: maps_id_seq; Type: SEQUENCE OWNED BY; Schema: tng; Owner: openatlas
@@ -313,7 +316,7 @@ CREATE SEQUENCE tng.settings_id_seq
     CACHE 1;
 
 
-ALTER TABLE tng.settings_id_seq OWNER TO openatlas;
+ALTER SEQUENCE tng.settings_id_seq OWNER TO openatlas;
 
 --
 -- Name: settings_id_seq; Type: SEQUENCE OWNED BY; Schema: tng; Owner: openatlas
@@ -418,4 +421,6 @@ ALTER TABLE ONLY tng.properties
 --
 -- PostgreSQL database dump complete
 --
+
+\unrestrict 3J2qy3FgOqncfOK3OYBpWPRt9kdthOIw7ugIWznRoV0mRntg3yoahn64xAadmKy
 

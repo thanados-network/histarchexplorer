@@ -305,7 +305,6 @@ class PresentationView:
 
     @staticmethod
     def parse_file(
-            entity_id: int,
             raw_file: list[dict[str, str | int | bool | None]]) -> list[File]:
         files = []
         for f in raw_file:
@@ -326,7 +325,7 @@ class PresentationView:
                 iiif_base_path=f.get("IIIFBasePath"),
                 overlay=f.get('overlay'),
                 from_super_entity=f.get('fromSuperEntity'),
-                main_image=g.main_images.get(entity_id) == f.get("id"),
+                main_image=f.get('mainImage'),
                 render_type=get_render_type(f.get("mimetype"))))
         return files
 
@@ -382,7 +381,7 @@ class PresentationView:
                 for ref in PresentationView.merge_references(
                     data.get("references", []))
                 if isinstance(ref, dict)],
-            files=cls.parse_file(data["id"], data.get('files', [])),
+            files=cls.parse_file(data.get('files', [])),
             relations=cls.parse_relations(data.get("relations", {})),
             start=start_date,
             end=end_date)

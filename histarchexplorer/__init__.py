@@ -1,13 +1,12 @@
 from typing import Any
 
 import psycopg2.extras
-from flask import Flask, Response, g, request, session, url_for, redirect
+from flask import Flask, Response, g, request, session, url_for
 from flask_babel import Babel
 from flask_caching import Cache
 from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
-from histarchexplorer.database.settings import get_main_image_table
 from histarchexplorer.models.config import (
     ConfigEntity, Link, Properties, get_config_classes)
 from histarchexplorer.models.search import SearchService
@@ -126,7 +125,6 @@ def before_request() -> None:
     if app.config['API_TOKEN']:
         g.api_headers["Authorization"] = f"Bearer {app.config['API_TOKEN']}"
 
-    g.main_images = get_main_image_table()
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
     g.config_classes = get_config_classes()
@@ -143,8 +141,6 @@ def before_request() -> None:
     g.search_service = SearchService(app)
     g.case_study_ids = [
         config.case_study for config in g.config_entities if config.case_study]
-    # Way to large
-    # g.file_of_entities = ApiAccess.get_files_of_entities()
 
     return None
 
