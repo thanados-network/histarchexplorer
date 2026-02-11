@@ -30,7 +30,8 @@ def entity_view(id_: int, tab_name: str = "overview") -> str:
 
 
 def get_entity_images(
-        files: list[File]) -> tuple[File, list[File], list[File]]:
+        files: list[File]) \
+        -> tuple[File | None, list[File | None], list[File | None]]:
     images = []
     main_image = None
     for image in files:
@@ -63,7 +64,6 @@ def get_entity(id_: int, tab_name: str) -> str:
             subunit_data=subunit_data,
             active_tab=tab_name,
             typetree_data=type_tree().json,
-            main_image_json=g.main_images,
             tab_name='subunits')
 
     match tab_name:

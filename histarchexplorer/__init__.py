@@ -1,14 +1,13 @@
 from typing import Any
 
 import psycopg2.extras
-from flask import Flask, Response, g, request, session, url_for, redirect
+from flask import Flask, Response, g, request, session, url_for
 from flask_babel import Babel
 from flask_caching import Cache
 from flask_login import current_user
 from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 
-from histarchexplorer.database.settings import get_main_image_table
 from histarchexplorer.models.config import (
     ConfigEntity, Link, Properties, get_config_classes)
 from histarchexplorer.models.search import SearchService
@@ -43,6 +42,8 @@ def connect() -> connection:
 
 
 def get_locale() -> str:
+    if app.config['LANGUAGE_OVERRIDE']:
+        return app.config['PREFERRED_LANGUAGE'] or 'en'
     if 'language' in session:
         return session['language']
     return request.accept_languages.best_match(app.config['LANGUAGES']) or 'en'
@@ -117,12 +118,14 @@ def before_request() -> None:
     g.view_classes = app.config['VIEW_CLASSES']
     g.admin_fields = app.config['ADMIN_FIELDS']
     g.additional_files_for_overview = app.config['ADD_FILES_FOR_OVERVIEW']
+    g.language_override = app.config['LANGUAGE_OVERRIDE']
+    g.darkmode_override = app.config['DARKMODE_OVERRIDE']
+    g.individual_pages = app.config['INDIVIDUAL_PAGES']
 
     g.api_headers = {}
     if app.config['API_TOKEN']:
         g.api_headers["Authorization"] = f"Bearer {app.config['API_TOKEN']}"
 
-    g.main_images = get_main_image_table()
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
     g.config_classes = get_config_classes()
@@ -139,8 +142,6 @@ def before_request() -> None:
     g.search_service = SearchService(app)
     g.case_study_ids = [
         config.case_study for config in g.config_entities if config.case_study]
-    # Way to large
-    # g.file_of_entities = ApiAccess.get_files_of_entities()
 
     return None
 
@@ -151,9 +152,15 @@ def inject_globals() -> dict[str, Any]:
         'available_languages': g.available_languages,
         'preferred_language': g.preferred_langauge,
         'current_language': g.language,
+        'darkmode_override': g.darkmode_override,
+        'language_override': g.language_override,
         'view_classes': g.view_classes,
         'admin_fields': g.admin_fields,
         'additional_files_for_overview': g.additional_files_for_overview,
+                'individual_pages': [
+            p for p in g.individual_pages
+            if p not in ('index', 'about')
+        ],
         'system_class_map': {
             "place": "places",
             "feature": "places",

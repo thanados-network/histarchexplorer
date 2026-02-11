@@ -13,8 +13,30 @@ from histarchexplorer.models.config import ConfigEntity
 from histarchexplorer.utils.view_util import get_view_class_count, slugify
 
 
+def register_individual_pages(app):
+    for page in app.config['INDIVIDUAL_PAGES']:
+        if page in ('index', 'about'):
+            continue
+
+        def make_view(page_name):
+            def view():
+                return render_template(
+                    "individual/content.html",
+                    content=page_name
+                )
+            return view
+
+        app.add_url_rule(
+            f"/{page}",
+            endpoint=f"individual_{page}",
+            view_func=make_view(page)
+        )
+register_individual_pages(app)
+
 @app.route('/')
 def index() -> str:
+    if 'index' in app.config['INDIVIDUAL_PAGES']:
+        return render_template("individual/content.html", content="index")
     map_data = g.settings.get_map_settings()
     map_ = None
     if index_map := map_data['map']:

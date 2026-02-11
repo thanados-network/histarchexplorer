@@ -23,7 +23,7 @@
                             <a class="nav-link nav-link-hover {% if category == request.endpoint %}active{% endif %}"
                                aria-current="page"
                                title="{{ title }}"
-                               href="{{ url_for(category) }}">{{ _(category) | upper }}
+                               href="/{{category}}">{{ _(category) | upper }}
                             </a>
                         </li>
                     {% endfor %}
@@ -32,7 +32,7 @@
         </div>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
+                <li class="nav-item {% if darkmode_override %}d-none {% endif %}">
                     <a class="nav-link" id="dark" role="button" onclick="setTheme(this.id)"
                        title="{{ _('toggle dark/light mode') }}">
                         <i class="bi bi-moon"></i>
@@ -42,7 +42,7 @@
                         <i class="bi bi-sun"></i>
                     </a>
                 </li>
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown {% if language_override %}d-none {% endif %}">
                     <a class="nav-link dropdown-toggle" href="#" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-globe me-2"></i><span id="language">{{ current_language }}</span>
