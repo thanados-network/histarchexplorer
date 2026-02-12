@@ -1,0 +1,190 @@
+<style>
+
+    /* HERO */
+    .hero {
+        height: calc(100vh - var(--navbar-height));
+        background: url("/static/images/ind_assets/karnburg_charlemont.jpg") center/cover no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        color: white;
+    }
+
+
+    .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+    }
+
+
+    .hero-content {
+        position: relative;
+        text-align: center;
+        max-width: 900px;
+        padding: 20px;
+    }
+
+
+    .hero-content img {
+        max-width: 500px;
+        width: 60%;
+    }
+
+
+    .hero-title {
+        font-size: 3.4rem;
+        margin: 30px 0 15px;
+        font-weight: 600;
+        text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+    }
+
+
+    .hero-subtitle {
+        font-size: 1.5rem;
+        line-height: 1.5;
+        max-width: 720px;
+        margin: auto;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+        margin-bottom: 20px;
+    }
+
+
+    .learn-more {
+        font-size: 2rem;
+        text-decoration: none;
+        color: white;
+        border: 2px solid white;
+        padding: 5px 10px;
+        border-radius: 12px;
+        background: rgba(74, 74, 74, 0.58);
+        transition: all 0.2s ease;
+    }
+
+    .learn-more:hover {
+        background: rgba(34, 34, 34, 0.58);
+    }
+
+
+    /* CONTENT TILES */
+    .tile {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+
+    .tile:nth-child(odd) {
+        background: #f5f5f5;
+    }
+
+
+    .tile:nth-child(even) {
+        background: white;
+    }
+
+
+    .tile-content {
+        max-width: 900px;
+    }
+
+
+    .tile img {
+        max-width: 100%;
+        border-radius: 12px;
+        margin-top: 20px;
+    }
+
+
+    .tile h2 {
+        font-size: 2.4rem;
+        margin-bottom: 10px;
+    }
+
+
+    .tile p {
+        font-size: 1.2rem;
+        line-height: 1.6;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+</style>
+<section class="hero">
+    <div class="hero-content">
+        <img src="/static/images/logos/logo.png" alt="Logo"/>
+
+
+        <h1 class="hero-title">
+            A Geospatial Approach to Modelling Social, Religious and Political Shifts in History
+        </h1>
+
+
+        <p class="hero-subtitle">
+            Mapping belief, power and everyday life through digital
+            archaeology, spatial humanities and data science.
+        </p>
+
+
+        <a class="learn-more" href="#content">↓ Explore</a>
+    </div>
+</section>
+
+
+<section id="content" class="tile">
+    <div class="tile-content">
+        <h2>Digital Medieval Landscapes</h2>
+        <p>
+            We integrate archaeology, written sources and spatial data
+            to reconstruct how people inhabited, shaped and understood
+            medieval environments.
+        </p>
+        <img src="/static/images/assets/example1.jpg" alt="Landscape"/>
+    </div>
+</section>
+
+
+<section class="tile">
+    <div class="tile-content">
+        <h2>Religion, Power & Society</h2>
+        <p>
+            Our research explores how religious practice, political
+            authority and social structures interacted across medieval
+            Europe.
+        </p>
+        <img src="/static/images/assets/example2.jpg" alt="Church"/>
+    </div>
+</section>
+
+
+<section class="tile">
+    <div class="tile-content">
+        <h2>Open Cultural Heritage Data</h2>
+        <p>
+            By building accessible datasets and spatial models we enable
+            new forms of research, collaboration and public engagement
+            with the medieval past.
+        </p>
+        <img src="/static/images/assets/example3.jpg" alt="Dataset"/>
+    </div>
+</section>
+
+
+{% include "footer.html" %}
+
+<script>
+document.querySelectorAll('a[href^=\"#\"]').forEach(anchor => {
+  anchor.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector(anchor.getAttribute('href'))
+      .scrollIntoView({ behavior: 'smooth' });
+  });
+});
+</script>
