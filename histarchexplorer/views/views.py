@@ -37,6 +37,7 @@ register_individual_pages(app)
 def index() -> str:
     if 'index' in app.config['INDIVIDUAL_PAGES']:
         return render_template("individual/content.html", content="index")
+    # todo: replace g.settings.get_map_settings()  with g.settings
     map_data = g.settings.get_map_settings()
     map_ = None
     if index_map := map_data['map']:

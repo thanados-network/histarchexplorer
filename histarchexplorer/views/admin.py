@@ -1,6 +1,6 @@
 import os
 import subprocess
-from typing import Any, Optional
+from typing import Optional
 
 from flask import (
     abort, current_app, flash, g, jsonify, redirect, render_template,
@@ -72,7 +72,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         processed_roles=Admin.process_roles(),
         processed_target_nodes=Admin.process_target_nodes(),
         maps=Admin.get_maps(),
-        settings=g.settings.get_map_settings(),
+        settings=g.settings,
         class_items={
             k: v for k, v in
             ApiAccess.get_entities_count_by_case_studies().items()
@@ -377,14 +377,17 @@ def sort_links() -> tuple[Response, int] | Response:
     return jsonify({'status': 'ok'})
 
 
-@app.route('/admin/update_case_study_id/<int:id_>', methods=['POST'])
+@app.route('/admin/update_general_settings/<int:id_>', methods=['POST'])
 @login_required
-def update_case_study_id(id_: int) -> Response:
+def update_general_settings(id_: int) -> Response:
     check_manager_user()
     if request.method == 'POST':
         validation_result = Admin.check_case_study_type_id(id_)
         if validation_result['is_valid']:
             g.settings.case_study_type_id = id_
+            g.settings.darkmode = request.form.get('darkMode') == 'on'
+            g.settings.language_selector = request.form.get(
+                'languageSelection') == 'on'
             g.settings.save_to_db()
             flash(_('updated case study id successfully'), 'info')
         else:

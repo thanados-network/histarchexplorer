@@ -24,7 +24,7 @@
           <option
             value="{{ map.id }}"
             data-tilestring="{{ map.tilestring }}"
-            {% if map.id== settings.map %} selected {% endif %}>
+            {% if map.id== settings.index_map %} selected {% endif %}>
             {{ map.display_name }}
           </option>
         {% endfor %}
@@ -49,7 +49,7 @@
         class="form-control"
         id="defaultImg"
         name="default_img"
-        value="{{ settings.img }}">
+        value="{{ settings.index_img }}">
     </div>
   </div>
   <button

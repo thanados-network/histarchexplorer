@@ -41,20 +41,11 @@ def connect(db_name: str) -> connection:
 
 
 def get_locale() -> str:
-    if app.config['LANGUAGE_OVERRIDE']:
+    if g.settings.language_selector:
         return app.config['PREFERRED_LANGUAGE'] or 'en'
     if 'language' in session:
         return session['language']
     return request.accept_languages.best_match(app.config['LANGUAGES']) or 'en'
-
-
-# ✅ Support both Flask-Babel <3.0 and ≥3.0
-if hasattr(babel, 'localeselector'):
-    # Old Flask-Babel (pre-3.0)
-    babel.localeselector(get_locale)
-else:
-    # New Flask-Babel (3.0+)
-    babel.locale_selector_func = get_locale
 
 
 def create_icon(css_class: str) -> str:
@@ -114,6 +105,11 @@ def before_request() -> None:
     #if not current_user.is_authenticated and request.endpoint != 'login':
     #    return redirect(url_for('login'))
 
+    g.settings = Settings.load_from_db()
+    if hasattr(babel, 'localeselector'):
+        babel.localeselector(get_locale)
+    else:
+        babel.locale_selector_func = get_locale
     session['language'] = get_locale()
     g.available_languages = app.config['LANGUAGES']
     g.language = session.get(
@@ -123,8 +119,6 @@ def before_request() -> None:
     g.view_classes = app.config['VIEW_CLASSES']
     g.admin_fields = app.config['ADMIN_FIELDS']
     g.additional_files_for_overview = app.config['ADD_FILES_FOR_OVERVIEW']
-    g.language_override = app.config['LANGUAGE_OVERRIDE']
-    g.darkmode_override = app.config['DARKMODE_OVERRIDE']
     g.individual_pages = app.config['INDIVIDUAL_PAGES']
 
     g.api_headers = {}
@@ -136,7 +130,6 @@ def before_request() -> None:
     g.config_classes = get_config_classes()
     g.config_properties = Properties.get_all()
     g.config_links = Link.get_all()
-    g.settings = Settings.load_from_db()
     g.config_classes_map = {
         'projects': 1,  # option for config_class=2 project vs 1=main_project?
         'persons': 2,
@@ -157,8 +150,8 @@ def inject_globals() -> dict[str, Any]:
         'available_languages': g.available_languages,
         'preferred_language': g.preferred_langauge,
         'current_language': g.language,
-        'darkmode_override': g.darkmode_override,
-        'language_override': g.language_override,
+        'darkmode_override': g.settings.darkmode,
+        'language_override': g.settings.language_selector,
         'view_classes': g.view_classes,
         'admin_fields': g.admin_fields,
         'additional_files_for_overview': g.additional_files_for_overview,

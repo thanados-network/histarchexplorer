@@ -37,34 +37,7 @@
         <div class="card mt-5 mb-5">
           <div class="card-body">
             <h5 class="card-title">{{ _('general settings') | upper }}</h5>
-            <div class="d-flex justify-content-start align-items-start">
-              <form id="caseStudyForm" method="POST" class="needs-validation"
-                    novalidate
-                    data-action-template="/admin/update_case_study_id/">
-                <div class="mb-3">
-                  <label for="caseStudyHierarchyID"
-                         class="form-label">{{ _('case study hierarchy ID') }}</label>
-                  <input type="text" class="form-control"
-                         id="caseStudyHierarchyID" name="case_study_id"
-                         pattern="^\d+$"
-                         value="{{ initial_case_study_type_id or '' }}"
-                         required>
-                  <div class="invalid-feedback" id="caseStudyIDFeedback">
-                    {{ _('Please enter a positive integer for the Case Study Hierarchy ID.') }}
-                  </div>
-                  <span id="caseStudyTypeName"
-                        class="form-text text-muted mt-2">
-                {% if initial_case_study_type_name %}
-                  ({{ initial_case_study_type_name }})
-                {% endif %}
-              </span>
-                </div>
-                <button
-                  type="submit"
-                  class="btn btn-primary">{{ _('Save') }}
-                </button>
-              </form>
-            </div>
+          {% include 'admin/general_settings.html' %}
           </div>
         </div>
 

@@ -6,20 +6,22 @@ from histarchexplorer.database.settings import (
 
 
 class Settings(BaseModel):
-    index_img: str = "/static/images/index_map_bg/Blank_map_of_Europe_central_network.png"
+    index_img: str = '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png'
     index_map: int = 1
-    img_map: str = "map"
+    img_map: str = 'map'
     greyscale: bool = False
-    shown_classes: List[str] = ["place", "feature", "stratigraphic_unit", "artifact", "human_remains", "person", "group", "acquisition", "event", "activity", "creation", "move", "production", "modification"]
+    darkmode: bool = False
+    language_selector: bool = False
+    shown_classes: List[str] = ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains', 'person', 'group', 'acquisition', 'event', 'activity', 'creation', 'move', 'production', 'modification']
     shown_types: List[str] = []
-    hidden_classes: List[str] = ["group"]
+    hidden_classes: List[str] = ['group']
     hidden_types: List[str] = []
-    shown_ids: List[str] = []
-    hidden_ids: List[str] = []
+    shown_ids: List[int] = []
+    hidden_ids: List[int] = []
     case_study_type_id: int = 8240
 
     @classmethod
-    def load_from_db(cls) -> "Settings":
+    def load_from_db(cls) -> 'Settings':
         create_settings_table()
 
         for key, value in cls().model_dump().items():

@@ -137,5 +137,3 @@ SIDEBAR_OPTIONS = [
     ]
 
 INDIVIDUAL_PAGES = [] #if index or about should be rendered individually from index.html and about.html in the templates/individual folder
-LANGUAGE_OVERRIDE = False
-DARKMODE_OVERRIDE = False
