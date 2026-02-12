@@ -9,6 +9,7 @@ class Settings(BaseModel):
     index_img: str = '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png'
     index_map: int = 1
     img_map: str = 'map'
+    preferred_language: str = 'en'
     greyscale: bool = False
     darkmode: bool = False
     language_selector: bool = False

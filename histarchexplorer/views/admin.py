@@ -390,6 +390,8 @@ def update_general_settings(id_: int) -> Response:
                 'accessRestriction') == 'on'
             g.settings.language_selector = request.form.get(
                 'languageSelection') == 'on'
+            g.settings.preferred_language = request.form.get(
+                'preferredLanguage')
             g.settings.save_to_db()
             flash(_('updated case study id successfully'), 'info')
         else:

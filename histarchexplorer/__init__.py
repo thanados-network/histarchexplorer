@@ -1,7 +1,7 @@
 from typing import Any
 
 import psycopg2.extras
-from flask import Flask, Response, g, redirect, request, session, url_for
+from flask import Flask, g, redirect, request, session, url_for
 from flask_babel import Babel
 from flask_caching import Cache
 from flask_login import current_user
@@ -44,7 +44,7 @@ def connect(db_name: str) -> connection:
 
 def get_locale() -> str:
     if g.settings.language_selector:
-        return app.config['PREFERRED_LANGUAGE'] or 'en'
+        return g.settings.preferred_language or 'en'
     if 'language' in session:
         return session['language']
     return request.accept_languages.best_match(app.config['LANGUAGES']) or 'en'
@@ -118,7 +118,7 @@ def before_request() -> Response | None:
     g.language = session.get(
         'language',
         request.accept_languages.best_match(g.available_languages.keys()))
-    g.preferred_langauge = app.config['PREFERRED_LANGUAGE']
+    g.preferred_langauge = g.settings.preferred_language
     g.view_classes = app.config['VIEW_CLASSES']
     g.admin_fields = app.config['ADMIN_FIELDS']
     g.additional_files_for_overview = app.config['ADD_FILES_FOR_OVERVIEW']
@@ -158,10 +158,9 @@ def inject_globals() -> dict[str, Any]:
         'view_classes': g.view_classes,
         'admin_fields': g.admin_fields,
         'additional_files_for_overview': g.additional_files_for_overview,
-                'individual_pages': [
+        'individual_pages': [
             p for p in g.individual_pages
-            if p not in ('index', 'about')
-        ],
+            if p not in ('index', 'about')],
         'system_class_map': {
             "place": "places",
             "feature": "places",

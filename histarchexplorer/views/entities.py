@@ -247,7 +247,7 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
             t.case_study_type_id IS NOT NULL
         """
 
-        g.cursor.execute(sql_get_cs_infos, {'language': g.language, 'preferred_language': app.config.get('PREFERRED_LANGUAGE')})
+        g.cursor.execute(sql_get_cs_infos, {'language': g.language, 'preferred_language': g.settings.preferred_language})
         cs_infos = g.cursor.fetchall()
 
         sql_case_studies = """

@@ -53,7 +53,19 @@
                for="activateAccessRestriction">Activate Access Restriction</label>
       </div>
     </div>
-
+  <div class="col mb-3">
+    <label for="preferredLanguage">
+      {{ _('preferred language') | capitalize }}
+    </label>
+    <select class="form-control" id="preferredLanguage" name="preferredLanguage">
+      {% for languages in available_languages %}
+        <option value={{ languages }}
+                  {% if languages == settings.preferred_language %}selected{% endif %}>
+          {{ languages | capitalize }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
     <button
       type="submit"
       class="btn btn-primary">{{ _('Save') }}
