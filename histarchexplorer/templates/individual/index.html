@@ -43,6 +43,7 @@
 
 
     .hero-subtitle {
+
         font-size: 1.5rem;
         line-height: 1.5;
         max-width: 720px;
@@ -70,12 +71,11 @@
 
     /* CONTENT TILES */
     .tile {
-        height: 100vh;
+        min-height: calc(100vh - var(--navbar-height));
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
-        padding: 60px 20px;
     }
 
 
@@ -86,11 +86,6 @@
 
     .tile:nth-child(even) {
         background: white;
-    }
-
-
-    .tile-content {
-        max-width: 900px;
     }
 
 
@@ -112,79 +107,134 @@
         line-height: 1.6;
     }
 
+    .subtile {
+        min-height: calc((100vh - var(--navbar-height)) / 2);
+        padding: 40px;
+        background: white;
+        border-radius: 0px;
+        height: 100%;
+        transition: transform .2s ease;
+        align-content: center;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03);
+    }
+
+    a {
+        text-decoration: none!important;
+        color: inherit;
+    }
+
+    .subtile:hover {
+        transform: scale(1.01);
+    }
+
+
+    .subtile h3 {
+        margin-bottom: 10px;
+    }
+
+    .tile-content > .row > * {
+        padding: 0;
+        margin: 0;
+    }
+
     html {
         scroll-behavior: smooth;
     }
 
+.subtile-blue {
+    background: #f3f6fb;
+}
+
+.subtile-sand {
+    background: #f6f4ef;
+}
+
+.subtile-green {
+    background: #eef5f1;
+}
+
+.subtile-white {
+    background: #ffffff;
+}
+
+
 </style>
+
 <section class="hero">
     <div class="hero-content">
         <img src="/static/images/logos/logo.png" alt="Logo"/>
 
 
         <h1 class="hero-title">
-            A Geospatial Approach to Modelling Social, Religious and Political Shifts in History
+            Modelling Social, Religious and Political Shifts in History
         </h1>
 
 
         <p class="hero-subtitle">
-            Mapping belief, power and everyday life through digital
+            A Geospatial Approach to Mapping belief, power and everyday life through digital
             archaeology, spatial humanities and data science.
         </p>
 
 
-        <a class="learn-more" href="#content">↓ Explore</a>
+        <a class="learn-more" href="#content">↓ learn more</a>
     </div>
 </section>
 
 
 <section id="content" class="tile">
+
     <div class="tile-content">
-        <h2>Digital Medieval Landscapes</h2>
-        <p>
-            We integrate archaeology, written sources and spatial data
-            to reconstruct how people inhabited, shaped and understood
-            medieval environments.
-        </p>
-        <img src="/static/images/assets/example1.jpg" alt="Landscape"/>
-    </div>
-</section>
+        <div class="row">
 
+            <a class="col-12 col-md-6" href="/entities">
+                <div class="subtile subtile-blue">
+                    <h3>Data Integration</h3>
+                    <p>
+                        Archaeological, textual and spatial data combined
+                        to reconstruct medieval lifeworlds.
+                    </p>
+                </div>
+            </a>
 
-<section class="tile">
-    <div class="tile-content">
-        <h2>Religion, Power & Society</h2>
-        <p>
-            Our research explores how religious practice, political
-            authority and social structures interacted across medieval
-            Europe.
-        </p>
-        <img src="/static/images/assets/example2.jpg" alt="Church"/>
-    </div>
-</section>
+            <a class="col-12 col-md-6" href="/about">
+                <div class="subtile subtile-sand">
+                    <h3>Project Background</h3>
+                    <p>
+                        ERC Starting Grant Project at the Univ. of Vienna and Natural History Museum Vienna.
+                    </p>
+                </div>
+            </a>
 
+            <a class="col-12 col-md-6" href="/outcome">
+                <div class="subtile subtile-green">
+                    <h3>Open Science</h3>
+                    <p>
+                        Open access publications, reusable datasets
+                        for interdisciplinary research and open source software.
+                    </p>
+                </div>
+            </a>
 
-<section class="tile">
-    <div class="tile-content">
-        <h2>Open Cultural Heritage Data</h2>
-        <p>
-            By building accessible datasets and spatial models we enable
-            new forms of research, collaboration and public engagement
-            with the medieval past.
-        </p>
-        <img src="/static/images/assets/example3.jpg" alt="Dataset"/>
-    </div>
-</section>
-
-
+            <div class="col-12 col-md-6">
+                <div class="subtile subtile-white">
 {% include "footer.html" %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+
+
 
 <script>
-document.querySelectorAll('a[href^=\"#\"]').forEach(anchor => {
-  anchor.addEventListener('click', e => {
-    e.preventDefault();
-    document.querySelector(anchor.getAttribute('href'))
-      .scrollIntoView({ behavior: 'smooth' });
-  });
-});
+    document.querySelectorAll('a[href^=\"#\"]').forEach(anchor => {
+        anchor.addEventListener('click', e => {
+            e.preventDefault();
+            document.querySelector(anchor.getAttribute('href'))
+                .scrollIntoView({behavior: 'smooth'});
+        });
+    });
 </script>
