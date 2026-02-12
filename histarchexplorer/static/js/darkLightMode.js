@@ -39,12 +39,14 @@ function setTheme(mode = 'auto') {
 // Function to handle system mode change
 function systemModeChange() {
     const mode = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-    setTheme(mode);
+    if (darkmodeOverride) setTheme('light');
+    if (!darkmodeOverride) setTheme(mode);
 }
 
 // Listen for changes in system color scheme and update the theme accordingly
 window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', systemModeChange);
 
 // Set initial theme based on localStorage or system preference
-setTheme();
+if (darkmodeOverride) setTheme('light');
+if (!darkmodeOverride) setTheme();
 

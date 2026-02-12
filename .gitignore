@@ -72,5 +72,8 @@ histarchexplorer/static/css/main.css.map
 # Python cache
 *.pyc
 
-
 cache_ids.txt
+
+/histarchexplorer/templates/individual/*
+!/histarchexplorer/templates/individual/content.html
+/histarchexplorer/static/images/ind_assets/*
