@@ -386,6 +386,8 @@ def update_general_settings(id_: int) -> Response:
         if validation_result['is_valid']:
             g.settings.case_study_type_id = id_
             g.settings.darkmode = request.form.get('darkMode') == 'on'
+            g.settings.access_restriction = request.form.get(
+                'accessRestriction') == 'on'
             g.settings.language_selector = request.form.get(
                 'languageSelection') == 'on'
             g.settings.save_to_db()

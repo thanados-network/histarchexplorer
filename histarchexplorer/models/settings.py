@@ -12,6 +12,7 @@ class Settings(BaseModel):
     greyscale: bool = False
     darkmode: bool = False
     language_selector: bool = False
+    access_restriction: bool = False
     shown_classes: List[str] = ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains', 'person', 'group', 'acquisition', 'event', 'activity', 'creation', 'move', 'production', 'modification']
     shown_types: List[str] = []
     hidden_classes: List[str] = ['group']

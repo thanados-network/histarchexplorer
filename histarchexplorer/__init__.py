@@ -1,11 +1,13 @@
 from typing import Any
 
 import psycopg2.extras
-from flask import Flask, Response, g, request, session, url_for, redirect
+from flask import Flask, Response, g, redirect, request, session, url_for
 from flask_babel import Babel
 from flask_caching import Cache
+from flask_login import current_user
 from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
+from werkzeug import Response
 
 from histarchexplorer.models.config import (
     ConfigEntity, Link, Properties, get_config_classes)
@@ -88,7 +90,7 @@ def get_type_divisions() -> dict[Any, dict[str, Any]]:
 
 
 @app.before_request
-def before_request() -> None:
+def before_request() -> Response | None:
     # todo: maybe change the cursor_factory to psycopg2.extras.RealDictCursor
     g.db = connect(app.config['DATABASE_NAME'])
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
@@ -97,15 +99,16 @@ def before_request() -> None:
     g.openatlas_cursor = g.openatlas_db.cursor(
         cursor_factory=psycopg2.extras.NamedTupleCursor)
 
-    if request.path.startswith('/reset'):
+    if request.path.startswith('/reset') or request.endpoint == 'static':
         return None
-    #quick login for preliminary prototype page
-    #if request.endpoint == 'static':
-    #    return
-    #if not current_user.is_authenticated and request.endpoint != 'login':
-    #    return redirect(url_for('login'))
 
     g.settings = Settings.load_from_db()
+
+    # Todo: move somewhere else but be aware of circular imports
+    if g.settings.access_restriction:
+        if not current_user.is_authenticated and request.endpoint != 'login':
+            return redirect(url_for('login'))
+
     if hasattr(babel, 'localeselector'):
         babel.localeselector(get_locale)
     else:
