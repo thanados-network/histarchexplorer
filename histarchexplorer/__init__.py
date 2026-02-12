@@ -1,7 +1,8 @@
 from typing import Any
 
 import psycopg2.extras
-from flask import Flask, Response, g, request, session, url_for
+from flask import Flask, Response, g, request, session, url_for, redirect
+
 from flask_babel import Babel
 from flask_caching import Cache
 from flask_login import current_user
