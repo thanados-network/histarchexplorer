@@ -331,7 +331,7 @@ def choose_index_background() -> Response:
 def select_entities() -> Response:
     check_manager_user()
     if request.method == 'POST':
-        g.settings.hidden_classes = request.form.getlist('selected_entities')
+        g.settings.shown_classes = request.form.getlist('selected_entities')
         g.settings.save_to_db()
         flash(_('set shown entities'), 'info')
     return redirect(url_for('admin'))
