@@ -41,8 +41,20 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         {'label': _('attributes'), 'target': 'nav-attributes',
          'id': g.config_classes['attribute']}]
 
-    if not tab and tabs:
-        tab = tabs[0]['target']
+    # Determine which main sidebar section should be active
+    active_main_sidebar_id = 'sidebar-general-settings-group' # Default
+
+    if tab:
+        # Check if the 'tab' parameter corresponds to one of the 'About Section Content' sub-tabs
+        if any(t['target'] == tab for t in tabs):
+            active_main_sidebar_id = 'sidebar-about-content'
+        elif tab == 'sidebar-maps':
+            active_main_sidebar_id = 'sidebar-maps'
+        elif tab == 'sidebar-index-page-options':
+            active_main_sidebar_id = 'sidebar-index-page-options'
+        # If 'tab' is not recognized, it will default to 'sidebar-general-settings-group'
+
+    # Set is_active for the sub-tabs within 'About Section Content'
     for tab_item in tabs:
         tab_item['is_active'] = tab_item['target'] == tab
 
@@ -81,7 +93,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         hidden_classes=g.settings.hidden_classes,
         initial_case_study_type_id=cs_type_id,
         initial_case_study_type_name=cs_type_name,
-        case_study_children=case_study_children)
+        case_study_children=case_study_children,
+        active_main_sidebar_id=active_main_sidebar_id # Pass this to the template
+    )
 
 
 @app.route('/admin/delete_link/<int:link_id>/<tab>/<entry>', methods=['GET'])
