@@ -1,10 +1,12 @@
 import os
 import subprocess
 from typing import Optional
+from datetime import datetime
+from werkzeug.utils import secure_filename
 
 from flask import (
     abort, current_app, flash, g, jsonify, redirect, render_template,
-    request, url_for)
+    request, url_for, send_file)
 from flask_babel import gettext as _
 from flask_login import current_user, login_required
 from werkzeug import Response
@@ -52,6 +54,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             active_main_sidebar_id = 'sidebar-maps'
         elif tab == 'sidebar-index-page-options':
             active_main_sidebar_id = 'sidebar-index-page-options'
+        elif tab == 'sidebar-database':
+            active_main_sidebar_id = 'sidebar-database'
         # If 'tab' is not recognized, it will default to 'sidebar-general-settings-group'
 
     # Set is_active for the sub-tabs within 'About Section Content'
@@ -96,6 +100,121 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         case_study_children=case_study_children,
         active_main_sidebar_id=active_main_sidebar_id # Pass this to the template
     )
+
+
+@app.route('/admin/backup_db')
+@login_required
+def backup_db():
+    check_manager_user()
+    try:
+        db_name = current_app.config['DATABASE_NAME']
+        db_user = current_app.config['DATABASE_USER']
+        db_pass = current_app.config['DATABASE_PASS']
+        db_host = current_app.config['DATABASE_HOST']
+        db_port = str(current_app.config['DATABASE_PORT'])
+
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f'backup_{db_name}_{timestamp}.sql'
+        filepath = os.path.join('/tmp', filename)
+
+        env = os.environ.copy()
+        env['PGPASSWORD'] = db_pass
+
+        command = [
+            'pg_dump',
+            '-U', db_user,
+            '-h', db_host,
+            '-p', db_port,
+            '-d', db_name,
+            '-n', 'tng',  # Todo: find better name
+            '-f', filepath,
+            '--clean',
+            '--if-exists',
+            '--create'
+        ]
+
+        subprocess.run(command, env=env, check=True, capture_output=True, text=True)
+
+        return send_file(filepath, as_attachment=True)
+
+    except subprocess.CalledProcessError as e:
+        app.logger.error(f"Database backup failed: {e.stderr}")
+        flash(_('Database backup failed. Check logs for details.'), 'danger')
+    except Exception as e:
+        app.logger.error(f"An unexpected error occurred during backup: {e}")
+        flash(_('An unexpected error occurred. Check logs for details.'), 'danger')
+
+    return redirect(url_for('admin', tab='sidebar-database'))
+
+
+@app.route('/admin/restore_db', methods=['POST'])
+@login_required
+def restore_db():
+    check_manager_user()
+    if 'sql_file' not in request.files:
+        flash(_('No file part'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-database'))
+
+    file = request.files['sql_file']
+    if file.filename == '':
+        flash(_('No selected file'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-database'))
+
+    if file and file.filename.endswith('.sql'):
+        try:
+            db_name = current_app.config['DATABASE_NAME']
+            db_user = current_app.config['DATABASE_USER']
+            db_pass = current_app.config['DATABASE_PASS']
+            db_host = current_app.config['DATABASE_HOST']
+            db_port = str(current_app.config['DATABASE_PORT'])
+
+            filename = secure_filename(file.filename)
+            filepath = os.path.join('/tmp', filename)
+            file.save(filepath)
+
+            env = os.environ.copy()
+            env['PGPASSWORD'] = db_pass
+
+            psql_command = [
+                'psql',
+                '-U', db_user,
+                '-h', db_host,
+                '-p', db_port,
+                '-d', db_name,
+                '-c', 'DROP SCHEMA IF EXISTS tng CASCADE;',
+                '-c', 'CREATE SCHEMA tng;',
+                '-c', f'ALTER SCHEMA tng OWNER TO {db_user};'
+            ]
+            subprocess.run(
+                psql_command,
+                env=env,
+                check=True,
+                capture_output=True,
+                text=True)
+
+            restore_command = [
+                'psql',
+                '-U', db_user,
+                '-h', db_host,
+                '-p', db_port,
+                '-d', db_name,
+                '-f', filepath]
+
+            subprocess.run(restore_command, env=env, check=True, capture_output=True, text=True)
+
+            os.remove(filepath)
+            flash(_('Database restored successfully.'), 'success')
+
+        except subprocess.CalledProcessError as e:
+            app.logger.error(f"Database restore failed: {e.stderr}")
+            flash(_('Database restore failed. Check logs for details.'), 'danger')
+        except Exception as e:
+            app.logger.error(f"An unexpected error occurred during restore: {e}")
+            flash(_('An unexpected error occurred. Check logs for details.'), 'danger')
+    else:
+        flash(_('Invalid file type. Please upload a .sql file.'), 'danger')
+
+    return redirect(url_for('admin', tab='sidebar-database'))
 
 
 @app.route('/admin/delete_link/<int:link_id>/<tab>/<entry>', methods=['GET'])
@@ -261,7 +380,7 @@ def edit_map() -> Response:
         form_data: dict[str, str] = {
             'name': name,
             'display_name': display_name,
-            'sortorder': sort_order,
+            'sort_order': sort_order,
             'tilestring': tile_string,
             'map_id': str(map_id)}
 

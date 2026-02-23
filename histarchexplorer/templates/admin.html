@@ -9,6 +9,7 @@
     <div class="container pt-3 pb-3 text-center">
       <h3>
         {{ _('admin options') |upper }}
+        <span class="text-body-secondary"> | {{ _('DB Interface') }}</span>
       </h3>
       {{ ui.flash_messages() }}
     </div>
@@ -22,7 +23,8 @@
             {'id': 'sidebar-general-settings-group', 'label': _('General Settings')},
             {'id': 'sidebar-about-content', 'label': _('About Content')},
             {'id': 'sidebar-index-page-options', 'label': _('Start Content')},
-            {'id': 'sidebar-maps', 'label': _('Maps')}
+            {'id': 'sidebar-maps', 'label': _('Maps')},
+            {'id': 'sidebar-database', 'label': _('Database Interface')}
           ] %}
 
           {% set ns = namespace(active_sidebar=active_main_sidebar_id) %}
@@ -96,6 +98,11 @@
                 {% include 'admin/index_page_options.html' %}
               </div>
             </div>
+          </div>
+
+          {# Database Interface Section #}
+          <div class="tab-pane fade {% if ns.active_sidebar == 'sidebar-database' %}show active{% endif %}" id="sidebar-database" role="tabpanel" aria-labelledby="sidebar-database-tab" tabindex="0">
+            {% include 'admin/database.html' %}
           </div>
 
         </div>

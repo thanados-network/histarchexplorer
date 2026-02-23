@@ -1,0 +1,45 @@
+<div class="card mt-3 mb-5">
+  <div class="card-body">
+    <h5 class="card-title">{{ _('Database Backup') | upper }}</h5>
+    <p class="card-text">
+      {{ _('Download a full SQL dump of the current database.') }}
+    </p>
+    <a href="{{ url_for('backup_db') }}" class="btn btn-primary">
+      <i class="bi bi-download"></i> {{ _('Download SQL Dump') }}
+    </a>
+  </div>
+</div>
+
+<div class="card mt-3 mb-5 border-danger">
+  <div class="card-body">
+    <h5 class="card-title text-danger">{{ _('Database Restore') | upper }}</h5>
+    <p class="card-text text-danger">
+      <strong>{{ _('Warning:') }}</strong>
+      {{ _('Restoring a database will overwrite all current data. This action cannot be undone.') }}
+    </p>
+
+    <form action="{{ url_for('restore_db') }}" method="post" enctype="multipart/form-data" class="mt-3">
+      <div class="mb-3">
+        <label for="sqlFile" class="form-label">{{ _('Select SQL Dump File') }}</label>
+        <input class="form-control" type="file" id="sqlFile" name="sql_file" accept=".sql" required>
+      </div>
+      <button type="submit" class="btn btn-danger" onclick="return confirm('{{ _('Are you sure you want to overwrite the database?') }}')">
+        <i class="bi bi-upload"></i> {{ _('Restore Database') }}
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="card mt-3 mb-5 border-danger">
+  <div class="card-body">
+    <h5 class="card-title text-danger">{{ _('Database Reset') | upper }}</h5>
+    <p class="card-text text-danger">
+      <strong>{{ _('Warning:') }}</strong>
+      {{ _('This will reset the entire database to the initial sample data. All custom data will be lost!') }}
+    </p>
+    <button id="resetButton" class="btn btn-danger" data-bs-toggle="tooltip"
+            title="{{ _('Resets the entire database') }}">
+      <i class="bi bi-arrow-counterclockwise"></i> {{ _('RESET DATABASE') }}
+    </button>
+  </div>
+</div>
