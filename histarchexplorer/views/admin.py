@@ -251,7 +251,9 @@ def set_favicon() -> Response:
     if not os.path.exists(logo_path):
         logo_path = os.path.join(static_path, filename)
 
-    favicon_path = os.path.join(app.static_folder, 'favicon.ico')
+    target_dir = os.path.join(app.root_path, '..', 'uploads')
+    os.makedirs(target_dir, exist_ok=True)
+    favicon_path = os.path.join(target_dir, 'favicon.ico')
 
     try:
         with Image.open(logo_path) as img:
@@ -963,3 +965,8 @@ def update_asset_license() -> Response:
 @app.route('/uploads/assets/<filename>')
 def uploaded_asset(filename):
     return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'assets'), filename)
+
+
+@app.route('/uploads/favicon.ico')
+def uploaded_favicon():
+    return send_from_directory(os.path.join(app.root_path, '..', 'uploads'), 'favicon.ico')

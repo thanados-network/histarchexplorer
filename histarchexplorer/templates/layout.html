@@ -2,7 +2,11 @@
 <html lang="{{ current_language }}">
 <head>
 
+  {% if has_uploaded_favicon %}
+  <link rel="icon" href="{{ url_for('uploaded_favicon', v=favicon_version) }}">
+  {% else %}
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico', v=favicon_version) }}">
+  {% endif %}
 
   <!-- Fonts & CSS -->
   <link href="/static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"/>

@@ -190,7 +190,9 @@ def inject_globals() -> dict[str, Any]:
             "file": "files"},
         'logo_id_to_filename_map': Admin.get_logo_id_to_filename_map(),
         'favicon_version': int(time.time()),
-        'get_logo_url': get_logo_url}
+        'get_logo_url': get_logo_url,
+        'has_uploaded_favicon': os.path.exists(
+            os.path.join(app.root_path, '..', 'uploads', 'favicon.ico'))}
 
 
 @app.after_request
