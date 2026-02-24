@@ -1,8 +1,12 @@
 <footer class="footer p-3 footercontent">
     {% for logo_id in g.settings.footer_logos %}
-        {% set logo_filename = g.logo_id_to_filename_map.get(logo_id) %}
+        {% set logo_filename = logo_id_to_filename_map.get(logo_id) %}
         {% if logo_filename %}
-            <img class="footerimg img-fluid" src="{{ url_for('static', filename='images/logos/' + logo_filename) }}" alt="{{ logo_filename }}">
+            {% if logo_filename.endswith('.svg') %}
+                <object class="footerimg img-fluid" data="{{ url_for('static', filename='images/logos/' + logo_filename) }}" type="image/svg+xml" style="height: 50px;"></object>
+            {% else %}
+                <img class="footerimg img-fluid" src="{{ url_for('static', filename='images/logos/' + logo_filename) }}" alt="{{ logo_filename }}">
+            {% endif %}
         {% endif %}
     {% endfor %}
 </footer>

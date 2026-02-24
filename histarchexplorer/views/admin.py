@@ -83,6 +83,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             app.logger.error('Error processing case study type ID: %s', e)
 
     admin_instance = Admin()
+    all_logos = admin_instance.get_all_logos_with_ids()
+    selected_footer_logos = g.settings.footer_logos
 
     return render_template(
         "admin.html",
@@ -108,7 +110,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         initial_case_study_type_name=cs_type_name,
         case_study_children=case_study_children,
         active_main_sidebar_id=active_main_sidebar_id,
-        licenses=admin_instance.licenses)
+        licenses=admin_instance.licenses,
+        all_logos=all_logos,
+        selected_footer_logos=selected_footer_logos)
 
 
 @app.route('/admin/upload_logo', methods=['POST'])
@@ -217,28 +221,19 @@ def set_main_logo() -> Response:
     return redirect(url_for('admin', tab='sidebar-logo-management'))
 
 
-@app.route('/admin/footer_content', methods=['GET', 'POST'])
+@app.route('/admin/update_footer_content', methods=['POST'])
 @login_required
-def footer_content() -> str | Response:
+def update_footer_content() -> Response:
     check_manager_user()
-    admin_instance = Admin()
-    if request.method == 'POST':
-        selected_logo_ids = [int(logo_id) for logo_id in request.form.getlist('footer_logos')]
-        g.settings.footer_logos = selected_logo_ids
-        try:
-            g.settings.save_to_db()
-            flash(_('Footer logos updated successfully.'), 'success')
-        except Exception as e:
-            app.logger.error("Failed to update footer logos: %s", e)
-            flash(_('Error updating footer logos'), 'error')
-        return redirect(url_for('admin', tab='sidebar-footer-content'))
-    
-    all_logos = admin_instance.get_all_logos_with_ids()
-    return render_template(
-        "admin/footer_content_management.html",
-        admin_instance=admin_instance,
-        all_logos=all_logos,
-        selected_footer_logos=g.settings.footer_logos)
+    selected_logo_ids = [int(logo_id) for logo_id in request.form.getlist('footer_logos')]
+    g.settings.footer_logos = selected_logo_ids
+    try:
+        g.settings.save_to_db()
+        flash(_('Footer logos updated successfully.'), 'success')
+    except Exception as e:
+        app.logger.error("Failed to update footer logos: %s", e)
+        flash(_('Error updating footer logos'), 'error')
+    return redirect(url_for('admin', tab='sidebar-footer-content'))
 
 
 @app.route('/admin/add_license', methods=['POST'])
