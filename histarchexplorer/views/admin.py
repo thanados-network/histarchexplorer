@@ -60,7 +60,6 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                 case _:
                     pass
 
-    # Set is_active for the sub-tabs within 'About Section Content'
     for tab_item in tabs:
         tab_item['is_active'] = tab_item['target'] == tab
 
@@ -87,7 +86,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         "admin.html",
         tabs=tabs,
         admin_instance=admin_instance,
-        processed_entities_by_tab=admin_instance.process_entities_by_tab(tabs, entry),
+        processed_entities_by_tab=admin_instance.process_entities_by_tab(
+            tabs,
+            entry),
         processed_links_by_entity=admin_instance.process_links_by_entity(),
         processed_properties_by_tab=admin_instance.process_properties_by_tab(tabs),
         processed_roles=admin_instance.process_roles(),
@@ -104,9 +105,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         initial_case_study_type_name=cs_type_name,
         case_study_children=case_study_children,
         active_main_sidebar_id=active_main_sidebar_id,
-        licenses=admin_instance.licenses,
-
-    )
+        licenses=admin_instance.licenses    )
 
 
 @app.route('/admin/upload_logo', methods=['POST'])
