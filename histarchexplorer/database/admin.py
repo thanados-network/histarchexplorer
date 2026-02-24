@@ -294,7 +294,11 @@ def get_licenses() -> Any:
 
 
 def get_file_licenses() -> dict[str, Any]:
-    g.cursor.execute('SELECT filename, license_id, attribution FROM tng.file_licenses')
+    g.cursor.execute('''
+        SELECT f.filename, fl.license_id, fl.attribution 
+        FROM tng.file_licenses fl
+        JOIN tng.files f ON fl.file_id = f.id
+    ''')
     return {row.filename: {'license_id': row.license_id, 'attribution': row.attribution} for row in g.cursor.fetchall()}
 
 
@@ -314,57 +318,107 @@ def delete_license(license_id: int) -> None:
 
 
 def update_file_license(filename: str, license_id: int, attribution: str) -> None:
+    # First get file_id from filename
+    g.cursor.execute('SELECT id FROM tng.files WHERE filename = %s', (filename,))
+    res = g.cursor.fetchone()
+    if not res:
+        return # Or handle error
+    file_id = res.id
+    
     g.cursor.execute(
         """
-        INSERT INTO tng.file_licenses (filename, license_id, attribution)
-        VALUES (%(filename)s, %(license_id)s, %(attribution)s)
-        ON CONFLICT (filename) DO UPDATE SET license_id = %(license_id)s, attribution = %(attribution)s
+        INSERT INTO tng.file_licenses (file_id, license_id, attribution)
+        VALUES (%(file_id)s, %(license_id)s, %(attribution)s)
+        ON CONFLICT (file_id) DO UPDATE SET license_id = %(license_id)s, attribution = %(attribution)s
         """,
-        {'filename': filename, 'license_id': license_id, 'attribution': attribution}
+        {'file_id': file_id, 'license_id': license_id, 'attribution': attribution}
     )
 
 
-def get_all_logos_from_db() -> list[dict[str, Any]]:
-    g.cursor.execute('SELECT id, filename, is_default FROM tng.logos WHERE is_active = TRUE ORDER BY filename')
+def get_all_files_from_db(file_type: str) -> list[dict[str, Any]]:
+    g.cursor.execute('SELECT id, filename, is_default FROM tng.files WHERE type = %s AND is_active = TRUE ORDER BY filename', (file_type,))
     return [{'id': row.id, 'filename': row.filename, 'is_default': row.is_default} for row in g.cursor.fetchall()]
 
 
-def add_logo_to_db(filename: str, is_default: bool = False) -> None:
+def add_file_to_db(filename: str, file_type: str, is_default: bool = False) -> None:
     g.cursor.execute(
-        'INSERT INTO tng.logos (filename, is_default, is_active) VALUES (%(filename)s, %(is_default)s, TRUE)',
-        {'filename': filename, 'is_default': is_default})
+        'INSERT INTO tng.files (type, filename, is_default, is_active) VALUES (%(type)s, %(filename)s, %(is_default)s, TRUE)',
+        {'type': file_type, 'filename': filename, 'is_default': is_default})
 
 
-def delete_logo_from_db(filename: str) -> None:
+def delete_file_from_db(filename: str, file_type: str) -> None:
     g.cursor.execute(
-        'SELECT is_default FROM tng.logos WHERE filename = %(filename)s',
-        {'filename': filename})
+        'SELECT is_default FROM tng.files WHERE filename = %(filename)s AND type = %(type)s',
+        {'filename': filename, 'type': file_type})
     row = g.cursor.fetchone()
     if row and row.is_default:
         g.cursor.execute(
-            'UPDATE tng.logos SET is_active = FALSE WHERE filename = %(filename)s',
-            {'filename': filename})
+            'UPDATE tng.files SET is_active = FALSE WHERE filename = %(filename)s AND type = %(type)s',
+            {'filename': filename, 'type': file_type})
     else:
         g.cursor.execute(
-            'DELETE FROM tng.logos WHERE filename = %(filename)s',
-            {'filename': filename})
+            'DELETE FROM tng.files WHERE filename = %(filename)s AND type = %(type)s',
+            {'filename': filename, 'type': file_type})
+
+
+def rename_file_in_db(old_name: str, new_name: str, file_type: str) -> None:
+    g.cursor.execute(
+        'UPDATE tng.files SET filename = %(new_name)s WHERE filename = %(old_name)s AND type = %(type)s',
+        {'old_name': old_name, 'new_name': new_name, 'type': file_type})
+
+
+def synchronize_files_with_db(file_type: str, folder_path: str) -> None:
+    if not os.path.exists(folder_path):
+        return
+
+    fs_files = set(os.listdir(folder_path))
+    g.cursor.execute('SELECT filename FROM tng.files WHERE type = %s AND is_default = TRUE', (file_type,))
+    db_files = {row.filename for row in g.cursor.fetchall()}
+
+    missing_in_db = fs_files - db_files
+    for filename in missing_in_db:
+        add_file_to_db(filename, file_type, is_default=True)
+
+
+# Wrapper functions for Logos
+def get_all_logos_from_db() -> list[dict[str, Any]]:
+    return get_all_files_from_db('logo')
+
+
+def add_logo_to_db(filename: str, is_default: bool = False) -> None:
+    add_file_to_db(filename, 'logo', is_default)
+
+
+def delete_logo_from_db(filename: str) -> None:
+    delete_file_from_db(filename, 'logo')
 
 
 def rename_logo_in_db(old_name: str, new_name: str) -> None:
-    g.cursor.execute(
-        'UPDATE tng.logos SET filename = %(new_name)s WHERE filename = %(old_name)s',
-        {'old_name': old_name, 'new_name': new_name})
+    rename_file_in_db(old_name, new_name, 'logo')
 
 
 def synchronize_logos_with_db() -> None:
     logo_path = os.path.join(current_app.static_folder, 'images', 'logos')
-    if not os.path.exists(logo_path):
-        return
+    synchronize_files_with_db('logo', logo_path)
 
-    fs_logos = set(os.listdir(logo_path))
-    g.cursor.execute('SELECT filename FROM tng.logos WHERE is_default = TRUE')
-    db_logos = {row.filename for row in g.cursor.fetchall()}
 
-    missing_in_db = fs_logos - db_logos
-    for filename in missing_in_db:
-        add_logo_to_db(filename, is_default=True)
+# Wrapper functions for Assets
+def get_all_assets_from_db() -> list[dict[str, Any]]:
+    return get_all_files_from_db('asset')
+
+
+def add_asset_to_db(filename: str, is_default: bool = False) -> None:
+    add_file_to_db(filename, 'asset', is_default)
+
+
+def delete_asset_from_db(filename: str) -> None:
+    delete_file_from_db(filename, 'asset')
+
+
+def rename_asset_in_db(old_name: str, new_name: str) -> None:
+    rename_file_in_db(old_name, new_name, 'asset')
+
+
+def synchronize_assets_with_db() -> None:
+    asset_path = os.path.join(current_app.static_folder, 'assets')
+    synchronize_files_with_db('asset', asset_path)

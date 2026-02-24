@@ -15,7 +15,8 @@ from werkzeug import Response
 from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.database.admin import (
-    update_sort_order, add_logo_to_db, delete_logo_from_db, rename_logo_in_db)
+    update_sort_order, add_logo_to_db, delete_logo_from_db, rename_logo_in_db,
+    add_asset_to_db, delete_asset_from_db, rename_asset_in_db)
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.models.admin import Admin
 from histarchexplorer.utils.view_util import find_children_by_id
@@ -56,7 +57,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                 case ('sidebar-maps' | 'sidebar-index-page-options' |
                       'sidebar-database' | 'sidebar-cache-options' |
                       'sidebar-content-group' | 'sidebar-logo-management' |
-                      'sidebar-footer-content' |
+                      'sidebar-footer-content' | 'sidebar-file-management-group' |
+                      'sidebar-assets' |
                       'sidebar-licenses'):
                     active_main_sidebar_id = tab
 
@@ -85,6 +87,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     admin_instance = Admin()
     all_logos = admin_instance.get_all_logos_with_ids()
+    all_assets = admin_instance.get_all_assets_with_ids()
     selected_footer_logos = g.settings.footer_logos
 
     return render_template(
@@ -113,6 +116,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         active_main_sidebar_id=active_main_sidebar_id,
         licenses=admin_instance.licenses,
         all_logos=all_logos,
+        all_assets=all_assets,
         selected_footer_logos=selected_footer_logos)
 
 
@@ -151,6 +155,7 @@ def rename_logo():
     if not old_name or not new_name:
         flash(_('Invalid request for renaming.'), 'danger')
         return redirect(url_for('admin', tab='sidebar-logo-management'))
+
     static_path = os.path.join(app.static_folder, 'images', 'logos')
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
 
@@ -843,3 +848,118 @@ def refresh_system_cache() -> Response:
 @app.route('/uploads/logos/<filename>')
 def uploaded_logo(filename):
     return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'logos'), filename)
+
+
+@app.route('/admin/upload_asset', methods=['POST'])
+@login_required
+def upload_asset():
+    check_manager_user()
+    if 'asset_file' not in request.files:
+        flash(_('No file part'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-assets'))
+
+    file = request.files['asset_file']
+    if file.filename == '':
+        flash(_('No selected file'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-assets'))
+
+    if file:
+        filename = secure_filename(file.filename)
+        upload_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
+        os.makedirs(upload_path, exist_ok=True)
+        file.save(os.path.join(upload_path, filename))
+        add_asset_to_db(filename, is_default=False)
+        flash(_('Asset "%(name)s" uploaded successfully.', name=filename),
+              'success')
+
+    return redirect(url_for('admin', tab='sidebar-assets'))
+
+
+@app.route('/admin/rename_asset', methods=['POST'])
+@login_required
+def rename_asset():
+    check_manager_user()
+    old_name = request.form.get('old_name')
+    new_name = request.form.get('new_name')
+
+    if not old_name or not new_name:
+        flash(_('Invalid request for renaming.'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-assets'))
+
+    static_path = os.path.join(app.static_folder, 'assets')
+    uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
+
+    old_filepath_static = os.path.join(static_path, secure_filename(old_name))
+    old_filepath_uploads = os.path.join(uploads_path, secure_filename(old_name))
+
+    if os.path.exists(old_filepath_static):
+        flash(_('Cannot rename default assets.'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-assets'))
+    elif os.path.exists(old_filepath_uploads):
+        old_filepath = old_filepath_uploads
+        new_filepath = os.path.join(uploads_path, secure_filename(new_name))
+    else:
+        flash(_('Original file not found.'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-assets'))
+
+    if os.path.exists(new_filepath):
+        flash(_('A file with the new name already exists.'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-assets'))
+
+    try:
+        os.rename(old_filepath, new_filepath)
+        rename_asset_in_db(old_name, new_name)
+        flash(_('Asset renamed from "%(old)s" to "%(new)s".', old=old_name,
+                new=new_name), 'success')
+    except OSError as e:
+        flash(_('Error renaming file: %(error)s', error=e), 'danger')
+
+    return redirect(url_for('admin', tab='sidebar-assets'))
+
+
+@app.route('/admin/delete_asset', methods=['POST'])
+@login_required
+def delete_asset():
+    check_manager_user()
+    filename = request.form.get('filename')
+    if not filename:
+        flash(_('No filename specified for deletion.'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-assets'))
+
+    uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
+    filepath_uploads = os.path.join(uploads_path, secure_filename(filename))
+
+    if os.path.exists(filepath_uploads):
+        try:
+            os.remove(filepath_uploads)
+            delete_asset_from_db(filename)
+            flash(_('Asset "%(name)s" deleted successfully.', name=filename),
+                  'success')
+        except OSError as e:
+            flash(_('Error deleting file: %(error)s', error=e), 'danger')
+    else:
+        delete_asset_from_db(filename)
+        flash(_('Default asset "%(name)s" deactivated.', name=filename), 'success')
+
+    return redirect(url_for('admin', tab='sidebar-assets'))
+
+
+@app.route('/admin/update_asset_license', methods=['POST'])
+@login_required
+def update_asset_license() -> Response:
+    check_manager_user()
+
+    filename = request.form.get('filename', '')
+    license_id = request.form.get('license_id', type=int)
+    attribution = request.form.get('attribution', '')
+
+    admin_instance = Admin()
+    admin_instance.update_file_license(filename, license_id, attribution)
+
+    flash(_('Asset license updated successfully.'), 'success')
+    return redirect(url_for('admin', tab='sidebar-assets'))
+
+
+@app.route('/uploads/assets/<filename>')
+def uploaded_asset(filename):
+    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'assets'), filename)

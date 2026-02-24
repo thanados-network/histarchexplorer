@@ -1,8 +1,7 @@
-import os
 from collections import defaultdict
 from typing import Any, Optional
 
-from flask import g, current_app
+from flask import g
 
 from histarchexplorer.database.admin import (
     add_entry, add_license, add_link,
@@ -15,7 +14,8 @@ from histarchexplorer.database.admin import (
     update_config_entry,
     update_file_license, update_map,
     update_sort_order,
-    get_all_logos_from_db)
+    get_all_logos_from_db,
+    get_all_assets_from_db)
 from histarchexplorer.database.map import get_maps
 from histarchexplorer.models.config import ConfigEntity
 
@@ -36,6 +36,7 @@ class Admin:
         self.admin_fields = fields if fields is not None else g.admin_fields
         self.language = g.language
         self.logos = self.get_all_logo_filenames()
+        self.assets = self.get_all_asset_filenames()
         self.licenses = self.get_licenses()
         self.file_licenses = self.get_file_licenses()
 
@@ -122,6 +123,19 @@ class Admin:
     @staticmethod
     def get_all_logo_filenames() -> list[str]:
         return [logo['filename'] for logo in Admin.get_all_logos_with_ids()]
+
+    @staticmethod
+    def get_all_assets_with_ids() -> list[dict[str, Any]]:
+        return get_all_assets_from_db()
+
+    @staticmethod
+    def get_asset_id_to_filename_map() -> dict[int, str]:
+        asset_list = Admin.get_all_assets_with_ids()
+        return {asset['id']: asset['filename'] for asset in asset_list}
+
+    @staticmethod
+    def get_all_asset_filenames() -> list[str]:
+        return [asset['filename'] for asset in Admin.get_all_assets_with_ids()]
 
     def _has_translation(self, entity: ConfigEntity, field_key: str) -> bool:
         value_attr = getattr(entity, field_key, None)
