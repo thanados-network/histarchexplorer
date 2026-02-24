@@ -61,6 +61,13 @@
                         </button>
                     {% endif %}
                 </form>
+                {# Set as Favicon Form #}
+                <form action="{{ url_for('set_favicon') }}" method="post" class="d-grid mb-2">
+                    <input type="hidden" name="filename" value="{{ filename }}">
+                    <button type="submit" class="btn btn-sm btn-outline-info">
+                        <i class="bi bi-heart"></i> {{ _('Set as Favicon') }}
+                    </button>
+                </form>
                 {# Rename Form #}
                 <form action="{{ url_for('rename_logo') }}" method="post" class="input-group input-group-sm mb-2">
                     <input type="hidden" name="old_name" value="{{ filename }}">

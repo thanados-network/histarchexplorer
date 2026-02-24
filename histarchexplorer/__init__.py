@@ -1,3 +1,4 @@
+import time
 from typing import Any
 
 import psycopg2.extras
@@ -177,7 +178,8 @@ def inject_globals() -> dict[str, Any]:
             "artifact": "items",
             "source": "sources",
             "file": "files"},
-        'logo_id_to_filename_map': Admin.get_logo_id_to_filename_map()}
+        'logo_id_to_filename_map': Admin.get_logo_id_to_filename_map(),
+        'favicon_version': int(time.time())}
 
 
 @app.after_request

@@ -2,7 +2,7 @@
 <html lang="{{ current_language }}">
 <head>
 
-  <link rel="icon" href="/static/images/favicons/favicon_thanados.ico">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico', v=favicon_version) }}">
 
   <!-- Fonts & CSS -->
   <link href="/static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"/>

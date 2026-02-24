@@ -3,6 +3,7 @@ import subprocess
 from typing import Optional
 from datetime import datetime
 from werkzeug.utils import secure_filename
+from PIL import Image
 
 from flask import (
     abort, current_app, flash, g, jsonify, redirect, render_template,
@@ -217,6 +218,29 @@ def set_main_logo() -> Response:
     except Exception as e:
         app.logger.error("Failed to set main logo: %s", e)
         flash(_('Error updating settings'), 'error')
+
+    return redirect(url_for('admin', tab='sidebar-logo-management'))
+
+
+@app.route('/admin/set_favicon', methods=['POST'])
+@login_required
+def set_favicon() -> Response:
+    check_manager_user()
+    filename = request.form.get('filename')
+    if not filename:
+        flash(_('No filename specified.'), 'danger')
+        return redirect(url_for('admin', tab='sidebar-logo-management'))
+
+    logo_path = os.path.join(app.static_folder, 'images', 'logos', filename)
+    favicon_path = os.path.join(app.static_folder, 'favicon.ico')
+
+    try:
+        with Image.open(logo_path) as img:
+            img.save(favicon_path, 'ICO', sizes=[(32, 32)])
+        flash(_('Favicon updated successfully.'), 'success')
+    except Exception as e:
+        app.logger.error(f"Failed to set favicon: {e}")
+        flash(_('Error creating favicon: %(error)s', error=str(e)), 'danger')
 
     return redirect(url_for('admin', tab='sidebar-logo-management'))
 
