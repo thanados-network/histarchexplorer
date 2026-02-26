@@ -1,0 +1,52 @@
+<div class="card mt-3 mb-5">
+  <div class="card-body">
+    <h5 class="card-title">{{ _('menu management') | upper }}</h5>
+    <form id="menuManagementForm">
+      <table class="table">
+        <thead>
+        <tr>
+          <th>{{ _('Menu Item') }}</th>
+          <th>{{ _('Show') }}</th>
+          <th>{{ _('Page Type') }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% set menu_items = ['Start page', 'About', 'Publication', 'Search', 'Footer', 'Legal notice'] %}
+
+        {% for item in menu_items %}
+          <tr>
+            <td>{{ _(item) }}</td>
+            <td>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox"
+                       id="show_{{ item|lower|replace(' ', '_') }}"
+                       name="show_{{ item|lower|replace(' ', '_') }}"
+                       {% if item == 'Legal notice' %}disabled{% else %}checked{% endif %}>
+              </div>
+            </td>
+            <td>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio"
+                       name="page_type_{{ item|lower|replace(' ', '_') }}"
+                       id="default_{{ item|lower|replace(' ', '_') }}"
+                       value="default" checked>
+                <label class="form-check-label"
+                       for="default_{{ item|lower|replace(' ', '_') }}">{{ _('Default') }}</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio"
+                       name="page_type_{{ item|lower|replace(' ', '_') }}"
+                       id="individual_{{ item|lower|replace(' ', '_') }}"
+                       value="individual">
+                <label class="form-check-label"
+                       for="individual_{{ item|lower|replace(' ', '_') }}">{{ _('Individual') }}</label>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <button type="submit" class="btn btn-primary">{{ _('Save Changes') }}</button>
+    </form>
+  </div>
+</div>

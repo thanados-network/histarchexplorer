@@ -30,10 +30,12 @@
             {'id': 'sidebar-general-settings-group', 'label': _('General Settings')},
             {'id': 'sidebar-cache-options', 'label': _('Cache Options')},
             {'id': 'sidebar-content-group', 'label': _('Content'), 'is_group': True},
-            {'id': 'sidebar-index-page-options', 'label': _('Start Content'), 'parent': 'sidebar-content-group'},
-            {'id': 'sidebar-about-content', 'label': _('About Content'), 'parent': 'sidebar-content-group'},
+            {'id': 'sidebar-index-page-options', 'label': _('Start page'), 'parent': 'sidebar-content-group'},
+            {'id': 'sidebar-about-content', 'label': _('About'), 'parent': 'sidebar-content-group'},
+            {'id': 'sidebar-about-publication', 'label': _('Publication'), 'parent': 'sidebar-content-group'},
             {'id': 'sidebar-legal-notice', 'label': _('Legal Notice'), 'parent': 'sidebar-content-group'},
-            {'id': 'sidebar-footer-content', 'label': _('Footer Content'), 'parent': 'sidebar-content-group'},
+            {'id': 'sidebar-footer-content', 'label': _('Footer'), 'parent': 'sidebar-content-group'},
+            {'id': 'sidebar-search-content', 'label': _('Search'), 'parent': 'sidebar-content-group'},
             {'id': 'sidebar-file-management-group', 'label': _('File Management'), 'is_group': True},
             {'id': 'sidebar-logo-management', 'label': _('Logo Management'), 'parent': 'sidebar-file-management-group'},
             {'id': 'sidebar-assets', 'label': _('Assets'), 'parent': 'sidebar-file-management-group'},
@@ -127,12 +129,7 @@
             class="tab-pane fade {% if ns.active_sidebar == 'sidebar-content-group' %}show active{% endif %}"
             id="sidebar-content-group" role="tabpanel"
             aria-labelledby="sidebar-content-group-tab" tabindex="0">
-            <div class="card mt-3 mb-5">
-              <div class="card-body">
-                <h5 class="card-title">{{ _('Content Overview') | upper }}</h5>
-                <p>{{ _('Select a content section from the sidebar to start editing.') }}</p>
-              </div>
-            </div>
+            {% include 'admin/menu_management.html' %}
           </div>
 
           {# About Section Content #}
