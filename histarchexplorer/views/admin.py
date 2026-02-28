@@ -619,8 +619,7 @@ def edit_entry() -> Response:
     config_id = request.form.get('config_id', type=int)
     name = request.form.get('name', '')
     cs_raw = request.form.get('case_study')
-    case_study: int | None = int(cs_raw) \
-        if cs_raw and cs_raw.isdigit() else None
+    case_study = int(cs_raw) if cs_raw and cs_raw.isdigit() else 0
 
     if config_id is None:
         flash(_('Configuration ID is required'), 'danger')
