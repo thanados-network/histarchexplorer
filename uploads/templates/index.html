@@ -1,0 +1,249 @@
+{% extends "layout.html" %}
+{% block content %}
+
+  <style>
+
+      /* HERO */
+      .hero {
+          height: calc(100vh - var(--navbar-height));
+          background: url("{{ get_assets_url('karnburg_charlemont.jpg') }}") center/cover no-repeat;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          color: white;
+      }
+
+
+      .hero::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.35);
+      }
+
+
+      .hero-content {
+          position: relative;
+          text-align: center;
+          max-width: 900px;
+          padding: 20px;
+      }
+
+
+      .hero-content img {
+          max-width: 500px;
+          width: 60%;
+      }
+
+
+      .hero-title {
+          font-size: 3.4rem;
+          margin: 30px 0 15px;
+          font-weight: 600;
+          text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+      }
+
+
+      .hero-subtitle {
+
+          font-size: 1.5rem;
+          line-height: 1.5;
+          max-width: 720px;
+          margin: auto;
+          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+          margin-bottom: 20px;
+      }
+
+
+      .learn-more {
+          font-size: 2rem;
+          text-decoration: none;
+          color: white;
+          border: 2px solid white;
+          padding: 5px 10px;
+          border-radius: 12px;
+          background: rgba(74, 74, 74, 0.58);
+          transition: all 0.2s ease;
+      }
+
+      .learn-more:hover {
+          background: rgba(34, 34, 34, 0.58);
+      }
+
+
+      /* CONTENT TILES */
+      .tile {
+          min-height: calc(100vh - var(--navbar-height));
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+      }
+
+
+      .tile:nth-child(odd) {
+          background: #f5f5f5;
+      }
+
+
+      .tile:nth-child(even) {
+          background: white;
+      }
+
+
+      .tile img {
+          max-width: 100%;
+          border-radius: 12px;
+          margin-top: 20px;
+      }
+
+
+      .tile h2 {
+          font-size: 2.4rem;
+          margin-bottom: 10px;
+      }
+
+
+      .tile p {
+          font-size: 1.2rem;
+          line-height: 1.6;
+      }
+
+      .subtile {
+          min-height: calc((100vh - var(--navbar-height)) / 2);
+          padding: 40px;
+          background: white;
+          border-radius: 0px;
+          height: 100%;
+          transition: transform .2s ease;
+          align-content: center;
+          box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+      }
+
+      a {
+          text-decoration: none !important;
+          color: inherit;
+      }
+
+      .subtile:hover {
+          transform: scale(1.01);
+      }
+
+
+      .subtile h3 {
+          margin-bottom: 10px;
+      }
+
+      .tile-content > .row > * {
+          padding: 0;
+          margin: 0;
+      }
+
+      html {
+          scroll-behavior: smooth;
+      }
+
+      .subtile-blue {
+          background: #f3f6fb;
+      }
+
+      .subtile-sand {
+          background: #f6f4ef;
+      }
+
+      .subtile-green {
+          background: #eef5f1;
+      }
+
+      .subtile-white {
+          background: #ffffff;
+      }
+
+
+  </style>
+
+  <div class="page-wrapper">
+    <section class="hero">
+      <div class="hero-content">
+        <img src="{{ get_logo_url('relic.png') }}" alt="Logo"/>
+
+
+        <h1 class="hero-title">
+          Modelling Social, Religious and Political Shifts in History
+        </h1>
+
+
+        <p class="hero-subtitle">
+          A Geospatial Approach to Mapping belief, power and everyday life
+          through digital
+          archaeology, spatial humanities and data science.
+        </p>
+
+
+        <a class="learn-more" href="#content">↓ learn more</a>
+      </div>
+    </section>
+
+
+    <section id="content" class="tile">
+
+      <div class="tile-content">
+        <div class="row">
+
+          <a class="col-12 col-md-6" href="/entities">
+            <div class="subtile subtile-blue">
+              <h3>Data Integration</h3>
+              <p>
+                Archaeological, textual and spatial data combined
+                to reconstruct medieval lifeworlds.
+              </p>
+            </div>
+          </a>
+
+          <a class="col-12 col-md-6" href="/about">
+            <div class="subtile subtile-sand">
+              <h3>Project Background</h3>
+              <p>
+                ERC Starting Grant Project at the Univ. of Vienna and Natural
+                History Museum Vienna.
+              </p>
+            </div>
+          </a>
+
+          <a class="col-12 col-md-6" href="/outcome">
+            <div class="subtile subtile-green">
+              <h3>Open Science</h3>
+              <p>
+                Open access publications, reusable datasets
+                for interdisciplinary research and open source software.
+              </p>
+            </div>
+          </a>
+
+          <div class="col-12 col-md-6">
+            <div class="subtile subtile-white">
+              {% include "footer.html" %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+
+
+  <script>
+    document.querySelectorAll('a[href^=\"#\"]').forEach(anchor => {
+      anchor.addEventListener('click', e => {
+        e.preventDefault();
+        document.querySelector(anchor.getAttribute('href'))
+          .scrollIntoView({behavior: 'smooth'});
+      });
+    });
+  </script>
+
+
+{% endblock %}

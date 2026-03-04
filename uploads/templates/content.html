@@ -1,0 +1,18 @@
+<style>
+    .ind-page-wrapper {
+        position: absolute;
+        top: var(--navbar-height);
+        width: 100%;
+        max-height: calc(100dvh - var(--navbar-height));
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+</style>
+
+{% extends "layout.html" %}
+{% block content %}
+    <div class="ind-page-wrapper">
+        {% include "individual/"+content +".html" %}
+
+    </div>
+{% endblock %}
