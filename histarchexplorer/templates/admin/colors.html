@@ -1,0 +1,147 @@
+<style>
+  .color-grid-popover {
+    display: grid;
+    grid-template-columns: repeat(6, 30px);
+    gap: 10px;
+    padding: 10px;
+    max-width: 280px;
+  }
+
+  .swatch {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 2px solid transparent;
+    transition: transform 0.1s ease;
+  }
+
+  .swatch:hover {
+    transform: scale(1.1);
+  }
+
+  .selected-color-display {
+    width: 100%;
+    height: 30px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .color-management-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+  }
+
+  .color-management-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .color-preview {
+    width: 25px;
+    height: 25px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+</style>
+
+<form method="POST" action="{{ url_for('update_entity_colors') }}">
+  <div class="row">
+    {% for entity_type in ['places', 'actors', 'events', 'items', 'sources', 'files', 'feature', 'stratigraphic_unit'] %}
+      <div class="col-md-3 mb-4">
+        <label class="form-label fw-bold">{{ _(entity_type) | capitalize }}</label>
+        <div class="selected-color-display"
+             id="display-{{ entity_type }}"
+             style="background-color: {{ settings.entity_colors.get(entity_type, '#000000') }};"
+             data-bs-toggle="popover"
+             data-bs-placement="bottom"
+             data-bs-html="true"
+             title="{{ _('select a color') }}">
+        </div>
+        <input type="hidden" id="selected-color-{{ entity_type }}"
+               name="entity_colors-{{ entity_type }}"
+               value="{{ settings.entity_colors.get(entity_type, '#000000') }}">
+      </div>
+    {% endfor %}
+  </div>
+
+  <button type="submit" class="btn btn-primary mt-3">{{ _('save') }}</button>
+</form>
+
+<hr class="my-5">
+
+<div>
+  <h5 class="mb-4">{{ _('Manage Available Colors') }}</h5>
+
+  <div class="color-management-grid mb-4">
+    {% for color in settings.available_colors %}
+      <div class="color-management-item">
+        <form method="POST" action="{{ url_for('delete_available_color') }}" >
+          <input type="hidden" name="color_to_delete" value="{{ color }}">
+          <button type="submit" class="btn btn-sm btn-danger"
+                  onclick="return confirm('{{ _('are you sure you want to delete this color?') }}')">
+            <i class="bi bi-trash"></i>
+          </button>
+        </form>
+        <div class="color-preview" style="background-color: {{ color }};">&nbsp;</div>
+        <code >{{ color }}</code>
+      </div>
+    {% endfor %}
+  </div>
+
+  <form method="POST" action="{{ url_for('add_available_color') }}" class="row g-3 align-items-end">
+    <div class="col-auto">
+      <label for="new_hex_color" class="form-label">{{ _('add new hex color') }}</label>
+      <input type="text" class="form-control" id="new_hex_color" name="new_color"
+             pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+             required oninput="updateColorPreview(this.value)">
+    </div>
+    <div class="col-auto">
+      <div id="new-color-preview" class="color-preview" style="background-color: transparent; border: 1px solid #ccc;">&nbsp;</div>
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-success">{{ _('add color') }}</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function updateColorPreview(color) {
+    const preview = document.getElementById('new-color-preview');
+    const isValid = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
+    preview.style.backgroundColor = isValid ? color : 'transparent';
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const availableColors = {{ settings.available_colors | tojson }};
+
+    document.querySelectorAll('[data-bs-toggle="popover"]').forEach(popoverTriggerEl => {
+      const entity_type = popoverTriggerEl.id.replace('display-', '');
+      const input = document.getElementById('selected-color-' + entity_type);
+
+      const colorGrid = document.createElement('div');
+      colorGrid.className = 'color-grid-popover';
+
+      availableColors.forEach(col => {
+        const swatch = document.createElement('div');
+        swatch.className = 'swatch';
+        swatch.style.backgroundColor = col;
+        swatch.onclick = (e) => {
+          e.stopPropagation();
+          input.value = col;
+          popoverTriggerEl.style.backgroundColor = col;
+          bootstrap.Popover.getInstance(popoverTriggerEl).hide();
+        };
+        colorGrid.appendChild(swatch);
+      });
+
+      const popover = new bootstrap.Popover(popoverTriggerEl, {
+        content: colorGrid,
+        sanitize: false
+      });
+    });
+  });
+</script>

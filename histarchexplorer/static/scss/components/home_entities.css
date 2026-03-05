@@ -160,7 +160,7 @@ body {
   background: var(--card-hover);
 }
 .entity-card--places {
-  border-top: 0.3125rem solid var(--limegreen);
+  border-top: 0.3125rem solid var(--pink);
 }
 .entity-card--actors {
   border-top: 0.3125rem solid var(--pink);

@@ -29,6 +29,25 @@ class Settings(BaseModel):
     nav_logo: str = 'thanados_light.svg'
     footer_logos: list[int] = []
     legal_notice: dict[str, str] = {}
+    entity_colors: dict[str, str] = {
+        'places': '#23cba7',
+        'actors': '#e83e8c',
+        'events': '#2980b9',
+        'items': '#fddb6d',
+        'sources': '#5c2a36',
+        'files': '#1f253d',
+        'feature': '#BBBBBB',
+        'stratigraphic_unit': '#000000'
+    }
+    available_colors: list[str] = [
+        '#23cba7', '#e83e8c', '#2980b9', '#fddb6d', '#5c2a36', '#1f253d',
+        '#4477AA', '#EE6677', '#228833', '#CCBB44', '#66CCEE', '#AA3377',
+        '#BBBBBB', '#004488', '#DDAA33', '#BB5566', '#000000',
+        '#0077BB', '#33BBEE', '#009988', '#EE7733', '#CC3311', '#EE3377',
+        '#2E4053', '#5D6D7E', '#85929E', '#AEB6BF', '#D6DBDF',
+        '#1A5276', '#1D8348', '#9A7D0A', '#922B21', '#633974',
+        '#7E5109', '#1C2833', '#99A3A4', '#515A5A'
+    ]
     menu_management: dict = {
         'start_page': {'show': True, 'page_type': 'default'},
         'legal_notice': {'show': True, 'page_type': 'default'},

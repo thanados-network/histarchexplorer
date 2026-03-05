@@ -1,5 +1,6 @@
 import os
 import json
+import re
 import subprocess
 from typing import Optional
 from datetime import datetime
@@ -67,7 +68,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                       'sidebar-menu-management' | 'sidebar-footer-content' |
                       'sidebar-file-management-group' | 'sidebar-assets' |
                       'sidebar-legal-notice' | 'sidebar-licenses' |
-                      'sidebar-team' | 'sidebar-about-publications'):
+                      'sidebar-team' | 'sidebar-about-publications' |
+                      'sidebar-colors'):
                     active_main_sidebar_id = tab
 
                 case _:
@@ -126,6 +128,62 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         all_logos=all_logos,
         all_assets=all_assets,
         selected_footer_logos=selected_footer_logos)
+
+
+@app.route('/admin/update_entity_colors', methods=['POST'])
+@login_required
+def update_entity_colors() -> Response:
+    check_manager_user()
+    colors = {}
+    for key, value in request.form.items():
+        if key.startswith('entity_colors-'):
+            entity_type = key.split('-')[1]
+            colors[entity_type] = value
+    g.settings.entity_colors = colors
+    try:
+        g.settings.save_to_db()
+        flash(_('Entity colors updated successfully.'), 'success')
+    except Exception as e:
+        app.logger.error("Failed to update entity colors: %s", e)
+        flash(_('Error updating entity colors'), 'error')
+    return _redirect_to_admin_tab('sidebar-colors')
+
+
+@app.route('/admin/add_available_color', methods=['POST'])
+@login_required
+def add_available_color() -> Response:
+    check_manager_user()
+    new_color = request.form.get('new_color')
+    if new_color and re.match(r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$', new_color):
+        if new_color not in g.settings.available_colors:
+            g.settings.available_colors.append(new_color)
+            try:
+                g.settings.save_to_db()
+                flash(_('Color added successfully.'), 'success')
+            except Exception as e:
+                app.logger.error("Failed to add color: %s", e)
+                flash(_('Error adding color'), 'error')
+        else:
+            flash(_('Color already exists.'), 'warning')
+    else:
+        flash(_('Invalid HEX code.'), 'danger')
+    return _redirect_to_admin_tab('sidebar-colors')
+
+
+@app.route('/admin/delete_available_color', methods=['POST'])
+@login_required
+def delete_available_color() -> Response:
+    check_manager_user()
+    color_to_delete = request.form.get('color_to_delete')
+    if color_to_delete in g.settings.available_colors:
+        g.settings.available_colors.remove(color_to_delete)
+        try:
+            g.settings.save_to_db()
+            flash(_('Color deleted successfully.'), 'success')
+        except Exception as e:
+            app.logger.error("Failed to delete color: %s", e)
+            flash(_('Error deleting color'), 'error')
+    return _redirect_to_admin_tab('sidebar-colors')
 
 
 @app.route('/admin/update_menu_management', methods=['POST'])

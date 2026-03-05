@@ -37,20 +37,6 @@ ADMIN_FIELDS = {
             'col_class': 'col-md-12'
             },
         {
-            'key': 'imprint',
-            'label': 'imprint',
-            'type': 'textarea',
-            'translatable': True,
-            'col_class': 'col-md-6'
-            },
-        {
-            'key': 'legal_notice',
-            'label': 'legal notice',
-            'type': 'textarea',
-            'translatable': True,
-            'col_class': 'col-md-6'
-            },
-        {
             'key': 'image',
             'label': 'Image URL',
             'type': 'text',

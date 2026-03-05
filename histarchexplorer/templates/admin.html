@@ -28,6 +28,7 @@
             role="tablist">
           {% set sidebar_sections = [
             {'id': 'sidebar-general-settings-group', 'label': _('General Settings')},
+            {'id': 'sidebar-colors', 'label': _('Colors')},
             {'id': 'sidebar-cache-options', 'label': _('Cache Options')},
             {'id': 'sidebar-content-group', 'label': _('Content'), 'is_group': True},
             {'id': 'sidebar-index-page-options', 'label': _('Start page'), 'parent': 'sidebar-content-group'},
@@ -106,6 +107,19 @@
                 <div class="d-flex justify-content-start align-items-start">
                   {% include 'admin/tools.html' %}
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {# Colors Section #}
+          <div
+            class="tab-pane fade {% if ns.active_sidebar == 'sidebar-colors' %}show active{% endif %}"
+            id="sidebar-colors" role="tabpanel"
+            aria-labelledby="sidebar-colors-tab" tabindex="0">
+            <div class="card mt-3 mb-5">
+              <div class="card-body">
+                <h5 class="card-title">{{ _('colors') | upper }}</h5>
+                {% include 'admin/colors.html' %}
               </div>
             </div>
           </div>
