@@ -169,7 +169,6 @@ ALTER TABLE tng.entities ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 --
 
 CREATE TABLE tng.file_licenses (
-    filename character varying(255) NOT NULL,
     license_id integer,
     attribution text,
     file_id integer NOT NULL
