@@ -171,7 +171,7 @@ def get_categorized_types(
             continue
         label = type_.division['label'].replace(' ', '_')
         divisions[label].append(
-            {'type': type_, 'icon': type_.division['icon']})
+            {'type': type_, 'division': type_.division})
     sorted_divisions = dict(sorted(divisions.items(), key=sort_key))
     return sorted_divisions
 

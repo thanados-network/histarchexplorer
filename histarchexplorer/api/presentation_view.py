@@ -1,5 +1,4 @@
 import json
-from curses.ascii import isdigit
 from dataclasses import asdict, dataclass, field
 from typing import Any, Optional
 
@@ -8,38 +7,17 @@ from flask import g, url_for
 
 from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import PROXIES
-from histarchexplorer.api.util import (dict_to_camel_case, format_date,
-                                       get_description_translated,
-                                       get_divisions, get_icon,
-                                       get_render_type, split_date_string)
+from histarchexplorer.api.util import (
+    dict_to_camel_case, format_date,
+    get_description_translated,
+    get_divisions,
+    get_render_type, split_date_string)
 
 
 @dataclass
 class GeometryModel:
     type: str
     coordinates: Any
-
-    # def swap_latlng(self) -> "GeometryModel":
-    #     def flip(coord):
-    #         return [coord[1], coord[0]]
-
-
-#
-#     if self.type == "Point":
-#         new_coords = flip(self.coordinates)
-#
-#     elif self.type == "LineString":
-#         new_coords = [flip(c) for c in self.coordinates]
-#
-#     elif self.type == "Polygon":
-#         # Polygons are lists of linear rings (outer ring + holes)
-#         new_coords = [[flip(c) for c in ring] for ring in self.coordinates]
-#
-#     else:
-#         # Leave untouched if unknown geometry type
-#         new_coords = self.coordinates
-#
-#     return GeometryModel(type=self.type, coordinates=new_coords)
 
 
 @dataclass
@@ -87,7 +65,6 @@ class EntityTypeModel:
     type_hierarchy: Optional[list[TypeHierarchyEntry]]
     value: Optional[str]
     unit: Optional[str]
-    icon: Optional[str]
     division: Optional[dict[str, str]]
 
 
@@ -244,7 +221,8 @@ class PresentationView:
                 hierarchy = [
                     TypeHierarchyEntry(**th)
                     for th in type_.get("typeHierarchy", [])]
-            id_ = int(type_["id"]) if isdigit(type_["id"]) else 0
+            id_str = str(type_["id"])
+            id_ = int(id_str) if id_str.isdigit() else 0
             types.append(EntityTypeModel(
                 id=id_,
                 title=type_.get("title", ""),
@@ -253,7 +231,6 @@ class PresentationView:
                 type_hierarchy=hierarchy,
                 value=type_.get("value"),
                 unit=type_.get("unit"),
-                icon=get_icon(id_, type_.get("typeHierarchy")),
                 division=get_divisions(
                     id_,
                     type_.get("typeHierarchy"))))
@@ -281,7 +258,6 @@ class PresentationView:
                         type_hierarchy=[],
                         value=None,
                         unit=None,
-                        icon=None,
                         division=None))
 
                 relation = Relation(

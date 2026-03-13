@@ -41,6 +41,7 @@
             {'id': 'sidebar-search-content', 'label': _('Search'), 'parent': 'sidebar-content-group'},
             {'id': 'sidebar-file-management-group', 'label': _('File Management'), 'is_group': True},
             {'id': 'sidebar-logo-management', 'label': _('Logo Management'), 'parent': 'sidebar-file-management-group'},
+            {'id': 'sidebar-icon-management', 'label': _('Icons'), 'parent': 'sidebar-file-management-group'},
             {'id': 'sidebar-assets', 'label': _('Assets'), 'parent': 'sidebar-file-management-group'},
             {'id': 'sidebar-team', 'label': _('Team'), 'parent': 'sidebar-file-management-group'},
             {'id': 'sidebar-licenses', 'label': _('Licenses')},
@@ -216,9 +217,17 @@
           {# Logo Management Section #}
           <div
             class="tab-pane fade {% if ns.active_sidebar == 'sidebar-logo-management' %}show active{% endif %}"
-            id="sidebar-logo-.management" role="tabpanel"
+            id="sidebar-logo-management" role="tabpanel"
             aria-labelledby="sidebar-logo-management-tab" tabindex="0">
             {% include 'admin/logo_management.html' %}
+          </div>
+
+          {# Icon Management Section #}
+          <div
+            class="tab-pane fade {% if ns.active_sidebar == 'sidebar-icon-management' %}show active{% endif %}"
+            id="sidebar-icon-management" role="tabpanel"
+            aria-labelledby="sidebar-icon-management-tab" tabindex="0">
+            {% include 'admin/icon_management.html' %}
           </div>
 
           {# Assets Section #}

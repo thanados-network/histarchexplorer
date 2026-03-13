@@ -31,32 +31,32 @@
 <div class="card mt-3 mb-5">
   <div class="card-body">
     <h5 class="card-title">{{ _('Existing Logos') | upper }}</h5>
-    {% if admin_instance.logos %}
+    {% if all_logos %}
       <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
-        {% for filename in admin_instance.logos %}
+        {% for logo in all_logos %}
           <div class="col">
-            <div class="card h-100 {% if settings.nav_logo == filename %}border-primary{% endif %}">
-              <img src="{{ get_logo_url(filename) }}" class="card-img-top p-3" alt="{{ filename }}" style="object-fit: contain; height: 150px;">
+            <div class="card h-100 {% if settings.nav_logo == logo.filename %}border-primary{% endif %}">
+              <img src="{{ get_logo_url(logo.filename) }}" class="card-img-top p-3" alt="{{ logo.filename }}" style="object-fit: contain; height: 150px;">
               <div class="card-body">
-                <p class="card-text small text-muted" style="word-break: break-all;">{{ filename }}</p>
+                <p class="card-text small text-muted" style="word-break: break-all;">{{ logo.filename }}</p>
               </div>
               <div class="card-footer bg-transparent border-top-0">
                 <form action="{{ url_for('update_file_license') }}" method="post" class="mb-2">
                   <input type="hidden" name="active_sidebar" value="sidebar-logo-management">
-                  <input type="hidden" name="filename" value="{{ filename }}">
+                  <input type="hidden" name="filename" value="{{ logo.filename }}">
                   <input type="hidden" name="file_type" value="logo">
                   <div class="mb-2">
                     <select name="license_id" class="form-select form-select-sm">
                       <option value="">{{ _('Select License...') }}</option>
                       {% for license in admin_instance.licenses %}
-                        <option value="{{ license.id }}" {% if admin_instance.file_licenses.get(filename) and admin_instance.file_licenses[filename].license_id == license.id %}selected{% endif %}>
+                        <option value="{{ license.id }}" {% if admin_instance.file_licenses.get(logo.filename) and admin_instance.file_licenses[logo.filename].license_id == license.id %}selected{% endif %}>
                           {{ license.label }}
                         </option>
                       {% endfor %}
                     </select>
                   </div>
                   <div class="mb-2">
-                    <input type="text" name="attribution" class="form-control form-control-sm" placeholder="{{ _('Attribution (if any)...') }}" value="{{ admin_instance.file_licenses.get(filename).attribution if admin_instance.file_licenses.get(filename) else '' }}">
+                    <input type="text" name="attribution" class="form-control form-control-sm" placeholder="{{ _('Attribution (if any)...') }}" value="{{ admin_instance.file_licenses.get(logo.filename).attribution if admin_instance.file_licenses.get(logo.filename) else '' }}">
                   </div>
                   <button type="submit" class="btn btn-sm btn-outline-primary w-100">{{ _('Save License') }}</button>
                 </form>
@@ -64,8 +64,8 @@
                 {# Set as Main Logo Form #}
                 <form action="{{ url_for('set_main_logo') }}" method="post" class="d-grid mb-2">
                     <input type="hidden" name="active_sidebar" value="sidebar-logo-management">
-                    <input type="hidden" name="filename" value="{{ filename }}">
-                    {% if settings.nav_logo == filename %}
+                    <input type="hidden" name="filename" value="{{ logo.filename }}">
+                    {% if settings.nav_logo == logo.filename %}
                         <button type="button" class="btn btn-sm btn-primary" disabled>
                             <i class="bi bi-star-fill"></i> {{ _('Main Logo') }}
                         </button>
@@ -78,7 +78,7 @@
                 {# Set as Favicon Form #}
                 <form action="{{ url_for('set_favicon') }}" method="post" class="d-grid mb-2">
                     <input type="hidden" name="active_sidebar" value="sidebar-logo-management">
-                    <input type="hidden" name="filename" value="{{ filename }}">
+                    <input type="hidden" name="filename" value="{{ logo.filename }}">
                     <button type="submit" class="btn btn-sm btn-outline-info">
                         <i class="bi bi-heart"></i> {{ _('Set as Favicon') }}
                     </button>
@@ -86,17 +86,17 @@
                 {# Rename Form #}
                 <form action="{{ url_for('rename_file') }}" method="post" class="input-group input-group-sm mb-2">
                     <input type="hidden" name="active_sidebar" value="sidebar-logo-management">
-                    <input type="hidden" name="old_name" value="{{ filename }}">
+                    <input type="hidden" name="old_name" value="{{ logo.filename }}">
                     <input type="hidden" name="file_type" value="logo">
-                    <input type="text" class="form-control" name="new_name" placeholder="{{ _('New name...') }}" required>
-                    <button type="submit" class="btn btn-outline-secondary" title="{{ _('Rename') }}"><i class="bi bi-pencil-square"></i></button>
+                    <input type="text" class="form-control" name="new_name" placeholder="{{ _('New name...') }}" required {% if logo.is_default %}disabled{% endif %}>
+                    <button type="submit" class="btn btn-outline-secondary" title="{{ _('Rename') }}" {% if logo.is_default %}disabled{% endif %}><i class="bi bi-pencil-square"></i></button>
                 </form>
                 {# Delete Form #}
                 <form action="{{ url_for('delete_file') }}" method="post" class="d-grid">
                     <input type="hidden" name="active_sidebar" value="sidebar-logo-management">
-                    <input type="hidden" name="filename" value="{{ filename }}">
+                    <input type="hidden" name="filename" value="{{ logo.filename }}">
                     <input type="hidden" name="file_type" value="logo">
-                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('{{ _('Are you sure you want to delete this logo?') }}')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('{{ _('Are you sure you want to delete this logo?') }}')" {% if logo.is_default %}disabled{% endif %}>
                       <i class="bi bi-trash"></i> {{ _('Delete') }}
                     </button>
                 </form>

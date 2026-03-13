@@ -373,9 +373,19 @@ function renderAttributes(categorizedTypes) {
     if (!tile || !host || !categorizedTypes || !Object.keys(categorizedTypes).length) return;
     host.innerHTML = "";
     Object.entries(categorizedTypes).forEach(([bucket, items]) => {
+        const division = items?.[0]?.division;
+        let iconHtml = '';
+        if (division) {
+            if (division.iconUrl) {
+                iconHtml = `<img src="${division.iconUrl}" class="attribute-icon">`;
+            } else if (division.icon) {
+                iconHtml = division.icon;
+            }
+        }
+
         const label = h("p", {
             class: "tile-sub-label text-uppercase mt-3",
-            html: `${(items?.[0]?.icon || "")} ${capitalizeWords(bucket.replaceAll("_", " "))}`
+            html: `${iconHtml} ${capitalizeWords(bucket.replaceAll("_", " "))}`
         });
         host.appendChild(label);
         items.forEach((entry) => {
@@ -626,4 +636,3 @@ function renderReferences(entity) {
     setTimeout(() => window.overviewGrid.refreshItems().layout(), 500);
     renderAllBreadcrumbs(data);
 })();
-

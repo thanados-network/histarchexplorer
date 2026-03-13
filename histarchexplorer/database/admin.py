@@ -346,8 +346,17 @@ def get_files_by_type_from_db(file_type: str) -> list[dict[str, Any]]:
 
 def add_file_to_db(filename: str, file_type: str, is_default: bool = False) -> None:
     g.cursor.execute(
-        'INSERT INTO tng.files (type, filename, is_default, is_active) VALUES (%(type)s, %(filename)s, %(is_default)s, TRUE)',
-        {'type': file_type, 'filename': filename, 'is_default': is_default})
+        'SELECT id FROM tng.files WHERE filename = %(filename)s AND type = %(type)s',
+        {'filename': filename, 'type': file_type})
+    row = g.cursor.fetchone()
+    if row:
+        g.cursor.execute(
+            'UPDATE tng.files SET is_active = TRUE, is_default = %(is_default)s WHERE id = %(id)s',
+            {'id': row.id, 'is_default': is_default})
+    else:
+        g.cursor.execute(
+            'INSERT INTO tng.files (type, filename, is_default, is_active) VALUES (%(type)s, %(filename)s, %(is_default)s, TRUE)',
+            {'type': file_type, 'filename': filename, 'is_default': is_default})
 
 
 def delete_file_from_db(filename: str, file_type: str) -> None:
@@ -381,13 +390,12 @@ def synchronize_files_with_db(file_type: str, folder_path: str, is_default_sourc
             fs_files.add(f)
 
     # Get all active filenames of this type from DB
-    g.cursor.execute('SELECT filename FROM tng.files WHERE type = %s AND is_active = TRUE', (file_type,))
+    g.cursor.execute('SELECT filename FROM tng.files WHERE type = %s', (file_type,))
     db_filenames = {row.filename for row in g.cursor.fetchall()}
 
     # Add new files from filesystem to DB if they don't exist yet
     for filename in fs_files:
-        if filename not in db_filenames:
-            add_file_to_db(filename, file_type, is_default=is_default_source)
+        add_file_to_db(filename, file_type, is_default=is_default_source)
 
 
 # Wrapper functions for Logos
@@ -475,6 +483,32 @@ def synchronize_teams_with_db() -> None:
     db_records = {row.filename: row.id for row in g.cursor.fetchall()}
 
     # Deactivate files in DB that no longer exist in *any* filesystem source
+    for filename, file_id in db_records.items():
+        if filename not in all_fs_files:
+            g.cursor.execute(
+                'UPDATE tng.files SET is_active = FALSE WHERE id = %s',
+                (file_id,)
+            )
+
+
+def synchronize_icons_with_db() -> None:
+    file_type = 'icon'
+    static_icon_path = os.path.join(current_app.static_folder, 'images', 'icons')
+    uploaded_icon_path = os.path.join(current_app.root_path, '..', 'uploads', 'icons')
+
+    synchronize_files_with_db(file_type, static_icon_path, is_default_source=True)
+    synchronize_files_with_db(file_type, uploaded_icon_path, is_default_source=False)
+
+    all_fs_files = set()
+    for path in [static_icon_path, uploaded_icon_path]:
+        if os.path.exists(path):
+            for f in os.listdir(path):
+                if not f.startswith('.'):
+                    all_fs_files.add(f)
+
+    g.cursor.execute('SELECT id, filename FROM tng.files WHERE type = %s AND is_active = TRUE', (file_type,))
+    db_records = {row.filename: row.id for row in g.cursor.fetchall()}
+
     for filename, file_id in db_records.items():
         if filename not in all_fs_files:
             g.cursor.execute(

@@ -1,8 +1,9 @@
 import re
+import os
 from datetime import datetime
 from typing import Any, Optional
 
-from flask import g
+from flask import g, url_for, current_app
 
 
 def split_date_string(date_str: Optional[str]) -> str:
@@ -49,18 +50,6 @@ def format_date(date_from: str, date_to: str) -> str:
     return f"{date} {'BC' if bc_from else ''}".strip()
 
 
-# def date_template_format(begin: Optional[str], end: Optional[str]) -> str:
-#     if begin and end:
-#         date = f'{begin} - {end}'
-#     elif begin:
-#         date = begin
-#     elif end:
-#         date = end
-#     else:
-#         date = ''
-#     return date
-
-
 def get_render_type(mime_type: str) -> str:
     match mime_type:
         case None:
@@ -82,31 +71,41 @@ def get_render_type(mime_type: str) -> str:
     return render_type
 
 
-def get_icon(
-        id_: int,
-        type_hierarchy: list[dict[str, str]]) -> str:
-    icon = g.sidebar_icons.get(int(id_))
-    if not icon:
-        for type_ in type_hierarchy:
-            type_id = int(type_['identifier'].rsplit('/', 1)[-1])
-            if g.sidebar_icons.get(type_id):
-                icon = g.sidebar_icons.get(type_id)
-                break
-    return icon or g.sidebar_icons.get('other')
+def get_icon_url(filename: str) -> str:
+    uploads_path = os.path.join(current_app.root_path, '..', 'uploads', 'icons')
+    if os.path.exists(os.path.join(uploads_path, filename)):
+        return url_for('uploaded_icon', filename=filename)
+    return url_for('static', filename=f'images/icons/{filename}')
 
 
 def get_divisions(
         id_: int,
         type_hierarchy: list[dict[str, str]]) -> dict[str, str]:
-    division = g.type_divisions.get(int(id_))
-    if not division:
-        for type_ in type_hierarchy:
-            type_id = int(type_['identifier'].rsplit('/', 1)[-1])
-            if g.type_divisions.get(type_id):
-                division = g.type_divisions.get(type_id)
-                break
-    return (division or
-            {'label': 'other', 'icon': '<i class="bi bi-boxes"></i>'})
+    type_ids_to_check = {id_} | {
+        int(t['identifier'].rsplit('/', 1)[-1]) for t in type_hierarchy}
+
+    for label, data in g.type_divisions.items():
+        configured_ids = set(data.get('ids', []))
+        if not type_ids_to_check.isdisjoint(configured_ids):
+            icon_type = data.get('icon_type')
+            icon_value = data.get('icon_value')
+
+            if icon_type == 'icon' and icon_value:
+                return {
+                    'label': label,
+                    'icon_url': get_icon_url(icon_value)
+                }
+            elif icon_type == 'bootstrap' and icon_value:
+                return {
+                    'label': label,
+                    'icon': f'<i class="bi {icon_value}"></i>'
+                }
+            return {
+                'label': label,
+                'icon': '<i class="bi bi-box"></i>'
+            }
+
+    return {'label': 'other', 'icon': '<i class="bi bi-boxes"></i>'}
 
 
 def get_description_translated(description: str) -> None | dict[str, str]:
