@@ -9,9 +9,18 @@ def test_about(
 
 def test_about_with_slug(
         authenticated_client: FlaskClient) -> None:
+    # 'thanados-netzwerk' is likely the slug for the main project in the test data
     rv = authenticated_client.get(
         '/about/thanados-netzwerk')
-    assert rv.status_code in (200, 404)
+    assert rv.status_code == 200
+
+
+def test_about_invalid_slug(
+        authenticated_client: FlaskClient) -> None:
+    rv = authenticated_client.get(
+        '/about/invalid-slug')
+    assert rv.status_code == 302
+    assert rv.location.endswith('/about')
 
 
 def test_publications(
