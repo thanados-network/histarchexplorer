@@ -18,6 +18,13 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 
+  <style>
+    :root {
+      {% for type, color in settings.entity_colors.items() %}
+        --entity-color-{{ type }}: {{ color }};
+      {% endfor %}
+    }
+  </style>
 
   <!-- JS -->
   <script src="{{ url_for('static', filename='node_modules/muuri/dist/muuri.min.js') }}"></script>

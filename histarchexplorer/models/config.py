@@ -13,7 +13,7 @@ from histarchexplorer.database.config_classes import get_config_classes_sql
 def get_config_classes() -> dict[str, int]:
     data = {}
     for config_class in get_config_classes_sql():
-        data[config_class.name] = config_class.id
+        data[config_class['name']] = config_class['id']
     return data
 
 
@@ -33,21 +33,21 @@ class Link:
 
     @classmethod
     def get_all(cls) -> list['Link']:
-        links = []
-        for link_ in get_config_links():
-            links.append(Link(
-                link_id=link_.link_id,
-                sortorder=link_.sortorder,
-                start_id=link_.start_id,
-                start_name=add_display(link_.start_name),
-                config_property=add_display(link_.config_property),
-                property_id=link_.property_id,
-                direction=link_.direction,
-                end_name=add_display(link_.end_name),
-                end_id=link_.end_id,
-                role=add_display(link_.role),
-                role_id=link_.role_id))
-        return links
+        return [
+            Link(
+                link_id=link_['link_id'],
+                sortorder=link_['sortorder'],
+                start_id=link_['start_id'],
+                start_name=add_display(link_['start_name']),
+                config_property=add_display(link_['config_property']),
+                property_id=link_['property_id'],
+                direction=link_['direction'],
+                end_name=add_display(link_['end_name']),
+                end_id=link_['end_id'],
+                role=add_display(link_['role']),
+                role_id=link_['role_id']
+            ) for link_ in get_config_links()
+        ]
 
 
 @dataclass()
@@ -60,15 +60,15 @@ class Properties:
 
     @classmethod
     def get_all(cls) -> list['Properties']:
-        properties = []
-        for property_ in get_config_properties():
-            properties.append(Properties(
-                id=property_.id,
-                name=add_display(property_.name),
-                domain=property_.domain_type_id,
-                range=property_.range_type_id,
-                direction=property_.direction))
-        return properties
+        return [
+            Properties(
+                id=prop['id'],
+                name=add_display(prop['name']),
+                domain=prop['domain_type_id'],
+                range=prop['range_type_id'],
+                direction=prop['direction']
+            ) for prop in get_config_properties()
+        ]
 
 
 # pylint: disable=too-many-instance-attributes
@@ -92,29 +92,26 @@ class ConfigEntity:
 
     @classmethod
     def get_all_localized(cls) -> list['ConfigEntity']:
-        entities = []
-
-        for entry in get_config_entities():
-            entities.append(ConfigEntity(
-                id=entry.id,
-                name=add_display(entry.name),
-                acronym=entry.acronym,
-                description=add_display(entry.description),
-                website=entry.website,
-                class_id=entry.class_id,
-                address=add_display(entry.address),
-                email=entry.email,
-                image=entry.image,
-                orcid_id=entry.orcid_id,
-                class_name=entry.class_name,
-                case_study=entry.case_study_type_id,
-                main_project=(entry.class_name == 'main-project'),
-                links=[l_ for l_ in g.config_links if l_.start_id == entry.id]
+        return [
+            ConfigEntity(
+                id=entry['id'],
+                name=add_display(entry['name']),
+                acronym=entry['acronym'],
+                description=add_display(entry['description']),
+                website=entry['website'],
+                class_id=entry['class_id'],
+                address=add_display(entry['address']),
+                email=entry['email'],
+                image=entry['image'],
+                orcid_id=entry['orcid_id'],
+                class_name=entry['class_name'],
+                case_study=entry['case_study_type_id'],
+                main_project=(entry['class_name'] == 'main-project'),
+                links=[l for l in g.config_links if l.start_id == entry['id']]
                 if g.config_links else [],
-                license_id=entry.license_id
-                ))
-
-        return entities
+                license_id=entry['license_id']
+            ) for entry in get_config_entities()
+        ]
 
     @classmethod
     def group_by_class_name(
@@ -153,24 +150,15 @@ class ConfigEntity:
 
 
 def localize(data: dict[str, str] | None) -> str | None:
-    selected_lang = g.language
     if not isinstance(data, dict):
         return data
 
-    # Try selected language
-    if selected_lang in data and data[selected_lang]:
-        return data[selected_lang]
+    # Try selected language, then preferred, then any filled value
+    for lang in (g.language, g.preferred_langauge):
+        if data.get(lang):
+            return data[lang]
 
-    # Fallback to g.preferred_langauge
-    if g.preferred_langauge in data and data[g.preferred_langauge]:
-        return data[g.preferred_langauge]
-
-    # Fallback to any filled value
-    for value in data.values():
-        if value:
-            return value
-
-    return None
+    return next((v for v in data.values() if v), None)
 
 
 def add_display(data: dict[str, Any] | None) \
@@ -183,11 +171,10 @@ def add_display(data: dict[str, Any] | None) \
     if isinstance(label, str):
         label = html.unescape(label)
 
+    result['display'] = {'language': None, 'label': label}
     for lang, value in data.items():
         if value == label:
-            result['display'] = {'language': lang, 'label': label}
+            result['display']['language'] = lang
             break
-    else:
-        result['display'] = {'language': None, 'label': label}
 
     return result

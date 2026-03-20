@@ -82,13 +82,13 @@ def get_sidebar_icons() -> dict[int, str]:
 
 def get_type_divisions() -> dict[Any, dict[str, Any]]:
     out = {}
-    for label, value in app.config['TYPE_DIVISIONS'].items():
+    for label, value in g.settings.type_divisions.items():
         icon = ''
-        if value['icon']:
-            if value['icon'][0] == 'img':
-                icon = create_image_icon(value['icon'][1])
-            if value['icon'][0] == 'css':
-                icon = create_icon(value['icon'][1])
+        if value['icon_type'] and value['icon_value']:
+            if value['icon_type'] == 'img':
+                icon = create_image_icon(value['icon_value'])
+            if value['icon_type'] == 'css':
+                icon = create_icon(value['icon_value'])
         for id_ in value['ids']:
             out[id_] = {'label': label, 'icon': icon}
     return out
@@ -96,13 +96,12 @@ def get_type_divisions() -> dict[Any, dict[str, Any]]:
 
 @app.before_request
 def before_request() -> Response | None:
-    # todo: maybe change the cursor_factory to psycopg2.extras.RealDictCursor
     g.db = connect(app.config['DATABASE_NAME'])
-    g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
+    g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     g.openatlas_db = connect(app.config['OPENATLAS_DATABASE_NAME'])
     g.openatlas_cursor = g.openatlas_db.cursor(
-        cursor_factory=psycopg2.extras.NamedTupleCursor)
+        cursor_factory=psycopg2.extras.RealDictCursor)
 
     if request.path.startswith('/reset') or request.endpoint == 'static':
         return None
@@ -158,11 +157,13 @@ def get_logo_url(filename: str) -> str:
         return url_for('uploaded_logo', filename=filename)
     return url_for('static', filename='images/logos/' + filename)
 
+
 def get_assets_url(filename: str) -> str:
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
     if os.path.exists(os.path.join(uploads_path, filename)):
         return url_for('uploaded_assets', filename=filename)
     return url_for('static', filename='assets/' + filename)
+
 
 def get_team_url(filename: str) -> str:
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'team')

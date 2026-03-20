@@ -19,7 +19,7 @@ def index() -> str:
     map_data = g.settings.get_map_settings()
     map_ = None
     if index_map := map_data['map']:
-        map_ = get_map_tilestring(index_map).tilestring
+        map_ = get_map_tilestring(index_map)
 
     grouped = ConfigEntity.group_by_class_name(g.config_entities)
     main_project = grouped.get('main-project', [None])[0]

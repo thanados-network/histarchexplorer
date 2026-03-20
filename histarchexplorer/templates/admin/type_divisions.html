@@ -1,0 +1,90 @@
+<form action="{{ url_for('update_type_divisions') }}" method="post">
+  <div id="type-divisions-container">
+    {% for label, division in settings.type_divisions.items() %}
+      <div class="card mb-3" data-label="{{ label }}">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <input type="text" class="form-control" name="label_{{ loop.index0 }}" value="{{ label }}">
+            <button type="button" class="btn btn-danger btn-sm ms-2" onclick="removeDivision(this)">
+              {{ _('Remove Division') }}
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4">
+              <label class="form-label">{{ _('Icon Type') }}</label>
+              <select class="form-select" name="icon_type_{{ loop.index0 }}">
+                <option value="css" {% if division.icon_type == 'css' %}selected{% endif %}>CSS</option>
+                <option value="img" {% if division.icon_type == 'img' %}selected{% endif %}>Image</option>
+                <option value="" {% if not division.icon_type %}selected{% endif %}>None</option>
+              </select>
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">{{ _('Icon Value') }}</label>
+              <input type="text" class="form-control" name="icon_value_{{ loop.index0 }}"
+                     value="{{ division.icon_value or '' }}">
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="form-label">{{ _('IDs') }}</label>
+            <input type="text" class="form-control" name="ids_{{ loop.index0 }}"
+                   value="{{ division.ids|join(', ') }}">
+            <small class="form-text text-muted">{{ _('Comma-separated list of IDs.') }}</small>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <button type="button" class="btn btn-success" onclick="addDivision()">
+    {{ _('Add Division') }}
+  </button>
+  <button type="submit" class="btn btn-primary mt-3">
+    {{ _('save changes') | upper }}
+  </button>
+</form>
+
+<script>
+  function addDivision() {
+    const container = document.getElementById('type-divisions-container');
+    const newIndex = container.children.length;
+    const newDivision = document.createElement('div');
+    newDivision.className = 'card mb-3';
+    newDivision.innerHTML = `
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <input type="text" class="form-control" name="label_${newIndex}" placeholder="New Label">
+          <button type="button" class="btn btn-danger btn-sm ms-2" onclick="removeDivision(this)">
+            {{ _('Remove Division') }}
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4">
+            <label class="form-label">{{ _('Icon Type') }}</label>
+            <select class="form-select" name="icon_type_${newIndex}">
+              <option value="css">CSS</option>
+              <option value="img">Image</option>
+              <option value="">None</option>
+            </select>
+          </div>
+          <div class="col-md-8">
+            <label class="form-label">{{ _('Icon Value') }}</label>
+            <input type="text" class="form-control" name="icon_value_${newIndex}" placeholder="Icon Value">
+          </div>
+        </div>
+        <div class="mt-3">
+          <label class="form-label">{{ _('IDs') }}</label>
+          <input type="text" class="form-control" name="ids_${newIndex}" placeholder="e.g., 123, 456, 789">
+          <small class="form-text text-muted">{{ _('Comma-separated list of IDs.') }}</small>
+        </div>
+      </div>
+    `;
+    container.appendChild(newDivision);
+  }
+
+  function removeDivision(button) {
+    button.closest('.card').remove();
+  }
+</script>

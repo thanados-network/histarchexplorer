@@ -1281,49 +1281,55 @@
             return;
         }
 
-        for (const id of ids) {
-            try {
-                const response = await fetch(`/get_rastermaps/${id}`);
-                if (!response.ok) {
-                    console.warn(`Error with ID ${id}: ${response.status}`);
-                    continue;
-                }
+        if (ids.length === 0) return;
 
-                const data = await response.json();
-                if (data[0]) {
-
-                    const images = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
-
-                    for (const img of images) {
-                        await addImageToMap(map, img);
-
-                        const layerId = `image_layer_${img.id}`;
-                        const item = document.createElement('div');
-                        item.className = 'image-legend-item';
-                        item.innerHTML = `
-                    <label>
-                        <input type="checkbox" checked data-layer="${layerId}">
-                        ${img.name}
-                    </label> <br>
-                    Opacity: 
-                    <input type="range" min="0" max="1" step="0.1" value="0.9" data-layer="${layerId}" title="Opacity">
-                `;
-                        legendContainer.appendChild(item);
-
-                        item.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
-                            const visible = e.target.checked ? 'visible' : 'none';
-                            if (map.getLayer(layerId)) map.setLayoutProperty(layerId, 'visibility', visible);
-                        });
-
-                        item.querySelector('input[type="range"]').addEventListener('input', (e) => {
-                            const opacity = parseFloat(e.target.value);
-                            if (map.getLayer(layerId)) map.setPaintProperty(layerId, 'raster-opacity', opacity);
-                        });
-                    }
-                }
-            } catch (err) {
-                console.error(`Fehler beim Laden von ID ${id}:`, err);
+        try {
+            const response = await fetch('/get_rastermaps', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ids: ids })
+            });
+            if (!response.ok) {
+                console.warn(`Error with IDs ${ids}: ${response.status}`);
+                return;
             }
+
+            const data = await response.json();
+            if (data && data.images) {
+                const images = data.images;
+
+                // Process images concurrently
+                await Promise.all(images.map(async (img) => {
+                    await addImageToMap(map, img);
+
+                    const layerId = `image_layer_${img.id}`;
+                    const item = document.createElement('div');
+                    item.className = 'image-legend-item';
+                    item.innerHTML = `
+                        <label>
+                            <input type="checkbox" checked data-layer="${layerId}">
+                            ${img.name}
+                        </label> <br>
+                        Opacity: 
+                        <input type="range" min="0" max="1" step="0.1" value="0.9" data-layer="${layerId}" title="Opacity">
+                    `;
+                    legendContainer.appendChild(item);
+
+                    item.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+                        const visible = e.target.checked ? 'visible' : 'none';
+                        if (map.getLayer(layerId)) map.setLayoutProperty(layerId, 'visibility', visible);
+                    });
+
+                    item.querySelector('input[type="range"]').addEventListener('input', (e) => {
+                        const opacity = parseFloat(e.target.value);
+                        if (map.getLayer(layerId)) map.setPaintProperty(layerId, 'raster-opacity', opacity);
+                    });
+                }));
+            }
+        } catch (err) {
+            console.error(`Fehler beim Laden von IDs ${ids}:`, err);
         }
     }
 
@@ -1370,7 +1376,7 @@
             [minLon, minLat]
         ];
     }
-    
+
     renderAllBreadcrumbs(entityData);
 
 })();

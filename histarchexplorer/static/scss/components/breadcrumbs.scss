@@ -19,7 +19,6 @@ nav[aria-label="breadcrumb"] {
       color: #000000;
       border-radius: 5px;
       letter-spacing: 1px;
-      // text-transform: uppercase;
       position: relative;
       display: inline-flex;
       justify-content: center;
@@ -36,7 +35,7 @@ nav[aria-label="breadcrumb"] {
         color: inherit;
         text-decoration: none;
         display: inline-block;
-        transform: skew(21deg); // counteract skew of parent
+        transform: skew(21deg);
       }
 
       &:not(:last-child)::after {
@@ -67,11 +66,10 @@ nav[aria-label="breadcrumb"] {
 }
 
 .head-breadcrumb {
-  background: #5b5658!important;
-  color: #fff!important;
-  cursor: default!important;
+  background: #5b5658 !important;
+  color: #fff !important;
+  cursor: default !important;
 }
-
 
 @media (max-width: 1000px) {
   nav[aria-label="breadcrumb"] ol.breadcrumb li.breadcrumb-item {
@@ -88,26 +86,41 @@ nav[aria-label="breadcrumb"] {
 }
 
 li.breadcrumb-item.active.breadcrumb-places {
-  background-color: var(--limegreen) !important;
+  background-color: var(--entity-color-places) !important;
   color: #fff;
 }
 
 li.breadcrumb-item.active.breadcrumb-actors {
-  background-color: var(--pink) !important;
+  background-color: var(--entity-color-actors) !important;
   color: #fff;
 }
 
 li.breadcrumb-item.active.breadcrumb-events {
-  background-color: var(--blue) !important;
+  background-color: var(--entity-color-events) !important;
   color: #fff;
 }
 
 li.breadcrumb-item.active.breadcrumb-items {
-  background-color: var(--light-orange) !important;
+  background-color: var(--entity-color-items) !important;
   color: #fff;
 }
 
 li.breadcrumb-item.active.breadcrumb-sources {
-  background-color: var(--reddish-brown) !important;
+  background-color: var(--entity-color-sources) !important;
+  color: #fff;
+}
+
+li.breadcrumb-item.active.breadcrumb-files {
+  background-color: var(--entity-color-files) !important;
+  color: #fff;
+}
+
+li.breadcrumb-item.active.breadcrumb-feature {
+  background-color: var(--entity-color-feature) !important;
+  color: #fff;
+}
+
+li.breadcrumb-item.active.breadcrumb-stratigraphic_unit {
+  background-color: var(--entity-color-stratigraphic_unit) !important;
   color: #fff;
 }

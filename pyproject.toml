@@ -1,0 +1,29 @@
+[project]
+name = "tng"
+version = "0.3.0"
+description = "The next generation of THANADOS frontend for OpenAtlas"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "bcrypt>=5.0.0",
+    "bleach>=6.3.0",
+    "flask-babel==4.0.0",
+    "flask-caching>=2.3.1",
+    "flask-login==0.6.3",
+    "flask-wtf==1.2.2",
+    "libsass>=0.23.0",
+    "mypy>=1.19.1",
+    "numpy>=2.4.2",
+    "pillow==12.1.1",
+    "psycopg2-binary>=2.9.11",
+    "pydantic>=2.12.5",
+    "redis>=7.2.1",
+    "requests>=2.32.5",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "pytest-flask>=1.3.0",
+]

@@ -18,9 +18,11 @@ from histarchexplorer.database.admin import (
     get_all_assets_from_db,
     get_files_by_type_from_db,
     synchronize_teams_with_db,
+    synchronize_icons_with_db,
     get_all_teams_from_db)
 from histarchexplorer.database.map import get_maps
 from histarchexplorer.models.config import ConfigEntity
+
 
 class EntryNotFound(Exception):
     pass
@@ -39,10 +41,12 @@ class Admin:
         self.language = g.language
         self.logos = self.get_all_logo_filenames()
         self.assets = self.get_all_asset_filenames()
-        self.teams = self.get_all_team_filenames() # Initialize teams
+        self.teams = self.get_all_team_filenames()
+        self.icons = self.get_files_by_type('icon')
         self.licenses = self.get_licenses()
         self.file_licenses = self.get_file_licenses()
-        synchronize_teams_with_db() # Call synchronize_teams_with_db here
+        synchronize_teams_with_db()
+        synchronize_icons_with_db()
 
     @staticmethod
     def get_files_by_type(file_type: str) -> list[dict[str, Any]]:
@@ -159,8 +163,8 @@ class Admin:
         return [team['filename'] for team in Admin.get_all_teams_with_ids()]
 
     def _has_translation(self, entity: ConfigEntity, field_key: str) -> bool:
-        value_attr = getattr(entity, field_key, None)
-
+        value_attr = getattr(
+            entity, field_key, None)
         if isinstance(value_attr, dict) and 'display' in value_attr:
             return bool(value_attr['display'].get(self.language))
         if value_attr is not None:
@@ -183,8 +187,7 @@ class Admin:
                 entity_dict: dict[str, Any] = {
                     'id': entity.id,
                     'class_id': entity.class_id,
-                    'license_id': entity.license_id
-                }
+                    'license_id': entity.license_id}
 
                 for field_config in fields_for_tab:
                     field_key = field_config['key']
@@ -237,8 +240,8 @@ class Admin:
         return dict(result)
 
     def process_properties_by_tab(
-            self, tabs: list[dict[str, str]]) -> dict[
-        str, list[dict[str, Any]]]:
+            self, tabs: list[dict[str, str]]
+            ) -> dict[str, list[dict[str, Any]]]:
         result = {}
         for t_data in tabs:
             tab_id = t_data['id']
@@ -273,11 +276,11 @@ class Admin:
     def check_case_study_type_id(entity_id: int) -> dict[str, Any]:
         details = Admin.get_openatlas_entity(entity_id)
         if details:
-            is_valid = details.openatlas_class_name == 'type'
+            is_valid = details['openatlas_class_name'] == 'type'
             return {
                 'is_valid': is_valid,
-                'name': details.name,
-                'class_name': details.openatlas_class_name}
+                'name': details['name'],
+                'class_name': details['openatlas_class_name']}
         return {
             'is_valid': False,
             'name': None,

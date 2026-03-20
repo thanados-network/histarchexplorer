@@ -7,12 +7,12 @@ from histarchexplorer.database.user import get_by_username, get_user_by_id
 
 class User(UserMixin):
     def __init__(self, row: Any) -> None:
-        self.id = row.id
-        self.active = row.active == 1
-        self.username = row.username
-        self.password = row.password
-        self.group = row.group_name
-        self.real_name = row.real_name
+        self.id = row['id']
+        self.active = row['active'] == 1
+        self.username = row['username']
+        self.password = row['password']
+        self.group = row['group_name']
+        self.real_name = row['real_name']
 
     @staticmethod
     def get_by_id(user_id: int) -> Optional['User']:

@@ -3,12 +3,13 @@ from typing import Any
 from flask import g
 
 
-def get_map_tilestring(index_map: int) -> Any:
+def get_map_tilestring(index_map: int) -> str | None:
     g.cursor.execute(
         'SELECT tilestring '
         'FROM tng.maps '
-        f'WHERE id={index_map}')
-    return g.cursor.fetchone()
+        'WHERE id = %s', (index_map,))
+    row = g.cursor.fetchone()
+    return row['tilestring'] if row else None
 
 
 def get_maps() -> tuple[str]:

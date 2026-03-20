@@ -3,7 +3,7 @@ from collections import defaultdict
 from dataclasses import asdict
 from typing import Any, Optional
 
-from flask import abort, g, render_template
+from flask import abort, g, render_template, request
 
 from histarchexplorer import app
 from histarchexplorer.api.presentation_view import (
@@ -171,7 +171,7 @@ def get_categorized_types(
             continue
         label = type_.division['label'].replace(' ', '_')
         divisions[label].append(
-            {'type': type_, 'icon': type_.division['icon']})
+            {'type': type_, 'division': type_.division})
     sorted_divisions = dict(sorted(divisions.items(), key=sort_key))
     return sorted_divisions
 
@@ -232,9 +232,8 @@ def get_sub_count(main_entity: PresentationView) -> dict[str, int | list[int]]:
     return {'count': count, 'ids': ids}
 
 
-def get_files_for_id(id_: int) -> dict[str, list[str]] | None:
+def get_files_for_ids(ids: list[int]) -> dict[str, list[dict[str, Any]]] | None:
     sql = """
-
           SELECT JSONB_AGG(
                          jsonb_build_object(
                                  'id', a.id,
@@ -252,20 +251,26 @@ def get_files_for_id(id_: int) -> dict[str, list[str]] | None:
                          JOIN model.link l ON e.id = l.domain_id
                          JOIN web.map_overlay o ON o.image_id = e.id
                 WHERE e.openatlas_class_name = 'file'
-                  AND l.range_id = %(id)s
-                  AND l.property_code = 'P67') a; \
+                  AND l.range_id = ANY(%(ids)s)
+                  AND l.property_code = 'P67') a;
           """
 
-    g.openatlas_cursor.execute(sql, {'id': id_})
+    g.openatlas_cursor.execute(sql, {'ids': ids})
     result = g.openatlas_cursor.fetchone()
     if result:
         return result
     return None
 
 
-@app.route('/get_rastermaps/<int:id_>')
-def get_rastermaps(id_: int) -> str:
-    return json.dumps(get_files_for_id(id_))
+@app.route('/get_rastermaps', methods=['POST'])
+def get_rastermaps() -> str:
+    data = request.get_json()
+    if not data or 'ids' not in data:
+        abort(400, "Missing 'ids' in request body")
+    ids = data['ids']
+    if not isinstance(ids, list):
+        abort(400, "'ids' must be a list")
+    return json.dumps(get_files_for_ids(ids))
 
 
 @app.route('/presentation-view/<int:id_>')

@@ -109,7 +109,7 @@ def find_children_by_id(
 
 
 def get_license_info(case_studies: list[Any]) -> dict[str, Any] | None:
-    all_licenses = {l.id: l for l in Admin.get_licenses()}
+    all_licenses = {l['id']: l for l in Admin.get_licenses()}
 
     for project in case_studies:
         if project.license_id and project.license_id in all_licenses:
@@ -122,7 +122,7 @@ def get_license_info(case_studies: list[Any]) -> dict[str, Any] | None:
         if mp.license_id and mp.license_id in all_licenses:
             return all_licenses[mp.license_id]
     for lic in all_licenses.values():
-        if lic.spdx_id == 'InC':
+        if lic['spdx_id'] == 'InC':
             return lic
 
     return list(all_licenses.values())[0] if all_licenses else None

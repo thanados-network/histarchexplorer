@@ -90,8 +90,7 @@ def get_config_class_by_id(id_: int) -> int | None:
     g.cursor.execute(
         'SELECT class_id FROM tng.entities WHERE id = %s',
         (id_,))
-    row = g.cursor.fetchone()
-    return row[0] if row else None
+    return (g.cursor.fetchone() or {}).get('class_id')
 
 
 def add_new_map(data: dict[str, str]) -> int:
@@ -102,12 +101,13 @@ def add_new_map(data: dict[str, str]) -> int:
         VALUES (%(name)s, %(display_name)s, %(sort_order)s, %(tile_string)s)
         RETURNING id
         ''', {
-            'name': data['name'],
-            'display_name': data['display_name'],
-            'sort_order': data['sort_order'],
-            'tile_string': data['tile_string']})
+            'name': data.get('name'),
+            'display_name': data.get('display_name'),
+            'sort_order': data.get('sort_order'),
+            'tile_string': data.get('tile_string')})
 
-    return g.cursor.fetchone()[0]
+    row = g.cursor.fetchone()
+    return row['id'] if row else 0
 
 
 def delete_map(map_id: int) -> None:
@@ -174,7 +174,7 @@ def add_entry(data: dict[str, str | int]) -> int:
             'class_id': config_class,
             'license_id': data.get('license_id')})
 
-    id_ = g.cursor.fetchone()[0]
+    id_ = g.cursor.fetchone()['id']
     _upsert_jsonb_fields(id_, data)
 
     return id_
@@ -241,13 +241,13 @@ def update_sort_order(table: str, params: list[dict[str, int]]) -> None:
 def check_sortorder() -> int:
     g.cursor.execute(
         '''
-        SELECT COALESCE(MAX(sortorder) + 1, 1)
+        SELECT COALESCE(MAX(sortorder) + 1, 1) AS next_order
         FROM tng.links
         WHERE sortorder IS NOT NULL''')
-    return g.cursor.fetchone()[0]
+    return g.cursor.fetchone()['next_order']
 
 
-def get_openatlas_entity(id_: int) -> NamedTuple:
+def get_openatlas_entity(id_: int) -> dict[str, Any]:
     g.openatlas_cursor.execute(
         '''
         SELECT id, name, openatlas_class_name
@@ -299,7 +299,7 @@ def get_file_licenses() -> dict[str, Any]:
         FROM tng.file_licenses fl
         JOIN tng.files f ON fl.file_id = f.id
     ''')
-    return {row.filename: {'license_id': row.license_id, 'attribution': row.attribution} for row in g.cursor.fetchall()}
+    return {row['filename']: {'license_id': row['license_id'], 'attribution': row['attribution']} for row in g.cursor.fetchall()}
 
 
 def add_license(spdx_id: str, uri: str, label: str, category: str) -> None:
@@ -323,7 +323,7 @@ def update_file_license(filename: str, license_id: int, attribution: str) -> Non
     res = g.cursor.fetchone()
     if not res:
         return # Or handle error
-    file_id = res.id
+    file_id = res['id']
 
     g.cursor.execute(
         """
@@ -337,7 +337,7 @@ def update_file_license(filename: str, license_id: int, attribution: str) -> Non
 
 def get_all_files_from_db(file_type: str) -> list[dict[str, Any]]:
     g.cursor.execute('SELECT id, filename, is_default FROM tng.files WHERE type = %s AND is_active = TRUE ORDER BY filename', (file_type,))
-    return [{'id': row.id, 'filename': row.filename, 'is_default': row.is_default} for row in g.cursor.fetchall()]
+    return [{'id': row['id'], 'filename': row['filename'], 'is_default': row['is_default']} for row in g.cursor.fetchall()]
 
 
 def get_files_by_type_from_db(file_type: str) -> list[dict[str, Any]]:
@@ -346,8 +346,17 @@ def get_files_by_type_from_db(file_type: str) -> list[dict[str, Any]]:
 
 def add_file_to_db(filename: str, file_type: str, is_default: bool = False) -> None:
     g.cursor.execute(
-        'INSERT INTO tng.files (type, filename, is_default, is_active) VALUES (%(type)s, %(filename)s, %(is_default)s, TRUE)',
-        {'type': file_type, 'filename': filename, 'is_default': is_default})
+        'SELECT id FROM tng.files WHERE filename = %(filename)s AND type = %(type)s',
+        {'filename': filename, 'type': file_type})
+    row = g.cursor.fetchone()
+    if row:
+        g.cursor.execute(
+            'UPDATE tng.files SET is_active = TRUE, is_default = %(is_default)s WHERE id = %(id)s',
+            {'id': row['id'], 'is_default': is_default})
+    else:
+        g.cursor.execute(
+            'INSERT INTO tng.files (type, filename, is_default, is_active) VALUES (%(type)s, %(filename)s, %(is_default)s, TRUE)',
+            {'type': file_type, 'filename': filename, 'is_default': is_default})
 
 
 def delete_file_from_db(filename: str, file_type: str) -> None:
@@ -355,7 +364,7 @@ def delete_file_from_db(filename: str, file_type: str) -> None:
         'SELECT is_default FROM tng.files WHERE filename = %(filename)s AND type = %(type)s',
         {'filename': filename, 'type': file_type})
     row = g.cursor.fetchone()
-    if row and row.is_default:
+    if row and row['is_default']:
         g.cursor.execute(
             'UPDATE tng.files SET is_active = FALSE WHERE filename = %(filename)s AND type = %(type)s',
             {'filename': filename, 'type': file_type})
@@ -381,13 +390,12 @@ def synchronize_files_with_db(file_type: str, folder_path: str, is_default_sourc
             fs_files.add(f)
 
     # Get all active filenames of this type from DB
-    g.cursor.execute('SELECT filename FROM tng.files WHERE type = %s AND is_active = TRUE', (file_type,))
-    db_filenames = {row.filename for row in g.cursor.fetchall()}
+    g.cursor.execute('SELECT filename FROM tng.files WHERE type = %s', (file_type,))
+    db_filenames = {row['filename'] for row in g.cursor.fetchall()}
 
     # Add new files from filesystem to DB if they don't exist yet
     for filename in fs_files:
-        if filename not in db_filenames:
-            add_file_to_db(filename, file_type, is_default=is_default_source)
+        add_file_to_db(filename, file_type, is_default=is_default_source)
 
 
 # Wrapper functions for Logos
@@ -472,9 +480,35 @@ def synchronize_teams_with_db() -> None:
 
     # Get all active files from DB for this file_type
     g.cursor.execute('SELECT id, filename FROM tng.files WHERE type = %s AND is_active = TRUE', (file_type,))
-    db_records = {row.filename: row.id for row in g.cursor.fetchall()}
+    db_records = {row['filename']: row['id'] for row in g.cursor.fetchall()}
 
     # Deactivate files in DB that no longer exist in *any* filesystem source
+    for filename, file_id in db_records.items():
+        if filename not in all_fs_files:
+            g.cursor.execute(
+                'UPDATE tng.files SET is_active = FALSE WHERE id = %s',
+                (file_id,)
+            )
+
+
+def synchronize_icons_with_db() -> None:
+    file_type = 'icon'
+    static_icon_path = os.path.join(current_app.static_folder, 'images', 'icons')
+    uploaded_icon_path = os.path.join(current_app.root_path, '..', 'uploads', 'icons')
+
+    synchronize_files_with_db(file_type, static_icon_path, is_default_source=True)
+    synchronize_files_with_db(file_type, uploaded_icon_path, is_default_source=False)
+
+    all_fs_files = set()
+    for path in [static_icon_path, uploaded_icon_path]:
+        if os.path.exists(path):
+            for f in os.listdir(path):
+                if not f.startswith('.'):
+                    all_fs_files.add(f)
+
+    g.cursor.execute('SELECT id, filename FROM tng.files WHERE type = %s AND is_active = TRUE', (file_type,))
+    db_records = {row['filename']: row['id'] for row in g.cursor.fetchall()}
+
     for filename, file_id in db_records.items():
         if filename not in all_fs_files:
             g.cursor.execute(

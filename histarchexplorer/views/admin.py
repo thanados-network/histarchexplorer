@@ -1,5 +1,6 @@
 import os
 import json
+import re
 import subprocess
 from typing import Optional
 from datetime import datetime
@@ -64,10 +65,12 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                 case ('sidebar-maps' | 'sidebar-index-page-options' |
                       'sidebar-database' | 'sidebar-cache-options' |
                       'sidebar-content-group' | 'sidebar-logo-management' |
+                      'sidebar-icon-management' |
                       'sidebar-menu-management' | 'sidebar-footer-content' |
                       'sidebar-file-management-group' | 'sidebar-assets' |
                       'sidebar-legal-notice' | 'sidebar-licenses' |
-                      'sidebar-team' | 'sidebar-about-publications'):
+                      'sidebar-team' | 'sidebar-about-publications' |
+                      'sidebar-colors' | 'sidebar-type-divisions'):
                     active_main_sidebar_id = tab
 
                 case _:
@@ -85,7 +88,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             cs_type_id = int(g.settings.case_study_type_id)
             details = Admin.get_openatlas_entity(cs_type_id)
             if details:
-                cs_type_name = details.name
+                cs_type_name = details['name']
 
             case_study_children = find_children_by_id(
                 type_tree().get_json(),
@@ -126,6 +129,97 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         all_logos=all_logos,
         all_assets=all_assets,
         selected_footer_logos=selected_footer_logos)
+
+
+@app.route('/admin/update_type_divisions', methods=['POST'])
+@login_required
+def update_type_divisions() -> Response:
+    check_manager_user()
+    new_type_divisions = {}
+    indices = {key.split('_')[-1] for key in request.form if key.startswith('label_')}
+    for index in indices:
+        label = request.form.get(f'label_{index}')
+        if not label:
+            continue
+
+        ids_str = request.form.get(f'ids_{index}', '')
+        try:
+            ids = [int(i.strip()) for i in ids_str.split(',') if i.strip()]
+        except ValueError:
+            flash(_('Invalid ID format for label "%(label)s". Please use comma-separated integers.', label=label), 'danger')
+            return _redirect_to_admin_tab('sidebar-type-divisions')
+
+        new_type_divisions[label] = {
+            'icon_type': request.form.get(f'icon_type_{index}'),
+            'icon_value': request.form.get(f'icon_value_{index}'),
+            'ids': ids
+        }
+
+    g.settings.type_divisions = new_type_divisions
+    try:
+        g.settings.save_to_db()
+        flash(_('Type divisions updated successfully.'), 'success')
+    except Exception as e:
+        app.logger.error("Failed to update type divisions: %s", e)
+        flash(_('Error updating type divisions'), 'error')
+
+    return _redirect_to_admin_tab('sidebar-type-divisions')
+
+
+@app.route('/admin/update_entity_colors', methods=['POST'])
+@login_required
+def update_entity_colors() -> Response:
+    check_manager_user()
+    colors = {}
+    for key, value in request.form.items():
+        if key.startswith('entity_colors-'):
+            entity_type = key.split('-')[1]
+            colors[entity_type] = value
+    g.settings.entity_colors = colors
+    try:
+        g.settings.save_to_db()
+        flash(_('Entity colors updated successfully.'), 'success')
+    except Exception as e:
+        app.logger.error("Failed to update entity colors: %s", e)
+        flash(_('Error updating entity colors'), 'error')
+    return _redirect_to_admin_tab('sidebar-colors')
+
+
+@app.route('/admin/add_available_color', methods=['POST'])
+@login_required
+def add_available_color() -> Response:
+    check_manager_user()
+    new_color = request.form.get('new_color')
+    if new_color and re.match(r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$', new_color):
+        if new_color not in g.settings.available_colors:
+            g.settings.available_colors.append(new_color)
+            try:
+                g.settings.save_to_db()
+                flash(_('Color added successfully.'), 'success')
+            except Exception as e:
+                app.logger.error("Failed to add color: %s", e)
+                flash(_('Error adding color'), 'error')
+        else:
+            flash(_('Color already exists.'), 'warning')
+    else:
+        flash(_('Invalid HEX code.'), 'danger')
+    return _redirect_to_admin_tab('sidebar-colors')
+
+
+@app.route('/admin/delete_available_color', methods=['POST'])
+@login_required
+def delete_available_color() -> Response:
+    check_manager_user()
+    color_to_delete = request.form.get('color_to_delete')
+    if color_to_delete in g.settings.available_colors:
+        g.settings.available_colors.remove(color_to_delete)
+        try:
+            g.settings.save_to_db()
+            flash(_('Color deleted successfully.'), 'success')
+        except Exception as e:
+            app.logger.error("Failed to delete color: %s", e)
+            flash(_('Error deleting color'), 'error')
+    return _redirect_to_admin_tab('sidebar-colors')
 
 
 @app.route('/admin/update_menu_management', methods=['POST'])
@@ -943,7 +1037,17 @@ def utility_processor():
             return url_for('uploaded_team', filename=filename)
         return url_for('static', filename=f'images/team/{filename}')
 
-    return dict(get_logo_url=get_logo_url, get_asset_url=get_asset_url, get_team_url=get_team_url)
+    def get_icon_url(filename):
+        uploads_path = os.path.join(app.root_path, '..', 'uploads', 'icons')
+        if os.path.exists(os.path.join(uploads_path, filename)):
+            return url_for('uploaded_icon', filename=filename)
+        return url_for('static', filename=f'images/icons/{filename}')
+
+    return dict(
+        get_logo_url=get_logo_url,
+        get_asset_url=get_asset_url,
+        get_team_url=get_team_url,
+        get_icon_url=get_icon_url)
 
 
 @app.route('/admin/upload_asset', methods=['POST'])
@@ -1066,6 +1170,11 @@ def uploaded_team(filename):
     return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'team'), filename)
 
 
+@app.route('/uploads/icons/<filename>')
+def uploaded_icon(filename):
+    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'icons'), filename)
+
+
 @app.route('/uploads/favicon.ico')
 def uploaded_favicon():
     return send_from_directory(os.path.join(app.root_path, '..', 'uploads'), 'favicon.ico')
@@ -1082,23 +1191,34 @@ def upload_file():
 
     if 'file' not in request.files:
         flash(_('No file part'), 'danger')
-        return _redirect_to_admin_tab(f'sidebar-{file_type}s')
+        return _redirect_to_admin_tab(f'sidebar-{file_type}')
 
     file = request.files['file']
     if file.filename == '':
         flash(_('No selected file'), 'danger')
-        return _redirect_to_admin_tab(f'sidebar-{file_type}s')
+        return _redirect_to_admin_tab(f'sidebar-{file_type}')
 
     if file:
         filename = secure_filename(file.filename)
-        upload_folder = 'logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'team'
+        if file_type == 'logo':
+            upload_folder = 'logos'
+        elif file_type == 'asset':
+            upload_folder = 'assets'
+        elif file_type == 'team':
+            upload_folder = 'team'
+        elif file_type == 'icon':
+            upload_folder = 'icons'
+        else:
+            flash(_('Invalid file type.'), 'danger')
+            return _redirect_to_admin_tab('sidebar-file-management-group')
+
         upload_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
         os.makedirs(upload_path, exist_ok=True)
         file.save(os.path.join(upload_path, filename))
         add_file_to_db(filename, file_type, is_default=False)
         flash(_('%(type)s "%(name)s" uploaded successfully.', type=file_type.capitalize(), name=filename), 'success')
 
-    return _redirect_to_admin_tab(f'sidebar-{file_type}s')
+    return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
 
 @app.route('/admin/rename_file', methods=['POST'])
@@ -1113,28 +1233,38 @@ def rename_file():
         flash(_('Invalid request for renaming.'), 'danger')
         return _redirect_to_admin_tab('sidebar-file-management-group')
 
-    upload_folder = 'logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'team'
-    static_folder = 'images/logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'images/team'
+    if file_type == 'logo':
+        upload_folder = 'logos'
+        static_folder = 'images/logos'
+    elif file_type == 'asset':
+        upload_folder = 'assets'
+        static_folder = 'assets'
+    elif file_type == 'team':
+        upload_folder = 'team'
+        static_folder = 'images/team'
+    else:
+        flash(_('Invalid file type.'), 'danger')
+        return _redirect_to_admin_tab('sidebar-file-management-group')
 
-    static_path = os.path.join(app.static_folder, static_folder) if static_folder else None
+    static_path = os.path.join(app.static_folder, static_folder)
     uploads_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
 
-    old_filepath_static = os.path.join(static_path, secure_filename(old_name)) if static_path else None
+    old_filepath_static = os.path.join(static_path, secure_filename(old_name))
     old_filepath_uploads = os.path.join(uploads_path, secure_filename(old_name))
 
-    if old_filepath_static and os.path.exists(old_filepath_static):
+    if os.path.exists(old_filepath_static):
         flash(_('Cannot rename default files.'), 'danger')
-        return _redirect_to_admin_tab(f'sidebar-{file_type}s')
+        return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
     elif os.path.exists(old_filepath_uploads):
         old_filepath = old_filepath_uploads
         new_filepath = os.path.join(uploads_path, secure_filename(new_name))
     else:
         flash(_('Original file not found.'), 'danger')
-        return _redirect_to_admin_tab(f'sidebar-{file_type}s')
+        return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
     if os.path.exists(new_filepath):
         flash(_('A file with the new name already exists.'), 'danger')
-        return _redirect_to_admin_tab(f'sidebar-{file_type}s')
+        return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
     try:
         os.rename(old_filepath, new_filepath)
@@ -1143,7 +1273,7 @@ def rename_file():
     except OSError as e:
         flash(_('Error renaming file: %(error)s', error=e), 'danger')
 
-    return _redirect_to_admin_tab(f'sidebar-{file_type}s')
+    return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
 
 @app.route('/admin/delete_file', methods=['POST'])
@@ -1157,7 +1287,18 @@ def delete_file():
         flash(_('No filename or type specified for deletion.'), 'danger')
         return _redirect_to_admin_tab('sidebar-file-management-group')
 
-    upload_folder = 'logos' if file_type == 'logo' else 'assets' if file_type == 'asset' else 'team'
+    if file_type == 'logo':
+        upload_folder = 'logos'
+    elif file_type == 'asset':
+        upload_folder = 'assets'
+    elif file_type == 'team':
+        upload_folder = 'team'
+    elif file_type == 'icon':
+        upload_folder = 'icons'
+    else:
+        flash(_('Invalid file type.'), 'danger')
+        return _redirect_to_admin_tab('sidebar-file-management-group')
+
     uploads_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
     filepath_uploads = os.path.join(uploads_path, secure_filename(filename))
 
@@ -1172,7 +1313,7 @@ def delete_file():
         delete_file_from_db(filename, file_type)
         flash(_('Default %(type)s "%(name)s" deactivated.', type=file_type.capitalize(), name=filename), 'success')
 
-    return _redirect_to_admin_tab(f'sidebar-{file_type}s')
+    return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
 
 @app.route('/admin/update_file_license', methods=['POST'])
@@ -1189,4 +1330,4 @@ def update_file_license() -> Response:
     admin_instance.update_file_license(filename, license_id, attribution)
 
     flash(_('%(type)s license updated successfully.', type=file_type.capitalize()), 'success')
-    return _redirect_to_admin_tab(f'sidebar-{file_type}s')
+    return _redirect_to_admin_tab(f'sidebar-{file_type}-management')

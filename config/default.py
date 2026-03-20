@@ -82,37 +82,6 @@ VIEW_CLASSES = {
 
 ADD_FILES_FOR_OVERVIEW = 2
 
-# Categorization of entity types with icons
-TYPE_DIVISIONS = {
-    'administrative unit': {
-        'ids': [86],
-        'icon': ('css', 'bi bi-map')},
-    'dimensions': {
-        'ids': [15678],
-        'icon': ('css', 'bi bi-rulers')},
-    'anthropology': {
-        'ids': [218963, 213216, 119444, 119334],
-        'icon': ('img', 'bone.svg')},
-    'material': {
-        'ids': [21160],
-        'icon': ('img', 'material.svg')},
-    'age': {
-        'ids': [22277, 117198],
-        'icon': ('css', 'bi bi-calendar-range')},
-    'burial characteristics': {
-        'ids': [213223],
-        'icon': None},
-    'grave characteristics': {
-        'ids': [218839],
-        'icon': ('img', 'grave.svg')},
-    'position of find in grave': {
-        'ids': [23440],
-        'icon': ('css', 'bi bi-crosshair')},
-    'case study': {
-        'ids': [8240],
-        'icon': ('css', 'bi bi-house')
-        }
-    }
 
 # Icons displayed in sidebar, mapped to entity IDs
 SIDEBAR_ICONS = {

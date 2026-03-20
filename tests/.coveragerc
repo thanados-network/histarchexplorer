@@ -1,7 +1,6 @@
-[report]
-precision=2
-skip_covered=True
-sort=cover
 [run]
-omit =
-    ..histarchexplorer/_deprecated_code/*
+source = histarchexplorer
+
+[report]
+precision = 2
+sort = cover

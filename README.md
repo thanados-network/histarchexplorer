@@ -1,7 +1,7 @@
 # Histarchexplorer
 
-Histarchexplorer is a presentation application built
-for [OpenAtlas](https://openatlas.eu) — an open-source system for managing
+Histarchexplorer is a presentation application built for
+[OpenAtlas](https://openatlas.eu) — an open-source system for managing
 historical, archaeological, and cultural heritage data.
 
 The goal of Histarchexplorer is to **transform structured OpenAtlas datasets
@@ -19,259 +19,175 @@ as a **bridge between OpenAtlas and the public presentation of knowledge**.
 
 ---
 
-## 🚀 Features
-
-- Integration with existing **OpenAtlas PostgreSQL + PostGIS** databases
-- Flask-based backend for serving visualizations
-- SCSS-based frontend styling with automatic compilation
-- Flexible modules for different presentation forms (maps, networks,
-  catalogues)
-
----
-
 ## ⚙️ Requirements
 
-Histarchexplorer is developed and tested on **Debian 12** with the following
+Histarchexplorer is developed and tested on **Debian 13** with the following
 stack:
 
-- **Python**: 3.x
-- **Flask**: 2.2.2
-- **PostgreSQL**: 15
-- **PostGIS**: 3
-- **Apache**: 2.4 with WSGI
-- **OpenAtlas** (required): running on the same database instance
+- **OS**: Debian 13
+- **Python**: 3.13+
+- **PostgreSQL**: 17+ with PostGIS 3+
+- **Redis**: Recommended for caching
+- **Apache2** with `mod_wsgi`
+- **OpenAtlas**: A running instance on the same database server.
 
 ---
 
 ## 🔧 Installation
 
-### 1. System dependencies
+This guide provides two paths for Python dependency management:
+- **`uv` (Recommended)**: Uses a virtual environment for isolated, project-specific packages.
+- **`apt`**: Uses system-wide packages managed by Debian.
 
-Install Apache, gettext, npm:
+### 1. Base System Setup
 
-```bash
-sudo apt install apache2 libapache2-mod-wsgi-py3 gettext npm
-```
-
-Install PostgreSQL 15 with PostGIS 3:
+First, install common dependencies for both methods:
 
 ```bash
-sudo apt install postgresql postgresql-15-postgis-3 postgresql-15-postgis-3-scripts
+sudo apt update
+sudo apt install \
+    apache2 libapache2-mod-wsgi-py3 \
+    postgresql redis-server libpq-dev \
+    gettext npm
 ```
 
-### 2. Python dependencies
+### 2. Clone the Repository
 
 ```bash
-sudo apt install python3-bcrypt python3-flask python3-flask-babel \
-    python3-flask-login python3-mypy python3-numpy python3-psycopg2 \
-    python3-werkzeug python3-wtforms python3-flask-caching python3-requests \
-    redis-server python3-redis python3-bleach python3-libsass python3-pydantic
+git clone https://github.com/thanados-network/histarchexplorer.git
+cd histarchexplorer
 ```
 
-#### Development dependencies (optional)
+---
 
+### 🚀 Path A: `uv` (Recommended)
+
+This method isolates project dependencies in a `.venv` directory.
+
+#### 2.1. Install `uv`
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+Source your profile (e.g., `source ~/.bashrc`) or restart your shell.
+
+#### 2.2. Install Python Dependencies
+
+This command creates the `.venv` and installs packages from `uv.lock`.
+
+```bash
+uv sync
+```
+
+For development tools (like `pytest`), use the `dev` group:
+```bash
+uv sync --group dev
+```
+
+---
+
+### 📦 Path B: `apt` (System Packages)
+
+This method uses Debian's package manager for all Python dependencies.
+
+#### 2.1. Install Python Dependencies
+
+```bash
+sudo apt install \
+    python3-bcrypt python3-flask python3-flask-babel \
+    python3-flask-login python3-mypy python3-numpy \
+    python3-psycopg2 python3-werkzeug python3-wtforms \
+    python3-flask-caching python3-requests python3-redis \
+    python3-bleach python3-libsass python3-pydantic
+```
+
+For development, install `pytest`:
 ```bash
 sudo apt install python3-pytest python3-pytest-cov python3-pytest-flask
 ```
 
-### 3. Clone the repository
+---
 
-Clone Histarchexplorer into `/var/www/`:
+### 3. Final Setup Steps (Both Paths)
 
-```bash
-cd /var/www/
-git clone https://github.com/thanados-network/histarchexplorer.git
-```
+#### 3.1. Database Setup
 
-### 4. Frontend setup (SCSS → CSS)
-
-    cd histarchexplorer/static
-    npm install --production=true
-
-### 5. Development Setup
-
-If you are working on frontend styles (SCSS), follow these steps.
-
+Create a new database for Histarchexplorer:
 
 ```bash
-cd histarchexplorer/histarchexplorer/static
-sass --watch scss/main.scss:css/main.css
+sudo -u postgres createdb <DATABASE_NAME> -O openatlas
+cat install/1_structure.sql install/2_data_model.sql | sudo -u postgres psql -d <DATABASE_NAME>
 ```
 
-#### Install Node dependencies
+#### 3.2. Configuration
 
-    cd histarchexplorer/static
-    npm install --production=false
-
-This installs all required JavaScript and SCSS build dependencies (including
-sass).
-
-#### Build CSS once
-
-    npm run build
-
-#### Watch for changes during development
-
-If you are actively editing SCSS files:
-
-    npm run dev
-
-#### Git hooks (optional, but recommended)
-
-If you have Git hooks installed, SCSS will rebuild automatically when:
-
-* switching branches (post-checkout)
-* pulling new commits (post-merge)
-
-If not yet set up:
-
-    cd ../..
-    bash .github/hooks/setup-hooks.sh
-
-#### Common Issues
-
-SCSS not compiling?
-Ensure you are in the correct folder:
-
-    cd histarchexplorer/histarchexplorer/static
-    npm install
-    npm run build
-
-#### Bootstrap deprecation warnings?
-
-These come from Bootstrap’s internal SCSS functions and are safe to ignore.
-They can be silenced with --quiet-deps in your build scripts (already
-configured).
-
-### 5. Database setup
-
-Histarchexplorer requires an existing **OpenAtlas PostgreSQL database** and 
-a new standalone **PostgreSQL** database. As *postgres* user please follow the 
-commands:
-
-```bash
-createdb <DATABASE_NAME> -O openatlas
-cd install
-cat 1_structure.sql 2_data_model.sql | psql -d <DATABASE_NAME> -f -
-```
-
-Alternatively, run the installation script (requires correct credentials in
-`instance/production.py`):
-
-```bash
-export PYTHONPATH=".:$PYTHONPATH"
-python3 install/install_script.py
-```
-
-### 6. Configure production settings
-
-Copy the example production configuration:
+Copy and edit the production configuration:
 
 ```bash
 cp instance/example_production.py instance/production.py
+# Edit instance/production.py with your database credentials
 ```
 
-Edit `instance/production.py` to match your OpenAtlas database credentials:
+#### 3.3. Frontend Setup (SCSS/JS)
 
-```python
-DATABASE_NAME = ''
-DATABASE_USER = ''
-DATABASE_PASS = ''
+Install Node.js dependencies and build the CSS files.
+
+```bash
+cd histarchexplorer/static
+npm install
+npm run build
+cd ../.. # Return to project root
 ```
+
+For frontend development, you can use `npm run dev` to automatically watch for
+SCSS changes.
+
+#### 3.4. Apache Configuration
+
+Copy the appropriate example configuration and enable the site.
+
+- **For `uv` installs**:
+  ```bash
+  sudo cp install/example_apache_uv.conf /etc/apache2/sites-available/histarchexplorer.conf
+  ```
+- **For `apt` installs**:
+  ```bash
+  sudo cp install/example_apache_apt.conf /etc/apache2/sites-available/histarchexplorer.conf
+  ```
+
+Then, enable the site and restart Apache:
+```bash
+sudo a2ensite histarchexplorer
+sudo systemctl reload apache2
+```
+
+---
 
 ## 🧪 Running Tests
 
-Histarchexplorer uses `pytest` for testing. The test suite runs against a dedicated test database.
-
-### Prerequisites
-
-1.  **Install development dependencies:**
-
+1.  **Create a Test Database**:
     ```bash
-    sudo apt install python3-pytest python3-pytest-cov python3-pytest-flask
+    sudo -u postgres createdb histarchexplorer_test -O openatlas
     ```
 
-2.  **Create a test database:**
+2.  **Configure Test Environment**:
+    Copy `example_testing.py` to `instance/testing.py` and edit the database name.
 
-    Create a new, empty database for testing (e.g., `tng_test`). Do **NOT** use your production or development database, as it will be reset during tests!
-
-    ```bash
-    createdb tng_test -O openatlas
-    ```
-
-3.  **Configure the test environment:**
-
-    Copy the example testing configuration:
-
-    ```bash
-    cp example_testing.py instance/testing.py
-    ```
-
-    Edit `instance/testing.py` and set `DATABASE_NAME` to your test database (e.g., `'tng_test'`). Adjust other credentials if necessary.
-
-### Running the tests
-
-To run all tests and generate a coverage report:
-
-```bash
-export PYTHONPATH=".:$PYTHONPATH"
-pytest
-```
-
-This will:
-1.  Connect to the configured test database.
-2.  **Reset the database** (drop schema `tng` and reload `tests/sql/reset.sql`).
-3.  Run all tests in the `tests/` directory.
-4.  Output a coverage report.
-
-## Redis Installation (Optional but Recommended)
-
-Histarchexplorer can use **Redis** as a high-performance backend for Flask-Caching (memoize). Redis is optional, but strongly recommended for production environments.
-
-### Install Redis on Debian 12
-
-```bash
-sudo apt update
-sudo apt install redis-server python3-redis
-```
-
-This installs:
-- **redis-server** → the Redis database
-- **python3-redis** → required for Flask to connect to Redis
-
-### Enable and start Redis
-
-```bash
-sudo systemctl enable redis-server
-sudo systemctl start redis-server
-```
-
-Check if Redis is running:
-
-```bash
-redis-cli ping
-# → PONG
-```
-
-### Redis default security
-On Debian 12, Redis binds **only to 127.0.0.1** by default:
-```
-bind 127.0.0.1 ::1
-protected-mode yes
-```
-This is ideal for local caching and does **not** expose Redis to the internet.
+3.  **Run Tests**:
+    - **`uv` path**: Activate the environment first: `source .venv/bin/activate && pytest`
+    - **`apt` path**: Simply run `pytest`
 
 ---
+
 ## 📂 Project Structure
 
 ```
 Histarchexplorer/
-├── config/              # Configuration file 
-├── install/             # Database installation scripts
-├── instance/            # Instance-specific configs (e.g., production.py)
+├── install/             # Database and deployment scripts
+├── instance/            # Instance-specific configs (production.py)
 └── histarchexplorer/    # Core Flask application
     ├── static/          # SCSS, CSS, JS, images
-    ├── templates/       # HTML templates (Flask Jinja2)
+    ├── templates/       # HTML templates (Jinja2)
 └── tests/               # Unit and integration tests
 ```
 
