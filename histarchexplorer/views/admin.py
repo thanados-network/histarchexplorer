@@ -88,7 +88,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             cs_type_id = int(g.settings.case_study_type_id)
             details = Admin.get_openatlas_entity(cs_type_id)
             if details:
-                cs_type_name = details.name
+                cs_type_name = details['name']
 
             case_study_children = find_children_by_id(
                 type_tree().get_json(),

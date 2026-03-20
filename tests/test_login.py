@@ -13,14 +13,14 @@ def test_login_success(client: FlaskClient) -> None:
     password = 'testpassword'
     hashed = hashpw(password.encode('utf-8'), gensalt()).decode('utf-8')
     
-    mock_user = User(type('Row', (), {
+    mock_user = User({
         'id': 1,
         'active': 1,
         'username': 'testuser',
         'password': hashed,
         'group_name': 'admin',
         'real_name': 'Test User'
-    })())
+    })
 
     with patch('histarchexplorer.models.user.User.get_by_username',
                return_value=mock_user), \
@@ -38,14 +38,14 @@ def test_login_invalid_password(client: FlaskClient) -> None:
     password = 'testpassword'
     hashed = hashpw(password.encode('utf-8'), gensalt()).decode('utf-8')
 
-    mock_user = User(type('Row', (), {
+    mock_user = User({
         'id': 1,
         'active': 1,
         'username': 'testuser',
         'password': hashed,
         'group_name': 'admin',
         'real_name': 'Test User'
-    })())
+    })
 
     with patch('histarchexplorer.models.user.User.get_by_username',
                return_value=mock_user):
@@ -62,14 +62,14 @@ def test_login_inactive_user(client: FlaskClient) -> None:
     password = 'testpassword'
     hashed = hashpw(password.encode('utf-8'), gensalt()).decode('utf-8')
 
-    mock_user = User(type('Row', (), {
+    mock_user = User({
         'id': 1,
         'active': 0,
         'username': 'testuser',
         'password': hashed,
         'group_name': 'admin',
         'real_name': 'Test User'
-    })())
+    })
 
     with patch('histarchexplorer.models.user.User.get_by_username',
                return_value=mock_user):

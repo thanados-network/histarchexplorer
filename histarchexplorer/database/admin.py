@@ -247,7 +247,7 @@ def check_sortorder() -> int:
     return g.cursor.fetchone()['next_order']
 
 
-def get_openatlas_entity(id_: int) -> NamedTuple:
+def get_openatlas_entity(id_: int) -> dict[str, Any]:
     g.openatlas_cursor.execute(
         '''
         SELECT id, name, openatlas_class_name

@@ -276,11 +276,11 @@ class Admin:
     def check_case_study_type_id(entity_id: int) -> dict[str, Any]:
         details = Admin.get_openatlas_entity(entity_id)
         if details:
-            is_valid = details.openatlas_class_name == 'type'
+            is_valid = details['openatlas_class_name'] == 'type'
             return {
                 'is_valid': is_valid,
-                'name': details.name,
-                'class_name': details.openatlas_class_name}
+                'name': details['name'],
+                'class_name': details['openatlas_class_name']}
         return {
             'is_valid': False,
             'name': None,

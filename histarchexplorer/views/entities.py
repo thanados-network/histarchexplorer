@@ -36,14 +36,11 @@ def build_id_collection(ids: list[int]) -> list[str]:
     if not ids:
         return []
 
-    result = [
-        row[0]
-        for id in ids
-        for row in get_recursive_type_ids(id)
+    return [
+        row['id']
+        for id_ in ids
+        for row in get_recursive_type_ids(id_)
     ]
-    #print('result build_id_collection(ids)')
-    #print(result)
-    return result
 
 
 # pylint: disable=too-many-locals
@@ -60,7 +57,7 @@ def get_browse_list_entities(
         WHERE property_code = 'P46'  AND domain_id = %(id)s
         """
         g.openatlas_cursor.execute(sql, {'id': id_})
-        shown_ids = g.openatlas_cursor.fetchall()
+        shown_ids = [row['range_id'] for row in g.openatlas_cursor.fetchall()]
         if not shown_ids:
             return None
 
@@ -146,7 +143,8 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
 
     #print((query, tuple(params)))
     g.openatlas_cursor.execute(query, tuple(params))
-    data['entities'] = g.openatlas_cursor.fetchone()[0] or []
+    result = g.openatlas_cursor.fetchone()
+    data['entities'] = result.get('items', []) if result else []
 
     geom_query = f"""
             SELECT jsonb_build_object(
@@ -182,7 +180,8 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
 """
 
     g.openatlas_cursor.execute(geom_query, tuple(params))
-    data['geometries'] = g.openatlas_cursor.fetchone()[0] or []
+    result = g.openatlas_cursor.fetchone()
+    data['geometries'] = result['geojson'] if result else []
 
     count_query = f"""
                      SELECT e.openatlas_class_name, COUNT(*) AS count
@@ -195,7 +194,7 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
     results = g.openatlas_cursor.fetchall()
 
     # Convert list of (class_name, count) to a dictionary for easy access
-    class_count_map = {row[0]: row[1] for row in results}
+    class_count_map = {row['openatlas_class_name']: row['count'] for row in results}
 
     # Build categorized counts
     categorized_counts = {}
@@ -251,26 +250,27 @@ JOIN all_children ac ON l1.range_id = ac.id JOIN model.entity c ON c.id = ac.id 
         cs_infos = g.cursor.fetchall()
 
         sql_case_studies = """
-            SELECT jsonb_agg(domain_id) as ids
+            SELECT array_agg(domain_id) as ids
             FROM model.link
             WHERE range_id = %(cs_id)s
               AND property_code = 'P2';
         """
 
         for case_study in shown_case_studies:
-            g.openatlas_cursor.execute(sql_case_studies, {'cs_id':case_study})
+            g.openatlas_cursor.execute(sql_case_studies, {'cs_id': case_study})
             results = g.openatlas_cursor.fetchone()
-            cs = {'id': case_study, 'ids': results}
-            for row in cs_infos:
-                if row['cs_id'] == cs['id']:
-                    if row['name']:
-                        cs['name'] = row['name']
-                        cs['acronym'] = row['name']
-                    if row['acronym']:
-                        cs['acronym'] = row['acronym']
-                    if row['description']:
-                        cs['description'] = row['description']
-            data['cs_ids'].append(cs)
+            if results:
+                cs = {'id': case_study, 'ids': results['ids']}
+                for row in cs_infos:
+                    if row['cs_id'] == cs['id']:
+                        if row['name']:
+                            cs['name'] = row['name']
+                            cs['acronym'] = row['name']
+                        if row['acronym']:
+                            cs['acronym'] = row['acronym']
+                        if row['description']:
+                            cs['description'] = row['description']
+                data['cs_ids'].append(cs)
 
 
 

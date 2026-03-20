@@ -15,7 +15,7 @@ def check_geom(id_: int) -> int | None:
                                        LIMIT 1)); \
         """, {'id': id_})
     result = g.openatlas_cursor.fetchone()
-    return id_ if result and result[0] else None
+    return id_ if result and result['exists'] else None
 
 
 def get_first_geom(id_: int) -> int | None:
@@ -35,7 +35,7 @@ def get_first_geom(id_: int) -> int | None:
     result = g.openatlas_cursor.fetchone()
 
     if result:
-        parent_id = result[0]
+        parent_id = result['domain_id']
         return get_first_geom(parent_id)  # Recursively check the parent
     return None  # No parent found with geometry
 
