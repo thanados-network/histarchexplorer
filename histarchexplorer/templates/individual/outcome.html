@@ -61,6 +61,13 @@
         border-color: #222;
     }
 
+    .pub-card img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 15px 0;
+    }
+
     .outcome-nav {
         position: sticky;
         top: 0;
@@ -89,12 +96,16 @@
         border-color: #222;
     }
 
-    #publications, #software, #datasets {
+    #publications, #software, #datasets, #news {
         padding-top: 167px;
     }
 </style>
 
 <nav class="outcome-nav">
+    <a href="#news" class="nav-btn">
+        News <span id="count-news"></span>
+    </a>
+
     <a href="#publications" class="nav-btn">
         Publications <span id="count-publications"></span>
     </a>
@@ -107,6 +118,16 @@
         Datasets <span id="count-datasets"></span>
     </a>
 </nav>
+
+<section id="news" class="sections">
+
+    <h1>News</h1>
+
+    <div id="news-container">
+        <!-- News items will be loaded here via JavaScript -->
+    </div>
+
+</section>
 
 <section id="publications" class="sections">
 
@@ -299,8 +320,89 @@
 
 {% include "footer.html" %}
 
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
+async function fetchNews() {
+    const container = document.getElementById('news-container');
+    const apiUrl = "https://api.github.com/repos/stefaneichert/RELIC/contents/news";
+
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error('Failed to fetch news list');
+        const files = await response.json();
+
+        const newsPromises = files
+            .filter(file => file.name.endsWith('.md'))
+            .map(async file => {
+                const res = await fetch(file.download_url);
+                if (!res.ok) return null;
+                const text = await res.text();
+                return parseNewsMarkdown(text);
+            });
+
+        let newsItems = await Promise.all(newsPromises);
+        newsItems = newsItems.filter(item => item !== null);
+
+        // Sort by date, latest on top
+        newsItems.sort((a, b) => b.dateObj - a.dateObj);
+
+        const baseUrl = "https://raw.githubusercontent.com/stefaneichert/RELIC/main/";
+
+        container.innerHTML = '';
+        newsItems.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'pub-card';
+            
+            // Adjust image paths to use GitHub raw content URL
+            let contentHtml = item.contentHtml;
+            contentHtml = contentHtml.replace(/<img src="\/news\/(.*?)"/g, `<img src="${baseUrl}news/$1"`);
+            
+            card.innerHTML = `
+                <h2>${item.title}</h2>
+                <p class="pub-authors">${item.date}</p>
+                <div>${contentHtml}</div>
+            `;
+            container.appendChild(card);
+        });
+
+        updateCounts();
+    } catch (error) {
+        console.error('Error loading news:', error);
+        container.innerHTML = '<p>Error loading news.</p>';
+    }
+}
+
+function parseNewsMarkdown(mdText) {
+    let title = "Untitled";
+    let dateStr = "";
+    let dateObj = new Date(0);
+
+    // Extract heading **heading text**
+    const titleMatch = mdText.match(/\*\*(.*?)\*\*/);
+    if (titleMatch) {
+        title = titleMatch[1];
+        mdText = mdText.replace(titleMatch[0], '');
+    }
+
+    // Extract date *date string in yyyy.mm.dd*
+    const dateMatch = mdText.match(/\*((\d{4})\.(\d{2})\.(\d{2}))\*/);
+    if (dateMatch) {
+        dateStr = dateMatch[1];
+        const [y, m, d] = dateStr.split('.');
+        dateObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+        mdText = mdText.replace(dateMatch[0], '');
+    }
+
+    // Convert remaining content to HTML using marked
+    const contentHtml = marked.parse(mdText.trim());
+
+    return { title, date: dateStr, dateObj, contentHtml };
+}
+
 function updateCounts() {
+    document.getElementById('count-news').textContent =
+        '(' + document.querySelectorAll('#news .pub-card').length + ')';
+
     document.getElementById('count-publications').textContent =
         '(' + document.querySelectorAll('#publications .pub-card').length + ')';
 
@@ -311,5 +413,5 @@ function updateCounts() {
         '(' + document.querySelectorAll('#datasets .pub-card').length + ')';
 }
 
-updateCounts();
+fetchNews();
 </script>
