@@ -1,3 +1,5 @@
+{% extends "layout.html" %}
+{% block content %}
 <style>
     .sections {
         max-width: 1000px;
@@ -100,7 +102,7 @@
         padding-top: 167px;
     }
 </style>
-
+<div class="page-wrapper">
 <nav class="outcome-nav">
     <a href="#news" class="nav-btn">
         News <span id="count-news"></span>
@@ -317,7 +319,7 @@
     </div>
 </section>
 
-
+</div>
 {% include "footer.html" %}
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -415,3 +417,4 @@ function updateCounts() {
 
 fetchNews();
 </script>
+{% endblock %}
