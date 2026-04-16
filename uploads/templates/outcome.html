@@ -1,353 +1,417 @@
-{% extends "layout.html" %}
-{% block content %}
-  <div class="page-wrapper">
+<style>
+    .sections {
+        max-width: 1000px;
+        margin: 120px auto;
+        padding: 0 20px;
+    }
 
+    .sections h1 {
+        font-size: 3rem;
+        margin-bottom: 60px;
+        font-weight: 600;
+    }
 
-    <style>
-        .sections {
-            max-width: 1000px;
-            margin: 120px auto;
-            padding: 0 20px;
-        }
+    /* Publication Card */
 
-        .sections h1 {
-            font-size: 3rem;
-            margin-bottom: 60px;
-            font-weight: 600;
-        }
+    .pub-card {
+        padding: 40px;
+        border-radius: 18px;
+        background: #fafafa;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+        transition: transform .2s ease;
+        margin-bottom: 30px;
+    }
 
-        /* Publication Card */
+    .pub-card:hover {
+        transform: scale(1.01);
+    }
 
-        .pub-card {
-            padding: 40px;
-            border-radius: 18px;
-            background: #fafafa;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
-            transition: transform .2s ease;
-            margin-bottom: 30px;
-        }
+    .pub-card h2 {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+    }
 
-        .pub-card:hover {
-            transform: scale(1.01);
-        }
+    .pub-authors {
+        color: #666;
+        margin-bottom: 10px;
+    }
 
-        .pub-card h2 {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-        }
+    .pub-journal {
+        margin-bottom: 20px;
+        font-style: italic;
+    }
 
-        .pub-authors {
-            color: #666;
-            margin-bottom: 10px;
-        }
+    .pub-links {
+        margin-top: 25px;
+    }
 
-        .pub-journal {
-            margin-bottom: 20px;
-            font-style: italic;
-        }
+    .pub-links a {
+        margin-right: 20px;
+        text-decoration: none;
+        border: 1px solid #ddd;
+        padding: 6px 14px;
+        border-radius: 10px;
+        color: #222;
+        transition: all 0.2s ease;
+    }
 
-        .pub-links {
-            margin-top: 25px;
-        }
+    .pub-links a:hover {
+        background: #222;
+        color: white;
+        border-color: #222;
+    }
 
-        .pub-links a {
-            margin-right: 20px;
-            text-decoration: none;
-            border: 1px solid #ddd;
-            padding: 6px 14px;
-            border-radius: 10px;
-            color: #222;
-            transition: all 0.2s ease;
-        }
+    .pub-card img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 15px 0;
+    }
 
-        .pub-links a:hover {
-            background: #222;
-            color: white;
-            border-color: #222;
-        }
+    .outcome-nav {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: white;
+        padding: 20px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+    }
 
-        .outcome-nav {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: white;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-        }
+    .nav-btn {
+        display: inline-block;
+        margin: 0 10px;
+        padding: 8px 18px;
+        border-radius: 12px;
+        border: 1px solid #ddd;
+        text-decoration: none;
+        color: #222;
+        transition: all .2s ease;
+        font-weight: 500;
+    }
 
-        .nav-btn {
-            display: inline-block;
-            margin: 0 10px;
-            padding: 8px 18px;
-            border-radius: 12px;
-            border: 1px solid #ddd;
-            text-decoration: none;
-            color: #222;
-            transition: all .2s ease;
-            font-weight: 500;
-        }
+    .nav-btn:hover {
+        background: #222;
+        color: white;
+        border-color: #222;
+    }
 
-        .nav-btn:hover {
-            background: #222;
-            color: white;
-            border-color: #222;
-        }
+    #publications, #software, #datasets, #news {
+        padding-top: 167px;
+    }
+</style>
 
-        #publications, #software, #datasets {
-            padding-top: 167px;
-        }
-    </style>
+<nav class="outcome-nav">
+    <a href="#news" class="nav-btn">
+        News <span id="count-news"></span>
+    </a>
 
-    <nav class="outcome-nav">
-      <a href="#publications" class="nav-btn">
+    <a href="#publications" class="nav-btn">
         Publications <span id="count-publications"></span>
-      </a>
+    </a>
 
-      <a href="#software" class="nav-btn">
+    <a href="#software" class="nav-btn">
         Software <span id="count-software"></span>
-      </a>
+    </a>
 
-      <a href="#datasets" class="nav-btn">
+    <a href="#datasets" class="nav-btn">
         Datasets <span id="count-datasets"></span>
-      </a>
-    </nav>
+    </a>
+</nav>
 
-    <section id="publications" class="sections">
+<section id="news" class="sections">
 
-      <h1>Publications</h1>
+    <h1>News</h1>
 
-      <div class="pub-card">
+    <div id="news-container">
+        <!-- News items will be loaded here via JavaScript -->
+    </div>
+
+</section>
+
+<section id="publications" class="sections">
+
+    <h1>Publications</h1>
+
+    <div class="pub-card">
         <h2>
-          RELIC. Zur räumlichen Modellierung des sozialen, religiösen und
-          politischen Wandels zwischen Früh- und
-          Hochmittelalter
+            RELIC. Zur räumlichen Modellierung des sozialen, religiösen und politischen Wandels zwischen Früh- und
+            Hochmittelalter
         </h2>
         <p class="pub-authors">
-          Stefan Eichert & Mária Vargha & Nina Richards (2026)
+            Stefan Eichert & Mária Vargha & Nina Richards (2026)
         </p>
         <p class="pub-journal">
-          Beiträge zur Mittelalter- und Neuzeitarchäologie in Österreich
-          41/2025, 53–67
+            Beiträge zur Mittelalter- und Neuzeitarchäologie in Österreich 41/2025, 53–67
         </p>
         <p>
-          <strong>Full citation:</strong><br>
-          Eichert, Stefan, Vargha, Mária and Richards, Nina. 2026.
-          “RELIC. Zur räumlichen Modellierung des sozialen, religiösen und
-          politischen Wandels zwischen Früh- und
-          Hochmittelalter”.
-          Beiträge zur Mittelalter- und Neuzeitarchäologie in Österreich
-          41/2025: 53–67.
+            <strong>Full citation:</strong><br>
+            Eichert, Stefan, Vargha, Mária and Richards, Nina. 2026.
+            “RELIC. Zur räumlichen Modellierung des sozialen, religiösen und politischen Wandels zwischen Früh- und
+            Hochmittelalter”.
+            Beiträge zur Mittelalter- und Neuzeitarchäologie in Österreich 41/2025: 53–67.
         </p>
         <div class="pub-links">
-          <a
-            href="https://www.oegmn.or.at/publikationen/bmoe/bmoe-41-2025.html"
-            target="_blank">
-            URL ↗
-          </a>
-          <a
-            href="{{ get_assets_url('bmoe_41_2025_04_vargha_eichert_richards.pdf') }}"
-            target="_blank">
-            PDF ↓
-          </a>
+            <a href="https://www.oegmn.or.at/publikationen/bmoe/bmoe-41-2025.html" target="_blank">
+                URL ↗
+            </a>
+            <a href="/static/images/ind_assets/bmoe_41_2025_04_vargha_eichert_richards.pdf" target="_blank">
+                PDF ↓
+            </a>
         </div>
-      </div>
+    </div>
 
-      <div class="pub-card">
+    <div class="pub-card">
         <h2>
-          A Geospatial Approach to Modelling Social, Religious and Political
-          Shifts in History
+            A Geospatial Approach to Modelling Social, Religious and Political Shifts in History
         </h2>
         <p class="pub-authors">
-          Mária Vargha & Stefan Eichert (2025)
+            Mária Vargha & Stefan Eichert (2025)
         </p>
         <p class="pub-journal">
-          European Journal of Geography 16(1), 90-100
+            European Journal of Geography 16(1), 90-100
         </p>
         <p>
-          <strong>Full citation:</strong><br>
-          Vargha, Mária, and Eichert, Stefan. 2025.
-          “A Geospatial Approach to Modelling Social, Religious and Political
-          Shifts in History”.
-          European Journal of Geography 16 (1):90-100.
-          https://doi.org/10.48088/ejg.si.spat.hum.m.var.90.100.
+            <strong>Full citation:</strong><br>
+            Vargha, Mária, and Eichert, Stefan. 2025.
+            “A Geospatial Approach to Modelling Social, Religious and Political Shifts in History”.
+            European Journal of Geography 16 (1):90-100.
+            https://doi.org/10.48088/ejg.si.spat.hum.m.var.90.100.
         </p>
         <div class="pub-links">
-          <a href="https://doi.org/10.48088/ejg.si.spat.hum.m.var.90.100"
-             target="_blank">
-            DOI ↗
-          </a>
+            <a href="https://doi.org/10.48088/ejg.si.spat.hum.m.var.90.100" target="_blank">
+                DOI ↗
+            </a>
 
-          <a
-            href="https://www.eurogeojournal.eu/index.php/egj/article/download/719/420/2765"
-            target="_blank">
-            PDF ↓
-          </a>
+            <a href="https://www.eurogeojournal.eu/index.php/egj/article/download/719/420/2765" target="_blank">
+                PDF ↓
+            </a>
         </div>
-      </div>
+    </div>
 
-      <div class="pub-card">
+    <div class="pub-card">
         <h2>
-          THANADOS. Ein offenes Webportal für archäologische und
-          anthropologische Quellen zu Bestattungen des
-          Mittelalters
+            THANADOS. Ein offenes Webportal für archäologische und anthropologische Quellen zu Bestattungen des
+            Mittelalters
         </h2>
         <p class="pub-authors">
-          Stefan Eichert & Nina Richards (2025)
+            Stefan Eichert & Nina Richards (2025)
         </p>
         <p class="pub-journal">
-          Archäologie Österreichs 35/2024, 57–59
+            Archäologie Österreichs 35/2024, 57–59
         </p>
         <p>
-          <strong>Full citation:</strong><br>
-          Eichert, Stefan, and Richards, Nina. 2025.
-          “THANADOS. Ein offenes Webportal für archäologische und
-          anthropologische Quellen zu Bestattungen des
-          Mittelalters”.
-          Archäologie Österreichs 35 2024: 57–59.
+            <strong>Full citation:</strong><br>
+            Eichert, Stefan, and Richards, Nina. 2025.
+            “THANADOS. Ein offenes Webportal für archäologische und anthropologische Quellen zu Bestattungen des
+            Mittelalters”.
+            Archäologie Österreichs 35 2024: 57–59.
         </p>
         <div class="pub-links">
-          <a
-            href="https://oeguf.ac.at/archaeologie-oesterreichs/product/64-archaeologie-oesterreichs-2024-35"
-            target="_blank">
-            URL ↗
-          </a>
-          <a href="{{ get_assets_url('Eichert.pdf') }}" target="_blank">
-            PDF ↓
-          </a>
+            <a href="https://oeguf.ac.at/archaeologie-oesterreichs/product/64-archaeologie-oesterreichs-2024-35"
+               target="_blank">
+                URL ↗
+            </a>
+            <a href="/static/images/ind_assets/Eichert.pdf" target="_blank">
+                PDF ↓
+            </a>
         </div>
-      </div>
+    </div>
 
-    </section>
+</section>
 
-    <section id="software" class="sections">
-      <h1>Software</h1>
-      <div class="pub-card">
+<section id="software" class="sections">
+    <h1>Software</h1>
+    <div class="pub-card">
         <h2>
-          OpenAtlas
+            OpenAtlas
         </h2>
 
         <p>
-          OpenAtlas is an open source database software developed especially to
-          acquire, edit and manage research data
-          from various fields of humanities like history, archaeology and
-          cultural heritage as well as related
-          scientific data. Within the RELIC Project various features have been
-          developed to facilitate the use of
-          OpenAtlas for the project.
+            OpenAtlas is an open source database software developed especially to acquire, edit and manage research data
+            from various fields of humanities like history, archaeology and cultural heritage as well as related
+            scientific data. Within the RELIC Project various features have been developed to facilitate the use of
+            OpenAtlas for the project.
         </p>
         <div class="pub-links">
-          <a href="https://openatlas.eu" target="_blank">
-            Project Site ↗
-          </a>
-          <a href="https://github.com/craws/OpenAtlas" target="_blank">
-            <i class="bi bi-github"></i>
-          </a>
+            <a href="https://openatlas.eu" target="_blank">
+                Project Site ↗
+            </a>
+            <a href="https://github.com/craws/OpenAtlas" target="_blank">
+                <i class="bi bi-github"></i>
+            </a>
         </div>
-      </div>
+    </div>
 
-      <div class="pub-card">
+    <div class="pub-card">
         <h2>
-          THANADOS
+            THANADOS
         </h2>
 
         <p>
-          THANADOS is an open research infrastructure for the study of medieval
-          and early modern burial
-          archaeology. It integrates archaeological, anthropological and
-          spatial data to enable comparative
-          analysis, long-term preservation and open access to burial-related
-          cultural heritage data.
+            THANADOS is an open research infrastructure for the study of medieval and early modern burial
+            archaeology. It integrates archaeological, anthropological and spatial data to enable comparative
+            analysis, long-term preservation and open access to burial-related cultural heritage data.
         </p>
 
         <div class="pub-links">
-          <a href="https://thanados.net" target="_blank">
-            Project Site ↗
-          </a>
+            <a href="https://thanados.net" target="_blank">
+                Project Site ↗
+            </a>
 
-          <a href="https://github.com/thanados-network/thanados"
-             target="_blank">
-            <i class="bi bi-github"></i>
-          </a>
+            <a href="https://github.com/thanados-network/thanados" target="_blank">
+                <i class="bi bi-github"></i>
+            </a>
         </div>
-      </div>
+    </div>
 
-      <div class="pub-card">
+    <div class="pub-card">
         <h2>
-          THANADOS Next Generation
+            THANADOS Next Generation
         </h2>
 
         <p>
-          The next generation THANADOS infrastructure (HistArchExplorer) is
-          developed within the RELIC project and
-          expands the platform with enhanced spatial analysis tools, improved
-          data integration workflows and modern
-          visualization approaches for archaeological and historical research
-          data.
+            The next generation THANADOS infrastructure (HistArchExplorer) is developed within the RELIC project and
+            expands the platform with enhanced spatial analysis tools, improved data integration workflows and modern
+            visualization approaches for archaeological and historical research data.
         </p>
 
         <div class="pub-links">
-          <a href="https://github.com/thanados-network/histarchexplorer"
-             target="_blank">
-            Repository ↗
-          </a>
+            <a href="https://github.com/thanados-network/histarchexplorer" target="_blank">
+                Repository ↗
+            </a>
 
-          <a href="https://github.com/thanados-network/histarchexplorer"
-             target="_blank">
-            <i class="bi bi-github"></i>
-          </a>
+            <a href="https://github.com/thanados-network/histarchexplorer" target="_blank">
+                <i class="bi bi-github"></i>
+            </a>
         </div>
-      </div>
+    </div>
 
-    </section>
+</section>
 
-    <section id="datasets" class="sections">
-      <h1>Datasets</h1>
+<section id="datasets" class="sections">
+    <h1>Datasets</h1>
 
-      <div class="pub-card">
+    <div class="pub-card">
         <h2>
-          RELIC / THANADOS API
+            RELIC / THANADOS API
         </h2>
 
         <p>
-          The THANADOS API provides structured access to archaeological,
-          anthropological and spatial burial data generated within the
-          RELIC research environment. It supports interoperable data
-          exchange, reproducible research workflows and integration into
-          spatial humanities applications.
+            The THANADOS API provides structured access to archaeological,
+            anthropological and spatial burial data generated within the
+            RELIC research environment. It supports interoperable data
+            exchange, reproducible research workflows and integration into
+            spatial humanities applications.
         </p>
 
         <div class="pub-links">
-          <a href="https://thanados.openatlas.eu/swagger/" target="_blank">
-            API Explorer ↗
-          </a>
+            <a href="https://thanados.openatlas.eu/swagger/" target="_blank">
+                API Explorer ↗
+            </a>
 
-          <a
-            href="https://thanados.openatlas.eu/static/manual/technical/api.html"
-            target="_blank">
-            Documentation ↗
-          </a>
+            <a href="https://thanados.openatlas.eu/static/manual/technical/api.html" target="_blank">
+                Documentation ↗
+            </a>
         </div>
-      </div>
-    </section>
+    </div>
+</section>
 
 
-    {% include "footer.html" %}
+{% include "footer.html" %}
 
-    <script>
-      function updateCounts() {
-        document.getElementById('count-publications').textContent =
-          '(' + document.querySelectorAll('#publications .pub-card').length + ')';
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+async function fetchNews() {
+    const container = document.getElementById('news-container');
+    const apiUrl = "https://api.github.com/repos/stefaneichert/RELIC/contents/news";
 
-        document.getElementById('count-software').textContent =
-          '(' + document.querySelectorAll('#software .pub-card').length + ')';
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error('Failed to fetch news list');
+        const files = await response.json();
 
-        document.getElementById('count-datasets').textContent =
-          '(' + document.querySelectorAll('#datasets .pub-card').length + ')';
-      }
+        const newsPromises = files
+            .filter(file => file.name.endsWith('.md'))
+            .map(async file => {
+                const res = await fetch(file.download_url);
+                if (!res.ok) return null;
+                const text = await res.text();
+                return parseNewsMarkdown(text);
+            });
 
-      updateCounts();
-    </script>
+        let newsItems = await Promise.all(newsPromises);
+        newsItems = newsItems.filter(item => item !== null);
 
-  </div>
-{% endblock %}
+        // Sort by date, latest on top
+        newsItems.sort((a, b) => b.dateObj - a.dateObj);
+
+        const baseUrl = "https://raw.githubusercontent.com/stefaneichert/RELIC/main/";
+
+        container.innerHTML = '';
+        newsItems.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'pub-card';
+
+            // Adjust image paths to use GitHub raw content URL
+            let contentHtml = item.contentHtml;
+            contentHtml = contentHtml.replace(/<img src="\/news\/(.*?)"/g, `<img src="${baseUrl}news/$1"`);
+
+            card.innerHTML = `
+                <h2>${item.title}</h2>
+                <p class="pub-authors">${item.date}</p>
+                <div>${contentHtml}</div>
+            `;
+            container.appendChild(card);
+        });
+
+        updateCounts();
+    } catch (error) {
+        console.error('Error loading news:', error);
+        container.innerHTML = '<p>Error loading news.</p>';
+    }
+}
+
+function parseNewsMarkdown(mdText) {
+    let title = "Untitled";
+    let dateStr = "";
+    let dateObj = new Date(0);
+
+    // Extract heading **heading text**
+    const titleMatch = mdText.match(/\*\*(.*?)\*\*/);
+    if (titleMatch) {
+        title = titleMatch[1];
+        mdText = mdText.replace(titleMatch[0], '');
+    }
+
+    // Extract date *date string in yyyy.mm.dd*
+    const dateMatch = mdText.match(/\*((\d{4})\.(\d{2})\.(\d{2}))\*/);
+    if (dateMatch) {
+        dateStr = dateMatch[1];
+        const [y, m, d] = dateStr.split('.');
+        dateObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+        mdText = mdText.replace(dateMatch[0], '');
+    }
+
+    // Convert remaining content to HTML using marked
+    const contentHtml = marked.parse(mdText.trim());
+
+    return { title, date: dateStr, dateObj, contentHtml };
+}
+
+function updateCounts() {
+    document.getElementById('count-news').textContent =
+        '(' + document.querySelectorAll('#news .pub-card').length + ')';
+
+    document.getElementById('count-publications').textContent =
+        '(' + document.querySelectorAll('#publications .pub-card').length + ')';
+
+    document.getElementById('count-software').textContent =
+        '(' + document.querySelectorAll('#software .pub-card').length + ')';
+
+    document.getElementById('count-datasets').textContent =
+        '(' + document.querySelectorAll('#datasets .pub-card').length + ')';
+}
+
+fetchNews();
+</script>
