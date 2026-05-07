@@ -1,50 +1,44 @@
-import os
+from unittest.mock import patch, MagicMock
 
 import pytest
-import psycopg2
-from histarchexplorer import app as flask_app_instance
+from flask.testing import FlaskClient
 
-@pytest.fixture(scope='session')
-def flask_app():
-    app = flask_app_instance
-    app.config.from_object('config.default')
-    app.config.from_pyfile('testing.py', silent=False)
-    fixture_conn = None
-    try:
-        fixture_conn = psycopg2.connect(
-            database=app.config['DATABASE_NAME'],
-            host=app.config['DATABASE_HOST'],
-            user=app.config['DATABASE_USER'],
-            password=app.config['DATABASE_PASS'],
-            port=app.config['DATABASE_PORT'] )
-        fixture_conn.autocommit = True
+from histarchexplorer import app
+from histarchexplorer.models.user import User
+from tests.base import reset_test_database
 
-        with fixture_conn.cursor() as cursor:
-            for script in ['reset.sql', 'add_test_user.sql']:
-                sql_path = os.path.join(app.root_path, 'sql', script)
-                with open(sql_path, 'r', encoding='utf-8') as file:
-                    sql_script = file.read()
-                cursor.execute(sql_script)
-        print(f"Successfully connected to test database: "
-              f"{app.config['DATABASE_NAME']} and schema prepared.")
-        yield app
-
-    except psycopg2.Error as e:
-        print(f"\nERROR: Could not connect to the test database! "
-              f"Please ensure your test database '{app.config['DATABASE_NAME']}' "
-              f"is running and accessible with the specified credentials in 'instance/testing.py'.")
-        print(f"PostgreSQL Error: {e}")
-        yield app
-    finally:
-        if fixture_conn:
-            fixture_conn.close()
-            print("Test database connection closed.")
-        print("Tearing down Flask app.")
+app.config.from_pyfile('testing.py')
 
 
-@pytest.fixture(scope='function')
-def client(flask_app):
-    with flask_app.test_client() as client:
-        with client.session_transaction() as sess:
-            sess.clear()
+@pytest.fixture(scope='session', autouse=True)
+def setup_database() -> None:
+    reset_test_database()
+
+
+@pytest.fixture()
+def client() -> FlaskClient:
+    with app.test_client() as client:
         yield client
+
+
+@pytest.fixture()
+def authenticated_client() -> FlaskClient:
+    mock_user = MagicMock(spec=User)
+    mock_user.is_authenticated = True
+    mock_user.is_active = True
+    mock_user.is_anonymous = False
+    mock_user.id = 1
+    mock_user.username = 'test'
+    mock_user.group = 'admin'
+    mock_user.real_name = 'Test User'
+    mock_user.get_id.return_value = '1'
+
+    with app.test_client() as client:
+        with patch(
+            'histarchexplorer.views.login.load_user',
+            return_value=mock_user
+        ), patch(
+            'flask_login.utils._get_user',
+            return_value=mock_user
+        ):
+            yield client

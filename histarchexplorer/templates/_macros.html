@@ -18,11 +18,10 @@
 {% macro flash_messages() %}
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      <div class="flash-messages mt-5 mb-5">
+      <div class="flash-messages">
         {% for cat, message in messages %}
           <div class="alert alert-{{ cat }} alert-dismissible fade show"
                role="alert">
-
             {{ message }}
             {{ close_button("alert") }}
           </div>

@@ -1,17 +1,23 @@
+import time
+import os
 from typing import Any
 
 import psycopg2.extras
-from flask import Flask, Response, g, request, session, url_for
+from flask import Flask, g, redirect, request, session, url_for
 from flask_babel import Babel
 from flask_caching import Cache
+from flask_login import current_user
 from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
+from werkzeug import Response
 
-from histarchexplorer.database.settings import get_main_image_table
-from histarchexplorer.models.config import (ConfigEntity, Link, Properties,
-                                            get_config_classes)
+from histarchexplorer.models.config import (
+    ConfigEntity, Link, Properties, get_config_classes)
 from histarchexplorer.models.search import SearchService
 from histarchexplorer.models.settings import Settings
+from histarchexplorer.models.admin import Admin
+from histarchexplorer.database.admin import (
+    synchronize_logos_with_db, synchronize_assets_with_db)
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
@@ -22,15 +28,15 @@ cache = Cache(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer.views import (
-    admin, login, views, about, entity, entities, search, media, vocabulary)
-from histarchexplorer.utils import view_util
+    admin, login, views, about, entity, entities, search, media, publication,
+    outcome)
 from histarchexplorer.api.api_access import ApiAccess
 
 
-def connect() -> connection:
+def connect(db_name: str) -> connection:
     try:
         connection_ = psycopg2.connect(
-            database=app.config['DATABASE_NAME'],
+            database=db_name,
             user=app.config['DATABASE_USER'],
             password=app.config['DATABASE_PASS'],
             port=app.config['DATABASE_PORT'],
@@ -42,18 +48,11 @@ def connect() -> connection:
 
 
 def get_locale() -> str:
+    if g.settings.language_selector:
+        return g.settings.preferred_language or 'en'
     if 'language' in session:
         return session['language']
     return request.accept_languages.best_match(app.config['LANGUAGES']) or 'en'
-
-
-# ✅ Support both Flask-Babel <3.0 and ≥3.0
-if hasattr(babel, 'localeselector'):
-    # Old Flask-Babel (pre-3.0)
-    babel.localeselector(get_locale)
-else:
-    # New Flask-Babel (3.0+)
-    babel.locale_selector_func = get_locale
 
 
 def create_icon(css_class: str) -> str:
@@ -81,33 +80,51 @@ def get_sidebar_icons() -> dict[int, str]:
     return icons
 
 
-def get_type_divisions():
+def get_type_divisions() -> dict[Any, dict[str, Any]]:
     out = {}
-    for label, value in app.config['TYPE_DIVISIONS'].items():
+    for label, value in g.settings.type_divisions.items():
         icon = ''
-        if value['icon']:
-            if value['icon'][0] == 'img':
-                icon = create_image_icon(value['icon'][1])
-            if value['icon'][0] == 'css':
-                icon = create_icon(value['icon'][1])
+        if value['icon_type'] and value['icon_value']:
+            if value['icon_type'] == 'img':
+                icon = create_image_icon(value['icon_value'])
+            if value['icon_type'] == 'css':
+                icon = create_icon(value['icon_value'])
         for id_ in value['ids']:
             out[id_] = {'label': label, 'icon': icon}
     return out
 
 
 @app.before_request
-def before_request() -> None:
-    g.db = connect()
-    g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
-    if request.path.startswith('/reset'):
+def before_request() -> Response | None:
+    g.db = connect(app.config['DATABASE_NAME'])
+    g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    g.openatlas_db = connect(app.config['OPENATLAS_DATABASE_NAME'])
+    g.openatlas_cursor = g.openatlas_db.cursor(
+        cursor_factory=psycopg2.extras.RealDictCursor)
+
+    if request.path.startswith('/reset') or request.endpoint == 'static':
         return None
 
+    g.settings = Settings.load_from_db()
+    synchronize_logos_with_db()
+    synchronize_assets_with_db()
+
+    # Todo: move somewhere else but be aware of circular imports
+    if g.settings.access_restriction:
+        if not current_user.is_authenticated and request.endpoint != 'login':
+            return redirect(url_for('login'))
+
+    if hasattr(babel, 'localeselector'):
+        babel.localeselector(get_locale)
+    else:
+        babel.locale_selector_func = get_locale
     session['language'] = get_locale()
     g.available_languages = app.config['LANGUAGES']
     g.language = session.get(
         'language',
         request.accept_languages.best_match(g.available_languages.keys()))
-    g.preferred_langauge = app.config['PREFERRED_LANGUAGE']
+    g.preferred_langauge = g.settings.preferred_language
     g.view_classes = app.config['VIEW_CLASSES']
     g.admin_fields = app.config['ADMIN_FIELDS']
     g.additional_files_for_overview = app.config['ADD_FILES_FOR_OVERVIEW']
@@ -116,13 +133,11 @@ def before_request() -> None:
     if app.config['API_TOKEN']:
         g.api_headers["Authorization"] = f"Bearer {app.config['API_TOKEN']}"
 
-    g.main_images = get_main_image_table()
     g.sidebar_icons = get_sidebar_icons()
     g.type_divisions = get_type_divisions()
     g.config_classes = get_config_classes()
     g.config_properties = Properties.get_all()
     g.config_links = Link.get_all()
-    g.settings = Settings.initialize_settings()
     g.config_classes_map = {
         'projects': 1,  # option for config_class=2 project vs 1=main_project?
         'persons': 2,
@@ -133,18 +148,40 @@ def before_request() -> None:
     g.search_service = SearchService(app)
     g.case_study_ids = [
         config.case_study for config in g.config_entities if config.case_study]
-    # Way to large
-    # g.file_of_entities = ApiAccess.get_files_of_entities()
-
     return None
+
+
+def get_logo_url(filename: str) -> str:
+    uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
+    if os.path.exists(os.path.join(uploads_path, filename)):
+        return url_for('uploaded_logo', filename=filename)
+    return url_for('static', filename='images/logos/' + filename)
+
+
+def get_assets_url(filename: str) -> str:
+    uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
+    if os.path.exists(os.path.join(uploads_path, filename)):
+        return url_for('uploaded_assets', filename=filename)
+    return url_for('static', filename='assets/' + filename)
+
+
+def get_team_url(filename: str) -> str:
+    uploads_path = os.path.join(app.root_path, '..', 'uploads', 'team')
+    if os.path.exists(os.path.join(uploads_path, filename)):
+        return url_for('uploaded_team', filename=filename)
+    return url_for('static', filename='images/team/' + filename)
 
 
 @app.context_processor
 def inject_globals() -> dict[str, Any]:
     return {
+        'settings': g.settings,
+        'nav_logo': g.settings.nav_logo,
         'available_languages': g.available_languages,
         'preferred_language': g.preferred_langauge,
         'current_language': g.language,
+        'darkmode_override': g.settings.darkmode,
+        'language_override': g.settings.language_selector,
         'view_classes': g.view_classes,
         'admin_fields': g.admin_fields,
         'additional_files_for_overview': g.additional_files_for_overview,
@@ -161,7 +198,14 @@ def inject_globals() -> dict[str, Any]:
             "event": "events",
             "artifact": "items",
             "source": "sources",
-            "file": "files"}}
+            "file": "files"},
+        'logo_id_to_filename_map': Admin.get_logo_id_to_filename_map(),
+        'favicon_version': int(time.time()),
+        'get_logo_url': get_logo_url,
+        'get_assets_url': get_assets_url,
+        'get_team_url': get_team_url,
+        'has_uploaded_favicon': os.path.exists(
+            os.path.join(app.root_path, '..', 'uploads', 'favicon.ico'))}
 
 
 @app.after_request
@@ -172,3 +216,14 @@ def apply_caching(response: Response) -> Response:
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['X-XSS-Protection'] = '1; mode=block'
     return response
+
+
+@app.teardown_request
+def teardown_request(exception: Exception | None) -> None:
+    db = getattr(g, 'db', None)
+    if db is not None:
+        db.close()
+
+    oa_db = getattr(g, 'openatlas_db', None)
+    if oa_db is not None:
+        oa_db.close()

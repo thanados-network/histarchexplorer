@@ -1,0 +1,58 @@
+
+<h3>{{ _('legal notice') | upper }} </h3>
+<div class="card mt-3 mb-5">
+    <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs" id="legal-notice-tabs" role="tablist">
+            {% for lang_code, lang_name in available_languages.items() %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if loop.first %}active{% endif %}" id="{{ lang_code }}-tab" data-bs-toggle="tab" data-bs-target="#{{ lang_code }}-tab-pane" type="button" role="tab" aria-controls="{{ lang_code }}-tab-pane" aria-selected="{% if loop.first %}true{% else %}false{% endif %}">{{ lang_name }}</button>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="card-body">
+        <form method="post" action="{{ url_for('update_legal_notice') }}">
+            <input type="hidden" name="active_sidebar" value="sidebar-legal-notice">
+            <div class="tab-content" id="legal-notice-tab-content">
+                {% for lang_code, lang_name in available_languages.items() %}
+                    <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="{{ lang_code }}-tab-pane" role="tabpanel" aria-labelledby="{{ lang_code }}-tab" tabindex="0">
+                        <h5 class="card-title">{{ lang_name }}</h5>
+                        <div class="mb-5">
+                            <label for="legal-notice-editor-{{ lang_code }}" class="form-label">{{ _('legal notice') | capitalize}}</label>
+                            <textarea id="legal-notice-editor-{{ lang_code }}" name="legal_notice_{{ lang_code }}" class="tinymce-editor">
+                                {{ settings.legal_notice.get(lang_code, '') }}
+                            </textarea>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">{{ _('save') }}</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        tinymce.init({
+            selector: '.tinymce-editor',
+            license_key: 'gpl',
+            menubar: false,
+            branding: false,
+            height: 300,
+            plugins: 'link lists image table code',
+            toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
+                     'superscript subscript | alignleft aligncenter alignright alignjustify | ' +
+                     'bullist numlist | table link image | removeformat code',
+            convert_urls: false,
+            default_link_target: '_blank',
+            rel_list: [{title: 'No referrer', value: 'noreferrer noopener'}],
+            image_advtab: true,
+            paste_as_text: false,
+            setup: function (editor) {
+                editor.on('change keyup', function () {
+                    editor.save();
+                });
+            }
+        });
+    });
+</script>

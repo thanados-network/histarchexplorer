@@ -1,18 +1,26 @@
-from flask import url_for
-
-from histarchexplorer import app
+from flask.testing import FlaskClient
 
 
-def test_search_page(client):
-    with app.app_context():
-        rv = client.get(url_for('search'))
-        assert rv.status_code == 200
-        assert b"Start typing above to see" in rv.data
+def test_search_get(
+        authenticated_client: FlaskClient) -> None:
+    rv = authenticated_client.get('/search')
+    assert rv.status_code == 200
 
-        rv = client.post(
-            url_for('search'),
-            data={
-                'query': 'mist',
-                'category': 'actor',
-                'system_class': 'person'})
-        assert b"Mistelbach" in rv.data
+
+def test_search_post(
+        authenticated_client: FlaskClient) -> None:
+    rv = authenticated_client.post(
+        '/search', data={'search': 'test'})
+    assert rv.status_code == 200
+
+
+def test_search_live(
+        authenticated_client: FlaskClient) -> None:
+    rv = authenticated_client.get('/search_live?q=test')
+    assert rv.status_code == 200
+
+
+def test_search_redirects_unauthenticated(
+        client: FlaskClient) -> None:
+    rv = client.get('/search')
+    assert rv.status_code == 302

@@ -1,40 +1,88 @@
-<div class="modal fade" id="citationModal" tabindex="-1"
-     aria-labelledby="citationModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+<div class="modal fade" id="citationModal" tabindex="-1" aria-labelledby="citationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="citationModalLabel">Cite this Page</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                aria-label="Close"></button>
+        <h5 class="modal-title" id="citationModalLabel">{{ _('Cite this Entry') }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p id="citationText" class="border border-secondary rounded-1 p-2 bg-light">
-          <span>"{{ entity.title }}". From: {{ project_name }}: {{ current_url }} [Accessed: {{ today_date }}]</span>
-        </p>
-      </div>
-      <div class="container-fluid">
-        <div class="row">
-        <p class="fw-bold">This is just a example, what we can add additionally and how it can be accessed</p>
-          {% for project in projects %}
-            <div class="col-5 bg-light">
-              <p>{{ project.name.display.label }}</p>
-              {% for link in project.links %}
-                <p>{{ link.config_property.display.label }}: {{ link.end_name.display.label }}</p>
-              {% endfor %}
+
+        {# 1. Citation Section #}
+        <div class="mb-4">
+          <h6 class="fw-bold text-muted text-uppercase small mb-2">{{ _('Recommended Citation') }}</h6>
+          <div class="position-relative">
+            <div class="p-3 bg-light border rounded mb-2" id="citationText">
+              {{ citation_text }}
             </div>
-          {% endfor %}
+            <button class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 m-2" onclick="navigator.clipboard.writeText(document.getElementById('citationText').innerText.trim()); this.innerHTML = '<i class=\'bi bi-check\'></i>'; setTimeout(() => { this.innerHTML = '<i class=\'bi bi-copy\'></i>'; }, 2000);" title="{{ _('Copy to clipboard') }}">
+              <i class="bi bi-copy"></i>
+            </button>
+          </div>
         </div>
+
+        <hr class="my-4">
+
+        {# 2. License Section #}
+        <div class="row align-items-center mb-4">
+          <div class="col-md-4 text-center">
+            {% if license %}
+              <a href="{{ license.uri }}" target="_blank">
+                <img src="{{ url_for('static', filename='images/licenses/' + license.spdx_id + '.svg') }}" alt="{{ license.label }}" style="height: 50px; max-width: 100%;" onerror="this.style.display='none'">
+              </a>
+            {% else %}
+              <span class="text-muted fst-italic">{{ _('No license info') }}</span>
+            {% endif %}
+          </div>
+          <div class="col-md-8">
+            <h6 class="fw-bold text-muted text-uppercase small mb-1">{{ _('License') }}</h6>
+            {% if license %}
+              <p class="mb-1 fw-bold">{{ license.label }}</p>
+              <a href="{{ license.uri }}" target="_blank" class="small text-decoration-none">
+                {{ _('View License Deed') }} <i class="bi bi-box-arrow-up-right"></i>
+              </a>
+            {% else %}
+              <p class="text-muted small">{{ _('No specific license information available for this entity.') }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        {# 3. Export Formats (Collapsible) #}
+        <div class="accordion" id="exportAccordion">
+          <div class="accordion-item border-0">
+            <h2 class="accordion-header" id="headingExport">
+              <button class="accordion-button collapsed bg-light rounded" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExport" aria-expanded="false" aria-controls="collapseExport">
+                <i class="bi bi-code-slash me-2"></i> {{ _('Export Formats (BibTeX, RIS)') }}
+              </button>
+            </h2>
+            <div id="collapseExport" class="accordion-collapse collapse" aria-labelledby="headingExport" data-bs-parent="#exportAccordion">
+              <div class="accordion-body">
+                <div class="mb-3">
+                  <label for="bibtexText" class="form-label small fw-bold">BibTeX</label>
+                  <div class="input-group input-group-sm">
+                    <textarea class="form-control font-monospace" id="bibtexText" rows="4" readonly>{{ bibtex }}</textarea>
+                    <button class="btn btn-outline-secondary" type="button" onclick="navigator.clipboard.writeText(document.getElementById('bibtexText').value);">
+                      <i class="bi bi-copy"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="mb-0">
+                  <label for="risText" class="form-label small fw-bold">RIS</label>
+                  <div class="input-group input-group-sm">
+                    <textarea class="form-control font-monospace" id="risText" rows="4" readonly>{{ ris }}</textarea>
+                    <button class="btn btn-outline-secondary" type="button" onclick="navigator.clipboard.writeText(document.getElementById('risText').value);">
+                      <i class="bi bi-copy"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="copyCitationBtn">
-          <i class="bi bi-copy"></i> Copy Citation
-        </button>
-        <button type="button" class="btn btn-secondary"
-                data-bs-dismiss="modal">Close
-        </button>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
       </div>
     </div>
   </div>
 </div>
-
-

@@ -77,10 +77,12 @@ body {
 }
 
 .page-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  padding-top: var(--navbar-height);
+        position: absolute;
+        top: var(--navbar-height);
+        width: 100%;
+        max-height: calc(100dvh - var(--navbar-height));
+        overflow-y: auto;
+        overflow-x: hidden;
 }
 
 .scrollable-container {

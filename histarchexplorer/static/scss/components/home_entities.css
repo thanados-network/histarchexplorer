@@ -77,10 +77,12 @@ body {
 }
 
 .page-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  padding-top: var(--navbar-height);
+        position: absolute;
+        top: var(--navbar-height);
+        width: 100%;
+        max-height: calc(100dvh - var(--navbar-height));
+        overflow-y: auto;
+        overflow-x: hidden;
 }
 
 .scrollable-container {
@@ -158,7 +160,7 @@ body {
   background: var(--card-hover);
 }
 .entity-card--places {
-  border-top: 0.3125rem solid var(--limegreen);
+  border-top: 0.3125rem solid var(--pink);
 }
 .entity-card--actors {
   border-top: 0.3125rem solid var(--pink);

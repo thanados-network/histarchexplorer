@@ -1,15 +1,17 @@
 from typing import Optional
 
 from flask import (
-    g, jsonify, redirect, render_template, request, session, url_for)
+    Response, g, jsonify, redirect, request, session, url_for)
+from flask.typing import ResponseValue
 from flask_login import login_required
-from werkzeug import Response
 
-from histarchexplorer import ConfigEntity, app, cache
+from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.database.map import get_map_tilestring
-from histarchexplorer.utils.view_util import get_view_class_count, slugify
+from histarchexplorer.models.config import ConfigEntity
+from histarchexplorer.utils.view_util import (
+    get_view_class_count, slugify, render_page_template)
 
 
 @app.route('/')
@@ -17,7 +19,7 @@ def index() -> str:
     map_data = g.settings.get_map_settings()
     map_ = None
     if index_map := map_data['map']:
-        map_ = get_map_tilestring(index_map).tilestring
+        map_ = get_map_tilestring(index_map)
 
     grouped = ConfigEntity.group_by_class_name(g.config_entities)
     main_project = grouped.get('main-project', [None])[0]
@@ -29,7 +31,6 @@ def index() -> str:
     for p in projects:
         slug = slugify(p.acronym)
 
-        # ensure description is safe + truncated server-side
         desc_label = p.description.get("display", {}).get("label") \
             if p.description['display']['label'] else ""
         if desc_label:
@@ -49,8 +50,8 @@ def index() -> str:
     # This is just for the carousal
     project_cards = project_cards[:12]
 
-    return render_template(
-        'index.html',
+    return render_page_template(
+        'index',
         map=map_,
         map_data=map_data,
         view_class_count=get_view_class_count(),
@@ -58,13 +59,13 @@ def index() -> str:
 
 
 @app.route('/language=<language>')
-def set_language(language: Optional[str] = None) -> Response:
+def set_language(language: Optional[str] = None) -> ResponseValue:
     session['language'] = language
     return redirect(request.referrer)
 
 
 @app.route('/type-tree')
-def type_tree():
+def type_tree() -> Response:
     return jsonify(ApiAccess.get_type_tree())
 
 @app.route('/type-tree-overview')
@@ -73,19 +74,18 @@ def type_tree_overview():
 
 
 @app.route('/files-of-entities')
-def get_files_of_entities():
+def get_files_of_entities() -> Response:
     return jsonify(ApiAccess.get_files_of_entities())
 
 
 @app.route('/entities-count')
-def get_entities_count_by_case_study():
+def get_entities_count_by_case_study() -> Response:
     return jsonify(ApiAccess.get_entities_count_by_case_studies())
 
 
-@app.route("/refresh-cache/<int:id_>", methods=["POST"])
+@app.route("/refresh-cache/<int:id_>", methods=["GET", "POST"])
 @login_required
-def refresh_cache(id_: int):
-    """Clear memoized cache for this entity."""
+def refresh_cache(id_: int) -> ResponseValue | tuple[ResponseValue, int]:
     try:
         cache.delete_memoized(PresentationView.from_api, PresentationView, id_)
         return redirect(url_for('entity_view', id_=id_))

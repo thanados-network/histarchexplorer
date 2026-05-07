@@ -28,23 +28,18 @@ function setTheme(mode = 'auto') {
     // Update body class based on selected theme
     document.body.classList.remove('light', 'dark');
     document.body.classList.add(modeToUse);
-
-    const logo = document.getElementById('logo');
-    if (logo) {
-        const logoSrc = `/static/images/logos/logo_mode_${modeToUse}.svg`;
-        logo.setAttribute('src', logoSrc);
-    }
 }
 
 // Function to handle system mode change
 function systemModeChange() {
     const mode = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-    setTheme(mode);
+    if (darkmodeOverride) setTheme('light');
+    if (!darkmodeOverride) setTheme(mode);
 }
 
 // Listen for changes in system color scheme and update the theme accordingly
 window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', systemModeChange);
 
 // Set initial theme based on localStorage or system preference
-setTheme();
-
+if (darkmodeOverride) setTheme('light');
+if (!darkmodeOverride) setTheme();

@@ -304,13 +304,15 @@
     function adjustTileHeight{{ tab_name }}() {
         setTimeout(function () {
             const header = document.getElementById(`{{tab_name}}-header`);
+            const breadcrumbCont = document.getElementById(`{{tab_name}}-breadcrumbs`);
             tileContainer{{tab_name}} = document.getElementById(`grid-container-{{tab_name}}`);
 
             if (!header || !tileContainer{{tab_name}}) return;
 
             const headerHeight = header.offsetHeight;
+            const breadcrumbHeight = breadcrumbCont.offsetHeight;
 
-            const maxHeight = window.innerHeight - 96 - headerHeight - (3 * 16) - 40; // Same calculation as table
+            const maxHeight = window.innerHeight - 96 - headerHeight - breadcrumbHeight - (3 * 16) - 40; // Same calculation as table
 
 
             tileContainer{{tab_name}}.style.height = `${maxHeight}px`;
@@ -484,4 +486,5 @@
     document.getElementById('toggleSidebar').addEventListener('click', function () {
         setTimeout(relayoutTiles{{ tab_name }}, 150);
     });
+
 </script>

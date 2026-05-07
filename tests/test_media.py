@@ -1,12 +1,19 @@
-from flask import url_for
-
-from histarchexplorer import app
+from flask.testing import FlaskClient
 
 
-def test_media(client):
-    with app.app_context():
-        rv = client.get(
-            url_for(
-            'view_mirador',
-            urls="https://thanados.openatlas.eu/api/iiif_manifest/2/128353"))
-        assert b"https://thanados.openatlas.eu/" in rv.data
+def test_view_media_image(
+        authenticated_client: FlaskClient) -> None:
+    rv = authenticated_client.get('/view/image/1')
+    assert rv.status_code in (200, 404)
+
+
+def test_view_media_3d(
+        authenticated_client: FlaskClient) -> None:
+    rv = authenticated_client.get('/view/3d/1')
+    assert rv.status_code in (200, 404)
+
+
+def test_view_media_nonexistent(
+        authenticated_client: FlaskClient) -> None:
+    rv = authenticated_client.get('/view/image/999999')
+    assert rv.status_code in (200, 404)

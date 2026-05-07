@@ -1,0 +1,68 @@
+<div class="card mt-3 mb-5">
+  <div class="card-body">
+    <h5 class="card-title">{{ _('Add New License') | upper }}</h5>
+    <form action="{{ url_for('add_license') }}" method="post">
+      <input type="hidden" name="active_sidebar" value="sidebar-licenses">
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <label for="spdx_id" class="form-label">{{ _('SPDX ID') }}</label>
+          <input type="text" class="form-control" id="spdx_id" name="spdx_id" required>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label for="uri" class="form-label">{{ _('URI') }}</label>
+          <input type="url" class="form-control" id="uri" name="uri" required>
+        </div>
+        <div class="col-md-3 mb-3">
+          <label for="label" class="form-label">{{ _('Label') }}</label>
+          <input type="text" class="form-control" id="label" name="label" required>
+        </div>
+        <div class="col-md-2 mb-3">
+          <label for="category" class="form-label">{{ _('Category') }}</label>
+          <select class="form-select" id="category" name="category" required>
+            <option value="LICENSE">LICENSE</option>
+            <option value="STATEMENT">STATEMENT</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">{{ _('Add License') }}</button>
+    </form>
+  </div>
+</div>
+
+<div class="card mt-3 mb-5">
+  <div class="card-body">
+    <h5 class="card-title">{{ _('Existing Licenses') | upper }}</h5>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>{{ _('Logo') }}</th>
+          <th>{{ _('Label') }}</th>
+          <th>{{ _('SPDX ID') }}</th>
+          <th>{{ _('Category') }}</th>
+          <th>{{ _('Actions') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for license in licenses %}
+          <tr>
+            <td>
+              <img src="{{ url_for('static', filename='images/licenses/' + license.spdx_id + '.svg') }}" alt="{{ license.spdx_id }}" style="height: 32px;"
+                   onerror="this.style.display='none'">
+            </td>
+            <td><a href="{{ license.uri }}" target="_blank">{{ license.label }}</a></td>
+            <td><code>{{ license.spdx_id }}</code></td>
+            <td><span class="badge bg-secondary">{{ license.category }}</span></td>
+            <td>
+              <form action="{{ url_for('delete_license', license_id=license.id) }}" method="post" class="d-inline">
+                <input type="hidden" name="active_sidebar" value="sidebar-licenses">
+                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('{{ _('Are you sure?') }}')">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

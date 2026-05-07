@@ -1,14 +1,12 @@
 <footer class="footer p-3 footercontent">
-        <a href="https://www.nhm-wien.ac.at/" target="_blank">
-            <img class="footerimg img-fluid" src="/static/images/logos/nhm_logo.png"></a>
-        <a href="https://www.oeaw.ac.at/oeai/" target="_blank">
-            <img class="footerimg img-fluid" src="/static/images/logos/oeai_logo.png"></a>
-        <a href="https://www.oeaw.ac.at/" target="_blank">
-            <img class="footerimg img-fluid" src="/static/images/logos/oeaw_logo.png"></a>
-        <a href="https://www.oeaw.ac.at/acdh/" target="_blank">
-            <img class="footerimg img-fluid" src="/static/images/logos/acdh_logo.png"></a>
-        <a href="https://openatlas.eu/" target="_blank">
-            <img class="footerimg img-fluid" src="/static/images/logos/openatlas_logo.png"></a>
-        <a href="https://www.aiscr.cz/en/" target="_blank">
-            <img class="footerimg img-fluid" src="/static/images/logos/AISCR_EN_H_CMYK_Pozitiv_h68.png"></a>
+    {% for logo_id in g.settings.footer_logos %}
+        {% set logo_filename = logo_id_to_filename_map.get(logo_id) %}
+        {% if logo_filename %}
+            {% if logo_filename.endswith('.svg') %}
+                <object class="footerimg img-fluid" data="{{ get_logo_url(logo_filename) }}" type="image/svg+xml" style="max-height: 100px; width: auto;"></object>
+            {% else %}
+                <img class="footerimg img-fluid" src="{{ get_logo_url(logo_filename) }}" alt="{{ logo_filename }}" style="max-height: 100px; width: auto;">
+            {% endif %}
+        {% endif %}
+    {% endfor %}
 </footer>

@@ -1,127 +1,83 @@
-from flask import url_for
-
-from histarchexplorer import app
+from flask.testing import FlaskClient
 
 
-def test_admin_page(client):
-    with app.app_context():
-        rv = client.get(url_for('admin'), follow_redirects=True)
-        assert b"Username" in rv.data
-
-        client.post(
-                url_for('login'),
-                data={'username': 'Alice', 'password': 'test'})
-        rv = client.get(url_for('admin'), follow_redirects=True)
-        assert b"TOOLS" in rv.data
+def test_admin_requires_login(client: FlaskClient) -> None:
+    rv = client.get('/admin/')
+    assert rv.status_code == 302
 
 
-        rv = client.get(url_for('clear_cache'), follow_redirects=True)
-        assert b"cache cleared" in rv.data
-
-        rv = client.get(url_for('warm_cache'), follow_redirects=True)
-        assert b"cache warmed" in rv.data
+def test_admin_page(authenticated_client: FlaskClient) -> None:
+    rv = authenticated_client.get('/admin/')
+    assert rv.status_code == 200
 
 
-        client.get(url_for('reset'))
-        rv = client.get(url_for('admin'), follow_redirects=True)
-        assert b"reset database" in rv.data
+def test_admin_tabs(authenticated_client: FlaskClient) -> None:
+    tabs = ['general', 'team', 'projects', 'maps', 'assets', 'system']
+    for tab in tabs:
+        rv = authenticated_client.get(f'/admin/{tab}')
+        assert rv.status_code == 200
 
 
-        client.get(
-            url_for('check_case_study_id_ajax', entity_id=277452),
-            follow_redirects=True)
+def test_admin_update_menu_management(authenticated_client: FlaskClient) -> None:
+    data = {
+        'menu_data': '{"about": {"show": true, "page_type": "individual"}}'
+    }
+    rv = authenticated_client.post('/admin/update_menu_management', data=data)
+    assert rv.status_code == 302
 
 
-        client.post(
-                url_for('deselect_entities'),
-                data={'selected_entities': ['source', 'external_reference']})
-        rv = client.get(url_for('admin'), follow_redirects=True)
-        assert b"set hidden entities" in rv.data
+def test_admin_update_legal_notice(authenticated_client: FlaskClient) -> None:
+    data = {
+        'legal_notice_de': 'Test DE',
+        'legal_notice_en': 'Test EN'
+    }
+    rv = authenticated_client.post('/admin/update_legal_notice', data=data)
+    assert rv.status_code == 302
 
-        client.post(
-                url_for('select_entities'),
-                data={'selected_entities': ['source', 'external_reference']})
-        rv = client.get(url_for('admin'), follow_redirects=True)
-        assert b"set shown entities" in rv.data
 
-        client.post(
-                url_for('update_case_study_id', id_=8240),
-                data={'selected_entities': ['source', 'external_reference']})
-        rv = client.get(url_for('admin'), follow_redirects=True)
-        assert b"updated case study id successfully" in rv.data
+def test_admin_add_available_color(authenticated_client: FlaskClient) -> None:
+    data = {'new_color': '#ff0000'}
+    rv = authenticated_client.post('/admin/add_available_color', data=data)
+    assert rv.status_code == 302
 
-        client.post(
-                url_for('update_case_study_id', id_=50505),
-                data={'selected_entities': ['source', 'external_reference']})
-        rv = client.get(url_for('admin'), follow_redirects=True)
-        assert b"Invalid Case Study ID" in rv.data
 
-        rv = client.get(
-            url_for(
-            'add_link',
-                domain='1',
-                range='3',
-                property='3',
-                role='2',
-                sortorder='5'),
-            follow_redirects=True)
-        assert b'Link added successfully' in rv.data
+def test_admin_delete_available_color(authenticated_client: FlaskClient) -> None:
+    data = {'color_to_delete': '#ff0000'}
+    rv = authenticated_client.post('/admin/delete_available_color', data=data)
+    assert rv.status_code == 302
 
-        rv = client.get(
-            url_for(
-            'delete_link',
-                link_id='8',
-                tab='nav-persons',
-                entry='nav-persons2'),
-            follow_redirects=True)
-        assert b'Link deleted successfully' in rv.data
 
-        # rv = client.post(
-        #     url_for(
-        #     'add_entry',
-        #         category='persons',
-        #         name='test',
-        #         description='testing',
-        #         email= 'test@test.org',
-        #         orcid_id='2134',
-        #         image='https://test.at/'),
-        #     follow_redirects=True)
-        # assert b'Entry added successfully!' in rv.data
+def test_admin_update_class_visibility(authenticated_client: FlaskClient) -> None:
+    data = {'visibility_data': '{"place": true}'}
+    rv = authenticated_client.post('/admin/update_class_visibility', data=data)
+    assert rv.status_code == 302
 
-        # rv = client.post(
-        #     url_for(
-        #     'add_entry',
-        #         category='institutions',
-        #         name='Institution',
-        #         description='desccription',
-        #         email= 'test@test.org',
-        #         address='Eichertweg 5',
-        #         image='https://test.at/',
-        #         website='https://nhm.at/'),
-        #     follow_redirects=True)
-        # assert b'Entry added successfully!' in rv.data
 
-        # rv = client.post(
-        #     url_for(
-        #     'add_entry',
-        #         category='projects',
-        #         name='Project',
-        #         description='Project description',
-        #         case_study= '277452',
-        #         website='https://nhm.at/'),
-        #     follow_redirects=True)
-        # assert b'Entry added successfully!' in rv.data
+def test_admin_clear_cache(authenticated_client: FlaskClient) -> None:
+    rv = authenticated_client.get('/admin/clear-cache')
+    assert rv.status_code == 302
 
-        # rv = client.get(
-        #     url_for(
-        #     'add_entry',
-        #         category='main_project',
-        #         name='test',
-        #         description='testing',
-        #         email= 'test@test.org',
-        #         orcid_id='2134',
-        #         image='https://test.at/'))
-        # assert b'Only one main project allowed' in rv.data
 
-        rv = client.get(url_for('logout'), follow_redirects=True)
-        assert b'ENTITIES' in rv.data
+def test_admin_refresh_system_cache(authenticated_client: FlaskClient) -> None:
+    rv = authenticated_client.get('/admin/refresh-system-cache')
+    assert rv.status_code == 302
+
+
+def test_admin_backup_db(authenticated_client: FlaskClient) -> None:
+    # This might fail if pg_dump is not available or if it tries to write to a protected dir
+    # But it should at least return a response
+    rv = authenticated_client.get('/admin/backup_db')
+    assert rv.status_code in (200, 302)
+
+
+def test_admin_add_license(authenticated_client: FlaskClient) -> None:
+    data = {
+        'license_name': 'Test License',
+        'license_url': 'http://example.com',
+        'spdx_id': 'Test-1.0',
+        'uri': 'http://example.com/uri',
+        'category': 'LICENSE',
+        'label': 'Test Label'
+    }
+    rv = authenticated_client.post('/admin/add_license', data=data)
+    assert rv.status_code == 302

@@ -1,0 +1,132 @@
+<form id="footer-logos-form" action="{{ url_for('update_footer_content') }}" method="post">
+  <div class="card mt-3">
+    <div class="card-body">
+      <h5 class="card-title">{{ _('Footer Order') | upper }}</h5>
+      <div id="sortable-logos" class="d-flex flex-wrap gap-3">
+        {% for logo_id in selected_footer_logos %}
+          {% set logo = all_logos | selectattr('id', 'equalto', logo_id) | first %}
+          {% if logo %}
+            <div class="card" data-id="{{ logo.id }}" style="width: 120px;">
+              <div class="card-header text-center fw-bold">#<span class="position">{{ loop.index }}</span></div>
+              <img src="{{ get_logo_url(logo.filename) }}" class="card-img-top p-2" alt="{{ logo.filename }}" style="object-fit: contain; height: 80px;">
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <button type="submit" class="btn btn-primary mt-3">{{ _('Save Footer Order') }}</button>
+    </div>
+  </div>
+
+  <div class="card mt-3 mb-5">
+    <div class="card-body">
+      <h5 class="card-title">{{ _('Select Footer Logos') | upper }}</h5>
+      <input type="hidden" name="active_sidebar" value="sidebar-footer-content">
+      <input type="hidden" name="footer_logo_order" id="footer-logo-order-input">
+      {% if all_logos %}
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+          {% for logo in all_logos %}
+            <div class="col">
+              <div class="card h-100">
+                <img src="{{ get_logo_url(logo.filename) }}" class="card-img-top p-3" alt="{{ logo.filename }}" style="object-fit: contain; height: 150px;">
+                <div class="card-body">
+                  <p class="card-text small text-muted" style="word-break: break-all;">{{ logo.filename }}</p>
+                  <div class="form-check">
+                    <input class="form-check-input logo-checkbox" type="checkbox" name="footer_logos" value="{{ logo.id }}" id="checkbox-{{ logo.id }}"
+                           data-filename="{{ logo.filename }}"
+                           data-url="{{ get_logo_url(logo.filename) }}"
+                           {% if logo.id in selected_footer_logos %}checked{% endif %}>
+                    <label class="form-check-label" for="checkbox-{{ logo.id }}">
+                      {{ _('Add to Footer') }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">{{ _('Save Footer Selection') }}</button>
+      {% else %}
+        <p class="text-muted">{{ _('No logos have been uploaded yet.') }}</p>
+      {% endif %}
+    </div>
+  </div>
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const sortableLogosContainer = document.getElementById('sortable-logos');
+  const orderInput = document.getElementById('footer-logo-order-input');
+  const form = document.getElementById('footer-logos-form');
+  const checkboxes = document.querySelectorAll('.logo-checkbox');
+
+  function updateOrderInput() {
+    const logoElements = sortableLogosContainer.querySelectorAll('.card');
+    const logoIds = Array.from(logoElements).map(el => el.getAttribute('data-id'));
+    orderInput.value = JSON.stringify(logoIds);
+  }
+
+  function updateSortableList() {
+    sortableLogosContainer.innerHTML = '';
+    const orderedLogoIds = {{ selected_footer_logos | tojson }};
+    const checkedCheckboxes = document.querySelectorAll('.logo-checkbox:checked');
+    const checkedLogoIds = Array.from(checkedCheckboxes).map(cb => cb.value);
+
+    let finalLogoIds = orderedLogoIds.filter(id => checkedLogoIds.includes(String(id)));
+
+    checkedLogoIds.forEach(id => {
+      if (!finalLogoIds.includes(Number(id))) {
+        finalLogoIds.push(Number(id));
+      }
+    });
+
+    let position = 1;
+    finalLogoIds.forEach(logoId => {
+        const checkbox = document.getElementById('checkbox-' + logoId);
+        if (checkbox) {
+            const filename = checkbox.getAttribute('data-filename');
+            const url = checkbox.getAttribute('data-url');
+            const logoElement = `
+              <div class="card" data-id="${logoId}" style="width: 120px;">
+                <div class="card-header text-center fw-bold">#<span class="position">${position++}</span></div>
+                <img src="${url}" class="card-img-top p-2" alt="${filename}" style="object-fit: contain; height: 80px;">
+              </div>
+            `;
+            sortableLogosContainer.insertAdjacentHTML('beforeend', logoElement);
+        }
+    });
+    updatePositions();
+    updateOrderInput();
+  }
+
+  function updatePositions() {
+    const logoElements = sortableLogosContainer.querySelectorAll('.card');
+    logoElements.forEach((el, index) => {
+      el.querySelector('.position').textContent = index + 1;
+    });
+  }
+
+  if (sortableLogosContainer) {
+    new Sortable(sortableLogosContainer, {
+      animation: 150,
+      ghostClass: 'blue-background-class',
+      onEnd: function () {
+        updatePositions();
+        updateOrderInput();
+      }
+    });
+  }
+
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', updateSortableList);
+  });
+
+  if (form) {
+    form.addEventListener('submit', function() {
+      updateOrderInput();
+    });
+  }
+
+  updateSortableList();
+});
+</script>

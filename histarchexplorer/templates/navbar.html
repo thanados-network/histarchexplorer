@@ -6,7 +6,11 @@
         </button>
         <a class="navbar-brand" title="{{ _('home') }}"
            href="{{ url_for('index') }}">
-            <img id="logo" src="/static/images/logos/logo_mode_light.svg">
+            {% if g.settings.nav_logo.endswith('.svg') %}
+                <object id="logo" data="{{ get_logo_url(g.settings.nav_logo) }}"
+                        type="image/svg+xml" style="max-height: 50px; width: auto; pointer-events: none;"></object>
+            {% else %}
+                <img id="logo" alt="logo" src="{{ get_logo_url(g.settings.nav_logo) }}" style="max-height: 50px; width: auto;">{% endif %}
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target=".navbar-collapse"
@@ -22,7 +26,7 @@
                             <a class="nav-link nav-link-hover {% if category == request.endpoint %}active{% endif %}"
                                aria-current="page"
                                title="{{ title }}"
-                               href="{{ url_for(category) }}">{{ _(category) | upper }}
+                               href="/{{category}}">{{ _(category) | upper }}
                             </a>
                         </li>
                     {% endfor %}
@@ -38,7 +42,7 @@
         </div>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
+                <li class="nav-item {% if darkmode_override %}d-none {% endif %}">
                     <a class="nav-link" id="dark" role="button" onclick="setTheme(this.id)"
                        title="{{ _('toggle dark/light mode') }}">
                         <i class="bi bi-moon"></i>
@@ -48,7 +52,7 @@
                         <i class="bi bi-sun"></i>
                     </a>
                 </li>
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown {% if language_override %}d-none {% endif %}">
                     <a class="nav-link dropdown-toggle" href="#" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-globe me-2"></i><span id="language">{{ current_language }}</span>
@@ -65,4 +69,3 @@
         </div>
     </div>
 </nav>
-

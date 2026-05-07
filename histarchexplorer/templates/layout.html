@@ -2,28 +2,40 @@
 <html lang="{{ current_language }}">
 <head>
 
-  <link rel="icon" href="/static/images/favicons/favicon_thanados.ico">
+  {% if has_uploaded_favicon %}
+  <link rel="icon" href="{{ url_for('uploaded_favicon', v=favicon_version) }}">
+  {% else %}
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico', v=favicon_version) }}">
+  {% endif %}
 
   <!-- Fonts & CSS -->
-  <link href="/static/node_modules/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="/static/node_modules/nouislider/dist/nouislider.min.css">
-  <link rel="stylesheet" href="/static/node_modules/@fontsource/inter/index.css">
-  <link rel="stylesheet" href="/static/node_modules/bootstrap-icons/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/node_modules/quercus.js/src/treeview.css">
-  <link href="/static/node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/maplibre-gl/dist/maplibre-gl.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/nouislider/dist/nouislider.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/@fontsource/inter/index.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap-icons/font/bootstrap-icons.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/quercus.js/src/treeview.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 
+  <style>
+    :root {
+      {% for type, color in settings.entity_colors.items() %}
+        --entity-color-{{ type }}: {{ color }};
+      {% endfor %}
+    }
+  </style>
 
   <!-- JS -->
-  <script src="/static/node_modules/muuri/dist/muuri.min.js"></script>
-  <script src="/static/node_modules/maplibre-gl/dist/maplibre-gl.js"></script>
-  <script src="/static/node_modules/@google/model-viewer/dist/model-viewer-umd.js"></script>
-  <script src="/static/node_modules/nouislider/dist/nouislider.min.js"></script>
-  <script src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/static/node_modules/quercus.js/src/treeview.js"></script>
-  <script defer src="/static/js/darkLightMode.js"></script>
-  <script type="text/javascript" src="/static/node_modules/tabulator-tables/dist/js/tabulator.js"></script>
+  <script src="{{ url_for('static', filename='node_modules/muuri/dist/muuri.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/maplibre-gl/dist/maplibre-gl.js') }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/@google/model-viewer/dist/model-viewer-umd.js') }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/nouislider/dist/nouislider.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/quercus.js/src/treeview.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/darkLightMode.js') }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/tabulator-tables/dist/js/tabulator.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script
     src="{{ url_for('static', filename='js/globalFunctions.js') }}"></script>
   <script>
@@ -34,6 +46,7 @@
       window.systemClassMap={{ system_class_map | tojson | safe }}
       window.additionalFilesOverview={{ additional_files_for_overview }}
       window.adminFields={{ admin_fields | tojson | safe }}
+      window.darkmodeOverride = {{ darkmode_override | lower}}
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

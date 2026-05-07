@@ -41,6 +41,7 @@ function toggleMapButtons(mapId, isEditing) {
     }
   });
 }
+
 // --- Rich text helpers for description field ---
 function initRichText(entryId) {
   if (typeof tinymce === 'undefined') {
@@ -65,12 +66,16 @@ function initRichText(entryId) {
       license_key: 'gpl',
       menubar: false,
       branding: false,
-      height: 220,
-      plugins: 'link lists image',
-      toolbar: 'bold italic underline | bullist numlist | link image',
+      height: 300,
+      plugins: 'link lists image table code',
+      toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
+        'superscript subscript | alignleft aligncenter alignright alignjustify | ' +
+        'bullist numlist | table link image | removeformat code',
       convert_urls: false,
       default_link_target: '_blank',
-      rel_list: [{ title: 'No referrer', value: 'noreferrer noopener' }],
+      rel_list: [{title: 'No referrer', value: 'noreferrer noopener'}],
+      image_advtab: true,
+      paste_as_text: false,
 
       setup: function (editor) {
         editor.on('change keyup', function () {
@@ -80,6 +85,7 @@ function initRichText(entryId) {
     });
   });
 }
+
 function destroyRichText(entryId) {
   if (typeof tinymce === 'undefined') {
     return;

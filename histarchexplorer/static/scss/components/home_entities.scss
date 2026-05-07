@@ -1,4 +1,4 @@
-@use '../globals'as *;
+@use '../globals' as *;
 
 .content-container {
   margin-top: var(--navbar-height);
@@ -17,7 +17,6 @@
     }
   }
 }
-
 
 .entity-card {
   position: relative;
@@ -41,53 +40,42 @@
   }
 
   &--places {
-    border-top: rem(5) solid var(--limegreen);
+    border-top: rem(5) solid var(--entity-color-places);
   }
 
   &--actors {
-    border-top: rem(5) solid var(--pink);
+    border-top: rem(5) solid var(--entity-color-actors);
   }
 
   &--events {
-    border-top: rem(5) solid var(--blue);
+    border-top: rem(5) solid var(--entity-color-events);
   }
 
   &--items {
-    border-top: rem(5) solid var(--light-orange);
+    border-top: rem(5) solid var(--entity-color-items);
   }
 
   &--sources {
-    border-top: rem(5) solid var(--reddish-brown);
+    border-top: rem(5) solid var(--entity-color-sources);
   }
 
   &--files {
-    border-top: rem(5) solid var(--dark-greyblue);
+    border-top: rem(5) solid var(--entity-color-files);
   }
 
+  &--feature {
+    border-top: rem(5) solid var(--entity-color-feature);
+  }
+
+  &--stratigraphic_unit {
+    border-top: rem(5) solid var(--entity-color-stratigraphic_unit);
+  }
 
   &__icon {
     img {
       max-width: 70%; /* Set the width of the image */
       height: auto;
     }
-
-    &--places {
-    }
-
-    &--persons {
-    }
-
-    &--events {
-    }
-
-    &--artifacts {
-    }
-
-    &--sources {
-    }
-  }
-
-  &__top {
   }
 
   &__label {
@@ -115,21 +103,6 @@
     }
   }
 
-  &--places {
-  }
-
-  &--persons {
-  }
-
-  &--events {
-  }
-
-  &--artifacts {
-  }
-
-  &--sources {
-  }
-
   &__description {
     color: var(--text-color1);
     font-weight: 300;
@@ -141,7 +114,6 @@
     font-size: rem(12);
     margin-top: rem(20);
   }
-
 }
 
 .cards_home_container {
@@ -156,7 +128,6 @@
   bottom: rem(227);
   background: rgba(255, 255, 255, 0.65);
   margin-top: var(--navbar-height);
-  //margin: 0;
   pointer-events: none; /* Disable pointer events initially */
 
   @media (max-width: 61.9375em) {
@@ -199,7 +170,6 @@
 
   @media (max-width: 47.9375em) {
     display: inline-block;
-
   }
 
   .bi-arrow-down-circle-fill {

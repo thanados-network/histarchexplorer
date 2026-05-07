@@ -1,14 +1,12 @@
-@use '../globals'as *;
+@use '../globals' as *;
 
 .main-entity-ellipse {
-  //border: 1px solid black;
   border-radius: 30px;
   background-color: rgba(255, 255, 255, 0.5);
   padding-bottom: rem(5);
   max-width: 80%;
   margin: auto;
   margin-top: 1rem;
-  //display: grid;
 
   @media (min-width: 1921px) or (max-width: 769px) {
     max-width: 90%;
@@ -23,37 +21,45 @@
   border-bottom: rem(5) solid transparent;
 
   &--places {
-    border-top-color: var(--limegreen);
-    border-bottom-color: var(--limegreen);
+    border-top-color: var(--entity-color-places);
+    border-bottom-color: var(--entity-color-places);
   }
 
   &--actors {
-    border-top-color: var(--pink);
-    border-bottom-color: var(--pink);
+    border-top-color: var(--entity-color-actors);
+    border-bottom-color: var(--entity-color-actors);
   }
 
   &--events {
-    border-top-color: var(--blue);
-    border-bottom-color: var(--blue);
+    border-top-color: var(--entity-color-events);
+    border-bottom-color: var(--entity-color-events);
   }
 
   &--items {
-    border-top-color: var(--light-orange);
-    border-bottom-color: var(--light-orange);
+    border-top-color: var(--entity-color-items);
+    border-bottom-color: var(--entity-color-items);
   }
 
   &--sources {
-    border-top-color: var(--reddish-brown);
-    border-bottom-color: var(--reddish-brown);
+    border-top-color: var(--entity-color-sources);
+    border-bottom-color: var(--entity-color-sources);
   }
 
   &--files {
-    border-top-color: var(--dark-greyblue);
-    border-bottom-color: var(--dark-greyblue);
+    border-top-color: var(--entity-color-files);
+    border-bottom-color: var(--entity-color-files);
   }
 
-}
+  &--feature {
+    border-top-color: var(--entity-color-feature);
+    border-bottom-color: var(--entity-color-feature);
+  }
 
+  &--stratigraphic_unit {
+    border-top-color: var(--entity-color-stratigraphic_unit);
+    border-bottom-color: var(--entity-color-stratigraphic_unit);
+  }
+}
 
 .hierarchy-button {
   display: flex;
@@ -128,16 +134,12 @@ button.btn-whitish[disabled] {
   }
 }
 
-
 .hierarchy-item {
   background-color: var(--hierarchy-item);
   padding-top: 1rem;
-  //display: grid;
-  //min-height: calc(100vh - 106px);
 }
 
 .attribute-area {
-  //border: 1px solid black;
   position: relative;
   top: 1rem;
   border-radius: 10px;
@@ -156,7 +158,6 @@ button.btn-whitish[disabled] {
     align-items: center;
   }
 }
-
 
 .cite-wrapper {
   display: flex;
@@ -187,5 +188,3 @@ button.btn-whitish[disabled] {
     box-shadow: none;
   }
 }
-
-

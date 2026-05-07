@@ -327,6 +327,11 @@
   // margin-top: 1.5rem;
   height: 100%;
   width: 100%;
+  cursor: pointer;
+}
+
+#muuri-map * {
+  cursor: pointer!important;
 }
 
 .map-wrapper {
@@ -523,4 +528,9 @@
       transform: scale(1.05);
     }
   }
+}
+
+#tile-sub {
+  height: 300px!important;
+  cursor: pointer;
 }

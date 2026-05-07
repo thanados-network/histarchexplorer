@@ -29,9 +29,30 @@ function capitalizeWords(s) {
 
 function pickDescription(descObj) {
     if (!descObj) return null;
-    const preferred = ['en', 'de'];
-    for (const key of preferred) if (descObj[key]) return descObj[key];
-    for (const v of Object.values(descObj)) if (v) return v;
+    const currentLang = window.currentLanguage;
+    const preferred = [];
+
+    if (currentLang) {
+        preferred.push(currentLang);
+    }
+    if (currentLang !== 'en') {
+        preferred.push('en');
+    }
+    if (currentLang !== 'de' && 'en' !== 'de') {
+        preferred.push('de');
+    }
+
+    for (const key of preferred) {
+        if (descObj[key]) {
+            return descObj[key];
+        }
+    }
+
+    for (const v of Object.values(descObj)) {
+        if (v) {
+            return v;
+        }
+    }
     return null;
 }
 
@@ -182,10 +203,168 @@ function renderDescription(entity) {
 function renderMapTile(entity) {
     const tile = document.getElementById("tile-map");
     if (!tile) return;
-    if (!entity?.geometries?.length && !entity?.overviewMap.features?.length);
+    if (!entity?.geometries?.length && !entity?.overviewMap.features?.length) ;
     tile.hidden = false;
     relayout(10);
 }
+
+function renderSubTile(entity) {
+    const tile = document.getElementById("tile-sub");
+    if (!tile) return;
+    const ctx = document.getElementById('myChart');
+
+    const flat = Object.values(entity.relations)
+        .filter(Array.isArray)
+        .flat();
+    const relations = getAllSubunits(flat, entity.id);
+    console.log(relations)
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: getChartData(relations),
+        options: {
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Subunits'
+                },
+                tooltip: {
+                    position: 'average',   // centers it over the bar segment
+                    yAlign: 'bottom',      // forces it above the cursor
+                    caretPadding: 8        // small gap between tooltip and bar
+                },
+            },
+            indexAxis: 'y',
+            responsive: true,
+            scales: {
+                x: {
+                    stacked: true,
+                },
+                y: {
+                    stacked: true,
+                    ticks: {autoSkip: false}
+                }
+            }
+        }
+    });
+    if (relations.length > 0) tile.hidden = false;
+
+    tile.addEventListener("click", () => {
+        const tab = document.getElementById("tab-subunits");
+        const tabTrigger = new bootstrap.Tab(tab);
+        tabTrigger.show();
+        setTimeout(() => {
+    if (gridsubunits) gridsubunits.refreshItems().layout();
+      console.log("hallihallo");
+  }, 500);
+    })
+
+}
+
+function getAllSubunits(flatArray, parentId) {
+    const result = [];
+    const visited = new Set();
+
+    function recurse(id) {
+        // Avoid loops
+        if (visited.has(id)) return;
+        visited.add(id);
+
+        // Find direct subunits of "id"
+        const children = flatArray.filter(e =>
+            e.relation_types?.some(
+                rel =>
+                    rel.property === "crm:P46i_forms_part_of" &&
+                    rel.relationTo === id
+            )
+        );
+
+        for (const child of children) {
+            result.push(child);
+            recurse(child.id); // Recursively find subunits of this subunit
+        }
+    }
+
+    recurse(parentId);
+    return result;
+}
+
+function getChartData(relations) {
+
+    const CLASS_ORDER = ["feature", "stratigraphic_unit", "artifact", "human_remains"];
+
+    const activeClasses = CLASS_ORDER.filter(cls =>
+        relations.some(r => r.system_class === cls)
+    );
+
+
+    const grouped = {};
+
+    for (const item of relations) {
+        const cls = item.system_class;
+
+        if (!activeClasses.includes(cls)) continue;
+
+        for (const t of item.types || []) {
+            const title = t.title || "Unknown";
+
+            if (!grouped[title]) {
+                grouped[title] = {
+                    feature: 0,
+                    stratigraphic_unit: 0,
+                    artifact: 0,
+                    human_remains: 0
+                };
+            }
+
+            grouped[title][cls]++;
+        }
+    }
+
+    const COLORS = [
+        "54, 162, 235",
+        "255, 99, 132",
+        "255, 159, 64",
+        "255, 205, 86",
+        "75, 192, 192",
+        "153, 102, 255",
+        "201, 203, 207"
+    ];
+
+    let colorIndex = 0;
+
+    const datasets = Object.entries(grouped).map(([title, counts]) => {
+        const color = COLORS[colorIndex % COLORS.length];
+        colorIndex++;
+
+        return {
+            label: title,
+            data: activeClasses.map(cls => counts[cls] || 0),
+            borderColor: `rgb(${color})`,
+            backgroundColor: `rgba(${color}, 0.5)`
+        };
+    });
+
+
+    const formattedLabels = activeClasses.map(cls => {
+        const total = relations.filter(r => r.system_class === cls).length;
+
+        const pretty =
+            cls.charAt(0).toUpperCase() +
+            cls.slice(1).replaceAll("_", " ");
+
+        return `${pretty} (${total})`;
+    });
+
+    return {
+        labels: formattedLabels,
+        datasets: datasets
+    };
+}
+
 
 
 function renderAttributes(categorizedTypes) {
@@ -194,16 +373,28 @@ function renderAttributes(categorizedTypes) {
     if (!tile || !host || !categorizedTypes || !Object.keys(categorizedTypes).length) return;
     host.innerHTML = "";
     Object.entries(categorizedTypes).forEach(([bucket, items]) => {
+        const division = items?.[0]?.division;
+        let iconHtml = '';
+        if (division) {
+            if (division.iconUrl) {
+                iconHtml = `<img src="${division.iconUrl}" class="attribute-icon">`;
+            } else if (division.icon) {
+                iconHtml = division.icon;
+            }
+        }
+
         const label = h("p", {
             class: "tile-sub-label text-uppercase mt-3",
-            html: `${(items?.[0]?.icon || "")} ${capitalizeWords(bucket.replaceAll("_", " "))}`
+            html: `${iconHtml} ${capitalizeWords(bucket.replaceAll("_", " "))}`
         });
         host.appendChild(label);
         items.forEach((entry) => {
-            console.log(entry)
             const t = entry.type || {};
             const vu = t.value && t.unit ? `: ${t.value} ${t.unit}` : "";
-            const badge = h("div", {class: "badge custom-badge text-wrap m-1", "data-id": t.id || ""},
+            const badge = h("div", {
+                    class: "badge custom-badge text-wrap m-1",
+                    "data-id": t.id || ""
+                },
                 h("h6", {class: "m-0 text-center", text: `${t.title || ""}${vu}`})
             );
             host.appendChild(badge);
@@ -236,7 +427,7 @@ function renderReferences(entity) {
             }),
             h("p", {
                 class: "reference-description",
-                text: `${ref.citation || ""} ${ref.pages || ""}`.trim()
+                text: `${ref.citation || ""} ${(ref.pages || "").replace("##main", "")}`.trim()
             })
         ]));
         list.appendChild(li);
@@ -244,13 +435,6 @@ function renderReferences(entity) {
     tile.hidden = false;
     relayout(10);
 }
-
-// ---------------------------------------------------------------------------
-// BOOTSTRAP
-// ---------------------------------------------------------------------------
-// ============================================================
-//  OVERVIEW.JS — async SPA-safe version using window.entityData
-// ============================================================
 
 (async function initOverview() {
     // --- Wait until DOM is ready ---
@@ -266,7 +450,6 @@ function renderReferences(entity) {
         return;
     }
 
-    // console.log("✅ Overview tab: entityData ready", data);
 
     const entity = data.entity || {};
     entity.overviewMap = data.overviewMap || {};
@@ -275,7 +458,7 @@ function renderReferences(entity) {
     const refreshButton = data.refreshButton || {};
     const mainImage = data.mainImage;
     const initialImages = data.initialImage;
-    const allImages = data.images;
+    const allImages = (data.images || []).filter(img => img?.from_super_entity === false);
     const additionalFilesOverview = window.additionalFilesOverview || 0;
 
     const grid = document.querySelector(".grid-overview");
@@ -348,7 +531,11 @@ function renderReferences(entity) {
       `;
             return h("div", {class: "old-entity-card", html: cardInner});
         })(),
-        h("div", {class: "item-content", "data-type": "types", id: "tile-attributes"}, [
+        h("div", {
+            class: "item-content",
+            "data-type": "types",
+            id: "tile-attributes"
+        }, [
             h("div", {id: "js-attributes"})]),
         h("div", {class: "item-content", "data-type": "description"}, [
             h("div", {class: "muuri-description"}, [
@@ -385,9 +572,19 @@ function renderReferences(entity) {
       }, [
         h("div", {class: "item-content"}, [h("div", {id: "js-attributes"})]),
       ]);*/
-    const mapTile = h("div", {class: "item", id: "tile-map", hidden: true}, [
+    const mapTile = h("div", {
+        class: "item",
+        id: "tile-map",
+        hidden: true,
+        title: "Click to open detailed Map"
+    }, [
         h("div", {class: "item-content item-content-full"}, [
-            h("div", {id: "muuri-map", style: "height:300px;"}),
+            h("div", {id: "muuri-map", href: "/map", style: "height:300px;"}),
+        ]),
+    ]);
+    const subTile = h("div", {class: "item", id: "tile-sub", hidden: true}, [
+        h("div", {class: "item-content"}, [
+            h("canvas", {id: "myChart", style: "width: 100%;"})
         ]),
     ]);
     const refTile = h("div", {
@@ -400,7 +597,8 @@ function renderReferences(entity) {
         ]),
     ]);
 
-    grid.append(mapTile, imageTile, galleryTile, refTile);
+
+    grid.append(mapTile, imageTile, galleryTile, refTile, subTile);
 
     // === RENDER DATA ===
     if (typeof renderToolbox === "function") renderToolbox(citeButton, refreshButton);
@@ -410,13 +608,15 @@ function renderReferences(entity) {
     if (typeof renderEntityCard === "function") renderEntityCard(entity, mainImage);
     if (typeof renderDescription === "function") renderDescription(entity);
     if (typeof renderMapTile === "function") renderMapTile(entity);
+    if (typeof renderSubTile === "function") renderSubTile(entity);
     if (typeof renderAttributes === "function") renderAttributes(categorizedTypes);
     if (typeof renderReferences === "function") renderReferences(entity);
 
     // === MEDIA OVERVIEW ===
-    const files = [];
+    let files = [];
     if (mainImage) files.push(mainImage);
     if (Array.isArray(initialImages)) files.push(...initialImages);
+    files = (files || []).filter(f => f?.from_super_entity === false);
     if (typeof renderOverviewMediaTiles === "function") {
         renderOverviewMediaTiles(files, allImages, additionalFilesOverview);
     }
@@ -436,4 +636,3 @@ function renderReferences(entity) {
     setTimeout(() => window.overviewGrid.refreshItems().layout(), 500);
     renderAllBreadcrumbs(data);
 })();
-

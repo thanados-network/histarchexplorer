@@ -24,7 +24,7 @@ async function loadHTML(id, tab, index, totalTabs) {
     //console.log(tab)
 
     let urlbase = `/get_entity/${id}/${tab}`
-    if (id === 0) urlbase =  `/get_entities/${tab}`
+    if (id === 0) urlbase = `/get_entities/${tab}`
     //console.log(urlbase)
     if (id === 0) urlbase = `/get_entities/${tab}`
     //console.log(urlbase)
@@ -126,12 +126,49 @@ function loadScript(script) {
     });
 }
 
+if (entityId == 0) {
+    tabsToLoad.forEach((tab, index) => {
+        if (!loadedTabs.includes(tab)) {
+            loadHTML(entityId, tab, index, tabsToLoad.length);
+        }
+    });
+} else {
+    (async function loadTabs() {
+        // Wait until the entity data is fetched
+        const data = await window.entityData;
+        if (!data) {
+            console.error("❌ Failed to load entityData.");
+            return;
+        }
 
-tabsToLoad.forEach((tab, index) => {
-    if (!loadedTabs.includes(tab)) {
-        loadHTML(entityId, tab, index, tabsToLoad.length);
-    }
-});
+        if (!data.spatial.features.length > 0) tabsToLoad = tabsToLoad.filter(t => t !== 'map');
+
+        tabsToLoad = tabsToLoad.filter(t => t !== 'catalogue');
+
+        if (data.hierarchy.subs === 0) {
+            tabsToLoad = tabsToLoad.filter(t => t !== 'subunits');
+        }
+
+        if (
+            !(
+                Array.isArray(data.images) &&
+                data.images.length > 0 &&
+                data.images.some(img => img && img.from_super_entity === false)
+            )
+        ) {
+            tabsToLoad = tabsToLoad.filter(t => t !== 'media');
+        }
+
+
+        tabsToLoad.forEach((tab, index) => {
+            if (!loadedTabs.includes(tab)) {
+                loadHTML(entityId, tab, index, tabsToLoad.length);
+            }
+        });
+
+
+    })();
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     // Activate a tab by name, optionally skipping pushState (for popstate navigation)
@@ -280,19 +317,19 @@ if (tabsToLoad?.length > 0 && rightSidebarcontent[tabsToLoad[0]]?.content) {
 
 // ===== Breadcrumbs (global renderer) =====
 document.addEventListener("DOMContentLoaded", () => {
-  // === Initial render for the first visible tab ===
-  if (window.entityData) renderAllBreadcrumbs(window.entityData);
+    // === Initial render for the first visible tab ===
+    if (window.entityData) renderAllBreadcrumbs(window.entityData);
 
-  // === Re-render whenever a Bootstrap tab becomes visible ===
-  document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
-    tab.addEventListener("shown.bs.tab", () => {
-      if (window.entityData) renderAllBreadcrumbs(window.entityData);
+    // === Re-render whenever a Bootstrap tab becomes visible ===
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener("shown.bs.tab", () => {
+            if (window.entityData) renderAllBreadcrumbs(window.entityData);
+        });
     });
-  });
 
-  // === Optional: also re-render when custom events fire (e.g., AJAX reloads) ===
-  document.addEventListener("entityUpdated", e => {
-    const data = e.detail?.entityData || window.entityData;
-    if (data) renderAllBreadcrumbs(data);
-  });
+    // === Optional: also re-render when custom events fire (e.g., AJAX reloads) ===
+    document.addEventListener("entityUpdated", e => {
+        const data = e.detail?.entityData || window.entityData;
+        if (data) renderAllBreadcrumbs(data);
+    });
 });

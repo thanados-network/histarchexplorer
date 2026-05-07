@@ -1,111 +1,66 @@
-<div class="button-card me-3">
-  <button id="resetButton" class="btn btn-danger" data-bs-toggle="tooltip"
-          title="{{ _('Resets the entire database') }}">
-    {{ _('reset') | upper }}
-  </button>
-</div>
-
-
-<form method="post" action="{{ url_for('select_entities') }}">
-  <div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle me-3"
-            type="button"
-            id="entityDropdown"
-            data-bs-toggle="dropdown"
-            aria-expanded="false">
-      {{ _('show classes') | capitalize }}
-    </button>
-    <ul class="dropdown-menu dropdown-menu-columns"
-        aria-labelledby="entityDropdown">
-      {% for view_class in view_classes %}
-        <li>
-          <h6 class="dropdown-header">{{ view_class |upper }}</h6>
-        </li>
-        {% for category in (view_classes[view_class]) %}
-          <li>
+<form method="post" action="{{ url_for('update_class_visibility') }}">
+  <input type="hidden" name="active_sidebar" value="sidebar-general-settings-group">
+  <div class="row">
+    {# Column for Shown Classes #}
+    <div class="col-md-6">
+      <h5>{{ _('Shown Classes') | capitalize }}</h5>
+      <p class="text-muted small">
+        {{ _('Checked classes will be explicitly shown in the browse interface.') }}
+      </p>
+      <div class="checkbox-list-container border rounded p-3">
+        {% for view_class, categories in view_classes.items() %}
+          <h6 class="dropdown-header mt-2">{{ view_class | upper }}</h6>
+          {% for category in categories %}
             <div class="form-check ms-3">
               <input class="form-check-input" type="checkbox"
-                     name="selected_entities"
+                     name="shown_classes"
                      value="{{ category }}"
-                     id="flexCheck{{ loop.index }}"
-                {% if category in shown_classes %}
-                     checked
-                {% endif %}>
-
-              <label class="form-check-label"
-                     for="flexCheck{{ loop.index }}">
+                     id="check_shown_{{ category }}"
+                     {% if category in shown_classes %}checked{% endif %}>
+              <label class="form-check-label" for="check_shown_{{ category }}">
                 {{ category }}
-                {% if class_items[category] %}
-                  ({{ class_items[category] }})
-                {% else %}
-                  (0)
-                {% endif %}
+                <span class="text-muted">
+                  ({{ class_items.get(category, 0) }})
+                </span>
               </label>
             </div>
-          </li>
+          {% endfor %}
         {% endfor %}
-      {% endfor %}
-      <button type="submit" class="btn btn-primary mt-3">
-        {{ _('save selection') | capitalize }}
-      </button>
-    </ul>
-  </div>
-</form>
+      </div>
+    </div>
 
-<form method="post" action="{{ url_for('deselect_entities') }}">
-  <div class="dropdown me-3">
-    <button class="btn btn-secondary dropdown-toggle"
-            type="button"
-            id="entityDropdownBlacklist"
-            data-bs-toggle="dropdown"
-            aria-expanded="false">
-      {{ _('hidden classes') | capitalize }}
-    </button>
-    <ul class="dropdown-menu dropdown-menu-columns"
-        aria-labelledby="entityDropdownBlacklist">
-      {% for view_class in view_classes %}
-        <li>
-          <h6 class="dropdown-header">
-            {{ view_class |upper }}
-          </h6>
-        </li>
-        {% for category in (view_classes[view_class]) %}
-          <li>
+    {# Column for Hidden Classes #}
+    <div class="col-md-6">
+      <h5>{{ _('Hidden Classes') | capitalize }}</h5>
+      <p class="text-muted small">
+        {{ _('Checked classes will be hidden from the browse interface.') }}
+      </p>
+      <div class="checkbox-list-container border rounded p-3">
+        {% for view_class, categories in view_classes.items() %}
+          <h6 class="dropdown-header mt-2">{{ view_class | upper }}</h6>
+          {% for category in categories %}
             <div class="form-check ms-3">
-              <input class="form-check-input"
-                     type="checkbox"
-                     name="selected_entities"
+              <input class="form-check-input" type="checkbox"
+                     name="hidden_classes"
                      value="{{ category }}"
-                     id="flexCheck{{ loop.index }}Blacklist"
-                {% if category in hidden_classes %}
-                     checked
-                {% endif %}>
-
-              <label class="form-check-label"
-                     for="flexCheck{{ loop.index }}Blacklist">
+                     id="check_hidden_{{ category }}"
+                     {% if category in hidden_classes %}checked{% endif %}>
+              <label class="form-check-label" for="check_hidden_{{ category }}">
                 {{ category }}
-                {% if class_items[category] %}
-                  ({{ class_items[category] }})
-                {% else %}
-                  (0)
-                {% endif %}
+                <span class="text-muted">
+                  ({{ class_items.get(category, 0) }})
+                </span>
               </label>
             </div>
-          </li>
+          {% endfor %}
         {% endfor %}
-      {% endfor %}
+      </div>
+    </div>
+  </div>
 
-      <button type="submit" class="btn btn-primary mt-3">
-        {{ _('save selection') | capitalize }}
-      </button>
-    </ul>
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <button type="submit" class="btn btn-primary">
+      <i class="bi bi-check-lg"></i> {{ _('Save Visibility Settings') }}
+    </button>
   </div>
 </form>
-
-
-<div class="button-card me-3">
-  <button id="logoutButton" class="btn btn-danger" data-bs-toggle="tooltip"
-          title="{{ _('logout') }}">
-    {{ _('logout') | upper }}
-  </button>
-</div>

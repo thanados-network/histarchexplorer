@@ -27,12 +27,12 @@
 
     {% endif %}
 </script>
-<div class="breadcrumbs ms-3"></div>
+<div id="{{ tab_name }}-breadcrumbs" class="breadcrumbs ms-3"></div>
 
 <div id="{{ tab_name }}-header"
      class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3 mt-3 ms-3 me-3">
 
-    <h3 class="m-0">{{ tab_name[0]|upper }}{{ tab_name[1:] }}</h3>
+    <h3 class="m-0">{{ tab_name[0]|upper }}{{ tab_name[1:] }}<span id="{{ tab_name }}-subcount"></span></h3>
 
     <div class="input-group" style="max-width: 600px;">
         <input type="text" id="filterInput{{ tab_name }}" class="form-control" placeholder="Search / Filter">
@@ -64,7 +64,7 @@
 
     <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2"
             onclick="{{ tab_name }}Modal.show()" title="Advanced Sort">
-        <i class="bi bi-funnel"></i>
+        <i class="bi bi-sort-down"></i>
     </button>
 
     <div class="d-flex flex-wrap gap-3">
@@ -202,7 +202,7 @@
             <div class="modal-footer justify-content-between">
 
                 <span class="form-check">
-                    <input class="form-check-input" type="checkbox" id="include-subcategories-{{ tab_name }}">
+                    <input class="form-check-input" checked type="checkbox" id="include-subcategories-{{ tab_name }}">
                     <label class="form-check-label" for="include-subcategories-{{ tab_name }}">
                       Include subcategories
                     </label>
