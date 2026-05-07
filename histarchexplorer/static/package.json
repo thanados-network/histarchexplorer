@@ -30,6 +30,6 @@
     "url": "https://github.com/lisaldrian/histarchexplorer.git"
   },
   "devDependencies": {
-    "sass": "^1.79.0"
+    "sass": "^1.97.2"
   }
 }

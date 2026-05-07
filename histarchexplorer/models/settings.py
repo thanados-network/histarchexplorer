@@ -80,6 +80,7 @@ class Settings(BaseModel):
         'publications': {'show': True, 'page_type': 'default'},
         'outcome': {'show': True, 'page_type': 'default'},
         'search': {'show': True, 'page_type': 'default'},
+        'vocabulary': {'show': True, 'page_type': 'default'},
         'footer': {'show': True, 'page_type': 'default'}}
     type_divisions: Dict[str, Dict[str, Union[str, List[int], None]]] = Field(
         default_factory=lambda: {
