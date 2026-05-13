@@ -1,55 +1,55 @@
 {% extends "layout.html" %}
 {% block content %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/quercus.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quercus.css') }}">
 
-  <div class="page-wrapper">
-    <div class="scrollable-container">
-      <div class="container">
+    <div class="page-wrapper">
+        <div class="scrollable-container">
+            <div class="container">
 
-        <div class="tabs">
-          <ul class="tab-links">
-            <li class="active"><a href="#standard">Standard</a></li>
-            <li><a href="#custom">Custom(test)</a></li>
-            <li><a href="#value">Value</a></li>
-          </ul>
+                <div class="tabs">
+                    <ul class="tab-links">
+                        <li class="active"><a href="#standard">Standard</a></li>
+                        <li><a href="#custom">Custom(test)</a></li>
+                        <li><a href="#value">Value</a></li>
+                    </ul>
 
-          <div class="tab-content">
+                    <div class="tab-content">
 
-            <div id="standard" class="tab active">
-              <div class="vocabulary-layout">
+                        <div id="standard" class="tab active">
+                            <div class="vocabulary-layout">
 
-    <div class="tree-panel">
-        <div id="standardTree"></div>
-    </div>
+                                <div class="tree-panel">
+                                    <div id="standardTree"></div>
+                                </div>
 
-    <div class="details-panel" id="detailsPanel">
-        <h3>Select a type</h3>
-        <p>Click a type node to see details.</p>
-    </div>
+                                <div class="details-panel" id="detailsPanel">
+                                    <h3>Select a type</h3>
+                                    <p>Click a type node to see details.</p>
+                                </div>
 
-</div>
+                            </div>
+                        </div>
+
+                        <div id="custom" class="tab">
+                            <div id="customTree"></div>
+                        </div>
+
+                        <div id="value" class="tab">
+                            <div id="valueTree"></div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
-
-            <div id="custom" class="tab">
-              <div id="customTree"></div>
-            </div>
-
-            <div id="value" class="tab">
-              <div id="valueTree"></div>
-            </div>
-
-          </div>
         </div>
-
-      </div>
     </div>
-  </div>
 
 
-  <script src="{{ url_for('static', filename='js/quercus.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/quercus.js') }}"></script>
     <script>
-    window.typeTree = {{ type_tree | tojson }};
-</script>
-<script src="{{ url_for('static', filename='js/vocabulary.js') }}"></script>
+        window.typeTree = {{ type_tree | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/vocabulary.js') }}"></script>
 
 {% endblock %}
