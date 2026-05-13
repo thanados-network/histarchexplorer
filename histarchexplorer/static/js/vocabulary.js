@@ -2,7 +2,43 @@ console.log("vocabulary.js loaded");
 console.log(window.typeTree);
 
 const typeTree = window.typeTree;
+async function handleNodeSelection(selectedNodesData, panelId) {
 
+    if (!selectedNodesData.length) return;
+
+    const node = selectedNodesData[selectedNodesData.length - 1];
+
+    const panel = document.getElementById(panelId);
+
+    panel.innerHTML = `
+        <p>Loading...</p>
+    `;
+
+    const response = await fetch(`/api/vocabulary/${node.id}`);
+    const data = await response.json();
+
+    panel.innerHTML = `
+        <h2>${data.name}</h2>
+
+        <hr>
+
+        <p>
+            <strong>ID:</strong><br>
+            ${data.id}
+        </p>
+
+        <p>
+            <strong>Description:</strong><br>
+            ${data.description || 'No description available.'}
+        </p>
+
+        <p>
+            <a href="/vocabulary/${data.id}">
+                Open full detail page →
+            </a>
+        </p>
+    `;
+}
 const treeviewContainer1 = document.getElementById('standardTree');
 const tree1 = new Treeview({
     containerId: 'standardTree',   // ID of the HTML element to render the tree into
