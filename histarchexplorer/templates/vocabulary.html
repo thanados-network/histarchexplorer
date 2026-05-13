@@ -50,6 +50,35 @@
           margin-left: 30px;
       }
 
+      .vocabulary-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.tree-panel {
+    flex: 1;
+    min-width: 500px;
+}
+
+.details-panel {
+    width: 420px;
+    position: sticky;
+    top: 100px;
+
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+
+    padding: 20px;
+
+    max-height: 80vh;
+    overflow-y: auto;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+
 
   </style>
   <div class="page-wrapper">
@@ -66,7 +95,18 @@
           <div class="tab-content">
 
             <div id="standard" class="tab active">
-              <div id="standardTree"></div>
+              <div class="vocabulary-layout">
+
+    <div class="tree-panel">
+        <div id="standardTree"></div>
+    </div>
+
+    <div class="details-panel" id="detailsPanel">
+        <h3>Select a type</h3>
+        <p>Click a type node to see details.</p>
+    </div>
+
+</div>
             </div>
 
             <div id="custom" class="tab">
@@ -96,13 +136,45 @@
           data: typeTree.standard,             // Your hierarchical data
           searchEnabled: true,          // Enable the search bar (default: true)
           initiallyExpanded: false,     // Start with nodes collapsed (default: false)
-          multiSelectEnabled: true,     // Enable multi-selection by clicking nodes
-          nodeSelectionEnabled: false,
-          onSelectionChange: (selectedNodesData) => { // Callback when selection changes
-              console.log('Selected Nodes (Tree 1):', selectedNodesData);
-              // Example: Update a display area with selected nodes
-              // document.getElementById('output-area').textContent = JSON.stringify(selectedNodesData, null, 2);
-          }
+          multiSelectEnabled: false,     // Enable multi-selection by clicking nodes
+          nodeSelectionEnabled: true,
+          onSelectionChange: async (selectedNodesData) => {
+
+    if (!selectedNodesData.length) return;
+
+    const node = selectedNodesData[selectedNodesData.length - 1];
+
+    const panel = document.getElementById('detailsPanel');
+
+    panel.innerHTML = `
+        <p>Loading...</p>
+    `;
+
+    const response = await fetch(`/api/vocabulary/${node.id}`);
+    const data = await response.json();
+
+    panel.innerHTML = `
+        <h2>${data.name}</h2>
+
+        <hr>
+
+        <p>
+            <strong>ID:</strong><br>
+            ${data.id}
+        </p>
+
+        <p>
+            <strong>Description:</strong><br>
+            ${data.description || 'No description available.'}
+        </p>
+
+        <p>
+            <a href="/vocabulary/${data.id}">
+                Open full detail page →
+            </a>
+        </p>
+    `;
+}
       });
 
 
@@ -113,7 +185,7 @@
           searchEnabled: true,          // Enable the search bar (default: true)
           initiallyExpanded: false,     // Start with nodes collapsed (default: false)
           multiSelectEnabled: true,     // Enable multi-selection by clicking nodes
-          nodeSelectionEnabled: false,
+          nodeSelectionEnabled: true,
           onSelectionChange: (selectedNodesData) => { // Callback when selection changes
               console.log('Selected Nodes (Tree 1):', selectedNodesData);
               // Example: Update a display area with selected nodes

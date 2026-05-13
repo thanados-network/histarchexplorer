@@ -53,3 +53,26 @@ def vocabulary_detail(type_id: int):
         cite_button=get_cite_button(entity),
     )
 
+from flask import render_template, jsonify, g
+
+@app.route("/api/vocabulary/<int:type_id>")
+def vocabulary_api(type_id: int):
+
+    entity = PresentationView.from_api(type_id)
+
+    description = None
+
+    if entity.description:
+        description = (
+            entity.description.get(g.language)
+            or entity.description.get('en')
+            or next(iter(entity.description.values()))
+        )
+
+    return jsonify({
+        "id": entity.id,
+        "name": entity.title,
+        "description": description
+    })
+
+
