@@ -1,0 +1,76 @@
+.tabs {
+          width: 100%;
+      }
+
+      .tab-links {
+          list-style: none;
+          padding: 0;
+          margin: 0 0 10px;
+          display: flex;
+          border-bottom: 1px solid #ccc;
+      }
+
+      .tab-links li {
+          margin-right: 10px;
+      }
+
+      .tab-links a {
+          display: block;
+          padding: 8px 12px;
+          text-decoration: none;
+          border: 1px solid #ccc;
+          border-bottom: none;
+          background: #eee;
+      }
+
+      .tab-links .active a {
+          background: #fff;
+          border-bottom: 1px solid #fff;
+      }
+
+      .tab-content .tab {
+          display: none;
+      }
+
+      .tab-content .tab.active {
+          display: block;
+      }
+
+      .custom-treeview-wrapper {
+          margin-top: 10px;
+          margin-left: 0px;
+      }
+
+      .page-wrapper .container {
+          margin-top: 10px;
+          margin-left: 30px;
+      }
+
+      .vocabulary-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.tree-panel {
+    flex: 1;
+    min-width: 500px;
+}
+
+.details-panel {
+    width: 420px;
+    position: sticky;
+    top: 100px;
+
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+
+    padding: 20px;
+
+    max-height: 80vh;
+    overflow-y: auto;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
