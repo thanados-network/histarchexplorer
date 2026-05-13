@@ -69,13 +69,10 @@ const tree3 = new Treeview({
     data: typeTree.value,             // Your hierarchical data
     searchEnabled: true,          // Enable the search bar (default: true)
     initiallyExpanded: false,     // Start with nodes collapsed (default: false)
-    multiSelectEnabled: true,     // Enable multi-selection by clicking nodes
-    nodeSelectionEnabled: false,
-    onSelectionChange: (selectedNodesData) => { // Callback when selection changes
-        console.log('Selected Nodes (Tree 1):', selectedNodesData);
-        // Example: Update a display area with selected nodes
-        // document.getElementById('output-area').textContent = JSON.stringify(selectedNodesData, null, 2);
-    }
+    multiSelectEnabled: false,     // Enable multi-selection by clicking nodes
+    nodeSelectionEnabled: true,
+    onSelectionChange: (selectedNodesData) =>
+    handleNodeSelection(selectedNodesData, 'valueDetailsPanel')
 });
 
 document.querySelectorAll('.tab-links a').forEach(link => {
