@@ -1,9 +1,6 @@
 --
 -- PostgreSQL database dump
 --
-
-\restrict dz1x6pwX1VIeNm6adxfaL0df5pWoOSmjsqBCWm8Z39H2cKDy3BOcyJdZcwSgrgg
-
 -- Dumped from database version 17.8 (Debian 17.8-0+deb13u1)
 -- Dumped by pg_dump version 17.8 (Debian 17.8-0+deb13u1)
 
@@ -174,7 +171,7 @@ ALTER TABLE tng.entities ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- Name: file_licenses; Type: TABLE; Schema: tng; Owner: bkoschicek
+-- Name: file_licenses; Type: TABLE; Schema: tng; Owner: openatlas
 --
 
 CREATE TABLE tng.file_licenses (
@@ -184,10 +181,10 @@ CREATE TABLE tng.file_licenses (
 );
 
 
-ALTER TABLE tng.file_licenses OWNER TO bkoschicek;
+ALTER TABLE tng.file_licenses OWNER TO openatlas;
 
 --
--- Name: files; Type: TABLE; Schema: tng; Owner: bkoschicek
+-- Name: files; Type: TABLE; Schema: tng; Owner: openatlas
 --
 
 CREATE TABLE tng.files (
@@ -200,10 +197,10 @@ CREATE TABLE tng.files (
 );
 
 
-ALTER TABLE tng.files OWNER TO bkoschicek;
+ALTER TABLE tng.files OWNER TO openatlas;
 
 --
--- Name: files_id_seq; Type: SEQUENCE; Schema: tng; Owner: bkoschicek
+-- Name: files_id_seq; Type: SEQUENCE; Schema: tng; Owner: openatlas
 --
 
 CREATE SEQUENCE tng.files_id_seq
@@ -215,17 +212,17 @@ CREATE SEQUENCE tng.files_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE tng.files_id_seq OWNER TO bkoschicek;
+ALTER SEQUENCE tng.files_id_seq OWNER TO openatlas;
 
 --
--- Name: files_id_seq; Type: SEQUENCE OWNED BY; Schema: tng; Owner: bkoschicek
+-- Name: files_id_seq; Type: SEQUENCE OWNED BY; Schema: tng; Owner: openatlas
 --
 
 ALTER SEQUENCE tng.files_id_seq OWNED BY tng.files.id;
 
 
 --
--- Name: licenses; Type: TABLE; Schema: tng; Owner: bkoschicek
+-- Name: licenses; Type: TABLE; Schema: tng; Owner: openatlas
 --
 
 CREATE TABLE tng.licenses (
@@ -238,10 +235,10 @@ CREATE TABLE tng.licenses (
 );
 
 
-ALTER TABLE tng.licenses OWNER TO bkoschicek;
+ALTER TABLE tng.licenses OWNER TO openatlas;
 
 --
--- Name: licenses_id_seq; Type: SEQUENCE; Schema: tng; Owner: bkoschicek
+-- Name: licenses_id_seq; Type: SEQUENCE; Schema: tng; Owner: openatlas
 --
 
 CREATE SEQUENCE tng.licenses_id_seq
@@ -253,10 +250,10 @@ CREATE SEQUENCE tng.licenses_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE tng.licenses_id_seq OWNER TO bkoschicek;
+ALTER SEQUENCE tng.licenses_id_seq OWNER TO openatlas;
 
 --
--- Name: licenses_id_seq; Type: SEQUENCE OWNED BY; Schema: tng; Owner: bkoschicek
+-- Name: licenses_id_seq; Type: SEQUENCE OWNED BY; Schema: tng; Owner: openatlas
 --
 
 ALTER SEQUENCE tng.licenses_id_seq OWNED BY tng.licenses.id;
@@ -393,14 +390,14 @@ CREATE TABLE tng.system_settings (
 ALTER TABLE tng.system_settings OWNER TO openatlas;
 
 --
--- Name: files id; Type: DEFAULT; Schema: tng; Owner: bkoschicek
+-- Name: files id; Type: DEFAULT; Schema: tng; Owner: openatlas
 --
 
 ALTER TABLE ONLY tng.files ALTER COLUMN id SET DEFAULT nextval('tng.files_id_seq'::regclass);
 
 
 --
--- Name: licenses id; Type: DEFAULT; Schema: tng; Owner: bkoschicek
+-- Name: licenses id; Type: DEFAULT; Schema: tng; Owner: openatlas
 --
 
 ALTER TABLE ONLY tng.licenses ALTER COLUMN id SET DEFAULT nextval('tng.licenses_id_seq'::regclass);
@@ -438,7 +435,7 @@ ALTER TABLE ONLY tng.entities
 
 
 --
--- Name: file_licenses file_licenses_pkey; Type: CONSTRAINT; Schema: tng; Owner: bkoschicek
+-- Name: file_licenses file_licenses_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
 ALTER TABLE ONLY tng.file_licenses
@@ -446,7 +443,7 @@ ALTER TABLE ONLY tng.file_licenses
 
 
 --
--- Name: files files_pkey; Type: CONSTRAINT; Schema: tng; Owner: bkoschicek
+-- Name: files files_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
 ALTER TABLE ONLY tng.files
@@ -454,7 +451,7 @@ ALTER TABLE ONLY tng.files
 
 
 --
--- Name: licenses licenses_pkey; Type: CONSTRAINT; Schema: tng; Owner: bkoschicek
+-- Name: licenses licenses_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
 ALTER TABLE ONLY tng.licenses
@@ -462,7 +459,7 @@ ALTER TABLE ONLY tng.licenses
 
 
 --
--- Name: licenses licenses_spdx_id_key; Type: CONSTRAINT; Schema: tng; Owner: bkoschicek
+-- Name: licenses licenses_spdx_id_key; Type: CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
 ALTER TABLE ONLY tng.licenses
@@ -509,7 +506,7 @@ ALTER TABLE ONLY tng.entities
 
 
 --
--- Name: file_licenses file_licenses_file_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: bkoschicek
+-- Name: file_licenses file_licenses_file_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
 ALTER TABLE ONLY tng.file_licenses
@@ -517,7 +514,7 @@ ALTER TABLE ONLY tng.file_licenses
 
 
 --
--- Name: file_licenses file_licenses_license_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: bkoschicek
+-- Name: file_licenses file_licenses_license_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
 --
 
 ALTER TABLE ONLY tng.file_licenses
@@ -548,35 +545,35 @@ GRANT UPDATE(license_id) ON TABLE tng.entities TO openatlas;
 
 
 --
--- Name: TABLE file_licenses; Type: ACL; Schema: tng; Owner: bkoschicek
+-- Name: TABLE file_licenses; Type: ACL; Schema: tng; Owner: openatlas
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tng.file_licenses TO openatlas;
 
 
 --
--- Name: TABLE files; Type: ACL; Schema: tng; Owner: bkoschicek
+-- Name: TABLE files; Type: ACL; Schema: tng; Owner: openatlas
 --
 
 GRANT ALL ON TABLE tng.files TO openatlas;
 
 
 --
--- Name: SEQUENCE files_id_seq; Type: ACL; Schema: tng; Owner: bkoschicek
+-- Name: SEQUENCE files_id_seq; Type: ACL; Schema: tng; Owner: openatlas
 --
 
 GRANT SELECT,USAGE ON SEQUENCE tng.files_id_seq TO openatlas;
 
 
 --
--- Name: TABLE licenses; Type: ACL; Schema: tng; Owner: bkoschicek
+-- Name: TABLE licenses; Type: ACL; Schema: tng; Owner: openatlas
 --
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tng.licenses TO openatlas;
 
 
 --
--- Name: SEQUENCE licenses_id_seq; Type: ACL; Schema: tng; Owner: bkoschicek
+-- Name: SEQUENCE licenses_id_seq; Type: ACL; Schema: tng; Owner: openatlas
 --
 
 GRANT SELECT,USAGE ON SEQUENCE tng.licenses_id_seq TO openatlas;
@@ -586,5 +583,4 @@ GRANT SELECT,USAGE ON SEQUENCE tng.licenses_id_seq TO openatlas;
 -- PostgreSQL database dump complete
 --
 
-\unrestrict dz1x6pwX1VIeNm6adxfaL0df5pWoOSmjsqBCWm8Z39H2cKDy3BOcyJdZcwSgrgg
 
