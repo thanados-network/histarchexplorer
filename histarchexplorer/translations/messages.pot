@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-22 13:51+0200\n"
+"POT-Creation-Date: 2026-05-22 14:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,8 +58,8 @@ msgstr ""
 msgid "Visibility Settings"
 msgstr ""
 
-#: templates/admin.html:32
-msgid "Colors"
+#: templates/admin.html:32 templates/admin.html:129
+msgid "Class colors"
 msgstr ""
 
 #: templates/admin.html:33
@@ -67,67 +67,67 @@ msgid "Type Divisions"
 msgstr ""
 
 #: templates/admin.html:34
-msgid "Cache Options"
-msgstr ""
-
-#: templates/admin.html:35
 msgid "Content"
 msgstr ""
 
-#: templates/admin.html:36
+#: templates/admin.html:35
 msgid "Start page"
 msgstr ""
 
-#: templates/admin.html:37
+#: templates/admin.html:36
 msgid "About"
 msgstr ""
 
-#: templates/admin.html:38 utils/view_util.py:58
+#: templates/admin.html:37 utils/view_util.py:58
 msgid "Publications"
 msgstr ""
 
-#: templates/admin.html:39 utils/view_util.py:20 utils/view_util.py:61
+#: templates/admin.html:38 utils/view_util.py:20 utils/view_util.py:61
 msgid "Outcome"
 msgstr ""
 
-#: templates/admin.html:40
+#: templates/admin.html:39
 msgid "Legal Notice"
 msgstr ""
 
-#: templates/admin.html:41
+#: templates/admin.html:40
 msgid "Footer"
 msgstr ""
 
-#: templates/admin.html:42
+#: templates/admin.html:41
 msgid "Search"
 msgstr ""
 
-#: templates/admin.html:43
+#: templates/admin.html:42
 msgid "File Management"
 msgstr ""
 
-#: templates/admin.html:44 templates/admin/logo_management.html:3
+#: templates/admin.html:43 templates/admin/logo_management.html:3
 msgid "Logo Management"
 msgstr ""
 
-#: templates/admin.html:45
+#: templates/admin.html:44
 msgid "Icons"
 msgstr ""
 
-#: templates/admin.html:46
+#: templates/admin.html:45
 msgid "Assets"
 msgstr ""
 
-#: templates/admin.html:47
+#: templates/admin.html:46
 msgid "Team"
 msgstr ""
 
-#: templates/admin.html:48
+#: templates/admin.html:47
 msgid "Licenses"
 msgstr ""
 
-#: templates/admin.html:49
+#: templates/admin.html:48
 msgid "Maps"
+msgstr ""
+
+#: templates/admin.html:49
+msgid "Cache Options"
 msgstr ""
 
 #: templates/admin.html:50
@@ -142,31 +142,27 @@ msgstr ""
 msgid "visibility settings"
 msgstr ""
 
-#: templates/admin.html:131
-msgid "colors"
-msgstr ""
-
-#: templates/admin.html:144
+#: templates/admin.html:142
 msgid "type divisions"
 msgstr ""
 
-#: templates/admin.html:157
+#: templates/admin.html:155
 msgid "cache options"
 msgstr ""
 
-#: templates/admin.html:197
+#: templates/admin.html:195
 msgid "index page options"
 msgstr ""
 
-#: templates/admin.html:219
+#: templates/admin.html:217
 msgid "File Management Overview"
 msgstr ""
 
-#: templates/admin.html:220
+#: templates/admin.html:218
 msgid "Select a file management section from the sidebar to start editing."
 msgstr ""
 
-#: templates/admin.html:272
+#: templates/admin.html:270
 msgid "maps"
 msgstr ""
 
@@ -740,55 +736,75 @@ msgstr ""
 msgid "save changes"
 msgstr ""
 
-#: templates/admin/visibility_settings.html:6
+#: templates/admin/visibility_settings.html:5
+msgid "Visibility Configuration"
+msgstr ""
+
+#: templates/admin/visibility_settings.html:7
+msgid "Save All Settings"
+msgstr ""
+
+#: templates/admin/visibility_settings.html:12
+msgid "Entity Classes"
+msgstr ""
+
+#: templates/admin/visibility_settings.html:17
 msgid "Shown Classes"
 msgstr ""
 
-#: templates/admin/visibility_settings.html:8
+#: templates/admin/visibility_settings.html:20
 msgid "Checked classes will be explicitly shown in the browse interface."
 msgstr ""
 
-#: templates/admin/visibility_settings.html:34
+#: templates/admin/visibility_settings.html:48
 msgid "Hidden Classes"
 msgstr ""
 
-#: templates/admin/visibility_settings.html:36
+#: templates/admin/visibility_settings.html:51
 msgid "Checked classes will be hidden from the browse interface."
 msgstr ""
 
-#: templates/admin/visibility_settings.html:63
-msgid "Shown Types"
+#: templates/admin/visibility_settings.html:82
+msgid "Entity Types"
 msgstr ""
 
-#: templates/admin/visibility_settings.html:65
+#: templates/admin/visibility_settings.html:85
+msgid "Shown Type IDs"
+msgstr ""
+
+#: templates/admin/visibility_settings.html:87
 msgid "Comma-separated list of type IDs to show."
 msgstr ""
 
-#: templates/admin/visibility_settings.html:71
-msgid "Hidden Types"
+#: templates/admin/visibility_settings.html:94
+msgid "Hidden Type IDs"
 msgstr ""
 
-#: templates/admin/visibility_settings.html:73
+#: templates/admin/visibility_settings.html:96
 msgid "Comma-separated list of type IDs to hide."
 msgstr ""
 
-#: templates/admin/visibility_settings.html:82
-msgid "Shown IDs"
+#: templates/admin/visibility_settings.html:106
+msgid "Individual Entity IDs"
 msgstr ""
 
-#: templates/admin/visibility_settings.html:84
+#: templates/admin/visibility_settings.html:109
+msgid "Shown Entity IDs"
+msgstr ""
+
+#: templates/admin/visibility_settings.html:111
 msgid "Comma-separated list of entity IDs to show."
 msgstr ""
 
-#: templates/admin/visibility_settings.html:90
-msgid "Hidden IDs"
+#: templates/admin/visibility_settings.html:118
+msgid "Hidden Entity IDs"
 msgstr ""
 
-#: templates/admin/visibility_settings.html:92
+#: templates/admin/visibility_settings.html:120
 msgid "Comma-separated list of entity IDs to hide."
 msgstr ""
 
-#: templates/admin/visibility_settings.html:101
+#: templates/admin/visibility_settings.html:131
 msgid "Save Visibility Settings"
 msgstr ""
 
