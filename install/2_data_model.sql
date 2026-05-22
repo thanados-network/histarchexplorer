@@ -2,7 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict fjq9U1sUhScA2Cxrm2KeHQh5ymyFts8XTMFKxoPBNxJcIFzngfMVmKfhbYUd6eA
 
 -- Dumped from database version 17.8 (Debian 17.8-0+deb13u1)
 -- Dumped by pg_dump version 17.8 (Debian 17.8-0+deb13u1)
@@ -84,7 +83,7 @@ INSERT INTO tng.entities OVERRIDING SYSTEM VALUE VALUES
 
 
 --
--- Data for Name: files; Type: TABLE DATA; Schema: tng; Owner: bkoschicek
+-- Data for Name: files; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
 INSERT INTO tng.files VALUES
@@ -245,7 +244,7 @@ SELECT pg_catalog.setval('tng.entities_id_seq', 63, true);
 
 
 --
--- Name: files_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: bkoschicek
+-- Name: files_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
 --
 
 SELECT pg_catalog.setval('tng.files_id_seq', 38, true);
@@ -283,5 +282,5 @@ SELECT pg_catalog.setval('tng.properties_id_seq', 1, false);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict fjq9U1sUhScA2Cxrm2KeHQh5ymyFts8XTMFKxoPBNxJcIFzngfMVmKfhbYUd6eA
+
 
