@@ -27,8 +27,11 @@ def get_locale() -> str:
     if 'language' in session:
         return session['language']
     settings = getattr(g, 'settings', None)
-    if settings and settings.language_selector:
-        return settings.preferred_language or 'en'
+    if settings:
+        if settings.language_selector:
+            return settings.preferred_language or 'en'
+        selected = settings.selected_languages or ['en']
+        return request.accept_languages.best_match(selected) or 'en'
     return request.accept_languages.best_match(app.config['LANGUAGES']) or 'en'
 
 
@@ -119,9 +122,16 @@ def before_request() -> Response | None:
             return redirect(url_for('login'))
 
     from flask_babel import get_locale as babel_get_locale
-    g.available_languages = app.config['LANGUAGES']
+    g.all_languages = app.config['LANGUAGES']
+    selected = g.settings.selected_languages or ['en']
+    if 'en' not in selected:
+        selected.append('en')
+    g.available_languages = {
+        k: v for k, v in g.all_languages.items() if k in selected}
     g.language = str(babel_get_locale())
     session['language'] = g.language
+    if g.settings.preferred_language not in g.available_languages:
+        g.settings.preferred_language = 'en'
     g.preferred_language = g.settings.preferred_language
     g.view_classes = app.config['VIEW_CLASSES']
     g.admin_fields = app.config['ADMIN_FIELDS']
@@ -156,10 +166,10 @@ def get_logo_url(filename: str) -> str:
     return url_for('static', filename='images/logos/' + filename)
 
 
-def get_assets_url(filename: str) -> str:
+def get_asset_url(filename: str) -> str:
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
     if os.path.exists(os.path.join(uploads_path, filename)):
-        return url_for('uploaded_assets', filename=filename)
+        return url_for('uploaded_asset', filename=filename)
     return url_for('static', filename='assets/' + filename)
 
 
@@ -175,6 +185,7 @@ def inject_globals() -> dict[str, Any]:
     return {
         'settings': g.settings,
         'nav_logo': g.settings.nav_logo,
+        'all_languages': g.all_languages,
         'available_languages': g.available_languages,
         'preferred_language': g.preferred_language,
         'current_language': g.language,
@@ -201,7 +212,7 @@ def inject_globals() -> dict[str, Any]:
         'logo_id_to_filename_map': Admin.get_logo_id_to_filename_map(),
         'favicon_version': int(time.time()),
         'get_logo_url': get_logo_url,
-        'get_assets_url': get_assets_url,
+        'get_asset_url': get_asset_url,
         'get_team_url': get_team_url,
         'has_uploaded_favicon': os.path.exists(
             os.path.join(app.root_path, '..', 'uploads', 'favicon.ico'))}

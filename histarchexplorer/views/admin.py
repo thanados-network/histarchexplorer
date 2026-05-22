@@ -137,7 +137,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 def update_type_divisions() -> Response:
     check_manager_user()
     new_type_divisions = {}
-    indices = {key.split('_')[-1] for key in request.form if key.startswith('label_')}
+    indices = {
+        key.split('_')[-1] for key in request.form if
+        key.startswith('label_')}
     for index in indices:
         label = request.form.get(f'label_{index}')
         if not label:
@@ -147,7 +149,9 @@ def update_type_divisions() -> Response:
         try:
             ids = [int(i.strip()) for i in ids_str.split(',') if i.strip()]
         except ValueError:
-            flash(_('Invalid ID format for label "%(label)s". Please use comma-separated integers.', label=label), 'danger')
+            flash(_(
+                'Invalid ID format for label "%(label)s". Please use '
+                'comma-separated integers.', label=label), 'danger')
             return _redirect_to_admin_tab('sidebar-type-divisions')
 
         new_type_divisions[label] = {
@@ -191,7 +195,8 @@ def update_entity_colors() -> Response:
 def add_available_color() -> Response:
     check_manager_user()
     new_color = request.form.get('new_color')
-    if new_color and re.match(r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$', new_color):
+    if (new_color and re.match(
+            r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$', new_color)):
         if new_color not in g.settings.available_colors:
             g.settings.available_colors.append(new_color)
             try:
@@ -308,7 +313,8 @@ def rename_logo():
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
 
     old_filepath_static = os.path.join(static_path, secure_filename(old_name))
-    old_filepath_uploads = os.path.join(uploads_path, secure_filename(old_name))
+    old_filepath_uploads = os.path.join(
+        uploads_path, secure_filename(old_name))
 
     if os.path.exists(old_filepath_static):
         flash(_('Cannot rename default logos.'), 'danger')
@@ -689,7 +695,9 @@ def add_entry() -> Response:
             _('Error adding entry %(name)s: Only one main project allowed', name=form_data["name"]),
             'danger')
     except Exception as e:
-        flash(_('Error adding entry %(name)s: %(error)s', name=form_data["name"], error=e), 'danger')
+        flash(_(
+            'Error adding entry %(name)s: %(error)s', name=form_data["name"],
+            error=e), 'danger')
     return redirect(redirect_base)
 
 
@@ -812,11 +820,14 @@ def add_map() -> Response:
     try:
         map_id = Admin.add_new_map(data)
         flash(
-            _('Map %(name)s with ID %(id)s added successfully!', name=data['name'], id=map_id),
+            _('Map %(name)s with ID %(id)s added successfully!',
+              name=data['name'], id=map_id),
             'success')
     except Exception as e:
         app.logger.error("Failed to add map: %s", e)
-        flash(_('Error adding map %(name)s: %(error)s', name=data['name'], error=e), 'danger')
+        flash(_(
+            'Error adding map %(name)s: %(error)s', name=data['name'],
+            error=e), 'danger')
 
     return _redirect_to_admin_tab('sidebar-maps')
 
@@ -929,6 +940,8 @@ def update_general_settings(ignore_id: Optional[int] = None) -> Response:
             'accessRestriction') == 'on'
         g.settings.language_selector = request.form.get(
             'languageSelection') == 'on'
+        g.settings.selected_languages = request.form.getlist(
+            'selectedLanguages')
         g.settings.preferred_language = request.form.get(
             'preferredLanguage')
         g.settings.save_to_db()
@@ -1034,44 +1047,25 @@ def refresh_system_cache() -> Response:
 
 @app.route('/uploads/logos/<filename>')
 def uploaded_logo(filename):
-    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'logos'), filename)
+    return send_from_directory(
+        os.path.join(app.root_path, '..', 'uploads', 'logos'), filename)
+
 
 @app.route('/uploads/assets/<filename>')
-def uploaded_assets(filename):
-    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'assets'), filename)
+def uploaded_asset(filename):
+    return send_from_directory(
+        os.path.join(app.root_path, '..', 'uploads', 'assets'), filename)
 
 
 @app.context_processor
 def utility_processor():
-    def get_logo_url(filename):
-        uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
-        if os.path.exists(os.path.join(uploads_path, filename)):
-            return url_for('uploaded_logo', filename=filename)
-        return url_for('static', filename=f'images/logos/{filename}')
-
-    def get_asset_url(filename):
-        uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
-        if os.path.exists(os.path.join(uploads_path, filename)):
-            return url_for('uploaded_asset', filename=filename)
-        return url_for('static', filename=f'assets/{filename}')
-
-    def get_team_url(filename):
-        uploads_path = os.path.join(app.root_path, '..', 'uploads', 'team')
-        if os.path.exists(os.path.join(uploads_path, filename)):
-            return url_for('uploaded_team', filename=filename)
-        return url_for('static', filename=f'images/team/{filename}')
-
     def get_icon_url(filename):
         uploads_path = os.path.join(app.root_path, '..', 'uploads', 'icons')
         if os.path.exists(os.path.join(uploads_path, filename)):
             return url_for('uploaded_icon', filename=filename)
         return url_for('static', filename=f'images/icons/{filename}')
 
-    return dict(
-        get_logo_url=get_logo_url,
-        get_asset_url=get_asset_url,
-        get_team_url=get_team_url,
-        get_icon_url=get_icon_url)
+    return dict(get_icon_url=get_icon_url)
 
 
 @app.route('/admin/upload_asset', methods=['POST'])
@@ -1114,7 +1108,8 @@ def rename_asset():
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
 
     old_filepath_static = os.path.join(static_path, secure_filename(old_name))
-    old_filepath_uploads = os.path.join(uploads_path, secure_filename(old_name))
+    old_filepath_uploads = os.path.join(
+        uploads_path, secure_filename(old_name))
 
     if os.path.exists(old_filepath_static):
         flash(_('Cannot rename default assets.'), 'danger')
@@ -1184,24 +1179,24 @@ def update_asset_license() -> Response:
     return _redirect_to_admin_tab('sidebar-assets')
 
 
-@app.route('/uploads/assets/<filename>')
-def uploaded_asset(filename):
-    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'assets'), filename)
 
 
 @app.route('/uploads/team/<filename>')
 def uploaded_team(filename):
-    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'team'), filename)
+    return send_from_directory(
+        os.path.join(app.root_path, '..', 'uploads', 'team'), filename)
 
 
 @app.route('/uploads/icons/<filename>')
 def uploaded_icon(filename):
-    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'icons'), filename)
+    return send_from_directory(
+        os.path.join(app.root_path, '..', 'uploads', 'icons'), filename)
 
 
 @app.route('/uploads/favicon.ico')
 def uploaded_favicon():
-    return send_from_directory(os.path.join(app.root_path, '..', 'uploads'), 'favicon.ico')
+    return send_from_directory(
+        os.path.join(app.root_path, '..', 'uploads'), 'favicon.ico')
 
 
 @app.route('/admin/upload_file', methods=['POST'])
@@ -1274,7 +1269,8 @@ def rename_file():
     uploads_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
 
     old_filepath_static = os.path.join(static_path, secure_filename(old_name))
-    old_filepath_uploads = os.path.join(uploads_path, secure_filename(old_name))
+    old_filepath_uploads = os.path.join(
+        uploads_path, secure_filename(old_name))
 
     if os.path.exists(old_filepath_static):
         flash(_('Cannot rename default files.'), 'danger')

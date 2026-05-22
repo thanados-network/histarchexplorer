@@ -1,75 +1,139 @@
-<div class="d-flex justify-content-start align-items-start row">
-  <form id="caseStudyForm" method="POST" class="needs-validation"
-        novalidate
-        data-action-template="/admin/update_general_settings/">
-    <input type="hidden" name="active_sidebar" value="sidebar-general-settings-group">
-    <div class=" col mb-3">
-      <label for="caseStudyHierarchyID"
-             class="form-label">{{ _('case study hierarchy ID') }}</label>
-      <input type="text" class="form-control"
-             id="caseStudyHierarchyID" name="case_study_id"
-             pattern="^\d+$"
-             value="{{ initial_case_study_type_id or '' }}"
-             required>
-      <div class="invalid-feedback" id="caseStudyIDFeedback">
-        {{ _('Please enter a positive integer for the Case Study Hierarchy ID.') }}
-      </div>
-      <span id="caseStudyTypeName"
-            class="form-text text-muted mt-2">
-                {% if initial_case_study_type_name %}
-                  ({{ initial_case_study_type_name }})
-                {% endif %}
-              </span>
-    </div>
-    <div class="col mb-3">
-      <div class="form-check form-switch mt-3 mb-3">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          id="deactivateDarkModeSwitch"
-          name="darkMode" {% if settings.darkmode %} checked {% endif %}>
-        <label class="form-check-label"
-               for="deactivateDarkModeSwitch">{{ _('Deactivate Darkmode') }}</label>
-      </div>
-    </div>
-    <div class="col mb-3">
-      <div class="form-check form-switch mt-3 mb-3">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          id="deactivateLanguageSelector"
-          name="languageSelection" {% if settings.language_selector %} checked {% endif %}>
-        <label class="form-check-label"
-               for="deactivateLanguageSelector">{{ _('Deactivate Language Selector') }}</label>
+<form id="caseStudyForm" method="POST" class="needs-validation"
+      novalidate
+      data-action-template="/admin/update_general_settings/">
+  <input type="hidden" name="active_sidebar" value="sidebar-general-settings-group">
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="bg-light p-3 rounded-3 border">
+        <h6 class="fw-bold mb-3 text-secondary">
+          <i class="bi bi-gear-wide-connected me-2"></i>{{ _('project configuration') | upper }}
+        </h6>
+        <div class="mb-0">
+          <label for="caseStudyHierarchyID" class="form-label fw-semibold">
+            {{ _('case study hierarchy ID') | capitalize }}
+          </label>
+          <div class="input-group">
+            <span class="input-group-text bg-white"><i class="bi bi-hash"></i></span>
+            <input type="text" class="form-control form-control-lg"
+                   id="caseStudyHierarchyID" name="case_study_id"
+                   pattern="^\d+$"
+                   value="{{ initial_case_study_type_id or '' }}"
+                   required>
+            <div class="invalid-feedback" id="caseStudyIDFeedback">
+              {{ _('Please enter a positive integer for the Case Study Hierarchy ID.') }}
+            </div>
+          </div>
+          <div class="form-text mt-2">
+            <span id="caseStudyTypeName" class="fw-bold text-info">
+              {% if initial_case_study_type_name %}
+                ({{ initial_case_study_type_name }})
+              {% endif %}
+            </span>
+            <span class="ms-1 text-muted">{{ _('This ID links your project to the central hierarchy.') }}</span>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="col mb-3">
-      <div class="form-check form-switch mt-3 mb-3">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          id="activateAccessRestriction"
-          name="accessRestriction" {% if settings.access_restriction %} checked {% endif %}>
-        <label class="form-check-label"
-               for="activateAccessRestriction">{{ _('Activate Access Restriction') }}</label>
-      </div>
-    </div>
-  <div class="col mb-3">
-    <label for="preferredLanguage">
-      {{ _('preferred language') | capitalize }}
-    </label>
-    <select class="form-control" id="preferredLanguage" name="preferredLanguage">
-      {% for languages in available_languages %}
-        <option value={{ languages }}
-                  {% if languages == settings.preferred_language %}selected{% endif %}>
-          {{ languages | capitalize }}
-        </option>
-      {% endfor %}
-    </select>
   </div>
-    <button
-      type="submit"
-      class="btn btn-primary">{{ _('Save') }}
-    </button>
-  </form>
-</div>
+
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-header bg-white py-3 border-bottom-0">
+          <h6 class="fw-bold mb-0 text-secondary">
+            <i class="bi bi-palette me-2"></i>{{ _('appearance & access') | upper }}
+          </h6>
+        </div>
+        <div class="card-body pt-0">
+          <div class="form-check form-switch p-3 border rounded mb-3 bg-light bg-opacity-50">
+            <input class="form-check-input ms-0 me-3" type="checkbox"
+                   id="deactivateDarkModeSwitch" name="darkMode"
+                   {% if settings.darkmode %} checked {% endif %}>
+            <label class="form-check-label fw-medium" for="deactivateDarkModeSwitch">
+              {{ _('Deactivate Darkmode') }}
+            </label>
+            <div class="form-text small ms-5">{{ _('Disable the dark theme option for all users.') }}</div>
+          </div>
+
+          <div class="form-check form-switch p-3 border rounded mb-3 bg-light bg-opacity-50">
+            <input class="form-check-input ms-0 me-3" type="checkbox"
+                   id="deactivateLanguageSelector" name="languageSelection"
+                   {% if settings.language_selector %} checked {% endif %}>
+            <label class="form-check-label fw-medium" for="deactivateLanguageSelector">
+              {{ _('Deactivate Language Selector') }}
+            </label>
+            <div class="form-text small ms-5">{{ _('Hide the language choice menu in the navbar.') }}</div>
+          </div>
+
+          <div class="form-check form-switch p-3 border rounded bg-light bg-opacity-50">
+            <input class="form-check-input ms-0 me-3" type="checkbox"
+                   id="activateAccessRestriction" name="accessRestriction"
+                   {% if settings.access_restriction %} checked {% endif %}>
+            <label class="form-check-label fw-medium" for="activateAccessRestriction">
+              {{ _('Activate Access Restriction') }}
+            </label>
+            <div class="form-text small ms-5">{{ _('Only logged-in users can see the content.') }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-header bg-white py-3 border-bottom-0">
+          <h6 class="fw-bold mb-0 text-secondary">
+            <i class="bi bi-translate me-2"></i>{{ _('localization') | upper }}
+          </h6>
+        </div>
+        <div class="card-body pt-0">
+          <label class="form-label fw-semibold mb-2">
+            {{ _('available languages') | capitalize }}
+          </label>
+          <div class="row g-2 mb-4">
+            {% for code, name in all_languages.items() %}
+              <div class="col-6">
+                <div class="form-check p-2 border rounded bg-light bg-opacity-50">
+                  <input class="form-check-input ms-1 me-2" type="checkbox"
+                         name="selectedLanguages" value="{{ code }}"
+                         id="lang_{{ code }}"
+                         {% if code in settings.selected_languages %}checked{% endif %}>
+                  <label class="form-check-label small" for="lang_{{ code }}">
+                    {{ name }}
+                  </label>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-0">
+            <label for="preferredLanguage" class="form-label fw-semibold">
+              {{ _('preferred language') | capitalize }}
+            </label>
+            <select class="form-select" id="preferredLanguage"
+                    name="preferredLanguage">
+              {% for code, name in available_languages.items() %}
+                <option value="{{ code }}"
+                        {% if code == settings.preferred_language %}selected{% endif %}>
+                  {{ name }}
+                </option>
+              {% endfor %}
+            </select>
+            <div class="form-text small">
+              {{ _('The default language used when no other choice is made.') }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-2">
+    <div class="col-12 text-end">
+      <hr class="my-4 opacity-25">
+      <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm">
+        <i class="bi bi-save2 me-2"></i>{{ _('Save Settings') }}
+      </button>
+    </div>
+  </div>
+</form>

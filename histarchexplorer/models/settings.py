@@ -38,9 +38,10 @@ class Settings(BaseModel):
     index_map: int = 1
     img_map: str = 'map'
     preferred_language: str = 'en'
+    selected_languages: list[str] = ['en', 'de']
+    language_selector: bool = False
     greyscale: bool = False
     darkmode: bool = False
-    language_selector: bool = False
     access_restriction: bool = False
     shown_classes: list[str] = [
         'place', 'feature', 'stratigraphic_unit',
