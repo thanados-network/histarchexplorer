@@ -29,7 +29,7 @@
           id="deactivateDarkModeSwitch"
           name="darkMode" {% if settings.darkmode %} checked {% endif %}>
         <label class="form-check-label"
-               for="deactivateDarkModeSwitch">Deactivate Darkmode</label>
+               for="deactivateDarkModeSwitch">{{ _('Deactivate Darkmode') }}</label>
       </div>
     </div>
     <div class="col mb-3">
@@ -40,7 +40,7 @@
           id="deactivateLanguageSelector"
           name="languageSelection" {% if settings.language_selector %} checked {% endif %}>
         <label class="form-check-label"
-               for="deactivateLanguageSelector">Deactivate Language Selector</label>
+               for="deactivateLanguageSelector">{{ _('Deactivate Language Selector') }}</label>
       </div>
     </div>
     <div class="col mb-3">
@@ -51,7 +51,7 @@
           id="activateAccessRestriction"
           name="accessRestriction" {% if settings.access_restriction %} checked {% endif %}>
         <label class="form-check-label"
-               for="activateAccessRestriction">Activate Access Restriction</label>
+               for="activateAccessRestriction">{{ _('Activate Access Restriction') }}</label>
       </div>
     </div>
   <div class="col mb-3">

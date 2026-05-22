@@ -8,7 +8,7 @@
 {% macro back_button(url) %}
   <div class="mb-3 text-start">
     <a href="{{ url }}" class="btn btn-outline-secondary">
-      <i class="bi bi-arrow-left"></i> Back to the entity
+      <i class="bi bi-arrow-left"></i> {{ _('Back to the entity') }}
     </a>
   </div>
 {% endmacro %}
@@ -35,7 +35,7 @@
 {% macro overview_image(image, information=False, last=False) %}
   {% set base_classes = "hover-max position-absolute bottom-0 end-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded" %}
   {% set icon_style = "font-size: 1.5em;" %}
-  {% set alt = image.title or "Image" %}
+  {% set alt = image.title or _("Image") %}
   <div class="item item-half">
     <div class="item-content item-content-full">
       <div class="muuri-images">
@@ -53,7 +53,7 @@
           {% elif image.render_type == 'video' %}
             <div class="video-wrapper position-relative" style="height:300px;overflow:hidden;">
               <video class="w-100 h-100 rounded shadow-sm" src="{{ image.url }}" controls preload="metadata">
-                Your browser does not support the video tag.
+                {{ _('Your browser does not support the video tag.') }}
               </video>
               <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2" type="button"
                       onclick="this.previousElementSibling.requestFullscreen();">
@@ -94,13 +94,13 @@
                     <div class="mb-2">{{ image.description }}</div>
                   {% endif %}
                   {% if image.license %}
-                    <div><b>License:</b> {{ image.license }}</div>
+                    <div><b>{{ _('License') }}:</b> {{ image.license }}</div>
                   {% endif %}
                   {% if image.creator %}
-                    <div><b>Creator:</b> {{ image.creator }}</div>
+                    <div><b>{{ _('Creator') }}:</b> {{ image.creator }}</div>
                   {% endif %}
                   {% if image.license_holder %}
-                    <div><b>License holder:</b> {{ image.license_holder }}</div>
+                    <div><b>{{ _('License holder') }}:</b> {{ image.license_holder }}</div>
                   {% endif %}
                 </div>
 
@@ -122,7 +122,7 @@
             <button id="show-more-images"
                     class="hover-max position-absolute bottom-0 start-0 m-2 text-dark bg-white bg-opacity-75 px-2 py-1 rounded"
                     type="button" data-target="#tab-pane-media">
-              More images
+              {{ _('More images') }}
             </button>
           {% endif %}
 
@@ -155,7 +155,7 @@
 
             <div class="spinner position-absolute top-50 start-50 translate-middle">
               <div class="spinner-border text-secondary" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">{{ _('Loading') }}...</span>
               </div>
             </div>
 

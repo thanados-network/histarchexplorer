@@ -686,11 +686,10 @@ def add_entry() -> Response:
         return redirect(f"{redirect_base}/{current_tab}{new_id}")
     except Admin.TooManyMainProjects:
         flash(
-            f'Error adding entry {form_data["name"]}: '
-            'Only one main project allowed',
+            _('Error adding entry %(name)s: Only one main project allowed', name=form_data["name"]),
             'danger')
     except Exception as e:
-        flash(f'Error adding entry {form_data["name"]}: {e}', 'danger')
+        flash(_('Error adding entry %(name)s: %(error)s', name=form_data["name"], error=e), 'danger')
     return redirect(redirect_base)
 
 
@@ -698,12 +697,12 @@ def add_entry() -> Response:
 @login_required
 def delete_entry(id_: int, tab: str) -> Response:
     check_manager_user()
-    if Admin.get_config_config_classes_by_id(id_) == 5:
+    if Admin.get_config_class_by_id(id_) == 5:
         flash(_('Main Project cannot be deleted'), 'danger')
         return redirect(url_for('admin', tab=tab))
     Admin.delete_entry(id_)
-    flash('Entry deleted successfully!', 'success')
-    return redirect(url_for('admin') + tab)
+    flash(_('Entry deleted successfully!'), 'success')
+    return redirect(url_for('admin', tab=tab))
 
 
 @app.route('/edit_entry', methods=['POST', 'GET'])
@@ -813,11 +812,11 @@ def add_map() -> Response:
     try:
         map_id = Admin.add_new_map(data)
         flash(
-            f"Map {data['name']} with ID {map_id} added successfully!",
+            _('Map %(name)s with ID %(id)s added successfully!', name=data['name'], id=map_id),
             'success')
     except Exception as e:
         app.logger.error("Failed to add map: %s", e)
-        flash(f"Error adding map {data['name']}: {e}", 'danger')
+        flash(_('Error adding map %(name)s: %(error)s', name=data['name'], error=e), 'danger')
 
     return _redirect_to_admin_tab('sidebar-maps')
 
@@ -828,9 +827,9 @@ def delete_map(map_id: int) -> Response:
     check_manager_user()
     try:
         Admin.delete_map(map_id)
-        flash('Map deleted successfully!', 'success')
+        flash(_('Map deleted successfully!'), 'success')
     except Exception as e:
-        flash(f'Error deleting map: {str(e)}', 'danger')
+        flash(_('Error deleting map: %(error)s', error=str(e)), 'danger')
     return _redirect_to_admin_tab('sidebar-maps')
 
 
@@ -1011,7 +1010,7 @@ def trigger_cache_warmup(refresh: bool = False) -> None:
                 stderr=subprocess.DEVNULL) as _proc:
             pass
     except Exception as e:
-        flash(str(e), "error")
+        flash(_("Error warming cache: %(error)s", error=str(e)), "error")
         abort(404)
 
 

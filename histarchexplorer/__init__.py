@@ -23,7 +23,16 @@ app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
 app.config.from_object('config.admin_fields')
 app.config.from_pyfile('production.py')
-babel = Babel(app)
+def get_locale() -> str:
+    if 'language' in session:
+        return session['language']
+    settings = getattr(g, 'settings', None)
+    if settings and settings.language_selector:
+        return settings.preferred_language or 'en'
+    return request.accept_languages.best_match(app.config['LANGUAGES']) or 'en'
+
+
+babel = Babel(app, locale_selector=get_locale)
 cache = Cache(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
@@ -47,12 +56,6 @@ def connect(db_name: str) -> connection:
         raise DatabaseError("Database connection error.") from e
 
 
-def get_locale() -> str:
-    if g.settings.language_selector:
-        return g.settings.preferred_language or 'en'
-    if 'language' in session:
-        return session['language']
-    return request.accept_languages.best_match(app.config['LANGUAGES']) or 'en'
 
 
 def create_icon(css_class: str) -> str:
@@ -115,16 +118,11 @@ def before_request() -> Response | None:
         if not current_user.is_authenticated and request.endpoint != 'login':
             return redirect(url_for('login'))
 
-    if hasattr(babel, 'localeselector'):
-        babel.localeselector(get_locale)
-    else:
-        babel.locale_selector_func = get_locale
-    session['language'] = get_locale()
+    from flask_babel import get_locale as babel_get_locale
     g.available_languages = app.config['LANGUAGES']
-    g.language = session.get(
-        'language',
-        request.accept_languages.best_match(g.available_languages.keys()))
-    g.preferred_langauge = g.settings.preferred_language
+    g.language = str(babel_get_locale())
+    session['language'] = g.language
+    g.preferred_language = g.settings.preferred_language
     g.view_classes = app.config['VIEW_CLASSES']
     g.admin_fields = app.config['ADMIN_FIELDS']
     g.additional_files_for_overview = app.config['ADD_FILES_FOR_OVERVIEW']
@@ -178,13 +176,14 @@ def inject_globals() -> dict[str, Any]:
         'settings': g.settings,
         'nav_logo': g.settings.nav_logo,
         'available_languages': g.available_languages,
-        'preferred_language': g.preferred_langauge,
+        'preferred_language': g.preferred_language,
         'current_language': g.language,
         'darkmode_override': g.settings.darkmode,
         'language_override': g.settings.language_selector,
         'view_classes': g.view_classes,
         'admin_fields': g.admin_fields,
         'additional_files_for_overview': g.additional_files_for_overview,
+        'count': 0,
         'system_class_map': {
             "place": "places",
             "feature": "places",

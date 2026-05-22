@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-22 14:03+0200\n"
+"POT-Creation-Date: 2026-05-22 15:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,52 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
+
+#: api/util.py:43 api/util.py:45 api/util.py:46 api/util.py:51
+msgid "BC"
+msgstr ""
+
+#: api/util.py:43 api/util.py:45 api/util.py:46
+msgid "AD"
+msgstr ""
+
+#: api/util.py:109
+msgid "other"
+msgstr ""
+
+#: templates/_macros.html:11
+msgid "Back to the entity"
+msgstr ""
+
+#: templates/_macros.html:38
+msgid "Image"
+msgstr ""
+
+#: templates/_macros.html:56
+msgid "Your browser does not support the video tag."
+msgstr ""
+
+#: templates/_macros.html:97 templates/admin/about_content.html:154
+#: templates/tabs/overview.html:12 templates/util/cite/modal.html:37
+msgid "License"
+msgstr ""
+
+#: templates/_macros.html:100 templates/tabs/overview.html:13
+msgid "Creator"
+msgstr ""
+
+#: templates/_macros.html:103 templates/tabs/overview.html:14
+msgid "License holder"
+msgstr ""
+
+#: templates/_macros.html:125
+msgid "More images"
+msgstr ""
+
+#: templates/_macros.html:158 templates/about.html:215 templates/entity.html:93
+#: templates/entity.html:113
+msgid "Loading"
+msgstr ""
 
 #: templates/about.html:57
 msgid "Show details"
@@ -33,9 +79,37 @@ msgstr ""
 msgid "project data overview"
 msgstr ""
 
+#: templates/about.html:153 views/admin.py:48
+msgid "projects"
+msgstr ""
+
+#: templates/about.html:178
+msgid "Details"
+msgstr ""
+
 #: templates/about.html:194 templates/admin/legal_notice.html:2
 #: templates/admin/legal_notice.html:21
 msgid "legal notice"
+msgstr ""
+
+#: templates/about.html:217
+msgid "close"
+msgstr ""
+
+#: templates/about.html:283
+msgid "Website"
+msgstr ""
+
+#: templates/about.html:284
+msgid "Email"
+msgstr ""
+
+#: templates/about.html:287
+msgid "ORCID"
+msgstr ""
+
+#: templates/about.html:290
+msgid "Address"
 msgstr ""
 
 #: templates/about.html:299
@@ -78,11 +152,11 @@ msgstr ""
 msgid "About"
 msgstr ""
 
-#: templates/admin.html:37 utils/view_util.py:58
+#: templates/admin.html:37 utils/view_util.py:59
 msgid "Publications"
 msgstr ""
 
-#: templates/admin.html:38 utils/view_util.py:20 utils/view_util.py:61
+#: templates/admin.html:38 utils/view_util.py:62
 msgid "Outcome"
 msgstr ""
 
@@ -94,7 +168,7 @@ msgstr ""
 msgid "Footer"
 msgstr ""
 
-#: templates/admin.html:41
+#: templates/admin.html:41 templates/search.html:108 templates/search.html:110
 msgid "Search"
 msgstr ""
 
@@ -166,6 +240,10 @@ msgstr ""
 msgid "maps"
 msgstr ""
 
+#: templates/login.html:6
+msgid "Login"
+msgstr ""
+
 #: templates/login.html:10 views/login.py:29
 msgid "username"
 msgstr ""
@@ -178,8 +256,175 @@ msgstr ""
 msgid "home"
 msgstr ""
 
+#: templates/navbar.html:18
+msgid "Toggle navigation"
+msgstr ""
+
 #: templates/navbar.html:40 templates/navbar.html:44
 msgid "toggle dark/light mode"
+msgstr ""
+
+#: templates/outcome.html:9
+msgid "Outcome Test Page"
+msgstr ""
+
+#: templates/publications.html:9
+msgid "Publications Test Page"
+msgstr ""
+
+#: templates/search.html:11
+msgid "Filter by Type"
+msgstr ""
+
+#: templates/search.html:14
+msgid "Actors"
+msgstr ""
+
+#: templates/search.html:17
+msgid "Person"
+msgstr ""
+
+#: templates/search.html:21
+msgid "Group"
+msgstr ""
+
+#: templates/search.html:24
+msgid "Items"
+msgstr ""
+
+#: templates/search.html:27
+msgid "Artifact"
+msgstr ""
+
+#: templates/search.html:31
+msgid "Human Remains"
+msgstr ""
+
+#: templates/search.html:34
+msgid "Events"
+msgstr ""
+
+#: templates/search.html:37
+msgid "Acquisition"
+msgstr ""
+
+#: templates/search.html:41
+msgid "Event"
+msgstr ""
+
+#: templates/search.html:45
+msgid "Activity"
+msgstr ""
+
+#: templates/search.html:49
+msgid "Creation"
+msgstr ""
+
+#: templates/search.html:53
+msgid "Move"
+msgstr ""
+
+#: templates/search.html:57
+msgid "Production"
+msgstr ""
+
+#: templates/search.html:61
+msgid "Modification"
+msgstr ""
+
+#: templates/search.html:64
+msgid "Places"
+msgstr ""
+
+#: templates/search.html:67
+msgid "Place"
+msgstr ""
+
+#: templates/search.html:71
+msgid "Stratigraphic Unit"
+msgstr ""
+
+#: templates/search.html:75
+msgid "Feature"
+msgstr ""
+
+#: templates/search.html:78
+msgid "Sources"
+msgstr ""
+
+#: templates/search.html:81
+msgid "Source"
+msgstr ""
+
+#: templates/search.html:85
+msgid "Bibliography"
+msgstr ""
+
+#: templates/search.html:89
+msgid "External Reference"
+msgstr ""
+
+#: templates/search.html:93
+msgid "Edition"
+msgstr ""
+
+#: templates/search.html:96
+msgid "Files"
+msgstr ""
+
+#: templates/search.html:99
+msgid "File"
+msgstr ""
+
+#: templates/search.html:120
+msgid "Start typing above to see live results or press enter to run a search."
+msgstr ""
+
+#: templates/search.html:127
+msgid "Static Search Results"
+msgstr ""
+
+#: templates/search.html:131
+#, python-format
+msgid "No results found for \"%(query)s\""
+msgstr ""
+
+#: templates/search.html:247 templates/search_detail.html:4
+msgid "Unnamed"
+msgstr ""
+
+#: templates/search.html:248
+msgid "Load more"
+msgstr ""
+
+#: templates/search.html:249
+msgid "Type at least 3 characters..."
+msgstr ""
+
+#: templates/search.html:250
+#, python-format
+msgid "Loading live results for \"%(query)s\"..."
+msgstr ""
+
+#: templates/search.html:251
+#, python-format
+msgid "No live results found for \"%(query)s\"."
+msgstr ""
+
+#: templates/search.html:252
+msgid "Error loading live results."
+msgstr ""
+
+#: templates/search.html:253
+msgid "Select one or more types"
+msgstr ""
+
+#: templates/search_detail.html:11
+msgid "Coordinates"
+msgstr ""
+
+#: templates/search_detail.html:14
+msgid "Back to search"
 msgstr ""
 
 #: templates/admin/about_content.html:3
@@ -204,10 +449,6 @@ msgstr ""
 
 #: templates/admin/about_content.html:139 templates/admin/modals.html:58
 msgid "Please provide a"
-msgstr ""
-
-#: templates/admin/about_content.html:154 templates/util/cite/modal.html:37
-msgid "License"
 msgstr ""
 
 #: templates/admin/about_content.html:174
@@ -265,9 +506,9 @@ msgstr ""
 
 #: templates/admin/assets_management.html:5
 msgid ""
-"The assets are general files, which can be used in individual pages, "
-"these can bne all datatypes, some can be displayed some only be "
-"downloaded."
+"The assets are general files, which can be used in individual pages. "
+"These can be all data types; some can be displayed, while some can only "
+"be downloaded."
 msgstr ""
 
 #: templates/admin/assets_management.html:13
@@ -468,6 +709,18 @@ msgstr ""
 msgid "Please enter a positive integer for the Case Study Hierarchy ID."
 msgstr ""
 
+#: templates/admin/general_settings.html:32
+msgid "Deactivate Darkmode"
+msgstr ""
+
+#: templates/admin/general_settings.html:43
+msgid "Deactivate Language Selector"
+msgstr ""
+
+#: templates/admin/general_settings.html:54
+msgid "Activate Access Restriction"
+msgstr ""
+
 #: templates/admin/general_settings.html:59
 msgid "preferred language"
 msgstr ""
@@ -512,6 +765,10 @@ msgstr ""
 
 #: templates/admin/index_page_options.html:21
 msgid "select map background"
+msgstr ""
+
+#: templates/admin/index_page_options.html:40
+msgid "Greyscale"
 msgstr ""
 
 #: templates/admin/index_page_options.html:44
@@ -567,8 +824,9 @@ msgstr ""
 
 #: templates/admin/logo_management.html:5
 msgid ""
-"The logo sections is only for logos and can be used for footer, site "
-"logo, project logos and institution logos, and also for indiviual pages."
+"The logo section is only for logos and can be used for the footer, site "
+"logo, project logos, and institution logos, as well as for individual "
+"pages."
 msgstr ""
 
 #: templates/admin/logo_management.html:13
@@ -684,7 +942,7 @@ msgstr ""
 
 #: templates/admin/team_management.html:5
 msgid ""
-"The team section only include person fotos, which can be used at the "
+"The team section only includes person photos, which can be used in the "
 "person management and for individual pages."
 msgstr ""
 
@@ -744,64 +1002,64 @@ msgstr ""
 msgid "Save All Settings"
 msgstr ""
 
-#: templates/admin/visibility_settings.html:12
-msgid "Entity Classes"
-msgstr ""
-
-#: templates/admin/visibility_settings.html:17
-msgid "Shown Classes"
-msgstr ""
-
-#: templates/admin/visibility_settings.html:20
-msgid "Checked classes will be explicitly shown in the browse interface."
-msgstr ""
-
-#: templates/admin/visibility_settings.html:48
-msgid "Hidden Classes"
-msgstr ""
-
-#: templates/admin/visibility_settings.html:51
-msgid "Checked classes will be hidden from the browse interface."
-msgstr ""
-
-#: templates/admin/visibility_settings.html:82
+#: templates/admin/visibility_settings.html:14
 msgid "Entity Types"
 msgstr ""
 
-#: templates/admin/visibility_settings.html:85
+#: templates/admin/visibility_settings.html:17
 msgid "Shown Type IDs"
 msgstr ""
 
-#: templates/admin/visibility_settings.html:87
+#: templates/admin/visibility_settings.html:19
 msgid "Comma-separated list of type IDs to show."
 msgstr ""
 
-#: templates/admin/visibility_settings.html:94
+#: templates/admin/visibility_settings.html:26
 msgid "Hidden Type IDs"
 msgstr ""
 
-#: templates/admin/visibility_settings.html:96
+#: templates/admin/visibility_settings.html:28
 msgid "Comma-separated list of type IDs to hide."
 msgstr ""
 
-#: templates/admin/visibility_settings.html:106
+#: templates/admin/visibility_settings.html:38
 msgid "Individual Entity IDs"
 msgstr ""
 
-#: templates/admin/visibility_settings.html:109
+#: templates/admin/visibility_settings.html:41
 msgid "Shown Entity IDs"
 msgstr ""
 
-#: templates/admin/visibility_settings.html:111
+#: templates/admin/visibility_settings.html:43
 msgid "Comma-separated list of entity IDs to show."
 msgstr ""
 
-#: templates/admin/visibility_settings.html:118
+#: templates/admin/visibility_settings.html:50
 msgid "Hidden Entity IDs"
 msgstr ""
 
-#: templates/admin/visibility_settings.html:120
+#: templates/admin/visibility_settings.html:52
 msgid "Comma-separated list of entity IDs to hide."
+msgstr ""
+
+#: templates/admin/visibility_settings.html:61
+msgid "Entity Classes"
+msgstr ""
+
+#: templates/admin/visibility_settings.html:66
+msgid "Shown Classes"
+msgstr ""
+
+#: templates/admin/visibility_settings.html:69
+msgid "Checked classes will be explicitly shown in the browse interface."
+msgstr ""
+
+#: templates/admin/visibility_settings.html:97
+msgid "Hidden Classes"
+msgstr ""
+
+#: templates/admin/visibility_settings.html:100
+msgid "Checked classes will be hidden from the browse interface."
 msgstr ""
 
 #: templates/admin/visibility_settings.html:131
@@ -810,6 +1068,31 @@ msgstr ""
 
 #: templates/tabs/feature.html:34 views/admin.py:54
 msgid "attributes"
+msgstr ""
+
+#: templates/tabs/overview.html:8
+msgid "subentities"
+msgstr ""
+
+#: templates/tabs/overview.html:9
+msgid "subunits"
+msgstr ""
+
+#: templates/tabs/overview.html:10
+msgid "description"
+msgstr ""
+
+#: templates/tabs/overview.html:11
+msgid "Media file"
+msgstr ""
+
+#: templates/tabs/overview.html:15
+msgid "Open full view"
+msgstr ""
+
+#: templates/tabs/overview.html:16
+#, python-format
+msgid "View all %(count)s files"
 msgstr ""
 
 #: templates/util/cite/modal.html:5
@@ -852,24 +1135,44 @@ msgstr ""
 msgid "about"
 msgstr ""
 
-#: utils/view_util.py:52
+#: utils/view_util.py:20
+msgid "outcome"
+msgstr ""
+
+#: utils/view_util.py:21
+msgid "publications"
+msgstr ""
+
+#: utils/view_util.py:53
 msgid "browse/select/find all entities"
 msgstr ""
 
-#: utils/view_util.py:55
+#: utils/view_util.py:56
 msgid "detailed search"
 msgstr ""
 
-#: utils/view_util.py:64
+#: utils/view_util.py:65
 msgid "about the project"
+msgstr ""
+
+#: utils/view_util.py:83
+msgid "Unknown"
+msgstr ""
+
+#: utils/view_util.py:145
+#, python-format
+msgid "Accessed: %(date)s"
+msgstr ""
+
+#: utils/view_util.py:194
+#, python-format
+msgid ""
+"%(project_name)s (%(year)s). %(title)s. Retrieved from %(url)s (Accessed:"
+" %(date)s)"
 msgstr ""
 
 #: views/admin.py:46
 msgid "main-project"
-msgstr ""
-
-#: views/admin.py:48
-msgid "projects"
 msgstr ""
 
 #: views/admin.py:52
@@ -935,17 +1238,17 @@ msgstr ""
 msgid "Legal notice updated successfully."
 msgstr ""
 
-#: views/admin.py:266 views/admin.py:380 views/admin.py:850
+#: views/admin.py:266 views/admin.py:380 views/admin.py:849
 msgid "Error updating settings"
 msgstr ""
 
-#: views/admin.py:276 views/admin.py:543 views/admin.py:1083
-#: views/admin.py:1218
+#: views/admin.py:276 views/admin.py:543 views/admin.py:1082
+#: views/admin.py:1217
 msgid "No file part"
 msgstr ""
 
-#: views/admin.py:281 views/admin.py:548 views/admin.py:1088
-#: views/admin.py:1223
+#: views/admin.py:281 views/admin.py:548 views/admin.py:1087
+#: views/admin.py:1222
 msgid "No selected file"
 msgstr ""
 
@@ -954,7 +1257,7 @@ msgstr ""
 msgid "Logo \"%(name)s\" uploaded successfully."
 msgstr ""
 
-#: views/admin.py:304 views/admin.py:1111 views/admin.py:1258
+#: views/admin.py:304 views/admin.py:1110 views/admin.py:1257
 msgid "Invalid request for renaming."
 msgstr ""
 
@@ -962,11 +1265,11 @@ msgstr ""
 msgid "Cannot rename default logos."
 msgstr ""
 
-#: views/admin.py:320 views/admin.py:1127 views/admin.py:1287
+#: views/admin.py:320 views/admin.py:1126 views/admin.py:1286
 msgid "Original file not found."
 msgstr ""
 
-#: views/admin.py:324 views/admin.py:1131 views/admin.py:1291
+#: views/admin.py:324 views/admin.py:1130 views/admin.py:1290
 msgid "A file with the new name already exists."
 msgstr ""
 
@@ -975,12 +1278,12 @@ msgstr ""
 msgid "Logo renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr ""
 
-#: views/admin.py:333 views/admin.py:1140 views/admin.py:1299
+#: views/admin.py:333 views/admin.py:1139 views/admin.py:1298
 #, python-format
 msgid "Error renaming file: %(error)s"
 msgstr ""
 
-#: views/admin.py:344 views/admin.py:1151
+#: views/admin.py:344 views/admin.py:1150
 msgid "No filename specified for deletion."
 msgstr ""
 
@@ -989,7 +1292,7 @@ msgstr ""
 msgid "Logo \"%(name)s\" deleted successfully."
 msgstr ""
 
-#: views/admin.py:357 views/admin.py:1164 views/admin.py:1336
+#: views/admin.py:357 views/admin.py:1163 views/admin.py:1335
 #, python-format
 msgid "Error deleting file: %(error)s"
 msgstr ""
@@ -1072,152 +1375,190 @@ msgstr ""
 msgid "Entry added successfully!"
 msgstr ""
 
-#: views/admin.py:702
+#: views/admin.py:689
+#, python-format
+msgid "Error adding entry %(name)s: Only one main project allowed"
+msgstr ""
+
+#: views/admin.py:692
+#, python-format
+msgid "Error adding entry %(name)s: %(error)s"
+msgstr ""
+
+#: views/admin.py:701
 msgid "Main Project cannot be deleted"
 msgstr ""
 
-#: views/admin.py:720
+#: views/admin.py:704
+msgid "Entry deleted successfully!"
+msgstr ""
+
+#: views/admin.py:719
 msgid "Configuration ID is required"
 msgstr ""
 
-#: views/admin.py:738
+#: views/admin.py:737
 #, python-format
 msgid "\"%(name)s\" updated successfully"
 msgstr ""
 
-#: views/admin.py:742
+#: views/admin.py:741
 #, python-format
 msgid "Error updating \"%(name)s\": %(error)s"
 msgstr ""
 
-#: views/admin.py:764
+#: views/admin.py:763
 msgid "Map ID is required"
 msgstr ""
 
-#: views/admin.py:781
+#: views/admin.py:780
 msgid "Map updated successfully"
 msgstr ""
 
-#: views/admin.py:784
+#: views/admin.py:783
 msgid "Invalid Map ID format"
 msgstr ""
 
-#: views/admin.py:787
+#: views/admin.py:786
 #, python-format
 msgid "Error updating map: %(error)s"
 msgstr ""
 
-#: views/admin.py:804
+#: views/admin.py:803
 msgid "Error: Name, Display Name and Description are required"
 msgstr ""
 
-#: views/admin.py:847
+#: views/admin.py:815
+#, python-format
+msgid "Map %(name)s with ID %(id)s added successfully!"
+msgstr ""
+
+#: views/admin.py:819
+#, python-format
+msgid "Error adding map %(name)s: %(error)s"
+msgstr ""
+
+#: views/admin.py:830
+msgid "Map deleted successfully!"
+msgstr ""
+
+#: views/admin.py:832
+#, python-format
+msgid "Error deleting map: %(error)s"
+msgstr ""
+
+#: views/admin.py:846
 msgid "Index background updated successfully"
 msgstr ""
 
-#: views/admin.py:881
+#: views/admin.py:880
 msgid "Invalid ID format. Please use comma-separated integers."
 msgstr ""
 
-#: views/admin.py:886
+#: views/admin.py:885
 msgid "Class visibility updated successfully."
 msgstr ""
 
-#: views/admin.py:936
+#: views/admin.py:935
 msgid "Updated case study ID successfully"
 msgstr ""
 
-#: views/admin.py:939
+#: views/admin.py:938
 msgid ""
 "Invalid Case Study ID. Must be a positive integer and its entity type "
 "must be \"type\"."
 msgstr ""
 
-#: views/admin.py:957
+#: views/admin.py:956
 msgid "reset database"
 msgstr ""
 
-#: views/admin.py:979
+#: views/admin.py:978
 msgid "cache cleared"
 msgstr ""
 
-#: views/admin.py:987
+#: views/admin.py:986
 msgid "Cache warmup started in background (refresh mode)"
 msgstr ""
 
-#: views/admin.py:995
+#: views/admin.py:994
 msgid "Cache warmup started in background."
 msgstr ""
 
-#: views/admin.py:1032
+#: views/admin.py:1013
+#, python-format
+msgid "Error warming cache: %(error)s"
+msgstr ""
+
+#: views/admin.py:1031
 msgid "system cache refreshed"
 msgstr ""
 
-#: views/admin.py:1097
+#: views/admin.py:1096
 #, python-format
 msgid "Asset \"%(name)s\" uploaded successfully."
 msgstr ""
 
-#: views/admin.py:1121
+#: views/admin.py:1120
 msgid "Cannot rename default assets."
 msgstr ""
 
-#: views/admin.py:1137
+#: views/admin.py:1136
 #, python-format
 msgid "Asset renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr ""
 
-#: views/admin.py:1161
+#: views/admin.py:1160
 #, python-format
 msgid "Asset \"%(name)s\" deleted successfully."
 msgstr ""
 
-#: views/admin.py:1167
+#: views/admin.py:1166
 #, python-format
 msgid "Default asset \"%(name)s\" deactivated."
 msgstr ""
 
-#: views/admin.py:1184
+#: views/admin.py:1183
 msgid "Asset license updated successfully."
 msgstr ""
 
-#: views/admin.py:1214
+#: views/admin.py:1213
 msgid "File type is missing."
 msgstr ""
 
-#: views/admin.py:1237 views/admin.py:1271 views/admin.py:1324
+#: views/admin.py:1236 views/admin.py:1270 views/admin.py:1323
 msgid "Invalid file type."
 msgstr ""
 
-#: views/admin.py:1244
+#: views/admin.py:1243
 #, python-format
 msgid "%(type)s \"%(name)s\" uploaded successfully."
 msgstr ""
 
-#: views/admin.py:1281
+#: views/admin.py:1280
 msgid "Cannot rename default files."
 msgstr ""
 
-#: views/admin.py:1297
+#: views/admin.py:1296
 #, python-format
 msgid "%(type)s renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr ""
 
-#: views/admin.py:1312
+#: views/admin.py:1311
 msgid "No filename or type specified for deletion."
 msgstr ""
 
-#: views/admin.py:1334
+#: views/admin.py:1333
 #, python-format
 msgid "%(type)s \"%(name)s\" deleted successfully."
 msgstr ""
 
-#: views/admin.py:1339
+#: views/admin.py:1338
 #, python-format
 msgid "Default %(type)s \"%(name)s\" deactivated."
 msgstr ""
 
-#: views/admin.py:1357
+#: views/admin.py:1356
 #, python-format
 msgid "%(type)s license updated successfully."
 msgstr ""
@@ -1228,5 +1569,22 @@ msgstr ""
 
 #: views/login.py:34
 msgid "login"
+msgstr ""
+
+#: views/login.py:53
+msgid "Your account is inactive."
+msgstr ""
+
+#: views/login.py:55
+msgid "Incorrect password."
+msgstr ""
+
+#: views/login.py:57
+msgid "User not found."
+msgstr ""
+
+#: views/views.py:90
+#, python-format
+msgid "Failed to clear cache: %(error)s"
 msgstr ""
 

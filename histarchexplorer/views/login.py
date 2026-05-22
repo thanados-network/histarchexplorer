@@ -50,11 +50,11 @@ def login() -> str | Response:
                     login_user(user)
                     return redirect(
                         request.args.get('next') or url_for('index'))
-                flash('error inactive', 'error')
+                flash(_('Your account is inactive.'), 'error')
             else:
-                flash('error wrong password', 'error')
+                flash(_('Incorrect password.'), 'error')
         else:
-            flash('error username', 'error')
+            flash(_('User not found.'), 'error')
     return render_template('login.html', form=form)
 
 

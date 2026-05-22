@@ -2,6 +2,7 @@ from typing import Optional
 
 from flask import (
     Response, g, jsonify, redirect, request, session, url_for)
+from flask_babel import gettext as _
 from flask.typing import ResponseValue
 from flask_login import login_required
 
@@ -86,4 +87,4 @@ def refresh_cache(id_: int) -> ResponseValue | tuple[ResponseValue, int]:
         cache.delete_memoized(PresentationView.from_api, PresentationView, id_)
         return redirect(url_for('entity_view', id_=id_))
     except Exception as e:
-        return jsonify({"message": f"Failed to clear cache: {e}"}), 500
+        return jsonify({"message": _("Failed to clear cache: %(error)s", error=e)}), 500

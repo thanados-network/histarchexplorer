@@ -1,0 +1,1633 @@
+# Czech translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-05-22 15:44+0200\n"
+"PO-Revision-Date: 2026-05-22 14:17+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: cs\n"
+"Language-Team: cs <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: api/util.py:43 api/util.py:45 api/util.py:46 api/util.py:51
+msgid "BC"
+msgstr "př. n. l."
+
+#: api/util.py:43 api/util.py:45 api/util.py:46
+msgid "AD"
+msgstr "n. l."
+
+#: api/util.py:109
+msgid "other"
+msgstr "jiné"
+
+#: templates/_macros.html:11
+msgid "Back to the entity"
+msgstr "Zpět k entitě"
+
+#: templates/_macros.html:38
+msgid "Image"
+msgstr "Obrázek"
+
+#: templates/_macros.html:56
+msgid "Your browser does not support the video tag."
+msgstr "Váš prohlížeč nepodporuje značku video."
+
+#: templates/_macros.html:97 templates/admin/about_content.html:154
+#: templates/tabs/overview.html:12 templates/util/cite/modal.html:37
+msgid "License"
+msgstr "Licence"
+
+#: templates/_macros.html:100 templates/tabs/overview.html:13
+msgid "Creator"
+msgstr "Tvůrce"
+
+#: templates/_macros.html:103 templates/tabs/overview.html:14
+msgid "License holder"
+msgstr "Držitel licence"
+
+#: templates/_macros.html:125
+msgid "More images"
+msgstr "Více obrázků"
+
+#: templates/_macros.html:158 templates/about.html:215 templates/entity.html:93
+#: templates/entity.html:113
+msgid "Loading"
+msgstr "Načítání"
+
+#: templates/about.html:57
+msgid "Show details"
+msgstr "Zobrazit podrobnosti"
+
+#: templates/about.html:66 views/admin.py:50
+msgid "persons"
+msgstr "osoby"
+
+#: templates/about.html:126
+msgid "data overview"
+msgstr "přehled dat"
+
+#: templates/about.html:128
+msgid "project data overview"
+msgstr "přehled projektových dat"
+
+#: templates/about.html:153 views/admin.py:48
+msgid "projects"
+msgstr "projekty"
+
+#: templates/about.html:178
+msgid "Details"
+msgstr "Podrobnosti"
+
+#: templates/about.html:194 templates/admin/legal_notice.html:2
+#: templates/admin/legal_notice.html:21
+msgid "legal notice"
+msgstr "právní upozornění"
+
+#: templates/about.html:217
+msgid "close"
+msgstr "zavřít"
+
+#: templates/about.html:283
+msgid "Website"
+msgstr "Webové stránky"
+
+#: templates/about.html:284
+msgid "Email"
+msgstr "E-mail"
+
+#: templates/about.html:287
+msgid "ORCID"
+msgstr "ORCID"
+
+#: templates/about.html:290
+msgid "Address"
+msgstr "Adresa"
+
+#: templates/about.html:299
+msgid "relations"
+msgstr "vztahy"
+
+#: templates/admin.html:13
+msgid "admin options"
+msgstr "možnosti správy"
+
+#: templates/admin.html:18 templates/admin.html:19
+msgid "logout"
+msgstr "odhlásit se"
+
+#: templates/admin.html:30
+msgid "General Settings"
+msgstr "Obecná nastavení"
+
+#: templates/admin.html:31
+msgid "Visibility Settings"
+msgstr "Nastavení viditelnosti"
+
+#: templates/admin.html:32 templates/admin.html:129
+msgid "Class colors"
+msgstr "Barvy tříd"
+
+#: templates/admin.html:33
+msgid "Type Divisions"
+msgstr "Typové rozdělení"
+
+#: templates/admin.html:34
+msgid "Content"
+msgstr "Obsah"
+
+#: templates/admin.html:35
+msgid "Start page"
+msgstr "Úvodní stránka"
+
+#: templates/admin.html:36
+msgid "About"
+msgstr "O projektu"
+
+#: templates/admin.html:37 utils/view_util.py:59
+msgid "Publications"
+msgstr "Publikace"
+
+#: templates/admin.html:38 utils/view_util.py:62
+msgid "Outcome"
+msgstr "Výsledek"
+
+#: templates/admin.html:39
+msgid "Legal Notice"
+msgstr "Právní upozornění"
+
+#: templates/admin.html:40
+msgid "Footer"
+msgstr "Zápatí"
+
+#: templates/admin.html:41 templates/search.html:108 templates/search.html:110
+msgid "Search"
+msgstr "Hledat"
+
+#: templates/admin.html:42
+msgid "File Management"
+msgstr "Správa souborů"
+
+#: templates/admin.html:43 templates/admin/logo_management.html:3
+msgid "Logo Management"
+msgstr "Správa log"
+
+#: templates/admin.html:44
+msgid "Icons"
+msgstr "Ikony"
+
+#: templates/admin.html:45
+msgid "Assets"
+msgstr "Sady"
+
+#: templates/admin.html:46
+msgid "Team"
+msgstr "Tým"
+
+#: templates/admin.html:47
+msgid "Licenses"
+msgstr "Licence"
+
+#: templates/admin.html:48
+msgid "Maps"
+msgstr "Mapy"
+
+#: templates/admin.html:49
+msgid "Cache Options"
+msgstr "Možnosti mezipaměti"
+
+#: templates/admin.html:50
+msgid "Database Interface"
+msgstr "Rozhraní databáze"
+
+#: templates/admin.html:102
+msgid "general settings"
+msgstr "obecná nastavení"
+
+#: templates/admin.html:116
+msgid "visibility settings"
+msgstr "nastavení viditelnosti"
+
+#: templates/admin.html:142
+msgid "type divisions"
+msgstr "rozdělení typů"
+
+#: templates/admin.html:155
+msgid "cache options"
+msgstr "možnosti mezipaměti"
+
+#: templates/admin.html:195
+msgid "index page options"
+msgstr "možnosti úvodní stránky"
+
+#: templates/admin.html:217
+msgid "File Management Overview"
+msgstr "Přehled správy souborů"
+
+#: templates/admin.html:218
+msgid "Select a file management section from the sidebar to start editing."
+msgstr ""
+"Chcete-li začít s úpravami, vyberte v postranním panelu sekci správy "
+"souborů."
+
+#: templates/admin.html:270
+msgid "maps"
+msgstr "mapy"
+
+#: templates/login.html:6
+msgid "Login"
+msgstr "Přihlášení"
+
+#: templates/login.html:10 views/login.py:29
+msgid "username"
+msgstr "uživatelské jméno"
+
+#: templates/login.html:14 views/login.py:32
+msgid "password"
+msgstr "heslo"
+
+#: templates/navbar.html:7
+msgid "home"
+msgstr "domů"
+
+#: templates/navbar.html:18
+msgid "Toggle navigation"
+msgstr "Přepnout navigaci"
+
+#: templates/navbar.html:40 templates/navbar.html:44
+msgid "toggle dark/light mode"
+msgstr "přepnout tmavý/světlý režim"
+
+#: templates/outcome.html:9
+msgid "Outcome Test Page"
+msgstr "Testovací stránka výsledků"
+
+#: templates/publications.html:9
+msgid "Publications Test Page"
+msgstr "Testovací stránka publikací"
+
+#: templates/search.html:11
+msgid "Filter by Type"
+msgstr "Filtrovat podle typu"
+
+#: templates/search.html:14
+msgid "Actors"
+msgstr "Aktéři"
+
+#: templates/search.html:17
+msgid "Person"
+msgstr "Osoba"
+
+#: templates/search.html:21
+msgid "Group"
+msgstr "Skupina"
+
+#: templates/search.html:24
+msgid "Items"
+msgstr "Předměty"
+
+#: templates/search.html:27
+msgid "Artifact"
+msgstr "Artefakt"
+
+#: templates/search.html:31
+msgid "Human Remains"
+msgstr "Lidské pozůstatky"
+
+#: templates/search.html:34
+msgid "Events"
+msgstr "Události"
+
+#: templates/search.html:37
+msgid "Acquisition"
+msgstr "Akvizice"
+
+#: templates/search.html:41
+msgid "Event"
+msgstr "Událost"
+
+#: templates/search.html:45
+msgid "Activity"
+msgstr "Aktivita"
+
+#: templates/search.html:49
+msgid "Creation"
+msgstr "Vytvoření"
+
+#: templates/search.html:53
+msgid "Move"
+msgstr "Přesun"
+
+#: templates/search.html:57
+msgid "Production"
+msgstr "Produkce"
+
+#: templates/search.html:61
+msgid "Modification"
+msgstr "Úprava"
+
+#: templates/search.html:64
+msgid "Places"
+msgstr "Místa"
+
+#: templates/search.html:67
+msgid "Place"
+msgstr "Místo"
+
+#: templates/search.html:71
+msgid "Stratigraphic Unit"
+msgstr "Stratigrafická jednotka"
+
+#: templates/search.html:75
+msgid "Feature"
+msgstr "Befund"
+
+#: templates/search.html:78
+msgid "Sources"
+msgstr "Zdroje"
+
+#: templates/search.html:81
+msgid "Source"
+msgstr "Zdroj"
+
+#: templates/search.html:85
+msgid "Bibliography"
+msgstr "Bibliografie"
+
+#: templates/search.html:89
+msgid "External Reference"
+msgstr "Externí odkaz"
+
+#: templates/search.html:93
+msgid "Edition"
+msgstr "Edice"
+
+#: templates/search.html:96
+msgid "Files"
+msgstr "Soubory"
+
+#: templates/search.html:99
+msgid "File"
+msgstr "Soubor"
+
+#: templates/search.html:120
+msgid "Start typing above to see live results or press enter to run a search."
+msgstr ""
+"Začněte psát výše, abyste viděli živé výsledky, nebo stiskněte enter pro "
+"spuštění vyhledávání."
+
+#: templates/search.html:127
+msgid "Static Search Results"
+msgstr "Statické výsledky vyhledávání"
+
+#: templates/search.html:131
+#, python-format
+msgid "No results found for \"%(query)s\""
+msgstr "Pro \"%(query)s\" nebyly nalezeny žádné výsledky"
+
+#: templates/search.html:247 templates/search_detail.html:4
+msgid "Unnamed"
+msgstr "Nepojmenovaný"
+
+#: templates/search.html:248
+msgid "Load more"
+msgstr "Načíst více"
+
+#: templates/search.html:249
+msgid "Type at least 3 characters..."
+msgstr "Zadejte alespoň 3 znaky..."
+
+#: templates/search.html:250
+#, python-format
+msgid "Loading live results for \"%(query)s\"..."
+msgstr "Načítání živých výsledků pro \"%(query)s\"..."
+
+#: templates/search.html:251
+#, python-format
+msgid "No live results found for \"%(query)s\"."
+msgstr "Pro \"%(query)s\" nebyly nalezeny žádné živé výsledky."
+
+#: templates/search.html:252
+msgid "Error loading live results."
+msgstr "Chyba při načítání živých výsledků."
+
+#: templates/search.html:253
+msgid "Select one or more types"
+msgstr "Vyberte jeden nebo více typů"
+
+#: templates/search_detail.html:11
+msgid "Coordinates"
+msgstr "Souřadnice"
+
+#: templates/search_detail.html:14
+msgid "Back to search"
+msgstr "Zpět k vyhledávání"
+
+#: templates/admin/about_content.html:3
+msgid "about section content"
+msgstr "obsah sekce o aplikaci"
+
+#: templates/admin/about_content.html:67 templates/admin/about_content.html:71
+msgid "no translation available"
+msgstr "překlad není k dispozici"
+
+#: templates/admin/about_content.html:83 templates/admin/about_content.html:160
+msgid "None"
+msgstr "Žádný"
+
+#: templates/admin/about_content.html:112 templates/admin/modals.html:41
+msgid "Select a value"
+msgstr "Vyberte hodnotu"
+
+#: templates/admin/about_content.html:133
+msgid "This entry has no translation for"
+msgstr "Tento záznam nemá žádný překlad pro"
+
+#: templates/admin/about_content.html:139 templates/admin/modals.html:58
+msgid "Please provide a"
+msgstr "Prosím uveďte"
+
+#: templates/admin/about_content.html:174
+msgid "Edit"
+msgstr "Upravit"
+
+#: templates/admin/about_content.html:182
+#: templates/admin/about_content.html:225
+#: templates/admin/assets_management.html:86
+#: templates/admin/icon_management.html:53
+#: templates/admin/logo_management.html:100 templates/admin/modals.html:89
+#: templates/admin/team_management.html:86
+msgid "Delete"
+msgstr "Smazat"
+
+#: templates/admin/about_content.html:187 templates/admin/modals.html:90
+msgid "Cancel"
+msgstr "Zrušit"
+
+#: templates/admin/about_content.html:193
+#: templates/admin/general_settings.html:72
+msgid "Save"
+msgstr "Uložit"
+
+#: templates/admin/about_content.html:236
+msgid "select connection"
+msgstr "vybrat spojení"
+
+#: templates/admin/about_content.html:249
+msgid "select node"
+msgstr "vybrat uzel"
+
+#: templates/admin/about_content.html:262
+msgid "select role"
+msgstr "vybrat roli"
+
+#: templates/admin/about_content.html:264
+msgid "not specified"
+msgstr "neuvedeno"
+
+#: templates/admin/about_content.html:279 templates/admin/colors.html:71
+#: templates/admin/index_page_options.html:58
+#: templates/admin/legal_notice.html:29 templates/admin/maps.html:104
+msgid "save"
+msgstr "uložit"
+
+#: templates/admin/about_content.html:291 templates/admin/maps.html:116
+#: templates/admin/modals.html:7 templates/admin/modals.html:68
+msgid "add entry"
+msgstr "přidat záznam"
+
+#: templates/admin/assets_management.html:3
+msgid "Asset Management"
+msgstr "Správa souborů"
+
+#: templates/admin/assets_management.html:5
+msgid ""
+"The assets are general files, which can be used in individual pages. "
+"These can be all data types; some can be displayed, while some can only "
+"be downloaded."
+msgstr ""
+"Soubory jsou obecné soubory, které lze použít na jednotlivých stránkách. "
+"Mohou to být všechny typy dat; některé lze zobrazit, zatímco jiné lze "
+"pouze stáhnout."
+
+#: templates/admin/assets_management.html:13
+msgid "Upload New Asset"
+msgstr "Nahrát nový soubor"
+
+#: templates/admin/assets_management.html:20
+#: templates/admin/icon_management.html:21
+#: templates/admin/logo_management.html:20
+#: templates/admin/team_management.html:21
+msgid "Upload"
+msgstr "Nahrát"
+
+#: templates/admin/assets_management.html:24
+msgid "Accepted formats: All files."
+msgstr "Přijímané formáty: Všechny soubory."
+
+#: templates/admin/assets_management.html:33
+msgid "Existing Assets"
+msgstr "Existující soubory"
+
+#: templates/admin/assets_management.html:58
+#: templates/admin/logo_management.html:50
+#: templates/admin/team_management.html:53
+msgid "Select License..."
+msgstr "Vybrat licenci..."
+
+#: templates/admin/assets_management.html:67
+#: templates/admin/logo_management.html:59
+#: templates/admin/team_management.html:64
+msgid "Attribution (if any)..."
+msgstr "Uvedení autora (pokud existuje)..."
+
+#: templates/admin/assets_management.html:69
+#: templates/admin/logo_management.html:61
+#: templates/admin/team_management.html:67
+msgid "Save License"
+msgstr "Uložit licenci"
+
+#: templates/admin/assets_management.html:77
+#: templates/admin/logo_management.html:91
+#: templates/admin/team_management.html:75
+msgid "New name..."
+msgstr "Nový název..."
+
+#: templates/admin/assets_management.html:78
+#: templates/admin/logo_management.html:92
+#: templates/admin/team_management.html:76
+msgid "Rename"
+msgstr "Přejmenovat"
+
+#: templates/admin/assets_management.html:85
+msgid "Are you sure you want to delete this asset?"
+msgstr "Opravdu chcete smazat tento soubor?"
+
+#: templates/admin/assets_management.html:95
+msgid "No assets have been uploaded yet."
+msgstr "Dosud nebyly nahrány žádné soubory."
+
+#: templates/admin/cache.html:4
+msgid "Refreshes the system cache."
+msgstr "Obnoví systémovou mezipaměť."
+
+#: templates/admin/cache.html:5
+msgid "refresh system cache"
+msgstr "obnovit systémovou mezipaměť"
+
+#: templates/admin/cache.html:11
+msgid "This will cache all not cached entities."
+msgstr "Tímto se uloží do mezipaměti všechny dosud neuložené entity."
+
+#: templates/admin/cache.html:12
+msgid "warm entity cache"
+msgstr "zahřát mezipaměť entit"
+
+#: templates/admin/cache.html:18
+msgid "This completely refreshes the cache."
+msgstr "Tímto se kompletně obnoví mezipaměť."
+
+#: templates/admin/cache.html:19
+msgid "refresh entity cache"
+msgstr "obnovit mezipaměť entit"
+
+#: templates/admin/cache.html:26
+msgid "Clear the cache to free up space"
+msgstr "Vymazat mezipaměť pro uvolnění místa"
+
+#: templates/admin/cache.html:27
+msgid "clear cache"
+msgstr "vymazat mezipaměť"
+
+#: templates/admin/colors.html:62
+msgid "select a color"
+msgstr "vybrat barvu"
+
+#: templates/admin/colors.html:77
+msgid "Manage Available Colors"
+msgstr "Spravovat dostupné barvy"
+
+#: templates/admin/colors.html:85
+msgid "are you sure you want to delete this color?"
+msgstr "opravdu chcete smazat tuto barvu?"
+
+#: templates/admin/colors.html:97
+msgid "add new hex color"
+msgstr "přidat novou hex barvu"
+
+#: templates/admin/colors.html:106
+msgid "add color"
+msgstr "přidat barvu"
+
+#: templates/admin/database.html:3
+msgid "Database Backup"
+msgstr "Záloha databáze"
+
+#: templates/admin/database.html:5
+msgid "Download a full SQL dump of the current database."
+msgstr "Stáhnout kompletní SQL dump aktuální databáze."
+
+#: templates/admin/database.html:8
+msgid "Download SQL Dump"
+msgstr "Stáhnout SQL dump"
+
+#: templates/admin/database.html:15
+msgid "Database Restore"
+msgstr "Obnovení databáze"
+
+#: templates/admin/database.html:17 templates/admin/database.html:38
+msgid "Warning:"
+msgstr "Varování:"
+
+#: templates/admin/database.html:18
+msgid ""
+"Restoring a database will overwrite all current data. This action cannot "
+"be undone."
+msgstr ""
+"Obnovení databáze přepíše všechna aktuální data. Tuto akci nelze vzít "
+"zpět."
+
+#: templates/admin/database.html:24
+msgid "Select SQL Dump File"
+msgstr "Vybrat soubor SQL dump"
+
+#: templates/admin/database.html:27
+msgid "Are you sure you want to overwrite the database?"
+msgstr "Opravdu chcete přepsat databázi?"
+
+#: templates/admin/database.html:28
+msgid "Restore Database"
+msgstr "Obnovit databázi"
+
+#: templates/admin/database.html:36
+msgid "Database Reset"
+msgstr "Reset databáze"
+
+#: templates/admin/database.html:39
+msgid ""
+"This will reset the entire database to the initial sample data. All "
+"custom data will be lost!"
+msgstr ""
+"Tímto se celá databáze resetuje na výchozí ukázková data. Všechna "
+"uživatelská data budou ztracena!"
+
+#: templates/admin/database.html:42
+msgid "Resets the entire database"
+msgstr "Resetuje celou databázi"
+
+#: templates/admin/database.html:43
+msgid "RESET DATABASE"
+msgstr "RESETOVAT DATABÁZI"
+
+#: templates/admin/footer_content_management.html:4
+msgid "Footer Order"
+msgstr "Pořadí zápatí"
+
+#: templates/admin/footer_content_management.html:16
+msgid "Save Footer Order"
+msgstr "Uložit pořadí zápatí"
+
+#: templates/admin/footer_content_management.html:22
+msgid "Select Footer Logos"
+msgstr "Vybrat loga v zápatí"
+
+#: templates/admin/footer_content_management.html:39
+msgid "Add to Footer"
+msgstr "Přidat do zápatí"
+
+#: templates/admin/footer_content_management.html:47
+msgid "Save Footer Selection"
+msgstr "Uložit výběr zápatí"
+
+#: templates/admin/footer_content_management.html:49
+#: templates/admin/logo_management.html:109
+msgid "No logos have been uploaded yet."
+msgstr "Dosud nebyly nahrány žádné loga."
+
+#: templates/admin/general_settings.html:8
+msgid "case study hierarchy ID"
+msgstr "ID hierarchie případové studie"
+
+#: templates/admin/general_settings.html:15
+msgid "Please enter a positive integer for the Case Study Hierarchy ID."
+msgstr "Zadejte prosím kladné celé číslo pro ID hierarchie případové studie."
+
+#: templates/admin/general_settings.html:32
+msgid "Deactivate Darkmode"
+msgstr "Deaktivovat tmavý režim"
+
+#: templates/admin/general_settings.html:43
+msgid "Deactivate Language Selector"
+msgstr "Deaktivovat výběr jazyka"
+
+#: templates/admin/general_settings.html:54
+msgid "Activate Access Restriction"
+msgstr "Aktivovat omezení přístupu"
+
+#: templates/admin/general_settings.html:59
+msgid "preferred language"
+msgstr "preferovaný jazyk"
+
+#: templates/admin/icon_management.html:3
+msgid "Icon Management"
+msgstr "Správa ikon"
+
+#: templates/admin/icon_management.html:5
+msgid ""
+"This section is for managing SVG icons that can be used throughout the "
+"application."
+msgstr "Tato sekce slouží ke správě ikon SVG, které lze používat v celé aplikaci."
+
+#: templates/admin/icon_management.html:13
+msgid "Upload New Icon"
+msgstr "Nahrát novou ikonu"
+
+#: templates/admin/icon_management.html:25
+msgid "Accepted format: SVG."
+msgstr "Přijímaný formát: SVG."
+
+#: templates/admin/icon_management.html:34
+msgid "Existing Icons"
+msgstr "Existující ikony"
+
+#: templates/admin/icon_management.html:52
+msgid "Are you sure you want to delete this icon?"
+msgstr "Opravdu chcete smazat tuto ikonu?"
+
+#: templates/admin/icon_management.html:62
+msgid "No icons have been uploaded yet."
+msgstr "Dosud nebyly nahrány žádné ikony."
+
+#: templates/admin/index_page_options.html:5
+msgid "choose index background"
+msgstr "vybrat pozadí úvodní stránky"
+
+#: templates/admin/index_page_options.html:19
+msgid "map options"
+msgstr "možnosti mapy"
+
+#: templates/admin/index_page_options.html:21
+msgid "select map background"
+msgstr "vybrat pozadí mapy"
+
+#: templates/admin/index_page_options.html:40
+msgid "Greyscale"
+msgstr "Stupně šedi"
+
+#: templates/admin/index_page_options.html:44
+msgid "image options"
+msgstr "možnosti obrázku"
+
+#: templates/admin/index_page_options.html:46
+msgid "define default background image"
+msgstr "definovat výchozí obrázek pozadí"
+
+#: templates/admin/license_management.html:3
+msgid "Add New License"
+msgstr "Přidat novou licenci"
+
+#: templates/admin/license_management.html:8
+#: templates/admin/license_management.html:40
+msgid "SPDX ID"
+msgstr "SPDX ID"
+
+#: templates/admin/license_management.html:12
+msgid "URI"
+msgstr "URI"
+
+#: templates/admin/license_management.html:16
+#: templates/admin/license_management.html:39
+msgid "Label"
+msgstr "Popisek"
+
+#: templates/admin/license_management.html:20
+#: templates/admin/license_management.html:41
+msgid "Category"
+msgstr "Kategorie"
+
+#: templates/admin/license_management.html:27
+msgid "Add License"
+msgstr "Přidat licenci"
+
+#: templates/admin/license_management.html:34
+msgid "Existing Licenses"
+msgstr "Existující licence"
+
+#: templates/admin/license_management.html:38
+msgid "Logo"
+msgstr "Logo"
+
+#: templates/admin/license_management.html:42
+msgid "Actions"
+msgstr "Akce"
+
+#: templates/admin/license_management.html:58
+msgid "Are you sure?"
+msgstr "Jste si jisti?"
+
+#: templates/admin/logo_management.html:5
+msgid ""
+"The logo section is only for logos and can be used for the footer, site "
+"logo, project logos, and institution logos, as well as for individual "
+"pages."
+msgstr ""
+"Sekce log je určena pouze pro loga a lze ji použít pro zápatí, logo webu,"
+" loga projektů a loga institucí, stejně jako pro jednotlivé stránky."
+
+#: templates/admin/logo_management.html:13
+msgid "Upload New Logo"
+msgstr "Nahrát nové logo"
+
+#: templates/admin/logo_management.html:24
+#: templates/admin/team_management.html:25
+msgid "Accepted formats: PNG, JPG, SVG, GIF."
+msgstr "Přijímané formáty: PNG, JPG, SVG, GIF."
+
+#: templates/admin/logo_management.html:33
+msgid "Existing Logos"
+msgstr "Existující loga"
+
+#: templates/admin/logo_management.html:70
+msgid "Main Logo"
+msgstr "Hlavní logo"
+
+#: templates/admin/logo_management.html:74
+msgid "Set as Main"
+msgstr "Nastavit jako hlavní"
+
+#: templates/admin/logo_management.html:83
+msgid "Set as Favicon"
+msgstr "Nastavit jako favicon"
+
+#: templates/admin/logo_management.html:99
+msgid "Are you sure you want to delete this logo?"
+msgstr "Opravdu chcete smazat toto logo?"
+
+#: templates/admin/maps.html:29
+msgid "name"
+msgstr "název"
+
+#: templates/admin/maps.html:37 templates/admin/maps.html:52
+msgid "Please provide a name"
+msgstr "Uveďte prosím jméno"
+
+#: templates/admin/maps.html:42
+msgid "Display Name"
+msgstr "Zobrazované jméno"
+
+#: templates/admin/maps.html:57
+msgid "order"
+msgstr "pořadí"
+
+#: templates/admin/maps.html:65
+msgid "Please provide an order"
+msgstr "Uveďte prosím pořadí"
+
+#: templates/admin/maps.html:73
+msgid "Leaflet Tile Layer String"
+msgstr "Řetězec vrstvy dlaždic Leaflet"
+
+#: templates/admin/maps.html:87
+msgid "edit"
+msgstr "upravit"
+
+#: templates/admin/maps.html:95
+msgid "delete"
+msgstr "smazat"
+
+#: templates/admin/maps.html:99
+msgid "cancel"
+msgstr "zrušit"
+
+#: templates/admin/menu_management.html:3
+msgid "menu management"
+msgstr "správa menu"
+
+#: templates/admin/menu_management.html:9
+msgid "Menu Item"
+msgstr "Položka menu"
+
+#: templates/admin/menu_management.html:10
+msgid "Show"
+msgstr "Zobrazit"
+
+#: templates/admin/menu_management.html:11
+msgid "Page Type"
+msgstr "Typ stránky"
+
+#: templates/admin/menu_management.html:36
+#: templates/admin/menu_management.html:72
+msgid "Default"
+msgstr "Výchozí"
+
+#: templates/admin/menu_management.html:45
+#: templates/admin/menu_management.html:81
+msgid "Individual"
+msgstr "Individuální"
+
+#: templates/admin/menu_management.html:88
+msgid "Save Changes"
+msgstr "Uložit změny"
+
+#: templates/admin/modals.html:82
+msgid "Confirm Delete"
+msgstr "Potvrdit smazání"
+
+#: templates/admin/modals.html:83 templates/util/cite/modal.html:84
+msgid "Close"
+msgstr "Zavřít"
+
+#: templates/admin/modals.html:86
+msgid "Are you sure you want to delete"
+msgstr "Opravdu chcete smazat"
+
+#: templates/admin/team_management.html:3
+msgid "Team Management"
+msgstr "Správa týmu"
+
+#: templates/admin/team_management.html:5
+msgid ""
+"The team section only includes person photos, which can be used in the "
+"person management and for individual pages."
+msgstr ""
+"Sekce týmu obsahuje pouze fotografie osob, které lze použít při správě "
+"osob a na jednotlivých stránkách."
+
+#: templates/admin/team_management.html:13
+msgid "Upload New Team Image"
+msgstr "Nahrát nový týmový obrázek"
+
+#: templates/admin/team_management.html:34
+msgid "Existing Team Images"
+msgstr "Existující týmové obrázky"
+
+#: templates/admin/team_management.html:85
+msgid "Are you sure you want to delete this image?"
+msgstr "Opravdu chcete smazat tento obrázek?"
+
+#: templates/admin/team_management.html:95
+msgid "No team images have been uploaded yet."
+msgstr "Dosud nebyly nahrány žádné týmové obrázky."
+
+#: templates/admin/type_divisions.html:9 templates/admin/type_divisions.html:58
+msgid "Remove Division"
+msgstr "Odebrat oddíl"
+
+#: templates/admin/type_divisions.html:16
+#: templates/admin/type_divisions.html:65
+msgid "Icon Type"
+msgstr "Typ ikony"
+
+#: templates/admin/type_divisions.html:24
+#: templates/admin/type_divisions.html:73
+msgid "Icon Value"
+msgstr "Hodnota ikony"
+
+#: templates/admin/type_divisions.html:30
+#: templates/admin/type_divisions.html:78
+msgid "IDs"
+msgstr "ID"
+
+#: templates/admin/type_divisions.html:33
+#: templates/admin/type_divisions.html:80
+msgid "Comma-separated list of IDs."
+msgstr "Seznam ID oddělený čárkami."
+
+#: templates/admin/type_divisions.html:40
+msgid "Add Division"
+msgstr "Přidat oddíl"
+
+#: templates/admin/type_divisions.html:43
+msgid "save changes"
+msgstr "uložit změny"
+
+#: templates/admin/visibility_settings.html:5
+msgid "Visibility Configuration"
+msgstr "Konfigurace viditelnosti"
+
+#: templates/admin/visibility_settings.html:7
+msgid "Save All Settings"
+msgstr "Uložit všechna nastavení"
+
+#: templates/admin/visibility_settings.html:14
+msgid "Entity Types"
+msgstr "Typy entit"
+
+#: templates/admin/visibility_settings.html:17
+msgid "Shown Type IDs"
+msgstr "Zobrazená ID typů"
+
+#: templates/admin/visibility_settings.html:19
+msgid "Comma-separated list of type IDs to show."
+msgstr "Seznam ID typů k zobrazení oddělený čárkami."
+
+#: templates/admin/visibility_settings.html:26
+msgid "Hidden Type IDs"
+msgstr "Skrytá ID typů"
+
+#: templates/admin/visibility_settings.html:28
+msgid "Comma-separated list of type IDs to hide."
+msgstr "Seznam ID typů ke skrytí oddělený čárkami."
+
+#: templates/admin/visibility_settings.html:38
+msgid "Individual Entity IDs"
+msgstr "Jednotlivá ID entit"
+
+#: templates/admin/visibility_settings.html:41
+msgid "Shown Entity IDs"
+msgstr "Zobrazená ID entit"
+
+#: templates/admin/visibility_settings.html:43
+msgid "Comma-separated list of entity IDs to show."
+msgstr "Seznam ID entit k zobrazení oddělený čárkami."
+
+#: templates/admin/visibility_settings.html:50
+msgid "Hidden Entity IDs"
+msgstr "Skrytá ID entit"
+
+#: templates/admin/visibility_settings.html:52
+msgid "Comma-separated list of entity IDs to hide."
+msgstr "Seznam ID entit ke skrytí oddělený čárkami."
+
+#: templates/admin/visibility_settings.html:61
+msgid "Entity Classes"
+msgstr "Třídy entit"
+
+#: templates/admin/visibility_settings.html:66
+msgid "Shown Classes"
+msgstr "Zobrazené třídy"
+
+#: templates/admin/visibility_settings.html:69
+msgid "Checked classes will be explicitly shown in the browse interface."
+msgstr "Zaškrtnuté třídy budou výslovně zobrazeny v rozhraní pro prohlížení."
+
+#: templates/admin/visibility_settings.html:97
+msgid "Hidden Classes"
+msgstr "Skryté třídy"
+
+#: templates/admin/visibility_settings.html:100
+msgid "Checked classes will be hidden from the browse interface."
+msgstr "Zaškrtnuté třídy budou v rozhraní pro prohlížení skryty."
+
+#: templates/admin/visibility_settings.html:131
+msgid "Save Visibility Settings"
+msgstr "Uložit nastavení viditelnosti"
+
+#: templates/tabs/feature.html:34 views/admin.py:54
+msgid "attributes"
+msgstr "atributy"
+
+#: templates/tabs/overview.html:8
+msgid "subentities"
+msgstr "subentity"
+
+#: templates/tabs/overview.html:9
+msgid "subunits"
+msgstr "subjednotky"
+
+#: templates/tabs/overview.html:10
+msgid "description"
+msgstr "popis"
+
+#: templates/tabs/overview.html:11
+msgid "Media file"
+msgstr "Mediální soubor"
+
+#: templates/tabs/overview.html:15
+msgid "Open full view"
+msgstr "Otevřít plné zobrazení"
+
+#: templates/tabs/overview.html:16
+#, python-format
+msgid "View all %(count)s files"
+msgstr "Zobrazit všech %(count)s souborů"
+
+#: templates/util/cite/modal.html:5
+msgid "Cite this Entry"
+msgstr "Citovat tento záznam"
+
+#: templates/util/cite/modal.html:12
+msgid "Recommended Citation"
+msgstr "Doporučená citace"
+
+#: templates/util/cite/modal.html:17
+msgid "Copy to clipboard"
+msgstr "Kopírovat do schránky"
+
+#: templates/util/cite/modal.html:33
+msgid "No license info"
+msgstr "Žádné informace o licenci"
+
+#: templates/util/cite/modal.html:41
+msgid "View License Deed"
+msgstr "Zobrazit znění licence"
+
+#: templates/util/cite/modal.html:44
+msgid "No specific license information available for this entity."
+msgstr "Pro tuto entitu nejsou k dispozici žádné konkrétní informace o licenci."
+
+#: templates/util/cite/modal.html:54
+msgid "Export Formats (BibTeX, RIS)"
+msgstr "Exportní formáty (BibTeX, RIS)"
+
+#: utils/view_util.py:17
+msgid "entities"
+msgstr "entity"
+
+#: utils/view_util.py:18
+msgid "search"
+msgstr "hledat"
+
+#: utils/view_util.py:19
+msgid "about"
+msgstr "o aplikaci"
+
+#: utils/view_util.py:20
+msgid "outcome"
+msgstr "výsledek"
+
+#: utils/view_util.py:21
+msgid "publications"
+msgstr "publikace"
+
+#: utils/view_util.py:53
+msgid "browse/select/find all entities"
+msgstr "procházet/vybrat/najít všechny entity"
+
+#: utils/view_util.py:56
+msgid "detailed search"
+msgstr "podrobné vyhledávání"
+
+#: utils/view_util.py:65
+msgid "about the project"
+msgstr "o projektu"
+
+#: utils/view_util.py:83
+msgid "Unknown"
+msgstr "Neznámý"
+
+#: utils/view_util.py:145
+#, python-format
+msgid "Accessed: %(date)s"
+msgstr "Datum přístupu: %(date)s"
+
+#: utils/view_util.py:194
+#, python-format
+msgid ""
+"%(project_name)s (%(year)s). %(title)s. Retrieved from %(url)s (Accessed:"
+" %(date)s)"
+msgstr ""
+"%(project_name)s (%(year)s). %(title)s. Získáno z %(url)s (Datum "
+"přístupu: %(date)s)"
+
+#: views/admin.py:46
+msgid "main-project"
+msgstr "hlavní projekt"
+
+#: views/admin.py:52
+msgid "institutions"
+msgstr "instituce"
+
+#: views/admin.py:150
+#, python-format
+msgid ""
+"Invalid ID format for label \"%(label)s\". Please use comma-separated "
+"integers."
+msgstr "Neplatný formát ID pro popisek \"%(label)s\". Použijte prosím celá čísla oddělená čárkami."
+
+#: views/admin.py:162
+msgid "Type divisions updated successfully."
+msgstr "Rozdělení typů bylo úspěšně aktualizováno."
+
+#: views/admin.py:165
+msgid "Error updating type divisions"
+msgstr "Chyba při aktualizaci rozdělení typů"
+
+#: views/admin.py:182
+msgid "Entity colors updated successfully."
+msgstr "Barvy entit byly úspěšně aktualizovány."
+
+#: views/admin.py:185
+msgid "Error updating entity colors"
+msgstr "Chyba při aktualizaci barev entit"
+
+#: views/admin.py:199
+msgid "Color added successfully."
+msgstr "Barva byla úspěšně přidána."
+
+#: views/admin.py:202
+msgid "Error adding color"
+msgstr "Chyba při přidávání barvy"
+
+#: views/admin.py:204
+msgid "Color already exists."
+msgstr "Barva již existuje."
+
+#: views/admin.py:206
+msgid "Invalid HEX code."
+msgstr "Neplatný HEX kód."
+
+#: views/admin.py:219
+msgid "Color deleted successfully."
+msgstr "Barva byla úspěšně smazána."
+
+#: views/admin.py:222
+msgid "Error deleting color"
+msgstr "Chyba při mazání barvy"
+
+#: views/admin.py:241
+msgid "Menu settings updated successfully."
+msgstr "Nastavení menu bylo úspěšně aktualizováno."
+
+#: views/admin.py:244
+msgid "Error updating menu settings"
+msgstr "Chyba při aktualizaci nastavení menu"
+
+#: views/admin.py:263
+msgid "Legal notice updated successfully."
+msgstr "Právní upozornění bylo úspěšně aktualizováno."
+
+#: views/admin.py:266 views/admin.py:380 views/admin.py:849
+msgid "Error updating settings"
+msgstr "Chyba při aktualizaci nastavení"
+
+#: views/admin.py:276 views/admin.py:543 views/admin.py:1082
+#: views/admin.py:1217
+msgid "No file part"
+msgstr "Chybí část souboru"
+
+#: views/admin.py:281 views/admin.py:548 views/admin.py:1087
+#: views/admin.py:1222
+msgid "No selected file"
+msgstr "Žádný vybraný soubor"
+
+#: views/admin.py:290
+#, python-format
+msgid "Logo \"%(name)s\" uploaded successfully."
+msgstr "Logo \"%(name)s\" úspěšně nahráno."
+
+#: views/admin.py:304 views/admin.py:1110 views/admin.py:1257
+msgid "Invalid request for renaming."
+msgstr "Neplatný požadavek na přejmenování."
+
+#: views/admin.py:314
+msgid "Cannot rename default logos."
+msgstr "Výchozí loga nelze přejmenovat."
+
+#: views/admin.py:320 views/admin.py:1126 views/admin.py:1286
+msgid "Original file not found."
+msgstr "Původní soubor nebyl nalezen."
+
+#: views/admin.py:324 views/admin.py:1130 views/admin.py:1290
+msgid "A file with the new name already exists."
+msgstr "Soubor s novým názvem již existuje."
+
+#: views/admin.py:330
+#, python-format
+msgid "Logo renamed from \"%(old)s\" to \"%(new)s\"."
+msgstr "Logo přejmenováno z \"%(old)s\" na \"%(new)s\"."
+
+#: views/admin.py:333 views/admin.py:1139 views/admin.py:1298
+#, python-format
+msgid "Error renaming file: %(error)s"
+msgstr "Chyba při přejmenování souboru: %(error)s"
+
+#: views/admin.py:344 views/admin.py:1150
+msgid "No filename specified for deletion."
+msgstr "Nebyl zadán žádný název souboru ke smazání."
+
+#: views/admin.py:354
+#, python-format
+msgid "Logo \"%(name)s\" deleted successfully."
+msgstr "Logo \"%(name)s\" úspěšně smazáno."
+
+#: views/admin.py:357 views/admin.py:1163 views/admin.py:1335
+#, python-format
+msgid "Error deleting file: %(error)s"
+msgstr "Chyba při mazání souboru: %(error)s"
+
+#: views/admin.py:360
+#, python-format
+msgid "Default logo \"%(name)s\" deactivated."
+msgstr "Výchozí logo \"%(name)s\" deaktivováno."
+
+#: views/admin.py:371 views/admin.py:391
+msgid "No filename specified."
+msgstr "Nebyl zadán žádný název souboru."
+
+#: views/admin.py:377
+msgid "Main logo updated successfully."
+msgstr "Hlavní logo bylo úspěšně aktualizováno."
+
+#: views/admin.py:409
+msgid "Favicon updated successfully."
+msgstr "Favicon byla úspěšně aktualizována."
+
+#: views/admin.py:412
+#, python-format
+msgid "Error creating favicon: %(error)s"
+msgstr "Chyba při vytváření favicon: %(error)s"
+
+#: views/admin.py:442
+msgid "Footer logos updated successfully."
+msgstr "Loga v zápatí byla úspěšně aktualizována."
+
+#: views/admin.py:445
+msgid "Error updating footer logos"
+msgstr "Chyba při aktualizaci log v zápatí"
+
+#: views/admin.py:459
+msgid "License added successfully."
+msgstr "Licence byla úspěšně přidána."
+
+#: views/admin.py:468
+msgid "License deleted successfully."
+msgstr "Licence byla úspěšně smazána."
+
+#: views/admin.py:484
+msgid "Logo license updated successfully."
+msgstr "Licence loga byla úspěšně aktualizována."
+
+#: views/admin.py:529
+msgid "Database backup failed. Check logs for details."
+msgstr "Zálohování databáze se nezdařilo. Podrobnosti naleznete v protokolech."
+
+#: views/admin.py:532 views/admin.py:608
+msgid "An unexpected error occurred. Check logs for details."
+msgstr "Došlo k neočekávané chybě. Podrobnosti naleznete v protokolech."
+
+#: views/admin.py:599
+msgid "Database restored successfully."
+msgstr "Databáze byla úspěšně obnovena."
+
+#: views/admin.py:603
+msgid "Database restore failed. Check logs for details."
+msgstr "Obnovení databáze se nezdařilo. Podrobnosti naleznete v protokolech."
+
+#: views/admin.py:611
+msgid "Invalid file type. Please upload a .sql file."
+msgstr "Neplatný typ souboru. Nahrajte prosím soubor .sql."
+
+#: views/admin.py:621
+msgid "Link deleted successfully"
+msgstr "Odkaz byl úspěšně smazán"
+
+#: views/admin.py:648
+msgid "Link added successfully"
+msgstr "Odkaz byl úspěšně přidán"
+
+#: views/admin.py:654
+msgid "Failed to add link: Invalid data provided"
+msgstr "Nepodařilo se přidat odkaz: Byla poskytnuta neplatná data"
+
+#: views/admin.py:685
+msgid "Entry added successfully!"
+msgstr "Záznam byl úspěšně přidán!"
+
+#: views/admin.py:689
+#, python-format
+msgid "Error adding entry %(name)s: Only one main project allowed"
+msgstr ""
+"Chyba při přidávání záznamu %(name)s: Je povolen pouze jeden hlavní "
+"projekt"
+
+#: views/admin.py:692
+#, python-format
+msgid "Error adding entry %(name)s: %(error)s"
+msgstr "Chyba při přidávání záznamu %(name)s: %(error)s"
+
+#: views/admin.py:701
+msgid "Main Project cannot be deleted"
+msgstr "Hlavní projekt nelze smazat"
+
+#: views/admin.py:704
+msgid "Entry deleted successfully!"
+msgstr "Záznam byl úspěšně smazán!"
+
+#: views/admin.py:719
+msgid "Configuration ID is required"
+msgstr "ID konfigurace je vyžadováno"
+
+#: views/admin.py:737
+#, python-format
+msgid "\"%(name)s\" updated successfully"
+msgstr "\"%(name)s\" úspěšně aktualizován"
+
+#: views/admin.py:741
+#, python-format
+msgid "Error updating \"%(name)s\": %(error)s"
+msgstr "Chyba při aktualizaci \"%(name)s\": %(error)s"
+
+#: views/admin.py:763
+msgid "Map ID is required"
+msgstr "ID mapy je vyžadováno"
+
+#: views/admin.py:780
+msgid "Map updated successfully"
+msgstr "Mapa byla úspěšně aktualizována"
+
+#: views/admin.py:783
+msgid "Invalid Map ID format"
+msgstr "Neplatný formát ID mapy"
+
+#: views/admin.py:786
+#, python-format
+msgid "Error updating map: %(error)s"
+msgstr "Chyba při aktualizaci mapy: %(error)s"
+
+#: views/admin.py:803
+msgid "Error: Name, Display Name and Description are required"
+msgstr "Chyba: Název, zobrazované jméno a popis jsou povinné"
+
+#: views/admin.py:815
+#, python-format
+msgid "Map %(name)s with ID %(id)s added successfully!"
+msgstr "Mapa %(name)s s ID %(id)s byla úspěšně přidána!"
+
+#: views/admin.py:819
+#, python-format
+msgid "Error adding map %(name)s: %(error)s"
+msgstr "Chyba při přidávání mapy %(name)s: %(error)s"
+
+#: views/admin.py:830
+msgid "Map deleted successfully!"
+msgstr "Mapa byla úspěšně smazána!"
+
+#: views/admin.py:832
+#, python-format
+msgid "Error deleting map: %(error)s"
+msgstr "Chyba při mazání mapy: %(error)s"
+
+#: views/admin.py:846
+msgid "Index background updated successfully"
+msgstr "Pozadí úvodní stránky bylo úspěšně aktualizováno"
+
+#: views/admin.py:880
+msgid "Invalid ID format. Please use comma-separated integers."
+msgstr "Neplatný formát ID. Použijte prosím celá čísla oddělená čárkami."
+
+#: views/admin.py:885
+msgid "Class visibility updated successfully."
+msgstr "Viditelnost třídy byla úspěšně aktualizována."
+
+#: views/admin.py:935
+msgid "Updated case study ID successfully"
+msgstr "ID případové studie bylo úspěšně aktualizováno"
+
+#: views/admin.py:938
+msgid ""
+"Invalid Case Study ID. Must be a positive integer and its entity type "
+"must be \"type\"."
+msgstr "Neplatné ID případové studie. Musí to být kladné celé číslo a jeho typ entity musí být \"Case Study\"."
+
+#: views/admin.py:956
+msgid "reset database"
+msgstr "resetovat databázi"
+
+#: views/admin.py:978
+msgid "cache cleared"
+msgstr "mezipaměť vymazána"
+
+#: views/admin.py:986
+msgid "Cache warmup started in background (refresh mode)"
+msgstr "Zahřívání mezipaměti spuštěno na pozadí (režim obnovení)"
+
+#: views/admin.py:994
+msgid "Cache warmup started in background."
+msgstr "Zahřívání mezipaměti spuštěno na pozadí."
+
+#: views/admin.py:1013
+#, python-format
+msgid "Error warming cache: %(error)s"
+msgstr "Chyba při zahřívání mezipaměti: %(error)s"
+
+#: views/admin.py:1031
+msgid "system cache refreshed"
+msgstr "systémová mezipaměť obnovena"
+
+#: views/admin.py:1096
+#, python-format
+msgid "Asset \"%(name)s\" uploaded successfully."
+msgstr "Soubor \"%(name)s\" úspěšně nahrán."
+
+#: views/admin.py:1120
+msgid "Cannot rename default assets."
+msgstr "Výchozí soubory nelze přejmenovat."
+
+#: views/admin.py:1136
+#, python-format
+msgid "Asset renamed from \"%(old)s\" to \"%(new)s\"."
+msgstr "Soubor přejmenován z \"%(old)s\" na \"%(new)s\"."
+
+#: views/admin.py:1160
+#, python-format
+msgid "Asset \"%(name)s\" deleted successfully."
+msgstr "Soubor \"%(name)s\" úspěšně smazán."
+
+#: views/admin.py:1166
+#, python-format
+msgid "Default asset \"%(name)s\" deactivated."
+msgstr "Výchozí soubor \"%(name)s\" deaktivován."
+
+#: views/admin.py:1183
+msgid "Asset license updated successfully."
+msgstr "Licence souboru byla úspěšně aktualizována."
+
+#: views/admin.py:1213
+msgid "File type is missing."
+msgstr "Chybí typ souboru."
+
+#: views/admin.py:1236 views/admin.py:1270 views/admin.py:1323
+msgid "Invalid file type."
+msgstr "Neplatný typ souboru."
+
+#: views/admin.py:1243
+#, python-format
+msgid "%(type)s \"%(name)s\" uploaded successfully."
+msgstr "%(type)s \"%(name)s\" úspěšně nahrán."
+
+#: views/admin.py:1280
+msgid "Cannot rename default files."
+msgstr "Výchozí soubory nelze přejmenovat."
+
+#: views/admin.py:1296
+#, python-format
+msgid "%(type)s renamed from \"%(old)s\" to \"%(new)s\"."
+msgstr "%(type)s úspěšně přejmenován z \"%(old)s\" na \"%(new)s\"."
+
+#: views/admin.py:1311
+msgid "No filename or type specified for deletion."
+msgstr "Nebyl zadán žádný název souboru ani typ ke smazání."
+
+#: views/admin.py:1333
+#, python-format
+msgid "%(type)s \"%(name)s\" deleted successfully."
+msgstr "%(type)s \"%(name)s\" úspěšně smazán."
+
+#: views/admin.py:1338
+#, python-format
+msgid "Default %(type)s \"%(name)s\" deactivated."
+msgstr "Výchozí %(type)s \"%(name)s\" deaktivován."
+
+#: views/admin.py:1356
+#, python-format
+msgid "%(type)s license updated successfully."
+msgstr "Licence %(type)s byla úspěšně aktualizována."
+
+#: views/login.py:33
+msgid "show password"
+msgstr "zobrazit heslo"
+
+#: views/login.py:34
+msgid "login"
+msgstr "přihlášení"
+
+#: views/login.py:53
+msgid "Your account is inactive."
+msgstr "Váš účet je neaktivní."
+
+#: views/login.py:55
+msgid "Incorrect password."
+msgstr "Nesprávné heslo."
+
+#: views/login.py:57
+msgid "User not found."
+msgstr "Uživatel nebyl nalezen."
+
+#: views/views.py:90
+#, python-format
+msgid "Failed to clear cache: %(error)s"
+msgstr "Nepodařilo se vymazat mezipaměť: %(error)s"
+
+#~ msgid ""
+#~ "The assets are general files, which "
+#~ "can be used in individual pages, "
+#~ "these can bne all datatypes, some "
+#~ "can be displayed some only be "
+#~ "downloaded."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The logo sections is only for "
+#~ "logos and can be used for footer,"
+#~ " site logo, project logos and "
+#~ "institution logos, and also for "
+#~ "indiviual pages."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The team section only include person "
+#~ "fotos, which can be used at the"
+#~ " person management and for individual "
+#~ "pages."
+#~ msgstr ""
+

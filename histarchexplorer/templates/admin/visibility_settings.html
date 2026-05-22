@@ -72,7 +72,7 @@
                style="max-height: 400px; overflow-y: auto;">
             {% for view_class, categories in view_classes.items() %}
               <h6 class="dropdown-header mt-2 text-primary border-bottom pb-1">
-                {{ view_class | upper }}
+                {{ _(view_class) | upper }}
               </h6>
               {% for category in categories %}
                 <div class="form-check ms-3 my-1">
@@ -81,7 +81,7 @@
                          id="check_shown_{{ category }}"
                          {% if category in shown_classes %}checked{% endif %}>
                   <label class="form-check-label" for="check_shown_{{ category }}">
-                    {{ category | replace("_", " ") | capitalize }}
+                    {{ _(category | replace("_", " ")) | capitalize }}
                     <span class="text-muted small">({{ class_items.get(category, 0) }})</span>
                   </label>
                 </div>
@@ -103,7 +103,7 @@
                style="max-height: 400px; overflow-y: auto;">
             {% for view_class, categories in view_classes.items() %}
               <h6 class="dropdown-header mt-2 text-primary border-bottom pb-1">
-                {{ view_class | upper }}
+                {{ _(view_class) | upper }}
               </h6>
               {% for category in categories %}
                 <div class="form-check ms-3 my-1">
@@ -113,7 +113,7 @@
                          {% if category in hidden_classes %}checked{% endif %}>
                   <label class="form-check-label"
                          for="check_hidden_{{ category }}">
-                    {{ category | replace("_", " ") | capitalize }}
+                    {{ _(category | replace("_", " ")) | capitalize }}
                     <span class="text-muted small">({{ class_items.get(category, 0) }})</span>
                   </label>
                 </div>

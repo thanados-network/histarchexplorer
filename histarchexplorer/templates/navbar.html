@@ -15,7 +15,7 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target=".navbar-collapse"
                 aria-controls=".navbar-collapse" aria-expanded="false"
-                aria-label="Toggle navigation">
+                aria-label="{{ _('Toggle navigation') }}">
             <i class="bi bi-three-dots-vertical"></i>
         </button>
         <div class="collapse navbar-collapse">
@@ -48,12 +48,12 @@
                 <li class="nav-item dropdown {% if language_override %}d-none {% endif %}">
                     <a class="nav-link dropdown-toggle" href="#" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-globe me-2"></i><span id="language">{{ current_language }}</span>
+                        <i class="bi bi-globe me-2"></i><span id="language">{{ available_languages.get(current_language, current_language) }}</span>
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        {% for lang in available_languages.items() %}
+                        {% for code, name in available_languages.items() %}
                             <li><a class="dropdown-item"
-                                   href="{{ url_for('set_language', language=lang[0] ) }}">{{ lang[0] }}</a>
+                                   href="{{ url_for('set_language', language=code ) }}">{{ name }}</a>
                             </li>
                         {% endfor %}
                     </ul>

@@ -1,0 +1,1640 @@
+# Hungarian translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-05-22 15:44+0200\n"
+"PO-Revision-Date: 2026-05-22 14:17+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: hu\n"
+"Language-Team: hu <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: api/util.py:43 api/util.py:45 api/util.py:46 api/util.py:51
+msgid "BC"
+msgstr "Kr. e."
+
+#: api/util.py:43 api/util.py:45 api/util.py:46
+msgid "AD"
+msgstr "Kr. u."
+
+#: api/util.py:109
+msgid "other"
+msgstr "egyéb"
+
+#: templates/_macros.html:11
+msgid "Back to the entity"
+msgstr "Vissza az entitáshoz"
+
+#: templates/_macros.html:38
+msgid "Image"
+msgstr "Kép"
+
+#: templates/_macros.html:56
+msgid "Your browser does not support the video tag."
+msgstr "Böngészője nem támogatja a videó taget."
+
+#: templates/_macros.html:97 templates/admin/about_content.html:154
+#: templates/tabs/overview.html:12 templates/util/cite/modal.html:37
+msgid "License"
+msgstr "Licenc"
+
+#: templates/_macros.html:100 templates/tabs/overview.html:13
+msgid "Creator"
+msgstr "Létrehozó"
+
+#: templates/_macros.html:103 templates/tabs/overview.html:14
+msgid "License holder"
+msgstr "Licenctulajdonos"
+
+#: templates/_macros.html:125
+msgid "More images"
+msgstr "További képek"
+
+#: templates/_macros.html:158 templates/about.html:215 templates/entity.html:93
+#: templates/entity.html:113
+msgid "Loading"
+msgstr "Betöltés"
+
+#: templates/about.html:57
+msgid "Show details"
+msgstr "Részletek mutatása"
+
+#: templates/about.html:66 views/admin.py:50
+msgid "persons"
+msgstr "személyek"
+
+#: templates/about.html:126
+msgid "data overview"
+msgstr "adatáttekintés"
+
+#: templates/about.html:128
+msgid "project data overview"
+msgstr "projektadatok áttekintése"
+
+#: templates/about.html:153 views/admin.py:48
+msgid "projects"
+msgstr "projektek"
+
+#: templates/about.html:178
+msgid "Details"
+msgstr "Részletek"
+
+#: templates/about.html:194 templates/admin/legal_notice.html:2
+#: templates/admin/legal_notice.html:21
+msgid "legal notice"
+msgstr "jogi nyilatkozat"
+
+#: templates/about.html:217
+msgid "close"
+msgstr "bezárás"
+
+#: templates/about.html:283
+msgid "Website"
+msgstr "Weboldal"
+
+#: templates/about.html:284
+msgid "Email"
+msgstr "E-mail"
+
+#: templates/about.html:287
+msgid "ORCID"
+msgstr "ORCID"
+
+#: templates/about.html:290
+msgid "Address"
+msgstr "Cím"
+
+#: templates/about.html:299
+msgid "relations"
+msgstr "kapcsolatok"
+
+#: templates/admin.html:13
+msgid "admin options"
+msgstr "adminisztrációs lehetőségek"
+
+#: templates/admin.html:18 templates/admin.html:19
+msgid "logout"
+msgstr "kijelentkezés"
+
+#: templates/admin.html:30
+msgid "General Settings"
+msgstr "Általános beállítások"
+
+#: templates/admin.html:31
+msgid "Visibility Settings"
+msgstr "Láthatósági beállítások"
+
+#: templates/admin.html:32 templates/admin.html:129
+msgid "Class colors"
+msgstr "Osztályszínek"
+
+#: templates/admin.html:33
+msgid "Type Divisions"
+msgstr "Típusfelosztások"
+
+#: templates/admin.html:34
+msgid "Content"
+msgstr "Tartalom"
+
+#: templates/admin.html:35
+msgid "Start page"
+msgstr "Kezdőlap"
+
+#: templates/admin.html:36
+msgid "About"
+msgstr "Névjegy"
+
+#: templates/admin.html:37 utils/view_util.py:59
+msgid "Publications"
+msgstr "Publikációk"
+
+#: templates/admin.html:38 utils/view_util.py:62
+msgid "Outcome"
+msgstr "Eredmény"
+
+#: templates/admin.html:39
+msgid "Legal Notice"
+msgstr "Jogi nyilatkozat"
+
+#: templates/admin.html:40
+msgid "Footer"
+msgstr "Lábléc"
+
+#: templates/admin.html:41 templates/search.html:108 templates/search.html:110
+msgid "Search"
+msgstr "Keresés"
+
+#: templates/admin.html:42
+msgid "File Management"
+msgstr "Fájlkezelés"
+
+#: templates/admin.html:43 templates/admin/logo_management.html:3
+msgid "Logo Management"
+msgstr "Logókezelés"
+
+#: templates/admin.html:44
+msgid "Icons"
+msgstr "Ikonok"
+
+#: templates/admin.html:45
+msgid "Assets"
+msgstr "Eszközök"
+
+#: templates/admin.html:46
+msgid "Team"
+msgstr "Csapat"
+
+#: templates/admin.html:47
+msgid "Licenses"
+msgstr "Licencek"
+
+#: templates/admin.html:48
+msgid "Maps"
+msgstr "Térképek"
+
+#: templates/admin.html:49
+msgid "Cache Options"
+msgstr "Gyorsítótár beállításai"
+
+#: templates/admin.html:50
+msgid "Database Interface"
+msgstr "Adatbázis interfész"
+
+#: templates/admin.html:102
+msgid "general settings"
+msgstr "általános beállítások"
+
+#: templates/admin.html:116
+msgid "visibility settings"
+msgstr "láthatósági beállítások"
+
+#: templates/admin.html:142
+msgid "type divisions"
+msgstr "típusfelosztások"
+
+#: templates/admin.html:155
+msgid "cache options"
+msgstr "gyorsítótár beállításai"
+
+#: templates/admin.html:195
+msgid "index page options"
+msgstr "kezdőlap beállításai"
+
+#: templates/admin.html:217
+msgid "File Management Overview"
+msgstr "Fájlkezelés áttekintése"
+
+#: templates/admin.html:218
+msgid "Select a file management section from the sidebar to start editing."
+msgstr ""
+"Válasszon egy fájlkezelési részt az oldalsávból a szerkesztés "
+"megkezdéséhez."
+
+#: templates/admin.html:270
+msgid "maps"
+msgstr "térképek"
+
+#: templates/login.html:6
+msgid "Login"
+msgstr "Bejelentkezés"
+
+#: templates/login.html:10 views/login.py:29
+msgid "username"
+msgstr "felhasználónév"
+
+#: templates/login.html:14 views/login.py:32
+msgid "password"
+msgstr "jelszó"
+
+#: templates/navbar.html:7
+msgid "home"
+msgstr "főoldal"
+
+#: templates/navbar.html:18
+msgid "Toggle navigation"
+msgstr "Navigáció váltása"
+
+#: templates/navbar.html:40 templates/navbar.html:44
+msgid "toggle dark/light mode"
+msgstr "sötét/világos mód váltása"
+
+#: templates/outcome.html:9
+msgid "Outcome Test Page"
+msgstr "Eredmény tesztoldal"
+
+#: templates/publications.html:9
+msgid "Publications Test Page"
+msgstr "Publikációk tesztoldal"
+
+#: templates/search.html:11
+msgid "Filter by Type"
+msgstr "Szűrés típus szerint"
+
+#: templates/search.html:14
+msgid "Actors"
+msgstr "Szereplők"
+
+#: templates/search.html:17
+msgid "Person"
+msgstr "Személy"
+
+#: templates/search.html:21
+msgid "Group"
+msgstr "Csoport"
+
+#: templates/search.html:24
+msgid "Items"
+msgstr "Tárgyak"
+
+#: templates/search.html:27
+msgid "Artifact"
+msgstr "Artefaktum"
+
+#: templates/search.html:31
+msgid "Human Remains"
+msgstr "Emberi maradványok"
+
+#: templates/search.html:34
+msgid "Events"
+msgstr "Események"
+
+#: templates/search.html:37
+msgid "Acquisition"
+msgstr "Szerzés"
+
+#: templates/search.html:41
+msgid "Event"
+msgstr "Esemény"
+
+#: templates/search.html:45
+msgid "Activity"
+msgstr "Tevékenység"
+
+#: templates/search.html:49
+msgid "Creation"
+msgstr "Létrehozás"
+
+#: templates/search.html:53
+msgid "Move"
+msgstr "Mozgatás"
+
+#: templates/search.html:57
+msgid "Production"
+msgstr "Termelés"
+
+#: templates/search.html:61
+msgid "Modification"
+msgstr "Módosítás"
+
+#: templates/search.html:64
+msgid "Places"
+msgstr "Helyek"
+
+#: templates/search.html:67
+msgid "Place"
+msgstr "Hely"
+
+#: templates/search.html:71
+msgid "Stratigraphic Unit"
+msgstr "Rétegtani egység"
+
+#: templates/search.html:75
+msgid "Feature"
+msgstr "Jelenség"
+
+#: templates/search.html:78
+msgid "Sources"
+msgstr "Források"
+
+#: templates/search.html:81
+msgid "Source"
+msgstr "Forrás"
+
+#: templates/search.html:85
+msgid "Bibliography"
+msgstr "Bibliográfia"
+
+#: templates/search.html:89
+msgid "External Reference"
+msgstr "Külső hivatkozás"
+
+#: templates/search.html:93
+msgid "Edition"
+msgstr "Kiadás"
+
+#: templates/search.html:96
+msgid "Files"
+msgstr "Fájlok"
+
+#: templates/search.html:99
+msgid "File"
+msgstr "Fájl"
+
+#: templates/search.html:120
+msgid "Start typing above to see live results or press enter to run a search."
+msgstr ""
+"Kezdjen el gépelni fent az élő eredményekhez, vagy nyomja meg az entert a"
+" kereséshez."
+
+#: templates/search.html:127
+msgid "Static Search Results"
+msgstr "Statikus keresési eredmények"
+
+#: templates/search.html:131
+#, python-format
+msgid "No results found for \"%(query)s\""
+msgstr "Nincs találat a következőhöz: \"%(query)s\""
+
+#: templates/search.html:247 templates/search_detail.html:4
+msgid "Unnamed"
+msgstr "Névtelen"
+
+#: templates/search.html:248
+msgid "Load more"
+msgstr "Továbbiak betöltése"
+
+#: templates/search.html:249
+msgid "Type at least 3 characters..."
+msgstr "Gépeljen be legalább 3 karaktert..."
+
+#: templates/search.html:250
+#, python-format
+msgid "Loading live results for \"%(query)s\"..."
+msgstr "Élő eredmények betöltése a következőhöz: \"%(query)s\"..."
+
+#: templates/search.html:251
+#, python-format
+msgid "No live results found for \"%(query)s\"."
+msgstr "Nem találhatók élő eredmények a következőhöz: \"%(query)s\"."
+
+#: templates/search.html:252
+msgid "Error loading live results."
+msgstr "Hiba az élő eredmények betöltésekor."
+
+#: templates/search.html:253
+msgid "Select one or more types"
+msgstr "Válasszon egy vagy több típust"
+
+#: templates/search_detail.html:11
+msgid "Coordinates"
+msgstr "Koordináták"
+
+#: templates/search_detail.html:14
+msgid "Back to search"
+msgstr "Vissza a kereséshez"
+
+#: templates/admin/about_content.html:3
+msgid "about section content"
+msgstr "névjegy szakasz tartalma"
+
+#: templates/admin/about_content.html:67 templates/admin/about_content.html:71
+msgid "no translation available"
+msgstr "nincs elérhető fordítás"
+
+#: templates/admin/about_content.html:83 templates/admin/about_content.html:160
+msgid "None"
+msgstr "Nincs"
+
+#: templates/admin/about_content.html:112 templates/admin/modals.html:41
+msgid "Select a value"
+msgstr "Válasszon egy értéket"
+
+#: templates/admin/about_content.html:133
+msgid "This entry has no translation for"
+msgstr "Ennek a bejegyzésnek nincs fordítása a következőhöz:"
+
+#: templates/admin/about_content.html:139 templates/admin/modals.html:58
+msgid "Please provide a"
+msgstr "Kérjük, adjon meg egy"
+
+#: templates/admin/about_content.html:174
+msgid "Edit"
+msgstr "Szerkesztés"
+
+#: templates/admin/about_content.html:182
+#: templates/admin/about_content.html:225
+#: templates/admin/assets_management.html:86
+#: templates/admin/icon_management.html:53
+#: templates/admin/logo_management.html:100 templates/admin/modals.html:89
+#: templates/admin/team_management.html:86
+msgid "Delete"
+msgstr "Törlés"
+
+#: templates/admin/about_content.html:187 templates/admin/modals.html:90
+msgid "Cancel"
+msgstr "Mégse"
+
+#: templates/admin/about_content.html:193
+#: templates/admin/general_settings.html:72
+msgid "Save"
+msgstr "Mentés"
+
+#: templates/admin/about_content.html:236
+msgid "select connection"
+msgstr "kapcsolat kiválasztása"
+
+#: templates/admin/about_content.html:249
+msgid "select node"
+msgstr "csomópont kiválasztása"
+
+#: templates/admin/about_content.html:262
+msgid "select role"
+msgstr "szerepkör kiválasztása"
+
+#: templates/admin/about_content.html:264
+msgid "not specified"
+msgstr "nincs meghatározva"
+
+#: templates/admin/about_content.html:279 templates/admin/colors.html:71
+#: templates/admin/index_page_options.html:58
+#: templates/admin/legal_notice.html:29 templates/admin/maps.html:104
+msgid "save"
+msgstr "mentés"
+
+#: templates/admin/about_content.html:291 templates/admin/maps.html:116
+#: templates/admin/modals.html:7 templates/admin/modals.html:68
+msgid "add entry"
+msgstr "bejegyzés hozzáadása"
+
+#: templates/admin/assets_management.html:3
+msgid "Asset Management"
+msgstr "Eszközkezelés"
+
+#: templates/admin/assets_management.html:5
+msgid ""
+"The assets are general files, which can be used in individual pages. "
+"These can be all data types; some can be displayed, while some can only "
+"be downloaded."
+msgstr ""
+"Az eszközök általános fájlok, amelyek egyedi oldalakon használhatók. Ezek"
+" bármilyen adattípusok lehetnek; némelyikük megjeleníthető, míg "
+"némelyikük csak letölthető."
+
+#: templates/admin/assets_management.html:13
+msgid "Upload New Asset"
+msgstr "Új eszköz feltöltése"
+
+#: templates/admin/assets_management.html:20
+#: templates/admin/icon_management.html:21
+#: templates/admin/logo_management.html:20
+#: templates/admin/team_management.html:21
+msgid "Upload"
+msgstr "Feltöltés"
+
+#: templates/admin/assets_management.html:24
+msgid "Accepted formats: All files."
+msgstr "Elfogadott formátumok: Minden fájl."
+
+#: templates/admin/assets_management.html:33
+msgid "Existing Assets"
+msgstr "Létező eszközök"
+
+#: templates/admin/assets_management.html:58
+#: templates/admin/logo_management.html:50
+#: templates/admin/team_management.html:53
+msgid "Select License..."
+msgstr "Licenc kiválasztása..."
+
+#: templates/admin/assets_management.html:67
+#: templates/admin/logo_management.html:59
+#: templates/admin/team_management.html:64
+msgid "Attribution (if any)..."
+msgstr "Szerző megnevezése (ha van)..."
+
+#: templates/admin/assets_management.html:69
+#: templates/admin/logo_management.html:61
+#: templates/admin/team_management.html:67
+msgid "Save License"
+msgstr "Licenc mentése"
+
+#: templates/admin/assets_management.html:77
+#: templates/admin/logo_management.html:91
+#: templates/admin/team_management.html:75
+msgid "New name..."
+msgstr "Új név..."
+
+#: templates/admin/assets_management.html:78
+#: templates/admin/logo_management.html:92
+#: templates/admin/team_management.html:76
+msgid "Rename"
+msgstr "Átnevezés"
+
+#: templates/admin/assets_management.html:85
+msgid "Are you sure you want to delete this asset?"
+msgstr "Biztosan törölni szeretné ezt az eszközt?"
+
+#: templates/admin/assets_management.html:95
+msgid "No assets have been uploaded yet."
+msgstr "Még nem töltöttek fel eszközöket."
+
+#: templates/admin/cache.html:4
+msgid "Refreshes the system cache."
+msgstr "Frissíti a rendszer gyorsítótárát."
+
+#: templates/admin/cache.html:5
+msgid "refresh system cache"
+msgstr "rendszer gyorsítótár frissítése"
+
+#: templates/admin/cache.html:11
+msgid "This will cache all not cached entities."
+msgstr "Ez minden még nem gyorsítótárazott entitást gyorsítótárazni fog."
+
+#: templates/admin/cache.html:12
+msgid "warm entity cache"
+msgstr "entitás gyorsítótár bemelegítése"
+
+#: templates/admin/cache.html:18
+msgid "This completely refreshes the cache."
+msgstr "Ez teljesen frissíti a gyorsítótárat."
+
+#: templates/admin/cache.html:19
+msgid "refresh entity cache"
+msgstr "entitás gyorsítótár frissítése"
+
+#: templates/admin/cache.html:26
+msgid "Clear the cache to free up space"
+msgstr "Gyorsítótár ürítése helyfelszabadítás érdekében"
+
+#: templates/admin/cache.html:27
+msgid "clear cache"
+msgstr "gyorsítótár ürítése"
+
+#: templates/admin/colors.html:62
+msgid "select a color"
+msgstr "szín kiválasztása"
+
+#: templates/admin/colors.html:77
+msgid "Manage Available Colors"
+msgstr "Elérhető színek kezelése"
+
+#: templates/admin/colors.html:85
+msgid "are you sure you want to delete this color?"
+msgstr "biztosan törölni szeretné ezt a színt?"
+
+#: templates/admin/colors.html:97
+msgid "add new hex color"
+msgstr "új hex szín hozzáadása"
+
+#: templates/admin/colors.html:106
+msgid "add color"
+msgstr "szín hozzáadása"
+
+#: templates/admin/database.html:3
+msgid "Database Backup"
+msgstr "Adatbázis mentés"
+
+#: templates/admin/database.html:5
+msgid "Download a full SQL dump of the current database."
+msgstr "Töltse le a jelenlegi adatbázis teljes SQL dumpját."
+
+#: templates/admin/database.html:8
+msgid "Download SQL Dump"
+msgstr "SQL dump letöltése"
+
+#: templates/admin/database.html:15
+msgid "Database Restore"
+msgstr "Adatbázis helyreállítás"
+
+#: templates/admin/database.html:17 templates/admin/database.html:38
+msgid "Warning:"
+msgstr "Figyelem:"
+
+#: templates/admin/database.html:18
+msgid ""
+"Restoring a database will overwrite all current data. This action cannot "
+"be undone."
+msgstr ""
+"Az adatbázis helyreállítása minden jelenlegi adatot felülír. Ez a művelet"
+" nem vonható vissza."
+
+#: templates/admin/database.html:24
+msgid "Select SQL Dump File"
+msgstr "SQL dump fájl kiválasztása"
+
+#: templates/admin/database.html:27
+msgid "Are you sure you want to overwrite the database?"
+msgstr "Biztosan felül szeretné írni az adatbázist?"
+
+#: templates/admin/database.html:28
+msgid "Restore Database"
+msgstr "Adatbázis helyreállítása"
+
+#: templates/admin/database.html:36
+msgid "Database Reset"
+msgstr "Adatbázis visszaállítás"
+
+#: templates/admin/database.html:39
+msgid ""
+"This will reset the entire database to the initial sample data. All "
+"custom data will be lost!"
+msgstr ""
+"Ez az egész adatbázist visszaállítja a kezdeti mintaadatokra. Minden "
+"egyedi adat elvész!"
+
+#: templates/admin/database.html:42
+msgid "Resets the entire database"
+msgstr "Visszaállítja a teljes adatbázist"
+
+#: templates/admin/database.html:43
+msgid "RESET DATABASE"
+msgstr "ADATBÁZIS VISSZAÁLLÍTÁSA"
+
+#: templates/admin/footer_content_management.html:4
+msgid "Footer Order"
+msgstr "Lábléc sorrend"
+
+#: templates/admin/footer_content_management.html:16
+msgid "Save Footer Order"
+msgstr "Lábléc sorrend mentése"
+
+#: templates/admin/footer_content_management.html:22
+msgid "Select Footer Logos"
+msgstr "Lábléc logók kiválasztása"
+
+#: templates/admin/footer_content_management.html:39
+msgid "Add to Footer"
+msgstr "Hozzáadás a lábléchez"
+
+#: templates/admin/footer_content_management.html:47
+msgid "Save Footer Selection"
+msgstr "Lábléc választék mentése"
+
+#: templates/admin/footer_content_management.html:49
+#: templates/admin/logo_management.html:109
+msgid "No logos have been uploaded yet."
+msgstr "Még nem töltöttek fel logókat."
+
+#: templates/admin/general_settings.html:8
+msgid "case study hierarchy ID"
+msgstr "esettanulmány hierarchia ID"
+
+#: templates/admin/general_settings.html:15
+msgid "Please enter a positive integer for the Case Study Hierarchy ID."
+msgstr ""
+"Kérjük, adjon meg egy pozitív egész számot az esettanulmány hierarchia "
+"ID-hez."
+
+#: templates/admin/general_settings.html:32
+msgid "Deactivate Darkmode"
+msgstr "Sötét mód deaktiválása"
+
+#: templates/admin/general_settings.html:43
+msgid "Deactivate Language Selector"
+msgstr "Nyelvválasztó deaktiválása"
+
+#: templates/admin/general_settings.html:54
+msgid "Activate Access Restriction"
+msgstr "Hozzáférési korlátozás aktiválása"
+
+#: templates/admin/general_settings.html:59
+msgid "preferred language"
+msgstr "preferált nyelv"
+
+#: templates/admin/icon_management.html:3
+msgid "Icon Management"
+msgstr "Ikonkezelés"
+
+#: templates/admin/icon_management.html:5
+msgid ""
+"This section is for managing SVG icons that can be used throughout the "
+"application."
+msgstr ""
+"Ez a rész az alkalmazás egészében használható SVG ikonok kezelésére "
+"szolgál."
+
+#: templates/admin/icon_management.html:13
+msgid "Upload New Icon"
+msgstr "Új ikon feltöltése"
+
+#: templates/admin/icon_management.html:25
+msgid "Accepted format: SVG."
+msgstr "Elfogadott formátum: SVG."
+
+#: templates/admin/icon_management.html:34
+msgid "Existing Icons"
+msgstr "Létező ikonok"
+
+#: templates/admin/icon_management.html:52
+msgid "Are you sure you want to delete this icon?"
+msgstr "Biztosan törölni szeretné ezt az ikont?"
+
+#: templates/admin/icon_management.html:62
+msgid "No icons have been uploaded yet."
+msgstr "Még nem töltöttek fel ikonokat."
+
+#: templates/admin/index_page_options.html:5
+msgid "choose index background"
+msgstr "kezdőlap hátterének kiválasztása"
+
+#: templates/admin/index_page_options.html:19
+msgid "map options"
+msgstr "térképbeállítások"
+
+#: templates/admin/index_page_options.html:21
+msgid "select map background"
+msgstr "térkép hátterének kiválasztása"
+
+#: templates/admin/index_page_options.html:40
+msgid "Greyscale"
+msgstr "Szürkeárnyalatos"
+
+#: templates/admin/index_page_options.html:44
+msgid "image options"
+msgstr "képbeállítások"
+
+#: templates/admin/index_page_options.html:46
+msgid "define default background image"
+msgstr "alapértelmezett háttérkép meghatározása"
+
+#: templates/admin/license_management.html:3
+msgid "Add New License"
+msgstr "Új licenc hozzáadása"
+
+#: templates/admin/license_management.html:8
+#: templates/admin/license_management.html:40
+msgid "SPDX ID"
+msgstr "SPDX ID"
+
+#: templates/admin/license_management.html:12
+msgid "URI"
+msgstr "URI"
+
+#: templates/admin/license_management.html:16
+#: templates/admin/license_management.html:39
+msgid "Label"
+msgstr "Címke"
+
+#: templates/admin/license_management.html:20
+#: templates/admin/license_management.html:41
+msgid "Category"
+msgstr "Kategória"
+
+#: templates/admin/license_management.html:27
+msgid "Add License"
+msgstr "Licenc hozzáadása"
+
+#: templates/admin/license_management.html:34
+msgid "Existing Licenses"
+msgstr "Létező licencek"
+
+#: templates/admin/license_management.html:38
+msgid "Logo"
+msgstr "Logó"
+
+#: templates/admin/license_management.html:42
+msgid "Actions"
+msgstr "Műveletek"
+
+#: templates/admin/license_management.html:58
+msgid "Are you sure?"
+msgstr "Biztos benne?"
+
+#: templates/admin/logo_management.html:5
+msgid ""
+"The logo section is only for logos and can be used for the footer, site "
+"logo, project logos, and institution logos, as well as for individual "
+"pages."
+msgstr ""
+"A logó rész csak logók számára fenntartott, és használható a lábléchez, "
+"az oldal logójához, projektlogókhoz és intézményi logókhoz, valamint "
+"egyedi oldalakhoz."
+
+#: templates/admin/logo_management.html:13
+msgid "Upload New Logo"
+msgstr "Új logó feltöltése"
+
+#: templates/admin/logo_management.html:24
+#: templates/admin/team_management.html:25
+msgid "Accepted formats: PNG, JPG, SVG, GIF."
+msgstr "Elfogadott formátumok: PNG, JPG, SVG, GIF."
+
+#: templates/admin/logo_management.html:33
+msgid "Existing Logos"
+msgstr "Létező logók"
+
+#: templates/admin/logo_management.html:70
+msgid "Main Logo"
+msgstr "Fő logó"
+
+#: templates/admin/logo_management.html:74
+msgid "Set as Main"
+msgstr "Beállítás főként"
+
+#: templates/admin/logo_management.html:83
+msgid "Set as Favicon"
+msgstr "Beállítás faviconként"
+
+#: templates/admin/logo_management.html:99
+msgid "Are you sure you want to delete this logo?"
+msgstr "Biztosan törölni szeretné ezt a logót?"
+
+#: templates/admin/maps.html:29
+msgid "name"
+msgstr "név"
+
+#: templates/admin/maps.html:37 templates/admin/maps.html:52
+msgid "Please provide a name"
+msgstr "Kérjük, adjon meg egy nevet"
+
+#: templates/admin/maps.html:42
+msgid "Display Name"
+msgstr "Megjelenített név"
+
+#: templates/admin/maps.html:57
+msgid "order"
+msgstr "sorrend"
+
+#: templates/admin/maps.html:65
+msgid "Please provide an order"
+msgstr "Kérjük, adjon meg egy sorrendet"
+
+#: templates/admin/maps.html:73
+msgid "Leaflet Tile Layer String"
+msgstr "Leaflet Tile Layer karaktersorozat"
+
+#: templates/admin/maps.html:87
+msgid "edit"
+msgstr "szerkesztés"
+
+#: templates/admin/maps.html:95
+msgid "delete"
+msgstr "törlés"
+
+#: templates/admin/maps.html:99
+msgid "cancel"
+msgstr "mégse"
+
+#: templates/admin/menu_management.html:3
+msgid "menu management"
+msgstr "menükezelés"
+
+#: templates/admin/menu_management.html:9
+msgid "Menu Item"
+msgstr "Menüpont"
+
+#: templates/admin/menu_management.html:10
+msgid "Show"
+msgstr "Mutat"
+
+#: templates/admin/menu_management.html:11
+msgid "Page Type"
+msgstr "Oldaltípus"
+
+#: templates/admin/menu_management.html:36
+#: templates/admin/menu_management.html:72
+msgid "Default"
+msgstr "Alapértelmezett"
+
+#: templates/admin/menu_management.html:45
+#: templates/admin/menu_management.html:81
+msgid "Individual"
+msgstr "Egyéni"
+
+#: templates/admin/menu_management.html:88
+msgid "Save Changes"
+msgstr "Módosítások mentése"
+
+#: templates/admin/modals.html:82
+msgid "Confirm Delete"
+msgstr "Törlés megerősítése"
+
+#: templates/admin/modals.html:83 templates/util/cite/modal.html:84
+msgid "Close"
+msgstr "Bezárás"
+
+#: templates/admin/modals.html:86
+msgid "Are you sure you want to delete"
+msgstr "Biztosan törölni szeretné"
+
+#: templates/admin/team_management.html:3
+msgid "Team Management"
+msgstr "Csapatkezelés"
+
+#: templates/admin/team_management.html:5
+msgid ""
+"The team section only includes person photos, which can be used in the "
+"person management and for individual pages."
+msgstr ""
+"A csapat rész csak személyfotókat tartalmaz, amelyek a személykezelésnél "
+"és egyedi oldalakon használhatók."
+
+#: templates/admin/team_management.html:13
+msgid "Upload New Team Image"
+msgstr "Új csapatkép feltöltése"
+
+#: templates/admin/team_management.html:34
+msgid "Existing Team Images"
+msgstr "Létező csapatképek"
+
+#: templates/admin/team_management.html:85
+msgid "Are you sure you want to delete this image?"
+msgstr "Biztosan törölni szeretné ezt a képet?"
+
+#: templates/admin/team_management.html:95
+msgid "No team images have been uploaded yet."
+msgstr "Még nem töltöttek fel csapatképeket."
+
+#: templates/admin/type_divisions.html:9 templates/admin/type_divisions.html:58
+msgid "Remove Division"
+msgstr "Felosztás eltávolítása"
+
+#: templates/admin/type_divisions.html:16
+#: templates/admin/type_divisions.html:65
+msgid "Icon Type"
+msgstr "Ikontípus"
+
+#: templates/admin/type_divisions.html:24
+#: templates/admin/type_divisions.html:73
+msgid "Icon Value"
+msgstr "Ikonérték"
+
+#: templates/admin/type_divisions.html:30
+#: templates/admin/type_divisions.html:78
+msgid "IDs"
+msgstr "ID-k"
+
+#: templates/admin/type_divisions.html:33
+#: templates/admin/type_divisions.html:80
+msgid "Comma-separated list of IDs."
+msgstr "ID-k vesszővel elválasztott listája."
+
+#: templates/admin/type_divisions.html:40
+msgid "Add Division"
+msgstr "Felosztás hozzáadása"
+
+#: templates/admin/type_divisions.html:43
+msgid "save changes"
+msgstr "módosítások mentése"
+
+#: templates/admin/visibility_settings.html:5
+msgid "Visibility Configuration"
+msgstr "Láthatósági konfiguráció"
+
+#: templates/admin/visibility_settings.html:7
+msgid "Save All Settings"
+msgstr "Összes beállítás mentése"
+
+#: templates/admin/visibility_settings.html:14
+msgid "Entity Types"
+msgstr "Entitás típusok"
+
+#: templates/admin/visibility_settings.html:17
+msgid "Shown Type IDs"
+msgstr "Megjelenített típus ID-k"
+
+#: templates/admin/visibility_settings.html:19
+msgid "Comma-separated list of type IDs to show."
+msgstr "Megjelenítendő típus ID-k vesszővel elválasztott listája."
+
+#: templates/admin/visibility_settings.html:26
+msgid "Hidden Type IDs"
+msgstr "Rejtett típus ID-k"
+
+#: templates/admin/visibility_settings.html:28
+msgid "Comma-separated list of type IDs to hide."
+msgstr "Rejtendő típus ID-k vesszővel elválasztott listája."
+
+#: templates/admin/visibility_settings.html:38
+msgid "Individual Entity IDs"
+msgstr "Egyéni entitás ID-k"
+
+#: templates/admin/visibility_settings.html:41
+msgid "Shown Entity IDs"
+msgstr "Megjelenített entitás ID-k"
+
+#: templates/admin/visibility_settings.html:43
+msgid "Comma-separated list of entity IDs to show."
+msgstr "Megjelenítendő entitás ID-k vesszővel elválasztott listája."
+
+#: templates/admin/visibility_settings.html:50
+msgid "Hidden Entity IDs"
+msgstr "Rejtett entitás ID-k"
+
+#: templates/admin/visibility_settings.html:52
+msgid "Comma-separated list of entity IDs to hide."
+msgstr "Rejtendő entitás ID-k vesszővel elválasztott listája."
+
+#: templates/admin/visibility_settings.html:61
+msgid "Entity Classes"
+msgstr "Entitás osztályok"
+
+#: templates/admin/visibility_settings.html:66
+msgid "Shown Classes"
+msgstr "Megjelenített osztályok"
+
+#: templates/admin/visibility_settings.html:69
+msgid "Checked classes will be explicitly shown in the browse interface."
+msgstr "A bejelölt osztályok kifejezetten meg fognak jelenni a böngészőfelületen."
+
+#: templates/admin/visibility_settings.html:97
+msgid "Hidden Classes"
+msgstr "Rejtett osztályok"
+
+#: templates/admin/visibility_settings.html:100
+msgid "Checked classes will be hidden from the browse interface."
+msgstr "A bejelölt osztályok rejtve maradnak a böngészőfelületen."
+
+#: templates/admin/visibility_settings.html:131
+msgid "Save Visibility Settings"
+msgstr "Láthatósági beállítások mentése"
+
+#: templates/tabs/feature.html:34 views/admin.py:54
+msgid "attributes"
+msgstr "attribútumok"
+
+#: templates/tabs/overview.html:8
+msgid "subentities"
+msgstr "alentitások"
+
+#: templates/tabs/overview.html:9
+msgid "subunits"
+msgstr "alegységek"
+
+#: templates/tabs/overview.html:10
+msgid "description"
+msgstr "leírás"
+
+#: templates/tabs/overview.html:11
+msgid "Media file"
+msgstr "Médiafájl"
+
+#: templates/tabs/overview.html:15
+msgid "Open full view"
+msgstr "Teljes nézet megnyitása"
+
+#: templates/tabs/overview.html:16
+#, python-format
+msgid "View all %(count)s files"
+msgstr "Mind a(z) %(count)s fájl megtekintése"
+
+#: templates/util/cite/modal.html:5
+msgid "Cite this Entry"
+msgstr "Idézet készítése"
+
+#: templates/util/cite/modal.html:12
+msgid "Recommended Citation"
+msgstr "Javasolt hivatkozás"
+
+#: templates/util/cite/modal.html:17
+msgid "Copy to clipboard"
+msgstr "Másolás a vágólapra"
+
+#: templates/util/cite/modal.html:33
+msgid "No license info"
+msgstr "Nincs licencinformáció"
+
+#: templates/util/cite/modal.html:41
+msgid "View License Deed"
+msgstr "Licenc megtekintése"
+
+#: templates/util/cite/modal.html:44
+msgid "No specific license information available for this entity."
+msgstr "Ehhez az entitáshoz nem érhető el specifikus licencinformáció."
+
+#: templates/util/cite/modal.html:54
+msgid "Export Formats (BibTeX, RIS)"
+msgstr "Exportálási formátumok (BibTeX, RIS)"
+
+#: utils/view_util.py:17
+msgid "entities"
+msgstr "entitások"
+
+#: utils/view_util.py:18
+msgid "search"
+msgstr "keresés"
+
+#: utils/view_util.py:19
+msgid "about"
+msgstr "névjegy"
+
+#: utils/view_util.py:20
+msgid "outcome"
+msgstr "eredmény"
+
+#: utils/view_util.py:21
+msgid "publications"
+msgstr "publikációk"
+
+#: utils/view_util.py:53
+msgid "browse/select/find all entities"
+msgstr "böngészés/kiválasztás/összes entitás keresése"
+
+#: utils/view_util.py:56
+msgid "detailed search"
+msgstr "részletes keresés"
+
+#: utils/view_util.py:65
+msgid "about the project"
+msgstr "a projektről"
+
+#: utils/view_util.py:83
+msgid "Unknown"
+msgstr "Ismeretlen"
+
+#: utils/view_util.py:145
+#, python-format
+msgid "Accessed: %(date)s"
+msgstr "Hozzáférés: %(date)s"
+
+#: utils/view_util.py:194
+#, python-format
+msgid ""
+"%(project_name)s (%(year)s). %(title)s. Retrieved from %(url)s (Accessed:"
+" %(date)s)"
+msgstr ""
+"%(project_name)s (%(year)s). %(title)s. Forrás: %(url)s (Hozzáférés: "
+"%(date)s)"
+
+#: views/admin.py:46
+msgid "main-project"
+msgstr "fő projekt"
+
+#: views/admin.py:52
+msgid "institutions"
+msgstr "intézmények"
+
+#: views/admin.py:150
+#, python-format
+msgid ""
+"Invalid ID format for label \"%(label)s\". Please use comma-separated "
+"integers."
+msgstr "Érvénytelen ID formátum a(z) \"%(label)s\" címkéhez. Kérjük, használjon vesszővel elválasztott egész számokat."
+
+#: views/admin.py:162
+msgid "Type divisions updated successfully."
+msgstr "Típusfelosztások sikeresen frissítve."
+
+#: views/admin.py:165
+msgid "Error updating type divisions"
+msgstr "Hiba a típusfelosztások frissítésekor"
+
+#: views/admin.py:182
+msgid "Entity colors updated successfully."
+msgstr "Entitás színei sikeresen frissítve."
+
+#: views/admin.py:185
+msgid "Error updating entity colors"
+msgstr "Hiba az entitás színeinek frissítésekor"
+
+#: views/admin.py:199
+msgid "Color added successfully."
+msgstr "Szín sikeresen hozzáadva."
+
+#: views/admin.py:202
+msgid "Error adding color"
+msgstr "Hiba a szín hozzáadásakor"
+
+#: views/admin.py:204
+msgid "Color already exists."
+msgstr "Ez a szín már létezik."
+
+#: views/admin.py:206
+msgid "Invalid HEX code."
+msgstr "Érvénytelen HEX kód."
+
+#: views/admin.py:219
+msgid "Color deleted successfully."
+msgstr "Szín sikeresen törölve."
+
+#: views/admin.py:222
+msgid "Error deleting color"
+msgstr "Hiba a szín törlésekor"
+
+#: views/admin.py:241
+msgid "Menu settings updated successfully."
+msgstr "Menübeállítások sikeresen frissítve."
+
+#: views/admin.py:244
+msgid "Error updating menu settings"
+msgstr "Hiba a menübeállítások frissítésekor"
+
+#: views/admin.py:263
+msgid "Legal notice updated successfully."
+msgstr "Jogi nyilatkozat sikeresen frissítve."
+
+#: views/admin.py:266 views/admin.py:380 views/admin.py:849
+msgid "Error updating settings"
+msgstr "Hiba a beállítások frissítésekor"
+
+#: views/admin.py:276 views/admin.py:543 views/admin.py:1082
+#: views/admin.py:1217
+msgid "No file part"
+msgstr "Nincs fájlrész"
+
+#: views/admin.py:281 views/admin.py:548 views/admin.py:1087
+#: views/admin.py:1222
+msgid "No selected file"
+msgstr "Nincs kiválasztott fájl"
+
+#: views/admin.py:290
+#, python-format
+msgid "Logo \"%(name)s\" uploaded successfully."
+msgstr "Logó \"%(name)s\" sikeresen feltöltve."
+
+#: views/admin.py:304 views/admin.py:1110 views/admin.py:1257
+msgid "Invalid request for renaming."
+msgstr "Érvénytelen átnevezési kérelem."
+
+#: views/admin.py:314
+msgid "Cannot rename default logos."
+msgstr "Az alapértelmezett logók nem nevezhetők át."
+
+#: views/admin.py:320 views/admin.py:1126 views/admin.py:1286
+msgid "Original file not found."
+msgstr "Az eredeti fájl nem található."
+
+#: views/admin.py:324 views/admin.py:1130 views/admin.py:1290
+msgid "A file with the new name already exists."
+msgstr "Már létezik fájl ezzel az névvel."
+
+#: views/admin.py:330
+#, python-format
+msgid "Logo renamed from \"%(old)s\" to \"%(new)s\"."
+msgstr "Logó átnevezve erről: \"%(old)s\" erre: \"%(new)s\"."
+
+#: views/admin.py:333 views/admin.py:1139 views/admin.py:1298
+#, python-format
+msgid "Error renaming file: %(error)s"
+msgstr "Hiba a fájl átnevezésekor: %(error)s"
+
+#: views/admin.py:344 views/admin.py:1150
+msgid "No filename specified for deletion."
+msgstr "Nincs megadva fájlnév a törléshez."
+
+#: views/admin.py:354
+#, python-format
+msgid "Logo \"%(name)s\" deleted successfully."
+msgstr "Logó \"%(name)s\" sikeresen törölve."
+
+#: views/admin.py:357 views/admin.py:1163 views/admin.py:1335
+#, python-format
+msgid "Error deleting file: %(error)s"
+msgstr "Hiba a fájl törlésekor: %(error)s"
+
+#: views/admin.py:360
+#, python-format
+msgid "Default logo \"%(name)s\" deactivated."
+msgstr "Alapértelmezett logó \"%(name)s\" deaktiválva."
+
+#: views/admin.py:371 views/admin.py:391
+msgid "No filename specified."
+msgstr "Nincs megadva fájlnév."
+
+#: views/admin.py:377
+msgid "Main logo updated successfully."
+msgstr "Fő logó sikeresen frissítve."
+
+#: views/admin.py:409
+msgid "Favicon updated successfully."
+msgstr "Favicon sikeresen frissítve."
+
+#: views/admin.py:412
+#, python-format
+msgid "Error creating favicon: %(error)s"
+msgstr "Hiba a favicon létrehozásakor: %(error)s"
+
+#: views/admin.py:442
+msgid "Footer logos updated successfully."
+msgstr "Lábléc logók sikeresen frissítve."
+
+#: views/admin.py:445
+msgid "Error updating footer logos"
+msgstr "Hiba a lábléc logók frissítésekor"
+
+#: views/admin.py:459
+msgid "License added successfully."
+msgstr "Licenc sikeresen hozzáadva."
+
+#: views/admin.py:468
+msgid "License deleted successfully."
+msgstr "Licenc sikeresen törölve."
+
+#: views/admin.py:484
+msgid "Logo license updated successfully."
+msgstr "Logó licenc sikeresen frissítve."
+
+#: views/admin.py:529
+msgid "Database backup failed. Check logs for details."
+msgstr "Adatbázis mentés sikertelen. Ellenőrizze a naplókat a részletekért."
+
+#: views/admin.py:532 views/admin.py:608
+msgid "An unexpected error occurred. Check logs for details."
+msgstr "Váratlan hiba történt. Ellenőrizze a naplókat a részletekért."
+
+#: views/admin.py:599
+msgid "Database restored successfully."
+msgstr "Adatbázis sikeresen helyreállítva."
+
+#: views/admin.py:603
+msgid "Database restore failed. Check logs for details."
+msgstr "Adatbázis helyreállítás sikertelen. Ellenőrizze a naplókat a részletekért."
+
+#: views/admin.py:611
+msgid "Invalid file type. Please upload a .sql file."
+msgstr "Érvénytelen fájltípus. Kérjük, töltsön fel egy .sql fájlt."
+
+#: views/admin.py:621
+msgid "Link deleted successfully"
+msgstr "Link sikeresen törölve"
+
+#: views/admin.py:648
+msgid "Link added successfully"
+msgstr "Link sikeresen hozzáadva"
+
+#: views/admin.py:654
+msgid "Failed to add link: Invalid data provided"
+msgstr "Nem sikerült a link hozzáadása: érvénytelen adatok"
+
+#: views/admin.py:685
+msgid "Entry added successfully!"
+msgstr "Bejegyzés sikeresen hozzáadva!"
+
+#: views/admin.py:689
+#, python-format
+msgid "Error adding entry %(name)s: Only one main project allowed"
+msgstr ""
+"Hiba a(z) %(name)s bejegyzés hozzáadásakor: Csak egy fő projekt "
+"engedélyezett"
+
+#: views/admin.py:692
+#, python-format
+msgid "Error adding entry %(name)s: %(error)s"
+msgstr "Hiba a(z) %(name)s bejegyzés hozzáadásakor: %(error)s"
+
+#: views/admin.py:701
+msgid "Main Project cannot be deleted"
+msgstr "A fő projekt nem törölhető"
+
+#: views/admin.py:704
+msgid "Entry deleted successfully!"
+msgstr "Bejegyzés sikeresen törölve!"
+
+#: views/admin.py:719
+msgid "Configuration ID is required"
+msgstr "Konfigurációs ID megadása kötelező"
+
+#: views/admin.py:737
+#, python-format
+msgid "\"%(name)s\" updated successfully"
+msgstr "\"%(name)s\" sikeresen frissítve"
+
+#: views/admin.py:741
+#, python-format
+msgid "Error updating \"%(name)s\": %(error)s"
+msgstr "Hiba a(z) \"%(name)s\" frissítésekor: %(error)s"
+
+#: views/admin.py:763
+msgid "Map ID is required"
+msgstr "Térkép ID megadása kötelező"
+
+#: views/admin.py:780
+msgid "Map updated successfully"
+msgstr "Térkép sikeresen frissítve"
+
+#: views/admin.py:783
+msgid "Invalid Map ID format"
+msgstr "Érvénytelen térkép ID formátum"
+
+#: views/admin.py:786
+#, python-format
+msgid "Error updating map: %(error)s"
+msgstr "Hiba a térkép frissítésekor: %(error)s"
+
+#: views/admin.py:803
+msgid "Error: Name, Display Name and Description are required"
+msgstr "Hiba: A név, a megjelenített név és a leírás kötelező"
+
+#: views/admin.py:815
+#, python-format
+msgid "Map %(name)s with ID %(id)s added successfully!"
+msgstr "A(z) %(name)s térkép (ID: %(id)s) sikeresen hozzáadva!"
+
+#: views/admin.py:819
+#, python-format
+msgid "Error adding map %(name)s: %(error)s"
+msgstr "Hiba a(z) %(name)s térkép hozzáadásakor: %(error)s"
+
+#: views/admin.py:830
+msgid "Map deleted successfully!"
+msgstr "Térkép sikeresen törölve!"
+
+#: views/admin.py:832
+#, python-format
+msgid "Error deleting map: %(error)s"
+msgstr "Hiba a térkép törlésekor: %(error)s"
+
+#: views/admin.py:846
+msgid "Index background updated successfully"
+msgstr "Kezdőlap háttere sikeresen frissítve"
+
+#: views/admin.py:880
+msgid "Invalid ID format. Please use comma-separated integers."
+msgstr ""
+"Érvénytelen ID formátum. Kérjük, használjon vesszővel elválasztott egész "
+"számokat."
+
+#: views/admin.py:885
+msgid "Class visibility updated successfully."
+msgstr "Osztály láthatósága sikeresen frissítve."
+
+#: views/admin.py:935
+msgid "Updated case study ID successfully"
+msgstr "Esettanulmány ID sikeresen frissítve"
+
+#: views/admin.py:938
+msgid ""
+"Invalid Case Study ID. Must be a positive integer and its entity type "
+"must be \"type\"."
+msgstr "Érvénytelen esettanulmány ID. Pozitív egész számnak kell lennie, és az entitástípusnak \"Case Study\"-nak kell lennie."
+
+#: views/admin.py:956
+msgid "reset database"
+msgstr "adatbázis visszaállítása"
+
+#: views/admin.py:978
+msgid "cache cleared"
+msgstr "gyorsítótár ürítve"
+
+#: views/admin.py:986
+msgid "Cache warmup started in background (refresh mode)"
+msgstr "A gyorsítótár bemelegítése elindult a háttérben (frissítési mód)"
+
+#: views/admin.py:994
+msgid "Cache warmup started in background."
+msgstr "A gyorsítótár bemelegítése elindult a háttérben."
+
+#: views/admin.py:1013
+#, python-format
+msgid "Error warming cache: %(error)s"
+msgstr "Hiba a gyorsítótár bemelegítésekor: %(error)s"
+
+#: views/admin.py:1031
+msgid "system cache refreshed"
+msgstr "rendszer gyorsítótár frissítve"
+
+#: views/admin.py:1096
+#, python-format
+msgid "Asset \"%(name)s\" uploaded successfully."
+msgstr "Eszköz \"%(name)s\" sikeresen feltöltve."
+
+#: views/admin.py:1120
+msgid "Cannot rename default assets."
+msgstr "Az alapértelmezett eszközök nem nevezhetők át."
+
+#: views/admin.py:1136
+#, python-format
+msgid "Asset renamed from \"%(old)s\" to \"%(new)s\"."
+msgstr "Eszköz átnevezve erről: \"%(old)s\" erre: \"%(new)s\"."
+
+#: views/admin.py:1160
+#, python-format
+msgid "Asset \"%(name)s\" deleted successfully."
+msgstr "Eszköz \"%(name)s\" sikeresen törölve."
+
+#: views/admin.py:1166
+#, python-format
+msgid "Default asset \"%(name)s\" deactivated."
+msgstr "Alapértelmezett eszköz \"%(name)s\" deaktiválva."
+
+#: views/admin.py:1183
+msgid "Asset license updated successfully."
+msgstr "Eszköz licenc sikeresen frissítve."
+
+#: views/admin.py:1213
+msgid "File type is missing."
+msgstr "A fájltípus hiányzik."
+
+#: views/admin.py:1236 views/admin.py:1270 views/admin.py:1323
+msgid "Invalid file type."
+msgstr "Érvénytelen fájltípus."
+
+#: views/admin.py:1243
+#, python-format
+msgid "%(type)s \"%(name)s\" uploaded successfully."
+msgstr "%(type)s \"%(name)s\" sikeresen feltöltve."
+
+#: views/admin.py:1280
+msgid "Cannot rename default files."
+msgstr "Az alapértelmezett fájlok nem nevezhetők át."
+
+#: views/admin.py:1296
+#, python-format
+msgid "%(type)s renamed from \"%(old)s\" to \"%(new)s\"."
+msgstr "%(type)s sikeresen átnevezve erről: \"%(old)s\" erre: \"%(new)s\"."
+
+#: views/admin.py:1311
+msgid "No filename or type specified for deletion."
+msgstr "Nincs megadva fájlnév vagy típus a törléshez."
+
+#: views/admin.py:1333
+#, python-format
+msgid "%(type)s \"%(name)s\" deleted successfully."
+msgstr "%(type)s \"%(name)s\" sikeresen törölve."
+
+#: views/admin.py:1338
+#, python-format
+msgid "Default %(type)s \"%(name)s\" deactivated."
+msgstr "Alapértelmezett %(type)s \"%(name)s\" deaktiválva."
+
+#: views/admin.py:1356
+#, python-format
+msgid "%(type)s license updated successfully."
+msgstr "%(type)s licenc sikeresen frissítve."
+
+#: views/login.py:33
+msgid "show password"
+msgstr "jelszó megjelenítése"
+
+#: views/login.py:34
+msgid "login"
+msgstr "bejelentkezés"
+
+#: views/login.py:53
+msgid "Your account is inactive."
+msgstr "Fiókja inaktív."
+
+#: views/login.py:55
+msgid "Incorrect password."
+msgstr "Helytelen jelszó."
+
+#: views/login.py:57
+msgid "User not found."
+msgstr "Felhasználó nem található."
+
+#: views/views.py:90
+#, python-format
+msgid "Failed to clear cache: %(error)s"
+msgstr "Nem sikerült a gyorsítótár ürítése: %(error)s"
+
+#~ msgid ""
+#~ "The assets are general files, which "
+#~ "can be used in individual pages, "
+#~ "these can bne all datatypes, some "
+#~ "can be displayed some only be "
+#~ "downloaded."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The logo sections is only for "
+#~ "logos and can be used for footer,"
+#~ " site logo, project logos and "
+#~ "institution logos, and also for "
+#~ "indiviual pages."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The team section only include person "
+#~ "fotos, which can be used at the"
+#~ " person management and for individual "
+#~ "pages."
+#~ msgstr ""
+
