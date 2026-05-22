@@ -52,7 +52,7 @@
   <div class="row">
     {% for entity_type in ['places', 'actors', 'events', 'items', 'sources', 'files', 'feature', 'stratigraphic_unit'] %}
       <div class="col-md-3 mb-4">
-        <label class="form-label fw-bold">{{ _(entity_type) | capitalize }}</label>
+        <label class="form-label fw-bold">{{ _(entity_type) | capitalize | replace('_', ' ') }}</label>
         <div class="selected-color-display"
              id="display-{{ entity_type }}"
              style="background-color: {{ settings.entity_colors.get(entity_type, '#000000') }};"

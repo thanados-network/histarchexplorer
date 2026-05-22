@@ -70,7 +70,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                       'sidebar-file-management-group' | 'sidebar-assets' |
                       'sidebar-legal-notice' | 'sidebar-licenses' |
                       'sidebar-team' | 'sidebar-about-publications' |
-                      'sidebar-colors' | 'sidebar-type-divisions'):
+                      'sidebar-colors' | 'sidebar-type-divisions' |
+                      'sidebar-visibility-settings'):
                     active_main_sidebar_id = tab
 
                 case _:
@@ -857,9 +858,33 @@ def update_class_visibility() -> Response:
     check_manager_user()
     g.settings.shown_classes = request.form.getlist('shown_classes')
     g.settings.hidden_classes = request.form.getlist('hidden_classes')
+
+    def parse_ids(name: str) -> list[int]:
+        raw = request.form.get(name, '')
+        if not raw:
+            return []
+        res = []
+        for x in raw.split(','):
+            val = x.strip()
+            if val:
+                if not val.isdigit():
+                    raise ValueError(val)
+                res.append(int(val))
+        return res
+
+    try:
+        g.settings.shown_types = parse_ids('shown_types')
+        g.settings.hidden_types = parse_ids('hidden_types')
+        g.settings.shown_ids = parse_ids('shown_ids')
+        g.settings.hidden_ids = parse_ids('hidden_ids')
+    except ValueError:
+        flash(_('Invalid ID format. Please use comma-separated integers.'),
+              'danger')
+        return _redirect_to_admin_tab('sidebar-visibility-settings')
+
     g.settings.save_to_db()
     flash(_('Class visibility updated successfully.'), 'success')
-    return _redirect_to_admin_tab('sidebar-general-settings-group')
+    return _redirect_to_admin_tab('sidebar-visibility-settings')
 
 
 @app.route('/sortlinks', methods=['POST'])

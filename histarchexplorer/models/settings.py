@@ -47,9 +47,9 @@ class Settings(BaseModel):
         'artifact', 'human_remains', 'person', 'group',
         'acquisition', 'event', 'activity', 'creation',
         'move', 'production', 'modification']
-    shown_types: list[str] = []
-    hidden_classes: list[str] = ['group']
-    hidden_types: list[str] = []
+    shown_types: list[int] = []
+    hidden_classes: list[str] = []
+    hidden_types: list[int] = []
     shown_ids: list[int] = []
     hidden_ids: list[int] = []
     case_study_type_id: int = 8240

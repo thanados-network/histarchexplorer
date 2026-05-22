@@ -1,6 +1,51 @@
 <form method="post" action="{{ url_for('update_class_visibility') }}">
-  <input type="hidden" name="active_sidebar" value="sidebar-general-settings-group">
-  <div class="row">
+  <input type="hidden" name="active_sidebar"
+         value="sidebar-visibility-settings">
+
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <button type="submit" class="btn btn-primary">
+      <i class="bi bi-check-lg"></i> {{ _('Save Visibility Settings') }}
+    </button>
+  </div>
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <h5>{{ _('Shown Types') | capitalize }}</h5>
+      <p class="text-muted small">
+        {{ _('Comma-separated list of type IDs to show.') }}
+      </p>
+      <input type="text" class="form-control" name="shown_types"
+             value="{{ settings.shown_types | join(', ') }}">
+    </div>
+    <div class="col-md-6">
+      <h5>{{ _('Hidden Types') | capitalize }}</h5>
+      <p class="text-muted small">
+        {{ _('Comma-separated list of type IDs to hide.') }}
+      </p>
+      <input type="text" class="form-control" name="hidden_types"
+             value="{{ settings.hidden_types | join(', ') }}">
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <h5>{{ _('Shown IDs') | capitalize }}</h5>
+      <p class="text-muted small">
+        {{ _('Comma-separated list of entity IDs to show.') }}
+      </p>
+      <input type="text" class="form-control" name="shown_ids"
+             value="{{ settings.shown_ids | join(', ') }}">
+    </div>
+    <div class="col-md-6">
+      <h5>{{ _('Hidden IDs') | capitalize }}</h5>
+      <p class="text-muted small">
+        {{ _('Comma-separated list of entity IDs to hide.') }}
+      </p>
+      <input type="text" class="form-control" name="hidden_ids"
+             value="{{ settings.hidden_ids | join(', ') }}">
+    </div>
+  </div>
+
+  <div class="row mt-4">
     {# Column for Shown Classes #}
     <div class="col-md-6">
       <h5>{{ _('Shown Classes') | capitalize }}</h5>
@@ -18,7 +63,7 @@
                      id="check_shown_{{ category }}"
                      {% if category in shown_classes %}checked{% endif %}>
               <label class="form-check-label" for="check_shown_{{ category }}">
-                {{ category }}
+                {{ category | replace("_", " ") | capitalize }}
                 <span class="text-muted">
                   ({{ class_items.get(category, 0) }})
                 </span>
@@ -45,8 +90,9 @@
                      value="{{ category }}"
                      id="check_hidden_{{ category }}"
                      {% if category in hidden_classes %}checked{% endif %}>
-              <label class="form-check-label" for="check_hidden_{{ category }}">
-                {{ category }}
+              <label class="form-check-label"
+                     for="check_hidden_{{ category }}">
+                {{ category | replace("_", " ") | capitalize }}
                 <span class="text-muted">
                   ({{ class_items.get(category, 0) }})
                 </span>
