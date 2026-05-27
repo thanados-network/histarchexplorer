@@ -78,14 +78,25 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                       'sidebar-team' | 'sidebar-about-publications' |
                       'sidebar-projects-content' | 'sidebar-stakeholders-content' |
                       'sidebar-colors' | 'sidebar-type-divisions' |
-                      'sidebar-visibility-settings'):
+                      'sidebar-visibility-settings' |
+                      'sidebar-general-settings-group' | 'sidebar-about-content' |
+                      'sidebar-outcome' | 'sidebar-search-content'):
                     active_main_sidebar_id = tab
 
                 case _:
                     pass
 
+    any_active_tab = False
     for tab_item in all_tabs:
         tab_item['is_active'] = tab_item['target'] == tab
+        if tab_item['is_active']:
+            any_active_tab = True
+
+    if not any_active_tab:
+        if active_main_sidebar_id == 'sidebar-projects-content':
+            project_tabs[0]['is_active'] = True
+        elif active_main_sidebar_id == 'sidebar-stakeholders-content':
+            stakeholder_tabs[0]['is_active'] = True
 
     cs_type_id: Optional[int] = None
     cs_type_name: Optional[str] = None
@@ -677,17 +688,26 @@ def add_entry() -> Response:
     category = request.form.get('category', '')
     form_data = {
         'category': category,
-        'name': request.form.get('name', ''),
         'acronym': request.form.get('acronym', ''),
         'email': request.form.get('email', ''),
         'website': request.form.get('website', ''),
         'orcid_id': request.form.get('orcid_id', ''),
         'image': request.form.get('image', ''),
-        'address': request.form.get('address', ''),
-        'description': request.form.get('description', ''),
         'case_study': request.form.get('case_study', type=int),
         'license_id': request.form.get('license_id', type=int)
     }
+
+    # Add multi-language fields
+    for col in ['name', 'address', 'description']:
+        for lang_code in g.available_languages.keys():
+            lang_key = f"{col}_{lang_code}"
+            if lang_key in request.form:
+                form_data[lang_key] = request.form.get(lang_key, '')
+
+        # Also keep the default key for backward compatibility or display
+        if col in request.form:
+            form_data[col] = request.form.get(col, '')
+
     current_tab = f'nav-{category}'
     redirect_base = url_for('admin') + current_tab
     try:
@@ -696,11 +716,13 @@ def add_entry() -> Response:
         return redirect(f"{redirect_base}/{current_tab}{new_id}")
     except Admin.TooManyMainProjects:
         flash(
-            _('Error adding entry %(name)s: Only one main project allowed', name=form_data["name"]),
+            _('Error adding entry %(name)s: Only one main project allowed',
+              name=form_data["name"]),
             'danger')
     except Exception as e:
         flash(_(
-            'Error adding entry %(name)s: %(error)s', name=form_data["name"],
+            'Error adding entry %(name)s: %(error)s',
+            name=form_data["name"],
             error=e), 'danger')
     return redirect(redirect_base)
 
@@ -727,21 +749,29 @@ def edit_entry() -> Response:
         flash(_('Configuration ID is required'), 'danger')
         return _redirect_to_admin_tab('sidebar-projects-content')
 
-    name = request.form.get('name', '')
     form_data = {
         'config_id': config_id,
-        'name': name,
         'acronym': request.form.get('acronym', ''),
         'email': request.form.get('email', ''),
         'website': request.form.get('website', ''),
         'orcid_id': request.form.get('orcid_id', ''),
         'image': request.form.get('image', ''),
-        'address': request.form.get('address', ''),
-        'description': request.form.get('description', ''),
         'case_study': request.form.get('case_study', type=int),
         'license_id': request.form.get('license_id', type=int)
     }
 
+    # Add multi-language fields
+    for col in ['name', 'address', 'description']:
+        for lang_code in g.available_languages.keys():
+            lang_key = f"{col}_{lang_code}"
+            if lang_key in request.form:
+                form_data[lang_key] = request.form.get(lang_key, '')
+
+        # Also keep the default key for backward compatibility or display
+        if col in request.form:
+            form_data[col] = request.form.get(col, '')
+
+    name = form_data.get('name', '')
     try:
         Admin.edit_entry(form_data)
         flash(_('"%(name)s" updated successfully', name=name), 'success')
@@ -755,7 +785,8 @@ def edit_entry() -> Response:
         url_for(
             'admin',
             entry=request.form.get('current_entry'),
-            tab=request.form.get('current_tab')))
+            tab=request.form.get('current_tab'),
+            _external=False))
 
 
 @app.route('/admin/edit_map', methods=['POST'])
@@ -966,13 +997,21 @@ def check_case_study_id_ajax(entity_id: int) -> Response:
 
 # Todo: remove for production
 @app.route('/reset')
+@login_required
 def reset() -> Response:
+    check_manager_user()
+    if not current_app.config.get('DEBUG') and not current_app.config.get('TESTING'):
+        flash(_('Reset is only allowed in debug or testing mode.'), 'danger')
+        return redirect(url_for('admin'))
     make_reset()
     flash(_('reset database'), 'info')
     return redirect(url_for('admin'))
 
 
 def make_reset() -> None:
+    if not current_app.config.get('DEBUG') and not current_app.config.get('TESTING'):
+        app.logger.warning('Attempted to reset database outside of DEBUG/TESTING mode.')
+        return
     env = os.environ.copy()
     env['PGPASSWORD'] = current_app.config['DATABASE_PASS']
     subprocess.run([

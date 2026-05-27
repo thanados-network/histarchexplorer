@@ -1,0 +1,29 @@
+<div class="image-selector-wrapper" id="wrapper-{{ field_id }}">
+    <input type="hidden" name="{{ field_name }}" id="input-{{ field_id }}" value="{{ field_value or '' }}">
+    <div class="d-flex align-items-center gap-3 border rounded p-2 bg-light shadow-sm">
+        <div class="image-preview border rounded overflow-hidden bg-white d-flex align-items-center justify-content-center"
+             style="width: 64px; height: 64px; min-width: 64px;">
+            <img src="{{ field_value or '' }}"
+                 id="preview-{{ field_id }}"
+                 class="img-fluid {% if not field_value %}d-none{% endif %}"
+                 style="max-height: 100%;"
+                 alt="Preview"
+                 onerror="this.classList.add('d-none'); document.getElementById('placeholder-{{ field_id }}').classList.remove('d-none');">
+            <i class="bi bi-image text-muted fs-3 {% if field_value %}d-none{% endif %}" id="placeholder-{{ field_id }}"></i>
+        </div>
+        <div class="flex-grow-1 overflow-hidden">
+            <div class="text-muted small mb-2 text-truncate" id="filename-{{ field_id }}">
+                {{ field_value.split('/')[-1] if field_value else _('No image selected') }}
+            </div>
+            <button type="button"
+                    class="btn btn-sm btn-primary py-1 px-3 shadow-sm select-image-btn"
+                    data-target-input="#input-{{ field_id }}"
+                    data-target-preview="#preview-{{ field_id }}"
+                    data-target-filename="#filename-{{ field_id }}"
+                    data-image-type="{{ field.image_type or 'logo' }}"
+                    {% if disabled %}disabled data-disabled{% endif %}>
+                <i class="bi bi-image me-1"></i>{{ _('Select Image') }}
+            </button>
+        </div>
+    </div>
+</div>

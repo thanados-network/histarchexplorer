@@ -39,6 +39,79 @@ function toggleButtons(entryId, isEditing) {
   });
 }
 
+function switchFieldLanguage(fieldKey, entityId, langCode, btn) {
+  const capitalizedField = fieldKey.charAt(0).toUpperCase() + fieldKey.slice(1);
+  const inputs = document.querySelectorAll(`.lang-input-${fieldKey}-${entityId}`);
+  
+  inputs.forEach(input => {
+    const inputLang = input.dataset.lang;
+    const isTarget = (inputLang === langCode);
+    const targetInputId = input.id;
+    
+    // Handle TinyMCE if applicable
+    if (input.classList.contains('js-richtext-rich') && typeof tinymce !== 'undefined') {
+      const editor = tinymce.get(targetInputId);
+      if (editor) {
+        const container = editor.getContainer();
+        if (container) {
+          container.style.display = isTarget ? '' : 'none';
+          if (isTarget) {
+            if (editor.mode && typeof editor.mode.set === 'function') {
+              editor.mode.set('design');
+            } else if (typeof editor.setMode === 'function') {
+              editor.setMode('design');
+            }
+            editor.focus();
+          }
+        }
+      } else {
+        input.classList.toggle('d-none', !isTarget);
+      }
+    } else {
+      input.classList.toggle('d-none', !isTarget);
+    }
+    
+    // Handle required attribute
+    if (input.hasAttribute('data-required-field')) {
+      if (isTarget) {
+        input.setAttribute('required', 'required');
+      } else {
+        input.removeAttribute('required');
+      }
+    }
+  });
+
+  // Update button colors
+  const buttons = document.querySelectorAll(`.lang-switch-btn-${fieldKey}-${entityId}`);
+  buttons.forEach(button => {
+    button.classList.remove('btn-primary', 'active', 'btn-success', 'btn-danger');
+
+    const targetLang = button.dataset.lang;
+    const targetInputId = `Input${capitalizedField}${entityId}_${targetLang}`;
+    const targetInput = document.getElementById(targetInputId);
+    
+    let hasValue = false;
+    if (targetInput) {
+      if (targetInput.classList.contains('js-richtext-rich') && typeof tinymce !== 'undefined') {
+        const editor = tinymce.get(targetInputId);
+        if (editor) {
+          hasValue = editor.getContent({format: 'text'}).trim() !== '';
+        } else {
+          hasValue = targetInput.value.trim() !== '';
+        }
+      } else {
+        hasValue = targetInput.value.trim() !== '';
+      }
+    }
+
+    if (targetLang === langCode) {
+      button.classList.add('btn-primary', 'active');
+    } else {
+      button.classList.add(hasValue ? 'btn-success' : 'btn-danger');
+    }
+  });
+}
+
 function toggleMapButtons(mapId, isEditing) {
   ['editMap', 'deleteMap', 'saveMap', 'cancelMap'].forEach(action => {
     const button = document.getElementById(`${action}${mapId}`);
@@ -91,6 +164,22 @@ function initRichText(containerId) {
       image_advtab: true,
       paste_as_text: false,
       setup: function (editor) {
+        editor.on('init', function () {
+          if (textarea.classList.contains('d-none')) {
+            const container = editor.getContainer();
+            if (container) {
+              container.style.display = 'none';
+            }
+          }
+          if (editor.mode && typeof editor.mode.set === 'function') {
+            editor.mode.set('design');
+          } else if (typeof editor.setMode === 'function') {
+            editor.setMode('design');
+          }
+          if (!textarea.classList.contains('d-none')) {
+            editor.focus();
+          }
+        });
         editor.on('change keyup', function () {
           editor.save();
         });
@@ -726,4 +815,21 @@ document.addEventListener('DOMContentLoaded', function () {
   tooltipTriggerList.forEach(function (tooltipTriggerEl) {
     new bootstrap.Tooltip(tooltipTriggerEl)
   })
+
+  // Update URL in address bar when tabs are switched without page reload
+  document.addEventListener('shown.bs.tab', function (event) {
+    const target = event.target;
+    const targetId = target.getAttribute('aria-controls') || 
+                     target.getAttribute('data-bs-target')?.replace('#', '');
+    
+    if (targetId) {
+      const newUrl = `/admin/${targetId}`;
+      // Use pushState to update URL without reload. 
+      // This maintains the same behavior as the previous server-side links
+      // but is much faster.
+      if (window.location.pathname !== newUrl) {
+        window.history.pushState({ tab: targetId }, '', newUrl);
+      }
+    }
+  });
 })

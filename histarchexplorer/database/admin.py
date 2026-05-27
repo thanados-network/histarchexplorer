@@ -205,35 +205,70 @@ def update_config_entry(data: dict[str, str | int]) -> None:
 
 
 def _upsert_jsonb_fields(config_id: int, data: dict[str, str | int]) -> None:
-    language = g.language
     valid_cols = {'address', 'description', 'name'}
     for col in valid_cols:
-        val = data.get(col, '')
-        if col in ('description') and val:
-            val = sanitize_richtext(str(val))
-        if val:
-            g.cursor.execute(
-                f"""
-                UPDATE tng.entities
-                   SET {col} = jsonb_set(
-                                 COALESCE({col}, '{{}}'),
-                                 %(path)s,
-                                 %(value)s::jsonb,
-                                 true)
-                 WHERE id = %(config_id)s
-                """, {
-                    'path': [language],
-                    'value': json.dumps(val),
-                    'config_id': config_id})
-        else:
-            g.cursor.execute(
-                f"""
-                UPDATE tng.entities
-                   SET {col} = COALESCE({col}, '{{}}') - %(key)s
-                 WHERE id = %(config_id)s
-                """, {
-                    'key': language,
-                    'config_id': config_id})
+        # Check for multi-language inputs from the form (e.g., name_en, name_de)
+        for lang_code in g.available_languages.keys():
+            lang_key = f"{col}_{lang_code}"
+            if lang_key in data:
+                val = data[lang_key]
+                if col == 'description' and val:
+                    val = sanitize_richtext(str(val))
+
+                if val:
+                    g.cursor.execute(
+                        f"""
+                        UPDATE tng.entities
+                           SET {col} = jsonb_set(
+                                         COALESCE({col}, '{{}}'),
+                                         %(path)s,
+                                         %(value)s::jsonb,
+                                         true)
+                         WHERE id = %(config_id)s
+                        """, {
+                            'path': [lang_code],
+                            'value': json.dumps(val),
+                            'config_id': config_id})
+                else:
+                    g.cursor.execute(
+                        f"""
+                        UPDATE tng.entities
+                           SET {col} = COALESCE({col}, '{{}}') - %(key)s
+                         WHERE id = %(config_id)s
+                        """, {
+                            'key': lang_code,
+                            'config_id': config_id})
+
+        # Fallback for single field update (e.g. from existing forms or scripts)
+        # only if no language-specific keys were provided for this column
+        if col in data and not any(
+                f"{col}_{l}" in data for l in g.available_languages):
+            val = data.get(col, '')
+            if col == 'description' and val:
+                val = sanitize_richtext(str(val))
+            if val:
+                g.cursor.execute(
+                    f"""
+                    UPDATE tng.entities
+                       SET {col} = jsonb_set(
+                                     COALESCE({col}, '{{}}'),
+                                     %(path)s,
+                                     %(value)s::jsonb,
+                                     true)
+                     WHERE id = %(config_id)s
+                    """, {
+                        'path': [g.language],
+                        'value': json.dumps(val),
+                        'config_id': config_id})
+            else:
+                g.cursor.execute(
+                    f"""
+                    UPDATE tng.entities
+                       SET {col} = COALESCE({col}, '{{}}') - %(key)s
+                     WHERE id = %(config_id)s
+                    """, {
+                        'key': g.language,
+                        'config_id': config_id})
 
 
 def update_sort_order(table: str, params: list[dict[str, int]]) -> None:

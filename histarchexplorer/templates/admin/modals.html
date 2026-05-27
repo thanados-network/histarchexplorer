@@ -46,19 +46,46 @@
                         <div class="row g-4">
                           {% for field in identity_fields %}
                             <div class="{{ field.col_class or 'col-md-6' }}">
-                              <label for="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal" class="form-label fw-semibold text-dark small">
-                                {{ _(field.label)|capitalize }}
-                              </label>
+                              <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal" class="form-label fw-semibold text-dark small mb-0">
+                                  {{ _(field.label)|capitalize }}
+                                </label>
+                                {% if field.translatable %}
+                                  <div class="btn-group btn-group-sm" role="group" aria-label="Language selector">
+                                    {% for lang_code, lang_name in available_languages.items() %}
+                                      <button type="button" 
+                                              class="btn btn-sm btn-lang-switch lang-switch-btn-{{ field.key }}-{{ tab_item.target | replace('-', '') }}Modal {% if lang_code == current_language %}btn-primary active{% else %}btn-danger{% endif %}"
+                                              data-lang="{{ lang_code }}"
+                                              onclick="switchFieldLanguage('{{ field.key }}', '{{ tab_item.target | replace('-', '') }}Modal', '{{ lang_code }}', this)"
+                                              title="{{ lang_name }}">
+                                        {{ lang_code | upper }}
+                                      </button>
+                                    {% endfor %}
+                                  </div>
+                                {% endif %}
+                              </div>
                               <div class="input-group shadow-sm">
                                 <span class="input-group-text bg-white border-end-0">
                                   <i class="bi {% if field.key == 'acronym' %}bi-alphabet-uppercase{% elif field.key == 'name' %}bi-tag{% elif field.key == 'website' %}bi-globe{% elif field.key == 'email' %}bi-envelope{% elif field.key == 'orcid_id' %}bi-person-badge{% else %}bi-pencil{% endif %} text-muted"></i>
                                 </span>
-                                <input type="{{ field.type }}"
-                                       class="form-control border-start-0 ps-0"
-                                       id="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal"
-                                       name="{{ field.key }}"
-                                       {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
-                                       {% if field.required %}required{% endif %}>
+                                {% if field.translatable %}
+                                  {% for lang_code in available_languages.keys() %}
+                                    <input type="{{ field.type }}"
+                                           class="form-control border-start-0 ps-0 lang-input-{{ field.key }}-{{ tab_item.target | replace('-', '') }}Modal {% if lang_code != current_language %}d-none{% endif %}"
+                                           id="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal_{{ lang_code }}"
+                                           name="{{ field.key }}_{{ lang_code }}"
+                                           data-lang="{{ lang_code }}"
+                                           {% if field.placeholder %}placeholder="{{ _(field.placeholder) }} ({{ lang_code | upper }})"{% endif %}
+                                           {% if field.required and lang_code == current_language %}required data-required-field{% endif %}>
+                                  {% endfor %}
+                                {% else %}
+                                  <input type="{{ field.type }}"
+                                         class="form-control border-start-0 ps-0"
+                                         id="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal"
+                                         name="{{ field.key }}"
+                                         {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
+                                         {% if field.required %}required data-required-field{% endif %}>
+                                {% endif %}
                               </div>
                               {% if field.required %}
                                 <div class="invalid-feedback">{{ _('Please provide a') }} {{ _(field.label) }}.</div>
@@ -82,15 +109,42 @@
                         <div class="row g-4">
                           {% for field in content_fields %}
                             <div class="col-12">
-                              <label for="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal" class="form-label fw-semibold text-dark small">
-                                {{ _(field.label)|capitalize }}
-                              </label>
-                              <textarea class="form-control shadow-sm {% if field.key in ['description', 'address'] %}js-richtext-rich{% endif %}"
-                                        id="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal"
-                                        name="{{ field.key }}"
-                                        rows="{% if field.key == 'description' %}5{% else %}2{% endif %}"
-                                        {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
-                                        {% if field.required %}required{% endif %}></textarea>
+                              <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal" class="form-label fw-semibold text-dark small mb-0">
+                                  {{ _(field.label)|capitalize }}
+                                </label>
+                                {% if field.translatable %}
+                                  <div class="btn-group btn-group-sm" role="group" aria-label="Language selector">
+                                    {% for lang_code, lang_name in available_languages.items() %}
+                                      <button type="button" 
+                                              class="btn btn-sm btn-lang-switch lang-switch-btn-{{ field.key }}-{{ tab_item.target | replace('-', '') }}Modal {% if lang_code == current_language %}btn-primary active{% else %}btn-danger{% endif %}"
+                                              data-lang="{{ lang_code }}"
+                                              onclick="switchFieldLanguage('{{ field.key }}', '{{ tab_item.target | replace('-', '') }}Modal', '{{ lang_code }}', this)"
+                                              title="{{ lang_name }}">
+                                        {{ lang_code | upper }}
+                                      </button>
+                                    {% endfor %}
+                                  </div>
+                                {% endif %}
+                              </div>
+                              {% if field.translatable %}
+                                {% for lang_code in available_languages.keys() %}
+                                  <textarea class="form-control shadow-sm lang-input-{{ field.key }}-{{ tab_item.target | replace('-', '') }}Modal {% if field.key in ['description', 'address'] %}js-richtext-rich{% endif %} {% if lang_code != current_language %}d-none{% endif %}"
+                                            id="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal_{{ lang_code }}"
+                                            name="{{ field.key }}_{{ lang_code }}"
+                                            data-lang="{{ lang_code }}"
+                                            rows="{% if field.key == 'description' %}5{% else %}2{% endif %}"
+                                            {% if field.placeholder %}placeholder="{{ _(field.placeholder) }} ({{ lang_code | upper }})"{% endif %}
+                                            {% if field.required and lang_code == current_language %}required data-required-field{% endif %}></textarea>
+                                {% endfor %}
+                              {% else %}
+                                <textarea class="form-control shadow-sm {% if field.key in ['description', 'address'] %}js-richtext-rich{% endif %}"
+                                          id="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal"
+                                          name="{{ field.key }}"
+                                          rows="{% if field.key == 'description' %}5{% else %}2{% endif %}"
+                                          {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
+                                          {% if field.required %}required data-required-field{% endif %}></textarea>
+                              {% endif %}
                               {% if field.required %}
                                 <div class="invalid-feedback">{{ _('Please provide a') }} {{ _(field.label) }}.</div>
                               {% endif %}
@@ -125,7 +179,7 @@
                                   <select class="form-select border-start-0 ps-0"
                                           id="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal"
                                           name="{{ field.key }}"
-                                          {% if field.required %}required{% endif %}>
+                                          {% if field.required %}required data-required-field{% endif %}>
                                     <option value="">{{ _('Select a value') }}</option>
                                     {% if field.key == 'case_study' %}
                                       {% for child in case_study_children %}

@@ -2,11 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict dFwdtbapHGK4BIT8MqV1Ba0bdYdDKh8kH8q0UTQ6WMoz2Yn046Z57YDaLzkjvB2
-
--- Dumped from database version 17.8 (Debian 17.8-0+deb13u1)
--- Dumped by pg_dump version 17.8 (Debian 17.8-0+deb13u1)
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -19,39 +14,8 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-DROP DATABASE IF EXISTS tng_relic;
---
--- Name: tng_relic; Type: DATABASE; Schema: -; Owner: openatlas
---
-
-CREATE DATABASE tng_relic WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'de_AT.UTF-8';
-
-
-ALTER DATABASE tng_relic OWNER TO openatlas;
-
-\unrestrict dFwdtbapHGK4BIT8MqV1Ba0bdYdDKh8kH8q0UTQ6WMoz2Yn046Z57YDaLzkjvB2
-\connect tng_relic
-\restrict dFwdtbapHGK4BIT8MqV1Ba0bdYdDKh8kH8q0UTQ6WMoz2Yn046Z57YDaLzkjvB2
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
--- Name: tng; Type: SCHEMA; Schema: -; Owner: openatlas
---
-
+DROP SCHEMA IF EXISTS tng CASCADE;
 CREATE SCHEMA tng;
-
-
 ALTER SCHEMA tng OWNER TO openatlas;
 
 --
