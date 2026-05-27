@@ -17,7 +17,8 @@ from histarchexplorer.models.search import SearchService
 from histarchexplorer.models.settings import Settings
 from histarchexplorer.models.admin import Admin
 from histarchexplorer.database.admin import (
-    synchronize_logos_with_db, synchronize_assets_with_db)
+    synchronize_logos_with_db, synchronize_assets_with_db,
+    synchronize_teams_with_db)
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
@@ -115,6 +116,7 @@ def before_request() -> Response | None:
     g.settings = Settings.load_from_db()
     synchronize_logos_with_db()
     synchronize_assets_with_db()
+    synchronize_teams_with_db()
 
     # Todo: move somewhere else but be aware of circular imports
     if g.settings.access_restriction:

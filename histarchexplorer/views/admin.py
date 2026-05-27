@@ -106,6 +106,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     admin_instance = Admin()
     all_logos = admin_instance.get_all_logos_with_ids()
+    all_team = admin_instance.get_all_teams_with_ids()
     all_assets = admin_instance.get_all_assets_with_ids()
     selected_footer_logos = g.settings.footer_logos
 
@@ -113,6 +114,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         "admin.html",
         project_tabs=project_tabs,
         stakeholder_tabs=stakeholder_tabs,
+        tabs=all_tabs,
         admin_instance=admin_instance,
         processed_entities_by_tab=admin_instance.process_entities_by_tab(
             all_tabs,
@@ -136,6 +138,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         active_main_sidebar_id=active_main_sidebar_id,
         licenses=admin_instance.licenses,
         all_logos=all_logos,
+        all_team=all_team,
         all_assets=all_assets,
         selected_footer_logos=selected_footer_logos)
 

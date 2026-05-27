@@ -1,13 +1,15 @@
 <div class="modal fade" id="addEntryModal" tabindex="-1"
        aria-labelledby="addEntryModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content shadow">
+        <div class="modal-header bg-primary text-white">
           <h5 class="modal-title"
-              id="addEntryModalLabel">{{ _('add entry')|capitalize }}</h5>
-          {{ ui.close_button("modal") }}
+              id="addEntryModalLabel">
+            <i class="bi bi-plus-circle me-2"></i>{{ _('add entry')|capitalize }}
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body bg-light">
           <form method="POST" action="{{ url_for('add_entry') }}"
                 class="needs-validation" novalidate>
             <input type="hidden" name="category" id="currentTab">
@@ -18,54 +20,154 @@
                    id="modal-fields-{{ tab_item.target }}"
                    {% if not loop.first %}style="display: none;"{% endif %}> {# Hide all but the first by default #}
 
-                <div class="row">
+                <div class="row g-4">
+                  {% set identity_fields = [] %}
+                  {% set content_fields = [] %}
+                  {% set media_fields = [] %}
+                  
                   {% for field in admin_fields[tab_item.target] %}
-                    <div class="{{ field.col_class or 'col-md-6' }} mt-2 modal-input">
-                      <label for="Input{{ field.key | capitalize }}Modal" class="form-label">
-                        {{ _(field.label)|capitalize }}
-                      </label>
-
-                      {% if field.type == 'textarea' %}
-                        <textarea class="form-control"
-                                  id="Input{{ field.key | capitalize }}Modal"
-                                  name="{{ field.key }}"
-                                  aria-describedby="{{ field.key }}HelpModal"
-                                  {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
-                                  {% if field.required %}required{% endif %}></textarea>
-                      {% elif field.type == 'select' %}
-                        <select class="form-select"
-                                id="Input{{ field.key | capitalize }}Modal"
-                                name="{{ field.key }}"
-                                aria-describedby="{{ field.key }}HelpModal"
-                                {% if field.required %}required{% endif %}>
-                          <option value="">{{ _('Select a value') }}</option>
-                          {% if field.key == 'case_study' %}
-                            {% for child in case_study_children %}
-                              <option value="{{ child.id }}">{{ child.name }}</option>
-                            {% endfor %}
-                          {% endif %}
-                        </select>
-                      {% else %}
-                        <input type="{{ field.type }}"
-                               class="form-control"
-                               id="Input{{ field.key | capitalize }}Modal"
-                               name="{{ field.key }}"
-                               {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
-                               {% if field.required %}required{% endif %}>
-                      {% endif %}
-
-                      {% if field.required %}
-                        <div class="invalid-feedback">{{ _('Please provide a') }} {{ _(field.label) }}.</div>
-                      {% endif %}
-                    </div>
+                    {% if field.type == 'textarea' %}
+                      {% set _ = content_fields.append(field) %}
+                    {% elif field.type == 'image' or field.key in ['license_id', 'case_study'] %}
+                      {% set _ = media_fields.append(field) %}
+                    {% else %}
+                      {% set _ = identity_fields.append(field) %}
+                    {% endif %}
                   {% endfor %}
+
+                  {# Group: Identity & Contact #}
+                  {% if identity_fields %}
+                  <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                      <div class="card-body p-4">
+                        <h6 class="text-uppercase text-primary fw-bold small mb-4 border-bottom pb-2">
+                          <i class="bi bi-info-square me-2"></i>{{ _('General Information') }}
+                        </h6>
+                        <div class="row g-4">
+                          {% for field in identity_fields %}
+                            <div class="{{ field.col_class or 'col-md-6' }}">
+                              <label for="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal" class="form-label fw-semibold text-dark small">
+                                {{ _(field.label)|capitalize }}
+                              </label>
+                              <div class="input-group shadow-sm">
+                                <span class="input-group-text bg-white border-end-0">
+                                  <i class="bi {% if field.key == 'acronym' %}bi-alphabet-uppercase{% elif field.key == 'name' %}bi-tag{% elif field.key == 'website' %}bi-globe{% elif field.key == 'email' %}bi-envelope{% elif field.key == 'orcid_id' %}bi-person-badge{% else %}bi-pencil{% endif %} text-muted"></i>
+                                </span>
+                                <input type="{{ field.type }}"
+                                       class="form-control border-start-0 ps-0"
+                                       id="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal"
+                                       name="{{ field.key }}"
+                                       {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
+                                       {% if field.required %}required{% endif %}>
+                              </div>
+                              {% if field.required %}
+                                <div class="invalid-feedback">{{ _('Please provide a') }} {{ _(field.label) }}.</div>
+                              {% endif %}
+                            </div>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+
+                  {# Group: Content #}
+                  {% if content_fields %}
+                  <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                      <div class="card-body p-4">
+                        <h6 class="text-uppercase text-primary fw-bold small mb-4 border-bottom pb-2">
+                          <i class="bi bi-text-left me-2"></i>{{ _('Content & Description') }}
+                        </h6>
+                        <div class="row g-4">
+                          {% for field in content_fields %}
+                            <div class="col-12">
+                              <label for="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal" class="form-label fw-semibold text-dark small">
+                                {{ _(field.label)|capitalize }}
+                              </label>
+                              <textarea class="form-control shadow-sm {% if field.key in ['description', 'address'] %}js-richtext-rich{% endif %}"
+                                        id="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal"
+                                        name="{{ field.key }}"
+                                        rows="{% if field.key == 'description' %}5{% else %}2{% endif %}"
+                                        {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}
+                                        {% if field.required %}required{% endif %}></textarea>
+                              {% if field.required %}
+                                <div class="invalid-feedback">{{ _('Please provide a') }} {{ _(field.label) }}.</div>
+                              {% endif %}
+                            </div>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+
+                  {# Group: Media & Settings #}
+                  {% if media_fields %}
+                  <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                      <div class="card-body p-4">
+                        <h6 class="text-uppercase text-primary fw-bold small mb-4 border-bottom pb-2">
+                          <i class="bi bi-gear me-2"></i>{{ _('Media & Settings') }}
+                        </h6>
+                        <div class="row g-4 align-items-end">
+                          {% for field in media_fields %}
+                            <div class="{% if field.type == 'image' %}col-md-7{% else %}col-md-5{% endif %}">
+                              <label for="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal" class="form-label fw-semibold text-dark small">
+                                {{ _(field.label)|capitalize }}
+                              </label>
+
+                              {% if field.type == 'select' or field.key in ['license_id', 'case_study'] %}
+                                <div class="input-group shadow-sm">
+                                  <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi {% if field.key == 'license_id' %}bi-shield-check{% elif field.key == 'case_study' %}bi-book{% else %}bi-list-ul{% endif %} text-muted"></i>
+                                  </span>
+                                  <select class="form-select border-start-0 ps-0"
+                                          id="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal"
+                                          name="{{ field.key }}"
+                                          {% if field.required %}required{% endif %}>
+                                    <option value="">{{ _('Select a value') }}</option>
+                                    {% if field.key == 'case_study' %}
+                                      {% for child in case_study_children %}
+                                        <option value="{{ child.id }}">{{ child.name }}</option>
+                                      {% endfor %}
+                                    {% elif field.key == 'license_id' %}
+                                      {% for license in licenses %}
+                                        <option value="{{ license.id }}">{{ license.label }}</option>
+                                      {% endfor %}
+                                    {% endif %}
+                                  </select>
+                                </div>
+                              {% elif field.type == 'image' %}
+                                {% set field_id = tab_item.target ~ field.key ~ 'Modal' %}
+                                {% set field_name = field.key %}
+                                {% set field_value = '' %}
+                                {% set disabled = false %}
+                                {% include 'admin/partials/image_field.html' %}
+                              {% endif %}
+                              
+                              {% if field.required %}
+                                <div class="invalid-feedback">{{ _('Please provide a') }} {{ _(field.label) }}.</div>
+                              {% endif %}
+                            </div>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
                 </div>
               </div>
             {% endfor %}
 
-            <div class="mt-3 text-end">
+            <div class="mt-5 pt-3 border-top text-end">
+              <button type="button" class="btn btn-secondary px-4 me-2 shadow-sm" data-bs-dismiss="modal">
+                {{ _('Cancel') }}
+              </button>
               <button type="submit"
-                      class="btn btn-primary">{{ _('add entry')|capitalize }}</button>
+                      class="btn btn-success px-5 shadow-sm">
+                <i class="bi bi-check-lg me-2"></i>{{ _('add entry')|capitalize }}
+              </button>
             </div>
           </form>
         </div>
@@ -87,6 +189,83 @@
       </div>
       <div class="modal-footer">
         <a id="confirmedDelete" href="#" class="btn btn-danger">{{ _('Delete') }}</a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Image Selector Modal -->
+<div class="modal fade" id="imageSelectorModal" tabindex="-1" aria-labelledby="imageSelectorModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="imageSelectorModalLabel">
+          <i class="bi bi-images me-2"></i>{{ _('Select Image') }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+      </div>
+      <div class="modal-body bg-light">
+        <div id="imageSelectorGrids">
+          {# Logo Grid #}
+          <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3 d-none" id="logoSelectorGrid">
+            <div class="col">
+              <div class="card h-100 image-option cursor-pointer border-2" data-value="" onclick="selectImageOption(this, event)">
+                <div class="card-body d-flex align-items-center justify-content-center p-2 bg-white" style="height: 120px;">
+                  <i class="bi bi-x-circle text-muted fs-1"></i>
+                </div>
+                <div class="card-footer p-1 text-center small text-truncate">{{ _('None') }}</div>
+              </div>
+            </div>
+            {% for logo in all_logos %}
+              {% set logo_url = get_logo_url(logo.filename) %}
+              <div class="col">
+                <div class="card h-100 image-option cursor-pointer border-2" 
+                     data-value="{{ logo_url }}" 
+                     data-filename="{{ logo.filename }}"
+                     onclick="selectImageOption(this, event)">
+                  <div class="card-body d-flex align-items-center justify-content-center p-2 bg-white" style="height: 120px;">
+                    <img src="{{ logo_url }}" class="img-fluid" style="max-height: 100%;" alt="{{ logo.filename }}">
+                  </div>
+                  <div class="card-footer p-1 text-center small text-truncate" title="{{ logo.filename }}">
+                    {{ logo.filename }}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          {# Team Grid #}
+          <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3 d-none" id="teamSelectorGrid">
+            <div class="col">
+              <div class="card h-100 image-option cursor-pointer border-2" data-value="" onclick="selectImageOption(this, event)">
+                <div class="card-body d-flex align-items-center justify-content-center p-2 bg-white" style="height: 120px;">
+                  <i class="bi bi-x-circle text-muted fs-1"></i>
+                </div>
+                <div class="card-footer p-1 text-center small text-truncate">{{ _('None') }}</div>
+              </div>
+            </div>
+            {% for person in all_team %}
+              {% set person_url = get_team_url(person.filename) %}
+              <div class="col">
+                <div class="card h-100 image-option cursor-pointer border-2" 
+                     data-value="{{ person_url }}" 
+                     data-filename="{{ person.filename }}"
+                     onclick="selectImageOption(this, event)">
+                  <div class="card-body d-flex align-items-center justify-content-center p-2 bg-white" style="height: 120px;">
+                    <img src="{{ person_url }}" class="img-fluid" style="max-height: 100%;" alt="{{ person.filename }}">
+                  </div>
+                  <div class="card-footer p-1 text-center small text-truncate" title="{{ person.filename }}">
+                    {{ person.filename }}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
       </div>
     </div>

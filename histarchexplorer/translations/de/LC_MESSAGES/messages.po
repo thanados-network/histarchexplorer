@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-27 13:51+0200\n"
+"POT-Creation-Date: 2026-05-27 15:00+0200\n"
 "PO-Revision-Date: 2025-10-16 17:55+0200\n"
 "Last-Translator: \n"
 "Language: de\n"
@@ -30,105 +30,6 @@ msgstr "n.Chr."
 msgid "other"
 msgstr "andere"
 
-#: histarchexplorer/templates/admin/stakeholders_content.html:3
-#, fuzzy
-msgid "stakeholders section content"
-msgstr "Inhalt des Über-Abschnitts"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:67
-#: histarchexplorer/templates/admin/stakeholders_content.html:71
-#: templates/admin/projects_content.html:67
-#: templates/admin/projects_content.html:71
-msgid "no translation available"
-msgstr "keine Übersetzung verfügbar"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:83
-#: histarchexplorer/templates/admin/stakeholders_content.html:160
-#: templates/admin/projects_content.html:83
-#: templates/admin/projects_content.html:160
-msgid "None"
-msgstr "Keine"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:112
-#: templates/admin/modals.html:41 templates/admin/projects_content.html:112
-msgid "Select a value"
-msgstr "Wert auswählen"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:133
-#: templates/admin/projects_content.html:133
-msgid "This entry has no translation for"
-msgstr "Dieser Eintrag hat keine Übersetzung für"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:139
-#: templates/admin/modals.html:58 templates/admin/projects_content.html:139
-msgid "Please provide a"
-msgstr "Bitte geben Sie ein"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:154
-#: templates/_macros.html:97 templates/admin/projects_content.html:154
-#: templates/tabs/overview.html:12 templates/util/cite/modal.html:37
-msgid "License"
-msgstr "Lizenz"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:174
-#: templates/admin/projects_content.html:174
-msgid "Edit"
-msgstr "Bearbeiten"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:182
-#: histarchexplorer/templates/admin/stakeholders_content.html:225
-#: templates/admin/assets_management.html:86
-#: templates/admin/icon_management.html:53
-#: templates/admin/logo_management.html:100 templates/admin/modals.html:89
-#: templates/admin/projects_content.html:182
-#: templates/admin/projects_content.html:225
-#: templates/admin/team_management.html:86
-msgid "Delete"
-msgstr "Löschen"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:187
-#: templates/admin/modals.html:90 templates/admin/projects_content.html:187
-msgid "Cancel"
-msgstr "Abbrechen"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:193
-#: templates/admin/projects_content.html:193
-msgid "Save"
-msgstr "Speichern"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:236
-#: templates/admin/projects_content.html:236
-msgid "select connection"
-msgstr "Verbindung auswählen"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:249
-#: templates/admin/projects_content.html:249
-msgid "select node"
-msgstr "Knoten auswählen"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:262
-#: templates/admin/projects_content.html:262
-msgid "select role"
-msgstr "Rolle auswählen"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:264
-#: templates/admin/projects_content.html:264
-msgid "not specified"
-msgstr "nicht angegeben"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:279
-#: templates/admin/colors.html:71 templates/admin/index_page_options.html:58
-#: templates/admin/legal_notice.html:29 templates/admin/maps.html:104
-#: templates/admin/projects_content.html:279
-msgid "save"
-msgstr "Speichern"
-
-#: histarchexplorer/templates/admin/stakeholders_content.html:291
-#: templates/admin/maps.html:116 templates/admin/modals.html:7
-#: templates/admin/modals.html:68 templates/admin/projects_content.html:291
-msgid "add entry"
-msgstr "Eintrag hinzufügen"
-
 #: templates/_macros.html:11
 msgid "Back to the entity"
 msgstr "Zurück zum Objekt"
@@ -140,6 +41,11 @@ msgstr "Bild"
 #: templates/_macros.html:56
 msgid "Your browser does not support the video tag."
 msgstr "Ihr Browser unterstützt das Video-Tag nicht."
+
+#: templates/_macros.html:97 templates/tabs/overview.html:12
+#: templates/util/cite/modal.html:37
+msgid "License"
+msgstr "Lizenz"
 
 #: templates/_macros.html:100 templates/tabs/overview.html:13
 msgid "Creator"
@@ -610,6 +516,14 @@ msgstr "Umbenennen"
 msgid "Are you sure you want to delete this asset?"
 msgstr "Sind Sie sicher, dass Sie dieses Asset löschen möchten?"
 
+#: templates/admin/assets_management.html:86
+#: templates/admin/icon_management.html:53
+#: templates/admin/logo_management.html:100 templates/admin/modals.html:191
+#: templates/admin/partials/entity_form.html:118
+#: templates/admin/team_management.html:86
+msgid "Delete"
+msgstr "Löschen"
+
 #: templates/admin/assets_management.html:95
 msgid "No assets have been uploaded yet."
 msgstr "Es wurden noch keine Assets hochgeladen."
@@ -649,6 +563,12 @@ msgstr "Cache leeren"
 #: templates/admin/colors.html:62
 msgid "select a color"
 msgstr "Farbe auswählen"
+
+#: templates/admin/colors.html:71 templates/admin/index_page_options.html:58
+#: templates/admin/legal_notice.html:29 templates/admin/maps.html:104
+#: templates/admin/partials/entity_form.html:213
+msgid "save"
+msgstr "Speichern"
 
 #: templates/admin/colors.html:77
 msgid "Manage Available Colors"
@@ -994,6 +914,12 @@ msgstr "löschen"
 msgid "cancel"
 msgstr "abbrechen"
 
+#: templates/admin/maps.html:116 templates/admin/modals.html:8
+#: templates/admin/modals.html:169 templates/admin/projects_content.html:79
+#: templates/admin/stakeholders_content.html:67
+msgid "add entry"
+msgstr "Eintrag hinzufügen"
+
 #: templates/admin/menu_management.html:3
 msgid "menu management"
 msgstr "Menü-Verwaltung"
@@ -1021,24 +947,79 @@ msgid "Individual"
 msgstr "Individuell"
 
 #: templates/admin/menu_management.html:88
+#: templates/admin/partials/entity_form.html:131
 msgid "Save Changes"
 msgstr "Änderungen speichern"
 
-#: templates/admin/modals.html:82
-msgid "Confirm Delete"
-msgstr "Löschen bestätigen"
-
-#: templates/admin/modals.html:83 templates/util/cite/modal.html:84
+#: templates/admin/modals.html:10 templates/admin/modals.html:185
+#: templates/admin/modals.html:207 templates/util/cite/modal.html:84
 msgid "Close"
 msgstr "Schließen"
 
-#: templates/admin/modals.html:86
+#: templates/admin/modals.html:44
+#, fuzzy
+msgid "General Information"
+msgstr "Einstellungen"
+
+#: templates/admin/modals.html:64 templates/admin/modals.html:95
+#: templates/admin/modals.html:150 templates/admin/partials/entity_form.html:89
+msgid "Please provide a"
+msgstr "Bitte geben Sie ein"
+
+#: templates/admin/modals.html:80
+#, fuzzy
+msgid "Content & Description"
+msgstr "BESCHREIBUNG"
+
+#: templates/admin/modals.html:111
+#, fuzzy
+msgid "Media & Settings"
+msgstr "Alle Einstellungen speichern"
+
+#: templates/admin/modals.html:129 templates/admin/partials/entity_form.html:56
+msgid "Select a value"
+msgstr "Wert auswählen"
+
+#: templates/admin/modals.html:165 templates/admin/modals.html:192
+#: templates/admin/modals.html:269
+#: templates/admin/partials/entity_form.html:124
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: templates/admin/modals.html:184
+msgid "Confirm Delete"
+msgstr "Löschen bestätigen"
+
+#: templates/admin/modals.html:188
 msgid "Are you sure you want to delete"
 msgstr "Sind Sie sicher, den Datensatz zu löschen"
+
+#: templates/admin/modals.html:205 templates/admin/partials/image_field.html:25
+#, fuzzy
+msgid "Select Image"
+msgstr "Rolle auswählen"
+
+#: templates/admin/modals.html:218 templates/admin/modals.html:246
+msgid "None"
+msgstr "Keine"
 
 #: templates/admin/projects_content.html:3
 #, fuzzy
 msgid "projects section content"
+msgstr "Inhalt des Über-Abschnitts"
+
+#: templates/admin/projects_content.html:38
+#, fuzzy
+msgid "Main Project"
+msgstr "Hauptprojekt"
+
+#: templates/admin/projects_content.html:85
+msgid "Maximum number of projects (6) reached."
+msgstr ""
+
+#: templates/admin/stakeholders_content.html:3
+#, fuzzy
+msgid "stakeholders section content"
 msgstr "Inhalt des Über-Abschnitts"
 
 #: templates/admin/team_management.html:3
@@ -1173,6 +1154,50 @@ msgstr "Ausgewählte Klassen werden in der Übersicht ausgeblendet."
 msgid "Save Visibility Settings"
 msgstr "Sichtbarkeitseinstellungen speichern"
 
+#: templates/admin/partials/entity_form.html:25
+#: templates/admin/partials/entity_form.html:27
+msgid "no translation available"
+msgstr "keine Übersetzung verfügbar"
+
+#: templates/admin/partials/entity_form.html:85
+msgid "This entry has no translation for"
+msgstr "Dieser Eintrag hat keine Übersetzung für"
+
+#: templates/admin/partials/entity_form.html:109
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: templates/admin/partials/entity_form.html:138
+#, fuzzy
+msgid "CONNECTED ENTITIES"
+msgstr "Entitäten"
+
+#: templates/admin/partials/entity_form.html:172
+#, fuzzy
+msgid "ADD NEW CONNECTION"
+msgstr "Verbindung auswählen"
+
+#: templates/admin/partials/entity_form.html:176
+msgid "select connection"
+msgstr "Verbindung auswählen"
+
+#: templates/admin/partials/entity_form.html:188
+msgid "select node"
+msgstr "Knoten auswählen"
+
+#: templates/admin/partials/entity_form.html:199
+msgid "select role"
+msgstr "Rolle auswählen"
+
+#: templates/admin/partials/entity_form.html:200
+msgid "not specified"
+msgstr "nicht angegeben"
+
+#: templates/admin/partials/image_field.html:16
+#, fuzzy
+msgid "No image selected"
+msgstr "Keine Datei ausgewählt"
+
 #: templates/tabs/feature.html:34 views/admin.py:56
 msgid "attributes"
 msgstr "Eigenschaften"
@@ -1288,7 +1313,7 @@ msgstr "Hauptprojekt"
 msgid "institutions"
 msgstr "Institutionen"
 
-#: views/admin.py:161
+#: views/admin.py:164
 #, python-format
 msgid ""
 "Invalid ID format for label \"%(label)s\". Please use comma-separated "
@@ -1297,290 +1322,290 @@ msgstr ""
 "Ungültiges ID-Format für Label \"%(label)s\". Bitte verwenden Sie "
 "kommagetrennte Ganzzahlen."
 
-#: views/admin.py:174
+#: views/admin.py:177
 msgid "Type divisions updated successfully."
 msgstr "Typeneinteilungen erfolgreich aktualisiert."
 
-#: views/admin.py:177
+#: views/admin.py:180
 msgid "Error updating type divisions"
 msgstr "Fehler beim Aktualisieren der Typeneinteilungen"
 
-#: views/admin.py:194
+#: views/admin.py:197
 msgid "Entity colors updated successfully."
 msgstr "Entitätsfarben erfolgreich aktualisiert."
 
-#: views/admin.py:197
+#: views/admin.py:200
 msgid "Error updating entity colors"
 msgstr "Fehler beim Aktualisieren der Entitätsfarben"
 
-#: views/admin.py:212
+#: views/admin.py:215
 msgid "Color added successfully."
 msgstr "Farbe erfolgreich hinzugefügt."
 
-#: views/admin.py:215
+#: views/admin.py:218
 msgid "Error adding color"
 msgstr "Fehler beim Hinzufügen der Farbe"
 
-#: views/admin.py:217
+#: views/admin.py:220
 msgid "Color already exists."
 msgstr "Farbe existiert bereits."
 
-#: views/admin.py:219
+#: views/admin.py:222
 msgid "Invalid HEX code."
 msgstr "Ungültiger HEX-Code."
 
-#: views/admin.py:232
+#: views/admin.py:235
 msgid "Color deleted successfully."
 msgstr "Farbe erfolgreich gelöscht."
 
-#: views/admin.py:235
+#: views/admin.py:238
 msgid "Error deleting color"
 msgstr "Fehler beim Löschen der Farbe"
 
-#: views/admin.py:254
+#: views/admin.py:257
 msgid "Menu settings updated successfully."
 msgstr "Menüeinstellungen erfolgreich aktualisiert."
 
-#: views/admin.py:257
+#: views/admin.py:260
 msgid "Error updating menu settings"
 msgstr "Fehler beim Aktualisieren der Menüeinstellungen"
 
-#: views/admin.py:276
+#: views/admin.py:279
 msgid "Legal notice updated successfully."
 msgstr "Impressum erfolgreich aktualisiert."
 
-#: views/admin.py:279 views/admin.py:394 views/admin.py:868
+#: views/admin.py:282 views/admin.py:397 views/admin.py:871
 msgid "Error updating settings"
 msgstr "Fehler beim Aktualisieren der Einstellungen"
 
-#: views/admin.py:289 views/admin.py:557 views/admin.py:1084
-#: views/admin.py:1220
+#: views/admin.py:292 views/admin.py:560 views/admin.py:1087
+#: views/admin.py:1223
 msgid "No file part"
 msgstr "Kein Dateiteil"
 
-#: views/admin.py:294 views/admin.py:562 views/admin.py:1089
-#: views/admin.py:1225
+#: views/admin.py:297 views/admin.py:565 views/admin.py:1092
+#: views/admin.py:1228
 msgid "No selected file"
 msgstr "Keine Datei ausgewählt"
 
-#: views/admin.py:303
+#: views/admin.py:306
 #, python-format
 msgid "Logo \"%(name)s\" uploaded successfully."
 msgstr "Logo \"%(name)s\" erfolgreich hochgeladen."
 
-#: views/admin.py:317 views/admin.py:1112 views/admin.py:1260
+#: views/admin.py:320 views/admin.py:1115 views/admin.py:1263
 msgid "Invalid request for renaming."
 msgstr "Ungültige Anfrage zur Umbenennung."
 
-#: views/admin.py:328
+#: views/admin.py:331
 msgid "Cannot rename default logos."
 msgstr "Standardlogos können nicht umbenannt werden."
 
-#: views/admin.py:334 views/admin.py:1129 views/admin.py:1290
+#: views/admin.py:337 views/admin.py:1132 views/admin.py:1293
 msgid "Original file not found."
 msgstr "Originaldatei nicht gefunden."
 
-#: views/admin.py:338 views/admin.py:1133 views/admin.py:1294
+#: views/admin.py:341 views/admin.py:1136 views/admin.py:1297
 msgid "A file with the new name already exists."
 msgstr "Eine Datei mit dem neuen Namen existiert bereits."
 
-#: views/admin.py:344
+#: views/admin.py:347
 #, python-format
 msgid "Logo renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "Logo erfolgreich von \"%(old)s\" in \"%(new)s\" umbenannt."
 
-#: views/admin.py:347 views/admin.py:1142 views/admin.py:1302
+#: views/admin.py:350 views/admin.py:1145 views/admin.py:1305
 #, python-format
 msgid "Error renaming file: %(error)s"
 msgstr "Fehler beim Umbenennen der Datei: %(error)s"
 
-#: views/admin.py:358 views/admin.py:1153
+#: views/admin.py:361 views/admin.py:1156
 msgid "No filename specified for deletion."
 msgstr "Kein Dateiname zum Löschen angegeben."
 
-#: views/admin.py:368
+#: views/admin.py:371
 #, python-format
 msgid "Logo \"%(name)s\" deleted successfully."
 msgstr "Logo \"%(name)s\" erfolgreich gelöscht."
 
-#: views/admin.py:371 views/admin.py:1166 views/admin.py:1339
+#: views/admin.py:374 views/admin.py:1169 views/admin.py:1342
 #, python-format
 msgid "Error deleting file: %(error)s"
 msgstr "Fehler beim Löschen der Datei: %(error)s"
 
-#: views/admin.py:374
+#: views/admin.py:377
 #, python-format
 msgid "Default logo \"%(name)s\" deactivated."
 msgstr "Standard-Logo \"%(name)s\" deaktiviert."
 
-#: views/admin.py:385 views/admin.py:405
+#: views/admin.py:388 views/admin.py:408
 msgid "No filename specified."
 msgstr "Kein Dateiname angegeben."
 
-#: views/admin.py:391
+#: views/admin.py:394
 msgid "Main logo updated successfully."
 msgstr "Hauptlogo erfolgreich aktualisiert."
 
-#: views/admin.py:423
+#: views/admin.py:426
 msgid "Favicon updated successfully."
 msgstr "Favicon erfolgreich aktualisiert."
 
-#: views/admin.py:426
+#: views/admin.py:429
 #, python-format
 msgid "Error creating favicon: %(error)s"
 msgstr "Fehler beim Erstellen des Favicons: %(error)s"
 
-#: views/admin.py:456
+#: views/admin.py:459
 msgid "Footer logos updated successfully."
 msgstr "Fußzeilenlogos erfolgreich aktualisiert."
 
-#: views/admin.py:459
+#: views/admin.py:462
 msgid "Error updating footer logos"
 msgstr "Fehler beim Aktualisieren der Fußzeilenlogos"
 
-#: views/admin.py:473
+#: views/admin.py:476
 msgid "License added successfully."
 msgstr "Lizenz erfolgreich hinzugefügt."
 
-#: views/admin.py:482
+#: views/admin.py:485
 msgid "License deleted successfully."
 msgstr "Lizenz erfolgreich gelöscht."
 
-#: views/admin.py:498
+#: views/admin.py:501
 msgid "Logo license updated successfully."
 msgstr "Logo-Lizenz erfolgreich aktualisiert."
 
-#: views/admin.py:543
+#: views/admin.py:546
 msgid "Database backup failed. Check logs for details."
 msgstr ""
 "Datenbank-Sicherung fehlgeschlagen. Weitere Informationen finden Sie in "
 "den Protokollen."
 
-#: views/admin.py:546 views/admin.py:622
+#: views/admin.py:549 views/admin.py:625
 msgid "An unexpected error occurred. Check logs for details."
 msgstr ""
 "Ein unerwarteter Fehler ist aufgetreten. Weitere Informationen finden Sie"
 " in den Protokollen."
 
-#: views/admin.py:613
+#: views/admin.py:616
 msgid "Database restored successfully."
 msgstr "Datenbank erfolgreich wiederhergestellt."
 
-#: views/admin.py:617
+#: views/admin.py:620
 msgid "Database restore failed. Check logs for details."
 msgstr ""
 "Datenbank-Wiederherstellung fehlgeschlagen. Weitere Informationen finden "
 "Sie in den Protokollen."
 
-#: views/admin.py:625
+#: views/admin.py:628
 msgid "Invalid file type. Please upload a .sql file."
 msgstr "Ungültiger Dateityp. Bitte laden Sie eine .sql-Datei hoch."
 
-#: views/admin.py:635
+#: views/admin.py:638
 msgid "Link deleted successfully"
 msgstr "Link erfolgreich gelöscht"
 
-#: views/admin.py:662
+#: views/admin.py:665
 msgid "Link added successfully"
 msgstr "Link erfolgreich hinzugefügt"
 
-#: views/admin.py:668
+#: views/admin.py:671
 msgid "Failed to add link: Invalid data provided"
 msgstr "Link konnte nicht hinzugefügt werden: Ungültige Daten angegeben"
 
-#: views/admin.py:699
+#: views/admin.py:702
 msgid "Entry added successfully!"
 msgstr "Eintrag erfolgreich hinzugefügt!"
 
-#: views/admin.py:703
+#: views/admin.py:706
 #, python-format
 msgid "Error adding entry %(name)s: Only one main project allowed"
 msgstr "Fehler beim Hinzufügen des Eintrags %(name)s: Nur ein Hauptprojekt erlaubt"
 
-#: views/admin.py:707
+#: views/admin.py:710
 #, python-format
 msgid "Error adding entry %(name)s: %(error)s"
 msgstr "Fehler beim Hinzufügen des Eintrags %(name)s: %(error)s"
 
-#: views/admin.py:717
+#: views/admin.py:720
 msgid "Main Project cannot be deleted"
 msgstr "Hauptprojekt kann nicht gelöscht werden"
 
-#: views/admin.py:720
+#: views/admin.py:723
 msgid "Entry deleted successfully!"
 msgstr "Eintrag erfolgreich gelöscht!"
 
-#: views/admin.py:735
+#: views/admin.py:738
 msgid "Configuration ID is required"
 msgstr "Konfigurations-ID ist erforderlich"
 
-#: views/admin.py:753
+#: views/admin.py:756
 #, python-format
 msgid "\"%(name)s\" updated successfully"
 msgstr "\"%(name)s\" erfolgreich aktualisiert"
 
-#: views/admin.py:757
+#: views/admin.py:760
 #, python-format
 msgid "Error updating \"%(name)s\": %(error)s"
 msgstr "Fehler beim Aktualisieren von \"%(name)s\": %(error)s"
 
-#: views/admin.py:779
+#: views/admin.py:782
 msgid "Map ID is required"
 msgstr "Karten-ID ist erforderlich"
 
-#: views/admin.py:796
+#: views/admin.py:799
 msgid "Map updated successfully"
 msgstr "Karte erfolgreich aktualisiert"
 
-#: views/admin.py:799
+#: views/admin.py:802
 msgid "Invalid Map ID format"
 msgstr "Ungültiges Karten-ID-Format"
 
-#: views/admin.py:802
+#: views/admin.py:805
 #, python-format
 msgid "Error updating map: %(error)s"
 msgstr "Fehler beim Aktualisieren der Karte: %(error)s"
 
-#: views/admin.py:819
+#: views/admin.py:822
 msgid "Error: Name, Display Name and Description are required"
 msgstr "Fehler: Name, Anzeigename und Beschreibung sind erforderlich"
 
-#: views/admin.py:831
+#: views/admin.py:834
 #, python-format
 msgid "Map %(name)s with ID %(id)s added successfully!"
 msgstr "Karte %(name)s mit ID %(id)s erfolgreich hinzugefügt!"
 
-#: views/admin.py:837
+#: views/admin.py:840
 #, python-format
 msgid "Error adding map %(name)s: %(error)s"
 msgstr "Fehler beim Hinzufügen der Karte %(name)s: %(error)s"
 
-#: views/admin.py:849
+#: views/admin.py:852
 msgid "Map deleted successfully!"
 msgstr "Karte erfolgreich gelöscht!"
 
-#: views/admin.py:851
+#: views/admin.py:854
 #, python-format
 msgid "Error deleting map: %(error)s"
 msgstr "Fehler beim Löschen der Karte: %(error)s"
 
-#: views/admin.py:865
+#: views/admin.py:868
 msgid "Index background updated successfully"
 msgstr "Hintergrund der Startseite erfolgreich aktualisiert"
 
-#: views/admin.py:899
+#: views/admin.py:902
 msgid "Invalid ID format. Please use comma-separated integers."
 msgstr "Ungültiges ID-Format. Bitte verwenden Sie kommagetrennte Ganzzahlen."
 
-#: views/admin.py:904
+#: views/admin.py:907
 msgid "Class visibility updated successfully."
 msgstr "Klassensichtbarkeit erfolgreich aktualisiert."
 
-#: views/admin.py:956
+#: views/admin.py:959
 msgid "Updated case study ID successfully"
 msgstr "Case-Study-ID erfolgreich aktualisiert"
 
-#: views/admin.py:959
+#: views/admin.py:962
 msgid ""
 "Invalid Case Study ID. Must be a positive integer and its entity type "
 "must be \"type\"."
@@ -1588,96 +1613,96 @@ msgstr ""
 "Ungültige Case-Study-ID. Muss eine positive Ganzzahl sein und der "
 "Entitätstyp muss \"Case Study\" sein."
 
-#: views/admin.py:977
+#: views/admin.py:980
 msgid "reset database"
 msgstr "Datenbank zurücksetzen"
 
-#: views/admin.py:999
+#: views/admin.py:1002
 msgid "cache cleared"
 msgstr "Cache geleert"
 
-#: views/admin.py:1007
+#: views/admin.py:1010
 msgid "Cache warmup started in background (refresh mode)"
 msgstr "Cache-Aufwärmen im Hintergrund gestartet (Aktualisierungsmodus)"
 
-#: views/admin.py:1015
+#: views/admin.py:1018
 msgid "Cache warmup started in background."
 msgstr "Cache-Aufwärmen im Hintergrund gestartet."
 
-#: views/admin.py:1034
+#: views/admin.py:1037
 #, python-format
 msgid "Error warming cache: %(error)s"
 msgstr "Fehler beim Aufwärmen des Caches: %(error)s"
 
-#: views/admin.py:1052
+#: views/admin.py:1055
 msgid "system cache refreshed"
 msgstr "System-Cache aktualisiert"
 
-#: views/admin.py:1098
+#: views/admin.py:1101
 #, python-format
 msgid "Asset \"%(name)s\" uploaded successfully."
 msgstr "Asset \"%(name)s\" erfolgreich hochgeladen."
 
-#: views/admin.py:1123
+#: views/admin.py:1126
 msgid "Cannot rename default assets."
 msgstr "Standard-Assets können nicht umbenannt werden."
 
-#: views/admin.py:1139
+#: views/admin.py:1142
 #, python-format
 msgid "Asset renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "Asset erfolgreich von \"%(old)s\" in \"%(new)s\" umbenannt."
 
-#: views/admin.py:1163
+#: views/admin.py:1166
 #, python-format
 msgid "Asset \"%(name)s\" deleted successfully."
 msgstr "Asset \"%(name)s\" erfolgreich gelöscht."
 
-#: views/admin.py:1169
+#: views/admin.py:1172
 #, python-format
 msgid "Default asset \"%(name)s\" deactivated."
 msgstr "Standard-Asset \"%(name)s\" deaktiviert."
 
-#: views/admin.py:1186
+#: views/admin.py:1189
 msgid "Asset license updated successfully."
 msgstr "Asset-Lizenz erfolgreich aktualisiert."
 
-#: views/admin.py:1216
+#: views/admin.py:1219
 msgid "File type is missing."
 msgstr "Dateityp fehlt."
 
-#: views/admin.py:1239 views/admin.py:1273 views/admin.py:1327
+#: views/admin.py:1242 views/admin.py:1276 views/admin.py:1330
 msgid "Invalid file type."
 msgstr "Ungültiger Dateityp."
 
-#: views/admin.py:1246
+#: views/admin.py:1249
 #, python-format
 msgid "%(type)s \"%(name)s\" uploaded successfully."
 msgstr "%(type)s \"%(name)s\" erfolgreich hochgeladen."
 
-#: views/admin.py:1284
+#: views/admin.py:1287
 msgid "Cannot rename default files."
 msgstr "Standarddateien können nicht umbenannt werden."
 
-#: views/admin.py:1300
+#: views/admin.py:1303
 #, python-format
 msgid "%(type)s renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "%(type)s erfolgreich von \"%(old)s\" in \"%(new)s\" umbenannt."
 
-#: views/admin.py:1315
+#: views/admin.py:1318
 msgid "No filename or type specified for deletion."
 msgstr "Kein Dateiname oder Typ zum Löschen angegeben."
 
-#: views/admin.py:1337
+#: views/admin.py:1340
 #, python-format
 msgid "%(type)s \"%(name)s\" deleted successfully."
 msgstr "%(type)s \"%(name)s\" erfolgreich gelöscht."
 
-#: views/admin.py:1342
+#: views/admin.py:1345
 #, python-format
 msgid "Default %(type)s \"%(name)s\" deactivated."
 msgstr "Standard-%(type)s \"%(name)s\" deaktiviert."
 
-#: views/admin.py:1360
+#: views/admin.py:1363
 #, python-format
 msgid "%(type)s license updated successfully."
 msgstr "%(type)s-Lizenz erfolgreich aktualisiert."
@@ -1819,4 +1844,7 @@ msgstr "Cache konnte nicht geleert werden: %(error)s"
 #~ " person management and for individual "
 #~ "pages."
 #~ msgstr ""
+
+#~ msgid "Save"
+#~ msgstr "Speichern"
 

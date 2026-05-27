@@ -1,5 +1,6 @@
 function toggleFields(form, enabled) {
   const fields = form.querySelectorAll('input:not([type="hidden"]), textarea, select');
+  const imageButtons = form.querySelectorAll('.select-image-btn');
 
   fields.forEach(field => {
     if (enabled) {
@@ -14,6 +15,14 @@ function toggleFields(form, enabled) {
       field.removeAttribute('required');
       field.classList.remove('is-invalid');
       field.classList.remove('is-valid');
+    }
+  });
+
+  imageButtons.forEach(btn => {
+    if (enabled) {
+      btn.removeAttribute('disabled');
+    } else {
+      btn.setAttribute('disabled', 'disabled');
     }
   });
 }
@@ -42,22 +51,27 @@ function toggleMapButtons(mapId, isEditing) {
   });
 }
 
-// --- Rich text helpers for description field ---
-function initRichText(entryId) {
+// --- Rich text helpers ---
+function initRichText(containerId) {
   if (typeof tinymce === 'undefined') {
     return;
   }
 
-  // Select ALL richtext-enabled textareas within this form
-  const form = document.getElementById(`form${entryId}`);
-  const textareas = form.querySelectorAll('.js-richtext-rich');
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  const textareas = container.querySelectorAll('.js-richtext-rich:not([disabled])');
 
   textareas.forEach(textarea => {
     const id = textarea.id;
 
-    // Avoid double init
-    if (tinymce.get(id)) {
-      tinymce.get(id).setMode('design');
+    const editor = tinymce.get(id);
+    if (editor) {
+      if (editor.mode && typeof editor.mode.set === 'function') {
+        editor.mode.set('design');
+      } else if (typeof editor.setMode === 'function') {
+        editor.setMode('design');
+      }
       return;
     }
 
@@ -76,7 +90,6 @@ function initRichText(entryId) {
       rel_list: [{title: 'No referrer', value: 'noreferrer noopener'}],
       image_advtab: true,
       paste_as_text: false,
-
       setup: function (editor) {
         editor.on('change keyup', function () {
           editor.save();
@@ -86,13 +99,15 @@ function initRichText(entryId) {
   });
 }
 
-function destroyRichText(entryId) {
+function destroyRichText(containerId) {
   if (typeof tinymce === 'undefined') {
     return;
   }
 
-  const form = document.getElementById(`form${entryId}`);
-  const textareas = form.querySelectorAll('.js-richtext-rich');
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  const textareas = container.querySelectorAll('.js-richtext-rich');
 
   textareas.forEach(textarea => {
     const id = textarea.id;
@@ -106,10 +121,11 @@ function destroyRichText(entryId) {
 
 
 function changeEdit(entryId, enabled) {
-  const form = document.getElementById(`form${entryId}`);
+  const formId = `form${entryId}`;
+  const form = document.getElementById(formId);
   if (form) {
     if (!enabled) {
-      destroyRichText(entryId);
+      destroyRichText(formId);
     }
 
     toggleFields(form, enabled);
@@ -117,7 +133,7 @@ function changeEdit(entryId, enabled) {
 
     if (enabled) {
       // Initialize richtext editor when user enters edit mode
-      initRichText(entryId);
+      initRichText(formId);
       form.classList.remove('was-validated');
     }
   }
@@ -143,6 +159,7 @@ function addMap() {
   }
 }
 
+let addEntryModalInstance = null;
 function addEntry(category) {
   const currentTabInput = document.getElementById('currentTab');
   if (currentTabInput) {
@@ -168,8 +185,10 @@ function addEntry(category) {
 
     const modalElement = document.getElementById('addEntryModal');
     if (modalElement) {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
+      if (!addEntryModalInstance) {
+        addEntryModalInstance = new bootstrap.Modal(modalElement);
+      }
+      addEntryModalInstance.show();
     }
   }
 }
@@ -386,6 +405,112 @@ document.getElementById('logoutButton')?.addEventListener('click', function () {
 });
 
 
+// --- Image Selector Modal logic ---
+const imageSelectorModal = document.getElementById('imageSelectorModal');
+if (imageSelectorModal) {
+  // Global listener for select-image buttons to open modal programmatically
+  // This avoids Bootstrap's default behavior of closing other modals when data-bs-toggle is used
+  document.addEventListener('click', function (event) {
+    const btn = event.target.closest('.select-image-btn');
+    if (btn && !btn.hasAttribute('disabled')) {
+      const modalInstance = bootstrap.Modal.getOrCreateInstance(imageSelectorModal);
+      modalInstance.show(btn);
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  });
+
+  imageSelectorModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const targetInput = button.getAttribute('data-target-input');
+    const targetPreview = button.getAttribute('data-target-preview');
+    const targetFilename = button.getAttribute('data-target-filename');
+    const imageType = button.getAttribute('data-image-type') || 'logo';
+
+    this.setAttribute('data-target-input', targetInput);
+    this.setAttribute('data-target-preview', targetPreview);
+    this.setAttribute('data-target-filename', targetFilename);
+
+    // Switch grids based on type
+    const logoGrid = document.getElementById('logoSelectorGrid');
+    const teamGrid = document.getElementById('teamSelectorGrid');
+    if (logoGrid && teamGrid) {
+      logoGrid.classList.toggle('d-none', imageType !== 'logo');
+      teamGrid.classList.toggle('d-none', imageType !== 'team');
+    }
+
+    // Highlight currently selected image
+    const currentInput = document.querySelector(targetInput);
+    const currentValue = currentInput ? currentInput.value : '';
+    this.querySelectorAll('.image-option').forEach(option => {
+      const isSelected = option.getAttribute('data-value') === currentValue;
+      option.classList.toggle('border-primary', isSelected);
+      option.classList.toggle('bg-primary', isSelected);
+      option.classList.toggle('bg-opacity-10', isSelected);
+    });
+  });
+}
+
+function selectImageOption(element, event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  const modal = document.getElementById('imageSelectorModal');
+  const targetInputSelector = modal.getAttribute('data-target-input');
+  const targetPreviewSelector = modal.getAttribute('data-target-preview');
+  const targetFilenameSelector = modal.getAttribute('data-target-filename');
+
+  const value = element.getAttribute('data-value');
+  const filename = element.getAttribute('data-filename') || 'None';
+
+  const targetInput = document.querySelector(targetInputSelector);
+  if (targetInput) targetInput.value = value;
+
+  const targetPreview = document.querySelector(targetPreviewSelector);
+  if (targetPreview) {
+    if (value) {
+      targetPreview.src = value;
+      targetPreview.classList.remove('d-none');
+      const placeholder = document.getElementById('placeholder-' + targetPreview.id.replace('preview-', ''));
+      if (placeholder) placeholder.classList.add('d-none');
+    } else {
+      targetPreview.src = '';
+      targetPreview.classList.add('d-none');
+      const placeholder = document.getElementById('placeholder-' + targetPreview.id.replace('preview-', ''));
+      if (placeholder) placeholder.classList.remove('d-none');
+    }
+  }
+
+  const targetFilename = document.querySelector(targetFilenameSelector);
+  if (targetFilename) {
+    targetFilename.textContent = filename === 'None' ? 'No image selected' : filename;
+  }
+
+  const modalInstance = bootstrap.Modal.getInstance(modal);
+  if (modalInstance) modalInstance.hide();
+}
+
+// --- Initialize Rich Text for Add Entry Modal ---
+const addEntryModal = document.getElementById('addEntryModal');
+if (addEntryModal) {
+  addEntryModal.addEventListener('shown.bs.modal', function (event) {
+    if (event.target !== addEntryModal) return;
+    initRichText('addEntryModal');
+  });
+  addEntryModal.addEventListener('hide.bs.modal', function (event) {
+    if (event.target !== addEntryModal) return;
+    destroyRichText('addEntryModal');
+  });
+}
+
+// Global listener to fix body class when multiple modals are used
+document.addEventListener('hidden.bs.modal', function () {
+  if (document.querySelectorAll('.modal.show').length > 0) {
+    document.body.classList.add('modal-open');
+  }
+});
+
 function deleteEntry(id, name, tab) {
   const deleteName = document.getElementById('deleteName');
   if (deleteName) {
@@ -436,57 +561,61 @@ const connectionSelects = document.querySelectorAll('.connection-select');
 connectionSelects.forEach(selectConnection => {
   selectConnection.addEventListener('change', () => {
     const isEnabled = selectConnection.selectedIndex !== 0;
+    const row = selectConnection.closest('.row');
+    const targetSelect = row.querySelector('.link-target');
+    const roleSelect = row.querySelector('.link-role');
+    const saveButton = row.querySelector('button');
 
-    if (selectConnection.nextElementSibling) {
-      selectConnection.nextElementSibling.disabled = !isEnabled;
-      if (selectConnection.nextElementSibling.classList.contains('link-target')) {
-        selectConnection.nextElementSibling.selectedIndex = 0;
-        const roleSelect = selectConnection.nextElementSibling.nextElementSibling;
-        if (roleSelect) {
-          roleSelect.disabled = true;
-          roleSelect.selectedIndex = 0;
-        }
-        const saveButton = selectConnection.parentNode.querySelector('button:last-child');
-        if (saveButton) {
-          saveButton.disabled = true;
-        }
+    if (selectConnection.classList.contains('link-type')) {
+      if (targetSelect) {
+        targetSelect.disabled = !isEnabled;
+        targetSelect.selectedIndex = 0;
       }
-      if (selectConnection.nextElementSibling.classList.contains('link-role')) {
-        selectConnection.nextElementSibling.selectedIndex = 0;
-        const saveButton = selectConnection.parentNode.querySelector('button:last-child');
-        if (saveButton) {
-          saveButton.disabled = !isEnabled;
-        }
+      if (roleSelect) {
+        roleSelect.disabled = true;
+        roleSelect.selectedIndex = 0;
       }
-    } else {
-      const saveButton = selectConnection.parentNode.querySelector('button:last-child');
+      if (saveButton) {
+        saveButton.disabled = true;
+      }
+    } else if (selectConnection.classList.contains('link-target')) {
+      if (roleSelect) {
+        roleSelect.disabled = !isEnabled;
+        roleSelect.selectedIndex = 0;
+      }
+      if (saveButton) {
+        saveButton.disabled = true;
+      }
+    } else if (selectConnection.classList.contains('link-role')) {
       if (saveButton) {
         saveButton.disabled = !isEnabled;
       }
     }
 
-
-    const saveButton = selectConnection.parentNode.querySelector('button:last-child');
     const optionData = selectConnection.options[selectConnection.selectedIndex];
-
     setSaveValues(selectConnection.classList, saveButton, optionData, selectConnection);
   });
 });
 
 function setSaveValues(classList, saveButton, info, thisElement) {
+  if (!saveButton || !info) {
+    return;
+  }
   const {value} = info;
+  const row = thisElement.closest('.row');
 
   if (classList.contains('link-type')) {
     saveButton.dataset.domain = info.getAttribute('data-entry');
     saveButton.dataset.direction = info.getAttribute('data-direction');
     saveButton.dataset.property = value;
 
-    const selectNode = thisElement.nextElementSibling;
-    const configClassToShow = `config-class-${info.getAttribute('data-range')}`;
-
-    Array.from(selectNode.options).forEach((option, i) => {
-      option.classList.toggle('d-none', !(option.classList.contains(configClassToShow) || i === 0));
-    });
+    const selectNode = row.querySelector('.link-target');
+    if (selectNode) {
+      const configClassToShow = `config-class-${info.getAttribute('data-range')}`;
+      Array.from(selectNode.options).forEach((option, i) => {
+        option.classList.toggle('d-none', !(option.classList.contains(configClassToShow) || i === 0));
+      });
+    }
   }
 
   if (classList.contains('link-target')) {
