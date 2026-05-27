@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-22 15:44+0200\n"
+"POT-Creation-Date: 2026-05-27 13:51+0200\n"
 "PO-Revision-Date: 2026-05-22 14:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sl\n"
@@ -31,6 +31,105 @@ msgstr "po n. št."
 msgid "other"
 msgstr "drugo"
 
+#: histarchexplorer/templates/admin/stakeholders_content.html:3
+#, fuzzy
+msgid "stakeholders section content"
+msgstr "vsebina razdelka o aplikaciji"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:67
+#: histarchexplorer/templates/admin/stakeholders_content.html:71
+#: templates/admin/projects_content.html:67
+#: templates/admin/projects_content.html:71
+msgid "no translation available"
+msgstr "prevod ni na voljo"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:83
+#: histarchexplorer/templates/admin/stakeholders_content.html:160
+#: templates/admin/projects_content.html:83
+#: templates/admin/projects_content.html:160
+msgid "None"
+msgstr "Brez"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:112
+#: templates/admin/modals.html:41 templates/admin/projects_content.html:112
+msgid "Select a value"
+msgstr "Izberite vrednost"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:133
+#: templates/admin/projects_content.html:133
+msgid "This entry has no translation for"
+msgstr "Ta vnos nima prevoda za"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:139
+#: templates/admin/modals.html:58 templates/admin/projects_content.html:139
+msgid "Please provide a"
+msgstr "Prosimo, navedite"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:154
+#: templates/_macros.html:97 templates/admin/projects_content.html:154
+#: templates/tabs/overview.html:12 templates/util/cite/modal.html:37
+msgid "License"
+msgstr "Licenca"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:174
+#: templates/admin/projects_content.html:174
+msgid "Edit"
+msgstr "Uredi"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:182
+#: histarchexplorer/templates/admin/stakeholders_content.html:225
+#: templates/admin/assets_management.html:86
+#: templates/admin/icon_management.html:53
+#: templates/admin/logo_management.html:100 templates/admin/modals.html:89
+#: templates/admin/projects_content.html:182
+#: templates/admin/projects_content.html:225
+#: templates/admin/team_management.html:86
+msgid "Delete"
+msgstr "Izbriši"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:187
+#: templates/admin/modals.html:90 templates/admin/projects_content.html:187
+msgid "Cancel"
+msgstr "Prekliči"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:193
+#: templates/admin/projects_content.html:193
+msgid "Save"
+msgstr "Shrani"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:236
+#: templates/admin/projects_content.html:236
+msgid "select connection"
+msgstr "izberi povezavo"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:249
+#: templates/admin/projects_content.html:249
+msgid "select node"
+msgstr "izberi vozlišče"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:262
+#: templates/admin/projects_content.html:262
+msgid "select role"
+msgstr "izberi vlogo"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:264
+#: templates/admin/projects_content.html:264
+msgid "not specified"
+msgstr "ni določeno"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:279
+#: templates/admin/colors.html:71 templates/admin/index_page_options.html:58
+#: templates/admin/legal_notice.html:29 templates/admin/maps.html:104
+#: templates/admin/projects_content.html:279
+msgid "save"
+msgstr "shrani"
+
+#: histarchexplorer/templates/admin/stakeholders_content.html:291
+#: templates/admin/maps.html:116 templates/admin/modals.html:7
+#: templates/admin/modals.html:68 templates/admin/projects_content.html:291
+msgid "add entry"
+msgstr "dodaj vnos"
+
 #: templates/_macros.html:11
 msgid "Back to the entity"
 msgstr "Nazaj na entiteto"
@@ -42,11 +141,6 @@ msgstr "Slika"
 #: templates/_macros.html:56
 msgid "Your browser does not support the video tag."
 msgstr "Vaš brskalnik ne podpira video oznake."
-
-#: templates/_macros.html:97 templates/admin/about_content.html:154
-#: templates/tabs/overview.html:12 templates/util/cite/modal.html:37
-msgid "License"
-msgstr "Licenca"
 
 #: templates/_macros.html:100 templates/tabs/overview.html:13
 msgid "Creator"
@@ -69,7 +163,7 @@ msgstr "Nalaganje"
 msgid "Show details"
 msgstr "Prikaži podrobnosti"
 
-#: templates/about.html:66 views/admin.py:50
+#: templates/about.html:66 views/admin.py:52
 msgid "persons"
 msgstr "osebe"
 
@@ -134,7 +228,7 @@ msgstr "Splošne nastavitve"
 msgid "Visibility Settings"
 msgstr "Nastavitve vidnosti"
 
-#: templates/admin.html:32 templates/admin.html:129
+#: templates/admin.html:32 templates/admin.html:131
 msgid "Class colors"
 msgstr "Barve razredov"
 
@@ -143,104 +237,113 @@ msgid "Type Divisions"
 msgstr "Razdelitev tipov"
 
 #: templates/admin.html:34
+#, fuzzy
+msgid "Projects"
+msgstr "projekti"
+
+#: templates/admin.html:35
+msgid "Stakeholders"
+msgstr ""
+
+#: templates/admin.html:36
 msgid "Content"
 msgstr "Vsebina"
 
-#: templates/admin.html:35
+#: templates/admin.html:37
 msgid "Start page"
 msgstr "Začetna stran"
 
-#: templates/admin.html:36
+#: templates/admin.html:38
 msgid "About"
 msgstr "O projektu"
 
-#: templates/admin.html:37 utils/view_util.py:59
+#: templates/admin.html:39 utils/view_util.py:59
 msgid "Publications"
 msgstr "Publikacije"
 
-#: templates/admin.html:38 utils/view_util.py:62
+#: templates/admin.html:40 utils/view_util.py:62
 msgid "Outcome"
 msgstr "Izid"
 
-#: templates/admin.html:39
+#: templates/admin.html:41
 msgid "Legal Notice"
 msgstr "Pravno obvestilo"
 
-#: templates/admin.html:40
+#: templates/admin.html:42
 msgid "Footer"
 msgstr "Noga"
 
-#: templates/admin.html:41 templates/search.html:108 templates/search.html:110
+#: templates/admin.html:43 templates/search.html:108 templates/search.html:110
 msgid "Search"
 msgstr "Iskanje"
 
-#: templates/admin.html:42
+#: templates/admin.html:44
 msgid "File Management"
 msgstr "Upravljanje datotek"
 
-#: templates/admin.html:43 templates/admin/logo_management.html:3
+#: templates/admin.html:45 templates/admin/logo_management.html:3
 msgid "Logo Management"
 msgstr "Upravljanje logotipov"
 
-#: templates/admin.html:44
+#: templates/admin.html:46
 msgid "Icons"
 msgstr "Ikone"
 
-#: templates/admin.html:45
+#: templates/admin.html:47
 msgid "Assets"
 msgstr "Sredstva"
 
-#: templates/admin.html:46
+#: templates/admin.html:48
 msgid "Team"
 msgstr "Ekipa"
 
-#: templates/admin.html:47
+#: templates/admin.html:49
 msgid "Licenses"
 msgstr "Licence"
 
-#: templates/admin.html:48
+#: templates/admin.html:50
 msgid "Maps"
 msgstr "Zemljevidi"
 
-#: templates/admin.html:49
+#: templates/admin.html:51
 msgid "Cache Options"
 msgstr "Možnosti predpomnilnika"
 
-#: templates/admin.html:50
+#: templates/admin.html:52
 msgid "Database Interface"
 msgstr "Vmesnik baze podatkov"
 
-#: templates/admin.html:102
+#: templates/admin.html:104
 msgid "general settings"
 msgstr "splošne nastavitve"
 
-#: templates/admin.html:116
+#: templates/admin.html:118
 msgid "visibility settings"
 msgstr "nastavitve vidnosti"
 
-#: templates/admin.html:142
+#: templates/admin.html:144
 msgid "type divisions"
 msgstr "razdelitev tipov"
 
-#: templates/admin.html:155
+#: templates/admin.html:157
 msgid "cache options"
 msgstr "možnosti predpomnilnika"
 
-#: templates/admin.html:195
+#: templates/admin.html:213
 msgid "index page options"
 msgstr "možnosti indeksne strani"
 
-#: templates/admin.html:217
+#: templates/admin.html:235
 msgid "File Management Overview"
 msgstr "Pregled upravljanja datotek"
 
-#: templates/admin.html:218
+#: templates/admin.html:236
 msgid "Select a file management section from the sidebar to start editing."
 msgstr ""
 "Izberite razdelek za upravljanje datotek v stranski vrstici, da začnete "
 "urejati."
 
-#: templates/admin.html:270
+#: templates/admin.html:288
 msgid "maps"
 msgstr "zemljevidi"
 
@@ -437,74 +540,9 @@ msgstr "Nazaj na iskanje"
 msgid "about section content"
 msgstr "vsebina razdelka o aplikaciji"
 
-#: templates/admin/about_content.html:67 templates/admin/about_content.html:71
-msgid "no translation available"
-msgstr "prevod ni na voljo"
-
-#: templates/admin/about_content.html:83 templates/admin/about_content.html:160
-msgid "None"
-msgstr "Brez"
-
-#: templates/admin/about_content.html:112 templates/admin/modals.html:41
-msgid "Select a value"
-msgstr "Izberite vrednost"
-
-#: templates/admin/about_content.html:133
-msgid "This entry has no translation for"
-msgstr "Ta vnos nima prevoda za"
-
-#: templates/admin/about_content.html:139 templates/admin/modals.html:58
-msgid "Please provide a"
-msgstr "Prosimo, navedite"
-
-#: templates/admin/about_content.html:174
-msgid "Edit"
-msgstr "Uredi"
-
-#: templates/admin/about_content.html:182
-#: templates/admin/about_content.html:225
-#: templates/admin/assets_management.html:86
-#: templates/admin/icon_management.html:53
-#: templates/admin/logo_management.html:100 templates/admin/modals.html:89
-#: templates/admin/team_management.html:86
-msgid "Delete"
-msgstr "Izbriši"
-
-#: templates/admin/about_content.html:187 templates/admin/modals.html:90
-msgid "Cancel"
-msgstr "Prekliči"
-
-#: templates/admin/about_content.html:193
-#: templates/admin/general_settings.html:72
-msgid "Save"
-msgstr "Shrani"
-
-#: templates/admin/about_content.html:236
-msgid "select connection"
-msgstr "izberi povezavo"
-
-#: templates/admin/about_content.html:249
-msgid "select node"
-msgstr "izberi vozlišče"
-
-#: templates/admin/about_content.html:262
-msgid "select role"
-msgstr "izberi vlogo"
-
-#: templates/admin/about_content.html:264
-msgid "not specified"
-msgstr "ni določeno"
-
-#: templates/admin/about_content.html:279 templates/admin/colors.html:71
-#: templates/admin/index_page_options.html:58
-#: templates/admin/legal_notice.html:29 templates/admin/maps.html:104
-msgid "save"
-msgstr "shrani"
-
-#: templates/admin/about_content.html:291 templates/admin/maps.html:116
-#: templates/admin/modals.html:7 templates/admin/modals.html:68
-msgid "add entry"
-msgstr "dodaj vnos"
+#: templates/admin/about_content.html:4
+msgid "Work in progress"
+msgstr ""
 
 #: templates/admin/assets_management.html:3
 msgid "Asset Management"
@@ -714,29 +752,72 @@ msgstr "Shrani izbor v nogi"
 msgid "No logos have been uploaded yet."
 msgstr "Logotipi še niso bili naloženi."
 
-#: templates/admin/general_settings.html:8
+#: templates/admin/general_settings.html:10
+#, fuzzy
+msgid "project configuration"
+msgstr "Konfiguracija vidnosti"
+
+#: templates/admin/general_settings.html:14
 msgid "case study hierarchy ID"
 msgstr "ID hierarchije študije primera"
 
-#: templates/admin/general_settings.html:15
+#: templates/admin/general_settings.html:24
 msgid "Please enter a positive integer for the Case Study Hierarchy ID."
 msgstr "Prosimo, vnesite pozitivno celo število za ID hierarchije študije primera."
 
-#: templates/admin/general_settings.html:32
+#: templates/admin/general_settings.html:33
+msgid "This ID links your project to the central hierarchy."
+msgstr ""
+
+#: templates/admin/general_settings.html:45
+msgid "appearance & access"
+msgstr ""
+
+#: templates/admin/general_settings.html:54
 msgid "Deactivate Darkmode"
 msgstr "Deaktiviraj temni način"
 
-#: templates/admin/general_settings.html:43
+#: templates/admin/general_settings.html:56
+msgid "Disable the dark theme option for all users."
+msgstr ""
+
+#: templates/admin/general_settings.html:64
 msgid "Deactivate Language Selector"
 msgstr "Deaktiviraj izbirnik jezika"
 
-#: templates/admin/general_settings.html:54
+#: templates/admin/general_settings.html:66
+msgid "Hide the language choice menu in the navbar."
+msgstr ""
+
+#: templates/admin/general_settings.html:74
 msgid "Activate Access Restriction"
 msgstr "Aktiviraj omejitev dostopa"
 
-#: templates/admin/general_settings.html:59
+#: templates/admin/general_settings.html:76
+msgid "Only logged-in users can see the content."
+msgstr ""
+
+#: templates/admin/general_settings.html:86
+#, fuzzy
+msgid "localization"
+msgstr "Ustvarjanje"
+
+#: templates/admin/general_settings.html:91
+msgid "available languages"
+msgstr ""
+
+#: templates/admin/general_settings.html:111
 msgid "preferred language"
 msgstr "prednostni jezik"
+
+#: templates/admin/general_settings.html:123
+msgid "The default language used when no other choice is made."
+msgstr ""
+
+#: templates/admin/general_settings.html:135
+#, fuzzy
+msgid "Save Settings"
+msgstr "Shrani vse nastavitve"
 
 #: templates/admin/icon_management.html:3
 msgid "Icon Management"
@@ -954,6 +1035,11 @@ msgstr "Zapri"
 msgid "Are you sure you want to delete"
 msgstr "Ali ste prepričani, da želite izbrisati"
 
+#: templates/admin/projects_content.html:3
+#, fuzzy
+msgid "projects section content"
+msgstr "vsebina razdelka o aplikaciji"
+
 #: templates/admin/team_management.html:3
 msgid "Team Management"
 msgstr "Upravljanje ekipe"
@@ -1086,7 +1172,7 @@ msgstr "Izbrani razredi bodo skriti v brskalnem vmesniku."
 msgid "Save Visibility Settings"
 msgstr "Shrani nastavitve vidnosti"
 
-#: templates/tabs/feature.html:34 views/admin.py:54
+#: templates/tabs/feature.html:34 views/admin.py:56
 msgid "attributes"
 msgstr "atributi"
 
@@ -1197,390 +1283,394 @@ msgstr ""
 msgid "main-project"
 msgstr "glavni projekt"
 
-#: views/admin.py:52
+#: views/admin.py:54
 msgid "institutions"
 msgstr "institucije"
 
-#: views/admin.py:150
+#: views/admin.py:161
 #, python-format
 msgid ""
 "Invalid ID format for label \"%(label)s\". Please use comma-separated "
 "integers."
-msgstr "Neveljaven format ID za oznako \"%(label)s\". Uporabite s črko ločena cela števila."
+msgstr ""
+"Neveljaven format ID za oznako \"%(label)s\". Uporabite s črko ločena "
+"cela števila."
 
-#: views/admin.py:162
+#: views/admin.py:174
 msgid "Type divisions updated successfully."
 msgstr "Razdelitev tipov uspešno posodobljena."
 
-#: views/admin.py:165
+#: views/admin.py:177
 msgid "Error updating type divisions"
 msgstr "Napaka pri posodabljanju razdelitve tipov"
 
-#: views/admin.py:182
+#: views/admin.py:194
 msgid "Entity colors updated successfully."
 msgstr "Barve entitete uspešno posodobljene."
 
-#: views/admin.py:185
+#: views/admin.py:197
 msgid "Error updating entity colors"
 msgstr "Napaka pri posodabljanju barv entitet"
 
-#: views/admin.py:199
+#: views/admin.py:212
 msgid "Color added successfully."
 msgstr "Barva uspešno dodana."
 
-#: views/admin.py:202
+#: views/admin.py:215
 msgid "Error adding color"
 msgstr "Napaka pri dodajanju barve"
 
-#: views/admin.py:204
+#: views/admin.py:217
 msgid "Color already exists."
 msgstr "Barva že obstaja."
 
-#: views/admin.py:206
+#: views/admin.py:219
 msgid "Invalid HEX code."
 msgstr "Neveljavna HEX koda."
 
-#: views/admin.py:219
+#: views/admin.py:232
 msgid "Color deleted successfully."
 msgstr "Barva uspešno izbrisana."
 
-#: views/admin.py:222
+#: views/admin.py:235
 msgid "Error deleting color"
 msgstr "Napaka pri brisanju barve"
 
-#: views/admin.py:241
+#: views/admin.py:254
 msgid "Menu settings updated successfully."
 msgstr "Nastavitve menija uspešno posodobljene."
 
-#: views/admin.py:244
+#: views/admin.py:257
 msgid "Error updating menu settings"
 msgstr "Napaka pri posodabljanju nastavitev menija"
 
-#: views/admin.py:263
+#: views/admin.py:276
 msgid "Legal notice updated successfully."
 msgstr "Pravno obvestilo uspešno posodobljeno."
 
-#: views/admin.py:266 views/admin.py:380 views/admin.py:849
+#: views/admin.py:279 views/admin.py:394 views/admin.py:868
 msgid "Error updating settings"
 msgstr "Napaka pri posodabljanju nastavitev"
 
-#: views/admin.py:276 views/admin.py:543 views/admin.py:1082
-#: views/admin.py:1217
+#: views/admin.py:289 views/admin.py:557 views/admin.py:1084
+#: views/admin.py:1220
 msgid "No file part"
 msgstr "Ni dela datoteke"
 
-#: views/admin.py:281 views/admin.py:548 views/admin.py:1087
-#: views/admin.py:1222
+#: views/admin.py:294 views/admin.py:562 views/admin.py:1089
+#: views/admin.py:1225
 msgid "No selected file"
 msgstr "Ni izbrane datoteke"
 
-#: views/admin.py:290
+#: views/admin.py:303
 #, python-format
 msgid "Logo \"%(name)s\" uploaded successfully."
 msgstr "Logotip \"%(name)s\" uspešno naložen."
 
-#: views/admin.py:304 views/admin.py:1110 views/admin.py:1257
+#: views/admin.py:317 views/admin.py:1112 views/admin.py:1260
 msgid "Invalid request for renaming."
 msgstr "Neveljavna zahteva za preimenovanje."
 
-#: views/admin.py:314
+#: views/admin.py:328
 msgid "Cannot rename default logos."
 msgstr "Privzetih logotipov ni mogoče preimenovati."
 
-#: views/admin.py:320 views/admin.py:1126 views/admin.py:1286
+#: views/admin.py:334 views/admin.py:1129 views/admin.py:1290
 msgid "Original file not found."
 msgstr "Izvirna datoteka ni bila najdena."
 
-#: views/admin.py:324 views/admin.py:1130 views/admin.py:1290
+#: views/admin.py:338 views/admin.py:1133 views/admin.py:1294
 msgid "A file with the new name already exists."
 msgstr "Datoteka z novim imenom že obstaja."
 
-#: views/admin.py:330
+#: views/admin.py:344
 #, python-format
 msgid "Logo renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "Logotip preimenovan iz \"%(old)s\" v \"%(new)s\"."
 
-#: views/admin.py:333 views/admin.py:1139 views/admin.py:1298
+#: views/admin.py:347 views/admin.py:1142 views/admin.py:1302
 #, python-format
 msgid "Error renaming file: %(error)s"
 msgstr "Napaka pri preimenovanju datoteke: %(error)s"
 
-#: views/admin.py:344 views/admin.py:1150
+#: views/admin.py:358 views/admin.py:1153
 msgid "No filename specified for deletion."
 msgstr "Ime datoteke za izbris ni določeno."
 
-#: views/admin.py:354
+#: views/admin.py:368
 #, python-format
 msgid "Logo \"%(name)s\" deleted successfully."
 msgstr "Logotip \"%(name)s\" uspešno izbrisan."
 
-#: views/admin.py:357 views/admin.py:1163 views/admin.py:1335
+#: views/admin.py:371 views/admin.py:1166 views/admin.py:1339
 #, python-format
 msgid "Error deleting file: %(error)s"
 msgstr "Napaka pri brisanju datoteke: %(error)s"
 
-#: views/admin.py:360
+#: views/admin.py:374
 #, python-format
 msgid "Default logo \"%(name)s\" deactivated."
 msgstr "Privzeti logotip \"%(name)s\" deaktiviran."
 
-#: views/admin.py:371 views/admin.py:391
+#: views/admin.py:385 views/admin.py:405
 msgid "No filename specified."
 msgstr "Ime datoteke ni določeno."
 
-#: views/admin.py:377
+#: views/admin.py:391
 msgid "Main logo updated successfully."
 msgstr "Glavni logotip uspešno posodobljen."
 
-#: views/admin.py:409
+#: views/admin.py:423
 msgid "Favicon updated successfully."
 msgstr "Favikona uspešno posodobljena."
 
-#: views/admin.py:412
+#: views/admin.py:426
 #, python-format
 msgid "Error creating favicon: %(error)s"
 msgstr "Napaka pri ustvarjanju favikone: %(error)s"
 
-#: views/admin.py:442
+#: views/admin.py:456
 msgid "Footer logos updated successfully."
 msgstr "Logotipi v nogi uspešno posodobljeni."
 
-#: views/admin.py:445
+#: views/admin.py:459
 msgid "Error updating footer logos"
 msgstr "Napaka pri posodabljanju logotipov v nogi"
 
-#: views/admin.py:459
+#: views/admin.py:473
 msgid "License added successfully."
 msgstr "Licenca uspešno dodana."
 
-#: views/admin.py:468
+#: views/admin.py:482
 msgid "License deleted successfully."
 msgstr "Licenca uspešno izbrisana."
 
-#: views/admin.py:484
+#: views/admin.py:498
 msgid "Logo license updated successfully."
 msgstr "Licenca logotipa uspešno posodobljena."
 
-#: views/admin.py:529
+#: views/admin.py:543
 msgid "Database backup failed. Check logs for details."
 msgstr "Varnostno kopiranje baze ni uspelo. Preverite dnevnike za podrobnosti."
 
-#: views/admin.py:532 views/admin.py:608
+#: views/admin.py:546 views/admin.py:622
 msgid "An unexpected error occurred. Check logs for details."
 msgstr "Prišlo je do nepričakovane napake. Preverite dnevnike za podrobnosti."
 
-#: views/admin.py:599
+#: views/admin.py:613
 msgid "Database restored successfully."
 msgstr "Baza podatkov uspešno obnovljena."
 
-#: views/admin.py:603
+#: views/admin.py:617
 msgid "Database restore failed. Check logs for details."
 msgstr "Obnova baze ni uspela. Preverite dnevnike za podrobnosti."
 
-#: views/admin.py:611
+#: views/admin.py:625
 msgid "Invalid file type. Please upload a .sql file."
 msgstr "Neveljaven tip datoteke. Prosimo, naložite .sql datoteko."
 
-#: views/admin.py:621
+#: views/admin.py:635
 msgid "Link deleted successfully"
 msgstr "Povezava uspešno izbrisana"
 
-#: views/admin.py:648
+#: views/admin.py:662
 msgid "Link added successfully"
 msgstr "Povezava uspešno dodana"
 
-#: views/admin.py:654
+#: views/admin.py:668
 msgid "Failed to add link: Invalid data provided"
 msgstr "Dodajanje povezave ni uspelo: Podani so neveljavni podatki"
 
-#: views/admin.py:685
+#: views/admin.py:699
 msgid "Entry added successfully!"
 msgstr "Vnos uspešno dodan!"
 
-#: views/admin.py:689
+#: views/admin.py:703
 #, python-format
 msgid "Error adding entry %(name)s: Only one main project allowed"
 msgstr "Napaka pri dodajanju vnosa %(name)s: Dovoljen je samo en glavni projekt"
 
-#: views/admin.py:692
+#: views/admin.py:707
 #, python-format
 msgid "Error adding entry %(name)s: %(error)s"
 msgstr "Napaka pri dodajanju vnosa %(name)s: %(error)s"
 
-#: views/admin.py:701
+#: views/admin.py:717
 msgid "Main Project cannot be deleted"
 msgstr "Glavnega projekta ni mogoče izbrisati"
 
-#: views/admin.py:704
+#: views/admin.py:720
 msgid "Entry deleted successfully!"
 msgstr "Vnos uspešno izbrisan!"
 
-#: views/admin.py:719
+#: views/admin.py:735
 msgid "Configuration ID is required"
 msgstr "ID konfiguracije je obvezen"
 
-#: views/admin.py:737
+#: views/admin.py:753
 #, python-format
 msgid "\"%(name)s\" updated successfully"
 msgstr "\"%(name)s\" uspešno posodobljen"
 
-#: views/admin.py:741
+#: views/admin.py:757
 #, python-format
 msgid "Error updating \"%(name)s\": %(error)s"
 msgstr "Napaka pri posodabljanju \"%(name)s\": %(error)s"
 
-#: views/admin.py:763
+#: views/admin.py:779
 msgid "Map ID is required"
 msgstr "ID zemljevida je obvezen"
 
-#: views/admin.py:780
+#: views/admin.py:796
 msgid "Map updated successfully"
 msgstr "Zemljevid uspešno posodobljen"
 
-#: views/admin.py:783
+#: views/admin.py:799
 msgid "Invalid Map ID format"
 msgstr "Neveljaven format ID zemljevida"
 
-#: views/admin.py:786
+#: views/admin.py:802
 #, python-format
 msgid "Error updating map: %(error)s"
 msgstr "Napaka pri posodabljanju zemljevida: %(error)s"
 
-#: views/admin.py:803
+#: views/admin.py:819
 msgid "Error: Name, Display Name and Description are required"
 msgstr "Napaka: Ime, prikazano ime in opis so obvezni"
 
-#: views/admin.py:815
+#: views/admin.py:831
 #, python-format
 msgid "Map %(name)s with ID %(id)s added successfully!"
 msgstr "Zemljevid %(name)s z ID %(id)s uspešno dodan!"
 
-#: views/admin.py:819
+#: views/admin.py:837
 #, python-format
 msgid "Error adding map %(name)s: %(error)s"
 msgstr "Napaka pri dodajanju zemljevida %(name)s: %(error)s"
 
-#: views/admin.py:830
+#: views/admin.py:849
 msgid "Map deleted successfully!"
 msgstr "Zemljevid uspešno izbrisan!"
 
-#: views/admin.py:832
+#: views/admin.py:851
 #, python-format
 msgid "Error deleting map: %(error)s"
 msgstr "Napaka pri brisanju zemljevida: %(error)s"
 
-#: views/admin.py:846
+#: views/admin.py:865
 msgid "Index background updated successfully"
 msgstr "Ozadje indeksa uspešno posodobljeno"
 
-#: views/admin.py:880
+#: views/admin.py:899
 msgid "Invalid ID format. Please use comma-separated integers."
 msgstr "Neveljaven format ID. Uporabite s črko ločena cela števila."
 
-#: views/admin.py:885
+#: views/admin.py:904
 msgid "Class visibility updated successfully."
 msgstr "Vidnost razreda uspešno posodobljena."
 
-#: views/admin.py:935
+#: views/admin.py:956
 msgid "Updated case study ID successfully"
 msgstr "ID študije primera uspešno posodobljen"
 
-#: views/admin.py:938
+#: views/admin.py:959
 msgid ""
 "Invalid Case Study ID. Must be a positive integer and its entity type "
 "must be \"type\"."
-msgstr "Neveljaven ID študije primera. Biti mora pozitivno celo število, tip entitete pa mora biti \"Case Study\"."
+msgstr ""
+"Neveljaven ID študije primera. Biti mora pozitivno celo število, tip "
+"entitete pa mora biti \"Case Study\"."
 
-#: views/admin.py:956
+#: views/admin.py:977
 msgid "reset database"
 msgstr "ponastavi bazo podatkov"
 
-#: views/admin.py:978
+#: views/admin.py:999
 msgid "cache cleared"
 msgstr "predpomnilnik počiščen"
 
-#: views/admin.py:986
+#: views/admin.py:1007
 msgid "Cache warmup started in background (refresh mode)"
 msgstr "Ogrevanje predpomnilnika se je začelo v ozadju (način osveževanja)"
 
-#: views/admin.py:994
+#: views/admin.py:1015
 msgid "Cache warmup started in background."
 msgstr "Ogrevanje predpomnilnika se je začelo v ozadju."
 
-#: views/admin.py:1013
+#: views/admin.py:1034
 #, python-format
 msgid "Error warming cache: %(error)s"
 msgstr "Napaka pri ogrevanju predpomnilnika: %(error)s"
 
-#: views/admin.py:1031
+#: views/admin.py:1052
 msgid "system cache refreshed"
 msgstr "sistemski predpomnilnik osvežen"
 
-#: views/admin.py:1096
+#: views/admin.py:1098
 #, python-format
 msgid "Asset \"%(name)s\" uploaded successfully."
 msgstr "Sredstvo \"%(name)s\" uspešno naloženo."
 
-#: views/admin.py:1120
+#: views/admin.py:1123
 msgid "Cannot rename default assets."
 msgstr "Privzetih sredstev ni mogoče preimenovati."
 
-#: views/admin.py:1136
+#: views/admin.py:1139
 #, python-format
 msgid "Asset renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "Sredstvo preimenovano iz \"%(old)s\" v \"%(new)s\"."
 
-#: views/admin.py:1160
+#: views/admin.py:1163
 #, python-format
 msgid "Asset \"%(name)s\" deleted successfully."
 msgstr "Sredstvo \"%(name)s\" uspešno izbrisano."
 
-#: views/admin.py:1166
+#: views/admin.py:1169
 #, python-format
 msgid "Default asset \"%(name)s\" deactivated."
 msgstr "Privzeto sredstvo \"%(name)s\" deaktivirano."
 
-#: views/admin.py:1183
+#: views/admin.py:1186
 msgid "Asset license updated successfully."
 msgstr "Licenca sredstva uspešno posodobljena."
 
-#: views/admin.py:1213
+#: views/admin.py:1216
 msgid "File type is missing."
 msgstr "Manjka tip datoteke."
 
-#: views/admin.py:1236 views/admin.py:1270 views/admin.py:1323
+#: views/admin.py:1239 views/admin.py:1273 views/admin.py:1327
 msgid "Invalid file type."
 msgstr "Neveljaven tip datoteke."
 
-#: views/admin.py:1243
+#: views/admin.py:1246
 #, python-format
 msgid "%(type)s \"%(name)s\" uploaded successfully."
 msgstr "%(type)s \"%(name)s\" uspešno naložen."
 
-#: views/admin.py:1280
+#: views/admin.py:1284
 msgid "Cannot rename default files."
 msgstr "Privzetih datotek ni mogoče preimenovati."
 
-#: views/admin.py:1296
+#: views/admin.py:1300
 #, python-format
 msgid "%(type)s renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "%(type)s uspešno preimenovan iz \"%(old)s\" v \"%(new)s\"."
 
-#: views/admin.py:1311
+#: views/admin.py:1315
 msgid "No filename or type specified for deletion."
 msgstr "Ime datoteke ali tip za izbris ni določen."
 
-#: views/admin.py:1333
+#: views/admin.py:1337
 #, python-format
 msgid "%(type)s \"%(name)s\" deleted successfully."
 msgstr "%(type)s \"%(name)s\" uspešno izbrisan."
 
-#: views/admin.py:1338
+#: views/admin.py:1342
 #, python-format
 msgid "Default %(type)s \"%(name)s\" deactivated."
 msgstr "Privzeti %(type)s \"%(name)s\" deaktiviran."
 
-#: views/admin.py:1356
+#: views/admin.py:1360
 #, python-format
 msgid "%(type)s license updated successfully."
 msgstr "Licenca %(type)s uspešno posodobljena."

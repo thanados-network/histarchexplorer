@@ -42,11 +42,13 @@ def _redirect_to_admin_tab(default_tab: str) -> Response:
 @login_required
 def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     check_manager_user()
-    tabs = [
+    project_tabs = [
         {'label': _('main-project'), 'target': 'nav-main-project',
          'id': g.config_classes['main-project']},
         {'label': _('projects'), 'target': 'nav-projects',
-         'id': g.config_classes['project']},
+         'id': g.config_classes['project']}]
+
+    stakeholder_tabs = [
         {'label': _('persons'), 'target': 'nav-persons',
          'id': g.config_classes['person']},
         {'label': _('institutions'), 'target': 'nav-institutions',
@@ -54,12 +56,16 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         {'label': _('attributes'), 'target': 'nav-attributes',
          'id': g.config_classes['attribute']}]
 
+    all_tabs = project_tabs + stakeholder_tabs
+
     # Determine which main sidebar section should be active
     active_main_sidebar_id = 'sidebar-general-settings-group'  # Default
 
     if tab:
-        if any(t['target'] == tab for t in tabs):
-            active_main_sidebar_id = 'sidebar-about-content'
+        if any(t['target'] == tab for t in project_tabs):
+            active_main_sidebar_id = 'sidebar-projects-content'
+        elif any(t['target'] == tab for t in stakeholder_tabs):
+            active_main_sidebar_id = 'sidebar-stakeholders-content'
         else:
             match tab:
                 case ('sidebar-maps' | 'sidebar-index-page-options' |
@@ -70,6 +76,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                       'sidebar-file-management-group' | 'sidebar-assets' |
                       'sidebar-legal-notice' | 'sidebar-licenses' |
                       'sidebar-team' | 'sidebar-about-publications' |
+                      'sidebar-projects-content' | 'sidebar-stakeholders-content' |
                       'sidebar-colors' | 'sidebar-type-divisions' |
                       'sidebar-visibility-settings'):
                     active_main_sidebar_id = tab
@@ -77,7 +84,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                 case _:
                     pass
 
-    for tab_item in tabs:
+    for tab_item in all_tabs:
         tab_item['is_active'] = tab_item['target'] == tab
 
     cs_type_id: Optional[int] = None
@@ -104,14 +111,15 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     return render_template(
         "admin.html",
-        tabs=tabs,
+        project_tabs=project_tabs,
+        stakeholder_tabs=stakeholder_tabs,
         admin_instance=admin_instance,
         processed_entities_by_tab=admin_instance.process_entities_by_tab(
-            tabs,
+            all_tabs,
             entry),
         processed_links_by_entity=admin_instance.process_links_by_entity(),
         processed_properties_by_tab=admin_instance.process_properties_by_tab(
-            tabs),
+            all_tabs),
         processed_roles=admin_instance.process_roles(),
         processed_target_nodes=admin_instance.process_target_nodes(),
         maps=Admin.get_maps(),
@@ -725,7 +733,7 @@ def edit_entry() -> Response:
 
     if config_id is None:
         flash(_('Configuration ID is required'), 'danger')
-        return _redirect_to_admin_tab('sidebar-about-content')
+        return _redirect_to_admin_tab('sidebar-projects-content')
 
     form_data: dict[str, str | int | None] = {
         'config_id': config_id,
