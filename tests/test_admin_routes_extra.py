@@ -41,12 +41,16 @@ def test_admin_additional_routes(authenticated_client: FlaskClient):
     assert rv.status_code == 200
     
     # Test sortlinks
-    rv = authenticated_client.post('/sortlinks', data={'order': '1,2,3'}, follow_redirects=True)
+    rv = authenticated_client.post('/sortlinks', json={
+        'table': 'links',
+        'criteria': [{'order': 1, 'id': 1}]
+    }, follow_redirects=True)
     assert rv.status_code == 200
     
     # Test reset
-    rv = authenticated_client.get('/reset', follow_redirects=True)
-    assert rv.status_code == 200
+    with patch('histarchexplorer.views.admin.make_reset'):
+        rv = authenticated_client.get('/reset', follow_redirects=True)
+        assert rv.status_code == 200
     
     # Test clear-cache
     rv = authenticated_client.get('/admin/clear-cache', follow_redirects=True)
