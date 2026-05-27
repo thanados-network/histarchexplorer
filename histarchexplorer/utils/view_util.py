@@ -81,7 +81,7 @@ def find_children_by_id(
         for child in children:
             prefix = '-' * depth
             name = child.get('name', _('Unknown'))
-            result.append({'id': str(child['id']), 'name': f"{prefix}{name}"})
+            result.append({'id': int(child['id']), 'name': f"{prefix}{name}"})
             sub_children = child.get('children')
             if isinstance(sub_children, list) and sub_children:
                 collect_descendants(sub_children, depth + 1)

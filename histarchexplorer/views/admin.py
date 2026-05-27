@@ -645,23 +645,16 @@ def add_link() -> Response:
     check_manager_user()
 
     try:
-        raw_domain = request.args.get('domain')
-        raw_range = request.args.get('range')
-        raw_prop = request.args.get('property')
-        raw_role = request.args.get('role', '0')
+        params = {
+            'domain': request.args.get('domain', type=int),
+            'range': request.args.get('range', type=int),
+            'prop': request.args.get('property', type=int),
+            'role': request.args.get('role', default=0, type=int),
+            'sortorder': Admin.check_sortorder()
+        }
 
-        if (raw_domain is not None and
-                raw_range is not None and
-                raw_prop is not None):
-
-            link_data = {
-                'domain': int(raw_domain),
-                'range': int(raw_range),
-                'prop': int(raw_prop),
-                'role': int(raw_role),
-                'sortorder': Admin.check_sortorder()}
-
-            Admin.add_link(link_data)
+        if all(v is not None for v in [params['domain'], params['range'], params['prop']]):
+            Admin.add_link(params)
             flash(_('Link added successfully'), 'success')
         else:
             raise ValueError("Missing required link parameters")
@@ -681,9 +674,9 @@ def add_link() -> Response:
 @login_required
 def add_entry() -> Response:
     check_manager_user()
-    case_study_str = request.form.get('case_study')
-    form_data: dict[str, str | int] = {
-        'category': request.form.get('category', ''),
+    category = request.form.get('category', '')
+    form_data = {
+        'category': category,
         'name': request.form.get('name', ''),
         'acronym': request.form.get('acronym', ''),
         'email': request.form.get('email', ''),
@@ -692,10 +685,10 @@ def add_entry() -> Response:
         'image': request.form.get('image', ''),
         'address': request.form.get('address', ''),
         'description': request.form.get('description', ''),
-        'case_study': int(case_study_str)
-        if case_study_str and case_study_str.isdigit() else 0,
-        'license_id': request.form.get('license_id', type=int)}
-    current_tab = f'nav-{form_data["category"]}'
+        'case_study': request.form.get('case_study', type=int),
+        'license_id': request.form.get('license_id', type=int)
+    }
+    current_tab = f'nav-{category}'
     redirect_base = url_for('admin') + current_tab
     try:
         new_id = Admin.add_entry(form_data)
@@ -730,15 +723,12 @@ def edit_entry() -> Response:
     check_manager_user()
 
     config_id = request.form.get('config_id', type=int)
-    name = request.form.get('name', '')
-    cs_raw = request.form.get('case_study')
-    case_study = int(cs_raw) if cs_raw and cs_raw.isdigit() else 0
-
     if config_id is None:
         flash(_('Configuration ID is required'), 'danger')
         return _redirect_to_admin_tab('sidebar-projects-content')
 
-    form_data: dict[str, str | int | None] = {
+    name = request.form.get('name', '')
+    form_data = {
         'config_id': config_id,
         'name': name,
         'acronym': request.form.get('acronym', ''),
@@ -748,8 +738,9 @@ def edit_entry() -> Response:
         'image': request.form.get('image', ''),
         'address': request.form.get('address', ''),
         'description': request.form.get('description', ''),
-        'case_study': case_study,
-        'license_id': request.form.get('license_id', type=int)}
+        'case_study': request.form.get('case_study', type=int),
+        'license_id': request.form.get('license_id', type=int)
+    }
 
     try:
         Admin.edit_entry(form_data)

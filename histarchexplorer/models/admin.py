@@ -19,7 +19,8 @@ from histarchexplorer.database.admin import (
     get_files_by_type_from_db,
     synchronize_teams_with_db,
     synchronize_icons_with_db,
-    get_all_teams_from_db)
+    get_all_teams_from_db,
+    TooManyMainProjects)
 from histarchexplorer.database.map import get_maps
 from histarchexplorer.models.config import ConfigEntity
 
@@ -29,8 +30,7 @@ class EntryNotFound(Exception):
 
 
 class Admin:
-    class TooManyMainProjects(Exception):
-        pass
+    TooManyMainProjects = TooManyMainProjects
 
     def __init__(self, fields=None) -> None:
         self.config_entities = g.config_entities

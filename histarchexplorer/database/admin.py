@@ -132,6 +132,10 @@ def update_map(data: dict[str, str]) -> None:
         data)
 
 
+class TooManyMainProjects(Exception):
+    pass
+
+
 def check_if_main_project_exist() -> bool:
     g.cursor.execute(
         "SELECT 1 FROM tng.entities WHERE class_id = 5 LIMIT 1")
@@ -149,7 +153,7 @@ def add_entry(data: dict[str, str | int]) -> int:
     if config_class is None:
         raise ValueError(f"Unknown category {data['category']}")
     if config_class == 5 and check_if_main_project_exist():
-        abort(404)
+        raise TooManyMainProjects()
     g.cursor.execute(
         """
         INSERT INTO tng.entities
@@ -159,7 +163,7 @@ def add_entry(data: dict[str, str | int]) -> int:
                 NULLIF(%(website)s, ''),
                 NULLIF(%(orcid_id)s, ''),
                 NULLIF(%(image)s, ''),
-                NULLIF(%(case_study)s, NULL),
+                %(case_study)s,
                 %(class_id)s,
                 %(acronym)s,
                 %(license_id)s)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-27 15:00+0200\n"
+"POT-Creation-Date: 2026-05-27 15:20+0200\n"
 "PO-Revision-Date: 2026-05-22 14:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sl\n"
@@ -914,7 +914,7 @@ msgid "cancel"
 msgstr "prekliči"
 
 #: templates/admin/maps.html:116 templates/admin/modals.html:8
-#: templates/admin/modals.html:169 templates/admin/projects_content.html:79
+#: templates/admin/modals.html:169 templates/admin/projects_content.html:78
 #: templates/admin/stakeholders_content.html:67
 msgid "add entry"
 msgstr "dodaj vnos"
@@ -1011,10 +1011,6 @@ msgstr "vsebina razdelka o aplikaciji"
 #, fuzzy
 msgid "Main Project"
 msgstr "glavni projekt"
-
-#: templates/admin/projects_content.html:85
-msgid "Maximum number of projects (6) reached."
-msgstr ""
 
 #: templates/admin/stakeholders_content.html:3
 #, fuzzy
@@ -1373,17 +1369,17 @@ msgstr "Napaka pri posodabljanju nastavitev menija"
 msgid "Legal notice updated successfully."
 msgstr "Pravno obvestilo uspešno posodobljeno."
 
-#: views/admin.py:282 views/admin.py:397 views/admin.py:871
+#: views/admin.py:282 views/admin.py:397 views/admin.py:862
 msgid "Error updating settings"
 msgstr "Napaka pri posodabljanju nastavitev"
 
-#: views/admin.py:292 views/admin.py:560 views/admin.py:1087
-#: views/admin.py:1223
+#: views/admin.py:292 views/admin.py:560 views/admin.py:1078
+#: views/admin.py:1214
 msgid "No file part"
 msgstr "Ni dela datoteke"
 
-#: views/admin.py:297 views/admin.py:565 views/admin.py:1092
-#: views/admin.py:1228
+#: views/admin.py:297 views/admin.py:565 views/admin.py:1083
+#: views/admin.py:1219
 msgid "No selected file"
 msgstr "Ni izbrane datoteke"
 
@@ -1392,7 +1388,7 @@ msgstr "Ni izbrane datoteke"
 msgid "Logo \"%(name)s\" uploaded successfully."
 msgstr "Logotip \"%(name)s\" uspešno naložen."
 
-#: views/admin.py:320 views/admin.py:1115 views/admin.py:1263
+#: views/admin.py:320 views/admin.py:1106 views/admin.py:1254
 msgid "Invalid request for renaming."
 msgstr "Neveljavna zahteva za preimenovanje."
 
@@ -1400,11 +1396,11 @@ msgstr "Neveljavna zahteva za preimenovanje."
 msgid "Cannot rename default logos."
 msgstr "Privzetih logotipov ni mogoče preimenovati."
 
-#: views/admin.py:337 views/admin.py:1132 views/admin.py:1293
+#: views/admin.py:337 views/admin.py:1123 views/admin.py:1284
 msgid "Original file not found."
 msgstr "Izvirna datoteka ni bila najdena."
 
-#: views/admin.py:341 views/admin.py:1136 views/admin.py:1297
+#: views/admin.py:341 views/admin.py:1127 views/admin.py:1288
 msgid "A file with the new name already exists."
 msgstr "Datoteka z novim imenom že obstaja."
 
@@ -1413,12 +1409,12 @@ msgstr "Datoteka z novim imenom že obstaja."
 msgid "Logo renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "Logotip preimenovan iz \"%(old)s\" v \"%(new)s\"."
 
-#: views/admin.py:350 views/admin.py:1145 views/admin.py:1305
+#: views/admin.py:350 views/admin.py:1136 views/admin.py:1296
 #, python-format
 msgid "Error renaming file: %(error)s"
 msgstr "Napaka pri preimenovanju datoteke: %(error)s"
 
-#: views/admin.py:361 views/admin.py:1156
+#: views/admin.py:361 views/admin.py:1147
 msgid "No filename specified for deletion."
 msgstr "Ime datoteke za izbris ni določeno."
 
@@ -1427,7 +1423,7 @@ msgstr "Ime datoteke za izbris ni določeno."
 msgid "Logo \"%(name)s\" deleted successfully."
 msgstr "Logotip \"%(name)s\" uspešno izbrisan."
 
-#: views/admin.py:374 views/admin.py:1169 views/admin.py:1342
+#: views/admin.py:374 views/admin.py:1160 views/admin.py:1333
 #, python-format
 msgid "Error deleting file: %(error)s"
 msgstr "Napaka pri brisanju datoteke: %(error)s"
@@ -1498,107 +1494,107 @@ msgstr "Neveljaven tip datoteke. Prosimo, naložite .sql datoteko."
 msgid "Link deleted successfully"
 msgstr "Povezava uspešno izbrisana"
 
-#: views/admin.py:665
+#: views/admin.py:658
 msgid "Link added successfully"
 msgstr "Povezava uspešno dodana"
 
-#: views/admin.py:671
+#: views/admin.py:664
 msgid "Failed to add link: Invalid data provided"
 msgstr "Dodajanje povezave ni uspelo: Podani so neveljavni podatki"
 
-#: views/admin.py:702
+#: views/admin.py:695
 msgid "Entry added successfully!"
 msgstr "Vnos uspešno dodan!"
 
-#: views/admin.py:706
+#: views/admin.py:699
 #, python-format
 msgid "Error adding entry %(name)s: Only one main project allowed"
 msgstr "Napaka pri dodajanju vnosa %(name)s: Dovoljen je samo en glavni projekt"
 
-#: views/admin.py:710
+#: views/admin.py:703
 #, python-format
 msgid "Error adding entry %(name)s: %(error)s"
 msgstr "Napaka pri dodajanju vnosa %(name)s: %(error)s"
 
-#: views/admin.py:720
+#: views/admin.py:713
 msgid "Main Project cannot be deleted"
 msgstr "Glavnega projekta ni mogoče izbrisati"
 
-#: views/admin.py:723
+#: views/admin.py:716
 msgid "Entry deleted successfully!"
 msgstr "Vnos uspešno izbrisan!"
 
-#: views/admin.py:738
+#: views/admin.py:727
 msgid "Configuration ID is required"
 msgstr "ID konfiguracije je obvezen"
 
-#: views/admin.py:756
+#: views/admin.py:747
 #, python-format
 msgid "\"%(name)s\" updated successfully"
 msgstr "\"%(name)s\" uspešno posodobljen"
 
-#: views/admin.py:760
+#: views/admin.py:751
 #, python-format
 msgid "Error updating \"%(name)s\": %(error)s"
 msgstr "Napaka pri posodabljanju \"%(name)s\": %(error)s"
 
-#: views/admin.py:782
+#: views/admin.py:773
 msgid "Map ID is required"
 msgstr "ID zemljevida je obvezen"
 
-#: views/admin.py:799
+#: views/admin.py:790
 msgid "Map updated successfully"
 msgstr "Zemljevid uspešno posodobljen"
 
-#: views/admin.py:802
+#: views/admin.py:793
 msgid "Invalid Map ID format"
 msgstr "Neveljaven format ID zemljevida"
 
-#: views/admin.py:805
+#: views/admin.py:796
 #, python-format
 msgid "Error updating map: %(error)s"
 msgstr "Napaka pri posodabljanju zemljevida: %(error)s"
 
-#: views/admin.py:822
+#: views/admin.py:813
 msgid "Error: Name, Display Name and Description are required"
 msgstr "Napaka: Ime, prikazano ime in opis so obvezni"
 
-#: views/admin.py:834
+#: views/admin.py:825
 #, python-format
 msgid "Map %(name)s with ID %(id)s added successfully!"
 msgstr "Zemljevid %(name)s z ID %(id)s uspešno dodan!"
 
-#: views/admin.py:840
+#: views/admin.py:831
 #, python-format
 msgid "Error adding map %(name)s: %(error)s"
 msgstr "Napaka pri dodajanju zemljevida %(name)s: %(error)s"
 
-#: views/admin.py:852
+#: views/admin.py:843
 msgid "Map deleted successfully!"
 msgstr "Zemljevid uspešno izbrisan!"
 
-#: views/admin.py:854
+#: views/admin.py:845
 #, python-format
 msgid "Error deleting map: %(error)s"
 msgstr "Napaka pri brisanju zemljevida: %(error)s"
 
-#: views/admin.py:868
+#: views/admin.py:859
 msgid "Index background updated successfully"
 msgstr "Ozadje indeksa uspešno posodobljeno"
 
-#: views/admin.py:902
+#: views/admin.py:893
 msgid "Invalid ID format. Please use comma-separated integers."
 msgstr "Neveljaven format ID. Uporabite s črko ločena cela števila."
 
-#: views/admin.py:907
+#: views/admin.py:898
 msgid "Class visibility updated successfully."
 msgstr "Vidnost razreda uspešno posodobljena."
 
-#: views/admin.py:959
+#: views/admin.py:950
 msgid "Updated case study ID successfully"
 msgstr "ID študije primera uspešno posodobljen"
 
-#: views/admin.py:962
+#: views/admin.py:953
 msgid ""
 "Invalid Case Study ID. Must be a positive integer and its entity type "
 "must be \"type\"."
@@ -1606,96 +1602,96 @@ msgstr ""
 "Neveljaven ID študije primera. Biti mora pozitivno celo število, tip "
 "entitete pa mora biti \"Case Study\"."
 
-#: views/admin.py:980
+#: views/admin.py:971
 msgid "reset database"
 msgstr "ponastavi bazo podatkov"
 
-#: views/admin.py:1002
+#: views/admin.py:993
 msgid "cache cleared"
 msgstr "predpomnilnik počiščen"
 
-#: views/admin.py:1010
+#: views/admin.py:1001
 msgid "Cache warmup started in background (refresh mode)"
 msgstr "Ogrevanje predpomnilnika se je začelo v ozadju (način osveževanja)"
 
-#: views/admin.py:1018
+#: views/admin.py:1009
 msgid "Cache warmup started in background."
 msgstr "Ogrevanje predpomnilnika se je začelo v ozadju."
 
-#: views/admin.py:1037
+#: views/admin.py:1028
 #, python-format
 msgid "Error warming cache: %(error)s"
 msgstr "Napaka pri ogrevanju predpomnilnika: %(error)s"
 
-#: views/admin.py:1055
+#: views/admin.py:1046
 msgid "system cache refreshed"
 msgstr "sistemski predpomnilnik osvežen"
 
-#: views/admin.py:1101
+#: views/admin.py:1092
 #, python-format
 msgid "Asset \"%(name)s\" uploaded successfully."
 msgstr "Sredstvo \"%(name)s\" uspešno naloženo."
 
-#: views/admin.py:1126
+#: views/admin.py:1117
 msgid "Cannot rename default assets."
 msgstr "Privzetih sredstev ni mogoče preimenovati."
 
-#: views/admin.py:1142
+#: views/admin.py:1133
 #, python-format
 msgid "Asset renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "Sredstvo preimenovano iz \"%(old)s\" v \"%(new)s\"."
 
-#: views/admin.py:1166
+#: views/admin.py:1157
 #, python-format
 msgid "Asset \"%(name)s\" deleted successfully."
 msgstr "Sredstvo \"%(name)s\" uspešno izbrisano."
 
-#: views/admin.py:1172
+#: views/admin.py:1163
 #, python-format
 msgid "Default asset \"%(name)s\" deactivated."
 msgstr "Privzeto sredstvo \"%(name)s\" deaktivirano."
 
-#: views/admin.py:1189
+#: views/admin.py:1180
 msgid "Asset license updated successfully."
 msgstr "Licenca sredstva uspešno posodobljena."
 
-#: views/admin.py:1219
+#: views/admin.py:1210
 msgid "File type is missing."
 msgstr "Manjka tip datoteke."
 
-#: views/admin.py:1242 views/admin.py:1276 views/admin.py:1330
+#: views/admin.py:1233 views/admin.py:1267 views/admin.py:1321
 msgid "Invalid file type."
 msgstr "Neveljaven tip datoteke."
 
-#: views/admin.py:1249
+#: views/admin.py:1240
 #, python-format
 msgid "%(type)s \"%(name)s\" uploaded successfully."
 msgstr "%(type)s \"%(name)s\" uspešno naložen."
 
-#: views/admin.py:1287
+#: views/admin.py:1278
 msgid "Cannot rename default files."
 msgstr "Privzetih datotek ni mogoče preimenovati."
 
-#: views/admin.py:1303
+#: views/admin.py:1294
 #, python-format
 msgid "%(type)s renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "%(type)s uspešno preimenovan iz \"%(old)s\" v \"%(new)s\"."
 
-#: views/admin.py:1318
+#: views/admin.py:1309
 msgid "No filename or type specified for deletion."
 msgstr "Ime datoteke ali tip za izbris ni določen."
 
-#: views/admin.py:1340
+#: views/admin.py:1331
 #, python-format
 msgid "%(type)s \"%(name)s\" deleted successfully."
 msgstr "%(type)s \"%(name)s\" uspešno izbrisan."
 
-#: views/admin.py:1345
+#: views/admin.py:1336
 #, python-format
 msgid "Default %(type)s \"%(name)s\" deactivated."
 msgstr "Privzeti %(type)s \"%(name)s\" deaktiviran."
 
-#: views/admin.py:1363
+#: views/admin.py:1354
 #, python-format
 msgid "%(type)s license updated successfully."
 msgstr "Licenca %(type)s uspešno posodobljena."
@@ -1750,4 +1746,7 @@ msgstr "Čiščenje predpomnilnika ni uspelo: %(error)s"
 
 #~ msgid "Save"
 #~ msgstr "Shrani"
+
+#~ msgid "Maximum number of projects (6) reached."
+#~ msgstr ""
 

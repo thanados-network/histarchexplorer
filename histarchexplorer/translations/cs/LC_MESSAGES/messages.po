@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-27 15:00+0200\n"
+"POT-Creation-Date: 2026-05-27 15:20+0200\n"
 "PO-Revision-Date: 2026-05-22 14:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: cs\n"
@@ -910,7 +910,7 @@ msgid "cancel"
 msgstr "zrušit"
 
 #: templates/admin/maps.html:116 templates/admin/modals.html:8
-#: templates/admin/modals.html:169 templates/admin/projects_content.html:79
+#: templates/admin/modals.html:169 templates/admin/projects_content.html:78
 #: templates/admin/stakeholders_content.html:67
 msgid "add entry"
 msgstr "přidat záznam"
@@ -1007,10 +1007,6 @@ msgstr "obsah sekce o aplikaci"
 #, fuzzy
 msgid "Main Project"
 msgstr "hlavní projekt"
-
-#: templates/admin/projects_content.html:85
-msgid "Maximum number of projects (6) reached."
-msgstr ""
 
 #: templates/admin/stakeholders_content.html:3
 #, fuzzy
@@ -1369,17 +1365,17 @@ msgstr "Chyba při aktualizaci nastavení menu"
 msgid "Legal notice updated successfully."
 msgstr "Právní upozornění bylo úspěšně aktualizováno."
 
-#: views/admin.py:282 views/admin.py:397 views/admin.py:871
+#: views/admin.py:282 views/admin.py:397 views/admin.py:862
 msgid "Error updating settings"
 msgstr "Chyba při aktualizaci nastavení"
 
-#: views/admin.py:292 views/admin.py:560 views/admin.py:1087
-#: views/admin.py:1223
+#: views/admin.py:292 views/admin.py:560 views/admin.py:1078
+#: views/admin.py:1214
 msgid "No file part"
 msgstr "Chybí část souboru"
 
-#: views/admin.py:297 views/admin.py:565 views/admin.py:1092
-#: views/admin.py:1228
+#: views/admin.py:297 views/admin.py:565 views/admin.py:1083
+#: views/admin.py:1219
 msgid "No selected file"
 msgstr "Žádný vybraný soubor"
 
@@ -1388,7 +1384,7 @@ msgstr "Žádný vybraný soubor"
 msgid "Logo \"%(name)s\" uploaded successfully."
 msgstr "Logo \"%(name)s\" úspěšně nahráno."
 
-#: views/admin.py:320 views/admin.py:1115 views/admin.py:1263
+#: views/admin.py:320 views/admin.py:1106 views/admin.py:1254
 msgid "Invalid request for renaming."
 msgstr "Neplatný požadavek na přejmenování."
 
@@ -1396,11 +1392,11 @@ msgstr "Neplatný požadavek na přejmenování."
 msgid "Cannot rename default logos."
 msgstr "Výchozí loga nelze přejmenovat."
 
-#: views/admin.py:337 views/admin.py:1132 views/admin.py:1293
+#: views/admin.py:337 views/admin.py:1123 views/admin.py:1284
 msgid "Original file not found."
 msgstr "Původní soubor nebyl nalezen."
 
-#: views/admin.py:341 views/admin.py:1136 views/admin.py:1297
+#: views/admin.py:341 views/admin.py:1127 views/admin.py:1288
 msgid "A file with the new name already exists."
 msgstr "Soubor s novým názvem již existuje."
 
@@ -1409,12 +1405,12 @@ msgstr "Soubor s novým názvem již existuje."
 msgid "Logo renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "Logo přejmenováno z \"%(old)s\" na \"%(new)s\"."
 
-#: views/admin.py:350 views/admin.py:1145 views/admin.py:1305
+#: views/admin.py:350 views/admin.py:1136 views/admin.py:1296
 #, python-format
 msgid "Error renaming file: %(error)s"
 msgstr "Chyba při přejmenování souboru: %(error)s"
 
-#: views/admin.py:361 views/admin.py:1156
+#: views/admin.py:361 views/admin.py:1147
 msgid "No filename specified for deletion."
 msgstr "Nebyl zadán žádný název souboru ke smazání."
 
@@ -1423,7 +1419,7 @@ msgstr "Nebyl zadán žádný název souboru ke smazání."
 msgid "Logo \"%(name)s\" deleted successfully."
 msgstr "Logo \"%(name)s\" úspěšně smazáno."
 
-#: views/admin.py:374 views/admin.py:1169 views/admin.py:1342
+#: views/admin.py:374 views/admin.py:1160 views/admin.py:1333
 #, python-format
 msgid "Error deleting file: %(error)s"
 msgstr "Chyba při mazání souboru: %(error)s"
@@ -1494,109 +1490,109 @@ msgstr "Neplatný typ souboru. Nahrajte prosím soubor .sql."
 msgid "Link deleted successfully"
 msgstr "Odkaz byl úspěšně smazán"
 
-#: views/admin.py:665
+#: views/admin.py:658
 msgid "Link added successfully"
 msgstr "Odkaz byl úspěšně přidán"
 
-#: views/admin.py:671
+#: views/admin.py:664
 msgid "Failed to add link: Invalid data provided"
 msgstr "Nepodařilo se přidat odkaz: Byla poskytnuta neplatná data"
 
-#: views/admin.py:702
+#: views/admin.py:695
 msgid "Entry added successfully!"
 msgstr "Záznam byl úspěšně přidán!"
 
-#: views/admin.py:706
+#: views/admin.py:699
 #, python-format
 msgid "Error adding entry %(name)s: Only one main project allowed"
 msgstr ""
 "Chyba při přidávání záznamu %(name)s: Je povolen pouze jeden hlavní "
 "projekt"
 
-#: views/admin.py:710
+#: views/admin.py:703
 #, python-format
 msgid "Error adding entry %(name)s: %(error)s"
 msgstr "Chyba při přidávání záznamu %(name)s: %(error)s"
 
-#: views/admin.py:720
+#: views/admin.py:713
 msgid "Main Project cannot be deleted"
 msgstr "Hlavní projekt nelze smazat"
 
-#: views/admin.py:723
+#: views/admin.py:716
 msgid "Entry deleted successfully!"
 msgstr "Záznam byl úspěšně smazán!"
 
-#: views/admin.py:738
+#: views/admin.py:727
 msgid "Configuration ID is required"
 msgstr "ID konfigurace je vyžadováno"
 
-#: views/admin.py:756
+#: views/admin.py:747
 #, python-format
 msgid "\"%(name)s\" updated successfully"
 msgstr "\"%(name)s\" úspěšně aktualizován"
 
-#: views/admin.py:760
+#: views/admin.py:751
 #, python-format
 msgid "Error updating \"%(name)s\": %(error)s"
 msgstr "Chyba při aktualizaci \"%(name)s\": %(error)s"
 
-#: views/admin.py:782
+#: views/admin.py:773
 msgid "Map ID is required"
 msgstr "ID mapy je vyžadováno"
 
-#: views/admin.py:799
+#: views/admin.py:790
 msgid "Map updated successfully"
 msgstr "Mapa byla úspěšně aktualizována"
 
-#: views/admin.py:802
+#: views/admin.py:793
 msgid "Invalid Map ID format"
 msgstr "Neplatný formát ID mapy"
 
-#: views/admin.py:805
+#: views/admin.py:796
 #, python-format
 msgid "Error updating map: %(error)s"
 msgstr "Chyba při aktualizaci mapy: %(error)s"
 
-#: views/admin.py:822
+#: views/admin.py:813
 msgid "Error: Name, Display Name and Description are required"
 msgstr "Chyba: Název, zobrazované jméno a popis jsou povinné"
 
-#: views/admin.py:834
+#: views/admin.py:825
 #, python-format
 msgid "Map %(name)s with ID %(id)s added successfully!"
 msgstr "Mapa %(name)s s ID %(id)s byla úspěšně přidána!"
 
-#: views/admin.py:840
+#: views/admin.py:831
 #, python-format
 msgid "Error adding map %(name)s: %(error)s"
 msgstr "Chyba při přidávání mapy %(name)s: %(error)s"
 
-#: views/admin.py:852
+#: views/admin.py:843
 msgid "Map deleted successfully!"
 msgstr "Mapa byla úspěšně smazána!"
 
-#: views/admin.py:854
+#: views/admin.py:845
 #, python-format
 msgid "Error deleting map: %(error)s"
 msgstr "Chyba při mazání mapy: %(error)s"
 
-#: views/admin.py:868
+#: views/admin.py:859
 msgid "Index background updated successfully"
 msgstr "Pozadí úvodní stránky bylo úspěšně aktualizováno"
 
-#: views/admin.py:902
+#: views/admin.py:893
 msgid "Invalid ID format. Please use comma-separated integers."
 msgstr "Neplatný formát ID. Použijte prosím celá čísla oddělená čárkami."
 
-#: views/admin.py:907
+#: views/admin.py:898
 msgid "Class visibility updated successfully."
 msgstr "Viditelnost třídy byla úspěšně aktualizována."
 
-#: views/admin.py:959
+#: views/admin.py:950
 msgid "Updated case study ID successfully"
 msgstr "ID případové studie bylo úspěšně aktualizováno"
 
-#: views/admin.py:962
+#: views/admin.py:953
 msgid ""
 "Invalid Case Study ID. Must be a positive integer and its entity type "
 "must be \"type\"."
@@ -1604,96 +1600,96 @@ msgstr ""
 "Neplatné ID případové studie. Musí to být kladné celé číslo a jeho typ "
 "entity musí být \"Case Study\"."
 
-#: views/admin.py:980
+#: views/admin.py:971
 msgid "reset database"
 msgstr "resetovat databázi"
 
-#: views/admin.py:1002
+#: views/admin.py:993
 msgid "cache cleared"
 msgstr "mezipaměť vymazána"
 
-#: views/admin.py:1010
+#: views/admin.py:1001
 msgid "Cache warmup started in background (refresh mode)"
 msgstr "Zahřívání mezipaměti spuštěno na pozadí (režim obnovení)"
 
-#: views/admin.py:1018
+#: views/admin.py:1009
 msgid "Cache warmup started in background."
 msgstr "Zahřívání mezipaměti spuštěno na pozadí."
 
-#: views/admin.py:1037
+#: views/admin.py:1028
 #, python-format
 msgid "Error warming cache: %(error)s"
 msgstr "Chyba při zahřívání mezipaměti: %(error)s"
 
-#: views/admin.py:1055
+#: views/admin.py:1046
 msgid "system cache refreshed"
 msgstr "systémová mezipaměť obnovena"
 
-#: views/admin.py:1101
+#: views/admin.py:1092
 #, python-format
 msgid "Asset \"%(name)s\" uploaded successfully."
 msgstr "Soubor \"%(name)s\" úspěšně nahrán."
 
-#: views/admin.py:1126
+#: views/admin.py:1117
 msgid "Cannot rename default assets."
 msgstr "Výchozí soubory nelze přejmenovat."
 
-#: views/admin.py:1142
+#: views/admin.py:1133
 #, python-format
 msgid "Asset renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "Soubor přejmenován z \"%(old)s\" na \"%(new)s\"."
 
-#: views/admin.py:1166
+#: views/admin.py:1157
 #, python-format
 msgid "Asset \"%(name)s\" deleted successfully."
 msgstr "Soubor \"%(name)s\" úspěšně smazán."
 
-#: views/admin.py:1172
+#: views/admin.py:1163
 #, python-format
 msgid "Default asset \"%(name)s\" deactivated."
 msgstr "Výchozí soubor \"%(name)s\" deaktivován."
 
-#: views/admin.py:1189
+#: views/admin.py:1180
 msgid "Asset license updated successfully."
 msgstr "Licence souboru byla úspěšně aktualizována."
 
-#: views/admin.py:1219
+#: views/admin.py:1210
 msgid "File type is missing."
 msgstr "Chybí typ souboru."
 
-#: views/admin.py:1242 views/admin.py:1276 views/admin.py:1330
+#: views/admin.py:1233 views/admin.py:1267 views/admin.py:1321
 msgid "Invalid file type."
 msgstr "Neplatný typ souboru."
 
-#: views/admin.py:1249
+#: views/admin.py:1240
 #, python-format
 msgid "%(type)s \"%(name)s\" uploaded successfully."
 msgstr "%(type)s \"%(name)s\" úspěšně nahrán."
 
-#: views/admin.py:1287
+#: views/admin.py:1278
 msgid "Cannot rename default files."
 msgstr "Výchozí soubory nelze přejmenovat."
 
-#: views/admin.py:1303
+#: views/admin.py:1294
 #, python-format
 msgid "%(type)s renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "%(type)s úspěšně přejmenován z \"%(old)s\" na \"%(new)s\"."
 
-#: views/admin.py:1318
+#: views/admin.py:1309
 msgid "No filename or type specified for deletion."
 msgstr "Nebyl zadán žádný název souboru ani typ ke smazání."
 
-#: views/admin.py:1340
+#: views/admin.py:1331
 #, python-format
 msgid "%(type)s \"%(name)s\" deleted successfully."
 msgstr "%(type)s \"%(name)s\" úspěšně smazán."
 
-#: views/admin.py:1345
+#: views/admin.py:1336
 #, python-format
 msgid "Default %(type)s \"%(name)s\" deactivated."
 msgstr "Výchozí %(type)s \"%(name)s\" deaktivován."
 
-#: views/admin.py:1363
+#: views/admin.py:1354
 #, python-format
 msgid "%(type)s license updated successfully."
 msgstr "Licence %(type)s byla úspěšně aktualizována."
@@ -1748,4 +1744,7 @@ msgstr "Nepodařilo se vymazat mezipaměť: %(error)s"
 
 #~ msgid "Save"
 #~ msgstr "Uložit"
+
+#~ msgid "Maximum number of projects (6) reached."
+#~ msgstr ""
 
