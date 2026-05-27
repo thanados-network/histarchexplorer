@@ -8,96 +8,95 @@
           <div class="form-area-wrapper">
             <!-- 🧠 Multi-select Dropdown with Choices.js -->
             <div class="mb-4">
-              <label for="system-class-select" class="form-label">Filter by
-                Type:</label>
+              <label for="system-class-select" class="form-label">{{ _('Filter by Type') }}:</label>
               <select class="form-select" id="system-class-select"
                       name="system_class[]" multiple>
-                <optgroup label="Actors">
+                <optgroup label="{{ _('Actors') }}">
                   <option value="person"
                           {% if 'person' in system_classes %}selected{% endif %}>
-                    Person
+                    {{ _('Person') }}
                   </option>
                   <option value="group"
                           {% if 'group' in system_classes %}selected{% endif %}>
-                    Group
+                    {{ _('Group') }}
                   </option>
                 </optgroup>
-                <optgroup label="Items">
+                <optgroup label="{{ _('Items') }}">
                   <option value="artifact"
                           {% if 'artifact' in system_classes %}selected{% endif %}>
-                    Artifact
+                    {{ _('Artifact') }}
                   </option>
                   <option value="human_remains"
                           {% if 'human_remains' in system_classes %}selected{% endif %}>
-                    Human Remains
+                    {{ _('Human Remains') }}
                   </option>
                 </optgroup>
-                <optgroup label="Events">
+                <optgroup label="{{ _('Events') }}">
                   <option value="acquisition"
                           {% if 'acquisition' in system_classes %}selected{% endif %}>
-                    Acquisition
+                    {{ _('Acquisition') }}
                   </option>
                   <option value="event"
                           {% if 'event' in system_classes %}selected{% endif %}>
-                    Event
+                    {{ _('Event') }}
                   </option>
                   <option value="activity"
                           {% if 'activity' in system_classes %}selected{% endif %}>
-                    Activity
+                    {{ _('Activity') }}
                   </option>
                   <option value="creation"
                           {% if 'creation' in system_classes %}selected{% endif %}>
-                    Creation
+                    {{ _('Creation') }}
                   </option>
                   <option value="move"
                           {% if 'move' in system_classes %}selected{% endif %}>
-                    Move
+                    {{ _('Move') }}
                   </option>
                   <option value="production"
                           {% if 'production' in system_classes %}selected{% endif %}>
-                    Production
+                    {{ _('Production') }}
                   </option>
                   <option value="modification"
                           {% if 'modification' in system_classes %}selected{% endif %}>
-                    Modification
+                    {{ _('Modification') }}
                   </option>
                 </optgroup>
-                <optgroup label="Places">
+                <optgroup label="{{ _('Places') }}">
                   <option value="place"
                           {% if 'place' in system_classes %}selected{% endif %}>
-                    Place
+                    {{ _('Place') }}
                   </option>
                   <option value="stratigraphic_unit"
                           {% if 'stratigraphic_unit' in system_classes %}selected{% endif %}>
-                    Stratigraphic Unit
+                    {{ _('Stratigraphic Unit') }}
                   </option>
                   <option value="feature"
                           {% if 'feature' in system_classes %}selected{% endif %}>
-                    Feature
+                    {{ _('Feature') }}
                   </option>
                 </optgroup>
-                <optgroup label="Sources">
+                <optgroup label="{{ _('Sources') }}">
                   <option value="source"
                           {% if 'source' in system_classes %}selected{% endif %}>
-                    Source
+                    {{ _('Source') }}
                   </option>
                   <option value="bibliography"
                           {% if 'bibliography' in system_classes %}selected{% endif %}>
-                    Bibliography
+                    {{ _('Bibliography') }}
                   </option>
                   <option value="external_reference"
                           {% if 'external_reference' in system_classes %}selected{% endif %}>
-                    External Reference
+                    {{ _('External Reference') }}
                   </option>
                   <option value="edition"
                           {% if 'edition' in system_classes %}selected{% endif %}>
-                    Edition
+                    {{ _('Edition') }}
                   </option>
                 </optgroup>
-                <optgroup label="Files">
+                <optgroup label="{{ _('Files') }}">
                   <option value="file"
                           {% if 'file' in system_classes %}selected{% endif %}>
-                    File
+                    {{ _('File') }}
                   </option>
                 </optgroup>
               </select>
@@ -106,9 +105,9 @@
             <!-- 🔍 Text Input + Button -->
             <div class="input-group mb-3">
               <input type="text" id="search-input" name="query"
-                     value="{{ query or '' }}" placeholder="Search..."
+                     value="{{ query or '' }}" placeholder="{{ _('Search') }}..."
                      class="form-control" autocomplete="off">
-              <button type="submit" class="btn btn-primary">Search</button>
+              <button type="submit" class="btn btn-primary">{{ _('Search') }}</button>
             </div>
           </div>
         </form>
@@ -118,19 +117,18 @@
     <!-- 👉 Hint when nothing has been searched yet -->
     {% if not results and not query %}
       <div style="padding: 100px 0; text-align: center; color: #888;">
-        <em>Start typing above to see live results or press enter to run a
-          search.</em>
+        <em>{{ _('Start typing above to see live results or press enter to run a search.') }}</em>
       </div>
     {% endif %}
 
     <!-- 📄 Static Search Results (rendered via JavaScript) -->
     {% if results is defined and results|length > 0 %}
       <div class="mt-5" id="static-results">
-        <h2>Static Search Results:</h2>
+        <h2>{{ _('Static Search Results') }}:</h2>
         <ul id="static-result-list"></ul>
       </div>
     {% elif query %}
-      <p><em>No results found for "{{ query }}"</em></p>
+      <p><em>{{ _('No results found for "%(query)s"', query=query) }}</em></p>
     {% endif %}
 
     <!-- The Live Search Popup is moved OUTSIDE the wrapper for proper overlay behavior -->
@@ -245,6 +243,16 @@
 
   <!-- ✅ JavaScript for Live Search and Static Search "Load More" functionality -->
   <script>
+    const searchTranslations = {
+        unnamed: "{{ _('Unnamed') }}",
+        loadMore: "{{ _('Load more') }}",
+        typeAtLeast3: "{{ _('Type at least 3 characters...') }}",
+        loadingLive: "{{ _('Loading live results for \"%(query)s\"...', query='') }}",
+        noLiveResults: "{{ _('No live results found for \"%(query)s\".', query='') }}",
+        errorLoading: "{{ _('Error loading live results.') }}",
+        selectTypes: "{{ _('Select one or more types') }}"
+    };
+
     document.addEventListener("DOMContentLoaded", function () {
       // ---- Variables for Static Search Pagination ----
       const staticResultList = document.getElementById('static-result-list');
@@ -262,7 +270,7 @@
           li.innerHTML = `
     <a href="/entity/${result.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
         <strong>
-          ${result.name || 'Unnamed'}
+          ${result.name || searchTranslations.unnamed}
         </strong>
         (${result.system_class})
         <br>
@@ -279,7 +287,7 @@
           const btn = document.createElement('button');
           btn.id = 'load-more-btn';
           btn.className = 'btn btn-secondary';
-          btn.innerText = 'Load more';
+          btn.innerText = searchTranslations.loadMore;
           btn.addEventListener('click', renderNextBatch);
           btnWrapper.appendChild(btn);
           document.getElementById('static-results').appendChild(btnWrapper);
@@ -306,7 +314,7 @@
         input.addEventListener('input', async function () {
           const query = input.value.trim();
           if (query.length < 3) {
-            liveResultsBox.innerHTML = "<p style='padding:8px; color:gray;'>Type at least 3 characters...</p>";
+            liveResultsBox.innerHTML = `<p style='padding:8px; color:gray;'>${searchTranslations.typeAtLeast3}</p>`;
             liveResultsBox.classList.remove('show');
             return;
           }
@@ -319,7 +327,7 @@
 
           liveResultsBox.innerHTML = `<p style="padding:8px; color:blue;">
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            Loading live results for "${query}"...
+            ${searchTranslations.loadingLive.replace('%(query)s', query)}
           </p>`;
           liveResultsBox.classList.add('show');
 
@@ -327,13 +335,13 @@
             const res = await fetch(url);
             const liveResults = await res.json();
             if (!Array.isArray(liveResults) || liveResults.length === 0) {
-              liveResultsBox.innerHTML = `<p style="padding:8px; color:orange;">No live results found for "${query}".</p>`;
+              liveResultsBox.innerHTML = `<p style="padding:8px; color:orange;">${searchTranslations.noLiveResults.replace('%(query)s', query)}</p>`;
             } else {
               liveResultsBox.innerHTML = liveResults.map(r => `
     <a href="/entity/${r.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
         <div class="p-2">
             <strong>
-              ${r.name || 'Unnamed'}
+              ${r.name || searchTranslations.unnamed}
             </strong><br>
             <small>${r.description ? r.description.slice(0, 150) + '…' : ''}</small>
         </div>
@@ -343,7 +351,7 @@
             }
           } catch (err) {
             console.error("Live search error:", err);
-            liveResultsBox.innerHTML = `<p style="padding:8px; color:red;">Error loading live results.</p>`;
+            liveResultsBox.innerHTML = `<p style="padding:8px; color:red;">${searchTranslations.errorLoading}</p>`;
           }
         });
 
@@ -363,7 +371,7 @@
           removeItemButton: true,
           shouldSort: false,
           placeholder: true,
-          placeholderValue: 'Select one or more types',
+          placeholderValue: searchTranslations.selectTypes,
           maxItemCount: 15
         });
       }

@@ -84,13 +84,13 @@
                                 {% endif %}
 
                                 <span class="ms-2">
-                                    {{ item.label if item.label else item.route }}
+                                    {{ _(item.label if item.label else item.route) | capitalize }}
                                 </span>
                             </a>
                         </li>
                     {% endfor %}
                     <li class="nav-item to-remove-spinner" role="presentation">
-                        <button title="loading"
+                        <button title="{{ _('Loading') }}"
                                 class="nav-link d-flex align-items-center"
                                 id="tab-spinner">
                             <i class="spinner-border"></i>
@@ -110,7 +110,7 @@
                             <div id="pane-content-{{ item.route }}">
                                 <div class="spinner-grow" style="width: 3rem; height: 3rem;"
                                      role="status">
-                                    <span class="visually-hidden">Loading...</span>
+                                    <span class="visually-hidden">{{ _('Loading') }}...</span>
                                 </div>
                                 <span>{{ item.route }}</span>
                             </div>

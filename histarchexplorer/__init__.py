@@ -17,13 +17,26 @@ from histarchexplorer.models.search import SearchService
 from histarchexplorer.models.settings import Settings
 from histarchexplorer.models.admin import Admin
 from histarchexplorer.database.admin import (
-    synchronize_logos_with_db, synchronize_assets_with_db)
+    synchronize_logos_with_db, synchronize_assets_with_db,
+    synchronize_teams_with_db)
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
 app.config.from_object('config.admin_fields')
 app.config.from_pyfile('production.py')
-babel = Babel(app)
+def get_locale() -> str:
+    if 'language' in session:
+        return session['language']
+    settings = getattr(g, 'settings', None)
+    if settings:
+        if settings.language_selector:
+            return settings.preferred_language or 'en'
+        selected = settings.selected_languages or ['en']
+        return request.accept_languages.best_match(selected) or 'en'
+    return request.accept_languages.best_match(app.config['LANGUAGES']) or 'en'
+
+
+babel = Babel(app, locale_selector=get_locale)
 cache = Cache(app)
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
@@ -47,12 +60,6 @@ def connect(db_name: str) -> connection:
         raise DatabaseError("Database connection error.") from e
 
 
-def get_locale() -> str:
-    if g.settings.language_selector:
-        return g.settings.preferred_language or 'en'
-    if 'language' in session:
-        return session['language']
-    return request.accept_languages.best_match(app.config['LANGUAGES']) or 'en'
 
 
 def create_icon(css_class: str) -> str:
@@ -109,22 +116,25 @@ def before_request() -> Response | None:
     g.settings = Settings.load_from_db()
     synchronize_logos_with_db()
     synchronize_assets_with_db()
+    synchronize_teams_with_db()
 
     # Todo: move somewhere else but be aware of circular imports
     if g.settings.access_restriction:
         if not current_user.is_authenticated and request.endpoint != 'login':
             return redirect(url_for('login'))
 
-    if hasattr(babel, 'localeselector'):
-        babel.localeselector(get_locale)
-    else:
-        babel.locale_selector_func = get_locale
-    session['language'] = get_locale()
-    g.available_languages = app.config['LANGUAGES']
-    g.language = session.get(
-        'language',
-        request.accept_languages.best_match(g.available_languages.keys()))
-    g.preferred_langauge = g.settings.preferred_language
+    from flask_babel import get_locale as babel_get_locale
+    g.all_languages = app.config['LANGUAGES']
+    selected = g.settings.selected_languages or ['en']
+    if 'en' not in selected:
+        selected.append('en')
+    g.available_languages = {
+        k: v for k, v in g.all_languages.items() if k in selected}
+    g.language = str(babel_get_locale())
+    session['language'] = g.language
+    if g.settings.preferred_language not in g.available_languages:
+        g.settings.preferred_language = 'en'
+    g.preferred_language = g.settings.preferred_language
     g.view_classes = app.config['VIEW_CLASSES']
     g.admin_fields = app.config['ADMIN_FIELDS']
     g.additional_files_for_overview = app.config['ADD_FILES_FOR_OVERVIEW']
@@ -158,10 +168,10 @@ def get_logo_url(filename: str) -> str:
     return url_for('static', filename='images/logos/' + filename)
 
 
-def get_assets_url(filename: str) -> str:
+def get_asset_url(filename: str) -> str:
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
     if os.path.exists(os.path.join(uploads_path, filename)):
-        return url_for('uploaded_assets', filename=filename)
+        return url_for('uploaded_asset', filename=filename)
     return url_for('static', filename='assets/' + filename)
 
 
@@ -177,14 +187,16 @@ def inject_globals() -> dict[str, Any]:
     return {
         'settings': g.settings,
         'nav_logo': g.settings.nav_logo,
+        'all_languages': g.all_languages,
         'available_languages': g.available_languages,
-        'preferred_language': g.preferred_langauge,
+        'preferred_language': g.preferred_language,
         'current_language': g.language,
         'darkmode_override': g.settings.darkmode,
         'language_override': g.settings.language_selector,
         'view_classes': g.view_classes,
         'admin_fields': g.admin_fields,
         'additional_files_for_overview': g.additional_files_for_overview,
+        'count': 0,
         'system_class_map': {
             "place": "places",
             "feature": "places",
@@ -202,7 +214,7 @@ def inject_globals() -> dict[str, Any]:
         'logo_id_to_filename_map': Admin.get_logo_id_to_filename_map(),
         'favicon_version': int(time.time()),
         'get_logo_url': get_logo_url,
-        'get_assets_url': get_assets_url,
+        'get_asset_url': get_asset_url,
         'get_team_url': get_team_url,
         'has_uploaded_favicon': os.path.exists(
             os.path.join(app.root_path, '..', 'uploads', 'favicon.ico'))}

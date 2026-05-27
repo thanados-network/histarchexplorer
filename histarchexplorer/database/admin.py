@@ -132,6 +132,10 @@ def update_map(data: dict[str, str]) -> None:
         data)
 
 
+class TooManyMainProjects(Exception):
+    pass
+
+
 def check_if_main_project_exist() -> bool:
     g.cursor.execute(
         "SELECT 1 FROM tng.entities WHERE class_id = 5 LIMIT 1")
@@ -149,7 +153,7 @@ def add_entry(data: dict[str, str | int]) -> int:
     if config_class is None:
         raise ValueError(f"Unknown category {data['category']}")
     if config_class == 5 and check_if_main_project_exist():
-        abort(404)
+        raise TooManyMainProjects()
     g.cursor.execute(
         """
         INSERT INTO tng.entities
@@ -159,7 +163,7 @@ def add_entry(data: dict[str, str | int]) -> int:
                 NULLIF(%(website)s, ''),
                 NULLIF(%(orcid_id)s, ''),
                 NULLIF(%(image)s, ''),
-                NULLIF(%(case_study)s, NULL),
+                %(case_study)s,
                 %(class_id)s,
                 %(acronym)s,
                 %(license_id)s)
@@ -201,35 +205,70 @@ def update_config_entry(data: dict[str, str | int]) -> None:
 
 
 def _upsert_jsonb_fields(config_id: int, data: dict[str, str | int]) -> None:
-    language = g.language
     valid_cols = {'address', 'description', 'name'}
     for col in valid_cols:
-        val = data.get(col, '')
-        if col in ('description') and val:
-            val = sanitize_richtext(str(val))
-        if val:
-            g.cursor.execute(
-                f"""
-                UPDATE tng.entities
-                   SET {col} = jsonb_set(
-                                 COALESCE({col}, '{{}}'),
-                                 %(path)s,
-                                 %(value)s::jsonb,
-                                 true)
-                 WHERE id = %(config_id)s
-                """, {
-                    'path': [language],
-                    'value': json.dumps(val),
-                    'config_id': config_id})
-        else:
-            g.cursor.execute(
-                f"""
-                UPDATE tng.entities
-                   SET {col} = COALESCE({col}, '{{}}') - %(key)s
-                 WHERE id = %(config_id)s
-                """, {
-                    'key': language,
-                    'config_id': config_id})
+        # Check for multi-language inputs from the form (e.g., name_en, name_de)
+        for lang_code in g.available_languages.keys():
+            lang_key = f"{col}_{lang_code}"
+            if lang_key in data:
+                val = data[lang_key]
+                if col == 'description' and val:
+                    val = sanitize_richtext(str(val))
+
+                if val:
+                    g.cursor.execute(
+                        f"""
+                        UPDATE tng.entities
+                           SET {col} = jsonb_set(
+                                         COALESCE({col}, '{{}}'),
+                                         %(path)s,
+                                         %(value)s::jsonb,
+                                         true)
+                         WHERE id = %(config_id)s
+                        """, {
+                            'path': [lang_code],
+                            'value': json.dumps(val),
+                            'config_id': config_id})
+                else:
+                    g.cursor.execute(
+                        f"""
+                        UPDATE tng.entities
+                           SET {col} = COALESCE({col}, '{{}}') - %(key)s
+                         WHERE id = %(config_id)s
+                        """, {
+                            'key': lang_code,
+                            'config_id': config_id})
+
+        # Fallback for single field update (e.g. from existing forms or scripts)
+        # only if no language-specific keys were provided for this column
+        if col in data and not any(
+                f"{col}_{l}" in data for l in g.available_languages):
+            val = data.get(col, '')
+            if col == 'description' and val:
+                val = sanitize_richtext(str(val))
+            if val:
+                g.cursor.execute(
+                    f"""
+                    UPDATE tng.entities
+                       SET {col} = jsonb_set(
+                                     COALESCE({col}, '{{}}'),
+                                     %(path)s,
+                                     %(value)s::jsonb,
+                                     true)
+                     WHERE id = %(config_id)s
+                    """, {
+                        'path': [g.language],
+                        'value': json.dumps(val),
+                        'config_id': config_id})
+            else:
+                g.cursor.execute(
+                    f"""
+                    UPDATE tng.entities
+                       SET {col} = COALESCE({col}, '{{}}') - %(key)s
+                     WHERE id = %(config_id)s
+                    """, {
+                        'key': g.language,
+                        'config_id': config_id})
 
 
 def update_sort_order(table: str, params: list[dict[str, int]]) -> None:

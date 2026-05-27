@@ -3,7 +3,7 @@
 
 <div class="container-fluid mt-5 p-3">
         {{ ui.flash_messages() }}
-    <h4 class="pb-2">Login</h4>
+    <h4 class="pb-2">{{ _('Login') }}</h4>
     <form method="post">
         {{ form.csrf_token }}
         <div class="input-group mb-3">

@@ -17,7 +17,8 @@ from histarchexplorer.models.admin import Admin
 _('entities')
 _('search')
 _('about')
-_('Outcome')
+_('outcome')
+_('publications')
 
 
 def render_page_template(page_name: str, **context: Any) -> str:
@@ -79,8 +80,8 @@ def find_children_by_id(
             depth: int = 1) -> None:
         for child in children:
             prefix = '-' * depth
-            name = child.get('name', 'Unknown')
-            result.append({'id': str(child['id']), 'name': f"{prefix}{name}"})
+            name = child.get('name', _('Unknown'))
+            result.append({'id': int(child['id']), 'name': f"{prefix}{name}"})
             sub_children = child.get('children')
             if isinstance(sub_children, list) and sub_children:
                 collect_descendants(sub_children, depth + 1)
@@ -141,7 +142,7 @@ def generate_bibtex(
     bibtex += f"  author = {{{project_name}}},\n"
     bibtex += f"  year = {{{year}}},\n"
     bibtex += f"  url = {{{url}}},\n"
-    bibtex += f"  note = {{Accessed: {date}}}\n"
+    bibtex += f"  note = {{{_('Accessed: %(date)s', date=date)}}}\n"
     bibtex += "}"
     return bibtex
 
@@ -189,7 +190,13 @@ def get_cite_button(entity: PresentationView) -> dict[str, str]:
     ris = generate_ris(entity, project_name, current_url, current_date)
 
     # APA-like citation style
-    citation_text = f"{project_name} ({current_date.split('-')[0]}). {entity.title}. Retrieved from {current_url} (Accessed: {current_date})"
+    citation_text = _(
+        '%(project_name)s (%(year)s). %(title)s. Retrieved from %(url)s (Accessed: %(date)s)',
+        project_name=project_name,
+        year=current_date.split('-')[0],
+        title=entity.title,
+        url=current_url,
+        date=current_date)
 
     button_html = render_template('util/cite/button.html')
     modal_html = render_template(

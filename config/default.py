@@ -8,7 +8,13 @@ except ImportError:
 
 # Application metadata
 VERSION = '0.4.0'
-LANGUAGES = {'de': 'Deutsch', 'en': 'English'}  # Supported languages
+LANGUAGES = {
+    'de': 'Deutsch',
+    'en': 'English',
+    'hu': 'Magyar',
+    'cs': 'Čeština',
+    'sl': 'Slovenščina',
+    'sr': 'Srpski'}  # Supported languages
 PREFERRED_LANGUAGE = 'en'  # Default language
 DEBUG = False  # Debug mode toggle
 SECRET_KEY = 'secretkey'  # Secret key for sessions and security

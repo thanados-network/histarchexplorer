@@ -21,7 +21,7 @@ ADMIN_FIELDS = {
             'label': 'website',
             'type': 'url',
             'placeholder': 'https://someurl.com',
-            'col_class': 'col-md-2'
+            'col_class': 'col-md-6'
             },
         {
             'key': 'case_study',
@@ -38,11 +38,18 @@ ADMIN_FIELDS = {
             },
         {
             'key': 'image',
-            'label': 'Image URL',
-            'type': 'text',
+            'label': 'image',
+            'type': 'image',
+            'image_type': 'logo',
             'placeholder': 'Please provide a square image',
             'col_class': 'col-lg col-md-4',
             'display_image': True
+            },
+        {
+            'key': 'license_id',
+            'label': 'license',
+            'type': 'select',
+            'col_class': 'col-md-6'
             }
         ],
     'nav-projects': [
@@ -67,7 +74,7 @@ ADMIN_FIELDS = {
             'label': 'website',
             'type': 'url',
             'placeholder': 'https://someurl.com',
-            'col_class': 'col-md-2'
+            'col_class': 'col-md-6'
             },
         {
             'key': 'case_study',
@@ -84,14 +91,29 @@ ADMIN_FIELDS = {
             },
         {
             'key': 'image',
-            'label': 'Image URL',
-            'type': 'text',
+            'label': 'image',
+            'type': 'image',
+            'image_type': 'logo',
             'placeholder': 'Please provide a square image',
             'col_class': 'col-md-4',
             'display_image': True
+            },
+        {
+            'key': 'license_id',
+            'label': 'license',
+            'type': 'select',
+            'col_class': 'col-md-6'
             }
         ],
     'nav-persons': [
+        {
+            'key': 'acronym',
+            'label': 'acronym',
+            'type': 'text',
+            'translatable': False,
+            'required': False,
+            'col_class': 'col-md-2'
+            },
         {
             'key': 'name',
             'label': 'name',
@@ -122,8 +144,9 @@ ADMIN_FIELDS = {
             },
         {
             'key': 'image',
-            'label': 'Image URL',
-            'type': 'text',
+            'label': 'image',
+            'type': 'image',
+            'image_type': 'team',
             'placeholder': 'Please provide a square image',
             'col_class': 'col-lg col-md-4',
             'display_image': True
@@ -135,7 +158,7 @@ ADMIN_FIELDS = {
             'label': 'acronym',
             'type': 'text',
             'translatable': False,
-            'required': True,
+            'required': False,
             'col_class': 'col-md-2'
             },
         {
@@ -163,8 +186,9 @@ ADMIN_FIELDS = {
             },
         {
             'key': 'image',
-            'label': 'Image URL',
-            'type': 'text',
+            'label': 'image',
+            'type': 'image',
+            'image_type': 'logo',
             'placeholder': 'Please provide a logo with 68px height',
             'col_class': 'col-6',
             'display_image': True
@@ -185,6 +209,14 @@ ADMIN_FIELDS = {
             },
         ],
     'nav-attributes': [
+        {
+            'key': 'acronym',
+            'label': 'acronym',
+            'type': 'text',
+            'translatable': False,
+            'required': False,
+            'col_class': 'col-md-2'
+            },
         {
             'key': 'name',
             'label': 'name',

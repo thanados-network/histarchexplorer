@@ -1,0 +1,84 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0 text-secondary">
+    <i class="bi bi-folder2-open me-2"></i>{{ _('projects section content') | upper }}
+  </h4>
+</div>
+
+<nav>
+  <div class="nav nav-pills mb-4" id="nav-tab" role="tablist">
+    {% for tab_item in project_tabs %}
+      <button
+        class="nav-link{% if tab_item.is_active %} active shadow-sm{% endif %} me-2"
+        id="{{ tab_item.id }}" data-bs-toggle="tab"
+        data-bs-target="#{{ tab_item.target }}" type="button"
+        role="tab"
+        aria-controls="{{ tab_item.target }}"
+        aria-selected="{% if tab_item.is_active %}true{% else %}false{% endif %}">
+        {{ tab_item.label | upper }}
+      </button>
+    {% endfor %}
+  </div>
+</nav>
+
+<div class="tab-content" id="nav-tabContent">
+  {% for tab_item in project_tabs %}
+    <div
+      class="tab-pane fade{% if tab_item.is_active %} show active{% endif %}"
+      id="{{ tab_item.target }}" role="tabpanel"
+      aria-labelledby="{{ tab_item.id }}" tabindex="0">
+
+      {% set entities = processed_entities_by_tab[tab_item.target] %}
+
+      {% if tab_item.id == g.config_classes['main-project'] %}
+        {# Main Project View - Single Card, no accordion #}
+        {% for entity in entities %}
+          <div class="card border-0 shadow-sm mb-5">
+            <div class="card-header bg-white py-3 border-bottom-0">
+              <h5 class="fw-bold mb-0 text-primary">
+                <i class="bi bi-star-fill me-2"></i>{{ entity.name_display_label or _('Main Project') }}
+              </h5>
+            </div>
+            <div class="card-body pt-0">
+              {% include 'admin/partials/entity_form.html' %}
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        {# Other Projects View - Accordion of Cards #}
+        <div class="accordion accordion-flush custom-projects-accordion" id="{{ tab_item.label }}accordion">
+          {% for entity in entities %}
+            <div class="accordion-item border rounded-3 mb-3 shadow-sm">
+              <h2 class="accordion-header">
+                <button
+                  class="accordion-button rounded-3 {% if entity.is_collapsed_entry %}collapsed{% endif %}"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#{{ tab_item.target }}{{ entity.id }}"
+                  aria-expanded="{% if entity.is_active_entry %}true{% else %}false{% endif %}"
+                  aria-controls="{{ tab_item.target }}{{ entity.id }}">
+                  <span class="fw-bold text-secondary">
+                    <i class="bi bi-projector me-2"></i>{{ entity.name_display_label or '' }}
+                  </span>
+                </button>
+              </h2>
+              <div id="{{ tab_item.target }}{{ entity.id }}"
+                   class="accordion-collapse collapse {% if entity.is_active_entry %} show {% endif %}"
+                   data-bs-parent="#{{ tab_item.label }}accordion">
+                <div class="accordion-body bg-white rounded-bottom-3">
+                  {% include 'admin/partials/entity_form.html' %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="text-end mt-4">
+          <button class="btn btn-primary btn-lg shadow-sm px-4"
+                  onclick="addEntry('{{ tab_item.target|string }}')">
+            <i class="bi bi-plus-lg me-2"></i>{{ _('add entry')|capitalize }}
+          </button>
+        </div>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>

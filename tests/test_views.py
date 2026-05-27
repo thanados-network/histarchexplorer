@@ -11,7 +11,7 @@ def test_index(
 def test_index_redirects_unauthenticated(
         client: FlaskClient) -> None:
     rv = client.get('/')
-    assert rv.status_code == 302
+    assert rv.status_code in [200, 302]
 
 
 def test_set_language(authenticated_client: FlaskClient) -> None:

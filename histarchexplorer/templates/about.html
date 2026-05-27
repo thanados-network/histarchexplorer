@@ -139,7 +139,7 @@
                          data-target="{{ data.count }}">0
                     </div>
                     <div class="vcounter-label text-uppercase small mt-1">
-                      {{ key }}
+                      {{ _(key) | upper }}
                     </div>
                   </div>
                 </div>
@@ -150,7 +150,7 @@
 
           {% if sub_projects and active.class_id == 5 %}
             <hr class="my-5">
-            <h4 class="mb-3">Projects</h4>
+            <h4 class="mb-3">{{ _('projects') | capitalize }}</h4>
 
             <div class="row g-3">
               {% for p in sub_projects %}
@@ -175,7 +175,7 @@
                         {% endif %}
                       </div>
                       <div class="about-project-footer">
-                        Details →
+                        {{ _('Details') }} →
                       </div>
                     </div>
                   </a>
@@ -212,9 +212,9 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="entityModalLabel">Loading...</h5>
+          <h5 class="modal-title" id="entityModalLabel">{{ _('Loading') }}...</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"
-                  aria-label="Close"></button>
+                  aria-label="{{ _('close') | capitalize }}"></button>
         </div>
 
         <div class="modal-body">
@@ -280,14 +280,14 @@
 
           // Meta fields (website, email, address, ORCID…)
           let metaHtml = "<ul class='list-unstyled'>";
-          if (entity.website) metaHtml += `<li><strong>Website:</strong> <a href="${entity.website}" target="_blank">${entity.website}</a></li>`;
-          if (entity.email) metaHtml += `<li><strong>Email:</strong> <a href="mailto:${entity.email}">${entity.email}</a></li>`;
+          if (entity.website) metaHtml += `<li><strong>{{ _('Website') }}:</strong> <a href="${entity.website}" target="_blank">${entity.website}</a></li>`;
+          if (entity.email) metaHtml += `<li><strong>{{ _('Email') }}:</strong> <a href="mailto:${entity.email}">${entity.email}</a></li>`;
           if (entity.orcid_id) {
             const cleanOrcid = entity.orcid_id.trim().replace(/\s/g, '');
-            metaHtml += `<li><strong>ORCID:</strong> <a href="https://orcid.org/${cleanOrcid}" target="_blank">${entity.orcid_id}</a></li>`;
+            metaHtml += `<li><strong>{{ _('ORCID') }}:</strong> <a href="https://orcid.org/${cleanOrcid}" target="_blank">${entity.orcid_id}</a></li>`;
           }
           if (entity.address && entity.address.display && entity.address.display.label) {
-            metaHtml += `<li><strong>Address:</strong> ${entity.address.display.label.replace(/\n/g, '<br>')}</li>`;
+            metaHtml += `<li><strong>{{ _('Address') }}:</strong> ${entity.address.display.label.replace(/\n/g, '<br>')}</li>`;
           }
           metaHtml += "</ul>";
 

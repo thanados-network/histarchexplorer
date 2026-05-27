@@ -42,11 +42,13 @@ def _redirect_to_admin_tab(default_tab: str) -> Response:
 @login_required
 def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     check_manager_user()
-    tabs = [
+    project_tabs = [
         {'label': _('main-project'), 'target': 'nav-main-project',
          'id': g.config_classes['main-project']},
         {'label': _('projects'), 'target': 'nav-projects',
-         'id': g.config_classes['project']},
+         'id': g.config_classes['project']}]
+
+    stakeholder_tabs = [
         {'label': _('persons'), 'target': 'nav-persons',
          'id': g.config_classes['person']},
         {'label': _('institutions'), 'target': 'nav-institutions',
@@ -54,12 +56,16 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         {'label': _('attributes'), 'target': 'nav-attributes',
          'id': g.config_classes['attribute']}]
 
+    all_tabs = project_tabs + stakeholder_tabs
+
     # Determine which main sidebar section should be active
     active_main_sidebar_id = 'sidebar-general-settings-group'  # Default
 
     if tab:
-        if any(t['target'] == tab for t in tabs):
-            active_main_sidebar_id = 'sidebar-about-content'
+        if any(t['target'] == tab for t in project_tabs):
+            active_main_sidebar_id = 'sidebar-projects-content'
+        elif any(t['target'] == tab for t in stakeholder_tabs):
+            active_main_sidebar_id = 'sidebar-stakeholders-content'
         else:
             match tab:
                 case ('sidebar-maps' | 'sidebar-index-page-options' |
@@ -70,14 +76,27 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                       'sidebar-file-management-group' | 'sidebar-assets' |
                       'sidebar-legal-notice' | 'sidebar-licenses' |
                       'sidebar-team' | 'sidebar-about-publications' |
-                      'sidebar-colors' | 'sidebar-type-divisions'):
+                      'sidebar-projects-content' | 'sidebar-stakeholders-content' |
+                      'sidebar-colors' | 'sidebar-type-divisions' |
+                      'sidebar-visibility-settings' |
+                      'sidebar-general-settings-group' | 'sidebar-about-content' |
+                      'sidebar-outcome' | 'sidebar-search-content'):
                     active_main_sidebar_id = tab
 
                 case _:
                     pass
 
-    for tab_item in tabs:
+    any_active_tab = False
+    for tab_item in all_tabs:
         tab_item['is_active'] = tab_item['target'] == tab
+        if tab_item['is_active']:
+            any_active_tab = True
+
+    if not any_active_tab:
+        if active_main_sidebar_id == 'sidebar-projects-content':
+            project_tabs[0]['is_active'] = True
+        elif active_main_sidebar_id == 'sidebar-stakeholders-content':
+            stakeholder_tabs[0]['is_active'] = True
 
     cs_type_id: Optional[int] = None
     cs_type_name: Optional[str] = None
@@ -98,19 +117,22 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     admin_instance = Admin()
     all_logos = admin_instance.get_all_logos_with_ids()
+    all_team = admin_instance.get_all_teams_with_ids()
     all_assets = admin_instance.get_all_assets_with_ids()
     selected_footer_logos = g.settings.footer_logos
 
     return render_template(
         "admin.html",
-        tabs=tabs,
+        project_tabs=project_tabs,
+        stakeholder_tabs=stakeholder_tabs,
+        tabs=all_tabs,
         admin_instance=admin_instance,
         processed_entities_by_tab=admin_instance.process_entities_by_tab(
-            tabs,
+            all_tabs,
             entry),
         processed_links_by_entity=admin_instance.process_links_by_entity(),
         processed_properties_by_tab=admin_instance.process_properties_by_tab(
-            tabs),
+            all_tabs),
         processed_roles=admin_instance.process_roles(),
         processed_target_nodes=admin_instance.process_target_nodes(),
         maps=Admin.get_maps(),
@@ -127,6 +149,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         active_main_sidebar_id=active_main_sidebar_id,
         licenses=admin_instance.licenses,
         all_logos=all_logos,
+        all_team=all_team,
         all_assets=all_assets,
         selected_footer_logos=selected_footer_logos)
 
@@ -136,7 +159,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 def update_type_divisions() -> Response:
     check_manager_user()
     new_type_divisions = {}
-    indices = {key.split('_')[-1] for key in request.form if key.startswith('label_')}
+    indices = {
+        key.split('_')[-1] for key in request.form if
+        key.startswith('label_')}
     for index in indices:
         label = request.form.get(f'label_{index}')
         if not label:
@@ -146,7 +171,9 @@ def update_type_divisions() -> Response:
         try:
             ids = [int(i.strip()) for i in ids_str.split(',') if i.strip()]
         except ValueError:
-            flash(_('Invalid ID format for label "%(label)s". Please use comma-separated integers.', label=label), 'danger')
+            flash(_(
+                'Invalid ID format for label "%(label)s". Please use '
+                'comma-separated integers.', label=label), 'danger')
             return _redirect_to_admin_tab('sidebar-type-divisions')
 
         new_type_divisions[label] = {
@@ -190,7 +217,8 @@ def update_entity_colors() -> Response:
 def add_available_color() -> Response:
     check_manager_user()
     new_color = request.form.get('new_color')
-    if new_color and re.match(r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$', new_color):
+    if (new_color and re.match(
+            r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$', new_color)):
         if new_color not in g.settings.available_colors:
             g.settings.available_colors.append(new_color)
             try:
@@ -307,7 +335,8 @@ def rename_logo():
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
 
     old_filepath_static = os.path.join(static_path, secure_filename(old_name))
-    old_filepath_uploads = os.path.join(uploads_path, secure_filename(old_name))
+    old_filepath_uploads = os.path.join(
+        uploads_path, secure_filename(old_name))
 
     if os.path.exists(old_filepath_static):
         flash(_('Cannot rename default logos.'), 'danger')
@@ -627,23 +656,16 @@ def add_link() -> Response:
     check_manager_user()
 
     try:
-        raw_domain = request.args.get('domain')
-        raw_range = request.args.get('range')
-        raw_prop = request.args.get('property')
-        raw_role = request.args.get('role', '0')
+        params = {
+            'domain': request.args.get('domain', type=int),
+            'range': request.args.get('range', type=int),
+            'prop': request.args.get('property', type=int),
+            'role': request.args.get('role', default=0, type=int),
+            'sortorder': Admin.check_sortorder()
+        }
 
-        if (raw_domain is not None and
-                raw_range is not None and
-                raw_prop is not None):
-
-            link_data = {
-                'domain': int(raw_domain),
-                'range': int(raw_range),
-                'prop': int(raw_prop),
-                'role': int(raw_role),
-                'sortorder': Admin.check_sortorder()}
-
-            Admin.add_link(link_data)
+        if all(v is not None for v in [params['domain'], params['range'], params['prop']]):
+            Admin.add_link(params)
             flash(_('Link added successfully'), 'success')
         else:
             raise ValueError("Missing required link parameters")
@@ -663,21 +685,30 @@ def add_link() -> Response:
 @login_required
 def add_entry() -> Response:
     check_manager_user()
-    case_study_str = request.form.get('case_study')
-    form_data: dict[str, str | int] = {
-        'category': request.form.get('category', ''),
-        'name': request.form.get('name', ''),
+    category = request.form.get('category', '')
+    form_data = {
+        'category': category,
         'acronym': request.form.get('acronym', ''),
         'email': request.form.get('email', ''),
         'website': request.form.get('website', ''),
         'orcid_id': request.form.get('orcid_id', ''),
         'image': request.form.get('image', ''),
-        'address': request.form.get('address', ''),
-        'description': request.form.get('description', ''),
-        'case_study': int(case_study_str)
-        if case_study_str and case_study_str.isdigit() else 0,
-        'license_id': request.form.get('license_id', type=int)}
-    current_tab = f'nav-{form_data["category"]}'
+        'case_study': request.form.get('case_study', type=int),
+        'license_id': request.form.get('license_id', type=int)
+    }
+
+    # Add multi-language fields
+    for col in ['name', 'address', 'description']:
+        for lang_code in g.available_languages.keys():
+            lang_key = f"{col}_{lang_code}"
+            if lang_key in request.form:
+                form_data[lang_key] = request.form.get(lang_key, '')
+
+        # Also keep the default key for backward compatibility or display
+        if col in request.form:
+            form_data[col] = request.form.get(col, '')
+
+    current_tab = f'nav-{category}'
     redirect_base = url_for('admin') + current_tab
     try:
         new_id = Admin.add_entry(form_data)
@@ -685,11 +716,14 @@ def add_entry() -> Response:
         return redirect(f"{redirect_base}/{current_tab}{new_id}")
     except Admin.TooManyMainProjects:
         flash(
-            f'Error adding entry {form_data["name"]}: '
-            'Only one main project allowed',
+            _('Error adding entry %(name)s: Only one main project allowed',
+              name=form_data["name"]),
             'danger')
     except Exception as e:
-        flash(f'Error adding entry {form_data["name"]}: {e}', 'danger')
+        flash(_(
+            'Error adding entry %(name)s: %(error)s',
+            name=form_data["name"],
+            error=e), 'danger')
     return redirect(redirect_base)
 
 
@@ -697,12 +731,12 @@ def add_entry() -> Response:
 @login_required
 def delete_entry(id_: int, tab: str) -> Response:
     check_manager_user()
-    if Admin.get_config_config_classes_by_id(id_) == 5:
+    if Admin.get_config_class_by_id(id_) == 5:
         flash(_('Main Project cannot be deleted'), 'danger')
         return redirect(url_for('admin', tab=tab))
     Admin.delete_entry(id_)
-    flash('Entry deleted successfully!', 'success')
-    return redirect(url_for('admin') + tab)
+    flash(_('Entry deleted successfully!'), 'success')
+    return redirect(url_for('admin', tab=tab))
 
 
 @app.route('/edit_entry', methods=['POST', 'GET'])
@@ -711,27 +745,33 @@ def edit_entry() -> Response:
     check_manager_user()
 
     config_id = request.form.get('config_id', type=int)
-    name = request.form.get('name', '')
-    cs_raw = request.form.get('case_study')
-    case_study = int(cs_raw) if cs_raw and cs_raw.isdigit() else 0
-
     if config_id is None:
         flash(_('Configuration ID is required'), 'danger')
-        return _redirect_to_admin_tab('sidebar-about-content')
+        return _redirect_to_admin_tab('sidebar-projects-content')
 
-    form_data: dict[str, str | int | None] = {
+    form_data = {
         'config_id': config_id,
-        'name': name,
         'acronym': request.form.get('acronym', ''),
         'email': request.form.get('email', ''),
         'website': request.form.get('website', ''),
         'orcid_id': request.form.get('orcid_id', ''),
         'image': request.form.get('image', ''),
-        'address': request.form.get('address', ''),
-        'description': request.form.get('description', ''),
-        'case_study': case_study,
-        'license_id': request.form.get('license_id', type=int)}
+        'case_study': request.form.get('case_study', type=int),
+        'license_id': request.form.get('license_id', type=int)
+    }
 
+    # Add multi-language fields
+    for col in ['name', 'address', 'description']:
+        for lang_code in g.available_languages.keys():
+            lang_key = f"{col}_{lang_code}"
+            if lang_key in request.form:
+                form_data[lang_key] = request.form.get(lang_key, '')
+
+        # Also keep the default key for backward compatibility or display
+        if col in request.form:
+            form_data[col] = request.form.get(col, '')
+
+    name = form_data.get('name', '')
     try:
         Admin.edit_entry(form_data)
         flash(_('"%(name)s" updated successfully', name=name), 'success')
@@ -745,7 +785,8 @@ def edit_entry() -> Response:
         url_for(
             'admin',
             entry=request.form.get('current_entry'),
-            tab=request.form.get('current_tab')))
+            tab=request.form.get('current_tab'),
+            _external=False))
 
 
 @app.route('/admin/edit_map', methods=['POST'])
@@ -812,11 +853,14 @@ def add_map() -> Response:
     try:
         map_id = Admin.add_new_map(data)
         flash(
-            f"Map {data['name']} with ID {map_id} added successfully!",
+            _('Map %(name)s with ID %(id)s added successfully!',
+              name=data['name'], id=map_id),
             'success')
     except Exception as e:
         app.logger.error("Failed to add map: %s", e)
-        flash(f"Error adding map {data['name']}: {e}", 'danger')
+        flash(_(
+            'Error adding map %(name)s: %(error)s', name=data['name'],
+            error=e), 'danger')
 
     return _redirect_to_admin_tab('sidebar-maps')
 
@@ -827,9 +871,9 @@ def delete_map(map_id: int) -> Response:
     check_manager_user()
     try:
         Admin.delete_map(map_id)
-        flash('Map deleted successfully!', 'success')
+        flash(_('Map deleted successfully!'), 'success')
     except Exception as e:
-        flash(f'Error deleting map: {str(e)}', 'danger')
+        flash(_('Error deleting map: %(error)s', error=str(e)), 'danger')
     return _redirect_to_admin_tab('sidebar-maps')
 
 
@@ -857,9 +901,33 @@ def update_class_visibility() -> Response:
     check_manager_user()
     g.settings.shown_classes = request.form.getlist('shown_classes')
     g.settings.hidden_classes = request.form.getlist('hidden_classes')
+
+    def parse_ids(name: str) -> list[int]:
+        raw = request.form.get(name, '')
+        if not raw:
+            return []
+        res = []
+        for x in raw.split(','):
+            val = x.strip()
+            if val:
+                if not val.isdigit():
+                    raise ValueError(val)
+                res.append(int(val))
+        return res
+
+    try:
+        g.settings.shown_types = parse_ids('shown_types')
+        g.settings.hidden_types = parse_ids('hidden_types')
+        g.settings.shown_ids = parse_ids('shown_ids')
+        g.settings.hidden_ids = parse_ids('hidden_ids')
+    except ValueError:
+        flash(_('Invalid ID format. Please use comma-separated integers.'),
+              'danger')
+        return _redirect_to_admin_tab('sidebar-visibility-settings')
+
     g.settings.save_to_db()
     flash(_('Class visibility updated successfully.'), 'success')
-    return _redirect_to_admin_tab('sidebar-general-settings-group')
+    return _redirect_to_admin_tab('sidebar-visibility-settings')
 
 
 @app.route('/sortlinks', methods=['POST'])
@@ -905,6 +973,8 @@ def update_general_settings(ignore_id: Optional[int] = None) -> Response:
             'accessRestriction') == 'on'
         g.settings.language_selector = request.form.get(
             'languageSelection') == 'on'
+        g.settings.selected_languages = request.form.getlist(
+            'selectedLanguages')
         g.settings.preferred_language = request.form.get(
             'preferredLanguage')
         g.settings.save_to_db()
@@ -927,13 +997,21 @@ def check_case_study_id_ajax(entity_id: int) -> Response:
 
 # Todo: remove for production
 @app.route('/reset')
+@login_required
 def reset() -> Response:
+    check_manager_user()
+    if not current_app.config.get('DEBUG') and not current_app.config.get('TESTING'):
+        flash(_('Reset is only allowed in debug or testing mode.'), 'danger')
+        return redirect(url_for('admin'))
     make_reset()
     flash(_('reset database'), 'info')
     return redirect(url_for('admin'))
 
 
 def make_reset() -> None:
+    if not current_app.config.get('DEBUG') and not current_app.config.get('TESTING'):
+        app.logger.warning('Attempted to reset database outside of DEBUG/TESTING mode.')
+        return
     env = os.environ.copy()
     env['PGPASSWORD'] = current_app.config['DATABASE_PASS']
     subprocess.run([
@@ -986,7 +1064,7 @@ def trigger_cache_warmup(refresh: bool = False) -> None:
                 stderr=subprocess.DEVNULL) as _proc:
             pass
     except Exception as e:
-        flash(str(e), "error")
+        flash(_("Error warming cache: %(error)s", error=str(e)), "error")
         abort(404)
 
 
@@ -1010,44 +1088,25 @@ def refresh_system_cache() -> Response:
 
 @app.route('/uploads/logos/<filename>')
 def uploaded_logo(filename):
-    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'logos'), filename)
+    return send_from_directory(
+        os.path.join(app.root_path, '..', 'uploads', 'logos'), filename)
+
 
 @app.route('/uploads/assets/<filename>')
-def uploaded_assets(filename):
-    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'assets'), filename)
+def uploaded_asset(filename):
+    return send_from_directory(
+        os.path.join(app.root_path, '..', 'uploads', 'assets'), filename)
 
 
 @app.context_processor
 def utility_processor():
-    def get_logo_url(filename):
-        uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
-        if os.path.exists(os.path.join(uploads_path, filename)):
-            return url_for('uploaded_logo', filename=filename)
-        return url_for('static', filename=f'images/logos/{filename}')
-
-    def get_asset_url(filename):
-        uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
-        if os.path.exists(os.path.join(uploads_path, filename)):
-            return url_for('uploaded_asset', filename=filename)
-        return url_for('static', filename=f'assets/{filename}')
-
-    def get_team_url(filename):
-        uploads_path = os.path.join(app.root_path, '..', 'uploads', 'team')
-        if os.path.exists(os.path.join(uploads_path, filename)):
-            return url_for('uploaded_team', filename=filename)
-        return url_for('static', filename=f'images/team/{filename}')
-
     def get_icon_url(filename):
         uploads_path = os.path.join(app.root_path, '..', 'uploads', 'icons')
         if os.path.exists(os.path.join(uploads_path, filename)):
             return url_for('uploaded_icon', filename=filename)
         return url_for('static', filename=f'images/icons/{filename}')
 
-    return dict(
-        get_logo_url=get_logo_url,
-        get_asset_url=get_asset_url,
-        get_team_url=get_team_url,
-        get_icon_url=get_icon_url)
+    return dict(get_icon_url=get_icon_url)
 
 
 @app.route('/admin/upload_asset', methods=['POST'])
@@ -1090,7 +1149,8 @@ def rename_asset():
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
 
     old_filepath_static = os.path.join(static_path, secure_filename(old_name))
-    old_filepath_uploads = os.path.join(uploads_path, secure_filename(old_name))
+    old_filepath_uploads = os.path.join(
+        uploads_path, secure_filename(old_name))
 
     if os.path.exists(old_filepath_static):
         flash(_('Cannot rename default assets.'), 'danger')
@@ -1160,24 +1220,24 @@ def update_asset_license() -> Response:
     return _redirect_to_admin_tab('sidebar-assets')
 
 
-@app.route('/uploads/assets/<filename>')
-def uploaded_asset(filename):
-    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'assets'), filename)
 
 
 @app.route('/uploads/team/<filename>')
 def uploaded_team(filename):
-    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'team'), filename)
+    return send_from_directory(
+        os.path.join(app.root_path, '..', 'uploads', 'team'), filename)
 
 
 @app.route('/uploads/icons/<filename>')
 def uploaded_icon(filename):
-    return send_from_directory(os.path.join(app.root_path, '..', 'uploads', 'icons'), filename)
+    return send_from_directory(
+        os.path.join(app.root_path, '..', 'uploads', 'icons'), filename)
 
 
 @app.route('/uploads/favicon.ico')
 def uploaded_favicon():
-    return send_from_directory(os.path.join(app.root_path, '..', 'uploads'), 'favicon.ico')
+    return send_from_directory(
+        os.path.join(app.root_path, '..', 'uploads'), 'favicon.ico')
 
 
 @app.route('/admin/upload_file', methods=['POST'])
@@ -1250,7 +1310,8 @@ def rename_file():
     uploads_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
 
     old_filepath_static = os.path.join(static_path, secure_filename(old_name))
-    old_filepath_uploads = os.path.join(uploads_path, secure_filename(old_name))
+    old_filepath_uploads = os.path.join(
+        uploads_path, secure_filename(old_name))
 
     if os.path.exists(old_filepath_static):
         flash(_('Cannot rename default files.'), 'danger')

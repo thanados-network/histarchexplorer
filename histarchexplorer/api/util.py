@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Any, Optional
 
 from flask import g, url_for, current_app
+from flask_babel import gettext as _
 
 
 def split_date_string(date_str: Optional[str]) -> str:
@@ -39,15 +40,15 @@ def format_date(date_from: str, date_to: str) -> str:
     if date_from and date_to:
         if is_full_year_span(date_from, date_to) or date_from == date_to:
             year = year_part(clean_from)
-            era = "BC" if bc_from else "AD"
+            era = _("BC") if bc_from else _("AD")
             return f"{year} {era}"
-        return (f"{year_part(clean_from)} {'BC' if bc_from else 'AD'} "
-                f"- {year_part(clean_to)} {'BC' if bc_to else 'AD'}")
+        return (f"{year_part(clean_from)} {_('BC') if bc_from else _('AD')} "
+                f"- {year_part(clean_to)} {_('BC') if bc_to else _('AD')}")
 
     # Only one side available
     date = ".".join(s.lstrip("0") for s in
                     clean_from.split(".")) if date_from else clean_to
-    return f"{date} {'BC' if bc_from else ''}".strip()
+    return f"{date} {_('BC') if bc_from else ''}".strip()
 
 
 def get_render_type(mime_type: str) -> str:
@@ -105,7 +106,7 @@ def get_divisions(
                 'icon': '<i class="bi bi-box"></i>'
             }
 
-    return {'label': 'other', 'icon': '<i class="bi bi-boxes"></i>'}
+    return {'label': _('other'), 'icon': '<i class="bi bi-boxes"></i>'}
 
 
 def get_description_translated(description: str) -> None | dict[str, str]:

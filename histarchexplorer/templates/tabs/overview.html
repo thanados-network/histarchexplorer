@@ -4,6 +4,17 @@
 </div>
 <script>
   const additionalFilesOverview = {{ additional_files_for_overview }};
+  window.overviewTranslations = {
+      subentities: "{{ _('subentities') | capitalize }}",
+      subunits: "{{ _('subunits') | capitalize }}",
+      description: "{{ _('description') | upper }}",
+      mediaFile: "{{ _('Media file') }}",
+      license: "{{ _('License') }}",
+      creator: "{{ _('Creator') }}",
+      licenseHolder: "{{ _('License holder') }}",
+      openFullView: "{{ _('Open full view') }}",
+      viewAllFiles: "{{ _('View all %(count)s files', count=0) }}"
+  };
 </script>
 
 <script

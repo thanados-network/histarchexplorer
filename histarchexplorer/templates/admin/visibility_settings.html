@@ -1,0 +1,134 @@
+<form method="post" action="{{ url_for('update_class_visibility') }}">
+  <input type="hidden" name="active_sidebar" value="sidebar-visibility-settings">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0 text-secondary">{{ _('Visibility Configuration') }}</h4>
+    <button type="submit" class="btn btn-primary shadow-sm">
+      <i class="bi bi-save"></i> {{ _('Save All Settings') }}
+    </button>
+  </div>
+
+  <div class="row g-4 mb-5">
+    <div class="col-md-6">
+      <div class="p-3 border rounded bg-white shadow-sm h-100">
+        <h5 class="mb-3"><i class="bi bi-tags-fill me-2"></i>{{ _('Entity Types') }}</h5>
+        <div class="mb-3">
+          <label class="form-label text-success fw-bold">
+            <i class="bi bi-plus-circle me-1"></i>{{ _('Shown Type IDs') }}
+          </label>
+          <p class="text-muted small">{{ _('Comma-separated list of type IDs to show.') }}</p>
+          <input type="text" class="form-control" name="shown_types"
+                 value="{{ settings.shown_types | join(', ') }}"
+                 placeholder="e.g. 101, 102, 103">
+        </div>
+        <div class="mb-0">
+          <label class="form-label text-danger fw-bold">
+            <i class="bi bi-dash-circle me-1"></i>{{ _('Hidden Type IDs') }}
+          </label>
+          <p class="text-muted small">{{ _('Comma-separated list of type IDs to hide.') }}</p>
+          <input type="text" class="form-control" name="hidden_types"
+                 value="{{ settings.hidden_types | join(', ') }}"
+                 placeholder="e.g. 201, 202">
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="p-3 border rounded bg-white shadow-sm h-100">
+        <h5 class="mb-3"><i class="bi bi-hash me-2"></i>{{ _('Individual Entity IDs') }}</h5>
+        <div class="mb-3">
+          <label class="form-label text-success fw-bold">
+            <i class="bi bi-plus-circle me-1"></i>{{ _('Shown Entity IDs') }}
+          </label>
+          <p class="text-muted small">{{ _('Comma-separated list of entity IDs to show.') }}</p>
+          <input type="text" class="form-control" name="shown_ids"
+                 value="{{ settings.shown_ids | join(', ') }}"
+                 placeholder="e.g. 1, 2, 3">
+        </div>
+        <div class="mb-0">
+          <label class="form-label text-danger fw-bold">
+            <i class="bi bi-dash-circle me-1"></i>{{ _('Hidden Entity IDs') }}
+          </label>
+          <p class="text-muted small">{{ _('Comma-separated list of entity IDs to hide.') }}</p>
+          <input type="text" class="form-control" name="hidden_ids"
+                 value="{{ settings.hidden_ids | join(', ') }}"
+                 placeholder="e.g. 4, 5">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mb-5">
+    <h5 class="mb-3"><i class="bi bi-collection-fill me-2"></i>{{ _('Entity Classes') }}</h5>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="p-3 border rounded bg-white shadow-sm">
+          <label class="form-label fw-bold text-success mb-2">
+            <i class="bi bi-plus-circle me-1"></i>{{ _('Shown Classes') }}
+          </label>
+          <p class="text-muted small mb-3">
+            {{ _('Checked classes will be explicitly shown in the browse interface.') }}
+          </p>
+          <div class="checkbox-list-container border rounded p-3 bg-light"
+               style="max-height: 400px; overflow-y: auto;">
+            {% for view_class, categories in view_classes.items() %}
+              <h6 class="dropdown-header mt-2 text-primary border-bottom pb-1">
+                {{ _(view_class) | upper }}
+              </h6>
+              {% for category in categories %}
+                <div class="form-check ms-3 my-1">
+                  <input class="form-check-input" type="checkbox"
+                         name="shown_classes" value="{{ category }}"
+                         id="check_shown_{{ category }}"
+                         {% if category in shown_classes %}checked{% endif %}>
+                  <label class="form-check-label" for="check_shown_{{ category }}">
+                    {{ _(category | replace("_", " ")) | capitalize }}
+                    <span class="text-muted small">({{ class_items.get(category, 0) }})</span>
+                  </label>
+                </div>
+              {% endfor %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="p-3 border rounded bg-white shadow-sm">
+          <label class="form-label fw-bold text-danger mb-2">
+            <i class="bi bi-dash-circle me-1"></i>{{ _('Hidden Classes') }}
+          </label>
+          <p class="text-muted small mb-3">
+            {{ _('Checked classes will be hidden from the browse interface.') }}
+          </p>
+          <div class="checkbox-list-container border rounded p-3 bg-light"
+               style="max-height: 400px; overflow-y: auto;">
+            {% for view_class, categories in view_classes.items() %}
+              <h6 class="dropdown-header mt-2 text-primary border-bottom pb-1">
+                {{ _(view_class) | upper }}
+              </h6>
+              {% for category in categories %}
+                <div class="form-check ms-3 my-1">
+                  <input class="form-check-input" type="checkbox"
+                         name="hidden_classes" value="{{ category }}"
+                         id="check_hidden_{{ category }}"
+                         {% if category in hidden_classes %}checked{% endif %}>
+                  <label class="form-check-label"
+                         for="check_hidden_{{ category }}">
+                    {{ _(category | replace("_", " ")) | capitalize }}
+                    <span class="text-muted small">({{ class_items.get(category, 0) }})</span>
+                  </label>
+                </div>
+              {% endfor %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="d-flex justify-content-center mt-5 mb-3">
+    <button type="submit" class="btn btn-primary btn-lg px-5 shadow">
+      <i class="bi bi-check-lg me-2"></i>{{ _('Save Visibility Settings') }}
+    </button>
+  </div>
+</form>

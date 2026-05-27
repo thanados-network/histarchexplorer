@@ -78,7 +78,7 @@ def get_entity(id_: int, tab_name: str) -> str:
         case _ if tab_name not in ['feature']:
             abort(404)
 
-    return render_template(f'tabs/{tab_name}.html', id_=id_)
+    return render_template(f'tabs/{tab_name}.html', id_=id_, count=0)
 
 
 def get_features_for_map(

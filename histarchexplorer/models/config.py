@@ -154,7 +154,7 @@ def localize(data: dict[str, str] | None) -> str | None:
         return data
 
     # Try selected language, then preferred, then any filled value
-    for lang in (g.language, g.preferred_langauge):
+    for lang in (g.language, g.preferred_language):
         if data.get(lang):
             return data[lang]
 

@@ -16,6 +16,10 @@ def setup_database() -> None:
 
 
 @pytest.fixture()
+def app_instance():
+    return app
+
+@pytest.fixture()
 def client() -> FlaskClient:
     with app.test_client() as client:
         yield client

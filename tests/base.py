@@ -22,3 +22,15 @@ def reset_test_database() -> None:
             env=env,
             check=True,
             capture_output=True)
+
+    # Force English for tests
+    subprocess.run(
+        ['psql',
+         '-U', app.config['DATABASE_USER'],
+         '-h', app.config['DATABASE_HOST'],
+         '-p', str(app.config['DATABASE_PORT']),
+         '-d', app.config['DATABASE_NAME'],
+         '-c', "UPDATE tng.system_settings SET value = '\"en\"' WHERE key = 'preferred_language';"],
+        env=env,
+        check=True,
+        capture_output=True)

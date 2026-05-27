@@ -8,7 +8,7 @@
       {% for background in ['map', 'image'] %}
         <option value={{ background }}
                   {% if background == settings.img_map %}selected{% endif %}>
-          {{ background | capitalize }}
+          {{ _(background) | capitalize }}
         </option>
       {% endfor %}
     </select>
@@ -37,7 +37,7 @@
           id="greyscaleSwitch"
           name="greyscale" {% if settings.greyscale %} checked {% endif %}>
         <label class="form-check-label"
-               for="greyscaleSwitch">Greyscale</label>
+               for="greyscaleSwitch">{{ _('Greyscale') }}</label>
       </div>
     </div>
     <div  class="col-md-6">

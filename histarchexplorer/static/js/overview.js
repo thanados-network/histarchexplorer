@@ -136,7 +136,7 @@ function renderHierarchyButtons() {
             class: "btn btn-outline-secondary rounded-pill px-3",
             title: "Show subentities",
         },
-        [h("i", {class: "bi bi-diagram-3 me-1"}), h("span", {text: "Subentities"})]
+        [h("i", {class: "bi bi-diagram-3 me-1"}), h("span", {text: window.overviewTranslations?.subentities || "Subentities"})]
     );
     host.appendChild(btn);
     relayout(10);
@@ -229,7 +229,7 @@ function renderSubTile(entity) {
                 },
                 title: {
                     display: true,
-                    text: 'Subunits'
+                    text: window.overviewTranslations?.subunits || 'Subunits'
                 },
                 tooltip: {
                     position: 'average',   // centers it over the bar segment
@@ -539,7 +539,7 @@ function renderReferences(entity) {
             h("div", {id: "js-attributes"})]),
         h("div", {class: "item-content", "data-type": "description"}, [
             h("div", {class: "muuri-description"}, [
-                h("span", {class: "tile-label", text: "DESCRIPTION"}),
+                h("span", {class: "tile-label", text: window.overviewTranslations?.description || "DESCRIPTION"}),
                 h("p", {id: "js-description"}),
             ]),
         ]),

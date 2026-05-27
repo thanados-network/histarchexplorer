@@ -1,0 +1,1752 @@
+# Slovenian translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-05-27 15:20+0200\n"
+"PO-Revision-Date: 2026-05-22 14:17+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: sl\n"
+"Language-Team: sl <LL@li.org>\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 "
+"|| n%100==4 ? 2 : 3);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: api/util.py:43 api/util.py:45 api/util.py:46 api/util.py:51
+msgid "BC"
+msgstr "pr. n. št."
+
+#: api/util.py:43 api/util.py:45 api/util.py:46
+msgid "AD"
+msgstr "po n. št."
+
+#: api/util.py:109
+msgid "other"
+msgstr "drugo"
+
+#: templates/_macros.html:11
+msgid "Back to the entity"
+msgstr "Nazaj na entiteto"
+
+#: templates/_macros.html:38
+msgid "Image"
+msgstr "Slika"
+
+#: templates/_macros.html:56
+msgid "Your browser does not support the video tag."
+msgstr "Vaš brskalnik ne podpira video oznake."
+
+#: templates/_macros.html:97 templates/tabs/overview.html:12
+#: templates/util/cite/modal.html:37
+msgid "License"
+msgstr "Licenca"
+
+#: templates/_macros.html:100 templates/tabs/overview.html:13
+msgid "Creator"
+msgstr "Ustvarjalec"
+
+#: templates/_macros.html:103 templates/tabs/overview.html:14
+msgid "License holder"
+msgstr "Imetnik licence"
+
+#: templates/_macros.html:125
+msgid "More images"
+msgstr "Več slik"
+
+#: templates/_macros.html:158 templates/about.html:215 templates/entity.html:93
+#: templates/entity.html:113
+msgid "Loading"
+msgstr "Nalaganje"
+
+#: templates/about.html:57
+msgid "Show details"
+msgstr "Prikaži podrobnosti"
+
+#: templates/about.html:66 views/admin.py:52
+msgid "persons"
+msgstr "osebe"
+
+#: templates/about.html:126
+msgid "data overview"
+msgstr "pregled podatkov"
+
+#: templates/about.html:128
+msgid "project data overview"
+msgstr "pregled projektnih podatkov"
+
+#: templates/about.html:153 views/admin.py:48
+msgid "projects"
+msgstr "projekti"
+
+#: templates/about.html:178
+msgid "Details"
+msgstr "Podrobnosti"
+
+#: templates/about.html:194 templates/admin/legal_notice.html:2
+#: templates/admin/legal_notice.html:21
+msgid "legal notice"
+msgstr "pravno obvestilo"
+
+#: templates/about.html:217
+msgid "close"
+msgstr "zapri"
+
+#: templates/about.html:283
+msgid "Website"
+msgstr "Spletna stran"
+
+#: templates/about.html:284
+msgid "Email"
+msgstr "E-pošta"
+
+#: templates/about.html:287
+msgid "ORCID"
+msgstr "ORCID"
+
+#: templates/about.html:290
+msgid "Address"
+msgstr "Naslov"
+
+#: templates/about.html:299
+msgid "relations"
+msgstr "odnosi"
+
+#: templates/admin.html:13
+msgid "admin options"
+msgstr "možnosti administratorja"
+
+#: templates/admin.html:18 templates/admin.html:19
+msgid "logout"
+msgstr "odjava"
+
+#: templates/admin.html:30
+msgid "General Settings"
+msgstr "Splošne nastavitve"
+
+#: templates/admin.html:31
+msgid "Visibility Settings"
+msgstr "Nastavitve vidnosti"
+
+#: templates/admin.html:32 templates/admin.html:131
+msgid "Class colors"
+msgstr "Barve razredov"
+
+#: templates/admin.html:33
+msgid "Type Divisions"
+msgstr "Razdelitev tipov"
+
+#: templates/admin.html:34
+#, fuzzy
+msgid "Projects"
+msgstr "projekti"
+
+#: templates/admin.html:35
+msgid "Stakeholders"
+msgstr ""
+
+#: templates/admin.html:36
+msgid "Content"
+msgstr "Vsebina"
+
+#: templates/admin.html:37
+msgid "Start page"
+msgstr "Začetna stran"
+
+#: templates/admin.html:38
+msgid "About"
+msgstr "O projektu"
+
+#: templates/admin.html:39 utils/view_util.py:59
+msgid "Publications"
+msgstr "Publikacije"
+
+#: templates/admin.html:40 utils/view_util.py:62
+msgid "Outcome"
+msgstr "Izid"
+
+#: templates/admin.html:41
+msgid "Legal Notice"
+msgstr "Pravno obvestilo"
+
+#: templates/admin.html:42
+msgid "Footer"
+msgstr "Noga"
+
+#: templates/admin.html:43 templates/search.html:108 templates/search.html:110
+msgid "Search"
+msgstr "Iskanje"
+
+#: templates/admin.html:44
+msgid "File Management"
+msgstr "Upravljanje datotek"
+
+#: templates/admin.html:45 templates/admin/logo_management.html:3
+msgid "Logo Management"
+msgstr "Upravljanje logotipov"
+
+#: templates/admin.html:46
+msgid "Icons"
+msgstr "Ikone"
+
+#: templates/admin.html:47
+msgid "Assets"
+msgstr "Sredstva"
+
+#: templates/admin.html:48
+msgid "Team"
+msgstr "Ekipa"
+
+#: templates/admin.html:49
+msgid "Licenses"
+msgstr "Licence"
+
+#: templates/admin.html:50
+msgid "Maps"
+msgstr "Zemljevidi"
+
+#: templates/admin.html:51
+msgid "Cache Options"
+msgstr "Možnosti predpomnilnika"
+
+#: templates/admin.html:52
+msgid "Database Interface"
+msgstr "Vmesnik baze podatkov"
+
+#: templates/admin.html:104
+msgid "general settings"
+msgstr "splošne nastavitve"
+
+#: templates/admin.html:118
+msgid "visibility settings"
+msgstr "nastavitve vidnosti"
+
+#: templates/admin.html:144
+msgid "type divisions"
+msgstr "razdelitev tipov"
+
+#: templates/admin.html:157
+msgid "cache options"
+msgstr "možnosti predpomnilnika"
+
+#: templates/admin.html:213
+msgid "index page options"
+msgstr "možnosti indeksne strani"
+
+#: templates/admin.html:235
+msgid "File Management Overview"
+msgstr "Pregled upravljanja datotek"
+
+#: templates/admin.html:236
+msgid "Select a file management section from the sidebar to start editing."
+msgstr ""
+"Izberite razdelek za upravljanje datotek v stranski vrstici, da začnete "
+"urejati."
+
+#: templates/admin.html:288
+msgid "maps"
+msgstr "zemljevidi"
+
+#: templates/login.html:6
+msgid "Login"
+msgstr "Prijava"
+
+#: templates/login.html:10 views/login.py:29
+msgid "username"
+msgstr "uporabniško ime"
+
+#: templates/login.html:14 views/login.py:32
+msgid "password"
+msgstr "geslo"
+
+#: templates/navbar.html:7
+msgid "home"
+msgstr "domov"
+
+#: templates/navbar.html:18
+msgid "Toggle navigation"
+msgstr "Preklopi navigacijo"
+
+#: templates/navbar.html:40 templates/navbar.html:44
+msgid "toggle dark/light mode"
+msgstr "preklop temni/svetli način"
+
+#: templates/outcome.html:9
+msgid "Outcome Test Page"
+msgstr "Testna stran rezultatov"
+
+#: templates/publications.html:9
+msgid "Publications Test Page"
+msgstr "Testna stran publikacij"
+
+#: templates/search.html:11
+msgid "Filter by Type"
+msgstr "Filtriraj po tipu"
+
+#: templates/search.html:14
+msgid "Actors"
+msgstr "Akterji"
+
+#: templates/search.html:17
+msgid "Person"
+msgstr "Oseba"
+
+#: templates/search.html:21
+msgid "Group"
+msgstr "Skupina"
+
+#: templates/search.html:24
+msgid "Items"
+msgstr "Predmeti"
+
+#: templates/search.html:27
+msgid "Artifact"
+msgstr "Artefakt"
+
+#: templates/search.html:31
+msgid "Human Remains"
+msgstr "Človeški ostanki"
+
+#: templates/search.html:34
+msgid "Events"
+msgstr "Dogodki"
+
+#: templates/search.html:37
+msgid "Acquisition"
+msgstr "Pridobitev"
+
+#: templates/search.html:41
+msgid "Event"
+msgstr "Dogodek"
+
+#: templates/search.html:45
+msgid "Activity"
+msgstr "Dejavnost"
+
+#: templates/search.html:49
+msgid "Creation"
+msgstr "Ustvarjanje"
+
+#: templates/search.html:53
+msgid "Move"
+msgstr "Premik"
+
+#: templates/search.html:57
+msgid "Production"
+msgstr "Produkcija"
+
+#: templates/search.html:61
+msgid "Modification"
+msgstr "Sprememba"
+
+#: templates/search.html:64
+msgid "Places"
+msgstr "Kraji"
+
+#: templates/search.html:67
+msgid "Place"
+msgstr "Kraj"
+
+#: templates/search.html:71
+msgid "Stratigraphic Unit"
+msgstr "Stratigrafska enota"
+
+#: templates/search.html:75
+msgid "Feature"
+msgstr "Značilnost"
+
+#: templates/search.html:78
+msgid "Sources"
+msgstr "Viri"
+
+#: templates/search.html:81
+msgid "Source"
+msgstr "Vir"
+
+#: templates/search.html:85
+msgid "Bibliography"
+msgstr "Bibliografija"
+
+#: templates/search.html:89
+msgid "External Reference"
+msgstr "Zunanja referenca"
+
+#: templates/search.html:93
+msgid "Edition"
+msgstr "Izdaja"
+
+#: templates/search.html:96
+msgid "Files"
+msgstr "Datoteke"
+
+#: templates/search.html:99
+msgid "File"
+msgstr "Datoteka"
+
+#: templates/search.html:120
+msgid "Start typing above to see live results or press enter to run a search."
+msgstr ""
+"Začnite tipkati zgoraj za rezultate v živo ali pritisnite enter za "
+"iskanje."
+
+#: templates/search.html:127
+msgid "Static Search Results"
+msgstr "Statični rezultati iskanja"
+
+#: templates/search.html:131
+#, python-format
+msgid "No results found for \"%(query)s\""
+msgstr "Ni rezultatov za \"%(query)s\""
+
+#: templates/search.html:247 templates/search_detail.html:4
+msgid "Unnamed"
+msgstr "Neimenovano"
+
+#: templates/search.html:248
+msgid "Load more"
+msgstr "Naloži več"
+
+#: templates/search.html:249
+msgid "Type at least 3 characters..."
+msgstr "Vtipkajte vsaj 3 znake..."
+
+#: templates/search.html:250
+#, python-format
+msgid "Loading live results for \"%(query)s\"..."
+msgstr "Nalaganje rezultatov v živo za \"%(query)s\"..."
+
+#: templates/search.html:251
+#, python-format
+msgid "No live results found for \"%(query)s\"."
+msgstr "Ni rezultatov v živo za \"%(query)s\"."
+
+#: templates/search.html:252
+msgid "Error loading live results."
+msgstr "Napaka pri nalaganju rezultatov v živo."
+
+#: templates/search.html:253
+msgid "Select one or more types"
+msgstr "Izberite enega ali več tipov"
+
+#: templates/search_detail.html:11
+msgid "Coordinates"
+msgstr "Koordinate"
+
+#: templates/search_detail.html:14
+msgid "Back to search"
+msgstr "Nazaj na iskanje"
+
+#: templates/admin/about_content.html:3
+msgid "about section content"
+msgstr "vsebina razdelka o aplikaciji"
+
+#: templates/admin/about_content.html:4
+msgid "Work in progress"
+msgstr ""
+
+#: templates/admin/assets_management.html:3
+msgid "Asset Management"
+msgstr "Upravljanje sredstev"
+
+#: templates/admin/assets_management.html:5
+msgid ""
+"The assets are general files, which can be used in individual pages. "
+"These can be all data types; some can be displayed, while some can only "
+"be downloaded."
+msgstr ""
+"Sredstva so splošne datoteke, ki se lahko uporabljajo na posameznih "
+"straneh. To so lahko vsi tipi podatkov; nekateri se lahko prikažejo, "
+"nekateri pa se lahko le prenesejo."
+
+#: templates/admin/assets_management.html:13
+msgid "Upload New Asset"
+msgstr "Naloži novo sredstvo"
+
+#: templates/admin/assets_management.html:20
+#: templates/admin/icon_management.html:21
+#: templates/admin/logo_management.html:20
+#: templates/admin/team_management.html:21
+msgid "Upload"
+msgstr "Naloži"
+
+#: templates/admin/assets_management.html:24
+msgid "Accepted formats: All files."
+msgstr "Sprejemljivi formati: Vse datoteke."
+
+#: templates/admin/assets_management.html:33
+msgid "Existing Assets"
+msgstr "Obstoječa sredstva"
+
+#: templates/admin/assets_management.html:58
+#: templates/admin/logo_management.html:50
+#: templates/admin/team_management.html:53
+msgid "Select License..."
+msgstr "Izberi licenco..."
+
+#: templates/admin/assets_management.html:67
+#: templates/admin/logo_management.html:59
+#: templates/admin/team_management.html:64
+msgid "Attribution (if any)..."
+msgstr "Pripis avtorstva (če obstaja)..."
+
+#: templates/admin/assets_management.html:69
+#: templates/admin/logo_management.html:61
+#: templates/admin/team_management.html:67
+msgid "Save License"
+msgstr "Shrani licenco"
+
+#: templates/admin/assets_management.html:77
+#: templates/admin/logo_management.html:91
+#: templates/admin/team_management.html:75
+msgid "New name..."
+msgstr "Novo ime..."
+
+#: templates/admin/assets_management.html:78
+#: templates/admin/logo_management.html:92
+#: templates/admin/team_management.html:76
+msgid "Rename"
+msgstr "Preimenuj"
+
+#: templates/admin/assets_management.html:85
+msgid "Are you sure you want to delete this asset?"
+msgstr "Ali ste prepričani, da želite izbrisati to sredstvo?"
+
+#: templates/admin/assets_management.html:86
+#: templates/admin/icon_management.html:53
+#: templates/admin/logo_management.html:100 templates/admin/modals.html:191
+#: templates/admin/partials/entity_form.html:118
+#: templates/admin/team_management.html:86
+msgid "Delete"
+msgstr "Izbriši"
+
+#: templates/admin/assets_management.html:95
+msgid "No assets have been uploaded yet."
+msgstr "Sredstva še niso bila naložena."
+
+#: templates/admin/cache.html:4
+msgid "Refreshes the system cache."
+msgstr "Osveži sistemski predpomnilnik."
+
+#: templates/admin/cache.html:5
+msgid "refresh system cache"
+msgstr "osveži sistemski predpomnilnik"
+
+#: templates/admin/cache.html:11
+msgid "This will cache all not cached entities."
+msgstr "To bo predpomnilo vse entitete, ki še niso v predpomnilniku."
+
+#: templates/admin/cache.html:12
+msgid "warm entity cache"
+msgstr "ogrej predpomnilnik entitete"
+
+#: templates/admin/cache.html:18
+msgid "This completely refreshes the cache."
+msgstr "To popolnoma osveži predpomnilnik."
+
+#: templates/admin/cache.html:19
+msgid "refresh entity cache"
+msgstr "osveži predpomnilnik entitete"
+
+#: templates/admin/cache.html:26
+msgid "Clear the cache to free up space"
+msgstr "Počisti predpomnilnik, da sprostiš prostor"
+
+#: templates/admin/cache.html:27
+msgid "clear cache"
+msgstr "počisti predpomnilnik"
+
+#: templates/admin/colors.html:62
+msgid "select a color"
+msgstr "izberi barvo"
+
+#: templates/admin/colors.html:71 templates/admin/index_page_options.html:58
+#: templates/admin/legal_notice.html:29 templates/admin/maps.html:104
+#: templates/admin/partials/entity_form.html:213
+msgid "save"
+msgstr "shrani"
+
+#: templates/admin/colors.html:77
+msgid "Manage Available Colors"
+msgstr "Upravljanje razpoložljivih barv"
+
+#: templates/admin/colors.html:85
+msgid "are you sure you want to delete this color?"
+msgstr "ali ste prepričani, da želite izbrisati to barvo?"
+
+#: templates/admin/colors.html:97
+msgid "add new hex color"
+msgstr "dodaj novo hex barvo"
+
+#: templates/admin/colors.html:106
+msgid "add color"
+msgstr "dodaj barvo"
+
+#: templates/admin/database.html:3
+msgid "Database Backup"
+msgstr "Varnostna kopija baze"
+
+#: templates/admin/database.html:5
+msgid "Download a full SQL dump of the current database."
+msgstr "Prenesite celoten SQL dump trenutne baze podatkov."
+
+#: templates/admin/database.html:8
+msgid "Download SQL Dump"
+msgstr "Prenesi SQL dump"
+
+#: templates/admin/database.html:15
+msgid "Database Restore"
+msgstr "Obnova baze"
+
+#: templates/admin/database.html:17 templates/admin/database.html:38
+msgid "Warning:"
+msgstr "Opozorilo:"
+
+#: templates/admin/database.html:18
+msgid ""
+"Restoring a database will overwrite all current data. This action cannot "
+"be undone."
+msgstr ""
+"Obnova baze bo prepisala vse trenutne podatke. Tega dejanja ni mogoče "
+"razveljaviti."
+
+#: templates/admin/database.html:24
+msgid "Select SQL Dump File"
+msgstr "Izberi SQL dump datoteko"
+
+#: templates/admin/database.html:27
+msgid "Are you sure you want to overwrite the database?"
+msgstr "Ali ste prepričani, da želite prepisati bazo podatkov?"
+
+#: templates/admin/database.html:28
+msgid "Restore Database"
+msgstr "Obnovi bazo podatkov"
+
+#: templates/admin/database.html:36
+msgid "Database Reset"
+msgstr "Ponastavitev baze"
+
+#: templates/admin/database.html:39
+msgid ""
+"This will reset the entire database to the initial sample data. All "
+"custom data will be lost!"
+msgstr ""
+"To bo ponastavilo celotno bazo na začetne vzorčne podatke. Vsi podatki po"
+" meri bodo izgubljeni!"
+
+#: templates/admin/database.html:42
+msgid "Resets the entire database"
+msgstr "Ponastavi celotno bazo podatkov"
+
+#: templates/admin/database.html:43
+msgid "RESET DATABASE"
+msgstr "PONASTAVI BAZO PODATKOV"
+
+#: templates/admin/footer_content_management.html:4
+msgid "Footer Order"
+msgstr "Vrstni red v nogi"
+
+#: templates/admin/footer_content_management.html:16
+msgid "Save Footer Order"
+msgstr "Shrani vrstni red v nogi"
+
+#: templates/admin/footer_content_management.html:22
+msgid "Select Footer Logos"
+msgstr "Izberi logotipe v nogi"
+
+#: templates/admin/footer_content_management.html:39
+msgid "Add to Footer"
+msgstr "Dodaj v nogo"
+
+#: templates/admin/footer_content_management.html:47
+msgid "Save Footer Selection"
+msgstr "Shrani izbor v nogi"
+
+#: templates/admin/footer_content_management.html:49
+#: templates/admin/logo_management.html:109
+msgid "No logos have been uploaded yet."
+msgstr "Logotipi še niso bili naloženi."
+
+#: templates/admin/general_settings.html:10
+#, fuzzy
+msgid "project configuration"
+msgstr "Konfiguracija vidnosti"
+
+#: templates/admin/general_settings.html:14
+msgid "case study hierarchy ID"
+msgstr "ID hierarchije študije primera"
+
+#: templates/admin/general_settings.html:24
+msgid "Please enter a positive integer for the Case Study Hierarchy ID."
+msgstr "Prosimo, vnesite pozitivno celo število za ID hierarchije študije primera."
+
+#: templates/admin/general_settings.html:33
+msgid "This ID links your project to the central hierarchy."
+msgstr ""
+
+#: templates/admin/general_settings.html:45
+msgid "appearance & access"
+msgstr ""
+
+#: templates/admin/general_settings.html:54
+msgid "Deactivate Darkmode"
+msgstr "Deaktiviraj temni način"
+
+#: templates/admin/general_settings.html:56
+msgid "Disable the dark theme option for all users."
+msgstr ""
+
+#: templates/admin/general_settings.html:64
+msgid "Deactivate Language Selector"
+msgstr "Deaktiviraj izbirnik jezika"
+
+#: templates/admin/general_settings.html:66
+msgid "Hide the language choice menu in the navbar."
+msgstr ""
+
+#: templates/admin/general_settings.html:74
+msgid "Activate Access Restriction"
+msgstr "Aktiviraj omejitev dostopa"
+
+#: templates/admin/general_settings.html:76
+msgid "Only logged-in users can see the content."
+msgstr ""
+
+#: templates/admin/general_settings.html:86
+#, fuzzy
+msgid "localization"
+msgstr "Ustvarjanje"
+
+#: templates/admin/general_settings.html:91
+msgid "available languages"
+msgstr ""
+
+#: templates/admin/general_settings.html:111
+msgid "preferred language"
+msgstr "prednostni jezik"
+
+#: templates/admin/general_settings.html:123
+msgid "The default language used when no other choice is made."
+msgstr ""
+
+#: templates/admin/general_settings.html:135
+#, fuzzy
+msgid "Save Settings"
+msgstr "Shrani vse nastavitve"
+
+#: templates/admin/icon_management.html:3
+msgid "Icon Management"
+msgstr "Upravljanje ikon"
+
+#: templates/admin/icon_management.html:5
+msgid ""
+"This section is for managing SVG icons that can be used throughout the "
+"application."
+msgstr ""
+"Ta razdelek je namenjen upravljanju ikon SVG, ki se lahko uporabljajo v "
+"celotni aplikaciji."
+
+#: templates/admin/icon_management.html:13
+msgid "Upload New Icon"
+msgstr "Naloži novo ikono"
+
+#: templates/admin/icon_management.html:25
+msgid "Accepted format: SVG."
+msgstr "Sprejemljiv format: SVG."
+
+#: templates/admin/icon_management.html:34
+msgid "Existing Icons"
+msgstr "Obstoječe ikone"
+
+#: templates/admin/icon_management.html:52
+msgid "Are you sure you want to delete this icon?"
+msgstr "Ali ste prepričani, da želite izbrisati to ikono?"
+
+#: templates/admin/icon_management.html:62
+msgid "No icons have been uploaded yet."
+msgstr "Ikone še niso bile naložene."
+
+#: templates/admin/index_page_options.html:5
+msgid "choose index background"
+msgstr "izberi ozadje indeksa"
+
+#: templates/admin/index_page_options.html:19
+msgid "map options"
+msgstr "možnosti zemljevida"
+
+#: templates/admin/index_page_options.html:21
+msgid "select map background"
+msgstr "izberi ozadje zemljevida"
+
+#: templates/admin/index_page_options.html:40
+msgid "Greyscale"
+msgstr "Sivinska lestvica"
+
+#: templates/admin/index_page_options.html:44
+msgid "image options"
+msgstr "možnosti slike"
+
+#: templates/admin/index_page_options.html:46
+msgid "define default background image"
+msgstr "določi privzeto sliko ozadja"
+
+#: templates/admin/license_management.html:3
+msgid "Add New License"
+msgstr "Dodaj novo licenco"
+
+#: templates/admin/license_management.html:8
+#: templates/admin/license_management.html:40
+msgid "SPDX ID"
+msgstr "SPDX ID"
+
+#: templates/admin/license_management.html:12
+msgid "URI"
+msgstr "URI"
+
+#: templates/admin/license_management.html:16
+#: templates/admin/license_management.html:39
+msgid "Label"
+msgstr "Oznaka"
+
+#: templates/admin/license_management.html:20
+#: templates/admin/license_management.html:41
+msgid "Category"
+msgstr "Kategorija"
+
+#: templates/admin/license_management.html:27
+msgid "Add License"
+msgstr "Dodaj licenco"
+
+#: templates/admin/license_management.html:34
+msgid "Existing Licenses"
+msgstr "Obstoječe licence"
+
+#: templates/admin/license_management.html:38
+msgid "Logo"
+msgstr "Logotip"
+
+#: templates/admin/license_management.html:42
+msgid "Actions"
+msgstr "Dejanja"
+
+#: templates/admin/license_management.html:58
+msgid "Are you sure?"
+msgstr "Ali ste prepričani?"
+
+#: templates/admin/logo_management.html:5
+msgid ""
+"The logo section is only for logos and can be used for the footer, site "
+"logo, project logos, and institution logos, as well as for individual "
+"pages."
+msgstr ""
+"Razdelek z logotipi je namenjen samo logotipom in se lahko uporablja za "
+"nogo, logotip strani, logotipe projektov in logotipe institucij ter za "
+"posamezne strani."
+
+#: templates/admin/logo_management.html:13
+msgid "Upload New Logo"
+msgstr "Naloži nov logotip"
+
+#: templates/admin/logo_management.html:24
+#: templates/admin/team_management.html:25
+msgid "Accepted formats: PNG, JPG, SVG, GIF."
+msgstr "Sprejemljivi formati: PNG, JPG, SVG, GIF."
+
+#: templates/admin/logo_management.html:33
+msgid "Existing Logos"
+msgstr "Obstoječi logotipi"
+
+#: templates/admin/logo_management.html:70
+msgid "Main Logo"
+msgstr "Glavni logotip"
+
+#: templates/admin/logo_management.html:74
+msgid "Set as Main"
+msgstr "Nastavi kot glavno"
+
+#: templates/admin/logo_management.html:83
+msgid "Set as Favicon"
+msgstr "Nastavi kot favikono"
+
+#: templates/admin/logo_management.html:99
+msgid "Are you sure you want to delete this logo?"
+msgstr "Ali ste prepričani, da želite izbrisati ta logotip?"
+
+#: templates/admin/maps.html:29
+msgid "name"
+msgstr "ime"
+
+#: templates/admin/maps.html:37 templates/admin/maps.html:52
+msgid "Please provide a name"
+msgstr "Prosimo, navedite ime"
+
+#: templates/admin/maps.html:42
+msgid "Display Name"
+msgstr "Prikazano ime"
+
+#: templates/admin/maps.html:57
+msgid "order"
+msgstr "vrstni red"
+
+#: templates/admin/maps.html:65
+msgid "Please provide an order"
+msgstr "Prosimo, navedite vrstni red"
+
+#: templates/admin/maps.html:73
+msgid "Leaflet Tile Layer String"
+msgstr "Leaflet Tile Layer niz"
+
+#: templates/admin/maps.html:87
+msgid "edit"
+msgstr "uredi"
+
+#: templates/admin/maps.html:95
+msgid "delete"
+msgstr "izbriši"
+
+#: templates/admin/maps.html:99
+msgid "cancel"
+msgstr "prekliči"
+
+#: templates/admin/maps.html:116 templates/admin/modals.html:8
+#: templates/admin/modals.html:169 templates/admin/projects_content.html:78
+#: templates/admin/stakeholders_content.html:67
+msgid "add entry"
+msgstr "dodaj vnos"
+
+#: templates/admin/menu_management.html:3
+msgid "menu management"
+msgstr "upravljanje menija"
+
+#: templates/admin/menu_management.html:9
+msgid "Menu Item"
+msgstr "Postavka menija"
+
+#: templates/admin/menu_management.html:10
+msgid "Show"
+msgstr "Prikaži"
+
+#: templates/admin/menu_management.html:11
+msgid "Page Type"
+msgstr "Tip strani"
+
+#: templates/admin/menu_management.html:36
+#: templates/admin/menu_management.html:72
+msgid "Default"
+msgstr "Privzeto"
+
+#: templates/admin/menu_management.html:45
+#: templates/admin/menu_management.html:81
+msgid "Individual"
+msgstr "Posamezno"
+
+#: templates/admin/menu_management.html:88
+#: templates/admin/partials/entity_form.html:131
+msgid "Save Changes"
+msgstr "Shrani spremembe"
+
+#: templates/admin/modals.html:10 templates/admin/modals.html:185
+#: templates/admin/modals.html:207 templates/util/cite/modal.html:84
+msgid "Close"
+msgstr "Zapri"
+
+#: templates/admin/modals.html:44
+#, fuzzy
+msgid "General Information"
+msgstr "splošne nastavitve"
+
+#: templates/admin/modals.html:64 templates/admin/modals.html:95
+#: templates/admin/modals.html:150 templates/admin/partials/entity_form.html:89
+msgid "Please provide a"
+msgstr "Prosimo, navedite"
+
+#: templates/admin/modals.html:80
+#, fuzzy
+msgid "Content & Description"
+msgstr "opis"
+
+#: templates/admin/modals.html:111
+#, fuzzy
+msgid "Media & Settings"
+msgstr "Shrani vse nastavitve"
+
+#: templates/admin/modals.html:129 templates/admin/partials/entity_form.html:56
+msgid "Select a value"
+msgstr "Izberite vrednost"
+
+#: templates/admin/modals.html:165 templates/admin/modals.html:192
+#: templates/admin/modals.html:269
+#: templates/admin/partials/entity_form.html:124
+msgid "Cancel"
+msgstr "Prekliči"
+
+#: templates/admin/modals.html:184
+msgid "Confirm Delete"
+msgstr "Potrdi izbris"
+
+#: templates/admin/modals.html:188
+msgid "Are you sure you want to delete"
+msgstr "Ali ste prepričani, da želite izbrisati"
+
+#: templates/admin/modals.html:205 templates/admin/partials/image_field.html:25
+#, fuzzy
+msgid "Select Image"
+msgstr "izberi vlogo"
+
+#: templates/admin/modals.html:218 templates/admin/modals.html:246
+msgid "None"
+msgstr "Brez"
+
+#: templates/admin/projects_content.html:3
+#, fuzzy
+msgid "projects section content"
+msgstr "vsebina razdelka o aplikaciji"
+
+#: templates/admin/projects_content.html:38
+#, fuzzy
+msgid "Main Project"
+msgstr "glavni projekt"
+
+#: templates/admin/stakeholders_content.html:3
+#, fuzzy
+msgid "stakeholders section content"
+msgstr "vsebina razdelka o aplikaciji"
+
+#: templates/admin/team_management.html:3
+msgid "Team Management"
+msgstr "Upravljanje ekipe"
+
+#: templates/admin/team_management.html:5
+msgid ""
+"The team section only includes person photos, which can be used in the "
+"person management and for individual pages."
+msgstr ""
+"Razdelek ekipe vključuje samo fotografije oseb, ki se lahko uporabljajo "
+"pri upravljanju oseb in na posameznih straneh."
+
+#: templates/admin/team_management.html:13
+msgid "Upload New Team Image"
+msgstr "Naloži novo sliko ekipe"
+
+#: templates/admin/team_management.html:34
+msgid "Existing Team Images"
+msgstr "Obstoječe slike ekipe"
+
+#: templates/admin/team_management.html:85
+msgid "Are you sure you want to delete this image?"
+msgstr "Ali ste prepričani, da želite izbrisati to sliko?"
+
+#: templates/admin/team_management.html:95
+msgid "No team images have been uploaded yet."
+msgstr "Slike ekipe še niso bile naložene."
+
+#: templates/admin/type_divisions.html:9 templates/admin/type_divisions.html:58
+msgid "Remove Division"
+msgstr "Odstrani razdelek"
+
+#: templates/admin/type_divisions.html:16
+#: templates/admin/type_divisions.html:65
+msgid "Icon Type"
+msgstr "Tip ikone"
+
+#: templates/admin/type_divisions.html:24
+#: templates/admin/type_divisions.html:73
+msgid "Icon Value"
+msgstr "Vrednost ikone"
+
+#: templates/admin/type_divisions.html:30
+#: templates/admin/type_divisions.html:78
+msgid "IDs"
+msgstr "ID-ji"
+
+#: templates/admin/type_divisions.html:33
+#: templates/admin/type_divisions.html:80
+msgid "Comma-separated list of IDs."
+msgstr "Z vejico ločen seznam ID-jev."
+
+#: templates/admin/type_divisions.html:40
+msgid "Add Division"
+msgstr "Dodaj razdelek"
+
+#: templates/admin/type_divisions.html:43
+msgid "save changes"
+msgstr "shrani spremembe"
+
+#: templates/admin/visibility_settings.html:5
+msgid "Visibility Configuration"
+msgstr "Konfiguracija vidnosti"
+
+#: templates/admin/visibility_settings.html:7
+msgid "Save All Settings"
+msgstr "Shrani vse nastavitve"
+
+#: templates/admin/visibility_settings.html:14
+msgid "Entity Types"
+msgstr "Tipi entitet"
+
+#: templates/admin/visibility_settings.html:17
+msgid "Shown Type IDs"
+msgstr "ID-ji prikazanih tipov"
+
+#: templates/admin/visibility_settings.html:19
+msgid "Comma-separated list of type IDs to show."
+msgstr "Z vejico ločen seznam ID-jev tipov, ki naj bodo prikazani."
+
+#: templates/admin/visibility_settings.html:26
+msgid "Hidden Type IDs"
+msgstr "ID-ji skritih tipov"
+
+#: templates/admin/visibility_settings.html:28
+msgid "Comma-separated list of type IDs to hide."
+msgstr "Z vejico ločen seznam ID-jev tipov, ki naj bodo skriti."
+
+#: templates/admin/visibility_settings.html:38
+msgid "Individual Entity IDs"
+msgstr "ID-ji posameznih entitet"
+
+#: templates/admin/visibility_settings.html:41
+msgid "Shown Entity IDs"
+msgstr "ID-ji prikazanih entitet"
+
+#: templates/admin/visibility_settings.html:43
+msgid "Comma-separated list of entity IDs to show."
+msgstr "Z vejico ločen seznam ID-jev entitet, ki naj bodo prikazani."
+
+#: templates/admin/visibility_settings.html:50
+msgid "Hidden Entity IDs"
+msgstr "ID-ji skritih entitet"
+
+#: templates/admin/visibility_settings.html:52
+msgid "Comma-separated list of entity IDs to hide."
+msgstr "Z vejico ločen seznam ID-jev entitet, ki naj bodo skriti."
+
+#: templates/admin/visibility_settings.html:61
+msgid "Entity Classes"
+msgstr "Razredi entitet"
+
+#: templates/admin/visibility_settings.html:66
+msgid "Shown Classes"
+msgstr "Prikazani razredi"
+
+#: templates/admin/visibility_settings.html:69
+msgid "Checked classes will be explicitly shown in the browse interface."
+msgstr "Izbrani razredi bodo izrecno prikazani v brskalnem vmesniku."
+
+#: templates/admin/visibility_settings.html:97
+msgid "Hidden Classes"
+msgstr "Skriti razredi"
+
+#: templates/admin/visibility_settings.html:100
+msgid "Checked classes will be hidden from the browse interface."
+msgstr "Izbrani razredi bodo skriti v brskalnem vmesniku."
+
+#: templates/admin/visibility_settings.html:131
+msgid "Save Visibility Settings"
+msgstr "Shrani nastavitve vidnosti"
+
+#: templates/admin/partials/entity_form.html:25
+#: templates/admin/partials/entity_form.html:27
+msgid "no translation available"
+msgstr "prevod ni na voljo"
+
+#: templates/admin/partials/entity_form.html:85
+msgid "This entry has no translation for"
+msgstr "Ta vnos nima prevoda za"
+
+#: templates/admin/partials/entity_form.html:109
+msgid "Edit"
+msgstr "Uredi"
+
+#: templates/admin/partials/entity_form.html:138
+#, fuzzy
+msgid "CONNECTED ENTITIES"
+msgstr "entitete"
+
+#: templates/admin/partials/entity_form.html:172
+#, fuzzy
+msgid "ADD NEW CONNECTION"
+msgstr "izberi povezavo"
+
+#: templates/admin/partials/entity_form.html:176
+msgid "select connection"
+msgstr "izberi povezavo"
+
+#: templates/admin/partials/entity_form.html:188
+msgid "select node"
+msgstr "izberi vozlišče"
+
+#: templates/admin/partials/entity_form.html:199
+msgid "select role"
+msgstr "izberi vlogo"
+
+#: templates/admin/partials/entity_form.html:200
+msgid "not specified"
+msgstr "ni določeno"
+
+#: templates/admin/partials/image_field.html:16
+#, fuzzy
+msgid "No image selected"
+msgstr "Ni izbrane datoteke"
+
+#: templates/tabs/feature.html:34 views/admin.py:56
+msgid "attributes"
+msgstr "atributi"
+
+#: templates/tabs/overview.html:8
+msgid "subentities"
+msgstr "subentitete"
+
+#: templates/tabs/overview.html:9
+msgid "subunits"
+msgstr "podenote"
+
+#: templates/tabs/overview.html:10
+msgid "description"
+msgstr "opis"
+
+#: templates/tabs/overview.html:11
+msgid "Media file"
+msgstr "Medijska datoteka"
+
+#: templates/tabs/overview.html:15
+msgid "Open full view"
+msgstr "Odpri celoten pogled"
+
+#: templates/tabs/overview.html:16
+#, python-format
+msgid "View all %(count)s files"
+msgstr "Ogled vseh %(count)s datotek"
+
+#: templates/util/cite/modal.html:5
+msgid "Cite this Entry"
+msgstr "Citiraj ta vnos"
+
+#: templates/util/cite/modal.html:12
+msgid "Recommended Citation"
+msgstr "Priporočen citat"
+
+#: templates/util/cite/modal.html:17
+msgid "Copy to clipboard"
+msgstr "Kopiraj v odložišče"
+
+#: templates/util/cite/modal.html:33
+msgid "No license info"
+msgstr "Ni informacij o licenci"
+
+#: templates/util/cite/modal.html:41
+msgid "View License Deed"
+msgstr "Ogled licence"
+
+#: templates/util/cite/modal.html:44
+msgid "No specific license information available for this entity."
+msgstr "Za to entiteto ni na voljo posebnih informacij o licenci."
+
+#: templates/util/cite/modal.html:54
+msgid "Export Formats (BibTeX, RIS)"
+msgstr "Izvozni formati (BibTeX, RIS)"
+
+#: utils/view_util.py:17
+msgid "entities"
+msgstr "entitete"
+
+#: utils/view_util.py:18
+msgid "search"
+msgstr "išči"
+
+#: utils/view_util.py:19
+msgid "about"
+msgstr "o aplikaciji"
+
+#: utils/view_util.py:20
+msgid "outcome"
+msgstr "rezultat"
+
+#: utils/view_util.py:21
+msgid "publications"
+msgstr "publikacije"
+
+#: utils/view_util.py:53
+msgid "browse/select/find all entities"
+msgstr "brskaj/izberi/najdi vse entitete"
+
+#: utils/view_util.py:56
+msgid "detailed search"
+msgstr "podrobno iskanje"
+
+#: utils/view_util.py:65
+msgid "about the project"
+msgstr "o projektu"
+
+#: utils/view_util.py:83
+msgid "Unknown"
+msgstr "Neznano"
+
+#: utils/view_util.py:145
+#, python-format
+msgid "Accessed: %(date)s"
+msgstr "Dostopano: %(date)s"
+
+#: utils/view_util.py:194
+#, python-format
+msgid ""
+"%(project_name)s (%(year)s). %(title)s. Retrieved from %(url)s (Accessed:"
+" %(date)s)"
+msgstr ""
+"%(project_name)s (%(year)s). %(title)s. Pridobljeno iz %(url)s "
+"(Dostopano: %(date)s)"
+
+#: views/admin.py:46
+msgid "main-project"
+msgstr "glavni projekt"
+
+#: views/admin.py:54
+msgid "institutions"
+msgstr "institucije"
+
+#: views/admin.py:164
+#, python-format
+msgid ""
+"Invalid ID format for label \"%(label)s\". Please use comma-separated "
+"integers."
+msgstr ""
+"Neveljaven format ID za oznako \"%(label)s\". Uporabite s črko ločena "
+"cela števila."
+
+#: views/admin.py:177
+msgid "Type divisions updated successfully."
+msgstr "Razdelitev tipov uspešno posodobljena."
+
+#: views/admin.py:180
+msgid "Error updating type divisions"
+msgstr "Napaka pri posodabljanju razdelitve tipov"
+
+#: views/admin.py:197
+msgid "Entity colors updated successfully."
+msgstr "Barve entitete uspešno posodobljene."
+
+#: views/admin.py:200
+msgid "Error updating entity colors"
+msgstr "Napaka pri posodabljanju barv entitet"
+
+#: views/admin.py:215
+msgid "Color added successfully."
+msgstr "Barva uspešno dodana."
+
+#: views/admin.py:218
+msgid "Error adding color"
+msgstr "Napaka pri dodajanju barve"
+
+#: views/admin.py:220
+msgid "Color already exists."
+msgstr "Barva že obstaja."
+
+#: views/admin.py:222
+msgid "Invalid HEX code."
+msgstr "Neveljavna HEX koda."
+
+#: views/admin.py:235
+msgid "Color deleted successfully."
+msgstr "Barva uspešno izbrisana."
+
+#: views/admin.py:238
+msgid "Error deleting color"
+msgstr "Napaka pri brisanju barve"
+
+#: views/admin.py:257
+msgid "Menu settings updated successfully."
+msgstr "Nastavitve menija uspešno posodobljene."
+
+#: views/admin.py:260
+msgid "Error updating menu settings"
+msgstr "Napaka pri posodabljanju nastavitev menija"
+
+#: views/admin.py:279
+msgid "Legal notice updated successfully."
+msgstr "Pravno obvestilo uspešno posodobljeno."
+
+#: views/admin.py:282 views/admin.py:397 views/admin.py:862
+msgid "Error updating settings"
+msgstr "Napaka pri posodabljanju nastavitev"
+
+#: views/admin.py:292 views/admin.py:560 views/admin.py:1078
+#: views/admin.py:1214
+msgid "No file part"
+msgstr "Ni dela datoteke"
+
+#: views/admin.py:297 views/admin.py:565 views/admin.py:1083
+#: views/admin.py:1219
+msgid "No selected file"
+msgstr "Ni izbrane datoteke"
+
+#: views/admin.py:306
+#, python-format
+msgid "Logo \"%(name)s\" uploaded successfully."
+msgstr "Logotip \"%(name)s\" uspešno naložen."
+
+#: views/admin.py:320 views/admin.py:1106 views/admin.py:1254
+msgid "Invalid request for renaming."
+msgstr "Neveljavna zahteva za preimenovanje."
+
+#: views/admin.py:331
+msgid "Cannot rename default logos."
+msgstr "Privzetih logotipov ni mogoče preimenovati."
+
+#: views/admin.py:337 views/admin.py:1123 views/admin.py:1284
+msgid "Original file not found."
+msgstr "Izvirna datoteka ni bila najdena."
+
+#: views/admin.py:341 views/admin.py:1127 views/admin.py:1288
+msgid "A file with the new name already exists."
+msgstr "Datoteka z novim imenom že obstaja."
+
+#: views/admin.py:347
+#, python-format
+msgid "Logo renamed from \"%(old)s\" to \"%(new)s\"."
+msgstr "Logotip preimenovan iz \"%(old)s\" v \"%(new)s\"."
+
+#: views/admin.py:350 views/admin.py:1136 views/admin.py:1296
+#, python-format
+msgid "Error renaming file: %(error)s"
+msgstr "Napaka pri preimenovanju datoteke: %(error)s"
+
+#: views/admin.py:361 views/admin.py:1147
+msgid "No filename specified for deletion."
+msgstr "Ime datoteke za izbris ni določeno."
+
+#: views/admin.py:371
+#, python-format
+msgid "Logo \"%(name)s\" deleted successfully."
+msgstr "Logotip \"%(name)s\" uspešno izbrisan."
+
+#: views/admin.py:374 views/admin.py:1160 views/admin.py:1333
+#, python-format
+msgid "Error deleting file: %(error)s"
+msgstr "Napaka pri brisanju datoteke: %(error)s"
+
+#: views/admin.py:377
+#, python-format
+msgid "Default logo \"%(name)s\" deactivated."
+msgstr "Privzeti logotip \"%(name)s\" deaktiviran."
+
+#: views/admin.py:388 views/admin.py:408
+msgid "No filename specified."
+msgstr "Ime datoteke ni določeno."
+
+#: views/admin.py:394
+msgid "Main logo updated successfully."
+msgstr "Glavni logotip uspešno posodobljen."
+
+#: views/admin.py:426
+msgid "Favicon updated successfully."
+msgstr "Favikona uspešno posodobljena."
+
+#: views/admin.py:429
+#, python-format
+msgid "Error creating favicon: %(error)s"
+msgstr "Napaka pri ustvarjanju favikone: %(error)s"
+
+#: views/admin.py:459
+msgid "Footer logos updated successfully."
+msgstr "Logotipi v nogi uspešno posodobljeni."
+
+#: views/admin.py:462
+msgid "Error updating footer logos"
+msgstr "Napaka pri posodabljanju logotipov v nogi"
+
+#: views/admin.py:476
+msgid "License added successfully."
+msgstr "Licenca uspešno dodana."
+
+#: views/admin.py:485
+msgid "License deleted successfully."
+msgstr "Licenca uspešno izbrisana."
+
+#: views/admin.py:501
+msgid "Logo license updated successfully."
+msgstr "Licenca logotipa uspešno posodobljena."
+
+#: views/admin.py:546
+msgid "Database backup failed. Check logs for details."
+msgstr "Varnostno kopiranje baze ni uspelo. Preverite dnevnike za podrobnosti."
+
+#: views/admin.py:549 views/admin.py:625
+msgid "An unexpected error occurred. Check logs for details."
+msgstr "Prišlo je do nepričakovane napake. Preverite dnevnike za podrobnosti."
+
+#: views/admin.py:616
+msgid "Database restored successfully."
+msgstr "Baza podatkov uspešno obnovljena."
+
+#: views/admin.py:620
+msgid "Database restore failed. Check logs for details."
+msgstr "Obnova baze ni uspela. Preverite dnevnike za podrobnosti."
+
+#: views/admin.py:628
+msgid "Invalid file type. Please upload a .sql file."
+msgstr "Neveljaven tip datoteke. Prosimo, naložite .sql datoteko."
+
+#: views/admin.py:638
+msgid "Link deleted successfully"
+msgstr "Povezava uspešno izbrisana"
+
+#: views/admin.py:658
+msgid "Link added successfully"
+msgstr "Povezava uspešno dodana"
+
+#: views/admin.py:664
+msgid "Failed to add link: Invalid data provided"
+msgstr "Dodajanje povezave ni uspelo: Podani so neveljavni podatki"
+
+#: views/admin.py:695
+msgid "Entry added successfully!"
+msgstr "Vnos uspešno dodan!"
+
+#: views/admin.py:699
+#, python-format
+msgid "Error adding entry %(name)s: Only one main project allowed"
+msgstr "Napaka pri dodajanju vnosa %(name)s: Dovoljen je samo en glavni projekt"
+
+#: views/admin.py:703
+#, python-format
+msgid "Error adding entry %(name)s: %(error)s"
+msgstr "Napaka pri dodajanju vnosa %(name)s: %(error)s"
+
+#: views/admin.py:713
+msgid "Main Project cannot be deleted"
+msgstr "Glavnega projekta ni mogoče izbrisati"
+
+#: views/admin.py:716
+msgid "Entry deleted successfully!"
+msgstr "Vnos uspešno izbrisan!"
+
+#: views/admin.py:727
+msgid "Configuration ID is required"
+msgstr "ID konfiguracije je obvezen"
+
+#: views/admin.py:747
+#, python-format
+msgid "\"%(name)s\" updated successfully"
+msgstr "\"%(name)s\" uspešno posodobljen"
+
+#: views/admin.py:751
+#, python-format
+msgid "Error updating \"%(name)s\": %(error)s"
+msgstr "Napaka pri posodabljanju \"%(name)s\": %(error)s"
+
+#: views/admin.py:773
+msgid "Map ID is required"
+msgstr "ID zemljevida je obvezen"
+
+#: views/admin.py:790
+msgid "Map updated successfully"
+msgstr "Zemljevid uspešno posodobljen"
+
+#: views/admin.py:793
+msgid "Invalid Map ID format"
+msgstr "Neveljaven format ID zemljevida"
+
+#: views/admin.py:796
+#, python-format
+msgid "Error updating map: %(error)s"
+msgstr "Napaka pri posodabljanju zemljevida: %(error)s"
+
+#: views/admin.py:813
+msgid "Error: Name, Display Name and Description are required"
+msgstr "Napaka: Ime, prikazano ime in opis so obvezni"
+
+#: views/admin.py:825
+#, python-format
+msgid "Map %(name)s with ID %(id)s added successfully!"
+msgstr "Zemljevid %(name)s z ID %(id)s uspešno dodan!"
+
+#: views/admin.py:831
+#, python-format
+msgid "Error adding map %(name)s: %(error)s"
+msgstr "Napaka pri dodajanju zemljevida %(name)s: %(error)s"
+
+#: views/admin.py:843
+msgid "Map deleted successfully!"
+msgstr "Zemljevid uspešno izbrisan!"
+
+#: views/admin.py:845
+#, python-format
+msgid "Error deleting map: %(error)s"
+msgstr "Napaka pri brisanju zemljevida: %(error)s"
+
+#: views/admin.py:859
+msgid "Index background updated successfully"
+msgstr "Ozadje indeksa uspešno posodobljeno"
+
+#: views/admin.py:893
+msgid "Invalid ID format. Please use comma-separated integers."
+msgstr "Neveljaven format ID. Uporabite s črko ločena cela števila."
+
+#: views/admin.py:898
+msgid "Class visibility updated successfully."
+msgstr "Vidnost razreda uspešno posodobljena."
+
+#: views/admin.py:950
+msgid "Updated case study ID successfully"
+msgstr "ID študije primera uspešno posodobljen"
+
+#: views/admin.py:953
+msgid ""
+"Invalid Case Study ID. Must be a positive integer and its entity type "
+"must be \"type\"."
+msgstr ""
+"Neveljaven ID študije primera. Biti mora pozitivno celo število, tip "
+"entitete pa mora biti \"Case Study\"."
+
+#: views/admin.py:971
+msgid "reset database"
+msgstr "ponastavi bazo podatkov"
+
+#: views/admin.py:993
+msgid "cache cleared"
+msgstr "predpomnilnik počiščen"
+
+#: views/admin.py:1001
+msgid "Cache warmup started in background (refresh mode)"
+msgstr "Ogrevanje predpomnilnika se je začelo v ozadju (način osveževanja)"
+
+#: views/admin.py:1009
+msgid "Cache warmup started in background."
+msgstr "Ogrevanje predpomnilnika se je začelo v ozadju."
+
+#: views/admin.py:1028
+#, python-format
+msgid "Error warming cache: %(error)s"
+msgstr "Napaka pri ogrevanju predpomnilnika: %(error)s"
+
+#: views/admin.py:1046
+msgid "system cache refreshed"
+msgstr "sistemski predpomnilnik osvežen"
+
+#: views/admin.py:1092
+#, python-format
+msgid "Asset \"%(name)s\" uploaded successfully."
+msgstr "Sredstvo \"%(name)s\" uspešno naloženo."
+
+#: views/admin.py:1117
+msgid "Cannot rename default assets."
+msgstr "Privzetih sredstev ni mogoče preimenovati."
+
+#: views/admin.py:1133
+#, python-format
+msgid "Asset renamed from \"%(old)s\" to \"%(new)s\"."
+msgstr "Sredstvo preimenovano iz \"%(old)s\" v \"%(new)s\"."
+
+#: views/admin.py:1157
+#, python-format
+msgid "Asset \"%(name)s\" deleted successfully."
+msgstr "Sredstvo \"%(name)s\" uspešno izbrisano."
+
+#: views/admin.py:1163
+#, python-format
+msgid "Default asset \"%(name)s\" deactivated."
+msgstr "Privzeto sredstvo \"%(name)s\" deaktivirano."
+
+#: views/admin.py:1180
+msgid "Asset license updated successfully."
+msgstr "Licenca sredstva uspešno posodobljena."
+
+#: views/admin.py:1210
+msgid "File type is missing."
+msgstr "Manjka tip datoteke."
+
+#: views/admin.py:1233 views/admin.py:1267 views/admin.py:1321
+msgid "Invalid file type."
+msgstr "Neveljaven tip datoteke."
+
+#: views/admin.py:1240
+#, python-format
+msgid "%(type)s \"%(name)s\" uploaded successfully."
+msgstr "%(type)s \"%(name)s\" uspešno naložen."
+
+#: views/admin.py:1278
+msgid "Cannot rename default files."
+msgstr "Privzetih datotek ni mogoče preimenovati."
+
+#: views/admin.py:1294
+#, python-format
+msgid "%(type)s renamed from \"%(old)s\" to \"%(new)s\"."
+msgstr "%(type)s uspešno preimenovan iz \"%(old)s\" v \"%(new)s\"."
+
+#: views/admin.py:1309
+msgid "No filename or type specified for deletion."
+msgstr "Ime datoteke ali tip za izbris ni določen."
+
+#: views/admin.py:1331
+#, python-format
+msgid "%(type)s \"%(name)s\" deleted successfully."
+msgstr "%(type)s \"%(name)s\" uspešno izbrisan."
+
+#: views/admin.py:1336
+#, python-format
+msgid "Default %(type)s \"%(name)s\" deactivated."
+msgstr "Privzeti %(type)s \"%(name)s\" deaktiviran."
+
+#: views/admin.py:1354
+#, python-format
+msgid "%(type)s license updated successfully."
+msgstr "Licenca %(type)s uspešno posodobljena."
+
+#: views/login.py:33
+msgid "show password"
+msgstr "pokaži geslo"
+
+#: views/login.py:34
+msgid "login"
+msgstr "prijava"
+
+#: views/login.py:53
+msgid "Your account is inactive."
+msgstr "Vaš račun je neaktiven."
+
+#: views/login.py:55
+msgid "Incorrect password."
+msgstr "Napačno geslo."
+
+#: views/login.py:57
+msgid "User not found."
+msgstr "Uporabnik ni bil najden."
+
+#: views/views.py:90
+#, python-format
+msgid "Failed to clear cache: %(error)s"
+msgstr "Čiščenje predpomnilnika ni uspelo: %(error)s"
+
+#~ msgid ""
+#~ "The assets are general files, which "
+#~ "can be used in individual pages, "
+#~ "these can bne all datatypes, some "
+#~ "can be displayed some only be "
+#~ "downloaded."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The logo sections is only for "
+#~ "logos and can be used for footer,"
+#~ " site logo, project logos and "
+#~ "institution logos, and also for "
+#~ "indiviual pages."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The team section only include person "
+#~ "fotos, which can be used at the"
+#~ " person management and for individual "
+#~ "pages."
+#~ msgstr ""
+
+#~ msgid "Save"
+#~ msgstr "Shrani"
+
+#~ msgid "Maximum number of projects (6) reached."
+#~ msgstr ""
+

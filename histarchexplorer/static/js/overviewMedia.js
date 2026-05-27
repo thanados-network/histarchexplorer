@@ -39,7 +39,7 @@ window.renderOverviewMediaTiles = function (files, allImages, additionalFilesOve
 //  TILE CREATION
 // ============================================================
 function createOverviewMediaTile(file) {
-  const alt = file.title || "Media file";
+  const alt = file.title || window.overviewTranslations?.mediaFile || "Media file";
   const item = document.createElement("div");
   item.className = "item item-half item-media";
   item.dataset.renderType = file.render_type || "unknown";
@@ -95,9 +95,9 @@ if (file.description || file.license || file.creator || file.license_holder) {
   hiddenDiv.className = "d-none";
   hiddenDiv.innerHTML = `
     ${file.description ? `<div class="mb-2">${file.description}</div>` : ""}
-    ${file.license ? `<div><b>License:</b> ${file.license}</div>` : ""}
-    ${file.creator ? `<div><b>Creator:</b> ${file.creator}</div>` : ""}
-    ${file.license_holder ? `<div><b>License holder:</b> ${file.license_holder}</div>` : ""}
+    ${file.license ? `<div><b>${window.overviewTranslations?.license || 'License'}:</b> ${file.license}</div>` : ""}
+    ${file.creator ? `<div><b>${window.overviewTranslations?.creator || 'Creator'}:</b> ${file.creator}</div>` : ""}
+    ${file.license_holder ? `<div><b>${window.overviewTranslations?.licenseHolder || 'License holder'}:</b> ${file.license_holder}</div>` : ""}
   `;
   caption.appendChild(hiddenDiv);
 
@@ -118,7 +118,7 @@ muuri.appendChild(caption);
   const viewBtn = document.createElement("button");
   viewBtn.className = "btn btn-sm btn-light position-absolute top-0 end-0 m-2";
   viewBtn.innerHTML = `<i class="bi bi-arrows-fullscreen"></i>`;
-  viewBtn.title = "Open full view";
+  viewBtn.title = window.overviewTranslations?.openFullView || "Open full view";
   viewBtn.addEventListener("click", () => {
     const type = file.render_type;
     window.open(`/view/${type}/${file.id}`, "_blank");
@@ -211,7 +211,8 @@ function createViewMoreButton(totalCount) {
   btn.className = "btn btn-more-files d-inline-flex align-items-center gap-2";
   btn.type = "button";
   btn.dataset.target = "#tab-pane-media";
-  btn.innerHTML = `<i class="bi bi-images"></i> <span>View all ${totalCount} files</span>`;
+  const viewAllText = (window.overviewTranslations?.viewAllFiles || "View all %(count)s files").replace("%(count)s", totalCount);
+  btn.innerHTML = `<i class="bi bi-images"></i> <span>${viewAllText}</span>`;
 
   btn.addEventListener("click", () => {
     const tabTrigger = document.querySelector(
