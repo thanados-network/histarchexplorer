@@ -21,6 +21,7 @@
 - **Coverage**: `pytest --cov=histarchexplorer`
 
 ### Coding-Standards
+- **Prinzipien**: Beachte immer KISS (Keep It Simple, Stupid) und DRY (Don't Repeat Yourself).
 - **Python**: PEP 8 konform, **strikt max. 79 Zeichen** Zeilenlänge.
 - **HTML/JS/SCSS**: **strikt max. 120 Zeichen** Zeilenlänge.
 - **Klammern**: Schließende `]` oder `)` immer in derselben Zeile wie das letzte Element.
