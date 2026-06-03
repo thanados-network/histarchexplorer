@@ -32,11 +32,14 @@ def index() -> str:
     for p in projects:
         slug = slugify(p.acronym)
 
-        desc_label = p.description.get("display", {}).get("label") \
-            if p.description['display']['label'] else ""
+        desc_label = p.description.get("display", {}).get("label")
+        if not desc_label:
+            desc_label = ""
+
         if desc_label:
-            short_desc = desc_label[:200] + "…" if len(desc_label) > 120 \
-                else desc_label
+            short_desc = (
+                desc_label[:200] + "…" if len(desc_label) > 120
+                else desc_label)
         else:
             short_desc = ""
 
@@ -87,4 +90,5 @@ def refresh_cache(id_: int) -> ResponseValue | tuple[ResponseValue, int]:
         cache.delete_memoized(PresentationView.from_api, PresentationView, id_)
         return redirect(url_for('entity_view', id_=id_))
     except Exception as e:
-        return jsonify({"message": _("Failed to clear cache: %(error)s", error=e)}), 500
+        return jsonify({
+            "message": _("Failed to clear cache: %(error)s", error=e)}), 500

@@ -6,9 +6,6 @@ from histarchexplorer.utils.view_util import render_page_template
 
 @app.route('/search', methods=['GET', 'POST'])
 def search() -> str:
-    """
-    Handles the main search page, displaying results from the search service.
-    """
     search_service = g.search_service
 
     results = []
@@ -36,9 +33,6 @@ def search() -> str:
 
 @app.route('/search_live')
 def search_live() -> Response:
-    """
-    Provides live search results for autocomplete features.
-    """
     search_service = g.search_service
 
     query = request.args.get('q', '').strip()
@@ -50,18 +44,3 @@ def search_live() -> Response:
 
 
 
-# @app.route('/search_result/<int:entity_id>')
-# def search_result_detail(entity_id: int):
-#     """
-#     Displays detailed information for a specific search result entity.
-#     """
-#     search_service = current_app.search_service
-#     entity = search_service.get_entity_detail(entity_id)
-#
-#     if entity is None:
-#         current_app.logger.warning(
-#             f"Entity with ID {entity_id} not found or error fetching.")
-#         return render_template('error.html', message="Entity not found."),
-#         404
-#
-#     return render_template('search_detail.html', entity=entity)

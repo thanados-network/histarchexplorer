@@ -21,7 +21,9 @@ from histarchexplorer.database.admin import (
     add_asset_to_db, delete_asset_from_db, rename_asset_in_db,
     add_file_to_db, delete_file_from_db, rename_file_in_db)
 from histarchexplorer.database.map import check_if_map_id_exist
-from histarchexplorer.forms.admin import MapForm
+from histarchexplorer.forms.admin import (
+    MapForm, GeneralSettingsForm, LicenseForm, FileUploadForm,
+    FileLicenseForm, FileRenameForm, FileDeleteForm)
 from histarchexplorer.models.admin import Admin
 from histarchexplorer.utils.view_util import find_children_by_id
 from histarchexplorer.views.views import type_tree
@@ -69,19 +71,22 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             active_main_sidebar_id = 'sidebar-stakeholders-content'
         else:
             match tab:
-                case ('sidebar-maps' | 'sidebar-index-page-options' |
-                      'sidebar-database' | 'sidebar-cache-options' |
-                      'sidebar-content-group' | 'sidebar-logo-management' |
-                      'sidebar-icon-management' |
-                      'sidebar-menu-management' | 'sidebar-footer-content' |
-                      'sidebar-file-management-group' | 'sidebar-assets' |
-                      'sidebar-legal-notice' | 'sidebar-licenses' |
-                      'sidebar-team' | 'sidebar-about-publications' |
-                      'sidebar-projects-content' | 'sidebar-stakeholders-content' |
-                      'sidebar-colors' | 'sidebar-type-divisions' |
-                      'sidebar-visibility-settings' |
-                      'sidebar-general-settings-group' | 'sidebar-about-content' |
-                      'sidebar-outcome' | 'sidebar-search-content'):
+                case (
+                        'sidebar-maps' | 'sidebar-index-page-options' |
+                        'sidebar-database' | 'sidebar-cache-options' |
+                        'sidebar-content-group' | 'sidebar-logo-management' |
+                        'sidebar-icon-management' |
+                        'sidebar-menu-management' | 'sidebar-footer-content' |
+                        'sidebar-file-management-group' | 'sidebar-assets' |
+                        'sidebar-legal-notice' | 'sidebar-licenses' |
+                        'sidebar-team' | 'sidebar-about-publications' |
+                        'sidebar-projects-content' |
+                        'sidebar-stakeholders-content' |
+                        'sidebar-colors' | 'sidebar-type-divisions' |
+                        'sidebar-visibility-settings' |
+                        'sidebar-general-settings-group' |
+                        'sidebar-about-content' |
+                        'sidebar-outcome' | 'sidebar-search-content'):
                     active_main_sidebar_id = tab
 
                 case _:
@@ -122,6 +127,29 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     all_assets = admin_instance.get_all_assets_with_ids()
     selected_footer_logos = g.settings.footer_logos
 
+    all_languages = app.config.get('LANGUAGES', {})
+    gen_form = GeneralSettingsForm()
+    gen_form.selectedLanguages.choices = [
+        (code, name) for code, name in all_languages.items()]
+    gen_form.preferredLanguage.choices = [
+        (code, name) for code, name in all_languages.items()
+        if code in g.settings.selected_languages]
+
+    # Pre-fill
+    gen_form.case_study_id.data = cs_type_id
+    gen_form.darkMode.data = g.settings.darkmode
+    gen_form.languageSelection.data = g.settings.language_selector
+    gen_form.accessRestriction.data = g.settings.access_restriction
+    gen_form.selectedLanguages.data = g.settings.selected_languages
+    gen_form.preferredLanguage.data = g.settings.preferred_language
+
+    license_form = LicenseForm()
+    file_license_form = FileLicenseForm()
+    file_license_form.license_id.choices = [
+        (l['id'], l['label']) for l in admin_instance.licenses]
+    file_license_form.license_id.choices.insert(
+        0, (0, _('Select License...')))
+
     return render_template(
         "admin.html",
         project_tabs=project_tabs,
@@ -138,6 +166,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         processed_target_nodes=admin_instance.process_target_nodes(),
         maps=Admin.get_maps(),
         settings=g.settings,
+        all_languages=all_languages,
         class_items={
             k: v for k, v in
             ApiAccess.get_entities_count_by_case_studies().items()
@@ -153,7 +182,13 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         all_team=all_team,
         all_assets=all_assets,
         selected_footer_logos=selected_footer_logos,
-        map_form=MapForm())
+        map_form=MapForm(),
+        general_settings_form=gen_form,
+        license_form=license_form,
+        file_upload_form=FileUploadForm(),
+        file_license_form=file_license_form,
+        file_rename_form=FileRenameForm(),
+        file_delete_form=FileDeleteForm())
 
 
 @app.route('/admin/update_type_divisions', methods=['POST'])
@@ -387,7 +422,9 @@ def delete_logo():
             flash(_('Error deleting file: %(error)s', error=e), 'danger')
     else:
         delete_logo_from_db(filename) # This will set is_active = FALSE
-        flash(_('Default logo "%(name)s" deactivated.', name=filename), 'success')
+        flash(
+            _('Default logo "%(name)s" deactivated.', name=filename),
+            'success')
 
     return _redirect_to_admin_tab('sidebar-logo-management')
 
@@ -457,7 +494,8 @@ def update_footer_content() -> Response:
             ordered_logo_ids = json.loads(ordered_logo_ids_str)
             # Ensure all selected logos are in the ordered list
             final_logo_ids = [
-                int(id) for id in ordered_logo_ids if int(id) in selected_logo_ids]
+                int(id) for id in ordered_logo_ids
+                if int(id) in selected_logo_ids]
             for logo_id in selected_logo_ids:
                 if logo_id not in final_logo_ids:
                     final_logo_ids.append(logo_id)
@@ -479,14 +517,20 @@ def update_footer_content() -> Response:
 
 @app.route('/admin/add_license', methods=['POST'])
 @login_required
-def add_license():
+def add_license() -> Response:
     check_manager_user()
-    spdx_id = request.form.get('spdx_id')
-    uri = request.form.get('uri')
-    label = request.form.get('label')
-    category = request.form.get('category')
-    Admin.add_license(spdx_id, uri, label, category)
-    flash(_('License added successfully.'), 'success')
+    form = LicenseForm()
+    if form.validate_on_submit():
+        Admin.add_license(
+            form.spdx_id.data,
+            form.uri.data,
+            form.label.data,
+            form.category.data)
+        flash(_('License added successfully.'), 'success')
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
     return _redirect_to_admin_tab('sidebar-licenses')
 
 
@@ -504,11 +548,22 @@ def delete_license(license_id):
 def update_logo_license() -> Response:
     check_manager_user()
 
-    filename = request.form.get('filename', '')
-    license_id = request.form.get('license_id', type=int)
-    attribution = request.form.get('attribution', '')
-
     admin_instance = Admin()
+    form = FileLicenseForm()
+    form.license_id.choices = [
+        (l['id'], l['label']) for l in admin_instance.licenses]
+    form.license_id.choices.insert(0, (0, _('Select License...')))
+
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
+        return _redirect_to_admin_tab('sidebar-logo-management')
+
+    filename = form.filename.data
+    license_id = form.license_id.data
+    attribution = form.attribution.data
+
     admin_instance.update_file_license(filename, license_id, attribution)
 
     flash(_('Logo license updated successfully.'), 'success')
@@ -666,7 +721,8 @@ def add_link() -> Response:
             'sortorder': Admin.check_sortorder()
         }
 
-        if all(v is not None for v in [params['domain'], params['range'], params['prop']]):
+        if all(v is not None for v in [
+                params['domain'], params['range'], params['prop']]):
             Admin.add_link(params)
             flash(_('Link added successfully'), 'success')
         else:
@@ -974,19 +1030,28 @@ def sort_links() -> tuple[Response, int] | Response:
 @login_required
 def update_general_settings(ignore_id: Optional[int] = None) -> Response:
     check_manager_user()
-    case_study_id = int(request.form.get('case_study_id'))
+    form = GeneralSettingsForm()
+    all_languages = app.config.get('LANGUAGES', {})
+    form.selectedLanguages.choices = [
+        (code, name) for code, name in all_languages.items()]
+    form.preferredLanguage.choices = [
+        (code, name) for code, name in all_languages.items()]
+
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
+        return _redirect_to_admin_tab('sidebar-general-settings-group')
+
+    case_study_id = form.case_study_id.data
     validation_result = Admin.check_case_study_type_id(case_study_id)
     if validation_result['is_valid']:
         g.settings.case_study_type_id = case_study_id
-        g.settings.darkmode = request.form.get('darkMode') == 'on'
-        g.settings.access_restriction = request.form.get(
-            'accessRestriction') == 'on'
-        g.settings.language_selector = request.form.get(
-            'languageSelection') == 'on'
-        g.settings.selected_languages = request.form.getlist(
-            'selectedLanguages')
-        g.settings.preferred_language = request.form.get(
-            'preferredLanguage')
+        g.settings.darkmode = form.darkMode.data
+        g.settings.access_restriction = form.accessRestriction.data
+        g.settings.language_selector = form.languageSelection.data
+        g.settings.selected_languages = form.selectedLanguages.data
+        g.settings.preferred_language = form.preferredLanguage.data
         g.settings.save_to_db()
         flash(_('Updated case study ID successfully'), 'info')
     else:
@@ -1010,8 +1075,11 @@ def check_case_study_id_ajax(entity_id: int) -> Response:
 @login_required
 def reset() -> Response:
     check_manager_user()
-    if not current_app.config.get('DEBUG') and not current_app.config.get('TESTING'):
-        flash(_('Reset is only allowed in debug or testing mode.'), 'danger')
+    if (not current_app.config.get('DEBUG') and
+            not current_app.config.get('TESTING')):
+        flash(
+            _('Reset is only allowed in debug or testing mode.'),
+            'danger')
         return redirect(url_for('admin'))
     make_reset()
     flash(_('reset database'), 'info')
@@ -1019,8 +1087,10 @@ def reset() -> Response:
 
 
 def make_reset() -> None:
-    if not current_app.config.get('DEBUG') and not current_app.config.get('TESTING'):
-        app.logger.warning('Attempted to reset database outside of DEBUG/TESTING mode.')
+    if (not current_app.config.get('DEBUG') and
+            not current_app.config.get('TESTING')):
+        app.logger.warning(
+            'Attempted to reset database outside of DEBUG/TESTING mode.')
         return
     env = os.environ.copy()
     env['PGPASSWORD'] = current_app.config['DATABASE_PASS']
@@ -1209,7 +1279,9 @@ def delete_asset():
             flash(_('Error deleting file: %(error)s', error=e), 'danger')
     else:
         delete_asset_from_db(filename)
-        flash(_('Default asset "%(name)s" deactivated.', name=filename), 'success')
+        flash(_(
+            'Default asset "%(name)s" deactivated.',
+            name=filename), 'success')
 
     return _redirect_to_admin_tab('sidebar-assets')
 
@@ -1252,72 +1324,79 @@ def uploaded_favicon():
 
 @app.route('/admin/upload_file', methods=['POST'])
 @login_required
-def upload_file():
+def upload_file() -> Response:
     check_manager_user()
-    file_type = request.form.get('file_type')
-    if not file_type:
-        flash(_('File type is missing.'), 'danger')
-        return _redirect_to_admin_tab('sidebar-file-management-group')
+    form = FileUploadForm()
+    # file_type and active_sidebar are in the form but we might use defaults
+    file_type = request.form.get('file_type', 'logo')
 
-    if 'file' not in request.files:
-        flash(_('No file part'), 'danger')
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
         return _redirect_to_admin_tab(f'sidebar-{file_type}')
 
-    file = request.files['file']
-    if file.filename == '':
-        flash(_('No selected file'), 'danger')
-        return _redirect_to_admin_tab(f'sidebar-{file_type}')
-
+    file = form.file.data
     if file:
         filename = secure_filename(file.filename)
-        if file_type == 'logo':
-            upload_folder = 'logos'
-        elif file_type == 'asset':
-            upload_folder = 'assets'
-        elif file_type == 'team':
-            upload_folder = 'team'
-        elif file_type == 'icon':
-            upload_folder = 'icons'
-        else:
-            flash(_('Invalid file type.'), 'danger')
-            return _redirect_to_admin_tab('sidebar-file-management-group')
+        match file_type:
+            case 'logo':
+                upload_folder = 'logos'
+            case 'asset':
+                upload_folder = 'assets'
+            case 'team':
+                upload_folder = 'team'
+            case 'icon':
+                upload_folder = 'icons'
+            case _:
+                flash(_('Invalid file type.'), 'danger')
+                return _redirect_to_admin_tab('sidebar-file-management-group')
 
-        upload_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
+        upload_path = os.path.join(
+            app.root_path, '..', 'uploads', upload_folder)
         os.makedirs(upload_path, exist_ok=True)
         file.save(os.path.join(upload_path, filename))
         add_file_to_db(filename, file_type, is_default=False)
-        flash(_('%(type)s "%(name)s" uploaded successfully.', type=file_type.capitalize(), name=filename), 'success')
+        flash(_(
+            '%(type)s "%(name)s" uploaded successfully.',
+            type=file_type.capitalize(), name=filename), 'success')
 
     return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
 
 @app.route('/admin/rename_file', methods=['POST'])
 @login_required
-def rename_file():
+def rename_file() -> Response:
     check_manager_user()
-    old_name = request.form.get('old_name')
-    new_name = request.form.get('new_name')
-    file_type = request.form.get('file_type')
+    form = FileRenameForm()
+    file_type = request.form.get('file_type', 'logo')
 
-    if not all([old_name, new_name, file_type]):
-        flash(_('Invalid request for renaming.'), 'danger')
-        return _redirect_to_admin_tab('sidebar-file-management-group')
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
+        return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
-    if file_type == 'logo':
-        upload_folder = 'logos'
-        static_folder = 'images/logos'
-    elif file_type == 'asset':
-        upload_folder = 'assets'
-        static_folder = 'assets'
-    elif file_type == 'team':
-        upload_folder = 'team'
-        static_folder = 'images/team'
-    else:
-        flash(_('Invalid file type.'), 'danger')
-        return _redirect_to_admin_tab('sidebar-file-management-group')
+    old_name = form.old_name.data
+    new_name = form.new_name.data
+
+    match file_type:
+        case 'logo':
+            upload_folder = 'logos'
+            static_folder = 'images/logos'
+        case 'asset':
+            upload_folder = 'assets'
+            static_folder = 'assets'
+        case 'team':
+            upload_folder = 'team'
+            static_folder = 'images/team'
+        case _:
+            flash(_('Invalid file type.'), 'danger')
+            return _redirect_to_admin_tab('sidebar-file-management-group')
 
     static_path = os.path.join(app.static_folder, static_folder)
-    uploads_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
+    uploads_path = os.path.join(
+        app.root_path, '..', 'uploads', upload_folder)
 
     old_filepath_static = os.path.join(static_path, secure_filename(old_name))
     old_filepath_uploads = os.path.join(
@@ -1340,7 +1419,11 @@ def rename_file():
     try:
         os.rename(old_filepath, new_filepath)
         rename_file_in_db(old_name, new_name, file_type)
-        flash(_('%(type)s renamed from "%(old)s" to "%(new)s".', type=file_type.capitalize(), old=old_name, new=new_name), 'success')
+        flash(_(
+            '%(type)s renamed from "%(old)s" to "%(new)s".',
+            type=file_type.capitalize(),
+            old=old_name,
+            new=new_name), 'success')
     except OSError as e:
         flash(_('Error renaming file: %(error)s', error=e), 'danger')
 
@@ -1349,40 +1432,51 @@ def rename_file():
 
 @app.route('/admin/delete_file', methods=['POST'])
 @login_required
-def delete_file():
+def delete_file() -> Response:
     check_manager_user()
-    filename = request.form.get('filename')
-    file_type = request.form.get('file_type')
+    form = FileDeleteForm()
+    file_type = request.form.get('file_type', 'logo')
 
-    if not filename or not file_type:
-        flash(_('No filename or type specified for deletion.'), 'danger')
-        return _redirect_to_admin_tab('sidebar-file-management-group')
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
+        return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
-    if file_type == 'logo':
-        upload_folder = 'logos'
-    elif file_type == 'asset':
-        upload_folder = 'assets'
-    elif file_type == 'team':
-        upload_folder = 'team'
-    elif file_type == 'icon':
-        upload_folder = 'icons'
-    else:
-        flash(_('Invalid file type.'), 'danger')
-        return _redirect_to_admin_tab('sidebar-file-management-group')
+    filename = form.filename.data
 
-    uploads_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
-    filepath_uploads = os.path.join(uploads_path, secure_filename(filename))
+    match file_type:
+        case 'logo':
+            upload_folder = 'logos'
+        case 'asset':
+            upload_folder = 'assets'
+        case 'team':
+            upload_folder = 'team'
+        case 'icon':
+            upload_folder = 'icons'
+        case _:
+            flash(_('Invalid file type.'), 'danger')
+            return _redirect_to_admin_tab('sidebar-file-management-group')
+
+    uploads_path = os.path.join(
+        app.root_path, '..', 'uploads', upload_folder)
+    filepath_uploads = os.path.join(
+        uploads_path, secure_filename(filename))
 
     if os.path.exists(filepath_uploads):
         try:
             os.remove(filepath_uploads)
             delete_file_from_db(filename, file_type)
-            flash(_('%(type)s "%(name)s" deleted successfully.', type=file_type.capitalize(), name=filename), 'success')
+            flash(_(
+                '%(type)s "%(name)s" deleted successfully.',
+                type=file_type.capitalize(), name=filename), 'success')
         except OSError as e:
             flash(_('Error deleting file: %(error)s', error=e), 'danger')
     else:
         delete_file_from_db(filename, file_type)
-        flash(_('Default %(type)s "%(name)s" deactivated.', type=file_type.capitalize(), name=filename), 'success')
+        flash(_(
+            'Default %(type)s "%(name)s" deactivated.',
+            type=file_type.capitalize(), name=filename), 'success')
 
     return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
@@ -1392,13 +1486,27 @@ def delete_file():
 def update_file_license() -> Response:
     check_manager_user()
 
-    filename = request.form.get('filename', '')
-    file_type = request.form.get('file_type', '')
-    license_id = request.form.get('license_id', type=int)
-    attribution = request.form.get('attribution', '')
-
     admin_instance = Admin()
+    form = FileLicenseForm()
+    form.license_id.choices = [
+        (l['id'], l['label']) for l in admin_instance.licenses]
+    form.license_id.choices.insert(0, (0, _('Select License...')))
+
+    file_type = request.form.get('file_type', 'logo')
+
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
+        return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
+
+    filename = form.filename.data
+    license_id = form.license_id.data
+    attribution = form.attribution.data
+
     admin_instance.update_file_license(filename, license_id, attribution)
 
-    flash(_('%(type)s license updated successfully.', type=file_type.capitalize()), 'success')
+    flash(_(
+        '%(type)s license updated successfully.',
+        type=file_type.capitalize()), 'success')
     return _redirect_to_admin_tab(f'sidebar-{file_type}-management')

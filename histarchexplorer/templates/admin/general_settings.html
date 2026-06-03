@@ -1,6 +1,7 @@
 <form id="caseStudyForm" method="POST" class="needs-validation"
       novalidate
       data-action-template="/admin/update_general_settings/">
+  {{ general_settings_form.csrf_token }}
   <input type="hidden" name="active_sidebar" value="sidebar-general-settings-group">
 
   <div class="row mb-4">
@@ -10,16 +11,14 @@
           <i class="bi bi-gear-wide-connected me-2"></i>{{ _('project configuration') | upper }}
         </h6>
         <div class="mb-0">
-          <label for="caseStudyHierarchyID" class="form-label fw-semibold">
-            {{ _('case study hierarchy ID') | capitalize }}
-          </label>
+          {{ general_settings_form.case_study_id.label(class="form-label fw-semibold") }}
           <div class="input-group">
             <span class="input-group-text bg-white"><i class="bi bi-hash"></i></span>
-            <input type="text" class="form-control form-control-lg"
-                   id="caseStudyHierarchyID" name="case_study_id"
-                   pattern="^\d+$"
-                   value="{{ initial_case_study_type_id or '' }}"
-                   required>
+            {{ general_settings_form.case_study_id(
+                class="form-control form-control-lg",
+                id="caseStudyHierarchyID",
+                pattern="^\d+$",
+                required=True) }}
             <div class="invalid-feedback" id="caseStudyIDFeedback">
               {{ _('Please enter a positive integer for the Case Study Hierarchy ID.') }}
             </div>
@@ -47,32 +46,32 @@
         </div>
         <div class="card-body pt-0">
           <div class="form-check form-switch p-3 border rounded mb-3 bg-light bg-opacity-50">
-            <input class="form-check-input ms-0 me-3" type="checkbox"
-                   id="deactivateDarkModeSwitch" name="darkMode"
-                   {% if settings.darkmode %} checked {% endif %}>
-            <label class="form-check-label fw-medium" for="deactivateDarkModeSwitch">
-              {{ _('Deactivate Darkmode') }}
-            </label>
+            {{ general_settings_form.darkMode(
+                class="form-check-input ms-0 me-3",
+                id="deactivateDarkModeSwitch") }}
+            {{ general_settings_form.darkMode.label(
+                class="form-check-label fw-medium",
+                for="deactivateDarkModeSwitch") }}
             <div class="form-text small ms-5">{{ _('Disable the dark theme option for all users.') }}</div>
           </div>
 
           <div class="form-check form-switch p-3 border rounded mb-3 bg-light bg-opacity-50">
-            <input class="form-check-input ms-0 me-3" type="checkbox"
-                   id="deactivateLanguageSelector" name="languageSelection"
-                   {% if settings.language_selector %} checked {% endif %}>
-            <label class="form-check-label fw-medium" for="deactivateLanguageSelector">
-              {{ _('Deactivate Language Selector') }}
-            </label>
+            {{ general_settings_form.languageSelection(
+                class="form-check-input ms-0 me-3",
+                id="deactivateLanguageSelector") }}
+            {{ general_settings_form.languageSelection.label(
+                class="form-check-label fw-medium",
+                for="deactivateLanguageSelector") }}
             <div class="form-text small ms-5">{{ _('Hide the language choice menu in the navbar.') }}</div>
           </div>
 
           <div class="form-check form-switch p-3 border rounded bg-light bg-opacity-50">
-            <input class="form-check-input ms-0 me-3" type="checkbox"
-                   id="activateAccessRestriction" name="accessRestriction"
-                   {% if settings.access_restriction %} checked {% endif %}>
-            <label class="form-check-label fw-medium" for="activateAccessRestriction">
-              {{ _('Activate Access Restriction') }}
-            </label>
+            {{ general_settings_form.accessRestriction(
+                class="form-check-input ms-0 me-3",
+                id="activateAccessRestriction") }}
+            {{ general_settings_form.accessRestriction.label(
+                class="form-check-label fw-medium",
+                for="activateAccessRestriction") }}
             <div class="form-text small ms-5">{{ _('Only logged-in users can see the content.') }}</div>
           </div>
         </div>
@@ -107,18 +106,11 @@
           </div>
 
           <div class="mb-0">
-            <label for="preferredLanguage" class="form-label fw-semibold">
-              {{ _('preferred language') | capitalize }}
-            </label>
-            <select class="form-select" id="preferredLanguage"
-                    name="preferredLanguage">
-              {% for code, name in available_languages.items() %}
-                <option value="{{ code }}"
-                        {% if code == settings.preferred_language %}selected{% endif %}>
-                  {{ name }}
-                </option>
-              {% endfor %}
-            </select>
+            {{ general_settings_form.preferredLanguage.label(
+                class="form-label fw-semibold") }}
+            {{ general_settings_form.preferredLanguage(
+                class="form-select",
+                id="preferredLanguage") }}
             <div class="form-text small">
               {{ _('The default language used when no other choice is made.') }}
             </div>

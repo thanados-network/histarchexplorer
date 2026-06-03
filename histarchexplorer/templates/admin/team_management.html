@@ -12,11 +12,11 @@
   <div class="card-body">
     <h5 class="card-title">{{ _('Upload New Team Image') | upper }}</h5>
     <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+      {{ file_upload_form.csrf_token }}
       <input type="hidden" name="active_sidebar" value="sidebar-team">
       <input type="hidden" name="file_type" value="team">
       <div class="input-group">
-        <input type="file" class="form-control" id="teamFile" name="file"
-               accept="image/png, image/jpeg, image/svg+xml, image/gif" required>
+        {{ file_upload_form.file(class="form-control", id="teamFile", accept="image/png, image/jpeg, image/svg+xml, image/gif", required=True) }}
         <button class="btn btn-primary" type="submit">
           <i class="bi bi-upload"></i> {{ _('Upload') }}
         </button>
@@ -45,12 +45,13 @@
               </div>
               <div class="card-footer bg-transparent border-top-0">
                 <form action="{{ url_for('update_file_license') }}" method="post" class="mb-2">
+                  {{ file_license_form.csrf_token }}
                   <input type="hidden" name="active_sidebar" value="sidebar-team">
                   <input type="hidden" name="filename" value="{{ file.filename }}">
                   <input type="hidden" name="file_type" value="team">
                   <div class="mb-2">
                     <select name="license_id" class="form-select form-select-sm">
-                      <option value="">{{ _('Select License...') }}</option>
+                      <option value="0">{{ _('Select License...') }}</option>
                       {% for license in admin_instance.licenses %}
                         <option value="{{ license.id }}"
                                 {% if admin_instance.file_licenses.get(file.filename) and admin_instance.file_licenses[file.filename].license_id == license.id %}selected{% endif %}>
@@ -69,6 +70,7 @@
                 <hr>
                 {# Rename Form #}
                 <form action="{{ url_for('rename_file') }}" method="post" class="input-group input-group-sm mb-2">
+                  {{ file_rename_form.csrf_token }}
                   <input type="hidden" name="active_sidebar" value="sidebar-team">
                   <input type="hidden" name="old_name" value="{{ file.filename }}">
                   <input type="hidden" name="file_type" value="team">
@@ -78,6 +80,7 @@
                 </form>
                 {# Delete Form #}
                 <form action="{{ url_for('delete_file') }}" method="post" class="d-grid">
+                  {{ file_delete_form.csrf_token }}
                   <input type="hidden" name="active_sidebar" value="sidebar-team">
                   <input type="hidden" name="filename" value="{{ file.filename }}">
                   <input type="hidden" name="file_type" value="team">

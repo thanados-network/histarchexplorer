@@ -5,14 +5,13 @@ from flask import flash, render_template, request, url_for
 from flask_babel import gettext as _
 from flask_login import (
     LoginManager, current_user, login_required, login_user, logout_user)
-from flask_wtf import FlaskForm
 from werkzeug import Response
 from werkzeug.utils import redirect
-from wtforms import BooleanField, PasswordField, StringField, SubmitField
-from wtforms.validators import InputRequired
 
 from histarchexplorer import app
+from histarchexplorer.forms.login import LoginForm
 from histarchexplorer.models.user import User
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -24,26 +23,17 @@ def load_user(user_id: int) -> Optional[User]:  # pragma: no cover
     return User.get_by_id(user_id)
 
 
-class LoginForm(FlaskForm):
-    username = StringField(
-        _('username'),
-        [InputRequired()],
-        render_kw={'autofocus': True})
-    password = PasswordField(_('password'), [InputRequired()])
-    show_passwords = BooleanField(_('show password'))
-    save = SubmitField(_('login'))
-
-
 @app.route('/login', methods=["GET", "POST"])
 def login() -> str | Response:
     if current_user.is_authenticated:
         return redirect(url_for('admin'))
+
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.get_by_username(request.form['username'])
+        user = User.get_by_username(form.username.data)
         if user:
             hash_ = hashpw(
-                request.form['password'].encode('utf-8'),
+                form.password.data.encode('utf-8'),
                 user.password.encode('utf-8'))
             if hash_ == user.password.encode('utf-8'):
                 if user.active:
