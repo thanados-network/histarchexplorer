@@ -18,6 +18,9 @@ SET row_security = off;
 
 ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS relationship_labels_range_id_fkey;
 ALTER TABLE IF EXISTS ONLY tng.properties DROP CONSTRAINT IF EXISTS relationship_labels_domain_id_fkey;
+ALTER TABLE IF EXISTS ONLY tng.publication_entities DROP CONSTRAINT IF EXISTS publication_entities_publication_id_fkey;
+ALTER TABLE IF EXISTS ONLY tng.publication_entities DROP CONSTRAINT IF EXISTS publication_entities_entity_id_fkey;
+ALTER TABLE IF EXISTS ONLY tng.publications DROP CONSTRAINT IF EXISTS publications_file_id_fkey;
 ALTER TABLE IF EXISTS ONLY tng.file_licenses DROP CONSTRAINT IF EXISTS file_licenses_license_id_fkey;
 ALTER TABLE IF EXISTS ONLY tng.file_licenses DROP CONSTRAINT IF EXISTS file_licenses_file_id_fkey;
 ALTER TABLE IF EXISTS ONLY tng.entities DROP CONSTRAINT IF EXISTS entities_class_id_fkey;
@@ -36,6 +39,8 @@ ALTER TABLE IF EXISTS tng.maps ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS tng.licenses ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS tng.files ALTER COLUMN id DROP DEFAULT;
 DROP TABLE IF EXISTS tng.system_settings;
+DROP TABLE IF EXISTS tng.publication_entities;
+DROP TABLE IF EXISTS tng.publications;
 DROP TABLE IF EXISTS tng.properties;
 DROP SEQUENCE IF EXISTS tng.maps_id_seq;
 DROP TABLE IF EXISTS tng.maps;
@@ -378,6 +383,51 @@ ALTER TABLE tng.properties ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
+-- Name: publications; Type: TABLE; Schema: tng; Owner: openatlas
+--
+
+CREATE TABLE tng.publications (
+    id integer NOT NULL,
+    title text NOT NULL,
+    authors text,
+    year integer,
+    publication_type text,
+    doi text,
+    url text,
+    file_id integer
+);
+
+
+ALTER TABLE tng.publications OWNER TO openatlas;
+
+--
+-- Name: publications_id_seq; Type: SEQUENCE; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE tng.publications ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME tng.publications_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: publication_entities; Type: TABLE; Schema: tng; Owner: openatlas
+--
+
+CREATE TABLE tng.publication_entities (
+    publication_id integer NOT NULL,
+    entity_id integer NOT NULL
+);
+
+
+ALTER TABLE tng.publication_entities OWNER TO openatlas;
+
+
+--
 -- Name: system_settings; Type: TABLE; Schema: tng; Owner: openatlas
 --
 
@@ -424,6 +474,22 @@ ALTER TABLE ONLY tng.classes
 
 ALTER TABLE ONLY tng.properties
     ADD CONSTRAINT config_properties_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: publications publications_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE ONLY tng.publications
+    ADD CONSTRAINT publications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: publication_entities publication_entities_pkey; Type: CONSTRAINT; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE ONLY tng.publication_entities
+    ADD CONSTRAINT publication_entities_pkey PRIMARY KEY (publication_id, entity_id);
 
 
 --
@@ -538,6 +604,30 @@ ALTER TABLE ONLY tng.properties
 
 
 --
+-- Name: publications publications_file_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE ONLY tng.publications
+    ADD CONSTRAINT publications_file_id_fkey FOREIGN KEY (file_id) REFERENCES tng.files(id) ON DELETE SET NULL;
+
+
+--
+-- Name: publication_entities publication_entities_entity_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE ONLY tng.publication_entities
+    ADD CONSTRAINT publication_entities_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES tng.entities(id) ON DELETE CASCADE;
+
+
+--
+-- Name: publication_entities publication_entities_publication_id_fkey; Type: FK CONSTRAINT; Schema: tng; Owner: openatlas
+--
+
+ALTER TABLE ONLY tng.publication_entities
+    ADD CONSTRAINT publication_entities_publication_id_fkey FOREIGN KEY (publication_id) REFERENCES tng.publications(id) ON DELETE CASCADE;
+
+
+--
 -- Name: COLUMN entities.license_id; Type: ACL; Schema: tng; Owner: openatlas
 --
 
@@ -556,6 +646,20 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tng.file_licenses TO openatlas;
 --
 
 GRANT ALL ON TABLE tng.files TO openatlas;
+
+
+--
+-- Name: TABLE publications; Type: ACL; Schema: tng; Owner: openatlas
+--
+
+GRANT ALL ON TABLE tng.publications TO openatlas;
+
+
+--
+-- Name: TABLE publication_entities; Type: ACL; Schema: tng; Owner: openatlas
+--
+
+GRANT ALL ON TABLE tng.publication_entities TO openatlas;
 
 
 --

@@ -56,6 +56,8 @@ class Settings(BaseModel):
     case_study_type_id: int = 8240
     nav_logo: str = 'thanados_light.svg'
     footer_logos: list[int] = []
+    publication_types: list[str] = [
+        'Works', 'Article', 'Software', 'Award', 'Press']
     legal_notice: dict[str, str] = {}
     entity_colors: dict[str, str] = {
         'places': '#23cba7',

@@ -20,11 +20,15 @@ from histarchexplorer.database.admin import (
     update_sort_order, add_logo_to_db, delete_logo_from_db, rename_logo_in_db,
     add_asset_to_db, delete_asset_from_db, rename_asset_in_db,
     add_file_to_db, delete_file_from_db, rename_file_in_db)
+from histarchexplorer.database.publications import (
+    get_publications, add_publication, update_publication, delete_publication,
+    link_publication_to_entities, get_all_projects)
 from histarchexplorer.database.map import check_if_map_id_exist
 from histarchexplorer.forms.admin import (
     MapForm, GeneralSettingsForm, LicenseForm, FileUploadForm,
     FileLicenseForm, FileRenameForm, FileDeleteForm)
 from histarchexplorer.models.admin import Admin
+from histarchexplorer.utils.doi import fetch_doi_metadata
 from histarchexplorer.utils.view_util import find_children_by_id
 from histarchexplorer.views.views import type_tree
 
@@ -181,6 +185,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         all_logos=all_logos,
         all_team=all_team,
         all_assets=all_assets,
+        all_publications=get_publications(),
+        all_projects=get_all_projects(),
         selected_footer_logos=selected_footer_logos,
         map_form=MapForm(),
         general_settings_form=gen_form,
@@ -1510,3 +1516,74 @@ def update_file_license() -> Response:
         '%(type)s license updated successfully.',
         type=file_type.capitalize()), 'success')
     return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
+
+
+@app.route('/admin/add_publication', methods=['POST'])
+@login_required
+def add_pub() -> Response:
+    check_manager_user()
+    data = request.form.to_dict()
+    entity_ids = [int(i) for i in request.form.getlist('projects')]
+
+    pub_id = add_publication(data)
+    link_publication_to_entities(pub_id, entity_ids)
+
+    flash(_('Publication added successfully.'), 'success')
+    return _redirect_to_admin_tab('sidebar-about-publications')
+
+
+@app.route('/admin/edit_publication', methods=['POST'])
+@login_required
+def edit_pub() -> Response:
+    check_manager_user()
+    pub_id_str = request.form.get('id')
+    if not pub_id_str:
+        flash(_('No publication ID provided.'), 'danger')
+        return _redirect_to_admin_tab('sidebar-about-publications')
+
+    pub_id = int(pub_id_str)
+    data = request.form.to_dict()
+    entity_ids = [int(i) for i in request.form.getlist('projects')]
+
+    update_publication(pub_id, data)
+    link_publication_to_entities(pub_id, entity_ids)
+
+    flash(_('Publication updated successfully.'), 'success')
+    return _redirect_to_admin_tab('sidebar-about-publications')
+
+
+@app.route('/admin/delete_publication/<int:pub_id>', methods=['POST', 'GET'])
+@login_required
+def delete_pub(pub_id: int) -> Response:
+    check_manager_user()
+    delete_publication(pub_id)
+    flash(_('Publication deleted successfully.'), 'success')
+    return _redirect_to_admin_tab('sidebar-about-publications')
+
+
+@app.route('/admin/import_doi', methods=['POST'])
+@login_required
+def import_doi() -> Response:
+    check_manager_user()
+    doi = request.form.get('doi', '')
+    metadata = fetch_doi_metadata(doi)
+    if metadata:
+        return jsonify(metadata)
+    return jsonify({'error': _('Could not fetch metadata for this DOI.')}), 400
+
+
+@app.route('/admin/update_publication_types', methods=['POST'])
+@login_required
+def update_pub_types() -> Response:
+    check_manager_user()
+    types_str = request.form.get('publication_types', '')
+    types = [t.strip() for t in types_str.split(',') if t.strip()]
+    g.settings.publication_types = types
+    try:
+        g.settings.save_to_db()
+        flash(_('Publication types updated successfully.'), 'success')
+    except Exception as e:
+        app.logger.error("Failed to update publication types: %s", e)
+        flash(_('Error updating publication types'), 'error')
+
+    return _redirect_to_admin_tab('sidebar-about-publications')
