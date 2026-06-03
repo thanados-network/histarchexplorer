@@ -1,0 +1,105 @@
+<!-- Image Selector Modal -->
+<div class="modal fade" id="imageSelectorModal" tabindex="-1" aria-labelledby="imageSelectorModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="imageSelectorModalLabel">
+          <i class="bi bi-images me-2"></i>{{ _('Select Image') }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+      </div>
+      <div class="modal-body bg-light">
+        <div id="imageSelectorGrids">
+          {# Logo Grid #}
+          <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3 d-none" id="logoSelectorGrid">
+            <div class="col">
+              <div class="card h-100 image-option cursor-pointer border-2" data-value="" onclick="selectImageOption(this, event)">
+                <div class="card-body d-flex align-items-center justify-content-center p-2 bg-white" style="height: 120px;">
+                  <i class="bi bi-x-circle text-muted fs-1"></i>
+                </div>
+                <div class="card-footer p-1 text-center small text-truncate">{{ _('None') }}</div>
+              </div>
+            </div>
+            {% for logo in all_logos %}
+              {% set logo_url = get_logo_url(logo.filename) %}
+              <div class="col">
+                <div class="card h-100 image-option cursor-pointer border-2" 
+                     data-value="{{ logo_url }}" 
+                     data-filename="{{ logo.filename }}"
+                     onclick="selectImageOption(this, event)">
+                  <div class="card-body d-flex align-items-center justify-content-center p-2 bg-white" style="height: 120px;">
+                    <img src="{{ logo_url }}" class="img-fluid" style="max-height: 100%;" alt="{{ logo.filename }}">
+                  </div>
+                  <div class="card-footer p-1 text-center small text-truncate" title="{{ logo.filename }}">
+                    {{ logo.filename }}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          {# Team Grid #}
+          <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3 d-none" id="teamSelectorGrid">
+            <div class="col">
+              <div class="card h-100 image-option cursor-pointer border-2" data-value="" onclick="selectImageOption(this, event)">
+                <div class="card-body d-flex align-items-center justify-content-center p-2 bg-white" style="height: 120px;">
+                  <i class="bi bi-x-circle text-muted fs-1"></i>
+                </div>
+                <div class="card-footer p-1 text-center small text-truncate">{{ _('None') }}</div>
+              </div>
+            </div>
+            {% for person in all_team %}
+              {% set person_url = get_team_url(person.filename) %}
+              <div class="col">
+                <div class="card h-100 image-option cursor-pointer border-2" 
+                     data-value="{{ person_url }}" 
+                     data-filename="{{ person.filename }}"
+                     onclick="selectImageOption(this, event)">
+                  <div class="card-body d-flex align-items-center justify-content-center p-2 bg-white" style="height: 120px;">
+                    <img src="{{ person_url }}" class="img-fluid" style="max-height: 100%;" alt="{{ person.filename }}">
+                  </div>
+                  <div class="card-footer p-1 text-center small text-truncate" title="{{ person.filename }}">
+                    {{ person.filename }}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          {# Asset Grid #}
+          <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3 d-none" id="assetSelectorGrid">
+            <div class="col">
+              <div class="card h-100 image-option cursor-pointer border-2" data-value="" onclick="selectImageOption(this, event)">
+                <div class="card-body d-flex align-items-center justify-content-center p-2 bg-white" style="height: 120px;">
+                  <i class="bi bi-x-circle text-muted fs-1"></i>
+                </div>
+                <div class="card-footer p-1 text-center small text-truncate">{{ _('None') }}</div>
+              </div>
+            </div>
+            {% for asset in all_assets %}
+              {% if asset.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.svg')) %}
+                {% set asset_url = get_asset_url(asset.filename) %}
+                <div class="col">
+                  <div class="card h-100 image-option cursor-pointer border-2" 
+                       data-value="{{ asset_url }}" 
+                       data-filename="{{ asset.filename }}"
+                       onclick="selectImageOption(this, event)">
+                    <div class="card-body d-flex align-items-center justify-content-center p-2 bg-white" style="height: 120px;">
+                      <img src="{{ asset_url }}" class="img-fluid" style="max-height: 100%;" alt="{{ asset.filename }}">
+                    </div>
+                    <div class="card-footer p-1 text-center small text-truncate" title="{{ asset.filename }}">
+                      {{ asset.filename }}
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+      </div>
+    </div>
+  </div>
+</div>
