@@ -21,6 +21,7 @@ from histarchexplorer.database.admin import (
     add_asset_to_db, delete_asset_from_db, rename_asset_in_db,
     add_file_to_db, delete_file_from_db, rename_file_in_db)
 from histarchexplorer.database.map import check_if_map_id_exist
+from histarchexplorer.forms.admin import MapForm
 from histarchexplorer.models.admin import Admin
 from histarchexplorer.utils.view_util import find_children_by_id
 from histarchexplorer.views.views import type_tree
@@ -151,7 +152,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         all_logos=all_logos,
         all_team=all_team,
         all_assets=all_assets,
-        selected_footer_logos=selected_footer_logos)
+        selected_footer_logos=selected_footer_logos,
+        map_form=MapForm())
 
 
 @app.route('/admin/update_type_divisions', methods=['POST'])
@@ -794,11 +796,18 @@ def edit_entry() -> Response:
 def edit_map() -> Response:
     check_manager_user()
 
-    raw_map_id = request.form.get('map_id')
-    name = request.form.get('name', '')
-    display_name = request.form.get('displayname', '')
-    sort_order = request.form.get('inputorder', '0')
-    tile_string = request.form.get('description', '')
+    form = MapForm()
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
+        return _redirect_to_admin_tab('sidebar-maps')
+
+    raw_map_id = form.map_id.data
+    name = form.name.data
+    display_name = form.displayname.data
+    sort_order = str(form.inputorder.data or 0)
+    tile_string = form.description.data
 
     if not raw_map_id:
         flash(_('Map ID is required'), 'danger')
@@ -813,7 +822,7 @@ def edit_map() -> Response:
         form_data: dict[str, str] = {
             'name': name,
             'display_name': display_name,
-            'sort_order': sort_order,
+            'sortorder': sort_order,
             'tilestring': tile_string,
             'map_id': str(map_id)}
 
@@ -834,16 +843,17 @@ def edit_map() -> Response:
 def add_map() -> Response:
     check_manager_user()
 
-    name = request.form.get('name')
-    display_name = request.form.get('displayname')
-    sort_order = request.form.get('inputorder', '0')
-    tile_string = request.form.get('description')
-
-    if not name or not display_name or not tile_string:
-        flash(
-            _('Error: Name, Display Name and Description are required'),
-            'danger')
+    form = MapForm()
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
         return _redirect_to_admin_tab('sidebar-maps')
+
+    name = form.name.data
+    display_name = form.displayname.data
+    sort_order = str(form.inputorder.data or 0)
+    tile_string = form.description.data
 
     data: dict[str, str] = {
         'name': name,
