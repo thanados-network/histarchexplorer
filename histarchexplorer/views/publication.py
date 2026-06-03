@@ -2,7 +2,8 @@ from flask import request
 from histarchexplorer import app
 from histarchexplorer.database.publications import (
     get_publications, get_all_projects)
-from histarchexplorer.utils.view_util import render_page_template
+from histarchexplorer.utils.view_util import (
+    render_page_template, get_publication_citation)
 
 
 @app.route('/publications')
@@ -29,6 +30,7 @@ def publications() -> str:
                     (pub['authors'] and
                      search_query not in pub['authors'].lower())):
                 continue
+        pub['citation'] = get_publication_citation(pub)
         filtered_publications.append(pub)
 
     # Get unique years and types for filters

@@ -130,38 +130,87 @@ def get_license_info(case_studies: list[Any]) -> dict[str, Any] | None:
 
 
 def generate_bibtex(
-        entity: PresentationView,
-        project_name: str,
-        url: str,
-        date: str) -> str:
-    year = date.split('-')[0]
-    key = f"{slugify(project_name)}_{entity.id}_{year}"
+        entity: Any,
+        project_name: str = None,
+        url: str = None,
+        date: str = None) -> str:
+    if hasattr(entity, 'id'):  # PresentationView
+        year = date.split('-')[0] if date else datetime.date.today().year
+        title = entity.title
+        author = project_name or _('Unknown Project')
+        key = f"{slugify(author)}_{entity.id}_{year}"
+        url = url or ""
+        note = _('Accessed: %(date)s', date=date) if date else ""
+    else:  # Publication dict
+        year = entity.get('year') or datetime.date.today().year
+        title = entity.get('title')
+        author = entity.get('authors') or _('Unknown Author')
+        key = f"{slugify(author.split(',')[0])}_{year}"
+        url = entity.get('doi') or entity.get('url') or ""
+        if entity.get('doi'):
+            url = f"https://doi.org/{url}"
+        note = ""
 
     bibtex = f"@misc{{{key},\n"
-    bibtex += f"  title = {{{entity.title}}},\n"
-    bibtex += f"  author = {{{project_name}}},\n"
+    bibtex += f"  title = {{{title}}},\n"
+    bibtex += f"  author = {{{author}}},\n"
     bibtex += f"  year = {{{year}}},\n"
-    bibtex += f"  url = {{{url}}},\n"
-    bibtex += f"  note = {{{_('Accessed: %(date)s', date=date)}}}\n"
-    bibtex += "}"
+    bibtex += f"  url = {{{url}}}"
+    if note:
+        bibtex += f",\n  note = {{{note}}}"
+    bibtex += "\n}"
     return bibtex
 
 
 def generate_ris(
-        entity: PresentationView,
-        project_name: str,
-        url: str,
-        date: str) -> str:
+        entity: Any,
+        project_name: str = None,
+        url: str = None,
+        date: str = None) -> str:
     """Generates a RIS citation string."""
-    year = date.split('-')[0]
+    if hasattr(entity, 'id'):  # PresentationView
+        year = date.split('-')[0] if date else datetime.date.today().year
+        title = entity.title
+        author = project_name or _('Unknown Project')
+        url = url or ""
+    else:  # Publication dict
+        year = entity.get('year') or datetime.date.today().year
+        title = entity.get('title')
+        author = entity.get('authors') or _('Unknown Author')
+        url = entity.get('doi') or entity.get('url') or ""
+        if entity.get('doi'):
+            url = f"https://doi.org/{url}"
+
     ris = "TY  - ELEC\n"
-    ris += f"TI  - {entity.title}\n"
-    ris += f"AU  - {project_name}\n"
+    ris += f"TI  - {title}\n"
+    ris += f"AU  - {author}\n"
     ris += f"PY  - {year}\n"
     ris += f"UR  - {url}\n"
-    ris += f"Y2  - {date}\n"  # Access date
+    if date:
+        ris += f"Y2  - {date}\n"  # Access date
     ris += "ER  -"
     return ris
+
+
+def get_publication_citation(pub: dict[str, Any]) -> dict[str, str]:
+    authors = pub.get('authors') or _('Unknown Author')
+    year = pub.get('year') or ''
+    title = pub.get('title') or ''
+    doi = pub.get('doi')
+    url = pub.get('url')
+
+    # APA style
+    apa = f"{authors} ({year}). {title}."
+    if doi:
+        apa += f" https://doi.org/{doi}"
+    elif url:
+        apa += f" {url}"
+
+    return {
+        'apa': apa,
+        'bibtex': generate_bibtex(pub),
+        'ris': generate_ris(pub)
+    }
 
 
 def get_cite_button(entity: PresentationView) -> dict[str, str]:

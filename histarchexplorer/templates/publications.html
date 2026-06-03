@@ -97,6 +97,63 @@
                                         <i class="bi bi-file-earmark-pdf"></i> {{ _('Download') }}
                                     </a>
                                     {% endif %}
+
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#citeModal{{ pub.id }}">
+                                        <i class="bi bi-quote"></i> {{ _('Cite') }}
+                                    </button>
+                                </div>
+
+                                {# Citation Modal #}
+                                <div class="modal fade" id="citeModal{{ pub.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">{{ _('Cite this Publication') }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-4">
+                                                    <h6 class="fw-bold text-muted text-uppercase small mb-2">{{ _('APA Style') }}</h6>
+                                                    <div class="position-relative">
+                                                        <div class="p-3 bg-light border rounded mb-2 font-monospace small" id="apa{{ pub.id }}">
+                                                            {{ pub.citation.apa }}
+                                                        </div>
+                                                        <button class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 m-2" 
+                                                                onclick="navigator.clipboard.writeText(document.getElementById('apa{{ pub.id }}').innerText.trim()); this.innerHTML = '<i class=\'bi bi-check\'></i>'; setTimeout(() => { this.innerHTML = '<i class=\'bi bi-copy\'></i>'; }, 2000);">
+                                                            <i class="bi bi-copy"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label small fw-bold">BibTeX</label>
+                                                    <div class="input-group input-group-sm">
+                                                        <textarea class="form-control font-monospace" rows="4" id="bib{{ pub.id }}" readonly>{{ pub.citation.bibtex }}</textarea>
+                                                        <button class="btn btn-outline-secondary" type="button" 
+                                                                onclick="navigator.clipboard.writeText(document.getElementById('bib{{ pub.id }}').value); this.innerHTML = '<i class=\'bi bi-check\'></i>'; setTimeout(() => { this.innerHTML = '<i class=\'bi bi-copy\'></i>'; }, 2000);">
+                                                            <i class="bi bi-copy"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-0">
+                                                    <label class="form-label small fw-bold">RIS</label>
+                                                    <div class="input-group input-group-sm">
+                                                        <textarea class="form-control font-monospace" rows="4" id="ris{{ pub.id }}" readonly>{{ pub.citation.ris }}</textarea>
+                                                        <button class="btn btn-outline-secondary" type="button" 
+                                                                onclick="navigator.clipboard.writeText(document.getElementById('ris{{ pub.id }}').value); this.innerHTML = '<i class=\'bi bi-check\'></i>'; setTimeout(() => { this.innerHTML = '<i class=\'bi bi-copy\'></i>'; }, 2000);">
+                                                            <i class="bi bi-copy"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {% if pub.entities %}
