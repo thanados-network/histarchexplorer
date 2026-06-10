@@ -41,6 +41,10 @@ def search_live() -> Response:
     """Perform real-time live search and return the results as JSON.
 
     Used by autocomplete or quick search bars in the navigation layout.
+
+    Returns:
+        Response: JSON list of autocomplete results as returned by
+            `SearchService.perform_live_search`.
     """
     search_service = g.search_service
 

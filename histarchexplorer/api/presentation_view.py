@@ -16,12 +16,28 @@ from histarchexplorer.api.util import (
 
 @dataclass
 class GeometryModel:
+    """Represents a spatial geometry in GeoJSON format.
+
+    Attributes:
+        type (str): Geometry type (e.g., 'Point', 'Polygon', 'LineString').
+        coordinates (Any): Coordinate values matching the geometry type.
+    """
     type: str
     coordinates: Any
 
 
 @dataclass
 class PropertyModel:
+    """Represents the properties associated with a spatial feature.
+
+    Attributes:
+        location_id (int): ID of the spatial location record.
+        entity_id (int): ID of the parent entity.
+        title (str): Title or label of the feature.
+        description (str): Description text or notes.
+        shape_type (str): Geometric shape type (e.g., 'point', 'polygon').
+        system_class (str): System class name of the associated entity.
+    """
     location_id: int
     entity_id: int
     title: str
@@ -32,12 +48,25 @@ class PropertyModel:
 
 @dataclass
 class FeatureModel:
+    """Represents a complete GeoJSON Feature with geometry and properties.
+
+    Attributes:
+        geometry (GeometryModel): The spatial geometry object.
+        properties (PropertyModel): Associated metadata and attributes.
+    """
     geometry: GeometryModel
     properties: PropertyModel
 
 
 @dataclass
 class TimePointModel:
+    """Represents a single point in time with fuzzy/chronological bounds.
+
+    Attributes:
+        earliest (str | None): Earliest possible date boundary.
+        latest (str | None): Latest possible date boundary.
+        comment (str | None): Chronological notes or comments.
+    """
     earliest: Optional[str] = None
     latest: Optional[str] = None
     comment: Optional[str] = None
@@ -45,12 +74,25 @@ class TimePointModel:
 
 @dataclass
 class TimeRangeModel:
+    """Represents a temporal coverage range with start and end points.
+
+    Attributes:
+        start (TimePointModel | None): Temporal start boundary.
+        end (TimePointModel | None): Temporal end boundary.
+    """
     start: Optional[TimePointModel] = None
     end: Optional[TimePointModel] = None
 
 
 @dataclass
 class TypeHierarchyEntry:
+    """Represents an entry within a classification type hierarchy.
+
+    Attributes:
+        label (str): Name or label of the hierarchy level.
+        descriptions (str | None): Description of the classification level.
+        identifier (str): System identifier/code for the level.
+    """
     label: str
     descriptions: Optional[str]
     identifier: str
@@ -58,6 +100,18 @@ class TypeHierarchyEntry:
 
 @dataclass
 class EntityTypeModel:
+    """Represents a classification type applied to an entity.
+
+    Attributes:
+        id (int): Unique identifier of the type.
+        title (str): Name of the type.
+        descriptions (str | None): Classification details.
+        is_standard (bool | None): True if it is a standard system type.
+        type_hierarchy (list[TypeHierarchyEntry] | None): Hierarchical path.
+        value (str | None): Associated quantitative value or text.
+        unit (str | None): Measurement unit of the value.
+        division (dict[str, str] | None): Division category details.
+    """
     id: int
     title: str
     descriptions: Optional[str]
@@ -70,6 +124,16 @@ class EntityTypeModel:
 
 @dataclass
 class ExternalReferenceModel:
+    """Represents a link to an external authority file or reference system.
+
+    Attributes:
+        id (str): Unique identifier of the reference.
+        type (str): Type of the reference system.
+        identifier (str): External ID or key (e.g., Wikidata ID).
+        reference_system (str): Name of the external system.
+        resolver_url (str | None): URL pattern to resolve the identifier.
+        reference_url (str | None): Complete resolved HTTP URL.
+    """
     id: str
     type: str
     identifier: str
@@ -90,6 +154,17 @@ class ExternalReferenceModel:
 
 @dataclass
 class Reference:
+    """Represents a bibliographic reference or citation.
+
+    Attributes:
+        id (str): Unique reference identifier.
+        title (str): Title of the cited source.
+        system_class (str): System class of the reference.
+        type (str | None): Citation type (e.g., 'primary', 'secondary').
+        type_id (int | None): ID of the citation type.
+        citation (str | None): Complete pre-formatted citation string.
+        pages (str | None): Page numbers or ranges cited.
+    """
     id: str
     title: str
     system_class: str
@@ -112,6 +187,24 @@ class Reference:
 
 @dataclass
 class File:
+    """Represents an associated media file or document.
+
+    Attributes:
+        id (int): Unique file identifier.
+        title (str): Display title of the file.
+        license (str | int | None): License name or ID.
+        creator (str | int | None): Author/creator of the file.
+        license_holder (str | int | None): Owner of the file license.
+        public (bool): True if the file is publicly shareable.
+        url (str | int | None): Direct file download or view URL.
+        mime_type (str | int | None): File mimetype (e.g., 'image/jpeg').
+        iiif_manifest (str | int | None): IIIF manifest endpoint URL.
+        iiif_base_path (str | int | None): Base path for IIIF image requests.
+        overlay (str | int | None): True/ID if used as a map overlay.
+        main_image (str | int | None): True/ID if it is the primary image.
+        from_super_entity (bool): True if inherited from a parent entity.
+        render_type (str | int | None): UI rendering type categorization.
+    """
     id: int
     title: str
     license: str | int | None = None
@@ -130,6 +223,21 @@ class File:
 
 @dataclass
 class Relation:
+    """Represents a semantic relation between two entities.
+
+    Attributes:
+        id (int): ID of the related entity.
+        name (str): Title/name of the related entity.
+        system_class (str): System class of the related entity.
+        relation_types (list[dict[str, Any]] | None): Semantic properties of
+            the relation (e.g., 'crm:P46i_forms_part_of').
+        description (dict[str, str] | None): Translated descriptions.
+        aliases (list[str] | None): Alternative names of the related entity.
+        time_range (TimeRangeModel | None): Validity period of the relation.
+        geometries (list[FeatureModel]): Parsed spatial features.
+        geometry_json (dict[str, Any]): Raw API GeoJSON.
+        types (list[EntityTypeModel]): Classifications of the related entity.
+    """
     id: int
     name: str
     system_class: str
@@ -145,6 +253,31 @@ class Relation:
 # pylint: disable=too-many-instance-attributes
 @dataclass
 class PresentationView:
+    """Model representing the full presentation details for an entity.
+
+    This class serves as the central data contract for entity visualization,
+    defining the standard structure returned to frontend clients.
+
+    Attributes:
+        id (int): Unique identifier of the entity.
+        system_class (str): OpenAtlas system class (e.g., 'place', 'feature').
+        view_class (str): CSS or UI class mapping for display.
+        title (str): Main display title of the entity.
+        description (dict[str, str] | None): Translated description dict.
+        aliases (list[str] | None): Alternative names or aliases.
+        start (str | None): Formatted start date string.
+        end (str | None): Formatted end date string.
+        geometries (list[FeatureModel]): Parsed spatial features for mapping.
+        geometry_json (dict[str, Any] | None): Raw API GeoJSON geometries.
+        when (TimeRangeModel | None): Parsed temporal coverage model.
+        types (list[EntityTypeModel]): List of classification types.
+        external_reference_systems (list[ExternalReferenceModel]): Links to
+            external authority files and resolver URLs.
+        references (list[Reference]): Merged bibliographic references.
+        files (list[File]): Associated public and licensed media files.
+        relations (dict[str, list[Relation]]): Map of related entities grouped
+            by their system class name.
+    """
     id: int
     system_class: str
     view_class: str

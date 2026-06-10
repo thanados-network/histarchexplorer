@@ -257,7 +257,8 @@ def get_sub_count(main_entity: PresentationView) -> dict[str, int | list[int]]:
     return {'count': count, 'ids': ids}
 
 
-def get_files_for_ids(ids: list[int]) -> dict[str, list[dict[str, Any]]] | None:
+def get_files_for_ids(
+        ids: list[int]) -> dict[str, list[dict[str, Any]]] | None:
     sql = """
           SELECT JSONB_AGG(
                          jsonb_build_object(
@@ -293,6 +294,26 @@ def get_rastermaps() -> str:
 
     Expects a JSON body containing a list of IDs and returns the
     associated map details.
+
+    Input format:
+        {
+            "ids": [int, ...]
+        }
+
+    Output format:
+        {
+            "images": [
+                {
+                    "id": int,
+                    "name": str,
+                    "description": str,
+                    "bbox": [
+                        [float, float],
+                        [float, float]
+                    ]
+                }
+            ]
+        }
     """
     data = request.get_json()
     if not data or 'ids' not in data:
@@ -305,10 +326,18 @@ def get_rastermaps() -> str:
 
 @app.route('/presentation-view/<int:id_>')
 def presentation_view(id_: int) -> dict[str, Any]:
-    """Retrieve full presentation details for an entity as a dictionary.
+    """Retrieve full presentation details for an entity as JSON.
 
-    Converts the structured PresentationView model into a plain
-    dictionary representation.
+    Converts the structured `PresentationView` model into a plain
+    dictionary representation. This provides core historical, spatial,
+    and semantic relationship data for UI widgets.
+
+    Args:
+        id_: int - The unique entity ID.
+
+    Returns:
+        dict: Serialized JSON structure matching the fields defined in
+            the `PresentationView` class.
     """
     return asdict(PresentationView.from_api(id_))
 
@@ -317,9 +346,25 @@ def presentation_view(id_: int) -> dict[str, Any]:
 def entity_data(id_: int) -> dict[str, Any]:
     """Generate all contextual display data for an entity page.
 
-    Aggregates details including hierarchy, spatial geometries, overview
-    map layouts, categorized division types, images, and citation
-    helper buttons.
+    Aggregates spatial geometries, hierarchical relations, categorized
+    types, and associated media files to drive the frontend entity details
+    interface.
+
+    Args:
+        id_: int - The unique entity ID.
+
+    Returns:
+        dict: An ad-hoc dictionary with the following keys:
+            - entity (dict): Serialized `PresentationView` structure.
+            - spatial (dict): A GeoJSON FeatureCollection of map elements.
+            - hierarchy (dict): Parent relationships and sub-counts.
+            - overviewMap (dict): Geometry or FeatureCollection for mapping.
+            - categorizedTypes (dict): Grouped classifications.
+            - citeButton (str): Pre-rendered citation button HTML.
+            - refreshButton (str): Pre-rendered cache refresh button HTML.
+            - mainImage (dict | None): Primary image file metadata.
+            - initialImage (list[dict]): Initial media thumbnails.
+            - images (list[dict]): All public shareable file objects.
     """
     entity = PresentationView.from_api(id_)
     data = get_sub_count(entity)

@@ -35,6 +35,10 @@ class ApiAccess:
 
         Queries class counts, defaulting to the globally configured case
         study IDs. Results are memoized for performance.
+
+        Returns:
+            dict[str, int]: A dictionary mapping system class names to
+                their total counts.
         """
         parser = Parser(type_id=type_ids or g.case_study_ids)
         return ApiAccess.get_system_class_count(parser)
@@ -46,6 +50,15 @@ class ApiAccess:
 
         Fetches media relationships. Results are memoized to reduce
         network overhead.
+
+        Returns:
+            dict[str, list[dict[str, Any]]]: Dict mapping "files" to a list of
+                file dictionaries. Each file dictionary contains:
+                - id (int): File ID.
+                - title (str): Title or filename.
+                - mimetype (str): File MIME type.
+                - license (str): License identifier.
+                - publicShareable (bool): Shareability flag.
         """
         return requests.get(
             f"{app.config['API_URL']}/files_of_entities/",
@@ -60,6 +73,16 @@ class ApiAccess:
 
         Queries the API endpoints. Results are memoized for faster
         subsequent lookups.
+
+        Returns:
+            dict[str, list[dict[str, Any]]]: A dictionary mapping categories
+                (e.g., "case_study") to a list of types. Each type dict
+                contains:
+                - id (int): Unique classification type ID.
+                - title (str): Type title.
+                - typeHierarchy (list[dict]): Parent hierarchy entry dicts with
+                  keys: 'identifier', 'label', 'descriptions'.
+                - isStandard (bool): Whether it is a standard system type.
         """
         return requests.get(
             f"{app.config['API_URL']}/type_by_view_class/",

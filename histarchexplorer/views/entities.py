@@ -12,9 +12,53 @@ def get_browse_list_entities(
         id_: int) -> dict[str, str | int | list[Any] | dict[str, Any]] | None:
     """Compile a list of entities and their geometries for browsing.
 
-    Processes visible/hidden classes, visible/hidden types, and case
-    studies to construct SQL conditions, fetches entities from the
-    database, and returns categorized entity and count metadata.
+    Processes visible/hidden classes, types, and case studies to construct
+    SQL conditions, fetches entities and geometries from the database,
+    and returns categorized entity and count metadata.
+
+    Args:
+        id_ (int): Optional parent entity ID. If provided, filters the
+            results to only include children of this entity via relation
+            property 'P46' (forms part of).
+
+    Returns:
+        dict[str, Any] | None: A structured ad-hoc dictionary containing
+            browsing metadata and query results, or None if an id_ was
+            provided but no child entities were found.
+
+            The dictionary contains the following keys:
+            - 'shown classes' (list[str]): Class names currently visible.
+            - 'hidden classes' (list[str]): Class names currently hidden.
+            - 'shown types' (list[str]): List of shown type IDs.
+            - 'hidden types' (list[str]): List of hidden type IDs.
+            - 'shown case studies' (list[int]): Active case study IDs.
+            - 'shown ids' (list[int]): Active/visible entity IDs.
+            - 'hidden ids' (list[int]): Hidden entity IDs.
+            - 'entities' (list[dict[str, Any]]): List of fetched entity
+              records. Each entity dict contains:
+                * 'id' (int): Entity database ID.
+                * 'name' (str): Name of the entity.
+                * 'description' (str): Detailed text description.
+                * 'class' (str): System class name.
+                * 'type' (str | None): Classification type label.
+                * 'type_id' (int | None): Classification type ID.
+                * 'begin' (str | None): Formatted start date.
+                * 'end' (str | None): Formatted end date.
+            - 'geometries' (dict[str, Any]): GeoJSON FeatureCollection
+              containing:
+                * 'type' (str): 'FeatureCollection'.
+                * 'features' (list[dict]): List of GeoJSON features.
+                  Each feature has keys: 'type' ('Feature'), 'geometry'
+                  (dict), and 'properties' containing: 'id' (int),
+                  'name' (str), and 'class' (str).
+            - 'totals' (dict[str, int]): Total count of entities per
+              UI category name (e.g., 'places').
+            - 'counts' (dict[str, list[dict[str, int]]]): Categorized
+              counts grouped by UI category name containing list of dicts
+              mapping {class_name: count}.
+            - 'cs_ids' (list[dict[str, Any]]): Details of case studies with
+              keys: 'id' (int), 'ids' (list[int]), 'name' (str),
+              'acronym' (str), and 'description' (str).
     """
     shown_ids = g.settings.shown_ids
 

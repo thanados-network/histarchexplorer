@@ -84,6 +84,10 @@ def type_tree() -> Response:
 
     Used by the frontend to build filter and selection menus based on
     available historical classifications.
+
+    Returns:
+        Response: JSON payload containing categories and type hierarchies
+            as returned by `ApiAccess.get_type_tree`.
     """
     return jsonify(ApiAccess.get_type_tree())
 
@@ -94,6 +98,10 @@ def get_files_of_entities() -> Response:
 
     This allows the frontend to query media associated with different
     archaeological and historical items.
+
+    Returns:
+        Response: JSON payload containing file mappings as returned by
+            `ApiAccess.get_files_of_entities`.
     """
     return jsonify(ApiAccess.get_files_of_entities())
 
@@ -104,6 +112,10 @@ def get_entities_count_by_case_study() -> Response:
 
     Provides count statistics to show how many items are registered
     under different projects or areas of study.
+
+    Returns:
+        Response: JSON payload containing class counts as returned by
+            `ApiAccess.get_entities_count_by_case_studies`.
     """
     return jsonify(ApiAccess.get_entities_count_by_case_studies())
 
@@ -115,6 +127,13 @@ def refresh_cache(id_: int) -> ResponseValue | tuple[ResponseValue, int]:
 
     Requires administrative login. Deletes the memoized cache for the
     given entity ID, then redirects to its presentation page.
+
+    Args:
+        id_: int - The unique entity ID to refresh.
+
+    Returns:
+        ResponseValue: Redirect to the entity page on success, or JSON
+            error message with HTTP 500 on failure.
     """
     try:
         cache.delete_memoized(PresentationView.from_api, PresentationView, id_)
