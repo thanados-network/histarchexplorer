@@ -25,6 +25,11 @@ def load_user(user_id: int) -> Optional[User]:  # pragma: no cover
 
 @app.route('/login', methods=["GET", "POST"])
 def login() -> str | Response:
+    """Handle administrative user login.
+
+    Validates login credentials, authenticates the user, and redirects
+    to the admin dashboard or the requested next URL.
+    """
     if current_user.is_authenticated:
         return redirect(url_for('admin'))
 
@@ -51,5 +56,9 @@ def login() -> str | Response:
 @app.route('/logout')
 @login_required
 def logout() -> Response:
+    """Log out the current user and redirect to the landing page.
+
+    Terminates the active user session.
+    """
     logout_user()
     return redirect('/')

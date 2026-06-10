@@ -8,6 +8,12 @@ from histarchexplorer.utils.view_util import (
 
 @app.route('/publications')
 def publications() -> str:
+    """Render the project publications page with customizable filters.
+
+    Allows filtering listed works by associated sub-project, publication
+    type, and release year, and provides real-time search on authors
+    or titles.
+    """
     all_publications = get_publications()
 
     selected_project = request.args.get('project', type=int)

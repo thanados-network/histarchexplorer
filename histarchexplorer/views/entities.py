@@ -10,6 +10,12 @@ from histarchexplorer.views.views import type_tree
 # pylint: disable=too-many-locals
 def get_browse_list_entities(
         id_: int) -> dict[str, str | int | list[Any] | dict[str, Any]] | None:
+    """Compile a list of entities and their geometries for browsing.
+
+    Processes visible/hidden classes, visible/hidden types, and case
+    studies to construct SQL conditions, fetches entities from the
+    database, and returns categorized entity and count metadata.
+    """
     shown_ids = g.settings.shown_ids
 
     if id_:
@@ -119,6 +125,11 @@ def get_browse_list_entities(
 
 # get entities and return the template
 def return_entities(tab_name: str, id_: int) -> str:
+    """Helper function to load entities and render the browsing layout.
+
+    Retrieves the browse list entities, configures sidebar tabs with
+    updated item counts, and renders the central entity template.
+    """
     data = get_browse_list_entities(id_)
 
     filtered_view_classes = {
@@ -150,11 +161,20 @@ def return_entities(tab_name: str, id_: int) -> str:
 @app.route('/entities/<tab_name>')
 @app.route('/entities/<tab_name>/<int:id_>')
 def entities(tab_name: str | None = None, id_: int | None = None) -> str:
+    """Render the main entity browse page.
+
+    Handles routing for the entities list, allowing optional filtering by
+    tab name or a specific parent entity ID.
+    """
     return return_entities(tab_name, id_)
 
 
 @app.route('/get_entities/<tab_name>')
 def get_entities(tab_name: str) -> str:
+    """Render the partial tab template for AJAX loading of browse results.
+
+    Returns the HTML segment corresponding to the specified browse tab.
+    """
     return render_template(
         'tabs/browse.html',
         tab_name=tab_name)

@@ -17,6 +17,11 @@ from histarchexplorer.utils.view_util import (
 
 @app.route('/')
 def index() -> str:
+    """Render the main landing page of the application.
+
+    This function fetches map settings, builds project showcase
+    cards, and renders the index template.
+    """
     map_data = g.settings.get_map_settings()
     map_ = None
     if index_map := map_data['map']:
@@ -64,28 +69,53 @@ def index() -> str:
 
 @app.route('/language=<language>')
 def set_language(language: Optional[str] = None) -> ResponseValue:
+    """Update the user's preferred language in the session.
+
+    Saves the selected language code to the session and redirects the
+    user back to the previous page.
+    """
     session['language'] = language
     return redirect(request.referrer)
 
 
 @app.route('/type-tree')
 def type_tree() -> Response:
+    """Fetch and return the complete hierarchical type tree as JSON.
+
+    Used by the frontend to build filter and selection menus based on
+    available historical classifications.
+    """
     return jsonify(ApiAccess.get_type_tree())
 
 
 @app.route('/files-of-entities')
 def get_files_of_entities() -> Response:
+    """Retrieve file information linked to all entities as JSON.
+
+    This allows the frontend to query media associated with different
+    archaeological and historical items.
+    """
     return jsonify(ApiAccess.get_files_of_entities())
 
 
 @app.route('/entities-count')
 def get_entities_count_by_case_study() -> Response:
+    """Get the number of entities within each case study as JSON.
+
+    Provides count statistics to show how many items are registered
+    under different projects or areas of study.
+    """
     return jsonify(ApiAccess.get_entities_count_by_case_studies())
 
 
 @app.route("/refresh-cache/<int:id_>", methods=["GET", "POST"])
 @login_required
 def refresh_cache(id_: int) -> ResponseValue | tuple[ResponseValue, int]:
+    """Clear cached data for a specific entity and reload its view.
+
+    Requires administrative login. Deletes the memoized cache for the
+    given entity ID, then redirects to its presentation page.
+    """
     try:
         cache.delete_memoized(PresentationView.from_api, PresentationView, id_)
         return redirect(url_for('entity_view', id_=id_))

@@ -1,7 +1,8 @@
 import json
 from typing import Any, Dict, List, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, TypeAdapter
+from pydantic_core import PydanticUndefined
 
 from histarchexplorer.database.settings import (
     create_settings_table, get_settings, save_settings)
@@ -10,6 +11,11 @@ from histarchexplorer.database.settings import (
 def _migrate_type_divisions(
         data: Dict[str, Any]) -> Dict[
     str, Dict[str, Union[str, List[int], None]]]:
+    """Migrate legacy type divisions format to the newer schema.
+
+    Translates old structure structures into named category division
+    schemas with associated ids, ensuring compatibility.
+    """
     if not data or not isinstance(data, dict):
         return {}
 
@@ -33,6 +39,12 @@ def _migrate_type_divisions(
 
 
 class Settings(BaseModel):
+    """Central settings data model representing application configurations.
+
+    Contains configurations for map imagery, grey/dark modes, visible and
+    hidden historical classes/types, preferred and available languages,
+    color palettes, menu configurations, and division/icon mapping.
+    """
     index_img: str = \
         '/static/images/index_map_bg/Blank_map_of_Europe_central_network.png'
     index_map: int = 1
@@ -111,6 +123,12 @@ class Settings(BaseModel):
 
     @classmethod
     def load_from_db(cls) -> 'Settings':
+        """Load and merge settings configurations from the database.
+
+        Initializes the settings table if missing, reads keys, merges database
+        overrides with standard default settings, handles migration and
+        sanitization, and returns the active Settings instance.
+        """
         create_settings_table()
         default_settings = cls().model_dump()
         db_settings_raw = {row['key']: row['value'] for row in get_settings()}
@@ -137,17 +155,78 @@ class Settings(BaseModel):
 
             merged_settings_data[key] = {**default_val, **db_val}
 
+        merged_settings_data = _validate_and_sanitize_settings(
+            merged_settings_data)
+
         instance = cls(**merged_settings_data)
         instance.save_to_db()
         return instance
 
     def save_to_db(self) -> None:
+        """Persist all current setting values to the database.
+
+        Dumps setting attributes and writes them as key-value pairs into the
+        database's settings table.
+        """
         for key, value in self.model_dump().items():
             save_settings(key, value)
 
     def get_map_settings(self) -> dict[str, Any]:
+        """Fetch map-specific display configuration as a dictionary.
+
+        Returns index image path, index map identifier, image map,
+        and greyscale status.
+        """
         return {
             'img': self.index_img,
             'map': self.index_map,
             'img_map': self.img_map,
             'greyscale': self.greyscale}
+
+
+def _validate_and_sanitize_settings(
+        data: Dict[str, Any]) -> Dict[str, Any]:
+    """Validate and clean settings dictionary against settings schema.
+
+    Ensures all keys have appropriate types, list formatting, and falls back
+    to default settings values on invalid data or validation failures.
+    """
+    sanitized = {}
+    for name, field in Settings.model_fields.items():
+        if field.default is not PydanticUndefined:
+            default_val = field.default
+        elif field.default_factory is not None:
+            default_val = field.default_factory()
+        else:
+            default_val = None
+
+        if name not in data:
+            sanitized[name] = default_val
+            continue
+
+        v = data[name]
+        origin = getattr(field.annotation, '__origin__', None)
+
+        if field.annotation is int:
+            if isinstance(v, list):
+                v = v[0] if len(v) > 0 else default_val
+            elif isinstance(v, str):
+                try:
+                    parsed = json.loads(v)
+                    if isinstance(parsed, list):
+                        v = parsed[0] if len(parsed) > 0 else default_val
+                except Exception:
+                    pass
+
+        is_list_type = (origin is list or field.annotation is list)
+        if is_list_type and v is not None and not isinstance(v, list):
+            v = [v]
+
+        try:
+            adapter = TypeAdapter(field.annotation)
+            validated_val = adapter.validate_python(v)
+            sanitized[name] = validated_val
+        except Exception:
+            sanitized[name] = default_val
+
+    return sanitized

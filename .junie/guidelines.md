@@ -24,5 +24,9 @@
 - **Python**: PEP 8 konform, **strikt max. 79 Zeichen** Zeilenlänge.
 - **HTML/JS/SCSS**: **strikt max. 120 Zeichen** Zeilenlänge.
 - **Klammern**: Schließende `]` oder `)` immer in derselben Zeile wie das letzte Element.
-- **Variablen**: CamelCase in JS, kebab-case in SCSS. Keine Docstrings.
+- **Variablen**: CamelCase in JS, kebab-case in SCSS.
+- **Docstrings**: Erforderlich für wichtige Funktionen und unklare Strukturen:
+  - Flask-Views / API-Endpunkte
+  - Komplexe Algorithmen
+  - Zentrale Datenmodelle / Schemas
 - **Struktur**: 1-2 Leerzeilen zur logischen Trennung.

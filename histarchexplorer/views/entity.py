@@ -17,6 +17,11 @@ from histarchexplorer.views.views import type_tree
 @app.route('/entity/<int:id_>')
 @app.route('/entity/<int:id_>/<tab_name>')
 def entity_view(id_: int, tab_name: str = "overview") -> str:
+    """Render the presentation layout for a single entity.
+
+    Sets up the sidebar navigation options and returns the main HTML
+    template populated with details for the entity.
+    """
     sidebar = app.config['SIDEBAR_OPTIONS']
     if tab_name not in {item['route'] for item in sidebar}:
         abort(404)
@@ -51,6 +56,11 @@ def get_entity_images(
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
 def get_entity(id_: int, tab_name: str) -> str:
+    """Fetch content for a specific tab of an entity.
+
+    Handles template loading for subunits, maps, media, features,
+    or general overview sections of an archaeological item.
+    """
     if tab_name == 'subunits':
         subunit_data = get_browse_list_entities(id_)
         filtered_view_classes = {
@@ -85,6 +95,11 @@ def get_features_for_map(
         e: PresentationView,
         hierarchy: Optional[dict[str, Any]] = None) \
         -> list[dict[str, str | int] | None]:
+    """Extract map features of an entity and its relations.
+
+    Collects geometries from the entity and related child items,
+    formatting them for map visualization in the frontend.
+    """
     map_data: list[Optional[dict[str, str | int]]] = []
     first_geom = None
     if e.geometry_json:
@@ -177,6 +192,11 @@ def get_categorized_types(
 
 
 def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
+    """Determine the administrative hierarchy of an entity.
+
+    Walks relationships to identify parent units (e.g., matching
+    stratigraphic units, features, and places) in reversed order.
+    """
     root: list[Optional[Relation]] = []
     match main_entity.system_class:
         case 'feature':
@@ -210,6 +230,11 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
 
 
 def get_sub_count(main_entity: PresentationView) -> dict[str, int | list[int]]:
+    """Count and gather IDs of sub-elements within an entity.
+
+    Finds forms-part-of (crm:P46) relationship types, returning
+    the total count and list of child IDs.
+    """
     sub_relations_map = {
         'place': ['feature'],
         'feature': ['stratigraphic_unit'],
@@ -264,6 +289,11 @@ def get_files_for_ids(ids: list[int]) -> dict[str, list[dict[str, Any]]] | None:
 
 @app.route('/get_rastermaps', methods=['POST'])
 def get_rastermaps() -> str:
+    """Retrieve raster overlay maps for the requested entity IDs.
+
+    Expects a JSON body containing a list of IDs and returns the
+    associated map details.
+    """
     data = request.get_json()
     if not data or 'ids' not in data:
         abort(400, "Missing 'ids' in request body")
@@ -275,11 +305,22 @@ def get_rastermaps() -> str:
 
 @app.route('/presentation-view/<int:id_>')
 def presentation_view(id_: int) -> dict[str, Any]:
+    """Retrieve full presentation details for an entity as a dictionary.
+
+    Converts the structured PresentationView model into a plain
+    dictionary representation.
+    """
     return asdict(PresentationView.from_api(id_))
 
 
 @app.route('/entity-data/<int:id_>')
 def entity_data(id_: int) -> dict[str, Any]:
+    """Generate all contextual display data for an entity page.
+
+    Aggregates details including hierarchy, spatial geometries, overview
+    map layouts, categorized division types, images, and citation
+    helper buttons.
+    """
     entity = PresentationView.from_api(id_)
     data = get_sub_count(entity)
     hierarchy = {

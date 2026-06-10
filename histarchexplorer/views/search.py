@@ -6,6 +6,11 @@ from histarchexplorer.utils.view_util import render_page_template
 
 @app.route('/search', methods=['GET', 'POST'])
 def search() -> str:
+    """Render the advanced search page and process search requests.
+
+    Supports custom text queries, system class filtering, and category
+    restrictions.
+    """
     search_service = g.search_service
 
     results = []
@@ -33,6 +38,10 @@ def search() -> str:
 
 @app.route('/search_live')
 def search_live() -> Response:
+    """Perform real-time live search and return the results as JSON.
+
+    Used by autocomplete or quick search bars in the navigation layout.
+    """
     search_service = g.search_service
 
     query = request.args.get('q', '').strip()
