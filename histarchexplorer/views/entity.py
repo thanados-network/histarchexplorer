@@ -78,7 +78,12 @@ def get_entity(id_: int, tab_name: str) -> str:
 
     match tab_name:
         case 'feature':
-            pass
+            data = entity_data(id_)
+            return render_template(
+                'tabs/feature.html',
+                entity=data['entity'],
+                categorized_types=data['categorizedTypes'],
+                main_image=data['mainImage'])
         case 'map':
             pass
         case 'media':

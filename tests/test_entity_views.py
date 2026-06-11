@@ -92,11 +92,99 @@ def test_get_entity_tabs(authenticated_client: FlaskClient) -> None:
         settings.access_restriction = False
         mock_settings.return_value = settings
         mock_sub.return_value = {'counts': {}}
-        
-        tabs = ['overview', 'map', 'media', 'subunits']
+        pv = PresentationView(
+            id=1, system_class="feature", view_class="feature",
+            title="Test Feature", description={"en": "Test"},
+            aliases=[], start="2023", end="2024"
+        )
+        pv.geometries = []
+        pv.types = []
+        pv.relations = {
+            'stratigraphic_unit': [
+                Relation(
+                    id=10,
+                    name='SU 10',
+                    system_class='stratigraphic_unit',
+                    description={'en': 'Primary burial cut'},
+                    aliases=['SU-X'],
+                    relation_types=[{
+                        'relationTo': 1,
+                        'property': 'crm:P46i_forms_part_of'}],
+                    types=[
+                        EntityTypeModel(
+                            id=101,
+                            title='Grave fill',
+                            descriptions=None,
+                            is_standard=True,
+                            type_hierarchy=None,
+                            value=None,
+                            unit=None,
+                            division=None)],
+                    geometries=[],
+                    geometry_json={})],
+            'artifact': [
+                Relation(
+                    id=20,
+                    name='Artifact A',
+                    system_class='artifact',
+                    description={'en': 'Bronze brooch with spiral motif'},
+                    aliases=['A-20'],
+                    relation_types=[{
+                        'relationTo': 10,
+                        'property': 'crm:P46i_forms_part_of'}],
+                    types=[
+                        EntityTypeModel(
+                            id=102,
+                            title='Brooch',
+                            descriptions=None,
+                            is_standard=True,
+                            type_hierarchy=None,
+                            value=None,
+                            unit=None,
+                            division=None)],
+                    geometries=[],
+                    geometry_json={})],
+            'human_remains': [
+                Relation(
+                    id=30,
+                    name='Remains R',
+                    system_class='human_remains',
+                    description={'en': 'Adult individual, supine position'},
+                    aliases=['HR-30'],
+                    relation_types=[{
+                        'relationTo': 10,
+                        'property': 'crm:P46i_forms_part_of'}],
+                    types=[
+                        EntityTypeModel(
+                            id=103,
+                            title='Inhumation',
+                            descriptions=None,
+                            is_standard=True,
+                            type_hierarchy=None,
+                            value=None,
+                            unit=None,
+                            division=None)],
+                    geometries=[],
+                    geometry_json={})]}
+        pv.files = []
+        pv.references = []
+        pv.geometry_json = {}
+        mock_from_api.return_value = pv
+
+        tabs = ['overview', 'map', 'media', 'subunits', 'feature']
         for tab in tabs:
             rv = authenticated_client.get(f'/get_entity/1/{tab}')
             assert rv.status_code == 200
+            if tab == 'feature':
+                assert b'Stratigraphic Overview' in rv.data
+                assert b'SU 10' in rv.data
+                assert b'Artifact A' in rv.data
+                assert b'Remains R' in rv.data
+                assert b'Artifact Details' in rv.data
+                assert b'Human Remains Details' in rv.data
+                assert b'Bronze brooch with spiral motif' in rv.data
+                assert b'Adult individual, supine position' in rv.data
+                assert b'thanados.openatlas.eu/api/query/' not in rv.data
 
 def test_get_rastermaps(authenticated_client: FlaskClient) -> None:
     with patch('histarchexplorer.views.entity.get_files_for_ids') as mock_get:

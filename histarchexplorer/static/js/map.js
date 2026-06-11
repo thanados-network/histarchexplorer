@@ -1196,6 +1196,8 @@
             });
     }
 
+    window.setSidebarContent = setSidebarContent;
+
 
     document.getElementById('tab-map').addEventListener('click', function (event) {
         if (notYetClickedTabs.includes('map') && !onePointFeature) {

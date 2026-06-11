@@ -1,56 +1,187 @@
 {% import '_macros.html' as ui %}
-<div id="map-sidebar-content container-fluid ">
-  <div class="row">
-    <div class="col">
-      <h2 id="feature-{{ entity.id }}">
-        {{ entity.title }}
-        <a href="{{ url_for('entity_view', id_=entity.id) }}">
-          <i class="bi bi-box-arrow-up-right"></i>
-        </a>
-      </h2>
-      <h5>
-        {% for type in entity.types %}
-          {% if type.is_standard %}
-            <p>{{ type.title | upper }}</p>
-          {% endif %}
-        {% endfor %}
-      </h5>
-    </div>
 
-    <div class="row ">
-      <p>{{ entity.description[current_language] }}</p>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-4">
-      {% if main_image %}
-        {{ ui.overview_image(main_image, manifests) }}
+{% macro image_src(file_obj, width, height) -%}
+  {% if file_obj and file_obj.iiif_base_path %}
+    {{ file_obj.iiif_base_path }}/full/!{{ width }},{{ height }}/0/default.jpg
+  {% elif file_obj and file_obj.url %}
+    {{ file_obj.url }}
+  {% else %}
+    https://dummyimage.com/{{ width }}x{{ height }}/e9ecef/6c757d.png&text=No+Image
+  {% endif %}
+{%- endmacro %}
+
+{% macro relation_details(item, heading) -%}
+  <div class="mt-2">
+    <strong class="small d-block">{{ heading }}</strong>
+    <div class="small">
+      <p class="mb-1">
+        <span class="fw-semibold">Name:</span>
+        {{ item.name }}
+        <span class="text-muted">(#{{ item.id }})</span>
+      </p>
+
+      {% set type_labels = item.types | selectattr('is_standard') |
+        map(attribute='title') | list %}
+      {% if type_labels %}
+        <p class="mb-1">
+          <span class="fw-semibold">Classification:</span>
+          {{ type_labels | join(', ') }}
+        </p>
+      {% endif %}
+
+      {% if item.aliases %}
+        <p class="mb-1">
+          <span class="fw-semibold">Aliases:</span>
+          {{ item.aliases | join(', ') }}
+        </p>
+      {% endif %}
+
+      {% if item.description and item.description.get('en') %}
+        <p class="mb-1">
+          <span class="fw-semibold">Description:</span>
+          {{ item.description.get('en') }}
+        </p>
       {% endif %}
     </div>
+  </div>
+{%- endmacro %}
 
-    {% if categorized_types %}
-      <div class="attribute-area col-8">
-        <!-- Attributes -->
-        <span class="tile-label">{{ _('attributes') | upper }}</span>
-        <div class="categorized-types">
-          {% for label, value in categorized_types.items() %}
-            <p class="tile-sub-label text-uppercase mt-3">
-              {{ value[0]['icon'] | safe }} {{ label.replace('_', ' ').title() }}</p>
-            {% for type in value %}
-              <div class="badge custom-badge text-wrap m-1">
-                <h6 class="m-0 text-center">
-                  {{ type.type.title }}
-                  {% if type.type.value and type.type.unit %}:
-                    {{ type.type.value }}
-                    {{ type.type.unit }}
-                  {% endif %}
-                </h6>
-              </div>
-            {% endfor %}
-          {% endfor %}
+<div class="container-fluid" id="map-sidebar-content">
+  <div class="row g-3">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h2 class="mb-1" id="feature-{{ entity.id }}">
+            {{ entity.title }}
+            <a class="ms-1" href="{{ url_for('entity_view', id_=entity.id) }}" title="Open full entity page">
+              <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+          </h2>
+          <p class="text-muted mb-0">Feature ID: {{ entity.id }}</p>
         </div>
       </div>
-    {% endif %}
+
+      <div class="row g-2 mt-2 align-items-start">
+        <div class="col-12 col-md-5 col-lg-4">
+          <img class="img-fluid rounded border"
+            src="{{ image_src(main_image, 320, 180) }}"
+            alt="Image for feature {{ entity.title }}">
+        </div>
+      </div>
+
+      {% set standard_types = entity.types | selectattr('is_standard') | list %}
+      {% if standard_types %}
+        <div class="mt-2">
+          {% for type in standard_types %}
+            <span class="badge text-bg-secondary me-1 mb-1">
+              {{ type.title | upper }}
+            </span>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% set su_ns = namespace(items=[]) %}
+      {% for su in entity.relations.get('stratigraphic_unit', []) %}
+        {% for rel_type in su.relation_types or [] %}
+          {% if rel_type.get('relationTo') == entity.id and rel_type.get('property') == 'crm:P46i_forms_part_of' %}
+            {% set su_ns.items = su_ns.items + [su] %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+
+      <div class="card mt-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <strong>Stratigraphic Overview</strong>
+          <span class="badge text-bg-dark">{{ su_ns.items | length }} SU</span>
+        </div>
+        <div class="card-body">
+          {% if su_ns.items %}
+            {% for su in su_ns.items | sort(attribute='name') %}
+              {% set artifact_ns = namespace(items=[]) %}
+              {% for artifact in entity.relations.get('artifact', []) %}
+                {% for rel_type in artifact.relation_types or [] %}
+                  {% if rel_type.get('relationTo') == su.id and rel_type.get('property') == 'crm:P46i_forms_part_of' %}
+                    {% set artifact_ns.items = artifact_ns.items + [artifact] %}
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+
+              {% set remain_ns = namespace(items=[]) %}
+              {% for remains in entity.relations.get('human_remains', []) %}
+                {% for rel_type in remains.relation_types or [] %}
+                  {% if rel_type.get('relationTo') == su.id and rel_type.get('property') == 'crm:P46i_forms_part_of' %}
+                    {% set remain_ns.items = remain_ns.items + [remains] %}
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+
+              <article class="border rounded p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-start">
+                  <h6 class="mb-1">{{ su.name }}</h6>
+                  <span class="text-muted small">SU ID: {{ su.id }}</span>
+                </div>
+
+                <div class="row g-2 mt-1 mb-2 align-items-start">
+                  <div class="col-12 col-md-4">
+                    <img class="img-fluid rounded border"
+                      src="https://dummyimage.com/280x160/e9ecef/6c757d.png&text=No+Image"
+                      alt="Image for stratigraphic unit {{ su.name }}">
+                  </div>
+                </div>
+
+                <div class="small text-muted mb-2">
+                  {{ artifact_ns.items | length }} artifacts,
+                  {{ remain_ns.items | length }} human remains
+                </div>
+
+                <div class="row g-2">
+                  <div class="col-md-6">
+                    <strong class="small d-block">Artifacts</strong>
+                    {% if artifact_ns.items %}
+                      <div class="small">
+                        {% for artifact in artifact_ns.items | sort(attribute='name') %}
+                          <div class="border rounded p-2 mb-2">
+                            <img class="img-fluid rounded border mb-2"
+                              src="https://dummyimage.com/280x160/e9ecef/6c757d.png&text=No+Image"
+                              alt="Image for artifact {{ artifact.name }}">
+                            {{ relation_details(artifact, 'Artifact Details') }}
+                          </div>
+                        {% endfor %}
+                      </div>
+                    {% else %}
+                      <p class="mb-0 small text-muted">No artifacts linked.</p>
+                    {% endif %}
+                  </div>
+
+                  <div class="col-md-6">
+                    <strong class="small d-block">Human remains</strong>
+                    {% if remain_ns.items %}
+                      <div class="small">
+                        {% for remains in remain_ns.items | sort(attribute='name') %}
+                          <div class="border rounded p-2 mb-2">
+                            <img class="img-fluid rounded border mb-2"
+                              src="https://dummyimage.com/280x160/e9ecef/6c757d.png&text=No+Image"
+                              alt="Image for human remains {{ remains.name }}">
+                            {{ relation_details(remains, 'Human Remains Details') }}
+                          </div>
+                        {% endfor %}
+                      </div>
+                    {% else %}
+                      <p class="mb-0 small text-muted">No human remains linked.</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </article>
+            {% endfor %}
+          {% else %}
+            <p class="mb-0 text-muted">
+              No stratigraphic units with
+              <code>crm:P46i_forms_part_of</code> relation to this feature.
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
