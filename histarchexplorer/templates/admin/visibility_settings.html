@@ -68,8 +68,7 @@
           <p class="text-muted small mb-3">
             {{ _('Checked classes will be explicitly shown in the browse interface.') }}
           </p>
-          <div class="checkbox-list-container border rounded p-3 bg-light"
-               style="max-height: 400px; overflow-y: auto;">
+          <div class="checkbox-list-container border rounded p-3 bg-light">
             {% for view_class, categories in view_classes.items() %}
               <h6 class="dropdown-header mt-2 text-primary border-bottom pb-1">
                 {{ _(view_class) | upper }}
@@ -99,8 +98,7 @@
           <p class="text-muted small mb-3">
             {{ _('Checked classes will be hidden from the browse interface.') }}
           </p>
-          <div class="checkbox-list-container border rounded p-3 bg-light"
-               style="max-height: 400px; overflow-y: auto;">
+          <div class="checkbox-list-container border rounded p-3 bg-light">
             {% for view_class, categories in view_classes.items() %}
               <h6 class="dropdown-header mt-2 text-primary border-bottom pb-1">
                 {{ _(view_class) | upper }}

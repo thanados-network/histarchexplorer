@@ -59,7 +59,8 @@ class Settings(BaseModel):
         'place', 'feature', 'stratigraphic_unit',
         'artifact', 'human_remains', 'person', 'group',
         'acquisition', 'event', 'activity', 'creation',
-        'move', 'production', 'modification']
+        'move', 'production', 'modification', 'type',
+        'source', 'file']
     shown_types: list[int] = []
     hidden_classes: list[str] = []
     hidden_types: list[int] = []

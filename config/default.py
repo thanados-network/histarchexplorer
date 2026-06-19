@@ -66,7 +66,7 @@ else:
 
 # Data handling
 CLASSES_TO_SKIP = {  # Entity classes excluded from processing
-    'object_location', 'type', 'appellation', 'administrative_unit',
+    'object_location', 'appellation', 'administrative_unit',
     'source_translation', 'type_tools', 'reference_system'}
 
 # Entity groups shown in views
@@ -78,7 +78,8 @@ VIEW_CLASSES = {
     'events': ('acquisition', 'event', 'activity', 'creation', 'move',
                'production', 'modification'),
     'sources': ('source', 'bibliography', 'external_reference', 'edition'),
-    'files': ('file',)}
+    'files': ('file',),
+    'types': ('type',)}
 
 # # Commonly used standard entity types
 # STANDARD_TYPES = [

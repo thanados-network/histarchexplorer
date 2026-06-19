@@ -21,7 +21,7 @@ class ApiAccess:
         returns a dictionary mapping class names to their total counts.
         """
         return requests.get(
-            f"{app.config['API_URL']}/system_class_count/",
+            f"{app.config['API_URL']}system_class_count/",
             params=parser.__dict__,
             headers=g.api_headers,
             proxies=PROXIES,
@@ -61,7 +61,7 @@ class ApiAccess:
                 - publicShareable (bool): Shareability flag.
         """
         return requests.get(
-            f"{app.config['API_URL']}/files_of_entities/",
+            f"{app.config['API_URL']}files_of_entities/",
             headers=g.api_headers,
             proxies=PROXIES,
             timeout=60).json()
@@ -85,8 +85,9 @@ class ApiAccess:
                 - isStandard (bool): Whether it is a standard system type.
         """
         return requests.get(
-            f"{app.config['API_URL']}/type_by_view_class/",
+            f"{app.config['API_URL']}type_by_view_class/",
             headers=g.api_headers,
+            proxies=PROXIES,
             timeout=20).json()
 
     @staticmethod

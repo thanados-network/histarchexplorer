@@ -67,6 +67,7 @@
             <div class="entity-card__icon">
               <img
                 src="/static/images/entity_icons/{{ view_class[:-1] | lower }}.png"
+                onerror="this.src='/static/images/entity_icons/item.png'"
                 alt="{{ view_class }}">
             </div>
             <div class="entity-card__label">{{ _(view_class) | capitalize }}</div>

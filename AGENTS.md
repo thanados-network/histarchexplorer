@@ -19,6 +19,9 @@
 - **Execution**: `pytest` in the root directory.
 - **Configuration**: `tests/conftest.py` contains the Flask app fixture.
 - **Coverage**: `pytest --cov=histarchexplorer`
+- **Optimization**: 
+  - External API calls (e.g. to `thanados.openatlas.eu`) MUST be mocked (see `tests/conftest.py`).
+  - Slow tests should be marked with `@pytest.mark.slow` and can be excluded with `-m "not slow"`.
 
 ### Database Upgrades
 - **Track changes**: Any change to the schema or data *must* be fully documented.

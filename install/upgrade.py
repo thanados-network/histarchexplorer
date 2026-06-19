@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any
 
 import psycopg2
+import psycopg2.extras
 
 
 def parse_version(filename: str) -> tuple[int, ...]:
@@ -105,14 +106,46 @@ def main() -> None:
 
         if not pending:
             print("Database is up to date. No pending migrations.")
-            return
+        else:
+            for _, version_str, filepath in pending:
+                with conn:
+                    with conn.cursor() as cur:
+                        apply_migration(cur, filepath, version_str)
 
-        for _, version_str, filepath in pending:
-            with conn:
-                with conn.cursor() as cur:
-                    apply_migration(cur, filepath, version_str)
+            print("Database upgrade completed successfully.")
 
-        print("Database upgrade completed successfully.")
+        try:
+            with app.test_request_context():
+                from flask import g
+                from histarchexplorer.models.admin import ConfigEntity
+                from histarchexplorer.models.config import Link
+                from histarchexplorer.views.admin import refresh_system_cache
+
+                # Initialize g for refresh_system_cache
+                g.db = conn
+                g.cursor = conn.cursor(
+                    cursor_factory=psycopg2.extras.RealDictCursor)
+
+                g.api_headers = {}
+                if app.config['API_TOKEN']:
+                    g.api_headers["Authorization"] = (
+                        f"Bearer {app.config['API_TOKEN']}")
+
+                # Mock g for localization and other things
+                g.language = 'en'
+                g.preferred_language = 'en'
+                g.config_links = Link.get_all()
+
+                # Mock g.case_study_ids as it is used in refresh_system_cache
+                g.case_study_ids = [
+                    c.case_study for c in ConfigEntity.get_all_localized()
+                    if c.case_study]
+
+                refresh_system_cache()
+                print("System cache refreshed successfully.")
+        except Exception as cache_error:
+            print(f"Failed to refresh system cache: {cache_error}")
+
     except Exception as e:
         print(f"Upgrade failed: {e}")
         raise
