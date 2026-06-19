@@ -1,90 +1,268 @@
 <form action="{{ url_for('update_type_divisions') }}" method="post">
-  <div id="type-divisions-container">
+  <div id="type-divisions-container" class="row row-cols-1 row-cols-md-2 g-4 mb-4">
     {% for label, division in settings.type_divisions.items() %}
-      <div class="card mb-3" data-label="{{ label }}">
-        <div class="card-header">
-          <div class="d-flex justify-content-between align-items-center">
-            <input type="text" class="form-control" name="label_{{ loop.index0 }}" value="{{ label }}">
-            <button type="button" class="btn btn-danger btn-sm ms-2" onclick="removeDivision(this)">
-              {{ _('Remove Division') }}
+      <div class="col" data-label="{{ label }}">
+        <div class="card h-100 shadow-sm border rounded">
+          <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+            <div class="input-group input-group-sm w-75">
+              <span class="input-group-text bg-white"><i class="bi bi-tag-fill text-muted"></i></span>
+              <input type="text" class="form-control fw-bold"
+                     name="label_{{ loop.index0 }}" value="{{ label }}"
+                     required placeholder="{{ _('Division Label') }}">
+            </div>
+            <button type="button" class="btn btn-outline-danger btn-sm"
+                    onclick="removeDivision(this)">
+              <i class="bi bi-trash"></i>
             </button>
           </div>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-4">
-              <label class="form-label">{{ _('Icon Type') }}</label>
-              <select class="form-select" name="icon_type_{{ loop.index0 }}">
-                <option value="css" {% if division.icon_type == 'css' %}selected{% endif %}>CSS</option>
-                <option value="img" {% if division.icon_type == 'img' %}selected{% endif %}>Image</option>
-                <option value="" {% if not division.icon_type %}selected{% endif %}>None</option>
-              </select>
+          <div class="card-body p-3">
+            <div class="row g-2 align-items-end mb-3">
+              <div class="col-md-5">
+                <label class="form-label text-muted small fw-bold mb-1">{{ _('Icon Type') }}</label>
+                <select class="form-select form-select-sm"
+                        name="icon_type_{{ loop.index0 }}"
+                        id="icon_type_{{ loop.index0 }}"
+                        onchange="toggleIconType({{ loop.index0 }})">
+                  <option value="css" {% if division.icon_type == 'css' %}selected{% endif %}>CSS Class</option>
+                  <option value="img" {% if division.icon_type == 'img' %}selected{% endif %}>SVG Icon</option>
+                  <option value="" {% if not division.icon_type %}selected{% endif %}>None</option>
+                </select>
+              </div>
+              <div class="col-md-7">
+                <div id="css_container_{{ loop.index0 }}" class="d-none">
+                  <label class="form-label text-muted small fw-bold mb-1">
+                    {{ _('Bootstrap Icon Class') }}
+                  </label>
+                  <input type="text" class="form-control form-select-sm"
+                         id="css_input_{{ loop.index0 }}"
+                         name="icon_value_{{ loop.index0 }}"
+                         value="{{ division.icon_value or '' }}"
+                         oninput="updatePreview({{ loop.index0 }})"
+                         placeholder="e.g. bi-tags">
+                </div>
+                <div id="img_container_{{ loop.index0 }}" class="d-none">
+                  <label class="form-label text-muted small fw-bold mb-1">
+                    {{ _('SVG Icon File') }}
+                  </label>
+                  <select class="form-select form-select-sm"
+                          id="img_select_{{ loop.index0 }}"
+                          name="icon_value_{{ loop.index0 }}"
+                          onchange="updatePreview({{ loop.index0 }})">
+                    <option value="">{{ _('Select Icon...') }}</option>
+                    {% for icon in admin_instance.icons %}
+                      <option value="{{ icon.filename }}"
+                              {% if division.icon_type == 'img' and division.icon_value == icon.filename %}
+                                selected
+                              {% endif %}>
+                        {{ icon.filename }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
             </div>
-            <div class="col-md-8">
-              <label class="form-label">{{ _('Icon Value') }}</label>
-              <input type="text" class="form-control" name="icon_value_{{ loop.index0 }}"
-                     value="{{ division.icon_value or '' }}">
+
+            <div class="d-flex align-items-center gap-3 mb-3 p-2 bg-light rounded border"
+                 style="min-height: 48px;">
+              <span class="text-muted small fw-bold">{{ _('Preview:') }}</span>
+              <div id="preview_container_{{ loop.index0 }}"
+                   class="d-flex align-items-center justify-content-center text-primary"
+                   style="width: 32px; height: 32px;"></div>
             </div>
-          </div>
-          <div class="mt-3">
-            <label class="form-label">{{ _('IDs') }}</label>
-            <input type="text" class="form-control" name="ids_{{ loop.index0 }}"
-                   value="{{ division.ids|join(', ') }}">
-            <small class="form-text text-muted">{{ _('Comma-separated list of IDs.') }}</small>
+
+            <div class="mb-0">
+              <label class="form-label text-muted small fw-bold mb-1">
+                {{ _('Type IDs (comma-separated)') }}
+              </label>
+              <input type="text" class="form-control form-select-sm"
+                     name="ids_{{ loop.index0 }}"
+                     value="{{ division.ids|join(', ') }}"
+                     placeholder="e.g. 101, 102">
+            </div>
           </div>
         </div>
       </div>
     {% endfor %}
   </div>
-  <button type="button" class="btn btn-success" onclick="addDivision()">
-    {{ _('Add Division') }}
-  </button>
-  <button type="submit" class="btn btn-primary mt-3">
-    {{ _('save changes') | upper }}
-  </button>
+
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <button type="button" class="btn btn-success" onclick="addDivision()">
+      <i class="bi bi-plus-circle me-1"></i>{{ _('Add Division') }}
+    </button>
+    <button type="submit" class="btn btn-primary px-4">
+      <i class="bi bi-save me-1"></i>{{ _('SAVE CHANGES') }}
+    </button>
+  </div>
 </form>
 
 <script>
+  let divisionCounter = {{ settings.type_divisions.items() | length }};
+
+  const iconUrls = {
+    {% for icon in admin_instance.icons %}
+      "{{ icon.filename }}": "{{ get_icon_url(icon.filename) }}",
+    {% endfor %}
+  };
+
+  const iconOptionsHtml = `
+    <option value="">{{ _('Select Icon...') }}</option>
+    {% for icon in admin_instance.icons %}
+      <option value="{{ icon.filename }}">{{ icon.filename }}</option>
+    {% endfor %}
+  `;
+
+  function toggleIconType(index) {
+    const typeSelect = document.getElementById(`icon_type_${index}`);
+    const cssContainer = document.getElementById(`css_container_${index}`);
+    const imgContainer = document.getElementById(`img_container_${index}`);
+    const cssInput = document.getElementById(`css_input_${index}`);
+    const imgSelect = document.getElementById(`img_select_${index}`);
+    const previewContainer = document.getElementById(`preview_container_${index}`);
+
+    if (!typeSelect) return;
+
+    if (typeSelect.value === 'css') {
+      cssContainer.classList.remove('d-none');
+      imgContainer.classList.add('d-none');
+      cssInput.setAttribute('name', `icon_value_${index}`);
+      imgSelect.removeAttribute('name');
+      updatePreview(index);
+    } else if (typeSelect.value === 'img') {
+      cssContainer.classList.add('d-none');
+      imgContainer.classList.remove('d-none');
+      imgSelect.setAttribute('name', `icon_value_${index}`);
+      cssInput.removeAttribute('name');
+      updatePreview(index);
+    } else {
+      cssContainer.classList.add('d-none');
+      imgContainer.classList.add('d-none');
+      cssInput.removeAttribute('name');
+      imgSelect.removeAttribute('name');
+      if (previewContainer) {
+        previewContainer.innerHTML = '';
+      }
+    }
+  }
+
+  function updatePreview(index) {
+    const typeSelect = document.getElementById(`icon_type_${index}`);
+    const previewContainer = document.getElementById(`preview_container_${index}`);
+    if (!typeSelect || !previewContainer) return;
+
+    if (typeSelect.value === 'css') {
+      const cssInput = document.getElementById(`css_input_${index}`);
+      const val = cssInput ? cssInput.value.trim() : '';
+      if (val) {
+        let classes = val;
+        if (!val.startsWith('bi ') && !val.split(' ').includes('bi')) {
+          classes = 'bi ' + val;
+        }
+        previewContainer.innerHTML = `<span class="fs-4"><i class="${classes}"></i></span>`;
+      } else {
+        previewContainer.innerHTML = '';
+      }
+    } else if (typeSelect.value === 'img') {
+      const imgSelect = document.getElementById(`img_select_${index}`);
+      const selectedIcon = imgSelect ? imgSelect.value : '';
+      if (selectedIcon && iconUrls[selectedIcon]) {
+        previewContainer.innerHTML = `<img src="${iconUrls[selectedIcon]}" ` +
+          `style="max-height: 32px; max-width: 32px; object-fit: contain;" alt="preview">`;
+      } else {
+        previewContainer.innerHTML = '';
+      }
+    } else {
+      previewContainer.innerHTML = '';
+    }
+  }
+
   function addDivision() {
     const container = document.getElementById('type-divisions-container');
-    const newIndex = container.children.length;
-    const newDivision = document.createElement('div');
-    newDivision.className = 'card mb-3';
-    newDivision.innerHTML = `
-      <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center">
-          <input type="text" class="form-control" name="label_${newIndex}" placeholder="New Label">
-          <button type="button" class="btn btn-danger btn-sm ms-2" onclick="removeDivision(this)">
-            {{ _('Remove Division') }}
+    const index = divisionCounter;
+    divisionCounter++;
+
+    const col = document.createElement('div');
+    col.className = 'col';
+    col.setAttribute('data-label', '');
+    col.innerHTML = `
+      <div class="card h-100 shadow-sm border rounded">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+          <div class="input-group input-group-sm w-75">
+            <span class="input-group-text bg-white"><i class="bi bi-tag-fill text-muted"></i></span>
+            <input type="text" class="form-control fw-bold"
+                   name="label_${index}" required placeholder="{{ _('Division Label') }}">
+          </div>
+          <button type="button" class="btn btn-outline-danger btn-sm"
+                  onclick="removeDivision(this)">
+            <i class="bi bi-trash"></i>
           </button>
         </div>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-4">
-            <label class="form-label">{{ _('Icon Type') }}</label>
-            <select class="form-select" name="icon_type_${newIndex}">
-              <option value="css">CSS</option>
-              <option value="img">Image</option>
-              <option value="">None</option>
-            </select>
+        <div class="card-body p-3">
+          <div class="row g-2 align-items-end mb-3">
+            <div class="col-md-5">
+              <label class="form-label text-muted small fw-bold mb-1">{{ _('Icon Type') }}</label>
+              <select class="form-select form-select-sm"
+                      name="icon_type_${index}"
+                      id="icon_type_${index}"
+                      onchange="toggleIconType(${index})">
+                <option value="css">CSS Class</option>
+                <option value="img">SVG Icon</option>
+                <option value="" selected>None</option>
+              </select>
+            </div>
+            <div class="col-md-7">
+              <div id="css_container_${index}" class="d-none">
+                <label class="form-label text-muted small fw-bold mb-1">
+                  {{ _('Bootstrap Icon Class') }}
+                </label>
+                <input type="text" class="form-control form-select-sm"
+                       id="css_input_${index}"
+                       name="icon_value_${index}"
+                       oninput="updatePreview(${index})"
+                       placeholder="e.g. bi-tags">
+              </div>
+              <div id="img_container_${index}" class="d-none">
+                <label class="form-label text-muted small fw-bold mb-1">
+                  {{ _('SVG Icon File') }}
+                </label>
+                <select class="form-select form-select-sm"
+                        id="img_select_${index}"
+                        name="icon_value_${index}"
+                        onchange="updatePreview(${index})">
+                  ${iconOptionsHtml}
+                </select>
+              </div>
+            </div>
           </div>
-          <div class="col-md-8">
-            <label class="form-label">{{ _('Icon Value') }}</label>
-            <input type="text" class="form-control" name="icon_value_${newIndex}" placeholder="Icon Value">
+
+          <div class="d-flex align-items-center gap-3 mb-3 p-2 bg-light rounded border"
+               style="min-height: 48px;">
+            <span class="text-muted small fw-bold">{{ _('Preview:') }}</span>
+            <div id="preview_container_${index}"
+                 class="d-flex align-items-center justify-content-center text-primary"
+                 style="width: 32px; height: 32px;"></div>
           </div>
-        </div>
-        <div class="mt-3">
-          <label class="form-label">{{ _('IDs') }}</label>
-          <input type="text" class="form-control" name="ids_${newIndex}" placeholder="e.g., 123, 456, 789">
-          <small class="form-text text-muted">{{ _('Comma-separated list of IDs.') }}</small>
+
+          <div class="mb-0">
+            <label class="form-label text-muted small fw-bold mb-1">
+              {{ _('Type IDs (comma-separated)') }}
+            </label>
+            <input type="text" class="form-control form-select-sm"
+                   name="ids_${index}" placeholder="e.g. 101, 102">
+          </div>
         </div>
       </div>
     `;
-    container.appendChild(newDivision);
+    container.appendChild(col);
+    toggleIconType(index);
   }
 
   function removeDivision(button) {
-    button.closest('.card').remove();
+    button.closest('.col').remove();
   }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    {% for label, division in settings.type_divisions.items() %}
+      toggleIconType({{ loop.index0 }});
+    {% endfor %}
+  });
 </script>

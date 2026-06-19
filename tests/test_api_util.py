@@ -102,3 +102,20 @@ def test_get_divisions(app_instance):
         # No match
         res = get_divisions(99, [])
         assert res['label'] == 'other'
+
+
+def test_create_image_icon(app_instance):
+    from histarchexplorer import create_image_icon
+    with app_instance.test_request_context():
+        with patch('os.path.exists') as mock_exists:
+            # Test when the custom uploaded icon exists
+            mock_exists.return_value = True
+            html = create_image_icon("custom.svg")
+            assert "/uploads/icons/custom.svg" in html
+            assert 'width="16"' in html
+
+            # Test when it falls back to static icon
+            mock_exists.return_value = False
+            html = create_image_icon("default.svg")
+            assert "static" in html
+            assert "default.svg" in html

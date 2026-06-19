@@ -67,9 +67,16 @@ def create_icon(css_class: str) -> str:
 
 
 def create_image_icon(file_name: str) -> str:
-    filepath = url_for("static", filename="images/entity_icons/")
-    return (f'<img src="{filepath + file_name}" '
-            f'width="16" height="16" alt="{file_name}"/>')
+    uploads_path = os.path.join(
+        app.root_path, "..", "uploads", "icons")
+    if os.path.exists(os.path.join(uploads_path, file_name)):
+        url = url_for("uploaded_icon", filename=file_name)
+    else:
+        url = url_for(
+            "static", filename=f"images/entity_icons/{file_name}")
+    return (
+        f'<img src="{url}" width="16" height="16" '
+        f'alt="{file_name}"/>')
 
 
 def get_sidebar_icons() -> dict[int, str]:
