@@ -110,8 +110,8 @@
             if (!iiifObj) return; // keep grey fallback
 
             // request a crisp raster sized to the tile and DPR
-            const tileW = Math.max(el.clientWidth, 1);
-            const tileH = Math.max(el.clientHeight, 1);
+            const tileW = el.clientWidth > 10 ? el.clientWidth : 200;
+            const tileH = el.clientHeight > 10 ? el.clientHeight : 360;
             const wReq = Math.round(tileW * QUALITY * DPRCAP);
             const hReq = Math.round(tileH * QUALITY * DPRCAP);
 
@@ -127,7 +127,9 @@
                 const imgW = img.naturalWidth || 1;
                 const imgH = img.naturalHeight || 1;
 
-                const tileAR = tileW / tileH;   // tile aspect ratio
+                const actualW = el.clientWidth > 10 ? el.clientWidth : tileW;
+                const actualH = el.clientHeight > 10 ? el.clientHeight : tileH;
+                const tileAR = actualW / actualH;   // tile aspect ratio
                 const imgAR = imgW / imgH;     // image aspect ratio
 
                 // Width percentages that emulate CSS cover/contain (but animatable)
