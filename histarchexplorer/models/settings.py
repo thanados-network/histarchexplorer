@@ -79,7 +79,8 @@ class Settings(BaseModel):
         'sources': '#5c2a36',
         'files': '#1f253d',
         'feature': '#BBBBBB',
-        'stratigraphic_unit': '#000000'}
+        'stratigraphic_unit': '#000000',
+        'types': '#4477AA'}
     available_colors: list[str] = [
         '#23cba7', '#e83e8c', '#2980b9', '#fddb6d', '#5c2a36', '#1f253d',
         '#4477AA', '#EE6677', '#228833', '#CCBB44', '#66CCEE', '#AA3377',

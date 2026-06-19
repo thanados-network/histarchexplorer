@@ -50,7 +50,7 @@
 
 <form method="POST" action="{{ url_for('update_entity_colors') }}">
   <div class="row">
-    {% for entity_type in ['places', 'actors', 'events', 'items', 'sources', 'files', 'feature', 'stratigraphic_unit'] %}
+    {% for entity_type in ['places', 'actors', 'events', 'items', 'sources', 'files', 'feature', 'stratigraphic_unit', 'types'] %}
       <div class="col-md-3 mb-4">
         <label class="form-label fw-bold">{{ _(entity_type) | capitalize | replace('_', ' ') }}</label>
         <div class="selected-color-display"

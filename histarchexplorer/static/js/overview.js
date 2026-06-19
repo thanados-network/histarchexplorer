@@ -424,7 +424,8 @@ function renderAttributes(categorizedTypes) {
             };
 
             let popoverHtml = `<div class="popover-content text-start">`;
-            popoverHtml += `<div><a href="/entity/${t.id}">` +
+            popoverHtml += `<div><a href="/entity/${t.id}" ` +
+                `style="color: var(--entity-color-types); text-decoration: none;">` +
                 `<strong>${t.title || ""}</strong></a></div>`;
             const desc = getTranslatedDescription(t.descriptions);
             if (desc) {
@@ -447,13 +448,17 @@ function renderAttributes(categorizedTypes) {
                 const parentLink = `/entity/${parentId}`;
                 popoverHtml += `<div class="mt-2 small">` +
                     `<strong>Subcategorie of:</strong> ` +
-                    `<a href="${parentLink}">${parent.label || ""}</a>` +
+                    `<a href="${parentLink}" ` +
+                    `style="color: var(--entity-color-types); text-decoration: none;">` +
+                    `${parent.label || ""}</a>` +
                     `</div>`;
 
                 const rootLink = `/entity/${rootId}`;
                 popoverHtml += `<div class="mt-1 small">` +
                     `<strong>Hierarchy:</strong> ` +
-                    `<a href="${rootLink}">${root.label || ""}</a>` +
+                    `<a href="${rootLink}" ` +
+                    `style="color: var(--entity-color-types); text-decoration: none;">` +
+                    `${root.label || ""}</a>` +
                     `</div>`;
             }
             popoverHtml += `</div>`;

@@ -90,6 +90,7 @@ def test_admin_asset_specific(authenticated_client: FlaskClient):
     }, follow_redirects=True)
     assert rv.status_code == 200
 
+@pytest.mark.slow
 def test_admin_cache_routes(authenticated_client: FlaskClient):
     with patch('subprocess.Popen'):
         rv = authenticated_client.get('/admin/warm-entity-cache', follow_redirects=True)

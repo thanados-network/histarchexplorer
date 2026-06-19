@@ -117,14 +117,29 @@ sudo a2ensite histarchexplorer && sudo systemctl reload apache2
 ## 🧪 Development & Testing
 
 ### Running Tests
-Use `pytest` via `uv` to ensure the correct environment:
+Use `pytest` via `uv` to ensure the correct environment. By default, slow tests are excluded:
 ```bash
 uv run pytest
 ```
 
+To run all tests (including slow ones):
+```bash
+uv run pytest -m ""
+```
+
+To run in parallel (faster, but may have database conflicts):
+```bash
+./tests/run_tests.sh parallel
+```
+
+For batch execution (file-by-file) to avoid timeouts in restricted environments:
+```bash
+./tests/run_tests.sh batch
+```
+
 ### Coverage Report
 ```bash
-uv run pytest --cov=histarchexplorer
+uv run pytest --cov=histarchexplorer --cov-report=term-missing
 ```
 
 ### Frontend Watch Mode

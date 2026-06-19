@@ -1,3 +1,4 @@
+import pytest
 from flask.testing import FlaskClient
 
 
@@ -58,6 +59,7 @@ def test_admin_clear_cache(authenticated_client: FlaskClient) -> None:
     assert rv.status_code == 302
 
 
+@pytest.mark.slow
 def test_admin_refresh_system_cache(authenticated_client: FlaskClient) -> None:
     rv = authenticated_client.get('/admin/refresh-system-cache')
     assert rv.status_code == 302
@@ -68,6 +70,15 @@ def test_admin_backup_db(authenticated_client: FlaskClient) -> None:
     # But it should at least return a response
     rv = authenticated_client.get('/admin/backup_db')
     assert rv.status_code in (200, 302)
+
+
+def test_admin_update_entity_colors(authenticated_client: FlaskClient) -> None:
+    data = {
+        'entity_colors-places': '#ff0000',
+        'entity_colors-types': '#00ff00'
+    }
+    rv = authenticated_client.post('/admin/update_entity_colors', data=data)
+    assert rv.status_code == 302
 
 
 def test_admin_add_license(authenticated_client: FlaskClient) -> None:
