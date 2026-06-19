@@ -33,10 +33,3 @@ ALTER TABLE tng.publication_entities
 
 GRANT ALL ON TABLE tng.publications TO openatlas;
 GRANT ALL ON TABLE tng.publication_entities TO openatlas;
-
-ALTER TABLE tng.entities
-    ALTER COLUMN case_study_type_id TYPE integer
-        USING CASE
-                  WHEN case_study_type_id IS NULL THEN NULL
-                  ELSE case_study_type_id[1]
-        END;
