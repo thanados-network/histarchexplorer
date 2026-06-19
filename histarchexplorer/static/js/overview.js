@@ -370,14 +370,16 @@ function getChartData(relations) {
 function renderAttributes(categorizedTypes) {
     const tile = document.getElementById("tile-attributes");
     const host = document.getElementById("js-attributes");
-    if (!tile || !host || !categorizedTypes || !Object.keys(categorizedTypes).length) return;
+    if (!tile || !host || !categorizedTypes ||
+        !Object.keys(categorizedTypes).length) return;
     host.innerHTML = "";
     Object.entries(categorizedTypes).forEach(([bucket, items]) => {
         const division = items?.[0]?.division;
         let iconHtml = '';
         if (division) {
             if (division.iconUrl) {
-                iconHtml = `<img src="${division.iconUrl}" class="attribute-icon">`;
+                iconHtml = `<img src="${division.iconUrl}" ` +
+                    `class="attribute-icon">`;
             } else if (division.icon) {
                 iconHtml = division.icon;
             }
@@ -393,13 +395,117 @@ function renderAttributes(categorizedTypes) {
             const vu = t.value && t.unit ? `: ${t.value} ${t.unit}` : "";
             const badge = h("div", {
                     class: "badge custom-badge text-wrap m-1",
-                    "data-id": t.id || ""
-                },
-                h("h6", {class: "m-0 text-center", text: `${t.title || ""}${vu}`})
+                    "data-id": t.id || "",
+                    style: "cursor: pointer;",
+                    "data-bs-toggle": "popover",
+                    role: "button",
+                    tabindex: "0"},
+                h("h6", {
+                    class: "m-0 text-center",
+                    text: `${t.title || ""}${vu}`})
             );
+
+            const getEntryId = (entryObj) => {
+                if (!entryObj || !entryObj.identifier) return null;
+                const parts = entryObj.identifier.split('/');
+                const idVal = parseInt(parts[parts.length - 1], 10);
+                return isNaN(idVal) ? null : idVal;
+            };
+
+            const getTranslatedDescription = (descriptions) => {
+                if (!descriptions) return null;
+                if (typeof descriptions === 'string') {
+                    return descriptions;
+                }
+                if (typeof descriptions === 'object') {
+                    return pickDescription(descriptions);
+                }
+                return null;
+            };
+
+            let popoverHtml = `<div class="popover-content text-start">`;
+            popoverHtml += `<div><a href="/entity/${t.id}">` +
+                `<strong>${t.title || ""}</strong></a></div>`;
+            const desc = getTranslatedDescription(t.descriptions);
+            if (desc) {
+                popoverHtml += `<div class="text-muted mt-1 small">` +
+                    `${desc}</div>`;
+            }
+
+            const hierarchy = t.typeHierarchy || t.type_hierarchy || [];
+            const ancestors = hierarchy.filter(entryObj => {
+                const entryId = getEntryId(entryObj);
+                return entryId !== null && entryId !== t.id;
+            });
+
+            if (ancestors.length > 0) {
+                const parent = ancestors[ancestors.length - 1];
+                const parentId = getEntryId(parent);
+                const root = ancestors[0];
+                const rootId = getEntryId(root);
+
+                const parentLink = `/entity/${parentId}`;
+                popoverHtml += `<div class="mt-2 small">` +
+                    `<strong>Subcategorie of:</strong> ` +
+                    `<a href="${parentLink}">${parent.label || ""}</a>` +
+                    `</div>`;
+
+                const rootLink = `/entity/${rootId}`;
+                popoverHtml += `<div class="mt-1 small">` +
+                    `<strong>Hierarchy:</strong> ` +
+                    `<a href="${rootLink}">${root.label || ""}</a>` +
+                    `</div>`;
+            }
+            popoverHtml += `</div>`;
+
+            new bootstrap.Popover(badge, {
+                content: popoverHtml,
+                html: true,
+                sanitize: false,
+                trigger: 'click',
+                placement: 'bottom',
+                container: 'body'});
+
+            badge.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    badge.click();
+                }
+            });
+
+            badge.addEventListener('click', () => {
+                const selector = '[data-bs-toggle="popover"]';
+                document.querySelectorAll(selector).forEach(el => {
+                    if (el !== badge) {
+                        const instance = bootstrap.Popover.getInstance(el);
+                        if (instance) {
+                            instance.hide();
+                        }
+                    }
+                });
+            });
+
             host.appendChild(badge);
         });
     });
+
+    if (!window.popoverDismissRegistered) {
+        document.addEventListener('click', (e) => {
+            const isTrigger = e.target.closest('[data-bs-toggle="popover"]');
+            const isInside = e.target.closest('.popover');
+            if (!isTrigger && !isInside) {
+                const selector = '[data-bs-toggle="popover"]';
+                document.querySelectorAll(selector).forEach(el => {
+                    const instance = bootstrap.Popover.getInstance(el);
+                    if (instance) {
+                        instance.hide();
+                    }
+                });
+            }
+        });
+        window.popoverDismissRegistered = true;
+    }
+
     tile.hidden = false;
     relayout(10);
 }
