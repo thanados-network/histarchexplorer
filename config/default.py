@@ -8,6 +8,7 @@ except ImportError:
 
 # Application metadata
 VERSION = '0.4.0'
+
 LANGUAGES = {
     'de': 'Deutsch',
     'en': 'English',
@@ -87,7 +88,6 @@ VIEW_CLASSES = {
 #     'Place', 'Feature', 'Stratigraphic unit']
 
 ADD_FILES_FOR_OVERVIEW = 2
-
 
 # Icons displayed in sidebar, mapped to entity IDs
 SIDEBAR_ICONS = {

@@ -207,3 +207,40 @@ def test_edit_entry(authenticated_client: FlaskClient) -> None:
         'name': 'Updated Name'
     }, follow_redirects=True)
     assert rv.status_code == 200
+
+
+def test_dynamic_entry_flow(authenticated_client: FlaskClient) -> None:
+    # 1. Post to add_entry with full multi-language and select fields
+    add_payload = {
+        'category': 'persons',
+        'acronym': 'TP',
+        'name_en': 'Test Person EN',
+        'name_de': 'Test Person DE',
+        'description_en': 'Desc EN',
+        'description_de': 'Desc DE',
+        'email': 'test@example.com',
+        'orcid_id': '0000-0002-1825-0097',
+        'image': 'test_person.png'}
+    rv = authenticated_client.post(
+        '/admin/add_entry',
+        data=add_payload,
+        follow_redirects=True)
+    assert rv.status_code == 200
+
+    # 2. Post to edit_entry with config_id
+    edit_payload = {
+        'config_id': '1',
+        'current_tab': 'nav-persons',
+        'acronym': 'TP2',
+        'name_en': 'Updated Person EN',
+        'name_de': 'Updated Person DE',
+        'description_en': 'Updated Desc EN',
+        'description_de': 'Updated Desc DE',
+        'email': 'test2@example.com',
+        'orcid_id': '0000-0002-1825-0098',
+        'image': 'test_person2.png'}
+    rv = authenticated_client.post(
+        '/edit_entry',
+        data=edit_payload,
+        follow_redirects=True)
+    assert rv.status_code == 200

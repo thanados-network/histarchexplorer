@@ -63,6 +63,28 @@ sudo -u postgres createuser openatlas
 sudo -u postgres psql -f install/reset.sql
 ```
 
+### 3b. Database Upgrades
+
+The database schema and data updates are managed incrementally using semantic versioned SQL files located under
+`install/upgrade/` (e.g., `install/upgrade/0.4.0.sql`).
+
+To apply pending migrations, execute:
+```bash
+uv run python install/upgrade.py
+```
+
+This utility will:
+1. Automatically create the `tng.schema_migrations` tracking table if it does not exist.
+2. Scan the `install/upgrade/` directory for SQL files matching `[0-9]*.[0-9]*.[0-9]*.sql`.
+3. Filter out migrations that have already been applied.
+4. Execute pending migrations sequentially in semantic version order inside isolated transaction blocks.
+
+#### Writing New Upgrades
+When introducing schema or data changes:
+1. Create a new SQL script in `install/upgrade/` named after the target version (e.g., `install/upgrade/0.5.0.sql`).
+2. Do not include transaction control statements (`BEGIN`, `COMMIT`, `ROLLBACK`) since the upgrade runner automatically
+   runs each file inside its own transaction block.
+
 ### 4. Configuration
 
 ```bash

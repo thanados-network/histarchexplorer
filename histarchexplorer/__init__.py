@@ -158,6 +158,16 @@ def before_request() -> Response | None:
     g.search_service = SearchService(app)
     g.case_study_ids = [
         config.case_study for config in g.config_entities if config.case_study]
+
+    g.pending_upgrades = []
+    if current_user.is_authenticated:
+        try:
+            from install.upgrade import get_pending_migrations
+            with g.db.cursor() as cur:
+                g.pending_upgrades = get_pending_migrations(cur)
+        except Exception:
+            pass
+
     return None
 
 
@@ -197,6 +207,7 @@ def inject_globals() -> dict[str, Any]:
         'admin_fields': g.admin_fields,
         'additional_files_for_overview': g.additional_files_for_overview,
         'count': 0,
+        'pending_upgrades': getattr(g, 'pending_upgrades', []),
         'system_class_map': {
             "place": "places",
             "feature": "places",

@@ -745,34 +745,45 @@ def add_link() -> Response:
             entry=request.args.get('entry', '')))
 
 
+def _extract_fields_from_request(fields: list) -> dict:
+    """
+    Extract fields from request.form dynamically based on the configuration.
+    """
+    data = {}
+    for field in fields:
+        key = field['key']
+        if field.get('translatable'):
+            for lang_code in g.available_languages.keys():
+                lang_key = f"{key}_{lang_code}"
+                if lang_key in request.form:
+                    data[lang_key] = request.form.get(lang_key, '')
+
+            if key in request.form:
+                data[key] = request.form.get(key, '')
+        else:
+            if field.get('type') == 'select':
+                data[key] = request.form.get(key, type=int)
+            else:
+                data[key] = request.form.get(key, '')
+    return data
+
+
 @app.route('/admin/add_entry', methods=['POST'])
 @login_required
 def add_entry() -> Response:
+    """
+    Dynamically extract form fields based on the category config
+    and save the new config entity to the database.
+    """
     check_manager_user()
     category = request.form.get('category', '')
-    form_data = {
-        'category': category,
-        'acronym': request.form.get('acronym', ''),
-        'email': request.form.get('email', ''),
-        'website': request.form.get('website', ''),
-        'orcid_id': request.form.get('orcid_id', ''),
-        'image': request.form.get('image', ''),
-        'case_study': request.form.get('case_study', type=int),
-        'license_id': request.form.get('license_id', type=int)
-    }
-
-    # Add multi-language fields
-    for col in ['name', 'address', 'description']:
-        for lang_code in g.available_languages.keys():
-            lang_key = f"{col}_{lang_code}"
-            if lang_key in request.form:
-                form_data[lang_key] = request.form.get(lang_key, '')
-
-        # Also keep the default key for backward compatibility or display
-        if col in request.form:
-            form_data[col] = request.form.get(col, '')
-
     current_tab = f'nav-{category}'
+
+    fields_for_category = g.admin_fields.get(current_tab, [])
+
+    form_data = {'category': category}
+    form_data.update(_extract_fields_from_request(fields_for_category))
+
     redirect_base = url_for('admin') + current_tab
     try:
         new_id = Admin.add_entry(form_data)
@@ -781,12 +792,12 @@ def add_entry() -> Response:
     except Admin.TooManyMainProjects:
         flash(
             _('Error adding entry %(name)s: Only one main project allowed',
-              name=form_data["name"]),
+              name=form_data.get('name', '')),
             'danger')
     except Exception as e:
         flash(_(
             'Error adding entry %(name)s: %(error)s',
-            name=form_data["name"],
+            name=form_data.get('name', ''),
             error=e), 'danger')
     return redirect(redirect_base)
 
@@ -806,6 +817,10 @@ def delete_entry(id_: int, tab: str) -> Response:
 @app.route('/edit_entry', methods=['POST', 'GET'])
 @login_required
 def edit_entry() -> Response:
+    """
+    Dynamically extract form fields based on the entity class config
+    and update the existing config entity in the database.
+    """
     check_manager_user()
 
     config_id = request.form.get('config_id', type=int)
@@ -813,27 +828,21 @@ def edit_entry() -> Response:
         flash(_('Configuration ID is required'), 'danger')
         return _redirect_to_admin_tab('sidebar-projects-content')
 
-    form_data = {
-        'config_id': config_id,
-        'acronym': request.form.get('acronym', ''),
-        'email': request.form.get('email', ''),
-        'website': request.form.get('website', ''),
-        'orcid_id': request.form.get('orcid_id', ''),
-        'image': request.form.get('image', ''),
-        'case_study': request.form.get('case_study', type=int),
-        'license_id': request.form.get('license_id', type=int)
-    }
+    current_tab = request.form.get('current_tab', '')
+    if not current_tab:
+        class_id = Admin.get_config_class_by_id(config_id)
+        class_to_target = {
+            g.config_classes.get('main-project'): 'nav-main-project',
+            g.config_classes.get('project'): 'nav-projects',
+            g.config_classes.get('person'): 'nav-persons',
+            g.config_classes.get('institution'): 'nav-institutions',
+            g.config_classes.get('attribute'): 'nav-attributes'}
+        current_tab = class_to_target.get(class_id, '')
 
-    # Add multi-language fields
-    for col in ['name', 'address', 'description']:
-        for lang_code in g.available_languages.keys():
-            lang_key = f"{col}_{lang_code}"
-            if lang_key in request.form:
-                form_data[lang_key] = request.form.get(lang_key, '')
+    fields_for_category = g.admin_fields.get(current_tab, [])
 
-        # Also keep the default key for backward compatibility or display
-        if col in request.form:
-            form_data[col] = request.form.get(col, '')
+    form_data = {'config_id': config_id}
+    form_data.update(_extract_fields_from_request(fields_for_category))
 
     name = form_data.get('name', '')
     try:
