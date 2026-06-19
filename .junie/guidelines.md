@@ -33,6 +33,7 @@
     can be retried cleanly.
 
 ### Coding Standards
+- **Prinzipien**: Beachte immer KISS (Keep It Simple, Stupid) und DRY (Don't Repeat Yourself).
 - **Python**: PEP 8 compliant, **strict max. 79 characters** line length.
 - **HTML/JS/SCSS**: **strict max. 120 characters** line length.
 - **Brackets/Parentheses**: Closing `]` or `)` always on the same line as the last element.
