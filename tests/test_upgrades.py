@@ -27,16 +27,20 @@ def db_cursor():
 def test_upgrades_all_scenarios(db_cursor, capsys):
     # Setup paths for fake sql files
     upgrade_dir = Path(app.root_path).parent / 'install' / 'upgrade'
-    orig_040 = upgrade_dir / '0.4.0.sql'
-    bak_040 = upgrade_dir / '0.4.0.sql.bak'
     file_98 = upgrade_dir / '98.0.0.sql'
     file_99 = upgrade_dir / '99.0.0.sql'
     file_rollback = upgrade_dir / '97.0.0.sql'
 
+    real_sql_files = list(upgrade_dir.glob('*.sql'))
+    backed_up = []
+
     try:
-        # Temporarily hide 0.4.0.sql to avoid running real migration in tests
-        if orig_040.exists():
-            orig_040.rename(bak_040)
+        # Temporarily hide all real migration SQL files
+        for sql_file in real_sql_files:
+            bak_file = sql_file.with_suffix('.sql.bak')
+            if not bak_file.exists():
+                sql_file.rename(bak_file)
+                backed_up.append((sql_file, bak_file))
 
         # 1. Dynamic Initialization Scenario
         # Drop schema migrations table
@@ -133,9 +137,10 @@ def test_upgrades_all_scenarios(db_cursor, capsys):
         assert "Database is up to date" in captured.out
 
     finally:
-        # Restore original 0.4.0.sql
-        if bak_040.exists():
-            bak_040.rename(orig_040)
+        # Restore original SQL files
+        for sql_file, bak_file in backed_up:
+            if bak_file.exists():
+                bak_file.rename(sql_file)
 
         # Cleanup fake files
         if file_98.exists():

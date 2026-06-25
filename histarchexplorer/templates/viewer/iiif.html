@@ -9,12 +9,9 @@
   <div class="page-wrapper">
     <div class="scrollable-container">
       <div class="container-fluid">
-        <div id="iiif-viewer" class="mirador-container">
-          <script
-            src="/static/node_modules/mirador/dist/mirador.min.js"></script>
-          <script
-            src="{{ url_for('static', filename='js/viewer/iiif.js') }}"></script>
-        </div>
+        <div id="iiif-viewer" class="mirador-viewer"></div>
+        <script src="{{ url_for('static', filename='node_modules/mirador/dist/mirador.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/viewer/iiif.js') }}"></script>
       </div>
     </div>
   </div>

@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         en: "English",
       },
       windows: [
-        { loadedManifest: manifestUrl },
+        { manifestId: manifestUrl },
       ],
     };
 
