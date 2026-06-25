@@ -1162,7 +1162,6 @@
             toggleRightSidebar('map', 'open');
             rightSidebarcontent.map.opened = true
         }
-        const startTime = performance.now();
         const contentDiv = document.getElementById('right-sidebar');
 
         contentDiv.innerHTML = `
@@ -1181,19 +1180,54 @@
                 return response.text(); // Get the HTML content
             })
             .then(html => {
-                const endTime = performance.now(); // End timing
-                const fetchTime = ((endTime - startTime) / 1000).toFixed(2); // Convert to seconds
-
-                // Append fetch time info to the HTML
-                const updatedHtml = html + `<p style="font-size: 12px; color: gray;">Loaded in ${fetchTime} s</p>`;
-
-                contentDiv.innerHTML = updatedHtml;
-
+                contentDiv.innerHTML = html;
+                initSidebarPopovers(contentDiv);
             })
             .catch(error => {
                 console.error("Error loading right sidebar content:", error);
                 contentDiv.innerHTML = `<p style="color: red; text-align: center;">Failed to load content.</p>`;
             });
+    }
+
+    function initSidebarPopovers(container) {
+        const selector = '[data-bs-toggle="popover"]';
+        const triggers = container.querySelectorAll(selector);
+        triggers.forEach(trigger => {
+            new bootstrap.Popover(trigger, {
+                html: true,
+                sanitize: false,
+                trigger: 'click',
+                placement: 'bottom',
+                container: 'body'});
+            trigger.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    trigger.click();
+                }
+            });
+            trigger.addEventListener('click', () => {
+                document.querySelectorAll(selector).forEach(el => {
+                    if (el !== trigger) {
+                        const instance = bootstrap.Popover.getInstance(el);
+                        if (instance) instance.hide();
+                    }
+                });
+            });
+        });
+
+        if (!window.popoverDismissRegistered) {
+            document.addEventListener('click', (e) => {
+                const isTrigger = e.target.closest(selector);
+                const isInside = e.target.closest('.popover');
+                if (!isTrigger && !isInside) {
+                    document.querySelectorAll(selector).forEach(el => {
+                        const instance = bootstrap.Popover.getInstance(el);
+                        if (instance) instance.hide();
+                    });
+                }
+            });
+            window.popoverDismissRegistered = true;
+        }
     }
 
     window.setSidebarContent = setSidebarContent;

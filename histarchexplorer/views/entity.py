@@ -54,6 +54,124 @@ def get_entity_images(
     return main_image, initial_images, images
 
 
+def is_part_of(relation: Relation, parent_id: int) -> bool:
+    """Check if a relation forms part of the given parent entity."""
+    for rel_type in relation.relation_types or []:
+        if (rel_type.get('relationTo') == parent_id
+                and rel_type.get('property') == 'crm:P46i_forms_part_of'):
+            return True
+    return False
+
+
+def extract_year(date_str: Optional[str]) -> Optional[int]:
+    """Extract the (signed) year from an ISO date string.
+
+    Negative values represent BC years.
+    """
+    if not date_str:
+        return None
+    date_part = date_str.split("T")[0]
+    is_bc = date_part.startswith("-")
+    year_part = date_part.lstrip("-").split("-")[0]
+    if not year_part.isdigit():
+        return None
+    year = int(year_part)
+    return -year if is_bc else year
+
+
+def compact_year_span(view: PresentationView) -> Optional[str]:
+    """Build a shortened time span from earliest begin to latest end.
+
+    Only the year is kept; BC/AD eras are appended.
+    """
+    begin = None
+    end = None
+    if view.when and view.when.start:
+        begin = view.when.start.earliest or view.when.start.latest
+    if view.when and view.when.end:
+        end = view.when.end.latest or view.when.end.earliest
+
+    def fmt(year: Optional[int]) -> Optional[str]:
+        if year is None:
+            return None
+        return f"{abs(year)} {'BC' if year < 0 else 'AD'}"
+
+    year_from = fmt(extract_year(begin))
+    year_to = fmt(extract_year(end))
+    if year_from and year_to:
+        if year_from == year_to:
+            return year_from
+        return f"{year_from} – {year_to}"
+    return year_from or year_to
+
+
+def get_valid_images(view: PresentationView) -> list[File]:
+    """Collect displayable images for an entity.
+
+    Excludes inherited (`from_super_entity`) files and non-image
+    render types. No placeholder fallback is added.
+    """
+    images = []
+    main_image = None
+    for image in view.files:
+        if image.from_super_entity:
+            continue
+        if image.render_type not in ('image', 'svg'):
+            continue
+        if not (image.iiif_base_path or image.url):
+            continue
+        if image.main_image:
+            main_image = image
+        else:
+            images.append(image)
+    if main_image:
+        images.insert(0, main_image)
+    return images
+
+
+def build_sidebar_block(view: PresentationView) -> dict[str, Any]:
+    """Build a uniform detail block for the map sidebar.
+
+    Used identically for the feature, stratigraphic units, artifacts
+    and human remains.
+    """
+    return {
+        'id': view.id,
+        'title': view.title,
+        'system_class': view.system_class,
+        'year_span': compact_year_span(view),
+        'categorized_types': get_categorized_types(view.types),
+        'description': view.description,
+        'images': get_valid_images(view)}
+
+
+def get_map_sidebar_data(id_: int) -> dict[str, Any]:
+    """Assemble the hierarchical view-model for the map sidebar.
+
+    Returns the clicked feature followed by each linked stratigraphic
+    unit, with that unit's artifacts and human remains grouped directly
+    beneath it (sequential per stratigraphic unit).
+    """
+    feature = PresentationView.from_api(id_)
+    groups = []
+    for su_rel in feature.relations.get('stratigraphic_unit', []):
+        if not is_part_of(su_rel, feature.id):
+            continue
+        su_view = PresentationView.from_api(su_rel.id)
+        children = []
+        for system_class in ('artifact', 'human_remains'):
+            for child_rel in feature.relations.get(system_class, []):
+                if is_part_of(child_rel, su_rel.id):
+                    children.append(build_sidebar_block(
+                        PresentationView.from_api(child_rel.id)))
+        groups.append({
+            'su': build_sidebar_block(su_view),
+            'children': children})
+    return {
+        'feature': build_sidebar_block(feature),
+        'groups': groups}
+
+
 @app.route('/get_entity/<int:id_>/<tab_name>')
 def get_entity(id_: int, tab_name: str) -> str:
     """Fetch content for a specific tab of an entity.
@@ -78,12 +196,9 @@ def get_entity(id_: int, tab_name: str) -> str:
 
     match tab_name:
         case 'feature':
-            data = entity_data(id_)
             return render_template(
                 'tabs/feature.html',
-                entity=data['entity'],
-                categorized_types=data['categorizedTypes'],
-                main_image=data['mainImage'])
+                sidebar=get_map_sidebar_data(id_))
         case 'map':
             pass
         case 'media':
