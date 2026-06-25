@@ -1183,6 +1183,11 @@
                 contentDiv.innerHTML = html;
                 initSidebarPopovers(contentDiv);
                 initSidebarCarousels(contentDiv);
+                // Remember the loaded feature content so switching tabs
+                // away and back restores it instead of the placeholder.
+                if (rightSidebarcontent.map) {
+                    rightSidebarcontent.map.content = html;
+                }
             })
             .catch(error => {
                 console.error("Error loading right sidebar content:", error);
@@ -1245,6 +1250,14 @@
     }
 
     window.setSidebarContent = setSidebarContent;
+
+    // Re-wire popovers/carousels after the cached map sidebar HTML is
+    // restored (e.g. when switching tabs away and back to the map).
+    window.initMapSidebarFeatures = function (container) {
+        if (!container) return;
+        initSidebarPopovers(container);
+        initSidebarCarousels(container);
+    };
 
     // Let the user drag the right sidebar wider/narrower. The map canvas
     // shares the remaining space, so it must be told to redraw on resize.

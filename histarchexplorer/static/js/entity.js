@@ -303,6 +303,11 @@ document.querySelectorAll('#nav-sidebar .nav-link').forEach(button => {
 
         setRightSidebarContent(rightSidebarcontent[tabName].content);
 
+        // Restored map content needs its popovers/carousels re-wired.
+        if (tabName === 'map' && typeof window.initMapSidebarFeatures === 'function') {
+            window.initMapSidebarFeatures(rightSidebar);
+        }
+
         // Ensure sidebar state is consistent with the clicked tab
         const shouldBeOpen = rightSidebarcontent[tabName].opened;
         const isCurrentlyOpen = rightSidebar.classList.contains('right-expanded');
