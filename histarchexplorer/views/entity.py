@@ -544,7 +544,6 @@ def background_cache_relations(
                         related_ids.add(rel.id)
 
             for rid in related_ids:
-                print(rid)
                 try:
                     PresentationView.from_api(rid)
                     time.sleep(0.5)
