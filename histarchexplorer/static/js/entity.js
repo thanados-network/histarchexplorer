@@ -279,7 +279,14 @@ function toggleRightSidebar(currentTab, mode = 'toggle') {
     }
 
     rightSidebarcontent[currentTab].opened = isExpanded;
-    root.style.setProperty('--right-sidebar-width', isExpanded ? '600px' : '0px');
+    // Keep a user-resized width across open/close within the same session.
+    if (isExpanded) {
+        const stored = root.style.getPropertyValue('--right-sidebar-width').trim();
+        const width = (stored && stored !== '0px') ? stored : '33vw';
+        root.style.setProperty('--right-sidebar-width', width);
+    } else {
+        root.style.setProperty('--right-sidebar-width', '0px');
+    }
 }
 
 // Attach event listeners to sidebar buttons

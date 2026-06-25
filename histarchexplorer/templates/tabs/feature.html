@@ -123,21 +123,41 @@
   {% endif %}
 {%- endmacro %}
 
+{# Maps a system_class to its configured entity-color CSS variable key. #}
+{% set entity_color_keys = {
+  'feature': 'feature',
+  'stratigraphic_unit': 'stratigraphic_unit',
+  'artifact': 'items',
+  'human_remains': 'items'} %}
+
 {% macro entity_card(block, heading_class) -%}
   {% set desc = pick_description(block.description) | trim %}
+  {% set color_key = entity_color_keys.get(block.system_class, '') %}
   <div class="map-sidebar-card mb-3">
     <div class="map-sidebar-title mb-1 {{ heading_class }}">
       <a href="{{ url_for('entity_view', id_=block.id) }}"
-        style="text-decoration: none;">{{ block.title }}</a>
+        style="text-decoration: none;
+          {% if color_key %}color: var(--entity-color-{{ color_key }});{% endif %}">
+        {{ block.title }}</a>
     </div>
     {% if block.year_span %}
       <p class="text-muted small mb-0">{{ block.year_span }}</p>
     {% endif %}
-    {{ type_badges(block.categorized_types) }}
+    <div class="map-sidebar-detail-row d-flex flex-wrap gap-3 mt-2">
+      {% if block.categorized_types %}
+        <div class="map-sidebar-types">
+          {{ type_badges(block.categorized_types) }}
+        </div>
+      {% endif %}
+      {% if block.images %}
+        <div class="map-sidebar-media">
+          {{ images_block(block) }}
+        </div>
+      {% endif %}
+    </div>
     {% if desc %}
       <p class="small mt-2 mb-0">{{ desc }}</p>
     {% endif %}
-    {{ images_block(block) }}
   </div>
 {%- endmacro %}
 
