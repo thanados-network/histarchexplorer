@@ -147,6 +147,24 @@
   overflow: hidden;
 }
 
+/* Modern, prominent sidebar headings so the entity titles stand out */
+/* next to the type badges. */
+.map-sidebar-heading {
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+
+  a {
+    font-weight: inherit;
+  }
+}
+
+/* Accent the left border of each stratigraphic-unit group so the start */
+/* of a unit and its sub-entities is clearly visible. */
+.map-sidebar-group {
+  border-left-width: 3px !important;
+  border-left-color: var(--entity-color-stratigraphic_unit, #adb5bd) !important;
+}
+
 /* Map right sidebar: types on the left, image on the right, wrapping */
 /* below each other when there is not enough horizontal space. */
 .map-sidebar-detail-row {

@@ -140,6 +140,7 @@ def build_sidebar_block(view: PresentationView) -> dict[str, Any]:
         'title': view.title,
         'system_class': view.system_class,
         'year_span': compact_year_span(view),
+        'main_types': [t for t in view.types if t.is_standard],
         'categorized_types': get_categorized_types(view.types),
         'description': view.description,
         'images': get_valid_images(view)}

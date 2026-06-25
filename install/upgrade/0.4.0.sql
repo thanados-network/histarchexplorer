@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS tng.publication_entities CASCADE;
+DROP TABLE IF EXISTS tng.publications CASCADE;
+
 CREATE TABLE tng.publications
 (
     id               integer NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

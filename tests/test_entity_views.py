@@ -124,7 +124,11 @@ def test_get_entity_tabs(authenticated_client: FlaskClient) -> None:
             aliases=[], start=None, end=None)
         feature.geometries = []
         feature.geometry_json = {}
-        feature.types = []
+        feature_main_type = EntityTypeModel(
+            id=200, title='Grave', descriptions={'en': 'A grave'},
+            is_standard=True, type_hierarchy=[], value=None, unit=None,
+            division=None)
+        feature.types = [feature_main_type]
         feature.files = []
         feature.references = []
         feature.relations = {
@@ -205,6 +209,8 @@ def test_get_entity_tabs(authenticated_client: FlaskClient) -> None:
                 assert body.index('SU 11') < body.index('Artifact B')
                 # Type badge with clickable popover.
                 assert 'data-bs-toggle="popover"' in body
+                # Main (standard) type rendered as a badge next to title.
+                assert 'Grave' in body
                 # Compact year span (earliest begin .. latest end).
                 assert '50 BC' in body
                 assert '120 AD' in body

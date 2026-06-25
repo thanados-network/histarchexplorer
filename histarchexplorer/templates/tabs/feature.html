@@ -60,6 +60,17 @@
   {{ content }}
 {%- endmacro %}
 
+{% macro type_badge(type) -%}
+  {% set vu = ': ' ~ type.value ~ ' ' ~ type.unit
+    if type.value and type.unit else '' %}
+  <div class="badge custom-badge text-wrap m-1" role="button"
+    tabindex="0" style="cursor: pointer;"
+    data-bs-toggle="popover" data-bs-html="true"
+    data-bs-content="{{ type_popover(type) | trim | forceescape }}">
+    <h6 class="m-0 text-center">{{ type.title }}{{ vu }}</h6>
+  </div>
+{%- endmacro %}
+
 {% macro type_badges(categorized_types) -%}
   {% if categorized_types %}
     <div class="mt-2">
@@ -74,15 +85,7 @@
           {{ bucket.replace('_', ' ') | title }}
         </p>
         {% for item in items %}
-          {% set type = item.type %}
-          {% set vu = ': ' ~ type.value ~ ' ' ~ type.unit
-            if type.value and type.unit else '' %}
-          <div class="badge custom-badge text-wrap m-1" role="button"
-            tabindex="0" style="cursor: pointer;"
-            data-bs-toggle="popover" data-bs-html="true"
-            data-bs-content="{{ type_popover(type) | trim | forceescape }}">
-            <h6 class="m-0 text-center">{{ type.title }}{{ vu }}</h6>
-          </div>
+          {{ type_badge(item.type) }}
         {% endfor %}
       {% endfor %}
     </div>
@@ -134,11 +137,15 @@
   {% set desc = pick_description(block.description) | trim %}
   {% set color_key = entity_color_keys.get(block.system_class, '') %}
   <div class="map-sidebar-card mb-3">
-    <div class="map-sidebar-title mb-1 {{ heading_class }}">
+    <div class="map-sidebar-title map-sidebar-heading mb-2 d-flex flex-wrap
+      align-items-center gap-2 {{ heading_class }}">
       <a href="{{ url_for('entity_view', id_=block.id) }}"
         style="text-decoration: none;
           {% if color_key %}color: var(--entity-color-{{ color_key }});{% endif %}">
         {{ block.title }}</a>
+      {% for type in block.main_types %}
+        {{ type_badge(type) }}
+      {% endfor %}
     </div>
     {% if block.year_span %}
       <p class="text-muted small mb-0">{{ block.year_span }}</p>
@@ -162,15 +169,17 @@
 {%- endmacro %}
 
 <div class="container-fluid" id="map-sidebar-content">
-  {{ entity_card(sidebar.feature, 'fs-4 fw-bold') }}
+  {{ entity_card(sidebar.feature, 'fs-2 fw-bold') }}
 
   {% for group in sidebar.groups %}
-    <div class="border-top pt-3">
-      {{ entity_card(group.su, 'fs-5 fw-semibold') }}
+    {# Indent the whole stratigraphic-unit group so it is clearly #}
+    {# visible where a unit and its sub-entities begin. #}
+    <div class="map-sidebar-group ms-3 border-start ps-3 mt-3">
+      {{ entity_card(group.su, 'fs-3 fw-semibold') }}
       {% if group.children %}
         <div class="ms-3 border-start ps-3">
           {% for child in group.children %}
-            {{ entity_card(child, 'fs-6 fw-semibold') }}
+            {{ entity_card(child, 'fs-4 fw-semibold') }}
           {% endfor %}
         </div>
       {% endif %}
