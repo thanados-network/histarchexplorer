@@ -42,6 +42,12 @@ def get_entity_images(
     for image in files:
         if image.render_type in ['unknown', 'webp']:
             continue
+        # Skip images inherited from a super entity. The frontend
+        # filters these out anyway (`from_super_entity === false`), and an
+        # inherited `main_image` would otherwise override the entity's own
+        # one, leaving no displayable image.
+        if image.from_super_entity:
+            continue
         if image.main_image:
             main_image = image
         else:
