@@ -105,6 +105,10 @@ function checkAndRemoveSpinner(totalTabs) {
             element.remove();
             //console.log("Spinner removed.");
         });
+
+        if (typeof entityId !== 'undefined' && entityId > 0) {
+            fetch(`/api/cache-related/${entityId}`);
+        }
     }
 }
 

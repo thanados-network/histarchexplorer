@@ -1,4 +1,6 @@
 import json
+import threading
+import time
 from collections import defaultdict
 from dataclasses import asdict
 from typing import Any, Optional
@@ -522,3 +524,50 @@ def entity_data(id_: int) -> dict[str, Any]:
         'mainImage': main_image,
         'initialImage': initial_images,
         'images': images}
+
+
+def background_cache_relations(
+        app_, entity_id: int, headers: dict, base_url: str) -> None:
+    """Fetch and cache all related entities in the background.
+
+    Iterates through semantic relations and triggers a full API fetch for
+    each, memoizing them in Redis. Adds a 0.5s delay between requests.
+    """
+    with app_.test_request_context(base_url=base_url):
+        g.api_headers = headers
+        try:
+            entity = PresentationView.from_api(entity_id)
+            related_ids = set()
+            for relations in entity.relations.values():
+                for rel in relations:
+                    if rel.id > 0:
+                        related_ids.add(rel.id)
+
+            for rid in related_ids:
+                print(rid)
+                try:
+                    PresentationView.from_api(rid)
+                    time.sleep(0.5)
+                except Exception as e:
+                    app_.logger.error(
+                        f"Failed to cache related entity {rid}: {e}")
+        except Exception as e:
+            app_.logger.error(
+                f"Background caching failed for {entity_id}: {e}")
+
+
+@app.route('/api/cache-related/<int:id_>')
+def cache_related(id_: int) -> str:
+    """Initiate background caching for an entity's relations.
+
+    Spawns a daemon thread to pre-fetch related entity data without
+    blocking the current request.
+    """
+    headers = getattr(g, 'api_headers', {})
+    base_url = request.base_url
+    thread = threading.Thread(
+        target=background_cache_relations,
+        args=(app, id_, headers, base_url))
+    thread.daemon = True
+    thread.start()
+    return json.dumps({"status": "success"})
