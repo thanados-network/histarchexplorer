@@ -24,13 +24,20 @@ def entity_view(id_: int, tab_name: str = "overview") -> str:
     Sets up the sidebar navigation options and returns the main HTML
     template populated with details for the entity.
     """
+    data = entity_data(id_)
+    entity_dict = data['entity']
+    has_feature = (entity_dict.get('system_class') == 'feature' or
+                   bool(entity_dict.get('relations', {}).get('feature')))
     sidebar = app.config['SIDEBAR_OPTIONS']
+    if not has_feature:
+        sidebar = [
+            item for item in sidebar if item['route'] != 'catalogue']
     if tab_name not in {item['route'] for item in sidebar}:
         abort(404)
     return render_template(
         'entity.html',
         sidebar_elements=sorted(sidebar, key=lambda item: item['order']),
-        data=entity_data(id_),
+        data=data,
         page_name="landing",
         active_tab=tab_name,
         entity_id=id_)
@@ -181,6 +188,59 @@ def get_map_sidebar_data(id_: int) -> dict[str, Any]:
         'groups': groups}
 
 
+def get_catalogue_data(id_: int) -> list[dict[str, Any]]:
+    """Assemble the hierarchical view-model for the catalogue.
+
+    Returns a list of all features, each containing its stratigraphic units,
+    artifacts, and human remains.
+    """
+    entity = PresentationView.from_api(id_)
+    features = []
+    if entity.system_class == 'feature':
+        features.append(entity)
+    else:
+        feature_relations = sorted(
+            entity.relations.get('feature', []),
+            key=lambda r: r.name)
+        for rel in feature_relations:
+            try:
+                features.append(PresentationView.from_api(rel.id))
+            except Exception as e:
+                app.logger.error(
+                    f"Failed to load feature {rel.id}: {e}")
+
+    catalogue_data = []
+    for feature in features:
+        groups = []
+        for su_rel in feature.relations.get('stratigraphic_unit', []):
+            if not is_part_of(su_rel, feature.id):
+                continue
+            try:
+                su_view = PresentationView.from_api(su_rel.id)
+            except Exception as e:
+                app.logger.error(
+                    f"Failed to load stratigraphic unit {su_rel.id}: {e}")
+                continue
+
+            children = []
+            for system_class in ('artifact', 'human_remains'):
+                for child_rel in feature.relations.get(system_class, []):
+                    if is_part_of(child_rel, su_rel.id):
+                        try:
+                            children.append(build_sidebar_block(
+                                PresentationView.from_api(child_rel.id)))
+                        except Exception as e:
+                            app.logger.error(
+                                f"Failed to load child {child_rel.id}: {e}")
+            groups.append({
+                'su': build_sidebar_block(su_view),
+                'children': children})
+        catalogue_data.append({
+            'feature': build_sidebar_block(feature),
+            'groups': groups})
+    return catalogue_data
+
+
 @app.route('/get_entity/<int:id_>/<tab_name>')
 def get_entity(id_: int, tab_name: str) -> str:
     """Fetch content for a specific tab of an entity.
@@ -208,13 +268,20 @@ def get_entity(id_: int, tab_name: str) -> str:
             return render_template(
                 'tabs/feature.html',
                 sidebar=get_map_sidebar_data(id_))
+        case 'catalogue':
+            catalogue_data = get_catalogue_data(id_)
+            if not catalogue_data:
+                abort(404)
+            return render_template(
+                'tabs/catalog.html',
+                catalogue=catalogue_data)
         case 'map':
             pass
         case 'media':
             pass
         case 'overview':
             pass
-        case _ if tab_name not in ['feature']:
+        case _ if tab_name not in ['feature', 'catalogue']:
             abort(404)
 
     return render_template(f'tabs/{tab_name}.html', id_=id_, count=0)

@@ -225,3 +225,82 @@ def test_get_rastermaps(authenticated_client: FlaskClient) -> None:
         mock_get.return_value = {'images': []}
         rv = authenticated_client.post('/get_rastermaps', json={'ids': [1, 2]})
         assert rv.status_code == 200
+
+
+def test_catalogue_tab(authenticated_client: FlaskClient) -> None:
+    from histarchexplorer.api.presentation_view import (
+        TimePointModel, TimeRangeModel)
+    with patch(
+        'histarchexplorer.api.presentation_view.'
+        'PresentationView.from_api'
+    ) as mock_from_api, patch(
+        'histarchexplorer.models.settings.Settings.load_from_db'
+    ) as mock_settings:
+
+        settings = Settings()
+        settings.access_restriction = False
+        mock_settings.return_value = settings
+
+        place = PresentationView(
+            id=1, system_class="place", view_class="place",
+            title="Test Place", description={"en": "Place description"},
+            aliases=[], start=None, end=None)
+        place.relations = {
+            'feature': [
+                Relation(
+                    id=2, name='Test Feature', system_class='feature',
+                    relation_types=_part_of(1))]}
+
+        feature = PresentationView(
+            id=2, system_class="feature", view_class="feature",
+            title="Test Feature", description={"en": "Feature description"},
+            aliases=[], start=None, end=None)
+        feature.relations = {
+            'stratigraphic_unit': [
+                Relation(
+                    id=10, name='SU 10', system_class='stratigraphic_unit',
+                    relation_types=_part_of(2))]}
+
+        su10 = _build_sub_view(
+            10, 'stratigraphic_unit', 'SU 10', 'Burial cut')
+
+        views = {1: place, 2: feature, 10: su10}
+        mock_from_api.side_effect = lambda id_: views[id_]
+
+        rv = authenticated_client.get('/entity/1')
+        assert rv.status_code == 200
+        assert b'catalogue' in rv.data
+
+        rv = authenticated_client.get('/get_entity/1/catalogue')
+        assert rv.status_code == 200
+        body = rv.data.decode('utf-8')
+        assert 'Test Feature' in body
+        assert 'SU 10' in body
+
+
+def test_catalogue_tab_no_features(
+        authenticated_client: FlaskClient) -> None:
+    with patch(
+        'histarchexplorer.api.presentation_view.'
+        'PresentationView.from_api'
+    ) as mock_from_api, patch(
+        'histarchexplorer.models.settings.Settings.load_from_db'
+    ) as mock_settings:
+
+        settings = Settings()
+        settings.access_restriction = False
+        mock_settings.return_value = settings
+
+        place = PresentationView(
+            id=1, system_class="place", view_class="place",
+            title="Test Place", description={"en": "Place description"},
+            aliases=[], start=None, end=None)
+
+        mock_from_api.return_value = place
+
+        rv = authenticated_client.get('/entity/1')
+        assert rv.status_code == 200
+        assert b'catalogue' not in rv.data
+
+        rv = authenticated_client.get('/get_entity/1/catalogue')
+        assert rv.status_code == 404

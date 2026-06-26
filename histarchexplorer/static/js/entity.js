@@ -147,8 +147,6 @@ if (entityId == 0) {
 
         if (!data.spatial.features.length > 0) tabsToLoad = tabsToLoad.filter(t => t !== 'map');
 
-        tabsToLoad = tabsToLoad.filter(t => t !== 'catalogue');
-
         if (data.hierarchy.subs === 0) {
             tabsToLoad = tabsToLoad.filter(t => t !== 'subunits');
         }

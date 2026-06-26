@@ -1,0 +1,143 @@
+{% from "tabs/feature.html" import entity_card %}
+
+<style>
+  .catalogue-toc {
+    border-left: 1px solid var(--bs-border-color);
+    padding-left: 0.5rem;
+  }
+  .catalogue-toc .nav-link {
+    color: var(--bs-body-color);
+    padding: 0.25rem 0.5rem;
+    border-left: 2px solid transparent;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+  }
+  .catalogue-toc .nav-link:hover {
+    background-color: var(--bs-secondary-bg);
+    border-left-color: var(--bs-secondary-border-subtle);
+  }
+  .catalogue-toc .nav-link.active {
+    font-weight: 600;
+    background-color: var(--bs-light-bg-subtle);
+  }
+  .catalogue-toc .nav-link.toc-feature.active {
+    border-left-color: var(--entity-color-feature, #2471a3);
+    color: var(--entity-color-feature, #2471a3);
+  }
+  .catalogue-toc .nav-link.toc-su.active {
+    border-left-color: var(--entity-color-stratigraphic_unit, #229954);
+    color: var(--entity-color-stratigraphic_unit, #229954);
+  }
+  .catalogue-toc .nav-link.toc-child.active {
+    border-left-color: var(--entity-color-items, #d35400);
+    color: var(--entity-color-items, #d35400);
+  }
+  .extra-small {
+    font-size: 0.8rem !important;
+  }
+</style>
+
+<div class="container-fluid py-3">
+  <div class="row">
+    <!-- Catalogue List -->
+    <div class="col-md-9" id="catalogue-list">
+      {% for item in catalogue %}
+        <div id="feature-{{ item.feature.id }}" class="catalogue-feature-section mb-5">
+          {{ entity_card(item.feature, 'fs-2 fw-bold') }}
+
+          {% for group in item.groups %}
+            <div id="su-{{ group.su.id }}" class="map-sidebar-group ms-3 border-start ps-3 mt-3">
+              {{ entity_card(group.su, 'fs-3 fw-semibold') }}
+              {% if group.children %}
+                <div class="ms-3 border-start ps-3">
+                  {% for child in group.children %}
+                    <div id="child-{{ child.id }}" class="mt-2">
+                      {{ entity_card(child, 'fs-4 fw-semibold') }}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- TOC Sidebar -->
+    <div class="col-md-3 d-none d-md-block">
+      <div class="position-sticky" style="top: 1rem; max-height: calc(100vh - 8rem); overflow-y: auto;">
+        <h5 class="mb-3">{{ _('Catalogue') }}</h5>
+        <nav class="nav flex-column catalogue-toc">
+          {% for item in catalogue %}
+            <a class="nav-link fw-bold py-1 text-truncate toc-feature" href="#feature-{{ item.feature.id }}">
+              {{ item.feature.title }}
+            </a>
+            {% for group in item.groups %}
+              <a class="nav-link small ps-3 py-1 text-truncate toc-su" href="#su-{{ group.su.id }}">
+                {{ group.su.title }}
+              </a>
+              {% for child in group.children %}
+                <a class="nav-link extra-small ps-4 py-1 text-truncate toc-child" href="#child-{{ child.id }}">
+                  {{ child.title }}
+                </a>
+              {% endfor %}
+            {% endfor %}
+          {% endfor %}
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const scrollContainer = document.querySelector('.entity-content');
+    if (!scrollContainer) return;
+
+    // Highlight active TOC item on scroll
+    const observerOptions = {
+      root: scrollContainer,
+      rootMargin: '-10% 0px -70% 0px',
+      threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          document.querySelectorAll('.catalogue-toc .nav-link').forEach(link => {
+            link.classList.remove('active');
+          });
+          const activeLink = document.querySelector(`.catalogue-toc a[href="#${id}"]`);
+          if (activeLink) {
+            activeLink.classList.add('active');
+            activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          }
+        }
+      });
+    }, observerOptions);
+
+    const targets = document.querySelectorAll(
+      '#catalogue-list [id^="feature-"], ' +
+      '#catalogue-list [id^="su-"], ' +
+      '#catalogue-list [id^="child-"]'
+    );
+    targets.forEach(target => observer.observe(target));
+
+    // Smooth scroll on TOC link click
+    document.querySelectorAll('.catalogue-toc a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          document.querySelectorAll('.catalogue-toc .nav-link').forEach(l => {
+            l.classList.remove('active');
+          });
+          link.classList.add('active');
+        }
+      });
+    });
+  })();
+</script>

@@ -13,7 +13,7 @@
   {%- if descriptions is mapping -%}
     {{ descriptions.get('en') or descriptions.get('de')
       or (descriptions.values() | list | first) }}
-  {%- else -%}
+  {%- elif descriptions -%}
     {{ descriptions }}
   {%- endif -%}
 {%- endmacro %}
@@ -169,6 +169,7 @@
   </div>
 {%- endmacro %}
 
+{% if sidebar is defined and sidebar %}
 <div class="container-fluid" id="map-sidebar-content">
   {{ entity_card(sidebar.feature, 'fs-2 fw-bold') }}
 
@@ -187,3 +188,4 @@
     </div>
   {% endfor %}
 </div>
+{% endif %}

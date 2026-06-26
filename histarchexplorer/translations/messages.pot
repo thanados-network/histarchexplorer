@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-06-26 13:23+0200\n"
+"POT-Creation-Date: 2026-06-26 20:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -611,7 +611,7 @@ msgstr ""
 #: templates/admin/assets_management.html:60
 #: templates/admin/logo_management.html:52
 #: templates/admin/team_management.html:54 views/admin.py:156
-#: views/admin.py:651 views/admin.py:1598
+#: views/admin.py:652 views/admin.py:1599
 msgid "Select License..."
 msgstr ""
 
@@ -1442,6 +1442,10 @@ msgstr ""
 msgid "Are you sure you want to delete"
 msgstr ""
 
+#: templates/tabs/catalog.html:69
+msgid "Catalogue"
+msgstr ""
+
 #: templates/tabs/overview.html:8
 msgid "subentities"
 msgstr ""
@@ -1579,413 +1583,413 @@ msgstr ""
 msgid "attributes"
 msgstr ""
 
-#: views/admin.py:270
+#: views/admin.py:271
 #, python-format
 msgid ""
 "Invalid ID format for label \"%(label)s\". Please use comma-separated "
 "integers."
 msgstr ""
 
-#: views/admin.py:283
+#: views/admin.py:284
 msgid "Type divisions updated successfully."
 msgstr ""
 
-#: views/admin.py:286
+#: views/admin.py:287
 msgid "Error updating type divisions"
 msgstr ""
 
-#: views/admin.py:321
+#: views/admin.py:322
 msgid "External identifiers updated successfully."
 msgstr ""
 
-#: views/admin.py:324
+#: views/admin.py:325
 msgid "Error updating external identifiers"
 msgstr ""
 
-#: views/admin.py:341
+#: views/admin.py:342
 msgid "Entity colors updated successfully."
 msgstr ""
 
-#: views/admin.py:344
+#: views/admin.py:345
 msgid "Error updating entity colors"
 msgstr ""
 
-#: views/admin.py:359
+#: views/admin.py:360
 msgid "Color added successfully."
 msgstr ""
 
-#: views/admin.py:362
+#: views/admin.py:363
 msgid "Error adding color"
 msgstr ""
 
-#: views/admin.py:364
+#: views/admin.py:365
 msgid "Color already exists."
 msgstr ""
 
-#: views/admin.py:366
+#: views/admin.py:367
 msgid "Invalid HEX code."
 msgstr ""
 
-#: views/admin.py:379
+#: views/admin.py:380
 msgid "Color deleted successfully."
 msgstr ""
 
-#: views/admin.py:382
+#: views/admin.py:383
 msgid "Error deleting color"
 msgstr ""
 
-#: views/admin.py:401
+#: views/admin.py:402
 msgid "Menu settings updated successfully."
 msgstr ""
 
-#: views/admin.py:404
+#: views/admin.py:405
 msgid "Error updating menu settings"
 msgstr ""
 
-#: views/admin.py:423
+#: views/admin.py:424
 msgid "Legal notice updated successfully."
 msgstr ""
 
-#: views/admin.py:426 views/admin.py:543 views/admin.py:1064
+#: views/admin.py:427 views/admin.py:544 views/admin.py:1065
 msgid "Error updating settings"
 msgstr ""
 
-#: views/admin.py:436 views/admin.py:724 views/admin.py:1302
+#: views/admin.py:437 views/admin.py:725 views/admin.py:1303
 msgid "No file part"
 msgstr ""
 
-#: views/admin.py:441 views/admin.py:729 views/admin.py:1307
+#: views/admin.py:442 views/admin.py:730 views/admin.py:1308
 msgid "No selected file"
 msgstr ""
 
-#: views/admin.py:450
+#: views/admin.py:451
 #, python-format
 msgid "Logo \"%(name)s\" uploaded successfully."
 msgstr ""
 
-#: views/admin.py:464 views/admin.py:1330
+#: views/admin.py:465 views/admin.py:1331
 msgid "Invalid request for renaming."
 msgstr ""
 
-#: views/admin.py:475
+#: views/admin.py:476
 msgid "Cannot rename default logos."
 msgstr ""
 
-#: views/admin.py:481 views/admin.py:1347 views/admin.py:1517
+#: views/admin.py:482 views/admin.py:1348 views/admin.py:1518
 msgid "Original file not found."
 msgstr ""
 
-#: views/admin.py:485 views/admin.py:1351 views/admin.py:1521
+#: views/admin.py:486 views/admin.py:1352 views/admin.py:1522
 msgid "A file with the new name already exists."
 msgstr ""
 
-#: views/admin.py:491
+#: views/admin.py:492
 #, python-format
 msgid "Logo renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr ""
 
-#: views/admin.py:494 views/admin.py:1360 views/admin.py:1533
+#: views/admin.py:495 views/admin.py:1361 views/admin.py:1534
 #, python-format
 msgid "Error renaming file: %(error)s"
 msgstr ""
 
-#: views/admin.py:505 views/admin.py:1371
+#: views/admin.py:506 views/admin.py:1372
 msgid "No filename specified for deletion."
 msgstr ""
 
-#: views/admin.py:515
+#: views/admin.py:516
 #, python-format
 msgid "Logo \"%(name)s\" deleted successfully."
 msgstr ""
 
-#: views/admin.py:518 views/admin.py:1384 views/admin.py:1579
+#: views/admin.py:519 views/admin.py:1385 views/admin.py:1580
 #, python-format
 msgid "Error deleting file: %(error)s"
 msgstr ""
 
-#: views/admin.py:522
+#: views/admin.py:523
 #, python-format
 msgid "Default logo \"%(name)s\" deactivated."
 msgstr ""
 
-#: views/admin.py:534 views/admin.py:554
+#: views/admin.py:535 views/admin.py:555
 msgid "No filename specified."
 msgstr ""
 
-#: views/admin.py:540
+#: views/admin.py:541
 msgid "Main logo updated successfully."
 msgstr ""
 
-#: views/admin.py:572
+#: views/admin.py:573
 msgid "Favicon updated successfully."
 msgstr ""
 
-#: views/admin.py:575
+#: views/admin.py:576
 #, python-format
 msgid "Error creating favicon: %(error)s"
 msgstr ""
 
-#: views/admin.py:606
+#: views/admin.py:607
 msgid "Footer logos updated successfully."
 msgstr ""
 
-#: views/admin.py:609
+#: views/admin.py:610
 msgid "Error updating footer logos"
 msgstr ""
 
-#: views/admin.py:625
+#: views/admin.py:626
 msgid "License added successfully."
 msgstr ""
 
-#: views/admin.py:638
+#: views/admin.py:639
 msgid "License deleted successfully."
 msgstr ""
 
-#: views/admin.py:665
+#: views/admin.py:666
 msgid "Logo license updated successfully."
 msgstr ""
 
-#: views/admin.py:710
+#: views/admin.py:711
 msgid "Database backup failed. Check logs for details."
 msgstr ""
 
-#: views/admin.py:713 views/admin.py:789
+#: views/admin.py:714 views/admin.py:790
 msgid "An unexpected error occurred. Check logs for details."
 msgstr ""
 
-#: views/admin.py:780
+#: views/admin.py:781
 msgid "Database restored successfully."
 msgstr ""
 
-#: views/admin.py:784
+#: views/admin.py:785
 msgid "Database restore failed. Check logs for details."
 msgstr ""
 
-#: views/admin.py:792
+#: views/admin.py:793
 msgid "Invalid file type. Please upload a .sql file."
 msgstr ""
 
-#: views/admin.py:802
+#: views/admin.py:803
 msgid "Link deleted successfully"
 msgstr ""
 
-#: views/admin.py:823
+#: views/admin.py:824
 msgid "Link added successfully"
 msgstr ""
 
-#: views/admin.py:829
+#: views/admin.py:830
 msgid "Failed to add link: Invalid data provided"
 msgstr ""
 
-#: views/admin.py:880
+#: views/admin.py:881
 msgid "Entry added successfully!"
 msgstr ""
 
-#: views/admin.py:884
+#: views/admin.py:885
 #, python-format
 msgid "Error adding entry %(name)s: Only one main project allowed"
 msgstr ""
 
-#: views/admin.py:889
+#: views/admin.py:890
 #, python-format
 msgid "Error adding entry %(name)s: %(error)s"
 msgstr ""
 
-#: views/admin.py:900
+#: views/admin.py:901
 msgid "Main Project cannot be deleted"
 msgstr ""
 
-#: views/admin.py:903
+#: views/admin.py:904
 msgid "Entry deleted successfully!"
 msgstr ""
 
-#: views/admin.py:918
+#: views/admin.py:919
 msgid "Configuration ID is required"
 msgstr ""
 
-#: views/admin.py:940
+#: views/admin.py:941
 #, python-format
 msgid "\"%(name)s\" updated successfully"
 msgstr ""
 
-#: views/admin.py:944
+#: views/admin.py:945
 #, python-format
 msgid "Error updating \"%(name)s\": %(error)s"
 msgstr ""
 
-#: views/admin.py:974
+#: views/admin.py:975
 msgid "Map ID is required"
 msgstr ""
 
-#: views/admin.py:991
+#: views/admin.py:992
 msgid "Map updated successfully"
 msgstr ""
 
-#: views/admin.py:994
+#: views/admin.py:995
 msgid "Invalid Map ID format"
 msgstr ""
 
-#: views/admin.py:997
+#: views/admin.py:998
 #, python-format
 msgid "Error updating map: %(error)s"
 msgstr ""
 
-#: views/admin.py:1027
+#: views/admin.py:1028
 #, python-format
 msgid "Map %(name)s with ID %(id)s added successfully!"
 msgstr ""
 
-#: views/admin.py:1033
+#: views/admin.py:1034
 #, python-format
 msgid "Error adding map %(name)s: %(error)s"
 msgstr ""
 
-#: views/admin.py:1045
+#: views/admin.py:1046
 msgid "Map deleted successfully!"
 msgstr ""
 
-#: views/admin.py:1047
+#: views/admin.py:1048
 #, python-format
 msgid "Error deleting map: %(error)s"
 msgstr ""
 
-#: views/admin.py:1061
+#: views/admin.py:1062
 msgid "Index background updated successfully"
 msgstr ""
 
-#: views/admin.py:1095
+#: views/admin.py:1096
 msgid "Invalid ID format. Please use comma-separated integers."
 msgstr ""
 
-#: views/admin.py:1100
+#: views/admin.py:1101
 msgid "Class visibility updated successfully."
 msgstr ""
 
-#: views/admin.py:1161
+#: views/admin.py:1162
 msgid "Updated case study ID successfully"
 msgstr ""
 
-#: views/admin.py:1164
+#: views/admin.py:1165
 msgid ""
 "Invalid Case Study ID. Must be a positive integer and its entity type "
 "must be \"type\"."
 msgstr ""
 
-#: views/admin.py:1186
+#: views/admin.py:1187
 msgid "Reset is only allowed in debug or testing mode."
 msgstr ""
 
-#: views/admin.py:1190
+#: views/admin.py:1191
 msgid "reset database"
 msgstr ""
 
-#: views/admin.py:1217
+#: views/admin.py:1218
 msgid "cache cleared"
 msgstr ""
 
-#: views/admin.py:1225
+#: views/admin.py:1226
 msgid "Cache warmup started in background (refresh mode)"
 msgstr ""
 
-#: views/admin.py:1233
+#: views/admin.py:1234
 msgid "Cache warmup started in background."
 msgstr ""
 
-#: views/admin.py:1252
+#: views/admin.py:1253
 #, python-format
 msgid "Error warming cache: %(error)s"
 msgstr ""
 
-#: views/admin.py:1270
+#: views/admin.py:1271
 msgid "system cache refreshed"
 msgstr ""
 
-#: views/admin.py:1316
+#: views/admin.py:1317
 #, python-format
 msgid "Asset \"%(name)s\" uploaded successfully."
 msgstr ""
 
-#: views/admin.py:1341
+#: views/admin.py:1342
 msgid "Cannot rename default assets."
 msgstr ""
 
-#: views/admin.py:1357
+#: views/admin.py:1358
 #, python-format
 msgid "Asset renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr ""
 
-#: views/admin.py:1381
+#: views/admin.py:1382
 #, python-format
 msgid "Asset \"%(name)s\" deleted successfully."
 msgstr ""
 
-#: views/admin.py:1388
+#: views/admin.py:1389
 #, python-format
 msgid "Default asset \"%(name)s\" deactivated."
 msgstr ""
 
-#: views/admin.py:1406
+#: views/admin.py:1407
 msgid "Asset license updated successfully."
 msgstr ""
 
-#: views/admin.py:1457 views/admin.py:1499 views/admin.py:1563
+#: views/admin.py:1458 views/admin.py:1500 views/admin.py:1564
 msgid "Invalid file type."
 msgstr ""
 
-#: views/admin.py:1466
+#: views/admin.py:1467
 #, python-format
 msgid "%(type)s \"%(name)s\" uploaded successfully."
 msgstr ""
 
-#: views/admin.py:1511
+#: views/admin.py:1512
 msgid "Cannot rename default files."
 msgstr ""
 
-#: views/admin.py:1528
+#: views/admin.py:1529
 #, python-format
 msgid "%(type)s renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr ""
 
-#: views/admin.py:1576
+#: views/admin.py:1577
 #, python-format
 msgid "%(type)s \"%(name)s\" deleted successfully."
 msgstr ""
 
-#: views/admin.py:1583
+#: views/admin.py:1584
 #, python-format
 msgid "Default %(type)s \"%(name)s\" deactivated."
 msgstr ""
 
-#: views/admin.py:1615
+#: views/admin.py:1616
 #, python-format
 msgid "%(type)s license updated successfully."
 msgstr ""
 
-#: views/admin.py:1630
+#: views/admin.py:1631
 msgid "Publication added successfully."
 msgstr ""
 
-#: views/admin.py:1640
+#: views/admin.py:1641
 msgid "No publication ID provided."
 msgstr ""
 
-#: views/admin.py:1650
+#: views/admin.py:1651
 msgid "Publication updated successfully."
 msgstr ""
 
-#: views/admin.py:1659
+#: views/admin.py:1660
 msgid "Publication deleted successfully."
 msgstr ""
 
-#: views/admin.py:1671
+#: views/admin.py:1672
 msgid "Could not fetch metadata for this DOI."
 msgstr ""
 
-#: views/admin.py:1683
+#: views/admin.py:1684
 msgid "Publication types updated successfully."
 msgstr ""
 
-#: views/admin.py:1686
+#: views/admin.py:1687
 msgid "Error updating publication types"
 msgstr ""
 
