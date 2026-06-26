@@ -7,7 +7,7 @@ from typing import Any, Optional
 
 from flask import abort, g, render_template, request
 
-from histarchexplorer import app
+from histarchexplorer import app, cache
 from histarchexplorer.api.presentation_view import (
     EntityTypeModel, File, PresentationView, Relation)
 from histarchexplorer.utils.view_util import (
@@ -188,55 +188,92 @@ def get_map_sidebar_data(id_: int) -> dict[str, Any]:
         'groups': groups}
 
 
+@cache.memoize()
 def get_catalogue_data(id_: int) -> list[dict[str, Any]]:
     """Assemble the hierarchical view-model for the catalogue.
 
     Returns a list of all features, each containing its stratigraphic units,
     artifacts, and human remains.
     """
+    # TODO: Replace this implementation with a new API endpoint specifically
+    # designed to fetch the complete hierarchical catalogue data in a single
+    # request to avoid N+1 queries.
     entity = PresentationView.from_api(id_)
-    features = []
     if entity.system_class == 'feature':
-        features.append(entity)
+        features = [entity]
+        sus = entity.relations.get('stratigraphic_unit', [])
+        artifacts = entity.relations.get('artifact', [])
+        remains = entity.relations.get('human_remains', [])
     else:
-        feature_relations = sorted(
+        features = sorted(
             entity.relations.get('feature', []),
-            key=lambda r: r.name)
-        for rel in feature_relations:
+            key=lambda f: f.name)
+        sus = entity.relations.get('stratigraphic_unit', [])
+        artifacts = entity.relations.get('artifact', [])
+        remains = entity.relations.get('human_remains', [])
+
+    su_parent_map = {}
+    for su in sus:
+        for rt in su.relation_types or []:
+            if rt.get('property') == 'crm:P46i_forms_part_of':
+                su_parent_map[su.id] = rt.get('relationTo')
+
+    child_parent_map = {}
+    for child in artifacts + remains:
+        for rt in child.relation_types or []:
+            if rt.get('property') == 'crm:P46i_forms_part_of':
+                child_parent_map[child.id] = rt.get('relationTo')
+
+    loaded_features = {}
+    for f in features:
+        if f.id == entity.id:
+            loaded_features[f.id] = entity
+        else:
             try:
-                features.append(PresentationView.from_api(rel.id))
+                loaded_features[f.id] = PresentationView.from_api(f.id)
             except Exception as e:
-                app.logger.error(
-                    f"Failed to load feature {rel.id}: {e}")
+                app.logger.error(f"Failed to load feature {f.id}: {e}")
+
+    loaded_sus = {}
+    for su in sus:
+        try:
+            loaded_sus[su.id] = PresentationView.from_api(su.id)
+        except Exception as e:
+            app.logger.error(f"Failed to load SU {su.id}: {e}")
+
+    loaded_children = {}
+    for child in artifacts + remains:
+        try:
+            loaded_children[child.id] = PresentationView.from_api(child.id)
+        except Exception as e:
+            app.logger.error(f"Failed to load child {child.id}: {e}")
 
     catalogue_data = []
-    for feature in features:
+    for f in features:
+        if f.id not in loaded_features:
+            continue
+        feature_view = loaded_features[f.id]
+
         groups = []
-        for su_rel in feature.relations.get('stratigraphic_unit', []):
-            if not is_part_of(su_rel, feature.id):
+        for su in sus:
+            if (su_parent_map.get(su.id) != f.id
+                    or su.id not in loaded_sus):
                 continue
-            try:
-                su_view = PresentationView.from_api(su_rel.id)
-            except Exception as e:
-                app.logger.error(
-                    f"Failed to load stratigraphic unit {su_rel.id}: {e}")
-                continue
+            su_view = loaded_sus[su.id]
 
             children = []
-            for system_class in ('artifact', 'human_remains'):
-                for child_rel in feature.relations.get(system_class, []):
-                    if is_part_of(child_rel, su_rel.id):
-                        try:
-                            children.append(build_sidebar_block(
-                                PresentationView.from_api(child_rel.id)))
-                        except Exception as e:
-                            app.logger.error(
-                                f"Failed to load child {child_rel.id}: {e}")
+            for child in artifacts + remains:
+                if (child_parent_map.get(child.id) == su.id
+                        and child.id in loaded_children):
+                    children.append(build_sidebar_block(
+                        loaded_children[child.id]))
+
             groups.append({
                 'su': build_sidebar_block(su_view),
                 'children': children})
+
         catalogue_data.append({
-            'feature': build_sidebar_block(feature),
+            'feature': build_sidebar_block(feature_view),
             'groups': groups})
     return catalogue_data
 

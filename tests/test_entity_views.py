@@ -249,7 +249,11 @@ def test_catalogue_tab(authenticated_client: FlaskClient) -> None:
             'feature': [
                 Relation(
                     id=2, name='Test Feature', system_class='feature',
-                    relation_types=_part_of(1))]}
+                    relation_types=_part_of(1))],
+            'stratigraphic_unit': [
+                Relation(
+                    id=10, name='SU 10', system_class='stratigraphic_unit',
+                    relation_types=_part_of(2))]}
 
         feature = PresentationView(
             id=2, system_class="feature", view_class="feature",
@@ -292,15 +296,15 @@ def test_catalogue_tab_no_features(
         mock_settings.return_value = settings
 
         place = PresentationView(
-            id=1, system_class="place", view_class="place",
+            id=3, system_class="place", view_class="place",
             title="Test Place", description={"en": "Place description"},
             aliases=[], start=None, end=None)
 
         mock_from_api.return_value = place
 
-        rv = authenticated_client.get('/entity/1')
+        rv = authenticated_client.get('/entity/3')
         assert rv.status_code == 200
         assert b'catalogue' not in rv.data
 
-        rv = authenticated_client.get('/get_entity/1/catalogue')
+        rv = authenticated_client.get('/get_entity/3/catalogue')
         assert rv.status_code == 404

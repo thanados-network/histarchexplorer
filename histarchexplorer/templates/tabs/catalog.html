@@ -35,6 +35,28 @@
   .extra-small {
     font-size: 0.8rem !important;
   }
+  .catalogue-feature-section {
+    position: relative;
+    padding-bottom: 2.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .catalogue-feature-section::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 25%;
+    right: 25%;
+    height: 1px;
+    background-color: var(--bs-border-color-translucent);
+    opacity: 0.4;
+  }
+  .catalogue-feature-section:last-child {
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  .catalogue-feature-section:last-child::after {
+    display: none;
+  }
 </style>
 
 <div class="container-fluid py-3">
@@ -94,6 +116,9 @@
     const scrollContainer = document.querySelector('.entity-content');
     if (!scrollContainer) return;
 
+    let isClickScrolling = false;
+    let clickScrollTimeout = null;
+
     // Highlight active TOC item on scroll
     const observerOptions = {
       root: scrollContainer,
@@ -102,6 +127,8 @@
     };
 
     const observer = new IntersectionObserver((entries) => {
+      if (isClickScrolling) return;
+
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const id = entry.target.getAttribute('id');
@@ -131,11 +158,28 @@
         const targetId = link.getAttribute('href').substring(1);
         const targetElement = document.getElementById(targetId);
         if (targetElement) {
-          targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          isClickScrolling = true;
+          if (clickScrollTimeout) clearTimeout(clickScrollTimeout);
+
+          // Immediately highlight the clicked link
           document.querySelectorAll('.catalogue-toc .nav-link').forEach(l => {
             l.classList.remove('active');
           });
           link.classList.add('active');
+          link.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+          // Scroll the content
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+          const resetFlag = () => {
+            isClickScrolling = false;
+          };
+
+          if ('onscrollend' in window || 'onscrollend' in scrollContainer) {
+            scrollContainer.addEventListener('scrollend', resetFlag, { once: true });
+          } else {
+            clickScrollTimeout = setTimeout(resetFlag, 1000);
+          }
         }
       });
     });
