@@ -128,7 +128,7 @@ class ExternalReferenceModel:
 
     Attributes:
         id (str): Unique identifier of the reference.
-        type (str): Type of the reference system.
+        type (str): Type of the reference system, e.g. 'closeMatch', 'exactMatch'.
         identifier (str): External ID or key (e.g., Wikidata ID).
         reference_system (str): Name of the external system.
         resolver_url (str | None): URL pattern to resolve the identifier.

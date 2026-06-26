@@ -547,6 +547,117 @@ function renderReferences(entity) {
     relayout(10);
 }
 
+function renderExternalReferences(entity, settings = {}) {
+    const tile = document.getElementById("tile-external-references");
+    const list = document.getElementById("js-external-references");
+    const refs = entity?.external_reference_systems;
+    if (!tile || !list || !Array.isArray(refs) || !refs.length) return;
+
+    list.innerHTML = "";
+    let renderedCount = 0;
+
+    refs.forEach((ref) => {
+        // QUICKFIX/TODO: Once a dedicated API endpoint for external reference systems is available,
+        // we should look up settings by system ID. Currently, we match by name since the API returns
+        // the external identifier value instead of the system ID in ref.id.
+        const sysSettings = Object.values(settings).find(s =>
+            s.name && s.name.toLowerCase() ===
+            (ref.reference_system || "").toLowerCase()) || {};
+        if (sysSettings.disabled) return;
+
+        renderedCount++;
+        const linkUrl = ref.reference_url || (ref.resolver_url
+            ? ref.resolver_url.replace("$1", ref.identifier)
+            : "#");
+
+        let matchBadge = null;
+        const typeNorm = (ref.type || "").toLowerCase().replace(/[^a-z]/g, "");
+        if (typeNorm === "exactmatch") {
+            matchBadge = h("span", {
+                class: "badge ms-2",
+                style: "font-size: 0.65rem; font-weight: 500; text-transform: uppercase; " +
+                    "background-color: rgba(40, 167, 69, 0.1); color: #28a745; " +
+                    "border: 1px solid rgba(40, 167, 69, 0.2); padding: 2px 4px; vertical-align: middle;",
+                text: window.overviewTranslations?.exactMatch || "exact match"
+            });
+        } else if (typeNorm === "closematch") {
+            matchBadge = h("span", {
+                class: "badge ms-2",
+                style: "font-size: 0.65rem; font-weight: 500; text-transform: uppercase; " +
+                    "background-color: rgba(255, 193, 7, 0.1); color: #b58100; " +
+                    "border: 1px solid rgba(255, 193, 7, 0.2); padding: 2px 4px; vertical-align: middle;",
+                text: window.overviewTranslations?.closeMatch || "close match"
+            });
+        }
+
+        let favicon = h("i", {class: "bi bi-globe"});
+        if (sysSettings.icon_type === "css" && sysSettings.icon_value) {
+            const iconClass = sysSettings.icon_value.startsWith("bi ") ||
+                sysSettings.icon_value.split(" ").includes("bi")
+                    ? sysSettings.icon_value
+                    : "bi " + sysSettings.icon_value;
+            favicon = h("i", {class: iconClass});
+        } else if (sysSettings.icon_type === "img" && sysSettings.icon_url) {
+            favicon = h("img", {
+                src: sysSettings.icon_url,
+                style: "max-width: 100%; max-height: 100%; object-fit: contain;"
+            });
+        }
+
+        let infoIcon = null;
+        if (sysSettings.description) {
+            infoIcon = h("i", {
+                class: "bi bi-info-circle text-muted ms-2",
+                style: "font-size: 0.8rem; cursor: help;"});
+            new bootstrap.Popover(infoIcon, {
+                content: sysSettings.description,
+                trigger: "hover focus",
+                placement: "top",
+                container: "body"});
+        }
+
+        const li = h("li", {class: "mb-3 d-flex align-items-start"}, [
+            h("span", {
+                class: "external-reference-favicon-placeholder me-2 mt-1 " +
+                    "d-inline-flex align-items-center justify-content-center",
+                style: "width: 18px; height: 18px; min-width: 18px; " +
+                    "border-radius: 4px; background-color: rgba(0, 0, 0, 0.06); " +
+                    "color: #6c757d; font-size: 10px;"
+            }, [
+                favicon]),
+            h("div", {class: "flex-grow-1"}, [
+                h("div", {class: "d-flex align-items-center mb-1"}, [
+                    h("span", {
+                        class: "fw-bold text-dark small text-uppercase",
+                        text: ref.reference_system || ref.type || "External System"
+                    }),
+                    infoIcon,
+                    matchBadge].filter(Boolean)),
+                h("a", {
+                    href: linkUrl,
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                    class: "external-reference-link text-decoration-none small text-break"
+                }, [
+                    h("span", {text: ref.identifier || ""}),
+                    h("i", {
+                        class: "bi bi-box-arrow-up-right ms-1",
+                        style: "font-size: 0.7rem;"
+                    })])])]);
+
+        list.appendChild(li);
+    });
+
+    if (renderedCount > 0) {
+        list.prepend(h("h4", {
+            class: "mb-3",
+            text: window.overviewTranslations?.externalReferences || "External Identifiers"
+        }));
+        tile.hidden = false;
+        relayout(10);
+    }
+}
+
 (async function initOverview() {
     // --- Wait until DOM is ready ---
     if (document.readyState === "loading") {
@@ -571,6 +682,7 @@ function renderReferences(entity) {
     const initialImages = data.initialImage;
     const allImages = (data.images || []).filter(img => img?.from_super_entity === false);
     const additionalFilesOverview = window.additionalFilesOverview || 0;
+    const externalIdentifiersSettings = data.externalIdentifiersSettings || {};
 
     const grid = document.querySelector(".grid-overview");
     if (!grid) {
@@ -708,8 +820,19 @@ function renderReferences(entity) {
         ]),
     ]);
 
+    const extRefTile = h("div", {
+        class: "item",
+        id: "tile-external-references",
+        hidden: true
+    }, [
+        h("div", {class: "item-content"}, [
+            h("ul", {
+                id: "js-external-references",
+                class: "no-bullets ps-0 mb-0"
+            })])]);
 
-    grid.append(mapTile, imageTile, galleryTile, refTile, subTile);
+
+    grid.append(mapTile, imageTile, galleryTile, refTile, subTile, extRefTile);
 
     // === RENDER DATA ===
     if (typeof renderToolbox === "function") renderToolbox(citeButton, refreshButton);
@@ -722,6 +845,8 @@ function renderReferences(entity) {
     if (typeof renderSubTile === "function") renderSubTile(entity);
     if (typeof renderAttributes === "function") renderAttributes(categorizedTypes);
     if (typeof renderReferences === "function") renderReferences(entity);
+    if (typeof renderExternalReferences === "function")
+        renderExternalReferences(entity, externalIdentifiersSettings);
 
     // === MEDIA OVERVIEW ===
     let files = [];

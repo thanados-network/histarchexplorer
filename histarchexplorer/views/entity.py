@@ -511,6 +511,15 @@ def entity_data(id_: int) -> dict[str, Any]:
                 'type': 'FeatureCollection',
                 'features': get_features_for_map(entity)}
     main_image, initial_images, images = get_entity_images(entity.files)
+
+    external_identifiers_settings = {}
+    for sys_id, data in g.settings.external_identifiers.items():
+        resolved_data = data.copy()
+        if data.get('icon_type') == 'img' and data.get('icon_value'):
+            from histarchexplorer.api.util import get_icon_url
+            resolved_data['icon_url'] = get_icon_url(data['icon_value'])
+        external_identifiers_settings[sys_id] = resolved_data
+
     return {
         'entity': asdict(entity),
         'spatial': {
@@ -523,7 +532,8 @@ def entity_data(id_: int) -> dict[str, Any]:
         'refreshButton': get_refresh_button(entity.id) or "",
         'mainImage': main_image,
         'initialImage': initial_images,
-        'images': images}
+        'images': images,
+        'externalIdentifiersSettings': external_identifiers_settings}
 
 
 def background_cache_relations(

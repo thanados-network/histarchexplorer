@@ -122,6 +122,8 @@ class Settings(BaseModel):
                                           'ids': [23440]},
             'case study': {'icon_type': 'css', 'icon_value': 'bi bi-house',
                            'ids': [8240]}})
+    external_identifiers: dict[str, dict[str, Any]] = Field(
+        default_factory=dict)
 
     @classmethod
     def load_from_db(cls) -> 'Settings':

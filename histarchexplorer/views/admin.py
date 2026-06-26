@@ -90,7 +90,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                         'sidebar-visibility-settings' |
                         'sidebar-general-settings-group' |
                         'sidebar-about-content' |
-                        'sidebar-outcome' | 'sidebar-search-content'):
+                        'sidebar-outcome' | 'sidebar-search-content' |
+                        'sidebar-external-identifiers'):
                     active_main_sidebar_id = tab
 
                 case _:
@@ -153,6 +154,58 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         (l['id'], l['label']) for l in admin_instance.licenses]
     file_license_form.license_id.choices.insert(
         0, (0, _('Select License...')))
+
+    # Synchronize external identifiers settings with OpenAtlas
+    try:
+        api_res = ApiAccess.get_table_rows(
+            classes=['reference_system'],
+            table_columns=['name', 'description'])
+
+        g.openatlas_cursor.execute(
+            '''
+            SELECT entity_id, resolver_url, website_url
+            FROM web.reference_system''')
+        db_rows = g.openatlas_cursor.fetchall()
+        url_lookup = {
+            str(r['entity_id']): {
+                'resolver_url': r['resolver_url'],
+                'website_url': r['website_url']}
+            for r in db_rows}
+
+        oa_ids = set()
+        for row in api_res.get('results', []):
+            checkbox_str, name, description = row[0], row[1], row[2]
+            match = re.search(r'value="(\d+)"', checkbox_str)
+            if match:
+                sys_id = match.group(1)
+                oa_ids.add(sys_id)
+                urls = url_lookup.get(sys_id, {})
+
+                if sys_id not in g.settings.external_identifiers:
+                    g.settings.external_identifiers[sys_id] = {
+                        'name': name,
+                        'resolver_url': urls.get('resolver_url') or '',
+                        'website_url': urls.get('website_url') or '',
+                        'description': '',
+                        'disabled': False,
+                        'icon_type': '',
+                        'icon_value': '',
+                        'is_missing': False}
+                else:
+                    g.settings.external_identifiers[sys_id].update({
+                        'name': name,
+                        'resolver_url': urls.get('resolver_url') or '',
+                        'website_url': urls.get('website_url') or '',
+                        'is_missing': False})
+
+        for sys_id in list(g.settings.external_identifiers.keys()):
+            if sys_id not in oa_ids:
+                g.settings.external_identifiers[sys_id]['is_missing'] = True
+
+        from histarchexplorer.database.settings import save_settings
+        save_settings('external_identifiers', g.settings.external_identifiers)
+    except Exception as e:
+        app.logger.error("Failed to sync external identifiers: %s", e)
 
     return render_template(
         "admin.html",
@@ -234,6 +287,44 @@ def update_type_divisions() -> Response:
         flash(_('Error updating type divisions'), 'error')
 
     return _redirect_to_admin_tab('sidebar-type-divisions')
+
+
+@app.route('/admin/update_external_identifiers', methods=['POST'])
+@login_required
+def update_external_identifiers() -> Response:
+    check_manager_user()
+    new_external_identifiers = {}
+
+    for sys_id, current_data in g.settings.external_identifiers.items():
+        if current_data.get('is_missing'):
+            present_key = f'present_{sys_id}'
+            if present_key not in request.form:
+                continue
+
+        disabled = request.form.get(f'disabled_{sys_id}') == 'on'
+        icon_type = request.form.get(f'icon_type_{sys_id}', '')
+        icon_value = request.form.get(f'icon_value_{sys_id}', '')
+        description = request.form.get(f'description_{sys_id}', '').strip()
+
+        new_external_identifiers[sys_id] = {
+            'name': current_data.get('name', ''),
+            'resolver_url': current_data.get('resolver_url', ''),
+            'website_url': current_data.get('website_url', ''),
+            'description': description,
+            'disabled': disabled,
+            'icon_type': icon_type,
+            'icon_value': icon_value,
+            'is_missing': current_data.get('is_missing', False)}
+
+    g.settings.external_identifiers = new_external_identifiers
+    try:
+        g.settings.save_to_db()
+        flash(_('External identifiers updated successfully.'), 'success')
+    except Exception as e:
+        app.logger.error("Failed to update external identifiers: %s", e)
+        flash(_('Error updating external identifiers'), 'error')
+
+    return _redirect_to_admin_tab('sidebar-external-identifiers')
 
 
 @app.route('/admin/update_entity_colors', methods=['POST'])

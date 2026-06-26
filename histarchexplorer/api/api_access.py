@@ -106,3 +106,28 @@ class ApiAccess:
             timeout=60).json()
         return req['results']
 
+    @staticmethod
+    def get_table_rows(
+            classes: list[str],
+            table_columns: Optional[list[str]] = None,
+            limit: int = 0) -> dict[str, Any]:
+        """Fetch tabular data for specific classes and columns from the API.
+
+        Queries the OpenAtlas API table_rows endpoint.
+        """
+        # TODO: Once a dedicated endpoint for external reference systems is
+        # available in the OpenAtlas API, replace the get_table_rows quickfix
+        # with the new endpoint.
+        if table_columns is None:
+            table_columns = ['name']
+        params = {
+            'system_classes': classes,
+            'table_columns': table_columns,
+            'limit': limit}
+        return requests.get(
+            f"{app.config['API_URL']}table_rows/",
+            params=params,
+            headers=g.api_headers,
+            proxies=PROXIES,
+            timeout=30).json()
+
