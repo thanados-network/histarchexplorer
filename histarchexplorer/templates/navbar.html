@@ -4,7 +4,7 @@
          style="font-size: 0.85rem; z-index: 1050;" role="alert">
         <i class="bi bi-exclamation-triangle-fill me-2"></i>
         Database upgrade required! Pending migrations: {{ pending_upgrades | join(', ') }}.
-        Run <code>uv run python install/upgrade.py</code>
+        Run <code class="text-lowercase">uv run python install/upgrade.py</code>
     </div>
     {% endif %}
     <div class="container-fluid">

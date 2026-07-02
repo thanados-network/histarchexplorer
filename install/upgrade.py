@@ -1,6 +1,10 @@
 import re
+import sys
 from pathlib import Path
 from typing import Any
+
+# Add project root to sys.path to allow importing histarchexplorer
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import psycopg2
 import psycopg2.extras
