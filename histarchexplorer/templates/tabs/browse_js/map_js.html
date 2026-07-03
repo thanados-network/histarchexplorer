@@ -77,10 +77,8 @@
             id: '{{ tab_name }}-layer-representative-points',
             type: 'circle',
             paint: {
-                'circle-radius': 6,
-                'circle-color': '#666666',
-                'circle-stroke-color': '#ffffff',
-                'circle-stroke-width': 2,
+                'circle-radius': 9,
+                'circle-color': '#088',
                 'circle-opacity': [
                     'step', ['zoom'],
                     ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], 0]]],
