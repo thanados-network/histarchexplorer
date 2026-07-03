@@ -44,11 +44,11 @@
     content: "";
     position: absolute;
     bottom: 0;
-    left: 25%;
-    right: 25%;
-    height: 1px;
+    left: 5%;
+    right: 5%;
+    height: 2px;
     background-color: var(--bs-border-color-translucent);
-    opacity: 0.4;
+    opacity: 0.7;
   }
   .catalogue-feature-section:last-child {
     padding-bottom: 0;
@@ -62,16 +62,16 @@
 <div class="container-fluid py-3">
   <div class="row">
     <!-- Catalogue List -->
-    <div class="col-md-9" id="catalogue-list">
+    <div class="col-md-10" id="catalogue-list">
       {% for item in catalogue %}
         <div id="feature-{{ item.feature.id }}" class="catalogue-feature-section mb-5">
           {{ entity_card(item.feature, 'fs-2 fw-bold') }}
 
           {% for group in item.groups %}
-            <div id="su-{{ group.su.id }}" class="map-sidebar-group ms-3 border-start ps-3 mt-3">
+            <div id="su-{{ group.su.id }}" class=" ms-md-3 ps-md-3 mt-3">
               {{ entity_card(group.su, 'fs-3 fw-semibold') }}
               {% if group.children %}
-                <div class="ms-3 border-start ps-3">
+                <div class="ms-md-3 ps-md-3">
                   {% for child in group.children %}
                     <div id="child-{{ child.id }}" class="mt-2">
                       {{ entity_card(child, 'fs-4 fw-semibold') }}
@@ -86,7 +86,7 @@
     </div>
 
     <!-- TOC Sidebar -->
-    <div class="col-md-3 d-none d-md-block">
+    <div class="col-md-2 d-none d-md-block" id="catalogue-sidebar">
       <div class="position-sticky" style="top: 1rem; max-height: calc(100vh - 8rem); overflow-y: auto;">
         <h5 class="mb-3">{{ _('Catalogue') }}</h5>
         <nav class="nav flex-column catalogue-toc">

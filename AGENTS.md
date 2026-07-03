@@ -19,7 +19,7 @@
 - **Execution**: `pytest` in the root directory.
 - **Configuration**: `tests/conftest.py` contains the Flask app fixture.
 - **Coverage**: `pytest --cov=histarchexplorer`
-- **Optimization**: 
+- **Optimization**:
   - External API calls (e.g. to `thanados.openatlas.eu`) MUST be mocked (see `tests/conftest.py`).
   - Slow tests should be marked with `@pytest.mark.slow` and can be excluded with `-m "not slow"`.
 
@@ -61,3 +61,15 @@
   - Complex algorithms
   - Core data models / schemas
 - **Structure**: 1-2 empty lines for logical separation.
+
+#### JavaScript (Vanilla JS Specifics)
+- **Scope & Variables**: Never use `var`. Use `const` by default; use `let` only if reassignment is explicitly required.
+- **Modularity & State**: Avoid polluting the global scope. Enforce encapsulation using ES Modules (`import`/`export`) or immediately invoked function expressions (IIFE) where modules aren't viable.
+- **DOM Manipulation & Performance**:
+  - Cache DOM selectors (do not repeatedly query the DOM for the same element).
+  - Use `DocumentFragment` when creating and appending multiple elements dynamically to prevent redundant reflows.
+  - Prefer `element.textContent` over `element.innerHTML` unless rendering actual HTML, to avoid XSS vulnerabilities.
+- **Asynchronous Operations**:
+  - Always handle asynchronous actions using `async/await` syntax combined with structured `try/catch` blocks.
+  - Provide meaningful error indicators or fallback states in the UI if a `fetch` or API call fails.
+- **Clean Functions**: Functions must be single-purpose. Keep them compact, and if a function requires more than 3 arguments, pass them as a single configuration object instead.
