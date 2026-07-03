@@ -212,3 +212,9 @@
     }
   }
 }
+
+/* Preserve the newline between the recommended citation and the */
+/* "after [reference]" clause in the citation modal. */
+#citationText {
+  white-space: pre-line;
+}

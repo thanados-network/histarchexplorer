@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-06-26 20:28+0200\n"
+"POT-Creation-Date: 2026-07-03 16:07+0200\n"
 "PO-Revision-Date: 2026-05-22 14:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sl\n"
@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.18.0\n"
 
 #: api/util.py:43 api/util.py:45 api/util.py:46 api/util.py:51
 msgid "BC"
@@ -1520,7 +1520,7 @@ msgstr "Potrdi izbris"
 msgid "Are you sure you want to delete"
 msgstr "Ali ste prepričani, da želite izbrisati"
 
-#: templates/tabs/catalog.html:69
+#: templates/tabs/catalog.html:91
 msgid "Catalogue"
 msgstr ""
 
@@ -1630,29 +1630,27 @@ msgstr "o projektu"
 msgid "Unknown"
 msgstr "Neznano"
 
-#: utils/view_util.py:140 utils/view_util.py:174
+#: utils/view_util.py:141 utils/view_util.py:184
 #, fuzzy
 msgid "Unknown Project"
 msgstr "glavni projekt"
 
-#: utils/view_util.py:143
-#, python-format
-msgid "Accessed: %(date)s"
-msgstr "Dostopano: %(date)s"
+#: utils/view_util.py:144 utils/view_util.py:272
+msgid "Accessed"
+msgstr "Dostopano"
 
-#: utils/view_util.py:147 utils/view_util.py:179 utils/view_util.py:196
+#: utils/view_util.py:150 utils/view_util.py:191
+msgid "after"
+msgstr "po"
+
+#: utils/view_util.py:155 utils/view_util.py:195 utils/view_util.py:214
 #, fuzzy
 msgid "Unknown Author"
 msgstr "Neznano"
 
-#: utils/view_util.py:243
-#, python-format
-msgid ""
-"%(project_name)s (%(year)s). %(title)s. Retrieved from %(url)s (Accessed:"
-" %(date)s)"
-msgstr ""
-"%(project_name)s (%(year)s). %(title)s. Pridobljeno iz %(url)s "
-"(Dostopano: %(date)s)"
+#: utils/view_util.py:271
+msgid "Retrieved from"
+msgstr "Pridobljeno iz"
 
 #: views/admin.py:53
 msgid "main-project"
@@ -2172,4 +2170,11 @@ msgstr "Čiščenje predpomnilnika ni uspelo: %(error)s"
 
 #~ msgid "types"
 #~ msgstr "Tip strani"
+
+#~ msgid ""
+#~ "%(project_name)s (%(year)s). %(title)s. Retrieved"
+#~ " from %(url)s (Accessed: %(date)s)"
+#~ msgstr ""
+#~ "%(project_name)s (%(year)s). %(title)s. Pridobljeno"
+#~ " iz %(url)s (Dostopano: %(date)s)"
 
