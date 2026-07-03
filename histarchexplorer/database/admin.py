@@ -1,9 +1,9 @@
 import json
 import os
-from typing import Any, NamedTuple
+from typing import Any
 
-from flask import abort, g, current_app
 import bleach
+from flask import abort, current_app, g
 
 ALLOWED_HTML_TAGS = [
     'b', 'strong', 'i', 'em', 'u',
@@ -128,8 +128,12 @@ def update_map(data: dict[str, str]) -> None:
                 END,
             tilestring   = NULLIF(%(tilestring)s, '')
         WHERE id = %(map_id)s
-        """,
-        data)
+        """, {
+            'name': data.get('name'),
+            'display_name': data.get('display_name'),
+            'sortorder': data.get('sortorder'),
+            'tilestring': data.get('tilestring'),
+            'map_id': data.get('map_id')})
 
 
 class TooManyMainProjects(Exception):
@@ -199,8 +203,15 @@ def update_config_entry(data: dict[str, str | int]) -> None:
             acronym            = %(acronym)s,
             license_id         = %(license_id)s
         WHERE id = %(config_id)s
-        """,
-        data)
+        """, {
+            'email': data.get('email'),
+            'website': data.get('website'),
+            'orcid_id': data.get('orcid_id'),
+            'image': data.get('image'),
+            'case_study': data.get('case_study'),
+            'acronym': data.get('acronym'),
+            'license_id': data.get('license_id'),
+            'config_id': config_id})
     _upsert_jsonb_fields(int(config_id), data)
 
 
@@ -303,11 +314,11 @@ def add_link(data: dict[str, Any]) -> None:
         VALUES (%(domain)s, %(range)s, %(prop)s, NULLIF(%(attribute)s, 0),
                 %(sortorder)s)
         ''', {
-            'domain': data['domain'],
-            'range': data['range'],
-            'prop': data['prop'],
-            'attribute': data['role'],
-            'sortorder': data['sortorder']})
+            'domain': data.get('domain'),
+            'range': data.get('range'),
+            'prop': data.get('prop'),
+            'attribute': data.get('role'),
+            'sortorder': data.get('sortorder')})
 
 
 def delete_link(id_: int) -> None:
