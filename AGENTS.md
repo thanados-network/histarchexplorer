@@ -62,13 +62,18 @@
   - Core data models / schemas
 - **Structure**: 1-2 empty lines for logical separation.
 
-#### JavaScript (Vanilla JS Specifics)
+#### Frontend Architecture (JS, Jinja2, SCSS)
+- **Jinja2 & JS Integration (Pragmatic SoC)**:
+  - Inline `<script>` tags inside Jinja2 templates are permitted *only* for initializing views, configuring page-specific variables, or passing data from Flask (e.g., setting global config objects or embedding dynamic IDs).
+  - Move complex logic, large event handlers, and heavy API/Leaflet manipulation into dedicated external `.js` files.
+  - When passing simple data attributes from Flask to JS, prefer HTML5 `data-*` attributes on the respective DOM elements instead of injecting raw Jinja tags into JS whenever possible.
 - **Scope & Variables**: Never use `var`. Use `const` by default; use `let` only if reassignment is explicitly required.
 - **Modularity & State**: Avoid polluting the global scope. Enforce encapsulation using ES Modules (`import`/`export`) or immediately invoked function expressions (IIFE) where modules aren't viable.
 - **DOM Manipulation & Performance**:
   - Cache DOM selectors (do not repeatedly query the DOM for the same element).
   - Use `DocumentFragment` when creating and appending multiple elements dynamically to prevent redundant reflows.
   - Prefer `element.textContent` over `element.innerHTML` unless rendering actual HTML, to avoid XSS vulnerabilities.
+- **Styling**: Do not manipulate `element.style` directly in JS. Instead, toggle SCSS/Bootstrap utility classes using `element.classList.add/remove/toggle` to keep styles centralized.
 - **Asynchronous Operations**:
   - Always handle asynchronous actions using `async/await` syntax combined with structured `try/catch` blocks.
   - Provide meaningful error indicators or fallback states in the UI if a `fetch` or API call fails.
