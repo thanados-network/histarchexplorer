@@ -100,6 +100,7 @@ async function loadHTML(id, tab, index, totalTabs) {
 
 // Function to check if all tabs are loaded and remove the spinner
 function checkAndRemoveSpinner(totalTabs) {
+    console.log(`checkAndRemoveSpinner: loadedCount=${loadedCount}, totalTabs=${totalTabs}`);
     if (loadedCount >= totalTabs) {
         document.querySelectorAll(".to-remove-spinner").forEach(element => {
             element.remove();
@@ -107,6 +108,7 @@ function checkAndRemoveSpinner(totalTabs) {
         });
 
         if (typeof entityId !== 'undefined' && entityId > 0) {
+            console.log(`Triggering background cache for entity: ${entityId}`);
             fetch(`/api/cache-related/${entityId}`);
         }
     }
@@ -131,11 +133,16 @@ function loadScript(script) {
 }
 
 if (entityId == 0) {
-    tabsToLoad.forEach((tab, index) => {
-        if (!loadedTabs.includes(tab)) {
-            loadHTML(entityId, tab, index, tabsToLoad.length);
-        }
-    });
+    loadedCount = loadedTabs.length;
+    if (loadedCount >= tabsToLoad.length) {
+        checkAndRemoveSpinner(tabsToLoad.length);
+    } else {
+        tabsToLoad.forEach((tab, index) => {
+            if (!loadedTabs.includes(tab)) {
+                loadHTML(entityId, tab, index, tabsToLoad.length);
+            }
+        });
+    }
 } else {
     (async function loadTabs() {
         // Wait until the entity data is fetched
@@ -161,14 +168,16 @@ if (entityId == 0) {
             tabsToLoad = tabsToLoad.filter(t => t !== 'media');
         }
 
-
-        tabsToLoad.forEach((tab, index) => {
-            if (!loadedTabs.includes(tab)) {
-                loadHTML(entityId, tab, index, tabsToLoad.length);
-            }
-        });
-
-
+        loadedCount = loadedTabs.length;
+        if (loadedCount >= tabsToLoad.length) {
+            checkAndRemoveSpinner(tabsToLoad.length);
+        } else {
+            tabsToLoad.forEach((tab, index) => {
+                if (!loadedTabs.includes(tab)) {
+                    loadHTML(entityId, tab, index, tabsToLoad.length);
+                }
+            });
+        }
     })();
 }
 

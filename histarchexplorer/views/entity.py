@@ -647,26 +647,32 @@ def background_cache_relations(
     Iterates through semantic relations and triggers a full API fetch for
     each, memoizing them in Redis. Adds a 0.5s delay between requests.
     """
-    with app_.test_request_context(base_url=base_url):
-        g.api_headers = headers
-        try:
-            entity = PresentationView.from_api(entity_id)
-            related_ids = set()
-            for relations in entity.relations.values():
-                for rel in relations:
-                    if rel.id > 0:
-                        related_ids.add(rel.id)
+    print(f"DEBUG: Entering background_cache_relations for {entity_id}")
+    try:
+        with app_.test_request_context(base_url=base_url):
+            print(f"DEBUG: Context established for {entity_id}")
+            g.api_headers = headers
+            try:
+                print(entity_id, "background caching relations")
+                entity = PresentationView.from_api(entity_id)
+                related_ids = set()
+                for relations in entity.relations.values():
+                    for rel in relations:
+                        if rel.id > 0:
+                            related_ids.add(rel.id)
 
-            for rid in related_ids:
-                try:
-                    PresentationView.from_api(rid)
-                    time.sleep(0.5)
-                except Exception as e:
-                    app_.logger.error(
-                        f"Failed to cache related entity {rid}: {e}")
-        except Exception as e:
-            app_.logger.error(
-                f"Background caching failed for {entity_id}: {e}")
+                for rid in related_ids:
+                    try:
+                        PresentationView.from_api(rid)
+                        time.sleep(0.5)
+                    except Exception as e:
+                        app_.logger.error(
+                            f"Failed to cache related entity {rid}: {e}")
+            except Exception as e:
+                app_.logger.error(
+                    f"Background caching failed for {entity_id}: {e}")
+    except Exception as e:
+        print(f"DEBUG: Failed to start background task for {entity_id}: {e}")
 
 
 @app.route('/api/cache-related/<int:id_>')
@@ -676,6 +682,7 @@ def cache_related(id_: int) -> str:
     Spawns a daemon thread to pre-fetch related entity data without
     blocking the current request.
     """
+    print(f"API call received: /api/cache-related/{id_}")
     headers = getattr(g, 'api_headers', {})
     base_url = request.base_url
     thread = threading.Thread(
