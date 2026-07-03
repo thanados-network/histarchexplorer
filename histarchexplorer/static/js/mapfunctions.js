@@ -1,3 +1,5 @@
+// MAPFUNCTIONS.JS — General file for all mapfunctions
+
 function addSkybox(map) {
     map.setSky({
         "sky-color": "#b2ddfa",
@@ -71,5 +73,83 @@ function showPopup(lngLat, featureNames, map) {
 
         });
     })
+}
+
+/**
+ * Processes a FeatureCollection to add representative points for non-point geometries.
+ * These points are used as markers when the original geometry is too small at low zoom levels.
+ * @param {Object} featureCollection - The GeoJSON FeatureCollection to process.
+ * @returns {Object} The updated FeatureCollection.
+ */
+function processRepresentativePoints(featureCollection) {
+    if (!featureCollection || !featureCollection.features) return featureCollection;
+
+    const newFeatures = [];
+    featureCollection.features.forEach(feature => {
+        if (!feature.geometry) return;
+        const type = feature.geometry.type;
+
+        if (type === 'Polygon' || type === 'MultiPolygon' || type === 'LineString' || type === 'MultiLineString') {
+            const bounds = new maplibregl.LngLatBounds();
+
+            const extendBounds = (geom) => {
+                if (!geom || !geom.coordinates) return;
+                const gType = geom.type;
+                const coords = geom.coordinates;
+                if (gType === 'Point') {
+                    bounds.extend(coords);
+                } else if (gType === 'LineString' || gType === 'MultiPoint') {
+                    coords.forEach(c => bounds.extend(c));
+                } else if (gType === 'Polygon' || gType === 'MultiLineString') {
+                    coords.forEach(ring => ring.forEach(c => bounds.extend(c)));
+                } else if (gType === 'MultiPolygon') {
+                    coords.forEach(poly => poly.forEach(ring => ring.forEach(c => bounds.extend(c))));
+                }
+            };
+
+            extendBounds(feature.geometry);
+
+            if (!bounds.isEmpty()) {
+                const center = bounds.getCenter();
+                const sw = bounds.getSouthWest();
+                const ne = bounds.getNorthEast();
+
+                // Calculate diagonal distance in meters using Haversine approximation
+                const lat1 = sw.lat * Math.PI / 180;
+                const lat2 = ne.lat * Math.PI / 180;
+                const deltaLat = (ne.lat - sw.lat) * Math.PI / 180;
+                const deltaLng = (ne.lng - sw.lng) * Math.PI / 180;
+
+                const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+                          Math.cos(lat1) * Math.cos(lat2) *
+                          Math.sin(deltaLng / 2) * Math.sin(deltaLng / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                const size = 6371000 * c; // Earth radius in meters
+
+                if (size > 0) {
+                    const lat = center.lat;
+                    // Formula: zoom = log2((pixel_size * circumference * cos(lat)) / (size * tile_size))
+                    const threshold = Math.log2((40 * 40075016 * Math.cos(lat * Math.PI / 180)) / (size * 256));
+
+                    newFeatures.push({
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [center.lng, center.lat]
+                        },
+                        properties: {
+                            ...feature.properties,
+                            representative: true,
+                            hide_point_zoom: threshold,
+                            fade_start_zoom: threshold - 1
+                        }
+                    });
+                }
+            }
+        }
+    });
+
+    featureCollection.features.push(...newFeatures);
+    return featureCollection;
 }
 
