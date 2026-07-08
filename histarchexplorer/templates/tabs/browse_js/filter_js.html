@@ -265,8 +265,8 @@ function addEnhancedUnavailableStyles{{ tab_name }}() {
     }
 }
 
-// Function to rebuild tree with filtered data
-function rebuildTreeWithFilteredData{{ tab_name }}() {
+// Function to rebuild a single tree with filtered data
+function rebuildTreeWithFilteredData{{ tab_name }}(tree) {
     const filteredData = getFilteredTableData{{ tab_name }}();
     const validTypeIds = getValidTypeIdsWithAncestors{{ tab_name }}(filteredData, {{ tab_name }}Data.treeData);
 
@@ -276,78 +276,51 @@ function rebuildTreeWithFilteredData{{ tab_name }}() {
     // Add our enhanced styling
     addEnhancedUnavailableStyles{{ tab_name }}();
 
-    // Clear existing trees
-    const container = document.getElementById("{{ tab_name }}-tree-container");
-    if (!container) return; // Safety check
+    const treeContainer = document.getElementById(`{{ tab_name }}Tree${tree}`);
+    if (!treeContainer) return; // Safety check
 
-    container.innerHTML = '';
+    // Store current selection before rebuilding
+    const currentInstance = window.{{ tab_name }}TreeInstances[tree];
+    const currentSelection = currentInstance ? {
+        selectedNodeIds: currentInstance.selectedNodeIds || [],
+        selectedNodeIdsWithChildren: currentInstance.selectedNodeIdsWithChildren || []
+    } : {selectedNodeIds: [], selectedNodeIdsWithChildren: []};
 
-    // Store current selections before rebuilding
-    const currentSelections = {};
-    if (window.{{ tab_name }}TreeInstances) {
-        for (const tree in window.{{ tab_name }}TreeInstances) {
-            if (window.{{ tab_name }}TreeInstances[tree]) {
-                currentSelections[tree] = {
-                    selectedNodeIds: window.{{ tab_name }}TreeInstances[tree].selectedNodeIds || [],
-                    selectedNodeIdsWithChildren: window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren || []
-                };
-            }
+    treeContainer.innerHTML = '';
+
+    // Create Treeview with marked data (unavailable nodes have selectable: false)
+    const treeview = new Treeview({
+        containerId: `{{ tab_name }}Tree${tree}`,
+        data: markedTreeData[tree][0].children, // Library will automatically apply .not-selectable class, remove root node
+        searchEnabled: true,
+        buttonStyle: 'bootstrapIcons',
+        nodeNameKey: 'label',
+        initiallyExpanded: false,
+        checkboxSelectionEnabled: true,
+        multiSelectEnabled: true,
+        showExpandCollapseAllButtons: true,
+        showSelectAllButton: true,
+        showInvertSelectionButton: true,
+        onSelectionChange: (selectedNodesData) => {
+            // Only available nodes will be selectable, so no filtering needed here
+            window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = selectedNodesData.map(node => node.id);
+            window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = treeview.getSelectedNodesAndChildrenValues('id');
         }
-    }
+    });
 
-    // Completely clear and reinitialize tree instances
-    window.{{ tab_name }}TreeInstances = {};
+    window.{{ tab_name }}TreeInstances[tree] = treeview;
+    window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = [];
+    window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = [];
 
-    // Rebuild trees - now ALL trees are shown, with unavailable nodes greyed out
-    const allOriginalTrees = Object.keys({{ tab_name }}Data.treeData);
-
-    for (const tree of allOriginalTrees) {
-        const div = document.createElement('div');
-        div.id = `{{ tab_name }}Tree${tree}`;
-        div.classList.add('tree-container');
-        div.innerHTML = `
-                <div class="tree-header">
-                    <h3 class="tree-header-title">${tree.replace('_', ' ').replace(/^./, c => c.toUpperCase())}</h3>
-                </div>
-            `;
-
-        div.classList.add('typeTreeSelector');
-        container.appendChild(div);
-
-        // Create Treeview with marked data (unavailable nodes have selectable: false)
-        const treeview = new Treeview({
-            containerId: `{{ tab_name }}Tree${tree}`,
-            data: markedTreeData[tree][0].children, // Library will automatically apply .not-selectable class, remove root node
-            searchEnabled: true,
-            buttonStyle: 'bootstrapIcons',
-            nodeNameKey: 'label',
-            initiallyExpanded: false,
-            checkboxSelectionEnabled: true,
-            multiSelectEnabled: true,
-            showExpandCollapseAllButtons: true,
-            showSelectAllButton: true,
-            showInvertSelectionButton: true,
-            onSelectionChange: (selectedNodesData) => {
-                // Only available nodes will be selectable, so no filtering needed here
-                window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = selectedNodesData.map(node => node.id);
-                window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = treeview.getSelectedNodesAndChildrenValues('id');
-            }
-        });
-
-        window.{{ tab_name }}TreeInstances[tree] = treeview;
-        window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = [];
-        window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = [];
-
-        // Restore selections that are still available
-        if (currentSelections[tree]?.selectedNodeIds.length > 0) {
-            const validSelections = currentSelections[tree].selectedNodeIds.filter(id => validTypeIds.has(id));
-            if (validSelections.length > 0) {
-                try {
-                    validSelections.forEach(id => treeview.selectNodeById(id, true));
-                    window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = validSelections;
-                } catch (e) {
-                    //console.log('Could not restore selections:', e);
-                }
+    // Restore selections that are still available
+    if (currentSelection.selectedNodeIds.length > 0) {
+        const validSelections = currentSelection.selectedNodeIds.filter(id => validTypeIds.has(id));
+        if (validSelections.length > 0) {
+            try {
+                validSelections.forEach(id => treeview.selectNodeById(id, true));
+                window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = validSelections;
+            } catch (e) {
+                //console.log('Could not restore selections:', e);
             }
         }
     }
@@ -483,10 +456,6 @@ filterInput{{ tab_name }}.addEventListener("input", function () {
     applyCombinedFilter{{ tab_name }}();
 });
 
-// Event listener for when the types accordion section is shown
-document.getElementById('typesCollapse{{ tab_name }}').addEventListener('shown.bs.collapse', () => {
-    rebuildTreeWithFilteredData{{ tab_name }}();
-});
 
 if ({{ tab_name }}Data.fields.includes("begin")) {
 
@@ -569,20 +538,59 @@ const {{ tab_name }}TreesToBuild = Object.keys({{ tab_name }}Data.treeData);
 
 const {{ tab_name }}CurrentContainer = document.getElementById("{{ tab_name }}-tree-container");
 
+if (!window.{{ tab_name }}TreeInstances) {
+    window.{{ tab_name }}TreeInstances = {};
+}
+
 for (const tree of {{ tab_name }}TreesToBuild) {
-    const div = document.createElement('div');
-    div.id = `{{ tab_name }}Tree${tree}`;
-    div.classList.add('tree-container');
-    div.innerHTML = `
-        <div class="tree-header">
-            <h3 class="tree-header-title">${tree.replace('_', ' ').replace(/^./, c => c.toUpperCase())}</h3>
+    const treeLabel = tree.replace('_', ' ').replace(/^./, c => c.toUpperCase());
+
+    const accordionItem = document.createElement('div');
+    accordionItem.classList.add('accordion-item');
+    accordionItem.innerHTML = `
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#typesCollapse{{ tab_name }}${tree}">
+                ${treeLabel} types
+            </button>
+        </h2>
+        <div id="typesCollapse{{ tab_name }}${tree}" class="accordion-collapse collapse">
+            <div class="p-3">
+                <div id="{{ tab_name }}Tree${tree}" class="tree-container typeTreeSelector"></div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <span class="form-check">
+                        <input class="form-check-input" checked type="checkbox"
+                               id="include-subcategories-{{ tab_name }}-${tree}">
+                        <label class="form-check-label" for="include-subcategories-{{ tab_name }}-${tree}">
+                            Include subcategories
+                        </label>
+                    </span>
+                    <span>
+                        <button type="button" class="btn btn-warning btn-sm filter-btn"
+                                id="reset-type-btn-{{ tab_name }}-${tree}">
+                            Reset
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm filter-btn"
+                                id="apply-type-btn-{{ tab_name }}-${tree}">
+                            Apply
+                        </button>
+                    </span>
+                </div>
+            </div>
         </div>
     `;
 
-    div.classList.add('typeTreeSelector');
-    {{ tab_name }}CurrentContainer.appendChild(div);
-    const {{ tab_name }}Checkbox = document.getElementById("include-subcategories-{{ tab_name }}");
+    {{ tab_name }}CurrentContainer.appendChild(accordionItem);
 
+    accordionItem.querySelector(`#reset-type-btn-{{ tab_name }}-${tree}`)
+        .addEventListener('click', () => deselectTree{{ tab_name }}(tree));
+    accordionItem.querySelector(`#apply-type-btn-{{ tab_name }}-${tree}`)
+        .addEventListener('click', () => filterTypes{{ tab_name }}());
+
+    document.getElementById(`typesCollapse{{ tab_name }}${tree}`)
+        .addEventListener('shown.bs.collapse', () => {
+            rebuildTreeWithFilteredData{{ tab_name }}(tree);
+        });
 
     // Create a Treeview instance – store it in an object instead of dynamic variable
     const treeview = new Treeview({
@@ -603,9 +611,6 @@ for (const tree of {{ tab_name }}TreesToBuild) {
         }
     });
 
-    if (!window.{{ tab_name }}TreeInstances) {
-        window.{{ tab_name }}TreeInstances = {};
-    }
     window.{{ tab_name }}TreeInstances[tree] = treeview;
     window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = []
     window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = []
@@ -614,11 +619,10 @@ for (const tree of {{ tab_name }}TreesToBuild) {
 
 let selectedNodes{{ tab_name }} = [];
 
-// Deselects all currently selected nodes across every tree of this tab
-function deselectTree{{ tab_name }}() {
-    for (const tree of {{ tab_name }}TreesToBuild) {
-        const treeInstance = window.{{ tab_name }}TreeInstances[tree];
-        if (!treeInstance) continue;
+// Deselects all currently selected nodes of the given tree of this tab
+function deselectTree{{ tab_name }}(tree) {
+    const treeInstance = window.{{ tab_name }}TreeInstances[tree];
+    if (treeInstance) {
         treeInstance.getSelectedNodes().forEach(node => {
             treeInstance.selectNodeById(node.id, false);
         });
@@ -630,13 +634,15 @@ function deselectTree{{ tab_name }}() {
 
 function filterTypes{{ tab_name }}() {
     selectedNodes{{ tab_name }} = [];
-    if (document.getElementById("include-subcategories-{{ tab_name }}").checked) {
-        for (const tree of {{ tab_name }}TreesToBuild) {
-            selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren);
-        }
-    } else {
-        for (const tree of {{ tab_name }}TreesToBuild) {
-            selectedNodes{{ tab_name }}.push(...window.{{ tab_name }}TreeInstances[tree].selectedNodeIds);
+    for (const tree of {{ tab_name }}TreesToBuild) {
+        const treeInstance = window.{{ tab_name }}TreeInstances[tree];
+        if (!treeInstance) continue;
+        const checkbox = document.getElementById(`include-subcategories-{{ tab_name }}-${tree}`);
+        const includeSubcategories = checkbox ? checkbox.checked : true;
+        if (includeSubcategories) {
+            selectedNodes{{ tab_name }}.push(...treeInstance.selectedNodeIdsWithChildren);
+        } else {
+            selectedNodes{{ tab_name }}.push(...treeInstance.selectedNodeIds);
         }
     }
     //console.log(selectedNodes{{ tab_name }})
