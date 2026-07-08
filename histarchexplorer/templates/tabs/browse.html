@@ -39,64 +39,6 @@
         <button class="btn btn-outline-secondary" type="button" id="clearFilter{{ tab_name }}">&times;</button>
     </div>
 
-    <div class="dropdown d-none" id="classDropdown{{ tab_name }}">
-        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                aria-expanded="false">
-            Classes
-        </button>
-        <ul class="dropdown-menu p-2" style="min-width: 250px;" id="classSelect{{ tab_name }}">
-        </ul>
-    </div>
-
-    <div class="dropdown d-none" id="csDropdown{{ tab_name }}">
-        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                aria-expanded="false">
-            Projects
-        </button>
-        <ul class="dropdown-menu p-2" style="min-width: 250px;" id="csSelect{{ tab_name }}">
-        </ul>
-    </div>
-
-    <button id="{{ tab_name }}TypesButton" type="button"
-            class="d-none btn btn-outline-secondary d-flex align-items-center gap-2"
-            onclick="{{ tab_name }}TreeModal.show()" title="Types">Types
-    </button>
-
-    <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2"
-            onclick="{{ tab_name }}Modal.show()" title="Advanced Sort">
-        <i class="bi bi-sort-down"></i>
-    </button>
-
-    <div class="d-flex flex-wrap gap-3">
-        <div style="min-width: 300px;" class="d-none ms-3 me-3" id="begin-{{ tab_name }}-container">
-            <div class="d-flex align-items-center gap-2">
-                <span id="sliderBeginMin{{ tab_name }}" class="text-nowrap me-3"></span>
-                <div class="slider-styled flex-grow-1" id="sliderBegin{{ tab_name }}"></div>
-                <span id="sliderBeginMax{{ tab_name }}" class="text-nowrap ms-3"></span>
-            </div>
-            <div class="form-check mt-2">
-                <input class="form-check-input" type="checkbox" id="includeNoBegin{{ tab_name }}" checked>
-                <label class="form-check-label" for="includeNoBegin{{ tab_name }}">
-                    include {{ tab_name }} without begin date
-                </label>
-            </div>
-        </div>
-
-        <div style="min-width: 300px;" class="d-none ms-3 me-3" id="end-{{ tab_name }}-container">
-            <div class="d-flex align-items-center gap-2">
-                <span id="sliderEndMin{{ tab_name }}" class="text-nowrap me-3"></span>
-                <div class="slider-styled flex-grow-1" id="sliderEnd{{ tab_name }}"></div>
-                <span id="sliderEndMax{{ tab_name }}" class="text-nowrap ms-3"></span>
-            </div>
-            <div class="form-check mt-2">
-                <input class="form-check-input" type="checkbox" id="includeNoEnd{{ tab_name }}" checked>
-                <label class="form-check-label" for="includeNoEnd{{ tab_name }}">
-                    include {{ tab_name }} without end date
-                </label>
-            </div>
-        </div>
-    </div>
-
     <div class="btn-group" role="group" aria-label="Change View">
         <button id="{{ tab_name }}-list-btn" type="button"
                 class="btn btn-outline-secondary active" onclick="{{ tab_name }}ToggleView('table')"
@@ -117,100 +59,33 @@
         </button>
     </div>
 
+    <button type="button" class="btn btn-outline-secondary" id="{{ tab_name }}-filter-toggle-btn"
+            title="Filters">
+        <i class="bi bi-funnel"></i>
+    </button>
+
 
 </div>
 
 
-<div id="table-{{ tab_name }}" class="tabulator-container"></div>
-<div id="tile-{{ tab_name }}" class="tile-container d-none">
-    <div id="grid-container-{{ tab_name }}" class="grid-container">
-        <div class="grid" id="grid-{{ tab_name }}">
-            <!-- Items will be populated by JavaScript -->
-        </div>
-    </div>
-    <div id="tile-pagination-{{ tab_name }}" class="tile-pagination"></div>
-</div>
-
-{% if tab_name in ['places', 'items'] %}
-    <div id="map-{{ tab_name }}" class="map-container d-none"></div>
-{% endif %}
-<div class="modal fade" id="modal-{{ tab_name }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-     aria-labelledby="modal-title-{{ tab_name }}" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-fullscreen-sm-down">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-title-{{ tab_name }}">Sort
-                    {{ tab_name[0]|upper }}{{ tab_name[1:] }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row align-items-end mb-2">
-                    <div class="col">
-                        <label class="form-label">Sort by</label>
-                    </div>
-                    <div class="col">
-                        <label class="form-label">Direction</label>
-                    </div>
-                    <div class="col-auto">
-                        <button type="button" class="btn btn-outline-danger remove-sort-level opacity-0 disabled">
-                            Remove
-                        </button>
-                    </div>
-                </div>
-                <div id="sort-levels-{{ tab_name }}">
-
+<div class="browse-body-wrapper d-flex">
+    <div class="browse-main-content flex-grow-1">
+        <div id="table-{{ tab_name }}" class="tabulator-container"></div>
+        <div id="tile-{{ tab_name }}" class="tile-container d-none">
+            <div id="grid-container-{{ tab_name }}" class="grid-container">
+                <div class="grid" id="grid-{{ tab_name }}">
+                    <!-- Items will be populated by JavaScript -->
                 </div>
             </div>
-            <div class="d-flex justify-content-between m-3">
-                <button type="button" class="btn btn-outline-primary"
-                        id="add-sort-level-{{ tab_name }}">
-                    Add Sort Level
-                </button>
-                <span>
-                                    <button type="button" class="btn btn-warning" id="reset-sort-btn-{{ tab_name }}">
-                                        Reset
-                                    </button>
-                                    <button type="button" class="btn btn-primary" id="apply-sort-btn-{{ tab_name }}">
-                                        Apply
-                                    </button>
-                                    </span>
-            </div>
+            <div id="tile-pagination-{{ tab_name }}" class="tile-pagination"></div>
         </div>
+
+        {% if tab_name in ['places', 'items'] %}
+            <div id="map-{{ tab_name }}" class="map-container d-none"></div>
+        {% endif %}
     </div>
-</div>
 
-
-<div class="modal fade" id="modal-{{ tab_name }}-tree" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-     aria-labelledby="modal-title-{{ tab_name }}-tree" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-fullscreen-sm-down">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-title-{{ tab_name }}-tree">Select Type(s)</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="{{ tab_name }}-tree-container"></div>
-            </div>
-            <div class="modal-footer justify-content-between">
-
-                <span class="form-check">
-                    <input class="form-check-input" checked type="checkbox" id="include-subcategories-{{ tab_name }}">
-                    <label class="form-check-label" for="include-subcategories-{{ tab_name }}">
-                      Include subcategories
-                    </label>
-                </span>
-                <span>
-                <button type="button" class="btn btn-warning" id="reset-type-btn-{{ tab_name }}" onclick="deselectTree{{ tab_name }}()">
-                    Reset
-                </button>
-                <button type="button" class="btn btn-primary" id="apply-type-btn-{{ tab_name }}" onclick="filterTypes{{ tab_name }}()">
-                    Apply
-                </button>
-                </span>
-
-            </div>
-        </div>
-    </div>
+    {% include "/tabs/browse_js/filter_sidebar.html" %}
 </div>
 
 

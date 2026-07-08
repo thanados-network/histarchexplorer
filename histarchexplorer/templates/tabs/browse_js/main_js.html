@@ -11,6 +11,12 @@ function {{tab_name}}ToggleView(view) {
         const el = document.getElementById(`${v}-${tabName}`);
         if (!el) return;
         el.classList.toggle("d-none", v !== view);
+        if (v === "table" && v === view && table{{ tab_name }}) {
+            // Force column width recalculation, needed because the
+            // table may have been hidden or the sidebar may have
+            // resized the container since the last redraw.
+            table{{ tab_name }}.redraw(true);
+        }
         if (v === "tile") {
             //console.log('Tile view selected, refreshing grid');
             // Adjust tile container height

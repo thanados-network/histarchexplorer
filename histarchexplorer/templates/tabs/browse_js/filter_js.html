@@ -1,8 +1,5 @@
 <script> {# Filter Search Sort #}
 //Filter/Sort/Search
-const {{tab_name}}Modal = new bootstrap.Modal('#modal-{{ tab_name }}', {})
-const {{tab_name}}TreeModal = new bootstrap.Modal('#modal-{{ tab_name }}-tree', {})
-
 const sortLevelsContainer{{ tab_name }} = document.getElementById('sort-levels-{{ tab_name }}');
 const addSortLevelBtn{{ tab_name }} = document.getElementById('add-sort-level-{{ tab_name }}');
 
@@ -51,7 +48,7 @@ document.getElementById('reset-sort-btn-{{ tab_name }}').addEventListener('click
     addSortLevel{{ tab_name }}();  // Optionally add one empty level back
 });
 
-document.getElementById('modal-{{ tab_name }}').addEventListener('shown.bs.modal', () => {
+document.getElementById('sortCollapse{{ tab_name }}').addEventListener('shown.bs.collapse', () => {
     if (sortLevelsContainer{{ tab_name }}.children.length === 0) {
         addSortLevel{{ tab_name }}();
     }
@@ -79,7 +76,7 @@ if (classList{{ tab_name }}.length > 1) {
 
         li.innerHTML = `
         <input class="form-check-input" type="checkbox" value="${cls}" id="check-${cls}">
-        <label class="form-check-label" for="check-${cls}">${cls.replace('_', ' ')}</label>
+        <label class="form-check-label" for="check-${cls}">${cls.replace('_', ' ').replace(/^./, c => c.toUpperCase())}</label>
     `;
 
         classSelect{{ tab_name }}.appendChild(li);
@@ -310,7 +307,7 @@ function rebuildTreeWithFilteredData{{ tab_name }}() {
         div.classList.add('tree-container');
         div.innerHTML = `
                 <div class="tree-header">
-                    <h3 class="tree-header-title">${tree.charAt(0).toUpperCase()}${tree.slice(1)}</h3>
+                    <h3 class="tree-header-title">${tree.replace('_', ' ').replace(/^./, c => c.toUpperCase())}</h3>
                 </div>
             `;
 
@@ -485,8 +482,8 @@ filterInput{{ tab_name }}.addEventListener("input", function () {
     applyCombinedFilter{{ tab_name }}();
 });
 
-// Event listener for when tree modal is shown
-document.getElementById('modal-{{ tab_name }}-tree').addEventListener('shown.bs.modal', () => {
+// Event listener for when the types accordion section is shown
+document.getElementById('typesCollapse{{ tab_name }}').addEventListener('shown.bs.collapse', () => {
     rebuildTreeWithFilteredData{{ tab_name }}();
 });
 
@@ -577,7 +574,7 @@ for (const tree of {{ tab_name }}TreesToBuild) {
     div.classList.add('tree-container');
     div.innerHTML = `
         <div class="tree-header">
-            <h3 class="tree-header-title">${tree.charAt(0).toUpperCase()}${tree.slice(1)}</h3>
+            <h3 class="tree-header-title">${tree.replace('_', ' ').replace(/^./, c => c.toUpperCase())}</h3>
         </div>
     `;
 

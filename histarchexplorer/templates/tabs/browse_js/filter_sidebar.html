@@ -1,0 +1,190 @@
+<div id="filter-sidebar-backdrop-{{ tab_name }}" class="filter-sidebar-backdrop"></div>
+<div id="filter-sidebar-{{ tab_name }}" class="filter-sidebar">
+    <div class="filter-sidebar-inner">
+        <div class="filter-sidebar-header d-flex justify-content-between align-items-center p-2 border-bottom">
+            <h5 class="m-0">Filters</h5>
+            <button type="button" class="btn-close" id="filter-sidebar-close-{{ tab_name }}"
+                    aria-label="Close"></button>
+        </div>
+
+        <div class="accordion accordion-flush" id="filter-accordion-{{ tab_name }}">
+
+            <div class="accordion-item d-none" id="classDropdown{{ tab_name }}">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#classCollapse{{ tab_name }}" aria-expanded="true">
+                        Classes
+                    </button>
+                </h2>
+                <div id="classCollapse{{ tab_name }}" class="accordion-collapse collapse show">
+                    <ul class="list-unstyled p-3 m-0" id="classSelect{{ tab_name }}">
+                    </ul>
+                </div>
+            </div>
+
+            <div class="accordion-item d-none" id="csDropdown{{ tab_name }}">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#csCollapse{{ tab_name }}" aria-expanded="true">
+                        Projects
+                    </button>
+                </h2>
+                <div id="csCollapse{{ tab_name }}" class="accordion-collapse collapse show">
+                    <ul class="list-unstyled p-3 m-0" id="csSelect{{ tab_name }}">
+                    </ul>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#dateCollapse{{ tab_name }}" aria-expanded="true">
+                        Date Range
+                    </button>
+                </h2>
+                <div id="dateCollapse{{ tab_name }}" class="accordion-collapse collapse show">
+                    <div class="p-3 d-flex flex-column gap-3">
+                        <div class="d-none" id="begin-{{ tab_name }}-container">
+                            <div class="d-flex align-items-center gap-2">
+                                <span id="sliderBeginMin{{ tab_name }}" class="text-nowrap me-3"></span>
+                                <div class="slider-styled flex-grow-1" id="sliderBegin{{ tab_name }}"></div>
+                                <span id="sliderBeginMax{{ tab_name }}" class="text-nowrap ms-3"></span>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="includeNoBegin{{ tab_name }}"
+                                       checked>
+                                <label class="form-check-label" for="includeNoBegin{{ tab_name }}">
+                                    include {{ tab_name }} without begin date
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-none" id="end-{{ tab_name }}-container">
+                            <div class="d-flex align-items-center gap-2">
+                                <span id="sliderEndMin{{ tab_name }}" class="text-nowrap me-3"></span>
+                                <div class="slider-styled flex-grow-1" id="sliderEnd{{ tab_name }}"></div>
+                                <span id="sliderEndMax{{ tab_name }}" class="text-nowrap ms-3"></span>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="includeNoEnd{{ tab_name }}"
+                                       checked>
+                                <label class="form-check-label" for="includeNoEnd{{ tab_name }}">
+                                    include {{ tab_name }} without end date
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item d-none" id="{{ tab_name }}TypesButton">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#typesCollapse{{ tab_name }}">
+                        Types
+                    </button>
+                </h2>
+                <div id="typesCollapse{{ tab_name }}" class="accordion-collapse collapse">
+                    <div class="p-3">
+                        <div id="{{ tab_name }}-tree-container"></div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <span class="form-check">
+                                <input class="form-check-input" checked type="checkbox"
+                                       id="include-subcategories-{{ tab_name }}">
+                                <label class="form-check-label" for="include-subcategories-{{ tab_name }}">
+                                    Include subcategories
+                                </label>
+                            </span>
+                            <span>
+                                <button type="button" class="btn btn-warning btn-sm"
+                                        id="reset-type-btn-{{ tab_name }}"
+                                        onclick="deselectTree{{ tab_name }}()">
+                                    Reset
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm"
+                                        id="apply-type-btn-{{ tab_name }}"
+                                        onclick="filterTypes{{ tab_name }}()">
+                                    Apply
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#sortCollapse{{ tab_name }}">
+                        Advanced Sort
+                    </button>
+                </h2>
+                <div id="sortCollapse{{ tab_name }}" class="accordion-collapse collapse">
+                    <div class="p-3">
+                        <div class="row align-items-end mb-2">
+                            <div class="col">
+                                <label class="form-label">Sort by</label>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Direction</label>
+                            </div>
+                            <div class="col-auto">
+                                <button type="button"
+                                        class="btn btn-outline-danger remove-sort-level opacity-0 disabled">
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                        <div id="sort-levels-{{ tab_name }}">
+                        </div>
+                        <div class="d-flex justify-content-between mt-3">
+                            <button type="button" class="btn btn-outline-primary"
+                                    id="add-sort-level-{{ tab_name }}">
+                                Add Sort Level
+                            </button>
+                            <span>
+                                <button type="button" class="btn btn-warning" id="reset-sort-btn-{{ tab_name }}">
+                                    Reset
+                                </button>
+                                <button type="button" class="btn btn-primary" id="apply-sort-btn-{{ tab_name }}">
+                                    Apply
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script> {# Filter Sidebar Toggle #}
+    function toggleFilterSidebar{{ tab_name }}() {
+        const sidebar = document.getElementById('filter-sidebar-{{ tab_name }}');
+        const backdrop = document.getElementById('filter-sidebar-backdrop-{{ tab_name }}');
+        sidebar.classList.toggle('open');
+        backdrop.classList.toggle('show', sidebar.classList.contains('open'));
+        setTimeout(() => {
+            adjustTableHeight{{ tab_name }}();
+            adjustTileHeight{{ tab_name }}();
+            // Recalculate table column widths, as the main content
+            // width has changed due to the sidebar opening/closing.
+            if (typeof table{{ tab_name }} !== 'undefined' && table{{ tab_name }}) {
+                table{{ tab_name }}.redraw(true);
+            }
+        }, 350);
+    }
+
+    document.getElementById('{{ tab_name }}-filter-toggle-btn').addEventListener('click', () => {
+        toggleFilterSidebar{{ tab_name }}();
+    });
+
+    document.getElementById('filter-sidebar-close-{{ tab_name }}').addEventListener('click', () => {
+        toggleFilterSidebar{{ tab_name }}();
+    });
+
+    document.getElementById('filter-sidebar-backdrop-{{ tab_name }}').addEventListener('click', () => {
+        toggleFilterSidebar{{ tab_name }}();
+    });
+</script>
