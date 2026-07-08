@@ -583,16 +583,18 @@ for (const tree of {{ tab_name }}TreesToBuild) {
     {{ tab_name }}CurrentContainer.appendChild(accordionItem);
 
     accordionItem.querySelector(`#reset-type-btn-{{ tab_name }}-${tree}`)
-        .addEventListener('click', () => deselectTree{{ tab_name }}(tree));
+        ?.addEventListener('click', () => deselectTree{{ tab_name }}(tree));
     accordionItem.querySelector(`#apply-type-btn-{{ tab_name }}-${tree}`)
-        .addEventListener('click', () => filterTypes{{ tab_name }}());
+        ?.addEventListener('click', () => filterTypes{{ tab_name }}());
 
     document.getElementById(`typesCollapse{{ tab_name }}${tree}`)
-        .addEventListener('shown.bs.collapse', () => {
+        ?.addEventListener('shown.bs.collapse', () => {
             rebuildTreeWithFilteredData{{ tab_name }}(tree);
         });
 
     // Create a Treeview instance – store it in an object instead of dynamic variable
+    if (!{{ tab_name }}Data.treeData[tree]?.[0]?.children) continue;
+
     const treeview = new Treeview({
         containerId: `{{ tab_name }}Tree${tree}`,   // ID of the HTML element to render the tree into
         data: {{ tab_name }}Data.treeData[tree][0].children,   // Use bracket notation to access the property, remove root node
