@@ -370,14 +370,16 @@ function getChartData(relations) {
 function renderAttributes(categorizedTypes) {
     const tile = document.getElementById("tile-attributes");
     const host = document.getElementById("js-attributes");
-    if (!tile || !host || !categorizedTypes || !Object.keys(categorizedTypes).length) return;
+    if (!tile || !host || !categorizedTypes ||
+        !Object.keys(categorizedTypes).length) return;
     host.innerHTML = "";
     Object.entries(categorizedTypes).forEach(([bucket, items]) => {
         const division = items?.[0]?.division;
         let iconHtml = '';
         if (division) {
             if (division.iconUrl) {
-                iconHtml = `<img src="${division.iconUrl}" class="attribute-icon">`;
+                iconHtml = `<img src="${division.iconUrl}" ` +
+                    `class="attribute-icon">`;
             } else if (division.icon) {
                 iconHtml = division.icon;
             }
@@ -393,13 +395,122 @@ function renderAttributes(categorizedTypes) {
             const vu = t.value && t.unit ? `: ${t.value} ${t.unit}` : "";
             const badge = h("div", {
                     class: "badge custom-badge text-wrap m-1",
-                    "data-id": t.id || ""
-                },
-                h("h6", {class: "m-0 text-center", text: `${t.title || ""}${vu}`})
+                    "data-id": t.id || "",
+                    style: "cursor: pointer;",
+                    "data-bs-toggle": "popover",
+                    role: "button",
+                    tabindex: "0"},
+                h("h6", {
+                    class: "m-0 text-center",
+                    text: `${t.title || ""}${vu}`})
             );
+
+            const getEntryId = (entryObj) => {
+                if (!entryObj || !entryObj.identifier) return null;
+                const parts = entryObj.identifier.split('/');
+                const idVal = parseInt(parts[parts.length - 1], 10);
+                return isNaN(idVal) ? null : idVal;
+            };
+
+            const getTranslatedDescription = (descriptions) => {
+                if (!descriptions) return null;
+                if (typeof descriptions === 'string') {
+                    return descriptions;
+                }
+                if (typeof descriptions === 'object') {
+                    return pickDescription(descriptions);
+                }
+                return null;
+            };
+
+            let popoverHtml = `<div class="popover-content text-start">`;
+            popoverHtml += `<div><a href="/entity/${t.id}" ` +
+                `style="color: var(--entity-color-types); text-decoration: none;">` +
+                `<strong>${t.title || ""}</strong></a></div>`;
+            const desc = getTranslatedDescription(t.descriptions);
+            if (desc) {
+                popoverHtml += `<div class="text-muted mt-1 small">` +
+                    `${desc}</div>`;
+            }
+
+            const hierarchy = t.typeHierarchy || t.type_hierarchy || [];
+            const ancestors = hierarchy.filter(entryObj => {
+                const entryId = getEntryId(entryObj);
+                return entryId !== null && entryId !== t.id;
+            });
+
+            if (ancestors.length > 0) {
+                const parent = ancestors[ancestors.length - 1];
+                const parentId = getEntryId(parent);
+                const root = ancestors[0];
+                const rootId = getEntryId(root);
+
+                const parentLink = `/entity/${parentId}`;
+                popoverHtml += `<div class="mt-2 small">` +
+                    `<strong>Subcategorie of:</strong> ` +
+                    `<a href="${parentLink}" ` +
+                    `style="color: var(--entity-color-types); text-decoration: none;">` +
+                    `${parent.label || ""}</a>` +
+                    `</div>`;
+
+                const rootLink = `/entity/${rootId}`;
+                popoverHtml += `<div class="mt-1 small">` +
+                    `<strong>Hierarchy:</strong> ` +
+                    `<a href="${rootLink}" ` +
+                    `style="color: var(--entity-color-types); text-decoration: none;">` +
+                    `${root.label || ""}</a>` +
+                    `</div>`;
+            }
+            popoverHtml += `</div>`;
+
+            new bootstrap.Popover(badge, {
+                content: popoverHtml,
+                html: true,
+                sanitize: false,
+                trigger: 'click',
+                placement: 'bottom',
+                container: 'body'});
+
+            badge.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    badge.click();
+                }
+            });
+
+            badge.addEventListener('click', () => {
+                const selector = '[data-bs-toggle="popover"]';
+                document.querySelectorAll(selector).forEach(el => {
+                    if (el !== badge) {
+                        const instance = bootstrap.Popover.getInstance(el);
+                        if (instance) {
+                            instance.hide();
+                        }
+                    }
+                });
+            });
+
             host.appendChild(badge);
         });
     });
+
+    if (!window.popoverDismissRegistered) {
+        document.addEventListener('click', (e) => {
+            const isTrigger = e.target.closest('[data-bs-toggle="popover"]');
+            const isInside = e.target.closest('.popover');
+            if (!isTrigger && !isInside) {
+                const selector = '[data-bs-toggle="popover"]';
+                document.querySelectorAll(selector).forEach(el => {
+                    const instance = bootstrap.Popover.getInstance(el);
+                    if (instance) {
+                        instance.hide();
+                    }
+                });
+            }
+        });
+        window.popoverDismissRegistered = true;
+    }
+
     tile.hidden = false;
     relayout(10);
 }
@@ -436,6 +547,117 @@ function renderReferences(entity) {
     relayout(10);
 }
 
+function renderExternalReferences(entity, settings = {}) {
+    const tile = document.getElementById("tile-external-references");
+    const list = document.getElementById("js-external-references");
+    const refs = entity?.external_reference_systems;
+    if (!tile || !list || !Array.isArray(refs) || !refs.length) return;
+
+    list.innerHTML = "";
+    let renderedCount = 0;
+
+    refs.forEach((ref) => {
+        // QUICKFIX/TODO: Once a dedicated API endpoint for external reference systems is available,
+        // we should look up settings by system ID. Currently, we match by name since the API returns
+        // the external identifier value instead of the system ID in ref.id.
+        const sysSettings = Object.values(settings).find(s =>
+            s.name && s.name.toLowerCase() ===
+            (ref.reference_system || "").toLowerCase()) || {};
+        if (sysSettings.disabled) return;
+
+        renderedCount++;
+        const linkUrl = ref.reference_url || (ref.resolver_url
+            ? ref.resolver_url.replace("$1", ref.identifier)
+            : "#");
+
+        let matchBadge = null;
+        const typeNorm = (ref.type || "").toLowerCase().replace(/[^a-z]/g, "");
+        if (typeNorm === "exactmatch") {
+            matchBadge = h("span", {
+                class: "badge ms-2",
+                style: "font-size: 0.65rem; font-weight: 500; text-transform: uppercase; " +
+                    "background-color: rgba(40, 167, 69, 0.1); color: #28a745; " +
+                    "border: 1px solid rgba(40, 167, 69, 0.2); padding: 2px 4px; vertical-align: middle;",
+                text: window.overviewTranslations?.exactMatch || "exact match"
+            });
+        } else if (typeNorm === "closematch") {
+            matchBadge = h("span", {
+                class: "badge ms-2",
+                style: "font-size: 0.65rem; font-weight: 500; text-transform: uppercase; " +
+                    "background-color: rgba(255, 193, 7, 0.1); color: #b58100; " +
+                    "border: 1px solid rgba(255, 193, 7, 0.2); padding: 2px 4px; vertical-align: middle;",
+                text: window.overviewTranslations?.closeMatch || "close match"
+            });
+        }
+
+        let favicon = h("i", {class: "bi bi-globe"});
+        if (sysSettings.icon_type === "css" && sysSettings.icon_value) {
+            const iconClass = sysSettings.icon_value.startsWith("bi ") ||
+                sysSettings.icon_value.split(" ").includes("bi")
+                    ? sysSettings.icon_value
+                    : "bi " + sysSettings.icon_value;
+            favicon = h("i", {class: iconClass});
+        } else if (sysSettings.icon_type === "img" && sysSettings.icon_url) {
+            favicon = h("img", {
+                src: sysSettings.icon_url,
+                style: "max-width: 100%; max-height: 100%; object-fit: contain;"
+            });
+        }
+
+        let infoIcon = null;
+        if (sysSettings.description) {
+            infoIcon = h("i", {
+                class: "bi bi-info-circle text-muted ms-2",
+                style: "font-size: 0.8rem; cursor: help;"});
+            new bootstrap.Popover(infoIcon, {
+                content: sysSettings.description,
+                trigger: "hover focus",
+                placement: "top",
+                container: "body"});
+        }
+
+        const li = h("li", {class: "mb-3 d-flex align-items-start"}, [
+            h("span", {
+                class: "external-reference-favicon-placeholder me-2 mt-1 " +
+                    "d-inline-flex align-items-center justify-content-center",
+                style: "width: 18px; height: 18px; min-width: 18px; " +
+                    "border-radius: 4px; background-color: rgba(0, 0, 0, 0.06); " +
+                    "color: #6c757d; font-size: 10px;"
+            }, [
+                favicon]),
+            h("div", {class: "flex-grow-1"}, [
+                h("div", {class: "d-flex align-items-center mb-1"}, [
+                    h("span", {
+                        class: "fw-bold text-dark small text-uppercase",
+                        text: ref.reference_system || ref.type || "External System"
+                    }),
+                    infoIcon,
+                    matchBadge].filter(Boolean)),
+                h("a", {
+                    href: linkUrl,
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                    class: "external-reference-link text-decoration-none small text-break"
+                }, [
+                    h("span", {text: ref.identifier || ""}),
+                    h("i", {
+                        class: "bi bi-box-arrow-up-right ms-1",
+                        style: "font-size: 0.7rem;"
+                    })])])]);
+
+        list.appendChild(li);
+    });
+
+    if (renderedCount > 0) {
+        list.prepend(h("h4", {
+            class: "mb-3",
+            text: window.overviewTranslations?.externalReferences || "External Identifiers"
+        }));
+        tile.hidden = false;
+        relayout(10);
+    }
+}
+
 (async function initOverview() {
     // --- Wait until DOM is ready ---
     if (document.readyState === "loading") {
@@ -460,6 +682,7 @@ function renderReferences(entity) {
     const initialImages = data.initialImage;
     const allImages = (data.images || []).filter(img => img?.from_super_entity === false);
     const additionalFilesOverview = window.additionalFilesOverview || 0;
+    const externalIdentifiersSettings = data.externalIdentifiersSettings || {};
 
     const grid = document.querySelector(".grid-overview");
     if (!grid) {
@@ -597,8 +820,19 @@ function renderReferences(entity) {
         ]),
     ]);
 
+    const extRefTile = h("div", {
+        class: "item",
+        id: "tile-external-references",
+        hidden: true
+    }, [
+        h("div", {class: "item-content"}, [
+            h("ul", {
+                id: "js-external-references",
+                class: "no-bullets ps-0 mb-0"
+            })])]);
 
-    grid.append(mapTile, imageTile, galleryTile, refTile, subTile);
+
+    grid.append(mapTile, imageTile, galleryTile, refTile, subTile, extRefTile);
 
     // === RENDER DATA ===
     if (typeof renderToolbox === "function") renderToolbox(citeButton, refreshButton);
@@ -611,6 +845,8 @@ function renderReferences(entity) {
     if (typeof renderSubTile === "function") renderSubTile(entity);
     if (typeof renderAttributes === "function") renderAttributes(categorizedTypes);
     if (typeof renderReferences === "function") renderReferences(entity);
+    if (typeof renderExternalReferences === "function")
+        renderExternalReferences(entity, externalIdentifiersSettings);
 
     // === MEDIA OVERVIEW ===
     let files = [];

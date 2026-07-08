@@ -10,6 +10,56 @@ from histarchexplorer.views.views import type_tree
 # pylint: disable=too-many-locals
 def get_browse_list_entities(
         id_: int) -> dict[str, str | int | list[Any] | dict[str, Any]] | None:
+    """Compile a list of entities and their geometries for browsing.
+
+    Processes visible/hidden classes, types, and case studies to construct
+    SQL conditions, fetches entities and geometries from the database,
+    and returns categorized entity and count metadata.
+
+    Args:
+        id_ (int): Optional parent entity ID. If provided, filters the
+            results to only include children of this entity via relation
+            property 'P46' (forms part of).
+
+    Returns:
+        dict[str, Any] | None: A structured ad-hoc dictionary containing
+            browsing metadata and query results, or None if an id_ was
+            provided but no child entities were found.
+
+            The dictionary contains the following keys:
+            - 'shown classes' (list[str]): Class names currently visible.
+            - 'hidden classes' (list[str]): Class names currently hidden.
+            - 'shown types' (list[str]): List of shown type IDs.
+            - 'hidden types' (list[str]): List of hidden type IDs.
+            - 'shown case studies' (list[int]): Active case study IDs.
+            - 'shown ids' (list[int]): Active/visible entity IDs.
+            - 'hidden ids' (list[int]): Hidden entity IDs.
+            - 'entities' (list[dict[str, Any]]): List of fetched entity
+              records. Each entity dict contains:
+                * 'id' (int): Entity database ID.
+                * 'name' (str): Name of the entity.
+                * 'description' (str): Detailed text description.
+                * 'class' (str): System class name.
+                * 'type' (str | None): Classification type label.
+                * 'type_id' (int | None): Classification type ID.
+                * 'begin' (str | None): Formatted start date.
+                * 'end' (str | None): Formatted end date.
+            - 'geometries' (dict[str, Any]): GeoJSON FeatureCollection
+              containing:
+                * 'type' (str): 'FeatureCollection'.
+                * 'features' (list[dict]): List of GeoJSON features.
+                  Each feature has keys: 'type' ('Feature'), 'geometry'
+                  (dict), and 'properties' containing: 'id' (int),
+                  'name' (str), and 'class' (str).
+            - 'totals' (dict[str, int]): Total count of entities per
+              UI category name (e.g., 'places').
+            - 'counts' (dict[str, list[dict[str, int]]]): Categorized
+              counts grouped by UI category name containing list of dicts
+              mapping {class_name: count}.
+            - 'cs_ids' (list[dict[str, Any]]): Details of case studies with
+              keys: 'id' (int), 'ids' (list[int]), 'name' (str),
+              'acronym' (str), and 'description' (str).
+    """
     shown_ids = g.settings.shown_ids
 
     if id_:
@@ -119,6 +169,11 @@ def get_browse_list_entities(
 
 # get entities and return the template
 def return_entities(tab_name: str, id_: int) -> str:
+    """Helper function to load entities and render the browsing layout.
+
+    Retrieves the browse list entities, configures sidebar tabs with
+    updated item counts, and renders the central entity template.
+    """
     data = get_browse_list_entities(id_)
 
     filtered_view_classes = {
@@ -150,11 +205,20 @@ def return_entities(tab_name: str, id_: int) -> str:
 @app.route('/entities/<tab_name>')
 @app.route('/entities/<tab_name>/<int:id_>')
 def entities(tab_name: str | None = None, id_: int | None = None) -> str:
+    """Render the main entity browse page.
+
+    Handles routing for the entities list, allowing optional filtering by
+    tab name or a specific parent entity ID.
+    """
     return return_entities(tab_name, id_)
 
 
 @app.route('/get_entities/<tab_name>')
 def get_entities(tab_name: str) -> str:
+    """Render the partial tab template for AJAX loading of browse results.
+
+    Returns the HTML segment corresponding to the specified browse tab.
+    """
     return render_template(
         'tabs/browse.html',
         tab_name=tab_name)

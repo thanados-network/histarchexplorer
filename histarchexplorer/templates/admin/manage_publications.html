@@ -1,0 +1,290 @@
+<div class="card mt-3 mb-5">
+    <div class="card-body">
+        <h5 class="card-title">{{ _('Manage Publication Types') | upper }}</h5>
+        <form action="{{ url_for('update_pub_types') }}" method="post">
+            <div class="mb-3">
+                <label for="publication_types" class="form-label">{{ _('Publication Types (comma separated)') }}</label>
+                <input type="text" class="form-control" id="publication_types" name="publication_types" 
+                       value="{{ settings.publication_types | join(', ') }}">
+            </div>
+            <button type="submit" class="btn btn-primary">{{ _('Update Types') }}</button>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-3 mb-5">
+    <div class="card-body">
+        <h5 class="card-title">{{ _('Add New Publication') | upper }}</h5>
+        
+        <div class="mb-4">
+            <label for="doi_import" class="form-label">{{ _('Import from DOI') }}</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="doi_import" placeholder="e.g. 10.1016/j.jas.2023.105895">
+                <button class="btn btn-secondary" type="button" id="btn_import_doi">
+                    <i class="bi bi-download"></i> {{ _('Import DOI') }}
+                </button>
+            </div>
+            <div id="doi_status" class="form-text mt-1"></div>
+        </div>
+
+        <form action="{{ url_for('add_pub') }}" method="post" id="form_publication">
+            <input type="hidden" name="active_sidebar" value="sidebar-about-publications">
+            <div class="mb-3">
+                <label for="pub_title" class="form-label">{{ _('Title') }}*</label>
+                <input type="text" class="form-control" id="pub_title" name="title" required>
+            </div>
+            <div class="mb-3">
+                <label for="pub_authors" class="form-label">{{ _('Authors') }}</label>
+                <input type="text" class="form-control" id="pub_authors" name="authors">
+                <div class="form-text">{{ _('Separate authors with semicolons (;)') }}</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="pub_year" class="form-label">{{ _('Year') }}</label>
+                    <input type="number" class="form-control" id="pub_year" name="year">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="pub_type" class="form-label">{{ _('Type') }}</label>
+                    <select class="form-select" id="pub_type" name="publication_type">
+                        <option value="">{{ _('Select type...') }}</option>
+                        {% for type in settings.publication_types %}
+                        <option value="{{ type }}">{{ type }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="pub_doi" class="form-label">{{ _('DOI') }}</label>
+                <input type="text" class="form-control" id="pub_doi" name="doi">
+            </div>
+            <div class="mb-3">
+                <label for="pub_url" class="form-label">{{ _('URL') }}</label>
+                <input type="url" class="form-control" id="pub_url" name="url">
+            </div>
+            <div class="mb-3">
+                <label for="pub_file" class="form-label">{{ _('Linked Asset') }}</label>
+                <select class="form-select" id="pub_file" name="file_id">
+                    <option value="">{{ _('No asset linked') }}</option>
+                    {% for asset in all_assets %}
+                    <option value="{{ asset.id }}">{{ asset.filename }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">{{ _('Linked Projects') }}</label>
+                <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                    {% for project in all_projects %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="projects" value="{{ project.id }}" 
+                               id="proj_{{ project.id }}">
+                        <label class="form-check-label" for="proj_{{ project.id }}">
+                            {{ project.name.en if project.name.en else project.name.de }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">{{ _('Add Publication') }}</button>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-3 mb-5">
+    <div class="card-body">
+        <h5 class="card-title">{{ _('Existing Publications') | upper }}</h5>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>{{ _('Year') }}</th>
+                        <th>{{ _('Title') }}</th>
+                        <th>{{ _('Authors') }}</th>
+                        <th>{{ _('Actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pub in all_publications %}
+                    <tr>
+                        <td>{{ pub.year or '-' }}</td>
+                        <td>
+                            <strong>{{ pub.title }}</strong><br>
+                            <small class="text-muted">{{ pub.publication_type }}</small>
+                        </td>
+                        <td><small>{{ pub.authors or '-' }}</small></td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-primary btn-edit-pub" 
+                                        data-pub='{{ pub | tojson }}'>
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <form action="{{ url_for('delete_pub', pub_id=pub.id) }}" method="post" class="d-inline">
+                                    <input type="hidden" name="active_sidebar" value="sidebar-about-publications">
+                                    <button type="submit" class="btn btn-outline-danger" 
+                                            onclick="return confirm('{{ _('Are you sure?') }}')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{# Edit Modal #}
+<div class="modal fade" id="editPubModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="{{ url_for('edit_pub') }}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ _('Edit Publication') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="edit_pub_id">
+                    <input type="hidden" name="active_sidebar" value="sidebar-about-publications">
+                    
+                    <div class="mb-3">
+                        <label for="edit_pub_title" class="form-label">{{ _('Title') }}*</label>
+                        <input type="text" class="form-control" id="edit_pub_title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_pub_authors" class="form-label">{{ _('Authors') }}</label>
+                        <input type="text" class="form-control" id="edit_pub_authors" name="authors">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_pub_year" class="form-label">{{ _('Year') }}</label>
+                            <input type="number" class="form-control" id="edit_pub_year" name="year">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_pub_type" class="form-label">{{ _('Type') }}</label>
+                            <select class="form-select" id="edit_pub_type" name="publication_type">
+                                <option value="">{{ _('Select type...') }}</option>
+                                {% for type in settings.publication_types %}
+                                <option value="{{ type }}">{{ type }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_pub_doi" class="form-label">{{ _('DOI') }}</label>
+                        <input type="text" class="form-control" id="edit_pub_doi" name="doi">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_pub_url" class="form-label">{{ _('URL') }}</label>
+                        <input type="url" class="form-control" id="edit_pub_url" name="url">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_pub_file" class="form-label">{{ _('Linked Asset') }}</label>
+                        <select class="form-select" id="edit_pub_file" name="file_id">
+                            <option value="">{{ _('No asset linked') }}</option>
+                            {% for asset in all_assets %}
+                            <option value="{{ asset.id }}">{{ asset.filename }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Linked Projects') }}</label>
+                        <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;" id="edit_pub_projects">
+                            {% for project in all_projects %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="projects" value="{{ project.id }}" 
+                                       id="edit_proj_{{ project.id }}">
+                                <label class="form-check-label" for="edit_proj_{{ project.id }}">
+                                    {{ project.name.en if project.name.en else project.name.de }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Save Changes') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // DOI Import
+    const btnImportDoi = document.getElementById('btn_import_doi');
+    const doiInput = document.getElementById('doi_import');
+    const doiStatus = document.getElementById('doi_status');
+
+    btnImportDoi.addEventListener('click', function() {
+        const doi = doiInput.value.trim();
+        if (!doi) return;
+
+        doiStatus.innerHTML = '<span class="text-info"><i class="bi bi-hourglass-split"></i> {{ _("Fetching data...") }}</span>';
+        
+        const formData = new FormData();
+        formData.append('doi', doi);
+
+        fetch("{{ url_for('import_doi') }}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                doiStatus.innerHTML = '<span class="text-danger">' + data.error + '</span>';
+            } else {
+                document.getElementById('pub_title').value = data.title || '';
+                document.getElementById('pub_authors').value = data.authors || '';
+                document.getElementById('pub_year').value = data.year || '';
+                document.getElementById('pub_doi').value = data.doi || '';
+                document.getElementById('pub_url').value = data.url || '';
+                doiStatus.innerHTML = '<span class="text-success">{{ _("Data imported successfully!") }}</span>';
+            }
+        })
+        .catch(error => {
+            doiStatus.innerHTML = '<span class="text-danger">{{ _("Error fetching data.") }}</span>';
+            console.error('Error:', error);
+        });
+    });
+
+    // Edit Publication
+    const editButtons = document.querySelectorAll('.btn-edit-pub');
+    const editModalEl = document.getElementById('editPubModal');
+    const editModal = new bootstrap.Modal(editModalEl);
+
+    editButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const pub = JSON.parse(this.dataset.pub);
+            
+            document.getElementById('edit_pub_id').value = pub.id;
+            document.getElementById('edit_pub_title').value = pub.title;
+            document.getElementById('edit_pub_authors').value = pub.authors || '';
+            document.getElementById('edit_pub_year').value = pub.year || '';
+            document.getElementById('edit_pub_type').value = pub.publication_type || '';
+            document.getElementById('edit_pub_doi').value = pub.doi || '';
+            document.getElementById('edit_pub_url').value = pub.url || '';
+            document.getElementById('edit_pub_file').value = pub.file_id || '';
+            
+            // Uncheck all projects first
+            const projectChecks = document.querySelectorAll('#edit_pub_projects input[type="checkbox"]');
+            projectChecks.forEach(cb => cb.checked = false);
+            
+            // Check linked projects
+            if (pub.entities) {
+                pub.entities.forEach(ent => {
+                    const cb = document.getElementById('edit_proj_' + ent.id);
+                    if (cb) cb.checked = true;
+                });
+            }
+            
+            editModal.show();
+        });
+    });
+});
+</script>

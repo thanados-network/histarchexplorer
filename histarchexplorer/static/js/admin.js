@@ -523,9 +523,11 @@ if (imageSelectorModal) {
     // Switch grids based on type
     const logoGrid = document.getElementById('logoSelectorGrid');
     const teamGrid = document.getElementById('teamSelectorGrid');
-    if (logoGrid && teamGrid) {
+    const assetGrid = document.getElementById('assetSelectorGrid');
+    if (logoGrid && teamGrid && assetGrid) {
       logoGrid.classList.toggle('d-none', imageType !== 'logo');
       teamGrid.classList.toggle('d-none', imageType !== 'team');
+      assetGrid.classList.toggle('d-none', imageType !== 'asset');
     }
 
     // Highlight currently selected image

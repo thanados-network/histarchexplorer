@@ -103,13 +103,20 @@ class SearchService:
             self,
             query: str,
             system_classes: list[str]) -> list[str]:
-        """
-        Performs a live search (e.g., for autocomplete).
+        """Performs a live search (e.g., for autocomplete).
+
         Args:
             query (str): The search query.
             system_classes (list): List of system classes to search within.
+
         Returns:
-            list: A list of live search results.
+            list[dict[str, Any]]: A list of live search results. Each result
+                dictionary contains:
+                - id (int): Entity ID.
+                - title (str): Main display title.
+                - systemClass (str): System class code.
+                - viewClass (str): UI view styling class.
+                - acronym (str): Abbreviation / identifier acronym.
         """
         if len(query) < 3:
             return []

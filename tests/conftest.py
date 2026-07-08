@@ -15,6 +15,22 @@ def setup_database() -> None:
     reset_test_database()
 
 
+@pytest.fixture(scope='session', autouse=True)
+def mock_api_calls():
+    """Mock external API calls globally."""
+    with patch('requests.get') as mock_get:
+        # Default mock response
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {
+            'results': [],
+            'files': [],
+            'case_study': [{'id': 1, 'title': 'Test Study'}],
+            'view_class': [],
+            'features': [{'properties': {}}]
+        }
+        yield mock_get
+
+
 @pytest.fixture()
 def app_instance():
     return app

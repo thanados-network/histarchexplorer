@@ -130,38 +130,105 @@ def get_license_info(case_studies: list[Any]) -> dict[str, Any] | None:
 
 
 def generate_bibtex(
-        entity: PresentationView,
-        project_name: str,
-        url: str,
-        date: str) -> str:
-    year = date.split('-')[0]
-    key = f"{slugify(project_name)}_{entity.id}_{year}"
+        entity: Any,
+        project_name: str = None,
+        url: str = None,
+        date: str = None,
+        main_reference: Any = None) -> str:
+    if hasattr(entity, 'id'):  # PresentationView
+        year = date.split('-')[0] if date else datetime.date.today().year
+        title = entity.title
+        author = project_name or _('Unknown Project')
+        key = f"{slugify(author)}_{entity.id}_{year}"
+        url = url or ""
+        note = f"{_('Accessed')}: {date}" if date else ""
+        if main_reference:
+            ref_text = main_reference.citation or main_reference.title
+            pages = (main_reference.pages or "").replace("##main", "").strip()
+            if pages:
+                ref_text = f"{ref_text} {pages}"
+            after_text = f"{_('after')} {ref_text}"
+            note = f"{after_text}, {note}" if note else after_text
+    else:  # Publication dict
+        year = entity.get('year') or datetime.date.today().year
+        title = entity.get('title')
+        author = entity.get('authors') or _('Unknown Author')
+        key = f"{slugify(author.split(',')[0])}_{year}"
+        url = entity.get('doi') or entity.get('url') or ""
+        if entity.get('doi'):
+            url = f"https://doi.org/{url}"
+        note = ""
 
     bibtex = f"@misc{{{key},\n"
-    bibtex += f"  title = {{{entity.title}}},\n"
-    bibtex += f"  author = {{{project_name}}},\n"
+    bibtex += f"  title = {{{title}}},\n"
+    bibtex += f"  author = {{{author}}},\n"
     bibtex += f"  year = {{{year}}},\n"
-    bibtex += f"  url = {{{url}}},\n"
-    bibtex += f"  note = {{{_('Accessed: %(date)s', date=date)}}}\n"
-    bibtex += "}"
+    bibtex += f"  url = {{{url}}}"
+    if note:
+        bibtex += f",\n  note = {{{note}}}"
+    bibtex += "\n}"
     return bibtex
 
 
 def generate_ris(
-        entity: PresentationView,
-        project_name: str,
-        url: str,
-        date: str) -> str:
+        entity: Any,
+        project_name: str = None,
+        url: str = None,
+        date: str = None,
+        main_reference: Any = None) -> str:
     """Generates a RIS citation string."""
-    year = date.split('-')[0]
+    note = ""
+    if hasattr(entity, 'id'):  # PresentationView
+        year = date.split('-')[0] if date else datetime.date.today().year
+        title = entity.title
+        author = project_name or _('Unknown Project')
+        url = url or ""
+        if main_reference:
+            ref_text = main_reference.citation or main_reference.title
+            pages = (main_reference.pages or "").replace("##main", "").strip()
+            if pages:
+                ref_text = f"{ref_text} {pages}"
+            note = f"{_('after')} {ref_text}"
+    else:  # Publication dict
+        year = entity.get('year') or datetime.date.today().year
+        title = entity.get('title')
+        author = entity.get('authors') or _('Unknown Author')
+        url = entity.get('doi') or entity.get('url') or ""
+        if entity.get('doi'):
+            url = f"https://doi.org/{url}"
+
     ris = "TY  - ELEC\n"
-    ris += f"TI  - {entity.title}\n"
-    ris += f"AU  - {project_name}\n"
+    ris += f"TI  - {title}\n"
+    ris += f"AU  - {author}\n"
     ris += f"PY  - {year}\n"
     ris += f"UR  - {url}\n"
-    ris += f"Y2  - {date}\n"  # Access date
+    if date:
+        ris += f"Y2  - {date}\n"  # Access date
+    if note:
+        ris += f"N1  - {note}\n"
     ris += "ER  -"
     return ris
+
+
+def get_publication_citation(pub: dict[str, Any]) -> dict[str, str]:
+    authors = pub.get('authors') or _('Unknown Author')
+    year = pub.get('year') or ''
+    title = pub.get('title') or ''
+    doi = pub.get('doi')
+    url = pub.get('url')
+
+    # APA style
+    apa = f"{authors} ({year}). {title}."
+    if doi:
+        apa += f" https://doi.org/{doi}"
+    elif url:
+        apa += f" {url}"
+
+    return {
+        'apa': apa,
+        'bibtex': generate_bibtex(pub),
+        'ris': generate_ris(pub)
+    }
 
 
 def get_cite_button(entity: PresentationView) -> dict[str, str]:
@@ -185,18 +252,34 @@ def get_cite_button(entity: PresentationView) -> dict[str, str]:
 
     current_url = url_for('entity_view', id_=entity.id, _external=True)
 
+    main_reference = None
+    # todo: if a entity has only one bibligraphy, this is the main ref.
+    #   what happens if there are multiple bibliography entries?
+    for ref in entity.references:
+        if ref.pages and '##main' in ref.pages:
+            main_reference = ref
+            break
+        if ref.system_class == 'bibliography':
+            main_reference = ref
+
     license_info = get_license_info(case_studies)
-    bibtex = generate_bibtex(entity, project_name, current_url, current_date)
-    ris = generate_ris(entity, project_name, current_url, current_date)
+    bibtex = generate_bibtex(
+        entity, project_name, current_url, current_date, main_reference)
+    ris = generate_ris(
+        entity, project_name, current_url, current_date, main_reference)
 
     # APA-like citation style
-    citation_text = _(
-        '%(project_name)s (%(year)s). %(title)s. Retrieved from %(url)s (Accessed: %(date)s)',
-        project_name=project_name,
-        year=current_date.split('-')[0],
-        title=entity.title,
-        url=current_url,
-        date=current_date)
+    year = current_date.split('-')[0]
+    citation_text = (
+        f"{project_name} ({year}). {entity.title}. "
+        f"{_('Retrieved from')} {current_url} "
+        f"({_('Accessed')}: {current_date})")
+    if main_reference:
+        ref_text = main_reference.citation or main_reference.title
+        pages = (main_reference.pages or "").replace("##main", "").strip()
+        if pages:
+            ref_text = f"{ref_text} {pages}"
+        citation_text = f"{citation_text}\n{_('after')} {ref_text}"
 
     button_html = render_template('util/cite/button.html')
     modal_html = render_template(

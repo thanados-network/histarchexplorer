@@ -128,7 +128,9 @@ function createSortLevel(id, fields, classList, typeIds,) {
       </select>
     </div>
     <div class="col-auto">
-      <button type="button" class="btn btn-outline-danger remove-sort-level">Remove</button>
+      <button type="button" class="btn btn-danger btn-sm filter-icon-btn remove-sort-level" title="Remove">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
   `;
 
@@ -203,7 +205,7 @@ function collectAndGroupMatchingData(jsonData, keysToMatch, categoriesToMatch, t
         result[combinedKey] = group.data;
     });
 
-    //console.log(result);
+    console.log(result);
 
     return result;
 }

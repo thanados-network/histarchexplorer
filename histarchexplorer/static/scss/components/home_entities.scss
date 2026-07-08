@@ -71,6 +71,10 @@
     border-top: rem(5) solid var(--entity-color-stratigraphic_unit);
   }
 
+  &--types {
+    border-top: rem(5) solid var(--entity-color-types);
+  }
+
   &__icon {
     img {
       max-width: 70%; /* Set the width of the image */

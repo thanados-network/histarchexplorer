@@ -100,11 +100,17 @@ async function loadHTML(id, tab, index, totalTabs) {
 
 // Function to check if all tabs are loaded and remove the spinner
 function checkAndRemoveSpinner(totalTabs) {
+    console.log(`checkAndRemoveSpinner: loadedCount=${loadedCount}, totalTabs=${totalTabs}`);
     if (loadedCount >= totalTabs) {
         document.querySelectorAll(".to-remove-spinner").forEach(element => {
             element.remove();
             //console.log("Spinner removed.");
         });
+
+        if (typeof entityId !== 'undefined' && entityId > 0) {
+            console.log(`Triggering background cache for entity: ${entityId}`);
+            fetch(`/api/cache-related/${entityId}`);
+        }
     }
 }
 
@@ -127,11 +133,16 @@ function loadScript(script) {
 }
 
 if (entityId == 0) {
-    tabsToLoad.forEach((tab, index) => {
-        if (!loadedTabs.includes(tab)) {
-            loadHTML(entityId, tab, index, tabsToLoad.length);
-        }
-    });
+    loadedCount = loadedTabs.length;
+    if (loadedCount >= tabsToLoad.length) {
+        checkAndRemoveSpinner(tabsToLoad.length);
+    } else {
+        tabsToLoad.forEach((tab, index) => {
+            if (!loadedTabs.includes(tab)) {
+                loadHTML(entityId, tab, index, tabsToLoad.length);
+            }
+        });
+    }
 } else {
     (async function loadTabs() {
         // Wait until the entity data is fetched
@@ -142,8 +153,6 @@ if (entityId == 0) {
         }
 
         if (!data.spatial.features.length > 0) tabsToLoad = tabsToLoad.filter(t => t !== 'map');
-
-        tabsToLoad = tabsToLoad.filter(t => t !== 'catalogue');
 
         if (data.hierarchy.subs === 0) {
             tabsToLoad = tabsToLoad.filter(t => t !== 'subunits');
@@ -159,14 +168,16 @@ if (entityId == 0) {
             tabsToLoad = tabsToLoad.filter(t => t !== 'media');
         }
 
-
-        tabsToLoad.forEach((tab, index) => {
-            if (!loadedTabs.includes(tab)) {
-                loadHTML(entityId, tab, index, tabsToLoad.length);
-            }
-        });
-
-
+        loadedCount = loadedTabs.length;
+        if (loadedCount >= tabsToLoad.length) {
+            checkAndRemoveSpinner(tabsToLoad.length);
+        } else {
+            tabsToLoad.forEach((tab, index) => {
+                if (!loadedTabs.includes(tab)) {
+                    loadHTML(entityId, tab, index, tabsToLoad.length);
+                }
+            });
+        }
     })();
 }
 
@@ -279,7 +290,14 @@ function toggleRightSidebar(currentTab, mode = 'toggle') {
     }
 
     rightSidebarcontent[currentTab].opened = isExpanded;
-    root.style.setProperty('--right-sidebar-width', isExpanded ? '600px' : '0px');
+    // Keep a user-resized width across open/close within the same session.
+    if (isExpanded) {
+        const stored = root.style.getPropertyValue('--right-sidebar-width').trim();
+        const width = (stored && stored !== '0px') ? stored : '33vw';
+        root.style.setProperty('--right-sidebar-width', width);
+    } else {
+        root.style.setProperty('--right-sidebar-width', '0px');
+    }
 }
 
 // Attach event listeners to sidebar buttons
@@ -295,6 +313,11 @@ document.querySelectorAll('#nav-sidebar .nav-link').forEach(button => {
         }
 
         setRightSidebarContent(rightSidebarcontent[tabName].content);
+
+        // Restored map content needs its popovers/carousels re-wired.
+        if (tabName === 'map' && typeof window.initMapSidebarFeatures === 'function') {
+            window.initMapSidebarFeatures(rightSidebar);
+        }
 
         // Ensure sidebar state is consistent with the clicked tab
         const shouldBeOpen = rightSidebarcontent[tabName].opened;

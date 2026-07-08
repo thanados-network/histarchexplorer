@@ -23,6 +23,21 @@ def test_get_entity_images():
         assert len(initial) == 1
         assert len(all_imgs) == 2
 
+def test_get_entity_images_skips_inherited_main_image():
+    """An inherited (super entity) image must not override the entity's
+    own main image and must be excluded from the result."""
+    from histarchexplorer import app
+    files = [
+        File(id=1, title='own', render_type='image', main_image=True, license='L', public=True, url='U', mime_type='image/bmp', creator='C', license_holder='H', iiif_manifest='I', iiif_base_path='B', overlay=False, from_super_entity=False),
+        File(id=2, title='inherited', render_type='image', main_image=True, license='L', public=True, url='U', mime_type='image/png', creator='C', license_holder='H', iiif_manifest='I', iiif_base_path='B', overlay=False, from_super_entity=True)
+    ]
+    with app.test_request_context():
+        g.additional_files_for_overview = 1
+        main, initial, all_imgs = get_entity_images(files)
+        assert main.id == 1
+        assert all(img.from_super_entity is False for img in all_imgs if img)
+        assert all(img.id != 2 for img in all_imgs if img)
+
 def test_get_parent_geometry():
     rel = Relation(id=1, name='R', system_class='S', geometries=[MagicMock()], geometry_json={'type': 'Point'})
     assert get_parent_geometry([rel]) == {'type': 'Point'}

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-27 15:20+0200\n"
+"POT-Creation-Date: 2026-07-03 16:07+0200\n"
 "PO-Revision-Date: 2026-05-22 14:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.18.0\n"
 
 #: api/util.py:43 api/util.py:45 api/util.py:46 api/util.py:51
 msgid "BC"
@@ -26,40 +26,107 @@ msgstr "BC"
 msgid "AD"
 msgstr "AD"
 
-#: api/util.py:109
+#: api/util.py:149
 msgid "other"
 msgstr "other"
+
+#: forms/admin.py:12 templates/admin/maps.html:33
+msgid "name"
+msgstr "name"
+
+#: forms/admin.py:13 templates/admin/maps.html:45
+msgid "Display Name"
+msgstr "Display Name"
+
+#: forms/admin.py:14
+msgid "order"
+msgstr "order"
+
+#: forms/admin.py:16 templates/admin/maps.html:59
+msgid "Leaflet Tile Layer String"
+msgstr "Leaflet Tile Layer String"
+
+#: forms/admin.py:22
+msgid "case study hierarchy ID"
+msgstr "case study hierarchy ID"
+
+#: forms/admin.py:24
+msgid "Deactivate Darkmode"
+msgstr "Deactivate Darkmode"
+
+#: forms/admin.py:25
+msgid "Deactivate Language Selector"
+msgstr "Deactivate Language Selector"
+
+#: forms/admin.py:26
+msgid "Activate Access Restriction"
+msgstr "Activate Access Restriction"
+
+#: forms/admin.py:27 templates/admin/general_settings.html:90
+msgid "available languages"
+msgstr ""
+
+#: forms/admin.py:28
+msgid "preferred language"
+msgstr "preferred language"
+
+#: forms/admin.py:32 templates/admin/license_management.html:38
+msgid "SPDX ID"
+msgstr "SPDX ID"
+
+#: forms/admin.py:33
+msgid "URI"
+msgstr "URI"
+
+#: forms/admin.py:34 templates/admin/license_management.html:37
+msgid "Label"
+msgstr "Label"
+
+#: forms/admin.py:36 templates/admin/license_management.html:39
+msgid "Category"
+msgstr "Category"
+
+#: forms/admin.py:42
+#, fuzzy
+msgid "file"
+msgstr "File"
+
+#: forms/admin.py:52 templates/tabs/overview.html:12
+#: templates/util/cite/modal.html:37
+msgid "License"
+msgstr "License"
+
+#: forms/admin.py:55
+#, fuzzy
+msgid "Attribution"
+msgstr "attributes"
+
+#: forms/admin.py:60
+#, fuzzy
+msgid "New Name"
+msgstr "New name..."
+
+#: forms/login.py:9 templates/login.html:10
+msgid "username"
+msgstr "username"
+
+#: forms/login.py:12 templates/login.html:14
+msgid "password"
+msgstr "password"
+
+#: forms/login.py:13
+msgid "show password"
+msgstr "show password"
+
+#: forms/login.py:14
+msgid "login"
+msgstr "login"
 
 #: templates/_macros.html:11
 msgid "Back to the entity"
 msgstr "Back to the entity"
 
-#: templates/_macros.html:38
-msgid "Image"
-msgstr "Image"
-
-#: templates/_macros.html:56
-msgid "Your browser does not support the video tag."
-msgstr "Your browser does not support the video tag."
-
-#: templates/_macros.html:97 templates/tabs/overview.html:12
-#: templates/util/cite/modal.html:37
-msgid "License"
-msgstr "License"
-
-#: templates/_macros.html:100 templates/tabs/overview.html:13
-msgid "Creator"
-msgstr "Creator"
-
-#: templates/_macros.html:103 templates/tabs/overview.html:14
-msgid "License holder"
-msgstr "License holder"
-
-#: templates/_macros.html:125
-msgid "More images"
-msgstr "More images"
-
-#: templates/_macros.html:158 templates/about.html:215 templates/entity.html:93
+#: templates/_macros.html:59 templates/about.html:215 templates/entity.html:93
 #: templates/entity.html:113
 msgid "Loading"
 msgstr "Loading"
@@ -68,7 +135,7 @@ msgstr "Loading"
 msgid "Show details"
 msgstr "Show details"
 
-#: templates/about.html:66 views/admin.py:52
+#: templates/about.html:66 views/admin.py:59
 msgid "persons"
 msgstr "persons"
 
@@ -80,7 +147,7 @@ msgstr "data overview"
 msgid "project data overview"
 msgstr "project data overview"
 
-#: templates/about.html:153 views/admin.py:48
+#: templates/about.html:153 views/admin.py:55
 msgid "projects"
 msgstr "projects"
 
@@ -133,7 +200,7 @@ msgstr "General Settings"
 msgid "Visibility Settings"
 msgstr "Visibility Settings"
 
-#: templates/admin.html:32 templates/admin.html:131
+#: templates/admin.html:32 templates/admin.html:132
 msgid "Class colors"
 msgstr "Class colors"
 
@@ -143,110 +210,121 @@ msgstr "Type Divisions"
 
 #: templates/admin.html:34
 #, fuzzy
+msgid "External Identifiers"
+msgstr "External Reference"
+
+#: templates/admin.html:35
+#, fuzzy
 msgid "Projects"
 msgstr "projects"
 
-#: templates/admin.html:35
+#: templates/admin.html:36
 msgid "Stakeholders"
 msgstr ""
 
-#: templates/admin.html:36
+#: templates/admin.html:37
 msgid "Content"
 msgstr "Content"
 
-#: templates/admin.html:37
+#: templates/admin.html:38
 msgid "Start page"
 msgstr "Start page"
 
-#: templates/admin.html:38
+#: templates/admin.html:39
 msgid "About"
 msgstr "About"
 
-#: templates/admin.html:39 utils/view_util.py:59
+#: templates/admin.html:40 templates/publications.html:6 utils/view_util.py:59
 msgid "Publications"
 msgstr "Publications"
 
-#: templates/admin.html:40 utils/view_util.py:62
+#: templates/admin.html:41 utils/view_util.py:62
 msgid "Outcome"
 msgstr "Outcome"
 
-#: templates/admin.html:41
+#: templates/admin.html:42
 msgid "Legal Notice"
 msgstr "Legal Notice"
 
-#: templates/admin.html:42
+#: templates/admin.html:43
 msgid "Footer"
 msgstr "Footer"
 
-#: templates/admin.html:43 templates/search.html:108 templates/search.html:110
+#: templates/admin.html:44 templates/publications.html:13
+#: templates/search.html:108 templates/search.html:110
 msgid "Search"
 msgstr "Search"
 
-#: templates/admin.html:44
+#: templates/admin.html:45
 msgid "File Management"
 msgstr "File Management"
 
-#: templates/admin.html:45 templates/admin/logo_management.html:3
+#: templates/admin.html:46 templates/admin/logo_management.html:3
 msgid "Logo Management"
 msgstr "Logo Management"
 
-#: templates/admin.html:46
+#: templates/admin.html:47
 msgid "Icons"
 msgstr "Icons"
 
-#: templates/admin.html:47
+#: templates/admin.html:48
 msgid "Assets"
 msgstr "Assets"
 
-#: templates/admin.html:48
+#: templates/admin.html:49
 msgid "Team"
 msgstr "Team"
 
-#: templates/admin.html:49
+#: templates/admin.html:50
 msgid "Licenses"
 msgstr "Licenses"
 
-#: templates/admin.html:50
+#: templates/admin.html:51
 msgid "Maps"
 msgstr "Maps"
 
-#: templates/admin.html:51
+#: templates/admin.html:52
 msgid "Cache Options"
 msgstr "Cache Options"
 
-#: templates/admin.html:52
+#: templates/admin.html:53
 msgid "Database Interface"
 msgstr "Database Interface"
 
-#: templates/admin.html:104
+#: templates/admin.html:105
 msgid "general settings"
 msgstr "general settings"
 
-#: templates/admin.html:118
+#: templates/admin.html:119
 msgid "visibility settings"
 msgstr "visibility settings"
 
-#: templates/admin.html:144
+#: templates/admin.html:145
 msgid "type divisions"
 msgstr "type divisions"
 
-#: templates/admin.html:157
+#: templates/admin.html:158 templates/tabs/overview.html:17
+#, fuzzy
+msgid "external identifiers"
+msgstr "External Reference"
+
+#: templates/admin.html:171
 msgid "cache options"
 msgstr "cache options"
 
-#: templates/admin.html:213
+#: templates/admin.html:235 templates/admin/index_page_options.html:3
 msgid "index page options"
 msgstr "index page options"
 
-#: templates/admin.html:235
+#: templates/admin.html:257
 msgid "File Management Overview"
 msgstr "File Management Overview"
 
-#: templates/admin.html:236
+#: templates/admin.html:258
 msgid "Select a file management section from the sidebar to start editing."
 msgstr "Select a file management section from the sidebar to start editing."
 
-#: templates/admin.html:288
+#: templates/admin.html:310
 msgid "maps"
 msgstr "maps"
 
@@ -254,23 +332,15 @@ msgstr "maps"
 msgid "Login"
 msgstr "Login"
 
-#: templates/login.html:10 views/login.py:29
-msgid "username"
-msgstr "username"
-
-#: templates/login.html:14 views/login.py:32
-msgid "password"
-msgstr "password"
-
-#: templates/navbar.html:7
+#: templates/navbar.html:15
 msgid "home"
 msgstr "home"
 
-#: templates/navbar.html:18
+#: templates/navbar.html:26
 msgid "Toggle navigation"
 msgstr "Toggle navigation"
 
-#: templates/navbar.html:40 templates/navbar.html:44
+#: templates/navbar.html:48 templates/navbar.html:52
 msgid "toggle dark/light mode"
 msgstr "toggle dark/light mode"
 
@@ -278,9 +348,92 @@ msgstr "toggle dark/light mode"
 msgid "Outcome Test Page"
 msgstr "Outcome Test Page"
 
-#: templates/publications.html:9
-msgid "Publications Test Page"
-msgstr "Publications Test Page"
+#: templates/publications.html:15
+msgid "Title, author..."
+msgstr ""
+
+#: templates/admin/manage_publications.html:43
+#: templates/admin/manage_publications.html:99
+#: templates/admin/manage_publications.html:160 templates/publications.html:18
+#, fuzzy
+msgid "Year"
+msgstr "search"
+
+#: templates/publications.html:20
+msgid "All Years"
+msgstr ""
+
+#: templates/admin/manage_publications.html:47
+#: templates/admin/manage_publications.html:164 templates/publications.html:29
+#, fuzzy
+msgid "Type"
+msgstr "Page Type"
+
+#: templates/publications.html:31
+#, fuzzy
+msgid "All Types"
+msgstr "Page Type"
+
+#: templates/publications.html:40
+#, fuzzy
+msgid "Project"
+msgstr "projects"
+
+#: templates/publications.html:42
+#, fuzzy
+msgid "All Projects"
+msgstr "projects"
+
+#: templates/publications.html:51
+#, fuzzy
+msgid "Filter"
+msgstr "File"
+
+#: templates/publications.html:57
+#, fuzzy
+msgid "Clear Filters"
+msgstr "Media file"
+
+#: templates/publications.html:90
+#, fuzzy
+msgid "External Link"
+msgstr "External Reference"
+
+#: templates/publications.html:97
+#, fuzzy
+msgid "Download"
+msgstr "Download SQL Dump"
+
+#: templates/publications.html:104
+#, fuzzy
+msgid "Cite"
+msgstr "Items"
+
+#: templates/publications.html:113
+#, fuzzy
+msgid "Cite this Publication"
+msgstr "publications"
+
+#: templates/publications.html:118
+#, fuzzy
+msgid "APA Style"
+msgstr "Page Type"
+
+#: templates/admin/partials/modal_add_entry.html:10
+#: templates/admin/partials/modal_delete_confirm.html:7
+#: templates/admin/partials/modal_image_selector.html:9
+#: templates/publications.html:153 templates/util/cite/modal.html:84
+msgid "Close"
+msgstr "Close"
+
+#: templates/publications.html:161
+#, fuzzy
+msgid "Linked Projects:"
+msgstr "main-project"
+
+#: templates/publications.html:177
+msgid "No publications found matching your criteria."
+msgstr ""
 
 #: templates/search.html:11
 msgid "Filter by Type"
@@ -463,64 +616,66 @@ msgstr ""
 msgid "Upload New Asset"
 msgstr "Upload New Asset"
 
-#: templates/admin/assets_management.html:20
+#: templates/admin/assets_management.html:21
 #: templates/admin/icon_management.html:21
-#: templates/admin/logo_management.html:20
+#: templates/admin/logo_management.html:21
 #: templates/admin/team_management.html:21
 msgid "Upload"
 msgstr "Upload"
 
-#: templates/admin/assets_management.html:24
+#: templates/admin/assets_management.html:25
 msgid "Accepted formats: All files."
 msgstr "Accepted formats: All files."
 
-#: templates/admin/assets_management.html:33
+#: templates/admin/assets_management.html:34
 msgid "Existing Assets"
 msgstr "Existing Assets"
 
-#: templates/admin/assets_management.html:58
-#: templates/admin/logo_management.html:50
-#: templates/admin/team_management.html:53
+#: templates/admin/assets_management.html:60
+#: templates/admin/logo_management.html:52
+#: templates/admin/team_management.html:54 views/admin.py:156
+#: views/admin.py:652 views/admin.py:1599
 msgid "Select License..."
 msgstr "Select License..."
 
-#: templates/admin/assets_management.html:67
-#: templates/admin/logo_management.html:59
-#: templates/admin/team_management.html:64
+#: templates/admin/assets_management.html:69
+#: templates/admin/logo_management.html:61
+#: templates/admin/team_management.html:65
 msgid "Attribution (if any)..."
 msgstr "Attribution (if any)..."
 
-#: templates/admin/assets_management.html:69
-#: templates/admin/logo_management.html:61
-#: templates/admin/team_management.html:67
+#: templates/admin/assets_management.html:71
+#: templates/admin/logo_management.html:63
+#: templates/admin/team_management.html:68
 msgid "Save License"
 msgstr "Save License"
 
-#: templates/admin/assets_management.html:77
-#: templates/admin/logo_management.html:91
-#: templates/admin/team_management.html:75
+#: templates/admin/assets_management.html:80
+#: templates/admin/logo_management.html:94
+#: templates/admin/team_management.html:77
 msgid "New name..."
 msgstr "New name..."
 
-#: templates/admin/assets_management.html:78
-#: templates/admin/logo_management.html:92
-#: templates/admin/team_management.html:76
+#: templates/admin/assets_management.html:81
+#: templates/admin/logo_management.html:95
+#: templates/admin/team_management.html:78
 msgid "Rename"
 msgstr "Rename"
 
-#: templates/admin/assets_management.html:85
+#: templates/admin/assets_management.html:89
 msgid "Are you sure you want to delete this asset?"
 msgstr "Are you sure you want to delete this asset?"
 
-#: templates/admin/assets_management.html:86
+#: templates/admin/assets_management.html:90
 #: templates/admin/icon_management.html:53
-#: templates/admin/logo_management.html:100 templates/admin/modals.html:191
-#: templates/admin/partials/entity_form.html:118
-#: templates/admin/team_management.html:86
+#: templates/admin/logo_management.html:104
+#: templates/admin/partials/entity_form.html:148
+#: templates/admin/partials/modal_delete_confirm.html:13
+#: templates/admin/team_management.html:89
 msgid "Delete"
 msgstr "Delete"
 
-#: templates/admin/assets_management.html:95
+#: templates/admin/assets_management.html:99
 msgid "No assets have been uploaded yet."
 msgstr "No assets have been uploaded yet."
 
@@ -560,9 +715,8 @@ msgstr "clear cache"
 msgid "select a color"
 msgstr "select a color"
 
-#: templates/admin/colors.html:71 templates/admin/index_page_options.html:58
-#: templates/admin/legal_notice.html:29 templates/admin/maps.html:104
-#: templates/admin/partials/entity_form.html:213
+#: templates/admin/colors.html:71 templates/admin/legal_notice.html:29
+#: templates/admin/maps.html:94 templates/admin/partials/entity_form.html:243
 msgid "save"
 msgstr "save"
 
@@ -599,6 +753,7 @@ msgid "Database Restore"
 msgstr "Database Restore"
 
 #: templates/admin/database.html:17 templates/admin/database.html:38
+#: templates/admin/external_identifiers.html:34
 msgid "Warning:"
 msgstr "Warning:"
 
@@ -642,6 +797,108 @@ msgstr "Resets the entire database"
 msgid "RESET DATABASE"
 msgstr "RESET DATABASE"
 
+#: templates/admin/external_identifiers.html:13
+msgid "Missing from OpenAtlas"
+msgstr ""
+
+#: templates/admin/external_identifiers.html:16
+msgid "ID:"
+msgstr ""
+
+#: templates/admin/external_identifiers.html:19
+msgid "Disabled"
+msgstr ""
+
+#: templates/admin/external_identifiers.html:35
+msgid "This external identifier is no longer present in the OpenAtlas database."
+msgstr ""
+
+#: templates/admin/external_identifiers.html:38
+msgid "Purge from System"
+msgstr ""
+
+#: templates/admin/external_identifiers.html:47
+msgid "Metadata from OpenAtlas"
+msgstr ""
+
+#: templates/admin/external_identifiers.html:50
+msgid "OpenAtlas ID"
+msgstr ""
+
+#: templates/admin/external_identifiers.html:54
+msgid "Resolver URL"
+msgstr ""
+
+#: templates/admin/external_identifiers.html:59
+#: templates/admin/external_identifiers.html:69
+#: templates/admin/partials/modal_image_selector.html:20
+#: templates/admin/partials/modal_image_selector.html:48
+#: templates/admin/partials/modal_image_selector.html:76
+msgid "None"
+msgstr "None"
+
+#: templates/admin/external_identifiers.html:64
+#, fuzzy
+msgid "Website URL"
+msgstr "Website"
+
+#: templates/admin/external_identifiers.html:78
+#, fuzzy
+msgid "Configuration"
+msgstr "Visibility Configuration"
+
+#: templates/admin/external_identifiers.html:86
+#, fuzzy
+msgid "Disable display in Overview"
+msgstr "data overview"
+
+#: templates/admin/external_identifiers.html:92
+#: templates/admin/type_divisions.html:21
+#: templates/admin/type_divisions.html:202
+msgid "Icon Type"
+msgstr "Icon Type"
+
+#: templates/admin/external_identifiers.html:105
+#: templates/admin/type_divisions.html:34
+#: templates/admin/type_divisions.html:215
+msgid "Bootstrap Icon Class"
+msgstr ""
+
+#: templates/admin/external_identifiers.html:116
+#: templates/admin/type_divisions.html:45
+#: templates/admin/type_divisions.html:225
+#, fuzzy
+msgid "SVG Icon File"
+msgstr "Icon Value"
+
+#: templates/admin/external_identifiers.html:122
+#: templates/admin/type_divisions.html:51
+#: templates/admin/type_divisions.html:108
+#, fuzzy
+msgid "Select Icon..."
+msgstr "Select License..."
+
+#: templates/admin/external_identifiers.html:138
+#: templates/admin/type_divisions.html:67
+#: templates/admin/type_divisions.html:239
+msgid "Preview:"
+msgstr ""
+
+#: templates/admin/external_identifiers.html:148
+msgid "Description (shown next to system name on hover)"
+msgstr ""
+
+#: templates/admin/external_identifiers.html:153
+#, fuzzy
+msgid "Enter description..."
+msgstr "description"
+
+#: templates/admin/external_identifiers.html:164
+#: templates/admin/type_divisions.html:93
+#, fuzzy
+msgid "SAVE CHANGES"
+msgstr "save changes"
+
 #: templates/admin/footer_content_management.html:4
 msgid "Footer Order"
 msgstr "Footer Order"
@@ -663,73 +920,50 @@ msgid "Save Footer Selection"
 msgstr "Save Footer Selection"
 
 #: templates/admin/footer_content_management.html:49
-#: templates/admin/logo_management.html:109
+#: templates/admin/logo_management.html:113
 msgid "No logos have been uploaded yet."
 msgstr "No logos have been uploaded yet."
 
-#: templates/admin/general_settings.html:10
+#: templates/admin/general_settings.html:11
 #, fuzzy
 msgid "project configuration"
 msgstr "Visibility Configuration"
 
-#: templates/admin/general_settings.html:14
-msgid "case study hierarchy ID"
-msgstr "case study hierarchy ID"
-
-#: templates/admin/general_settings.html:24
+#: templates/admin/general_settings.html:23
 msgid "Please enter a positive integer for the Case Study Hierarchy ID."
 msgstr "Please enter a positive integer for the Case Study Hierarchy ID."
 
-#: templates/admin/general_settings.html:33
+#: templates/admin/general_settings.html:32
 msgid "This ID links your project to the central hierarchy."
 msgstr ""
 
-#: templates/admin/general_settings.html:45
+#: templates/admin/general_settings.html:44
 msgid "appearance & access"
 msgstr ""
 
-#: templates/admin/general_settings.html:54
-msgid "Deactivate Darkmode"
-msgstr "Deactivate Darkmode"
-
-#: templates/admin/general_settings.html:56
+#: templates/admin/general_settings.html:55
 msgid "Disable the dark theme option for all users."
 msgstr ""
 
-#: templates/admin/general_settings.html:64
-msgid "Deactivate Language Selector"
-msgstr "Deactivate Language Selector"
-
-#: templates/admin/general_settings.html:66
+#: templates/admin/general_settings.html:65
 msgid "Hide the language choice menu in the navbar."
 msgstr ""
 
-#: templates/admin/general_settings.html:74
-msgid "Activate Access Restriction"
-msgstr "Activate Access Restriction"
-
-#: templates/admin/general_settings.html:76
+#: templates/admin/general_settings.html:75
 msgid "Only logged-in users can see the content."
 msgstr ""
 
-#: templates/admin/general_settings.html:86
+#: templates/admin/general_settings.html:85
 #, fuzzy
 msgid "localization"
 msgstr "Creation"
 
-#: templates/admin/general_settings.html:91
-msgid "available languages"
-msgstr ""
-
-#: templates/admin/general_settings.html:111
-msgid "preferred language"
-msgstr "preferred language"
-
-#: templates/admin/general_settings.html:123
+#: templates/admin/general_settings.html:115
 msgid "The default language used when no other choice is made."
 msgstr ""
 
-#: templates/admin/general_settings.html:135
+#: templates/admin/general_settings.html:127
+#: templates/admin/index_page_options.html:106
 #, fuzzy
 msgid "Save Settings"
 msgstr "Save All Settings"
@@ -766,70 +1000,72 @@ msgstr "Are you sure you want to delete this icon?"
 msgid "No icons have been uploaded yet."
 msgstr "No icons have been uploaded yet."
 
-#: templates/admin/index_page_options.html:5
+#: templates/admin/index_page_options.html:14
+#, fuzzy
+msgid "background type"
+msgstr "Icon Type"
+
+#: templates/admin/index_page_options.html:18
 msgid "choose index background"
 msgstr "choose index background"
 
-#: templates/admin/index_page_options.html:19
+#: templates/admin/index_page_options.html:32
+msgid ""
+"Select whether to use a map or a static image as the landing page "
+"background."
+msgstr ""
+
+#: templates/admin/index_page_options.html:44
 msgid "map options"
 msgstr "map options"
 
-#: templates/admin/index_page_options.html:21
+#: templates/admin/index_page_options.html:50
 msgid "select map background"
 msgstr "select map background"
 
-#: templates/admin/index_page_options.html:40
+#: templates/admin/index_page_options.html:70
 msgid "Greyscale"
 msgstr "Greyscale"
 
-#: templates/admin/index_page_options.html:44
+#: templates/admin/index_page_options.html:71
+msgid "Display the map in greyscale mode."
+msgstr ""
+
+#: templates/admin/index_page_options.html:81
 msgid "image options"
 msgstr "image options"
 
-#: templates/admin/index_page_options.html:46
+#: templates/admin/index_page_options.html:86
 msgid "define default background image"
 msgstr "define default background image"
+
+#: templates/admin/index_page_options.html:95
+msgid "Select an image from the uploaded assets to be used as background."
+msgstr ""
 
 #: templates/admin/license_management.html:3
 msgid "Add New License"
 msgstr "Add New License"
 
-#: templates/admin/license_management.html:8
-#: templates/admin/license_management.html:40
-msgid "SPDX ID"
-msgstr "SPDX ID"
-
-#: templates/admin/license_management.html:12
-msgid "URI"
-msgstr "URI"
-
-#: templates/admin/license_management.html:16
-#: templates/admin/license_management.html:39
-msgid "Label"
-msgstr "Label"
-
-#: templates/admin/license_management.html:20
-#: templates/admin/license_management.html:41
-msgid "Category"
-msgstr "Category"
-
-#: templates/admin/license_management.html:27
+#: templates/admin/license_management.html:25
 msgid "Add License"
 msgstr "Add License"
 
-#: templates/admin/license_management.html:34
+#: templates/admin/license_management.html:32
 msgid "Existing Licenses"
 msgstr "Existing Licenses"
 
-#: templates/admin/license_management.html:38
+#: templates/admin/license_management.html:36
 msgid "Logo"
 msgstr "Logo"
 
-#: templates/admin/license_management.html:42
+#: templates/admin/license_management.html:40
+#: templates/admin/manage_publications.html:102
 msgid "Actions"
 msgstr "Actions"
 
-#: templates/admin/license_management.html:58
+#: templates/admin/license_management.html:56
+#: templates/admin/manage_publications.html:123
 msgid "Are you sure?"
 msgstr "Are you sure?"
 
@@ -847,72 +1083,195 @@ msgstr ""
 msgid "Upload New Logo"
 msgstr "Upload New Logo"
 
-#: templates/admin/logo_management.html:24
+#: templates/admin/logo_management.html:25
 #: templates/admin/team_management.html:25
 msgid "Accepted formats: PNG, JPG, SVG, GIF."
 msgstr "Accepted formats: PNG, JPG, SVG, GIF."
 
-#: templates/admin/logo_management.html:33
+#: templates/admin/logo_management.html:34
 msgid "Existing Logos"
 msgstr "Existing Logos"
 
-#: templates/admin/logo_management.html:70
+#: templates/admin/logo_management.html:72
 msgid "Main Logo"
 msgstr "Main Logo"
 
-#: templates/admin/logo_management.html:74
+#: templates/admin/logo_management.html:76
 msgid "Set as Main"
 msgstr "Set as Main"
 
-#: templates/admin/logo_management.html:83
+#: templates/admin/logo_management.html:85
 msgid "Set as Favicon"
 msgstr "Set as Favicon"
 
-#: templates/admin/logo_management.html:99
+#: templates/admin/logo_management.html:103
 msgid "Are you sure you want to delete this logo?"
 msgstr "Are you sure you want to delete this logo?"
 
-#: templates/admin/maps.html:29
-msgid "name"
-msgstr "name"
+#: templates/admin/manage_publications.html:3
+#, fuzzy
+msgid "Manage Publication Types"
+msgstr "publications"
 
-#: templates/admin/maps.html:37 templates/admin/maps.html:52
+#: templates/admin/manage_publications.html:6
+msgid "Publication Types (comma separated)"
+msgstr ""
+
+#: templates/admin/manage_publications.html:10
+#, fuzzy
+msgid "Update Types"
+msgstr "Page Type"
+
+#: templates/admin/manage_publications.html:17
+#, fuzzy
+msgid "Add New Publication"
+msgstr "publications"
+
+#: templates/admin/manage_publications.html:20
+msgid "Import from DOI"
+msgstr ""
+
+#: templates/admin/manage_publications.html:24
+msgid "Import DOI"
+msgstr ""
+
+#: templates/admin/manage_publications.html:33
+#: templates/admin/manage_publications.html:100
+#: templates/admin/manage_publications.html:151
+#, fuzzy
+msgid "Title"
+msgstr "File"
+
+#: templates/admin/manage_publications.html:37
+#: templates/admin/manage_publications.html:101
+#: templates/admin/manage_publications.html:155
+#, fuzzy
+msgid "Authors"
+msgstr "Actors"
+
+#: templates/admin/manage_publications.html:39
+msgid "Separate authors with semicolons (;)"
+msgstr ""
+
+#: templates/admin/manage_publications.html:49
+#: templates/admin/manage_publications.html:166
+#, fuzzy
+msgid "Select type..."
+msgstr "Select License..."
+
+#: templates/admin/manage_publications.html:57
+#: templates/admin/manage_publications.html:174
+msgid "DOI"
+msgstr ""
+
+#: templates/admin/manage_publications.html:61
+#: templates/admin/manage_publications.html:178
+#, fuzzy
+msgid "URL"
+msgstr "URI"
+
+#: templates/admin/manage_publications.html:65
+#: templates/admin/manage_publications.html:182
+msgid "Linked Asset"
+msgstr ""
+
+#: templates/admin/manage_publications.html:67
+#: templates/admin/manage_publications.html:184
+msgid "No asset linked"
+msgstr ""
+
+#: templates/admin/manage_publications.html:74
+#: templates/admin/manage_publications.html:191
+#, fuzzy
+msgid "Linked Projects"
+msgstr "main-project"
+
+#: templates/admin/manage_publications.html:87
+#, fuzzy
+msgid "Add Publication"
+msgstr "publications"
+
+#: templates/admin/manage_publications.html:94
+#, fuzzy
+msgid "Existing Publications"
+msgstr "Existing Icons"
+
+#: templates/admin/manage_publications.html:143
+#, fuzzy
+msgid "Edit Publication"
+msgstr "publications"
+
+#: templates/admin/manage_publications.html:206 templates/admin/maps.html:147
+#: templates/admin/partials/case_study_modal.html:12
+#: templates/admin/partials/entity_form.html:154
+#: templates/admin/partials/modal_add_entry.html:219
+#: templates/admin/partials/modal_delete_confirm.html:14
+#: templates/admin/partials/modal_image_selector.html:101
+msgid "Cancel"
+msgstr "Cancel"
+
+#: templates/admin/manage_publications.html:207
+#: templates/admin/menu_management.html:88
+#: templates/admin/partials/entity_form.html:161
+msgid "Save Changes"
+msgstr "Save Changes"
+
+#: templates/admin/manage_publications.html:225
+msgid "Fetching data..."
+msgstr ""
+
+#: templates/admin/manage_publications.html:247
+#, fuzzy
+msgid "Data imported successfully!"
+msgstr "Database restored successfully."
+
+#: templates/admin/manage_publications.html:251
+#, fuzzy
+msgid "Error fetching data."
+msgstr "Error deleting color"
+
+#: templates/admin/maps.html:40 templates/admin/maps.html:129
 msgid "Please provide a name"
 msgstr "Please provide a name"
 
-#: templates/admin/maps.html:42
-msgid "Display Name"
-msgstr "Display Name"
+#: templates/admin/maps.html:54 templates/admin/maps.html:134
+#, fuzzy
+msgid "Please provide a display name"
+msgstr "Please provide a name"
 
-#: templates/admin/maps.html:57
-msgid "order"
-msgstr "order"
-
-#: templates/admin/maps.html:65
-msgid "Please provide an order"
-msgstr "Please provide an order"
-
-#: templates/admin/maps.html:73
-msgid "Leaflet Tile Layer String"
+#: templates/admin/maps.html:67 templates/admin/maps.html:139
+#, fuzzy
+msgid "Please provide a tile layer string"
 msgstr "Leaflet Tile Layer String"
 
-#: templates/admin/maps.html:87
+#: templates/admin/maps.html:77
 msgid "edit"
 msgstr "edit"
 
-#: templates/admin/maps.html:95
+#: templates/admin/maps.html:85
 msgid "delete"
 msgstr "delete"
 
-#: templates/admin/maps.html:99
+#: templates/admin/maps.html:90
 msgid "cancel"
 msgstr "cancel"
 
-#: templates/admin/maps.html:116 templates/admin/modals.html:8
-#: templates/admin/modals.html:169 templates/admin/projects_content.html:78
+#: templates/admin/maps.html:106 templates/admin/maps.html:116
+#: templates/admin/maps.html:150
+#: templates/admin/partials/modal_add_entry.html:8
+#: templates/admin/partials/modal_add_entry.html:223
+#: templates/admin/projects_content.html:78
 #: templates/admin/stakeholders_content.html:67
 msgid "add entry"
 msgstr "add entry"
+
+#: templates/admin/maps.html:128 templates/admin/maps.html:133
+msgid "e.g. OpenStreetMap"
+msgstr ""
+
+#: templates/admin/maps.html:138
+msgid "L.tileLayer(...)"
+msgstr ""
 
 #: templates/admin/menu_management.html:3
 msgid "menu management"
@@ -939,63 +1298,6 @@ msgstr "Default"
 #: templates/admin/menu_management.html:81
 msgid "Individual"
 msgstr "Individual"
-
-#: templates/admin/menu_management.html:88
-#: templates/admin/partials/entity_form.html:131
-msgid "Save Changes"
-msgstr "Save Changes"
-
-#: templates/admin/modals.html:10 templates/admin/modals.html:185
-#: templates/admin/modals.html:207 templates/util/cite/modal.html:84
-msgid "Close"
-msgstr "Close"
-
-#: templates/admin/modals.html:44
-#, fuzzy
-msgid "General Information"
-msgstr "general settings"
-
-#: templates/admin/modals.html:64 templates/admin/modals.html:95
-#: templates/admin/modals.html:150 templates/admin/partials/entity_form.html:89
-msgid "Please provide a"
-msgstr "Please provide a"
-
-#: templates/admin/modals.html:80
-#, fuzzy
-msgid "Content & Description"
-msgstr "description"
-
-#: templates/admin/modals.html:111
-#, fuzzy
-msgid "Media & Settings"
-msgstr "Save All Settings"
-
-#: templates/admin/modals.html:129 templates/admin/partials/entity_form.html:56
-msgid "Select a value"
-msgstr "Select a value"
-
-#: templates/admin/modals.html:165 templates/admin/modals.html:192
-#: templates/admin/modals.html:269
-#: templates/admin/partials/entity_form.html:124
-msgid "Cancel"
-msgstr "Cancel"
-
-#: templates/admin/modals.html:184
-msgid "Confirm Delete"
-msgstr "Confirm Delete"
-
-#: templates/admin/modals.html:188
-msgid "Are you sure you want to delete"
-msgstr "Are you sure you want to delete"
-
-#: templates/admin/modals.html:205 templates/admin/partials/image_field.html:25
-#, fuzzy
-msgid "Select Image"
-msgstr "select role"
-
-#: templates/admin/modals.html:218 templates/admin/modals.html:246
-msgid "None"
-msgstr "None"
 
 #: templates/admin/projects_content.html:3
 #, fuzzy
@@ -1032,45 +1334,28 @@ msgstr "Upload New Team Image"
 msgid "Existing Team Images"
 msgstr "Existing Team Images"
 
-#: templates/admin/team_management.html:85
+#: templates/admin/team_management.html:88
 msgid "Are you sure you want to delete this image?"
 msgstr "Are you sure you want to delete this image?"
 
-#: templates/admin/team_management.html:95
+#: templates/admin/team_management.html:98
 msgid "No team images have been uploaded yet."
 msgstr "No team images have been uploaded yet."
 
-#: templates/admin/type_divisions.html:9 templates/admin/type_divisions.html:58
-msgid "Remove Division"
-msgstr "Remove Division"
-
-#: templates/admin/type_divisions.html:16
-#: templates/admin/type_divisions.html:65
-msgid "Icon Type"
-msgstr "Icon Type"
-
-#: templates/admin/type_divisions.html:24
-#: templates/admin/type_divisions.html:73
-msgid "Icon Value"
-msgstr "Icon Value"
-
-#: templates/admin/type_divisions.html:30
-#: templates/admin/type_divisions.html:78
-msgid "IDs"
-msgstr "IDs"
-
-#: templates/admin/type_divisions.html:33
-#: templates/admin/type_divisions.html:80
-msgid "Comma-separated list of IDs."
-msgstr "Comma-separated list of IDs."
-
-#: templates/admin/type_divisions.html:40
-msgid "Add Division"
+#: templates/admin/type_divisions.html:11
+#: templates/admin/type_divisions.html:192
+#, fuzzy
+msgid "Division Label"
 msgstr "Add Division"
 
-#: templates/admin/type_divisions.html:43
-msgid "save changes"
-msgstr "save changes"
+#: templates/admin/type_divisions.html:75
+#: templates/admin/type_divisions.html:247
+msgid "Type IDs (comma-separated)"
+msgstr ""
+
+#: templates/admin/type_divisions.html:90
+msgid "Add Division"
+msgstr "Add Division"
 
 #: templates/admin/visibility_settings.html:5
 msgid "Visibility Configuration"
@@ -1132,54 +1417,67 @@ msgstr "Shown Classes"
 msgid "Checked classes will be explicitly shown in the browse interface."
 msgstr "Checked classes will be explicitly shown in the browse interface."
 
-#: templates/admin/visibility_settings.html:97
+#: templates/admin/visibility_settings.html:96
 msgid "Hidden Classes"
 msgstr "Hidden Classes"
 
-#: templates/admin/visibility_settings.html:100
+#: templates/admin/visibility_settings.html:99
 msgid "Checked classes will be hidden from the browse interface."
 msgstr "Checked classes will be hidden from the browse interface."
 
-#: templates/admin/visibility_settings.html:131
+#: templates/admin/visibility_settings.html:129
 msgid "Save Visibility Settings"
 msgstr "Save Visibility Settings"
 
-#: templates/admin/partials/entity_form.html:25
-#: templates/admin/partials/entity_form.html:27
-msgid "no translation available"
-msgstr "no translation available"
+#: templates/admin/partials/case_study_modal.html:5
+#, fuzzy
+msgid "Select Case Studies"
+msgstr "Select a value"
 
-#: templates/admin/partials/entity_form.html:85
-msgid "This entry has no translation for"
-msgstr "This entry has no translation for"
+#: templates/admin/partials/case_study_modal.html:13
+#, fuzzy
+msgid "Apply Selection"
+msgstr "Save Footer Selection"
 
-#: templates/admin/partials/entity_form.html:109
+#: templates/admin/partials/entity_form.html:77
+#: templates/admin/partials/modal_add_entry.html:183
+msgid "Select a value"
+msgstr "Select a value"
+
+#: templates/admin/partials/entity_form.html:119
+#: templates/admin/partials/modal_add_entry.html:91
+#: templates/admin/partials/modal_add_entry.html:149
+#: templates/admin/partials/modal_add_entry.html:204
+msgid "Please provide a"
+msgstr "Please provide a"
+
+#: templates/admin/partials/entity_form.html:139
 msgid "Edit"
 msgstr "Edit"
 
-#: templates/admin/partials/entity_form.html:138
+#: templates/admin/partials/entity_form.html:168
 #, fuzzy
 msgid "CONNECTED ENTITIES"
 msgstr "entities"
 
-#: templates/admin/partials/entity_form.html:172
+#: templates/admin/partials/entity_form.html:202
 #, fuzzy
 msgid "ADD NEW CONNECTION"
 msgstr "select connection"
 
-#: templates/admin/partials/entity_form.html:176
+#: templates/admin/partials/entity_form.html:206
 msgid "select connection"
 msgstr "select connection"
 
-#: templates/admin/partials/entity_form.html:188
+#: templates/admin/partials/entity_form.html:218
 msgid "select node"
 msgstr "select node"
 
-#: templates/admin/partials/entity_form.html:199
+#: templates/admin/partials/entity_form.html:229
 msgid "select role"
 msgstr "select role"
 
-#: templates/admin/partials/entity_form.html:200
+#: templates/admin/partials/entity_form.html:230
 msgid "not specified"
 msgstr "not specified"
 
@@ -1188,9 +1486,38 @@ msgstr "not specified"
 msgid "No image selected"
 msgstr "No selected file"
 
-#: templates/tabs/feature.html:34 views/admin.py:56
-msgid "attributes"
-msgstr "attributes"
+#: templates/admin/partials/image_field.html:25
+#: templates/admin/partials/modal_image_selector.html:7
+#, fuzzy
+msgid "Select Image"
+msgstr "select role"
+
+#: templates/admin/partials/modal_add_entry.html:44
+#, fuzzy
+msgid "General Information"
+msgstr "general settings"
+
+#: templates/admin/partials/modal_add_entry.html:107
+#, fuzzy
+msgid "Content & Description"
+msgstr "description"
+
+#: templates/admin/partials/modal_add_entry.html:165
+#, fuzzy
+msgid "Media & Settings"
+msgstr "Save All Settings"
+
+#: templates/admin/partials/modal_delete_confirm.html:6
+msgid "Confirm Delete"
+msgstr "Confirm Delete"
+
+#: templates/admin/partials/modal_delete_confirm.html:10
+msgid "Are you sure you want to delete"
+msgstr "Are you sure you want to delete"
+
+#: templates/tabs/catalog.html:91
+msgid "Catalogue"
+msgstr ""
 
 #: templates/tabs/overview.html:8
 msgid "subentities"
@@ -1208,6 +1535,14 @@ msgstr "description"
 msgid "Media file"
 msgstr "Media file"
 
+#: templates/tabs/overview.html:13
+msgid "Creator"
+msgstr "Creator"
+
+#: templates/tabs/overview.html:14
+msgid "License holder"
+msgstr "License holder"
+
 #: templates/tabs/overview.html:15
 msgid "Open full view"
 msgstr "Open full view"
@@ -1216,6 +1551,15 @@ msgstr "Open full view"
 #, python-format
 msgid "View all %(count)s files"
 msgstr "View all %(count)s files"
+
+#: templates/tabs/overview.html:18
+msgid "exact match"
+msgstr ""
+
+#: templates/tabs/overview.html:19
+#, fuzzy
+msgid "close match"
+msgstr "Close"
 
 #: templates/util/cite/modal.html:5
 msgid "Cite this Entry"
@@ -1281,29 +1625,41 @@ msgstr "about the project"
 msgid "Unknown"
 msgstr "Unknown"
 
-#: utils/view_util.py:145
-#, python-format
-msgid "Accessed: %(date)s"
-msgstr "Accessed: %(date)s"
+#: utils/view_util.py:141 utils/view_util.py:184
+#, fuzzy
+msgid "Unknown Project"
+msgstr "main-project"
 
-#: utils/view_util.py:194
-#, python-format
-msgid ""
-"%(project_name)s (%(year)s). %(title)s. Retrieved from %(url)s (Accessed:"
-" %(date)s)"
-msgstr ""
-"%(project_name)s (%(year)s). %(title)s. Retrieved from %(url)s (Accessed:"
-" %(date)s)"
+#: utils/view_util.py:144 utils/view_util.py:272
+msgid "Accessed"
+msgstr "Accessed"
 
-#: views/admin.py:46
+#: utils/view_util.py:150 utils/view_util.py:191
+msgid "after"
+msgstr "after"
+
+#: utils/view_util.py:155 utils/view_util.py:195 utils/view_util.py:214
+#, fuzzy
+msgid "Unknown Author"
+msgstr "Unknown"
+
+#: utils/view_util.py:271
+msgid "Retrieved from"
+msgstr "Retrieved from"
+
+#: views/admin.py:53
 msgid "main-project"
 msgstr "main-project"
 
-#: views/admin.py:54
+#: views/admin.py:61
 msgid "institutions"
 msgstr "institutions"
 
-#: views/admin.py:164
+#: views/admin.py:63
+msgid "attributes"
+msgstr "attributes"
+
+#: views/admin.py:271
 #, python-format
 msgid ""
 "Invalid ID format for label \"%(label)s\". Please use comma-separated "
@@ -1312,284 +1668,288 @@ msgstr ""
 "Invalid ID format for label \"%(label)s\". Please use comma-separated "
 "integers."
 
-#: views/admin.py:177
+#: views/admin.py:284
 msgid "Type divisions updated successfully."
 msgstr "Type divisions updated successfully."
 
-#: views/admin.py:180
+#: views/admin.py:287
 msgid "Error updating type divisions"
 msgstr "Error updating type divisions"
 
-#: views/admin.py:197
+#: views/admin.py:322
+#, fuzzy
+msgid "External identifiers updated successfully."
+msgstr "Legal notice updated successfully."
+
+#: views/admin.py:325
+#, fuzzy
+msgid "Error updating external identifiers"
+msgstr "External Reference"
+
+#: views/admin.py:342
 msgid "Entity colors updated successfully."
 msgstr "Entity colors updated successfully."
 
-#: views/admin.py:200
+#: views/admin.py:345
 msgid "Error updating entity colors"
 msgstr "Error updating entity colors"
 
-#: views/admin.py:215
+#: views/admin.py:360
 msgid "Color added successfully."
 msgstr "Color added successfully."
 
-#: views/admin.py:218
+#: views/admin.py:363
 msgid "Error adding color"
 msgstr "Error adding color"
 
-#: views/admin.py:220
+#: views/admin.py:365
 msgid "Color already exists."
 msgstr "Color already exists."
 
-#: views/admin.py:222
+#: views/admin.py:367
 msgid "Invalid HEX code."
 msgstr "Invalid HEX code."
 
-#: views/admin.py:235
+#: views/admin.py:380
 msgid "Color deleted successfully."
 msgstr "Color deleted successfully."
 
-#: views/admin.py:238
+#: views/admin.py:383
 msgid "Error deleting color"
 msgstr "Error deleting color"
 
-#: views/admin.py:257
+#: views/admin.py:402
 msgid "Menu settings updated successfully."
 msgstr "Menu settings updated successfully."
 
-#: views/admin.py:260
+#: views/admin.py:405
 msgid "Error updating menu settings"
 msgstr "Error updating menu settings"
 
-#: views/admin.py:279
+#: views/admin.py:424
 msgid "Legal notice updated successfully."
 msgstr "Legal notice updated successfully."
 
-#: views/admin.py:282 views/admin.py:397 views/admin.py:862
+#: views/admin.py:427 views/admin.py:544 views/admin.py:1065
 msgid "Error updating settings"
 msgstr "Error updating settings"
 
-#: views/admin.py:292 views/admin.py:560 views/admin.py:1078
-#: views/admin.py:1214
+#: views/admin.py:437 views/admin.py:725 views/admin.py:1303
 msgid "No file part"
 msgstr "No file part"
 
-#: views/admin.py:297 views/admin.py:565 views/admin.py:1083
-#: views/admin.py:1219
+#: views/admin.py:442 views/admin.py:730 views/admin.py:1308
 msgid "No selected file"
 msgstr "No selected file"
 
-#: views/admin.py:306
+#: views/admin.py:451
 #, python-format
 msgid "Logo \"%(name)s\" uploaded successfully."
 msgstr "Logo \"%(name)s\" uploaded successfully."
 
-#: views/admin.py:320 views/admin.py:1106 views/admin.py:1254
+#: views/admin.py:465 views/admin.py:1331
 msgid "Invalid request for renaming."
 msgstr "Invalid request for renaming."
 
-#: views/admin.py:331
+#: views/admin.py:476
 msgid "Cannot rename default logos."
 msgstr "Cannot rename default logos."
 
-#: views/admin.py:337 views/admin.py:1123 views/admin.py:1284
+#: views/admin.py:482 views/admin.py:1348 views/admin.py:1518
 msgid "Original file not found."
 msgstr "Original file not found."
 
-#: views/admin.py:341 views/admin.py:1127 views/admin.py:1288
+#: views/admin.py:486 views/admin.py:1352 views/admin.py:1522
 msgid "A file with the new name already exists."
 msgstr "A file with the new name already exists."
 
-#: views/admin.py:347
+#: views/admin.py:492
 #, python-format
 msgid "Logo renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "Logo renamed from \"%(old)s\" to \"%(new)s\"."
 
-#: views/admin.py:350 views/admin.py:1136 views/admin.py:1296
+#: views/admin.py:495 views/admin.py:1361 views/admin.py:1534
 #, python-format
 msgid "Error renaming file: %(error)s"
 msgstr "Error renaming file: %(error)s"
 
-#: views/admin.py:361 views/admin.py:1147
+#: views/admin.py:506 views/admin.py:1372
 msgid "No filename specified for deletion."
 msgstr "No filename specified for deletion."
 
-#: views/admin.py:371
+#: views/admin.py:516
 #, python-format
 msgid "Logo \"%(name)s\" deleted successfully."
 msgstr "Logo \"%(name)s\" deleted successfully."
 
-#: views/admin.py:374 views/admin.py:1160 views/admin.py:1333
+#: views/admin.py:519 views/admin.py:1385 views/admin.py:1580
 #, python-format
 msgid "Error deleting file: %(error)s"
 msgstr "Error deleting file: %(error)s"
 
-#: views/admin.py:377
+#: views/admin.py:523
 #, python-format
 msgid "Default logo \"%(name)s\" deactivated."
 msgstr "Default logo \"%(name)s\" deactivated."
 
-#: views/admin.py:388 views/admin.py:408
+#: views/admin.py:535 views/admin.py:555
 msgid "No filename specified."
 msgstr "No filename specified."
 
-#: views/admin.py:394
+#: views/admin.py:541
 msgid "Main logo updated successfully."
 msgstr "Main logo updated successfully."
 
-#: views/admin.py:426
+#: views/admin.py:573
 msgid "Favicon updated successfully."
 msgstr "Favicon updated successfully."
 
-#: views/admin.py:429
+#: views/admin.py:576
 #, python-format
 msgid "Error creating favicon: %(error)s"
 msgstr "Error creating favicon: %(error)s"
 
-#: views/admin.py:459
+#: views/admin.py:607
 msgid "Footer logos updated successfully."
 msgstr "Footer logos updated successfully."
 
-#: views/admin.py:462
+#: views/admin.py:610
 msgid "Error updating footer logos"
 msgstr "Error updating footer logos"
 
-#: views/admin.py:476
+#: views/admin.py:626
 msgid "License added successfully."
 msgstr "License added successfully."
 
-#: views/admin.py:485
+#: views/admin.py:639
 msgid "License deleted successfully."
 msgstr "License deleted successfully."
 
-#: views/admin.py:501
+#: views/admin.py:666
 msgid "Logo license updated successfully."
 msgstr "Logo license updated successfully."
 
-#: views/admin.py:546
+#: views/admin.py:711
 msgid "Database backup failed. Check logs for details."
 msgstr "Database backup failed. Check logs for details."
 
-#: views/admin.py:549 views/admin.py:625
+#: views/admin.py:714 views/admin.py:790
 msgid "An unexpected error occurred. Check logs for details."
 msgstr "An unexpected error occurred. Check logs for details."
 
-#: views/admin.py:616
+#: views/admin.py:781
 msgid "Database restored successfully."
 msgstr "Database restored successfully."
 
-#: views/admin.py:620
+#: views/admin.py:785
 msgid "Database restore failed. Check logs for details."
 msgstr "Database restore failed. Check logs for details."
 
-#: views/admin.py:628
+#: views/admin.py:793
 msgid "Invalid file type. Please upload a .sql file."
 msgstr "Invalid file type. Please upload a .sql file."
 
-#: views/admin.py:638
+#: views/admin.py:803
 msgid "Link deleted successfully"
 msgstr "Link deleted successfully"
 
-#: views/admin.py:658
+#: views/admin.py:824
 msgid "Link added successfully"
 msgstr "Link added successfully"
 
-#: views/admin.py:664
+#: views/admin.py:830
 msgid "Failed to add link: Invalid data provided"
 msgstr "Failed to add link: Invalid data provided"
 
-#: views/admin.py:695
+#: views/admin.py:881
 msgid "Entry added successfully!"
 msgstr "Entry added successfully!"
 
-#: views/admin.py:699
+#: views/admin.py:885
 #, python-format
 msgid "Error adding entry %(name)s: Only one main project allowed"
 msgstr "Error adding entry %(name)s: Only one main project allowed"
 
-#: views/admin.py:703
+#: views/admin.py:890
 #, python-format
 msgid "Error adding entry %(name)s: %(error)s"
 msgstr "Error adding entry %(name)s: %(error)s"
 
-#: views/admin.py:713
+#: views/admin.py:901
 msgid "Main Project cannot be deleted"
 msgstr "Main Project cannot be deleted"
 
-#: views/admin.py:716
+#: views/admin.py:904
 msgid "Entry deleted successfully!"
 msgstr "Entry deleted successfully!"
 
-#: views/admin.py:727
+#: views/admin.py:919
 msgid "Configuration ID is required"
 msgstr "Configuration ID is required"
 
-#: views/admin.py:747
+#: views/admin.py:941
 #, python-format
 msgid "\"%(name)s\" updated successfully"
 msgstr "\"%(name)s\" updated successfully"
 
-#: views/admin.py:751
+#: views/admin.py:945
 #, python-format
 msgid "Error updating \"%(name)s\": %(error)s"
 msgstr "Error updating \"%(name)s\": %(error)s"
 
-#: views/admin.py:773
+#: views/admin.py:975
 msgid "Map ID is required"
 msgstr "Map ID is required"
 
-#: views/admin.py:790
+#: views/admin.py:992
 msgid "Map updated successfully"
 msgstr "Map updated successfully"
 
-#: views/admin.py:793
+#: views/admin.py:995
 msgid "Invalid Map ID format"
 msgstr "Invalid Map ID format"
 
-#: views/admin.py:796
+#: views/admin.py:998
 #, python-format
 msgid "Error updating map: %(error)s"
 msgstr "Error updating map: %(error)s"
 
-#: views/admin.py:813
-msgid "Error: Name, Display Name and Description are required"
-msgstr "Error: Name, Display Name and Description are required"
-
-#: views/admin.py:825
+#: views/admin.py:1028
 #, python-format
 msgid "Map %(name)s with ID %(id)s added successfully!"
 msgstr "Map %(name)s with ID %(id)s added successfully!"
 
-#: views/admin.py:831
+#: views/admin.py:1034
 #, python-format
 msgid "Error adding map %(name)s: %(error)s"
 msgstr "Error adding map %(name)s: %(error)s"
 
-#: views/admin.py:843
+#: views/admin.py:1046
 msgid "Map deleted successfully!"
 msgstr "Map deleted successfully!"
 
-#: views/admin.py:845
+#: views/admin.py:1048
 #, python-format
 msgid "Error deleting map: %(error)s"
 msgstr "Error deleting map: %(error)s"
 
-#: views/admin.py:859
+#: views/admin.py:1062
 msgid "Index background updated successfully"
 msgstr "Index background updated successfully"
 
-#: views/admin.py:893
+#: views/admin.py:1096
 msgid "Invalid ID format. Please use comma-separated integers."
 msgstr "Invalid ID format. Please use comma-separated integers."
 
-#: views/admin.py:898
+#: views/admin.py:1101
 msgid "Class visibility updated successfully."
 msgstr "Class visibility updated successfully."
 
-#: views/admin.py:950
+#: views/admin.py:1162
 msgid "Updated case study ID successfully"
 msgstr "Updated case study ID successfully"
 
-#: views/admin.py:953
+#: views/admin.py:1165
 msgid ""
 "Invalid Case Study ID. Must be a positive integer and its entity type "
 "must be \"type\"."
@@ -1597,121 +1957,143 @@ msgstr ""
 "Invalid Case Study ID. Must be a positive integer and its entity type "
 "must be \"type\"."
 
-#: views/admin.py:971
+#: views/admin.py:1187
+msgid "Reset is only allowed in debug or testing mode."
+msgstr ""
+
+#: views/admin.py:1191
 msgid "reset database"
 msgstr "reset database"
 
-#: views/admin.py:993
+#: views/admin.py:1218
 msgid "cache cleared"
 msgstr "cache cleared"
 
-#: views/admin.py:1001
+#: views/admin.py:1226
 msgid "Cache warmup started in background (refresh mode)"
 msgstr "Cache warmup started in background (refresh mode)"
 
-#: views/admin.py:1009
+#: views/admin.py:1234
 msgid "Cache warmup started in background."
 msgstr "Cache warmup started in background."
 
-#: views/admin.py:1028
+#: views/admin.py:1253
 #, python-format
 msgid "Error warming cache: %(error)s"
 msgstr "Error warming cache: %(error)s"
 
-#: views/admin.py:1046
+#: views/admin.py:1271
 msgid "system cache refreshed"
 msgstr "system cache refreshed"
 
-#: views/admin.py:1092
+#: views/admin.py:1317
 #, python-format
 msgid "Asset \"%(name)s\" uploaded successfully."
 msgstr "Asset \"%(name)s\" uploaded successfully."
 
-#: views/admin.py:1117
+#: views/admin.py:1342
 msgid "Cannot rename default assets."
 msgstr "Cannot rename default assets."
 
-#: views/admin.py:1133
+#: views/admin.py:1358
 #, python-format
 msgid "Asset renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "Asset renamed from \"%(old)s\" to \"%(new)s\"."
 
-#: views/admin.py:1157
+#: views/admin.py:1382
 #, python-format
 msgid "Asset \"%(name)s\" deleted successfully."
 msgstr "Asset \"%(name)s\" deleted successfully."
 
-#: views/admin.py:1163
+#: views/admin.py:1389
 #, python-format
 msgid "Default asset \"%(name)s\" deactivated."
 msgstr "Default asset \"%(name)s\" deactivated."
 
-#: views/admin.py:1180
+#: views/admin.py:1407
 msgid "Asset license updated successfully."
 msgstr "Asset license updated successfully."
 
-#: views/admin.py:1210
-msgid "File type is missing."
-msgstr "File type is missing."
-
-#: views/admin.py:1233 views/admin.py:1267 views/admin.py:1321
+#: views/admin.py:1458 views/admin.py:1500 views/admin.py:1564
 msgid "Invalid file type."
 msgstr "Invalid file type."
 
-#: views/admin.py:1240
+#: views/admin.py:1467
 #, python-format
 msgid "%(type)s \"%(name)s\" uploaded successfully."
 msgstr "%(type)s \"%(name)s\" uploaded successfully."
 
-#: views/admin.py:1278
+#: views/admin.py:1512
 msgid "Cannot rename default files."
 msgstr "Cannot rename default files."
 
-#: views/admin.py:1294
+#: views/admin.py:1529
 #, python-format
 msgid "%(type)s renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "%(type)s renamed from \"%(old)s\" to \"%(new)s\"."
 
-#: views/admin.py:1309
-msgid "No filename or type specified for deletion."
-msgstr "No filename or type specified for deletion."
-
-#: views/admin.py:1331
+#: views/admin.py:1577
 #, python-format
 msgid "%(type)s \"%(name)s\" deleted successfully."
 msgstr "%(type)s \"%(name)s\" deleted successfully."
 
-#: views/admin.py:1336
+#: views/admin.py:1584
 #, python-format
 msgid "Default %(type)s \"%(name)s\" deactivated."
 msgstr "Default %(type)s \"%(name)s\" deactivated."
 
-#: views/admin.py:1354
+#: views/admin.py:1616
 #, python-format
 msgid "%(type)s license updated successfully."
 msgstr "%(type)s license updated successfully."
 
-#: views/login.py:33
-msgid "show password"
-msgstr "show password"
+#: views/admin.py:1631
+#, fuzzy
+msgid "Publication added successfully."
+msgstr "License added successfully."
 
-#: views/login.py:34
-msgid "login"
-msgstr "login"
+#: views/admin.py:1641
+#, fuzzy
+msgid "No publication ID provided."
+msgstr "Publications Test Page"
 
-#: views/login.py:53
+#: views/admin.py:1651
+#, fuzzy
+msgid "Publication updated successfully."
+msgstr "Favicon updated successfully."
+
+#: views/admin.py:1660
+#, fuzzy
+msgid "Publication deleted successfully."
+msgstr "License deleted successfully."
+
+#: views/admin.py:1672
+msgid "Could not fetch metadata for this DOI."
+msgstr ""
+
+#: views/admin.py:1684
+#, fuzzy
+msgid "Publication types updated successfully."
+msgstr "Favicon updated successfully."
+
+#: views/admin.py:1687
+#, fuzzy
+msgid "Error updating publication types"
+msgstr "Error updating settings"
+
+#: views/login.py:48
 msgid "Your account is inactive."
 msgstr "Your account is inactive."
 
-#: views/login.py:55
+#: views/login.py:50
 msgid "Incorrect password."
 msgstr "Incorrect password."
 
-#: views/login.py:57
+#: views/login.py:52
 msgid "User not found."
 msgstr "User not found."
 
-#: views/views.py:90
+#: views/views.py:143
 #, python-format
 msgid "Failed to clear cache: %(error)s"
 msgstr "Failed to clear cache: %(error)s"
@@ -1721,4 +2103,50 @@ msgstr "Failed to clear cache: %(error)s"
 
 #~ msgid "Maximum number of projects (6) reached."
 #~ msgstr ""
+
+#~ msgid "Image"
+#~ msgstr "Image"
+
+#~ msgid "Your browser does not support the video tag."
+#~ msgstr "Your browser does not support the video tag."
+
+#~ msgid "More images"
+#~ msgstr "More images"
+
+#~ msgid "Please provide an order"
+#~ msgstr "Please provide an order"
+
+#~ msgid "Remove Division"
+#~ msgstr "Remove Division"
+
+#~ msgid "IDs"
+#~ msgstr "IDs"
+
+#~ msgid "Comma-separated list of IDs."
+#~ msgstr "Comma-separated list of IDs."
+
+#~ msgid "no translation available"
+#~ msgstr "no translation available"
+
+#~ msgid "This entry has no translation for"
+#~ msgstr "This entry has no translation for"
+
+#~ msgid "Error: Name, Display Name and Description are required"
+#~ msgstr "Error: Name, Display Name and Description are required"
+
+#~ msgid "File type is missing."
+#~ msgstr "File type is missing."
+
+#~ msgid "No filename or type specified for deletion."
+#~ msgstr "No filename or type specified for deletion."
+
+#~ msgid "types"
+#~ msgstr "Page Type"
+
+#~ msgid ""
+#~ "%(project_name)s (%(year)s). %(title)s. Retrieved"
+#~ " from %(url)s (Accessed: %(date)s)"
+#~ msgstr ""
+#~ "%(project_name)s (%(year)s). %(title)s. Retrieved"
+#~ " from %(url)s (Accessed: %(date)s)"
 

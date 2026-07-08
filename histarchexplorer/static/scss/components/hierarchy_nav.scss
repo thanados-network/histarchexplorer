@@ -59,6 +59,11 @@
     border-top-color: var(--entity-color-stratigraphic_unit);
     border-bottom-color: var(--entity-color-stratigraphic_unit);
   }
+
+  &--types {
+    border-top-color: var(--entity-color-types);
+    border-bottom-color: var(--entity-color-types);
+  }
 }
 
 .hierarchy-button {

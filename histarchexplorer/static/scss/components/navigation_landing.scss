@@ -46,8 +46,40 @@
 }
 
 #right-sidebar.right-expanded {
-  width: 600px;
+  width: var(--right-sidebar-width);
+  min-width: 280px;
   overflow-x: hidden;
+}
+
+/* Draggable handle to resize the right sidebar (and the map next to it). */
+.right-sidebar-resizer {
+  position: fixed;
+  width: 8px;
+  z-index: 200001;
+  cursor: col-resize;
+  display: none;
+  background: transparent;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: rgba(0, 0, 0, 0.15);
+  }
+
+  &:hover::after {
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* On small screens the sidebar takes the full width, so hide the handle. */
+@media (max-width: 1199px) {
+  .right-sidebar-resizer {
+    display: none !important;
+  }
 }
 
 #nav-sidebar .nav-link span {

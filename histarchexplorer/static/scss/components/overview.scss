@@ -234,6 +234,14 @@
   //font-weight: lighter;
 }
 
+.attribute-icon,
+.tile-sub-label img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
 
 .muuri-description {
   max-height: calc(100vh - var(--navbar-height));

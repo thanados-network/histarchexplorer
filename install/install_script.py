@@ -1,5 +1,10 @@
+import re
+import sys
 from pathlib import Path
 from typing import Any
+
+# Add project root to sys.path to allow importing histarchexplorer
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import psycopg2
 
@@ -11,6 +16,28 @@ def run_sql_file(cursor: Any, filepath: Path) -> None:
         sql = f.read()
         cursor.execute(sql)
         print(f"Executed {filepath.name}")
+
+
+def seed_migrations(cursor: Any, upgrade_dir: Path) -> None:
+    """Create the migration table and mark existing migrations as applied."""
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS tng.schema_migrations (
+            version VARCHAR(50) PRIMARY KEY,
+            applied_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
+    """)
+
+    sql_files = list(upgrade_dir.glob('[0-9]*.[0-9]*.[0-9]*.sql'))
+    for filepath in sql_files:
+        match = re.search(r'(\d+\.\d+\.\d+)', filepath.name)
+        if match:
+            version_str = match.group(1)
+            cursor.execute("""
+                INSERT INTO tng.schema_migrations (version)
+                VALUES (%s)
+                ON CONFLICT (version) DO NOTHING;
+            """, (version_str,))
+            print(f"Seeded migration version {version_str} as applied.")
 
 
 def main() -> None:
@@ -32,6 +59,7 @@ def main() -> None:
             with conn.cursor() as cur:
                 for sql_path in sql_paths:
                     run_sql_file(cur, sql_path)
+                seed_migrations(cur, base_dir / 'upgrade')
     finally:
         conn.close()
         print("Database connection closed.")

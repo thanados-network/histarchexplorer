@@ -12,6 +12,12 @@ from histarchexplorer.utils.view_util import (
 @app.route('/about', strict_slashes=False)
 @app.route('/about/<slug>')
 def about(slug: Optional[str] = None) -> Response | str | ResponseValue:
+    """Render the 'About' page for a project or sub-project.
+
+    Fetches details of the active project (selected via slug, or
+    the main project by default), lists team members and institutions
+    categorized by their roles, and compiles everything for display.
+    """
     grouped = ConfigEntity.group_by_class_name(g.config_entities)
     main_project = grouped['main-project'][0]
     sub_projects = grouped.get('project', [])

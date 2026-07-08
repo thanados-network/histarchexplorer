@@ -1162,7 +1162,6 @@
             toggleRightSidebar('map', 'open');
             rightSidebarcontent.map.opened = true
         }
-        const startTime = performance.now();
         const contentDiv = document.getElementById('right-sidebar');
 
         contentDiv.innerHTML = `
@@ -1181,20 +1180,144 @@
                 return response.text(); // Get the HTML content
             })
             .then(html => {
-                const endTime = performance.now(); // End timing
-                const fetchTime = ((endTime - startTime) / 1000).toFixed(2); // Convert to seconds
-
-                // Append fetch time info to the HTML
-                const updatedHtml = html + `<p style="font-size: 12px; color: gray;">Loaded in ${fetchTime} s</p>`;
-
-                contentDiv.innerHTML = updatedHtml;
-
+                contentDiv.innerHTML = html;
+                initSidebarPopovers(contentDiv);
+                initSidebarCarousels(contentDiv);
+                // Remember the loaded feature content so switching tabs
+                // away and back restores it instead of the placeholder.
+                if (rightSidebarcontent.map) {
+                    rightSidebarcontent.map.content = html;
+                }
             })
             .catch(error => {
                 console.error("Error loading right sidebar content:", error);
                 contentDiv.innerHTML = `<p style="color: red; text-align: center;">Failed to load content.</p>`;
             });
     }
+
+    function initSidebarPopovers(container) {
+        const selector = '[data-bs-toggle="popover"]';
+        const triggers = container.querySelectorAll(selector);
+        triggers.forEach(trigger => {
+            new bootstrap.Popover(trigger, {
+                html: true,
+                sanitize: false,
+                trigger: 'click',
+                placement: 'bottom',
+                container: 'body'});
+            trigger.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    trigger.click();
+                }
+            });
+            trigger.addEventListener('click', () => {
+                document.querySelectorAll(selector).forEach(el => {
+                    if (el !== trigger) {
+                        const instance = bootstrap.Popover.getInstance(el);
+                        if (instance) instance.hide();
+                    }
+                });
+            });
+        });
+
+        if (!window.popoverDismissRegistered) {
+            document.addEventListener('click', (e) => {
+                const isTrigger = e.target.closest(selector);
+                const isInside = e.target.closest('.popover');
+                if (!isTrigger && !isInside) {
+                    document.querySelectorAll(selector).forEach(el => {
+                        const instance = bootstrap.Popover.getInstance(el);
+                        if (instance) instance.hide();
+                    });
+                }
+            });
+            window.popoverDismissRegistered = true;
+        }
+    }
+
+    // Bootstrap's carousel does not auto-initialise on HTML that is
+    // injected after page load, so wire up each sidebar carousel manually
+    // (no autoplay - the user steps through with the prev/next arrows).
+    function initSidebarCarousels(container) {
+        const carousels = container.querySelectorAll('.carousel');
+        carousels.forEach(el => {
+            bootstrap.Carousel.getOrCreateInstance(el, {
+                interval: false,
+                ride: false,
+                wrap: true});
+        });
+    }
+
+    window.setSidebarContent = setSidebarContent;
+
+    // Re-wire popovers/carousels after the cached map sidebar HTML is
+    // restored (e.g. when switching tabs away and back to the map).
+    window.initMapSidebarFeatures = function (container) {
+        if (!container) return;
+        initSidebarPopovers(container);
+        initSidebarCarousels(container);
+    };
+
+    // Let the user drag the right sidebar wider/narrower. The map canvas
+    // shares the remaining space, so it must be told to redraw on resize.
+    function initSidebarResize() {
+        const sidebar = document.getElementById('right-sidebar');
+        if (!sidebar || document.querySelector('.right-sidebar-resizer')) {
+            return;
+        }
+        const root = document.documentElement;
+        const handle = document.createElement('div');
+        handle.className = 'right-sidebar-resizer';
+        document.body.appendChild(handle);
+
+        function positionHandle() {
+            const rect = sidebar.getBoundingClientRect();
+            if (rect.width > 0 && window.innerWidth > 1199) {
+                handle.style.display = 'block';
+                handle.style.left = `${rect.left - 4}px`;
+                handle.style.top = `${rect.top}px`;
+                handle.style.height = `${rect.height}px`;
+            } else {
+                handle.style.display = 'none';
+            }
+        }
+
+        let dragging = false;
+        handle.addEventListener('mousedown', (e) => {
+            dragging = true;
+            document.body.style.userSelect = 'none';
+            document.body.style.cursor = 'col-resize';
+            e.preventDefault();
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (!dragging) return;
+            const minWidth = 280;
+            const maxWidth = window.innerWidth * 0.8;
+            let newWidth = window.innerWidth - e.clientX;
+            newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
+            root.style.setProperty(
+                '--right-sidebar-width', `${newWidth}px`);
+            positionHandle();
+        });
+        document.addEventListener('mouseup', () => {
+            if (!dragging) return;
+            dragging = false;
+            document.body.style.userSelect = '';
+            document.body.style.cursor = '';
+            map.resize();
+        });
+
+        const observer = new ResizeObserver(() => {
+            positionHandle();
+            map.resize();
+        });
+        observer.observe(sidebar);
+        window.addEventListener('resize', positionHandle);
+        positionHandle();
+    }
+
+    initSidebarResize();
 
 
     document.getElementById('tab-map').addEventListener('click', function (event) {

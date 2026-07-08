@@ -20,8 +20,15 @@ from histarchexplorer.database.admin import (
     update_sort_order, add_logo_to_db, delete_logo_from_db, rename_logo_in_db,
     add_asset_to_db, delete_asset_from_db, rename_asset_in_db,
     add_file_to_db, delete_file_from_db, rename_file_in_db)
+from histarchexplorer.database.publications import (
+    get_publications, add_publication, update_publication, delete_publication,
+    link_publication_to_entities, get_all_projects)
 from histarchexplorer.database.map import check_if_map_id_exist
+from histarchexplorer.forms.admin import (
+    MapForm, GeneralSettingsForm, LicenseForm, FileUploadForm,
+    FileLicenseForm, FileRenameForm, FileDeleteForm)
 from histarchexplorer.models.admin import Admin
+from histarchexplorer.utils.doi import fetch_doi_metadata
 from histarchexplorer.utils.view_util import find_children_by_id
 from histarchexplorer.views.views import type_tree
 
@@ -68,19 +75,23 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             active_main_sidebar_id = 'sidebar-stakeholders-content'
         else:
             match tab:
-                case ('sidebar-maps' | 'sidebar-index-page-options' |
-                      'sidebar-database' | 'sidebar-cache-options' |
-                      'sidebar-content-group' | 'sidebar-logo-management' |
-                      'sidebar-icon-management' |
-                      'sidebar-menu-management' | 'sidebar-footer-content' |
-                      'sidebar-file-management-group' | 'sidebar-assets' |
-                      'sidebar-legal-notice' | 'sidebar-licenses' |
-                      'sidebar-team' | 'sidebar-about-publications' |
-                      'sidebar-projects-content' | 'sidebar-stakeholders-content' |
-                      'sidebar-colors' | 'sidebar-type-divisions' |
-                      'sidebar-visibility-settings' |
-                      'sidebar-general-settings-group' | 'sidebar-about-content' |
-                      'sidebar-outcome' | 'sidebar-search-content'):
+                case (
+                        'sidebar-maps' | 'sidebar-index-page-options' |
+                        'sidebar-database' | 'sidebar-cache-options' |
+                        'sidebar-content-group' | 'sidebar-logo-management' |
+                        'sidebar-icon-management' |
+                        'sidebar-menu-management' | 'sidebar-footer-content' |
+                        'sidebar-file-management-group' | 'sidebar-assets' |
+                        'sidebar-legal-notice' | 'sidebar-licenses' |
+                        'sidebar-team' | 'sidebar-about-publications' |
+                        'sidebar-projects-content' |
+                        'sidebar-stakeholders-content' |
+                        'sidebar-colors' | 'sidebar-type-divisions' |
+                        'sidebar-visibility-settings' |
+                        'sidebar-general-settings-group' |
+                        'sidebar-about-content' |
+                        'sidebar-outcome' | 'sidebar-search-content' |
+                        'sidebar-external-identifiers'):
                     active_main_sidebar_id = tab
 
                 case _:
@@ -121,6 +132,81 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     all_assets = admin_instance.get_all_assets_with_ids()
     selected_footer_logos = g.settings.footer_logos
 
+    all_languages = app.config.get('LANGUAGES', {})
+    gen_form = GeneralSettingsForm()
+    gen_form.selectedLanguages.choices = [
+        (code, name) for code, name in all_languages.items()]
+    gen_form.preferredLanguage.choices = [
+        (code, name) for code, name in all_languages.items()
+        if code in g.settings.selected_languages]
+
+    # Pre-fill
+    gen_form.case_study_id.data = cs_type_id
+    gen_form.darkMode.data = g.settings.darkmode
+    gen_form.languageSelection.data = g.settings.language_selector
+    gen_form.accessRestriction.data = g.settings.access_restriction
+    gen_form.selectedLanguages.data = g.settings.selected_languages
+    gen_form.preferredLanguage.data = g.settings.preferred_language
+
+    license_form = LicenseForm()
+    file_license_form = FileLicenseForm()
+    file_license_form.license_id.choices = [
+        (l['id'], l['label']) for l in admin_instance.licenses]
+    file_license_form.license_id.choices.insert(
+        0, (0, _('Select License...')))
+
+    # Synchronize external identifiers settings with OpenAtlas
+    try:
+        api_res = ApiAccess.get_table_rows(
+            classes=['reference_system'],
+            table_columns=['name', 'description'])
+
+        g.openatlas_cursor.execute(
+            '''
+            SELECT entity_id, resolver_url, website_url
+            FROM web.reference_system''')
+        db_rows = g.openatlas_cursor.fetchall()
+        url_lookup = {
+            str(r['entity_id']): {
+                'resolver_url': r['resolver_url'],
+                'website_url': r['website_url']}
+            for r in db_rows}
+
+        oa_ids = set()
+        for row in api_res.get('results', []):
+            checkbox_str, name, description = row[0], row[1], row[2]
+            match = re.search(r'value="(\d+)"', checkbox_str)
+            if match:
+                sys_id = match.group(1)
+                oa_ids.add(sys_id)
+                urls = url_lookup.get(sys_id, {})
+
+                if sys_id not in g.settings.external_identifiers:
+                    g.settings.external_identifiers[sys_id] = {
+                        'name': name,
+                        'resolver_url': urls.get('resolver_url') or '',
+                        'website_url': urls.get('website_url') or '',
+                        'description': '',
+                        'disabled': False,
+                        'icon_type': '',
+                        'icon_value': '',
+                        'is_missing': False}
+                else:
+                    g.settings.external_identifiers[sys_id].update({
+                        'name': name,
+                        'resolver_url': urls.get('resolver_url') or '',
+                        'website_url': urls.get('website_url') or '',
+                        'is_missing': False})
+
+        for sys_id in list(g.settings.external_identifiers.keys()):
+            if sys_id not in oa_ids:
+                g.settings.external_identifiers[sys_id]['is_missing'] = True
+
+        from histarchexplorer.database.settings import save_settings
+        save_settings('external_identifiers', g.settings.external_identifiers)
+    except Exception as e:
+        app.logger.error("Failed to sync external identifiers: %s", e)
+
     return render_template(
         "admin.html",
         project_tabs=project_tabs,
@@ -137,6 +223,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         processed_target_nodes=admin_instance.process_target_nodes(),
         maps=Admin.get_maps(),
         settings=g.settings,
+        all_languages=all_languages,
         class_items={
             k: v for k, v in
             ApiAccess.get_entities_count_by_case_studies().items()
@@ -151,7 +238,16 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         all_logos=all_logos,
         all_team=all_team,
         all_assets=all_assets,
-        selected_footer_logos=selected_footer_logos)
+        all_publications=get_publications(),
+        all_projects=get_all_projects(),
+        selected_footer_logos=selected_footer_logos,
+        map_form=MapForm(),
+        general_settings_form=gen_form,
+        license_form=license_form,
+        file_upload_form=FileUploadForm(),
+        file_license_form=file_license_form,
+        file_rename_form=FileRenameForm(),
+        file_delete_form=FileDeleteForm())
 
 
 @app.route('/admin/update_type_divisions', methods=['POST'])
@@ -191,6 +287,44 @@ def update_type_divisions() -> Response:
         flash(_('Error updating type divisions'), 'error')
 
     return _redirect_to_admin_tab('sidebar-type-divisions')
+
+
+@app.route('/admin/update_external_identifiers', methods=['POST'])
+@login_required
+def update_external_identifiers() -> Response:
+    check_manager_user()
+    new_external_identifiers = {}
+
+    for sys_id, current_data in g.settings.external_identifiers.items():
+        if current_data.get('is_missing'):
+            present_key = f'present_{sys_id}'
+            if present_key not in request.form:
+                continue
+
+        disabled = request.form.get(f'disabled_{sys_id}') == 'on'
+        icon_type = request.form.get(f'icon_type_{sys_id}', '')
+        icon_value = request.form.get(f'icon_value_{sys_id}', '')
+        description = request.form.get(f'description_{sys_id}', '').strip()
+
+        new_external_identifiers[sys_id] = {
+            'name': current_data.get('name', ''),
+            'resolver_url': current_data.get('resolver_url', ''),
+            'website_url': current_data.get('website_url', ''),
+            'description': description,
+            'disabled': disabled,
+            'icon_type': icon_type,
+            'icon_value': icon_value,
+            'is_missing': current_data.get('is_missing', False)}
+
+    g.settings.external_identifiers = new_external_identifiers
+    try:
+        g.settings.save_to_db()
+        flash(_('External identifiers updated successfully.'), 'success')
+    except Exception as e:
+        app.logger.error("Failed to update external identifiers: %s", e)
+        flash(_('Error updating external identifiers'), 'error')
+
+    return _redirect_to_admin_tab('sidebar-external-identifiers')
 
 
 @app.route('/admin/update_entity_colors', methods=['POST'])
@@ -385,7 +519,9 @@ def delete_logo():
             flash(_('Error deleting file: %(error)s', error=e), 'danger')
     else:
         delete_logo_from_db(filename) # This will set is_active = FALSE
-        flash(_('Default logo "%(name)s" deactivated.', name=filename), 'success')
+        flash(
+            _('Default logo "%(name)s" deactivated.', name=filename),
+            'success')
 
     return _redirect_to_admin_tab('sidebar-logo-management')
 
@@ -455,7 +591,8 @@ def update_footer_content() -> Response:
             ordered_logo_ids = json.loads(ordered_logo_ids_str)
             # Ensure all selected logos are in the ordered list
             final_logo_ids = [
-                int(id) for id in ordered_logo_ids if int(id) in selected_logo_ids]
+                int(id) for id in ordered_logo_ids
+                if int(id) in selected_logo_ids]
             for logo_id in selected_logo_ids:
                 if logo_id not in final_logo_ids:
                     final_logo_ids.append(logo_id)
@@ -477,14 +614,20 @@ def update_footer_content() -> Response:
 
 @app.route('/admin/add_license', methods=['POST'])
 @login_required
-def add_license():
+def add_license() -> Response:
     check_manager_user()
-    spdx_id = request.form.get('spdx_id')
-    uri = request.form.get('uri')
-    label = request.form.get('label')
-    category = request.form.get('category')
-    Admin.add_license(spdx_id, uri, label, category)
-    flash(_('License added successfully.'), 'success')
+    form = LicenseForm()
+    if form.validate_on_submit():
+        Admin.add_license(
+            form.spdx_id.data,
+            form.uri.data,
+            form.label.data,
+            form.category.data)
+        flash(_('License added successfully.'), 'success')
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
     return _redirect_to_admin_tab('sidebar-licenses')
 
 
@@ -502,11 +645,22 @@ def delete_license(license_id):
 def update_logo_license() -> Response:
     check_manager_user()
 
-    filename = request.form.get('filename', '')
-    license_id = request.form.get('license_id', type=int)
-    attribution = request.form.get('attribution', '')
-
     admin_instance = Admin()
+    form = FileLicenseForm()
+    form.license_id.choices = [
+        (l['id'], l['label']) for l in admin_instance.licenses]
+    form.license_id.choices.insert(0, (0, _('Select License...')))
+
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
+        return _redirect_to_admin_tab('sidebar-logo-management')
+
+    filename = form.filename.data
+    license_id = form.license_id.data
+    attribution = form.attribution.data
+
     admin_instance.update_file_license(filename, license_id, attribution)
 
     flash(_('Logo license updated successfully.'), 'success')
@@ -664,7 +818,8 @@ def add_link() -> Response:
             'sortorder': Admin.check_sortorder()
         }
 
-        if all(v is not None for v in [params['domain'], params['range'], params['prop']]):
+        if all(v is not None for v in [
+                params['domain'], params['range'], params['prop']]):
             Admin.add_link(params)
             flash(_('Link added successfully'), 'success')
         else:
@@ -681,34 +836,45 @@ def add_link() -> Response:
             entry=request.args.get('entry', '')))
 
 
+def _extract_fields_from_request(fields: list) -> dict:
+    """
+    Extract fields from request.form dynamically based on the configuration.
+    """
+    data = {}
+    for field in fields:
+        key = field['key']
+        if field.get('translatable'):
+            for lang_code in g.available_languages.keys():
+                lang_key = f"{key}_{lang_code}"
+                if lang_key in request.form:
+                    data[lang_key] = request.form.get(lang_key, '')
+
+            if key in request.form:
+                data[key] = request.form.get(key, '')
+        else:
+            if field.get('type') == 'select':
+                data[key] = request.form.get(key, type=int)
+            else:
+                data[key] = request.form.get(key, '')
+    return data
+
+
 @app.route('/admin/add_entry', methods=['POST'])
 @login_required
 def add_entry() -> Response:
+    """
+    Dynamically extract form fields based on the category config
+    and save the new config entity to the database.
+    """
     check_manager_user()
     category = request.form.get('category', '')
-    form_data = {
-        'category': category,
-        'acronym': request.form.get('acronym', ''),
-        'email': request.form.get('email', ''),
-        'website': request.form.get('website', ''),
-        'orcid_id': request.form.get('orcid_id', ''),
-        'image': request.form.get('image', ''),
-        'case_study': request.form.get('case_study', type=int),
-        'license_id': request.form.get('license_id', type=int)
-    }
-
-    # Add multi-language fields
-    for col in ['name', 'address', 'description']:
-        for lang_code in g.available_languages.keys():
-            lang_key = f"{col}_{lang_code}"
-            if lang_key in request.form:
-                form_data[lang_key] = request.form.get(lang_key, '')
-
-        # Also keep the default key for backward compatibility or display
-        if col in request.form:
-            form_data[col] = request.form.get(col, '')
-
     current_tab = f'nav-{category}'
+
+    fields_for_category = g.admin_fields.get(current_tab, [])
+
+    form_data = {'category': category}
+    form_data.update(_extract_fields_from_request(fields_for_category))
+
     redirect_base = url_for('admin') + current_tab
     try:
         new_id = Admin.add_entry(form_data)
@@ -717,12 +883,12 @@ def add_entry() -> Response:
     except Admin.TooManyMainProjects:
         flash(
             _('Error adding entry %(name)s: Only one main project allowed',
-              name=form_data["name"]),
+              name=form_data.get('name', '')),
             'danger')
     except Exception as e:
         flash(_(
             'Error adding entry %(name)s: %(error)s',
-            name=form_data["name"],
+            name=form_data.get('name', ''),
             error=e), 'danger')
     return redirect(redirect_base)
 
@@ -742,6 +908,10 @@ def delete_entry(id_: int, tab: str) -> Response:
 @app.route('/edit_entry', methods=['POST', 'GET'])
 @login_required
 def edit_entry() -> Response:
+    """
+    Dynamically extract form fields based on the entity class config
+    and update the existing config entity in the database.
+    """
     check_manager_user()
 
     config_id = request.form.get('config_id', type=int)
@@ -749,27 +919,21 @@ def edit_entry() -> Response:
         flash(_('Configuration ID is required'), 'danger')
         return _redirect_to_admin_tab('sidebar-projects-content')
 
-    form_data = {
-        'config_id': config_id,
-        'acronym': request.form.get('acronym', ''),
-        'email': request.form.get('email', ''),
-        'website': request.form.get('website', ''),
-        'orcid_id': request.form.get('orcid_id', ''),
-        'image': request.form.get('image', ''),
-        'case_study': request.form.get('case_study', type=int),
-        'license_id': request.form.get('license_id', type=int)
-    }
+    current_tab = request.form.get('current_tab', '')
+    if not current_tab:
+        class_id = Admin.get_config_class_by_id(config_id)
+        class_to_target = {
+            g.config_classes.get('main-project'): 'nav-main-project',
+            g.config_classes.get('project'): 'nav-projects',
+            g.config_classes.get('person'): 'nav-persons',
+            g.config_classes.get('institution'): 'nav-institutions',
+            g.config_classes.get('attribute'): 'nav-attributes'}
+        current_tab = class_to_target.get(class_id, '')
 
-    # Add multi-language fields
-    for col in ['name', 'address', 'description']:
-        for lang_code in g.available_languages.keys():
-            lang_key = f"{col}_{lang_code}"
-            if lang_key in request.form:
-                form_data[lang_key] = request.form.get(lang_key, '')
+    fields_for_category = g.admin_fields.get(current_tab, [])
 
-        # Also keep the default key for backward compatibility or display
-        if col in request.form:
-            form_data[col] = request.form.get(col, '')
+    form_data = {'config_id': config_id}
+    form_data.update(_extract_fields_from_request(fields_for_category))
 
     name = form_data.get('name', '')
     try:
@@ -794,11 +958,18 @@ def edit_entry() -> Response:
 def edit_map() -> Response:
     check_manager_user()
 
-    raw_map_id = request.form.get('map_id')
-    name = request.form.get('name', '')
-    display_name = request.form.get('displayname', '')
-    sort_order = request.form.get('inputorder', '0')
-    tile_string = request.form.get('description', '')
+    form = MapForm()
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
+        return _redirect_to_admin_tab('sidebar-maps')
+
+    raw_map_id = form.map_id.data
+    name = form.name.data
+    display_name = form.displayname.data
+    sort_order = str(form.inputorder.data or 0)
+    tile_string = form.description.data
 
     if not raw_map_id:
         flash(_('Map ID is required'), 'danger')
@@ -813,7 +984,7 @@ def edit_map() -> Response:
         form_data: dict[str, str] = {
             'name': name,
             'display_name': display_name,
-            'sort_order': sort_order,
+            'sortorder': sort_order,
             'tilestring': tile_string,
             'map_id': str(map_id)}
 
@@ -834,16 +1005,17 @@ def edit_map() -> Response:
 def add_map() -> Response:
     check_manager_user()
 
-    name = request.form.get('name')
-    display_name = request.form.get('displayname')
-    sort_order = request.form.get('inputorder', '0')
-    tile_string = request.form.get('description')
-
-    if not name or not display_name or not tile_string:
-        flash(
-            _('Error: Name, Display Name and Description are required'),
-            'danger')
+    form = MapForm()
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
         return _redirect_to_admin_tab('sidebar-maps')
+
+    name = form.name.data
+    display_name = form.displayname.data
+    sort_order = str(form.inputorder.data or 0)
+    tile_string = form.description.data
 
     data: dict[str, str] = {
         'name': name,
@@ -964,19 +1136,28 @@ def sort_links() -> tuple[Response, int] | Response:
 @login_required
 def update_general_settings(ignore_id: Optional[int] = None) -> Response:
     check_manager_user()
-    case_study_id = int(request.form.get('case_study_id'))
+    form = GeneralSettingsForm()
+    all_languages = app.config.get('LANGUAGES', {})
+    form.selectedLanguages.choices = [
+        (code, name) for code, name in all_languages.items()]
+    form.preferredLanguage.choices = [
+        (code, name) for code, name in all_languages.items()]
+
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
+        return _redirect_to_admin_tab('sidebar-general-settings-group')
+
+    case_study_id = form.case_study_id.data
     validation_result = Admin.check_case_study_type_id(case_study_id)
     if validation_result['is_valid']:
         g.settings.case_study_type_id = case_study_id
-        g.settings.darkmode = request.form.get('darkMode') == 'on'
-        g.settings.access_restriction = request.form.get(
-            'accessRestriction') == 'on'
-        g.settings.language_selector = request.form.get(
-            'languageSelection') == 'on'
-        g.settings.selected_languages = request.form.getlist(
-            'selectedLanguages')
-        g.settings.preferred_language = request.form.get(
-            'preferredLanguage')
+        g.settings.darkmode = form.darkMode.data
+        g.settings.access_restriction = form.accessRestriction.data
+        g.settings.language_selector = form.languageSelection.data
+        g.settings.selected_languages = form.selectedLanguages.data
+        g.settings.preferred_language = form.preferredLanguage.data
         g.settings.save_to_db()
         flash(_('Updated case study ID successfully'), 'info')
     else:
@@ -1000,8 +1181,11 @@ def check_case_study_id_ajax(entity_id: int) -> Response:
 @login_required
 def reset() -> Response:
     check_manager_user()
-    if not current_app.config.get('DEBUG') and not current_app.config.get('TESTING'):
-        flash(_('Reset is only allowed in debug or testing mode.'), 'danger')
+    if (not current_app.config.get('DEBUG') and
+            not current_app.config.get('TESTING')):
+        flash(
+            _('Reset is only allowed in debug or testing mode.'),
+            'danger')
         return redirect(url_for('admin'))
     make_reset()
     flash(_('reset database'), 'info')
@@ -1009,8 +1193,10 @@ def reset() -> Response:
 
 
 def make_reset() -> None:
-    if not current_app.config.get('DEBUG') and not current_app.config.get('TESTING'):
-        app.logger.warning('Attempted to reset database outside of DEBUG/TESTING mode.')
+    if (not current_app.config.get('DEBUG') and
+            not current_app.config.get('TESTING')):
+        app.logger.warning(
+            'Attempted to reset database outside of DEBUG/TESTING mode.')
         return
     env = os.environ.copy()
     env['PGPASSWORD'] = current_app.config['DATABASE_PASS']
@@ -1199,7 +1385,9 @@ def delete_asset():
             flash(_('Error deleting file: %(error)s', error=e), 'danger')
     else:
         delete_asset_from_db(filename)
-        flash(_('Default asset "%(name)s" deactivated.', name=filename), 'success')
+        flash(_(
+            'Default asset "%(name)s" deactivated.',
+            name=filename), 'success')
 
     return _redirect_to_admin_tab('sidebar-assets')
 
@@ -1242,72 +1430,79 @@ def uploaded_favicon():
 
 @app.route('/admin/upload_file', methods=['POST'])
 @login_required
-def upload_file():
+def upload_file() -> Response:
     check_manager_user()
-    file_type = request.form.get('file_type')
-    if not file_type:
-        flash(_('File type is missing.'), 'danger')
-        return _redirect_to_admin_tab('sidebar-file-management-group')
+    form = FileUploadForm()
+    # file_type and active_sidebar are in the form but we might use defaults
+    file_type = request.form.get('file_type', 'logo')
 
-    if 'file' not in request.files:
-        flash(_('No file part'), 'danger')
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
         return _redirect_to_admin_tab(f'sidebar-{file_type}')
 
-    file = request.files['file']
-    if file.filename == '':
-        flash(_('No selected file'), 'danger')
-        return _redirect_to_admin_tab(f'sidebar-{file_type}')
-
+    file = form.file.data
     if file:
         filename = secure_filename(file.filename)
-        if file_type == 'logo':
-            upload_folder = 'logos'
-        elif file_type == 'asset':
-            upload_folder = 'assets'
-        elif file_type == 'team':
-            upload_folder = 'team'
-        elif file_type == 'icon':
-            upload_folder = 'icons'
-        else:
-            flash(_('Invalid file type.'), 'danger')
-            return _redirect_to_admin_tab('sidebar-file-management-group')
+        match file_type:
+            case 'logo':
+                upload_folder = 'logos'
+            case 'asset':
+                upload_folder = 'assets'
+            case 'team':
+                upload_folder = 'team'
+            case 'icon':
+                upload_folder = 'icons'
+            case _:
+                flash(_('Invalid file type.'), 'danger')
+                return _redirect_to_admin_tab('sidebar-file-management-group')
 
-        upload_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
+        upload_path = os.path.join(
+            app.root_path, '..', 'uploads', upload_folder)
         os.makedirs(upload_path, exist_ok=True)
         file.save(os.path.join(upload_path, filename))
         add_file_to_db(filename, file_type, is_default=False)
-        flash(_('%(type)s "%(name)s" uploaded successfully.', type=file_type.capitalize(), name=filename), 'success')
+        flash(_(
+            '%(type)s "%(name)s" uploaded successfully.',
+            type=file_type.capitalize(), name=filename), 'success')
 
     return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
 
 @app.route('/admin/rename_file', methods=['POST'])
 @login_required
-def rename_file():
+def rename_file() -> Response:
     check_manager_user()
-    old_name = request.form.get('old_name')
-    new_name = request.form.get('new_name')
-    file_type = request.form.get('file_type')
+    form = FileRenameForm()
+    file_type = request.form.get('file_type', 'logo')
 
-    if not all([old_name, new_name, file_type]):
-        flash(_('Invalid request for renaming.'), 'danger')
-        return _redirect_to_admin_tab('sidebar-file-management-group')
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
+        return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
-    if file_type == 'logo':
-        upload_folder = 'logos'
-        static_folder = 'images/logos'
-    elif file_type == 'asset':
-        upload_folder = 'assets'
-        static_folder = 'assets'
-    elif file_type == 'team':
-        upload_folder = 'team'
-        static_folder = 'images/team'
-    else:
-        flash(_('Invalid file type.'), 'danger')
-        return _redirect_to_admin_tab('sidebar-file-management-group')
+    old_name = form.old_name.data
+    new_name = form.new_name.data
+
+    match file_type:
+        case 'logo':
+            upload_folder = 'logos'
+            static_folder = 'images/logos'
+        case 'asset':
+            upload_folder = 'assets'
+            static_folder = 'assets'
+        case 'team':
+            upload_folder = 'team'
+            static_folder = 'images/team'
+        case _:
+            flash(_('Invalid file type.'), 'danger')
+            return _redirect_to_admin_tab('sidebar-file-management-group')
 
     static_path = os.path.join(app.static_folder, static_folder)
-    uploads_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
+    uploads_path = os.path.join(
+        app.root_path, '..', 'uploads', upload_folder)
 
     old_filepath_static = os.path.join(static_path, secure_filename(old_name))
     old_filepath_uploads = os.path.join(
@@ -1330,7 +1525,11 @@ def rename_file():
     try:
         os.rename(old_filepath, new_filepath)
         rename_file_in_db(old_name, new_name, file_type)
-        flash(_('%(type)s renamed from "%(old)s" to "%(new)s".', type=file_type.capitalize(), old=old_name, new=new_name), 'success')
+        flash(_(
+            '%(type)s renamed from "%(old)s" to "%(new)s".',
+            type=file_type.capitalize(),
+            old=old_name,
+            new=new_name), 'success')
     except OSError as e:
         flash(_('Error renaming file: %(error)s', error=e), 'danger')
 
@@ -1339,40 +1538,51 @@ def rename_file():
 
 @app.route('/admin/delete_file', methods=['POST'])
 @login_required
-def delete_file():
+def delete_file() -> Response:
     check_manager_user()
-    filename = request.form.get('filename')
-    file_type = request.form.get('file_type')
+    form = FileDeleteForm()
+    file_type = request.form.get('file_type', 'logo')
 
-    if not filename or not file_type:
-        flash(_('No filename or type specified for deletion.'), 'danger')
-        return _redirect_to_admin_tab('sidebar-file-management-group')
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
+        return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
-    if file_type == 'logo':
-        upload_folder = 'logos'
-    elif file_type == 'asset':
-        upload_folder = 'assets'
-    elif file_type == 'team':
-        upload_folder = 'team'
-    elif file_type == 'icon':
-        upload_folder = 'icons'
-    else:
-        flash(_('Invalid file type.'), 'danger')
-        return _redirect_to_admin_tab('sidebar-file-management-group')
+    filename = form.filename.data
 
-    uploads_path = os.path.join(app.root_path, '..', 'uploads', upload_folder)
-    filepath_uploads = os.path.join(uploads_path, secure_filename(filename))
+    match file_type:
+        case 'logo':
+            upload_folder = 'logos'
+        case 'asset':
+            upload_folder = 'assets'
+        case 'team':
+            upload_folder = 'team'
+        case 'icon':
+            upload_folder = 'icons'
+        case _:
+            flash(_('Invalid file type.'), 'danger')
+            return _redirect_to_admin_tab('sidebar-file-management-group')
+
+    uploads_path = os.path.join(
+        app.root_path, '..', 'uploads', upload_folder)
+    filepath_uploads = os.path.join(
+        uploads_path, secure_filename(filename))
 
     if os.path.exists(filepath_uploads):
         try:
             os.remove(filepath_uploads)
             delete_file_from_db(filename, file_type)
-            flash(_('%(type)s "%(name)s" deleted successfully.', type=file_type.capitalize(), name=filename), 'success')
+            flash(_(
+                '%(type)s "%(name)s" deleted successfully.',
+                type=file_type.capitalize(), name=filename), 'success')
         except OSError as e:
             flash(_('Error deleting file: %(error)s', error=e), 'danger')
     else:
         delete_file_from_db(filename, file_type)
-        flash(_('Default %(type)s "%(name)s" deactivated.', type=file_type.capitalize(), name=filename), 'success')
+        flash(_(
+            'Default %(type)s "%(name)s" deactivated.',
+            type=file_type.capitalize(), name=filename), 'success')
 
     return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
@@ -1382,13 +1592,98 @@ def delete_file():
 def update_file_license() -> Response:
     check_manager_user()
 
-    filename = request.form.get('filename', '')
-    file_type = request.form.get('file_type', '')
-    license_id = request.form.get('license_id', type=int)
-    attribution = request.form.get('attribution', '')
-
     admin_instance = Admin()
+    form = FileLicenseForm()
+    form.license_id.choices = [
+        (l['id'], l['label']) for l in admin_instance.licenses]
+    form.license_id.choices.insert(0, (0, _('Select License...')))
+
+    file_type = request.form.get('file_type', 'logo')
+
+    if not form.validate_on_submit():
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{getattr(form, field).label.text}: {error}", 'danger')
+        return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
+
+    filename = form.filename.data
+    license_id = form.license_id.data
+    attribution = form.attribution.data
+
     admin_instance.update_file_license(filename, license_id, attribution)
 
-    flash(_('%(type)s license updated successfully.', type=file_type.capitalize()), 'success')
+    flash(_(
+        '%(type)s license updated successfully.',
+        type=file_type.capitalize()), 'success')
     return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
+
+
+@app.route('/admin/add_publication', methods=['POST'])
+@login_required
+def add_pub() -> Response:
+    check_manager_user()
+    data = request.form.to_dict()
+    entity_ids = [int(i) for i in request.form.getlist('projects')]
+
+    pub_id = add_publication(data)
+    link_publication_to_entities(pub_id, entity_ids)
+
+    flash(_('Publication added successfully.'), 'success')
+    return _redirect_to_admin_tab('sidebar-about-publications')
+
+
+@app.route('/admin/edit_publication', methods=['POST'])
+@login_required
+def edit_pub() -> Response:
+    check_manager_user()
+    pub_id_str = request.form.get('id')
+    if not pub_id_str:
+        flash(_('No publication ID provided.'), 'danger')
+        return _redirect_to_admin_tab('sidebar-about-publications')
+
+    pub_id = int(pub_id_str)
+    data = request.form.to_dict()
+    entity_ids = [int(i) for i in request.form.getlist('projects')]
+
+    update_publication(pub_id, data)
+    link_publication_to_entities(pub_id, entity_ids)
+
+    flash(_('Publication updated successfully.'), 'success')
+    return _redirect_to_admin_tab('sidebar-about-publications')
+
+
+@app.route('/admin/delete_publication/<int:pub_id>', methods=['POST', 'GET'])
+@login_required
+def delete_pub(pub_id: int) -> Response:
+    check_manager_user()
+    delete_publication(pub_id)
+    flash(_('Publication deleted successfully.'), 'success')
+    return _redirect_to_admin_tab('sidebar-about-publications')
+
+
+@app.route('/admin/import_doi', methods=['POST'])
+@login_required
+def import_doi() -> Response:
+    check_manager_user()
+    doi = request.form.get('doi', '')
+    metadata = fetch_doi_metadata(doi)
+    if metadata:
+        return jsonify(metadata)
+    return jsonify({'error': _('Could not fetch metadata for this DOI.')}), 400
+
+
+@app.route('/admin/update_publication_types', methods=['POST'])
+@login_required
+def update_pub_types() -> Response:
+    check_manager_user()
+    types_str = request.form.get('publication_types', '')
+    types = [t.strip() for t in types_str.split(',') if t.strip()]
+    g.settings.publication_types = types
+    try:
+        g.settings.save_to_db()
+        flash(_('Publication types updated successfully.'), 'success')
+    except Exception as e:
+        app.logger.error("Failed to update publication types: %s", e)
+        flash(_('Error updating publication types'), 'error')
+
+    return _redirect_to_admin_tab('sidebar-about-publications')

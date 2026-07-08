@@ -85,26 +85,66 @@ def get_divisions(
     type_ids_to_check = {id_} | {
         int(t['identifier'].rsplit('/', 1)[-1]) for t in type_hierarchy}
 
-    for label, data in g.type_divisions.items():
-        configured_ids = set(data.get('ids', []))
-        if not type_ids_to_check.isdisjoint(configured_ids):
-            icon_type = data.get('icon_type')
-            icon_value = data.get('icon_value')
+    type_divisions_source = None
+    if (hasattr(g, 'settings') and g.settings
+            and hasattr(g.settings, 'type_divisions')):
+        type_divisions_source = g.settings.type_divisions
+    elif hasattr(g, 'type_divisions') and g.type_divisions:
+        first_val = next(iter(g.type_divisions.values()), None)
+        if isinstance(first_val, dict) and 'ids' in first_val:
+            type_divisions_source = g.type_divisions
 
-            if icon_type == 'icon' and icon_value:
+    if type_divisions_source:
+        for label, data in type_divisions_source.items():
+            configured_ids = set(data.get('ids', []))
+            if not type_ids_to_check.isdisjoint(configured_ids):
+                icon_type = data.get('icon_type')
+                icon_value = data.get('icon_value')
+
+                if icon_type in ('icon', 'img') and icon_value:
+                    url = get_icon_url(icon_value)
+                    return {
+                        'label': label,
+                        'icon_url': url,
+                        'iconUrl': url
+                    }
+                elif icon_type in ('bootstrap', 'css') and icon_value:
+                    css_class = icon_value
+                    if (not icon_value.startswith('bi ')
+                            and not icon_value.split(' ').count('bi')):
+                        css_class = f"bi {icon_value}"
+                    icon_html = f'<i class="{css_class}"></i>'
+                    return {
+                        'label': label,
+                        'icon': icon_html
+                    }
                 return {
                     'label': label,
-                    'icon_url': get_icon_url(icon_value)
+                    'icon': '<i class="bi bi-box"></i>'
                 }
-            elif icon_type == 'bootstrap' and icon_value:
-                return {
-                    'label': label,
-                    'icon': f'<i class="bi {icon_value}"></i>'
-                }
-            return {
-                'label': label,
-                'icon': '<i class="bi bi-box"></i>'
-            }
+    else:
+        if hasattr(g, 'type_divisions') and g.type_divisions:
+            for check_id in [id_] + [
+                int(t['identifier'].rsplit('/', 1)[-1])
+                for t in type_hierarchy
+            ]:
+                if check_id in g.type_divisions:
+                    div = g.type_divisions[check_id]
+                    icon_html = div.get('icon', '')
+                    if '<img' in icon_html:
+                        src_match = re.search(r'src="([^"]+)"', icon_html)
+                        icon_url = src_match.group(1) if src_match else ""
+                        return {
+                            'label': div['label'],
+                            'icon': icon_html,
+                            'icon_url': icon_url,
+                            'iconUrl': icon_url
+                        }
+                    else:
+                        return {
+                            'label': div['label'],
+                            'icon': icon_html or '<i class="bi bi-box"></i>'
+                        }
 
     return {'label': _('other'), 'icon': '<i class="bi bi-boxes"></i>'}
 

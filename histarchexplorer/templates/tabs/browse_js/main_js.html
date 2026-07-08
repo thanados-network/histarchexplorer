@@ -11,6 +11,12 @@ function {{tab_name}}ToggleView(view) {
         const el = document.getElementById(`${v}-${tabName}`);
         if (!el) return;
         el.classList.toggle("d-none", v !== view);
+        if (v === "table" && v === view && table{{ tab_name }}) {
+            // Force column width recalculation, needed because the
+            // table may have been hidden or the sidebar may have
+            // resized the container since the last redraw.
+            table{{ tab_name }}.redraw(true);
+        }
         if (v === "tile") {
             //console.log('Tile view selected, refreshing grid');
             // Adjust tile container height
@@ -26,17 +32,20 @@ function {{tab_name}}ToggleView(view) {
         }
     });
 
-    // 2. Change the dropdown button icon
-    const iconMap = {
-        table: "bi-list-ul",
-        map: "bi-geo-alt-fill",
-        tile: "bi-grid-3x3-gap-fill"
+    // 2. Highlight the active view button in the button group
+    const viewButtonMap = {
+        table: `${tabName}-list-btn`,
+        map: `${tabName}-map-btn`,
+        tile: `${tabName}-tiles-btn`
     };
 
-    const dropdownBtn = document.querySelector(`#${tabName}-dropdown-btn-icon`);
-    if (dropdownBtn && iconMap[view]) {
-        dropdownBtn.className = `bi ${iconMap[view]}`;
-    }
+    Object.values(viewButtonMap).forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.classList.remove("active");
+    });
+
+    const activeBtn = document.getElementById(viewButtonMap[view]);
+    if (activeBtn) activeBtn.classList.add("active");
 
     {% if tab_name in ["places", "items"] %}
         if (!{{ tab_name }}MapLoaded) {

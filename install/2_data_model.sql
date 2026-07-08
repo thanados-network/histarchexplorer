@@ -118,6 +118,39 @@ INSERT INTO tng.files VALUES
 
 
 --
+-- Data for Name: licenses; Type: TABLE DATA; Schema: tng; Owner: openatlas
+--
+
+INSERT INTO tng.licenses VALUES
+	(1, 'CC-BY-4.0', 'https://creativecommons.org/licenses/by/4.0/',
+	 'CC BY 4.0', 'LICENSE'),
+	(2, 'CC-BY-SA-4.0', 'https://creativecommons.org/licenses/by-sa/4.0/',
+	 'CC BY-SA 4.0', 'LICENSE'),
+	(3, 'CC-BY-ND-4.0', 'https://creativecommons.org/licenses/by-nd/4.0/',
+	 'CC BY-ND 4.0', 'LICENSE'),
+	(4, 'CC-BY-NC-4.0', 'https://creativecommons.org/licenses/by-nc/4.0/',
+	 'CC BY-NC 4.0', 'LICENSE'),
+	(5, 'CC-BY-NC-SA-4.0',
+	 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+	 'CC BY-NC-SA 4.0', 'LICENSE'),
+	(6, 'CC-BY-NC-ND-4.0',
+	 'https://creativecommons.org/licenses/by-nc-nd/4.0/',
+	 'CC BY-NC-ND 4.0', 'LICENSE'),
+	(7, 'CC0-1.0', 'https://creativecommons.org/publicdomain/zero/1.0/',
+	 'CC0 1.0', 'LICENSE'),
+	(8, 'InC', 'http://rightsstatements.org/vocab/InC/1.0/',
+	 'In Copyright', 'STATEMENT'),
+	(9, 'InC-NC', 'http://rightsstatements.org/vocab/InC-NC/1.0/',
+	 'In Copyright - NC', 'STATEMENT'),
+	(10, 'InC-EDU', 'http://rightsstatements.org/vocab/InC-EDU/1.0/',
+	 'In Copyright - EDU', 'STATEMENT'),
+	(11, 'NoC-NC', 'http://rightsstatements.org/vocab/NoC-NC/1.0/',
+	 'No Copyright - NC', 'STATEMENT'),
+	(12, 'CNE', 'http://rightsstatements.org/vocab/CNE/1.0/',
+	 'Copyright Not Evaluated', 'STATEMENT');
+
+
+--
 -- Data for Name: links; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
 
@@ -262,6 +295,13 @@ SELECT pg_catalog.setval('tng.links_id_seq', 29, true);
 --
 
 SELECT pg_catalog.setval('tng.links_id_seq1', 90, true);
+
+
+--
+-- Name: licenses_id_seq; Type: SEQUENCE SET; Schema: tng; Owner: openatlas
+--
+
+SELECT pg_catalog.setval('tng.licenses_id_seq', 12, true);
 
 
 --

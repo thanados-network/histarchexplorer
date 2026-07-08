@@ -2,26 +2,24 @@
   <div class="card-body">
     <h5 class="card-title">{{ _('Add New License') | upper }}</h5>
     <form action="{{ url_for('add_license') }}" method="post">
+      {{ license_form.csrf_token }}
       <input type="hidden" name="active_sidebar" value="sidebar-licenses">
       <div class="row">
         <div class="col-md-3 mb-3">
-          <label for="spdx_id" class="form-label">{{ _('SPDX ID') }}</label>
-          <input type="text" class="form-control" id="spdx_id" name="spdx_id" required>
+          {{ license_form.spdx_id.label(class="form-label") }}
+          {{ license_form.spdx_id(class="form-control", id="spdx_id", required=True) }}
         </div>
         <div class="col-md-4 mb-3">
-          <label for="uri" class="form-label">{{ _('URI') }}</label>
-          <input type="url" class="form-control" id="uri" name="uri" required>
+          {{ license_form.uri.label(class="form-label") }}
+          {{ license_form.uri(class="form-control", id="uri", type="url", required=True) }}
         </div>
         <div class="col-md-3 mb-3">
-          <label for="label" class="form-label">{{ _('Label') }}</label>
-          <input type="text" class="form-control" id="label" name="label" required>
+          {{ license_form.label.label(class="form-label") }}
+          {{ license_form.label(class="form-control", id="label", required=True) }}
         </div>
         <div class="col-md-2 mb-3">
-          <label for="category" class="form-label">{{ _('Category') }}</label>
-          <select class="form-select" id="category" name="category" required>
-            <option value="LICENSE">LICENSE</option>
-            <option value="STATEMENT">STATEMENT</option>
-          </select>
+          {{ license_form.category.label(class="form-label") }}
+          {{ license_form.category(class="form-select", id="category", required=True) }}
         </div>
       </div>
       <button type="submit" class="btn btn-primary">{{ _('Add License') }}</button>

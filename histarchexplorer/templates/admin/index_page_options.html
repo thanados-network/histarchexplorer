@@ -1,60 +1,110 @@
-<form method="POST" action="{{ url_for('choose_index_background') }}">
-  <input type="hidden" name="active_sidebar" value="sidebar-index-page-options">
-  <div class="col-md-3 mt-3">
-    <label for="ImgMap">
-      {{ _('choose index background') | capitalize }}
-    </label>
-    <select class="form-control" id="ImgMap" name="imgmap">
-      {% for background in ['map', 'image'] %}
-        <option value={{ background }}
-                  {% if background == settings.img_map %}selected{% endif %}>
-          {{ _(background) | capitalize }}
-        </option>
-      {% endfor %}
-    </select>
-  </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0 text-secondary">
+    <i class="bi bi-window-sidebar me-2"></i>{{ _('index page options') | upper }}
+  </h4>
+</div>
 
-  <div class="form-group row mt-3">
-    <div class="col-md-6 border-end ">
-      <h6>{{ _('map options') | upper }}</h6>
-      <label for="selectMap" class="form-label">
-        {{ _('select map background') | capitalize }}
-      </label>
-      <select class="form-control" id="selectMap" name="mapselection">
-        {% for map in maps %}
-          <option
-            value="{{ map.id }}"
-            data-tilestring="{{ map.tilestring }}"
-            {% if map.id== settings.index_map %} selected {% endif %}>
-            {{ map.display_name }}
-          </option>
-        {% endfor %}
-      </select>
-      <div class="form-check form-switch mt-3 mb-3">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          id="greyscaleSwitch"
-          name="greyscale" {% if settings.greyscale %} checked {% endif %}>
-        <label class="form-check-label"
-               for="greyscaleSwitch">{{ _('Greyscale') }}</label>
+<form method="POST" action="{{ url_for('choose_index_background') }}" class="needs-validation" novalidate>
+  <input type="hidden" name="active_sidebar" value="sidebar-index-page-options">
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="bg-light p-3 rounded-3 border">
+        <h6 class="fw-bold mb-3 text-secondary">
+          <i class="bi bi-image-fill me-2"></i>{{ _('background type') | upper }}
+        </h6>
+        <div class="mb-0">
+          <label for="ImgMap" class="form-label fw-semibold">
+            {{ _('choose index background') | capitalize }}
+          </label>
+          <div class="input-group">
+            <span class="input-group-text bg-white"><i class="bi bi-layers"></i></span>
+            <select class="form-select form-select-lg" id="ImgMap" name="imgmap">
+              {% for background in ['map', 'image'] %}
+                <option value="{{ background }}"
+                          {% if background == settings.img_map %}selected{% endif %}>
+                  {{ _(background) | capitalize }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-text mt-2">
+            {{ _('Select whether to use a map or a static image as the landing page background.') }}
+          </div>
+        </div>
       </div>
     </div>
-    <div  class="col-md-6">
-      <h6>{{ _('image options') | upper }}</h6>
-      <label for="defaultImg" class="form-label">
-        {{ _('define default background image') | capitalize }}
-      </label>
-      <input
-        type="text"
-        class="form-control"
-        id="defaultImg"
-        name="default_img"
-        value="{{ settings.index_img }}">
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-header bg-white py-3 border-bottom-0">
+          <h6 class="fw-bold mb-0 text-secondary">
+            <i class="bi bi-map me-2"></i>{{ _('map options') | upper }}
+          </h6>
+        </div>
+        <div class="card-body pt-0">
+          <div class="mb-3">
+            <label for="selectMap" class="form-label fw-semibold">
+              {{ _('select map background') | capitalize }}
+            </label>
+            <select class="form-select" id="selectMap" name="mapselection">
+              {% for map in maps %}
+                <option
+                  value="{{ map.id }}"
+                  data-tilestring="{{ map.tilestring }}"
+                  {% if map.id == settings.index_map %} selected {% endif %}>
+                  {{ map.display_name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-check form-switch p-3 border rounded bg-light bg-opacity-50">
+            <input
+              class="form-check-input ms-0 me-3"
+              type="checkbox"
+              id="greyscaleSwitch"
+              name="greyscale" {% if settings.greyscale %} checked {% endif %}>
+            <label class="form-check-label fw-medium"
+                   for="greyscaleSwitch">{{ _('Greyscale') }}</label>
+            <div class="form-text small ms-5">{{ _('Display the map in greyscale mode.') }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-header bg-white py-3 border-bottom-0">
+          <h6 class="fw-bold mb-0 text-secondary">
+            <i class="bi bi-images me-2"></i>{{ _('image options') | upper }}
+          </h6>
+        </div>
+        <div class="card-body pt-0">
+          <label class="form-label fw-semibold mb-2">
+            {{ _('define default background image') | capitalize }}
+          </label>
+          {% set field_id = 'index_img' %}
+          {% set field_name = 'default_img' %}
+          {% set field_value = settings.index_img %}
+          {% set disabled = false %}
+          {% set field = {'image_type': 'asset'} %}
+          {% include 'admin/partials/image_field.html' %}
+          <div class="form-text mt-2">
+            {{ _('Select an image from the uploaded assets to be used as background.') }}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <button
-    type="submit"
-    class="btn btn-primary m-2 float-end">{{ _('save')|capitalize }}
-  </button>
+
+  <div class="row mt-2">
+    <div class="col-12 text-end">
+      <hr class="my-4 opacity-25">
+      <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm">
+        <i class="bi bi-save2 me-2"></i>{{ _('Save Settings') }}
+      </button>
+    </div>
+  </div>
 </form>

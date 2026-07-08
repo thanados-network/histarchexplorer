@@ -67,9 +67,16 @@ def create_icon(css_class: str) -> str:
 
 
 def create_image_icon(file_name: str) -> str:
-    filepath = url_for("static", filename="images/entity_icons/")
-    return (f'<img src="{filepath + file_name}" '
-            f'width="16" height="16" alt="{file_name}"/>')
+    uploads_path = os.path.join(
+        app.root_path, "..", "uploads", "icons")
+    if os.path.exists(os.path.join(uploads_path, file_name)):
+        url = url_for("uploaded_icon", filename=file_name)
+    else:
+        url = url_for(
+            "static", filename=f"images/entity_icons/{file_name}")
+    return (
+        f'<img src="{url}" width="16" height="16" '
+        f'alt="{file_name}"/>')
 
 
 def get_sidebar_icons() -> dict[int, str]:
@@ -158,6 +165,16 @@ def before_request() -> Response | None:
     g.search_service = SearchService(app)
     g.case_study_ids = [
         config.case_study for config in g.config_entities if config.case_study]
+
+    g.pending_upgrades = []
+    if current_user.is_authenticated:
+        try:
+            from install.upgrade import get_pending_migrations
+            with g.db.cursor() as cur:
+                g.pending_upgrades = get_pending_migrations(cur)
+        except Exception:
+            pass
+
     return None
 
 
@@ -197,6 +214,7 @@ def inject_globals() -> dict[str, Any]:
         'admin_fields': g.admin_fields,
         'additional_files_for_overview': g.additional_files_for_overview,
         'count': 0,
+        'pending_upgrades': getattr(g, 'pending_upgrades', []),
         'system_class_map': {
             "place": "places",
             "feature": "places",
@@ -210,7 +228,8 @@ def inject_globals() -> dict[str, Any]:
             "event": "events",
             "artifact": "items",
             "source": "sources",
-            "file": "files"},
+            "file": "files",
+            "type": "types"},
         'logo_id_to_filename_map': Admin.get_logo_id_to_filename_map(),
         'favicon_version': int(time.time()),
         'get_logo_url': get_logo_url,

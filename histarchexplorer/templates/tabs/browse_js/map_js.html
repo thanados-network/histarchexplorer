@@ -14,6 +14,7 @@
         type: "FeatureCollection",
         features: filteredGeomData{{ tab_name }}
     };
+    processRepresentativePoints(featureCollection{{ tab_name }});
 
     const bounds{{ tab_name }} = new maplibregl.LngLatBounds();
     featureCollection{{ tab_name }}.features.forEach(extendBounds{{ tab_name }});
@@ -32,7 +33,8 @@
     const mapVectorLayers{{ tab_name }} = [
         '{{ tab_name }}-layer-fill',
         '{{ tab_name }}-layer-line',
-        '{{ tab_name }}-layer-circle'
+        '{{ tab_name }}-layer-circle',
+        '{{ tab_name }}-layer-representative-points'
     ]
 
     map{{tab_name}}.on('load', () => {
@@ -69,7 +71,30 @@
             id: '{{ tab_name }}-layer-circle',
             type: 'circle',
             paint: { 'circle-radius': 9, 'circle-color': '#088' },
-            filter: ['==', '$type', 'Point']
+            filter: ['all', ['==', ['geometry-type'], 'Point'], ['!', ['has', 'representative']]]
+        },
+        {
+            id: '{{ tab_name }}-layer-representative-points',
+            type: 'circle',
+            paint: {
+                'circle-radius': 9,
+                'circle-color': '#088',
+                'circle-opacity': [
+                    'step', ['zoom'],
+                    ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], 0]]],
+                    {% for z in range(1, 26) %}
+                    {{ z }}.0, ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], {{ z }}.0]]]{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                'circle-stroke-opacity': [
+                    'step', ['zoom'],
+                    ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], 0]]],
+                    {% for z in range(1, 26) %}
+                    {{ z }}.0, ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], {{ z }}.0]]]{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ]
+            },
+            filter: ['all', ['==', ['geometry-type'], 'Point'], ['has', 'representative']]
         }
     ];
 

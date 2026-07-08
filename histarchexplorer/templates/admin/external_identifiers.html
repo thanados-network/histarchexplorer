@@ -1,0 +1,254 @@
+<form action="{{ url_for('update_external_identifiers') }}" method="post">
+  <div class="accordion mb-4" id="external-identifiers-accordion">
+    {% for sys_id, data in settings.external_identifiers.items() %}
+      <div class="accordion-item shadow-sm mb-3 border rounded" id="accordion-item-{{ sys_id }}">
+        <h2 class="accordion-header" id="heading-{{ sys_id }}">
+          <button class="accordion-button collapsed fw-bold d-flex justify-content-between align-items-center"
+                  type="button" data-bs-toggle="collapse"
+                  data-bs-target="#collapse-{{ sys_id }}"
+                  aria-expanded="false" aria-controls="collapse-{{ sys_id }}">
+            <span class="flex-grow-1">
+              {% if data.is_missing %}
+                <i class="bi bi-exclamation-triangle-fill text-warning me-2"
+                   title="{{ _('Missing from OpenAtlas') }}"></i>
+              {% endif %}
+              {{ data.name or 'External System' }}
+              <span class="text-muted small ms-2">({{ _('ID:') }} {{ sys_id }})</span>
+            </span>
+            {% if data.disabled %}
+              <span class="badge bg-secondary me-3">{{ _('Disabled') }}</span>
+            {% endif %}
+          </button>
+        </h2>
+        <div id="collapse-{{ sys_id }}" class="accordion-collapse collapse"
+             aria-labelledby="heading-{{ sys_id }}"
+             data-bs-parent="#external-identifiers-accordion">
+          <div class="accordion-body bg-white p-4">
+
+            <input type="hidden" name="present_{{ sys_id }}" value="1">
+
+            {% if data.is_missing %}
+              <div class="alert alert-warning d-flex align-items-center justify-content-between mb-4">
+                <div>
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                  <strong>{{ _('Warning:') }}</strong>
+                  {{ _('This external identifier is no longer present in the OpenAtlas database.') }}
+                </div>
+                <button type="button" class="btn btn-danger btn-sm" onclick="purgeIdentifier('{{ sys_id }}')">
+                  <i class="bi bi-trash-fill me-1"></i>{{ _('Purge from System') }}
+                </button>
+              </div>
+            {% endif %}
+
+            <div class="row g-3 mb-3">
+              {# Left Column: Metadata (Read-only) #}
+              <div class="col-md-6">
+                <h6 class="text-muted small fw-bold mb-3 border-bottom pb-2">
+                  {{ _('Metadata from OpenAtlas') }}
+                </h6>
+                <div class="mb-2">
+                  <label class="form-label text-muted small mb-0">{{ _('OpenAtlas ID') }}</label>
+                  <div class="fw-bold">{{ sys_id }}</div>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label text-muted small mb-0">{{ _('Resolver URL') }}</label>
+                  <div class="text-break font-monospace small">
+                    {% if data.resolver_url %}
+                      <a href="{{ data.resolver_url }}" target="_blank">{{ data.resolver_url }}</a>
+                    {% else %}
+                      <span class="text-muted italic">{{ _('None') }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label text-muted small mb-0">{{ _('Website URL') }}</label>
+                  <div class="text-break font-monospace small">
+                    {% if data.website_url %}
+                      <a href="{{ data.website_url }}" target="_blank">{{ data.website_url }}</a>
+                    {% else %}
+                      <span class="text-muted italic">{{ _('None') }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              {# Right Column: Configuration & Icon #}
+              <div class="col-md-6 border-start ps-4">
+                <h6 class="text-muted small fw-bold mb-3 border-bottom pb-2">
+                  {{ _('Configuration') }}
+                </h6>
+
+                <div class="form-check form-switch mb-3">
+                  <input class="form-check-input" type="checkbox" role="switch"
+                         id="disabled_{{ sys_id }}" name="disabled_{{ sys_id }}"
+                         {% if data.disabled %}checked{% endif %}>
+                  <label class="form-check-label fw-bold small" for="disabled_{{ sys_id }}">
+                    {{ _('Disable display in Overview') }}
+                  </label>
+                </div>
+
+                <div class="row g-2 align-items-end mb-3">
+                  <div class="col-md-5">
+                    <label class="form-label text-muted small fw-bold mb-1">{{ _('Icon Type') }}</label>
+                    <select class="form-select form-select-sm"
+                            name="icon_type_{{ sys_id }}"
+                            id="icon_type_{{ sys_id }}"
+                            onchange="toggleIconType('{{ sys_id }}')">
+                      <option value="css" {% if data.icon_type == 'css' %}selected{% endif %}>CSS Class</option>
+                      <option value="img" {% if data.icon_type == 'img' %}selected{% endif %}>SVG Icon</option>
+                      <option value="" {% if not data.icon_type %}selected{% endif %}>None</option>
+                    </select>
+                  </div>
+                  <div class="col-md-7">
+                    <div id="css_container_{{ sys_id }}" class="d-none">
+                      <label class="form-label text-muted small fw-bold mb-1">
+                        {{ _('Bootstrap Icon Class') }}
+                      </label>
+                      <input type="text" class="form-control form-select-sm"
+                             id="css_input_{{ sys_id }}"
+                             name="icon_value_{{ sys_id }}"
+                             value="{{ data.icon_value or '' }}"
+                             oninput="updatePreview('{{ sys_id }}')"
+                             placeholder="e.g. bi-globe">
+                    </div>
+                    <div id="img_container_{{ sys_id }}" class="d-none">
+                      <label class="form-label text-muted small fw-bold mb-1">
+                        {{ _('SVG Icon File') }}
+                      </label>
+                      <select class="form-select form-select-sm"
+                              id="img_select_{{ sys_id }}"
+                              name="icon_value_{{ sys_id }}"
+                              onchange="updatePreview('{{ sys_id }}')">
+                        <option value="">{{ _('Select Icon...') }}</option>
+                        {% for icon in admin_instance.icons %}
+                          <option value="{{ icon.filename }}"
+                                  {% if data.icon_type == 'img' and data.icon_value == icon.filename %}
+                                    selected
+                                  {% endif %}>
+                            {{ icon.filename }}
+                          </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-3 mb-0 p-2 bg-light rounded border"
+                     style="min-height: 48px;">
+                  <span class="text-muted small fw-bold">{{ _('Preview:') }}</span>
+                  <div id="preview_container_{{ sys_id }}"
+                       class="d-flex align-items-center justify-content-center text-primary"
+                       style="width: 32px; height: 32px;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-0 border-top pt-3">
+              <label class="form-label text-muted small fw-bold mb-1" for="description_{{ sys_id }}">
+                {{ _('Description (shown next to system name on hover)') }}
+              </label>
+              <textarea class="form-control form-control-sm"
+                        id="description_{{ sys_id }}" name="description_{{ sys_id }}"
+                        rows="2"
+                        placeholder="{{ _('Enter description...') }}">{{ data.description or '' }}</textarea>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="d-flex justify-content-end align-items-center mt-4">
+    <button type="submit" class="btn btn-primary px-4">
+      <i class="bi bi-save me-1"></i>{{ _('SAVE CHANGES') }}
+    </button>
+  </div>
+</form>
+
+<script>
+  const iconUrls = {
+    {% for icon in admin_instance.icons %}
+      "{{ icon.filename }}": "{{ get_icon_url(icon.filename) }}",
+    {% endfor %}
+  };
+
+  function toggleIconType(sysId) {
+    const typeSelect = document.getElementById(`icon_type_${sysId}`);
+    const cssContainer = document.getElementById(`css_container_${sysId}`);
+    const imgContainer = document.getElementById(`img_container_${sysId}`);
+    const cssInput = document.getElementById(`css_input_${sysId}`);
+    const imgSelect = document.getElementById(`img_select_${sysId}`);
+    const previewContainer = document.getElementById(`preview_container_${sysId}`);
+
+    if (!typeSelect) return;
+
+    if (typeSelect.value === 'css') {
+      cssContainer.classList.remove('d-none');
+      imgContainer.classList.add('d-none');
+      cssInput.setAttribute('name', `icon_value_${sysId}`);
+      imgSelect.removeAttribute('name');
+      updatePreview(sysId);
+    } else if (typeSelect.value === 'img') {
+      cssContainer.classList.add('d-none');
+      imgContainer.classList.remove('d-none');
+      imgSelect.setAttribute('name', `icon_value_${sysId}`);
+      cssInput.removeAttribute('name');
+      updatePreview(sysId);
+    } else {
+      cssContainer.classList.add('d-none');
+      imgContainer.classList.add('d-none');
+      cssInput.removeAttribute('name');
+      imgSelect.removeAttribute('name');
+      if (previewContainer) {
+        previewContainer.innerHTML = '';
+      }
+    }
+  }
+
+  function updatePreview(sysId) {
+    const typeSelect = document.getElementById(`icon_type_${sysId}`);
+    const previewContainer = document.getElementById(`preview_container_${sysId}`);
+    if (!typeSelect || !previewContainer) return;
+
+    if (typeSelect.value === 'css') {
+      const cssInput = document.getElementById(`css_input_${sysId}`);
+      const val = cssInput ? cssInput.value.trim() : '';
+      if (val) {
+        let classes = val;
+        if (!val.startsWith('bi ') && !val.split(' ').includes('bi')) {
+          classes = 'bi ' + val;
+        }
+        previewContainer.innerHTML = `<span class="fs-4"><i class="${classes}"></i></span>`;
+      } else {
+        previewContainer.innerHTML = '';
+      }
+    } else if (typeSelect.value === 'img') {
+      const imgSelect = document.getElementById(`img_select_${sysId}`);
+      const selectedIcon = imgSelect ? imgSelect.value : '';
+      if (selectedIcon && iconUrls[selectedIcon]) {
+        previewContainer.innerHTML = `<img src="${iconUrls[selectedIcon]}" ` +
+          `style="max-height: 32px; max-width: 32px; object-fit: contain;" alt="preview">`;
+      } else {
+        previewContainer.innerHTML = '';
+      }
+    } else {
+      previewContainer.innerHTML = '';
+    }
+  }
+
+  function purgeIdentifier(sysId) {
+    if (confirm("Are you sure you want to purge this external identifier from the system?")) {
+      const el = document.getElementById(`accordion-item-${sysId}`);
+      if (el) {
+        el.remove();
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    {% for sys_id, data in settings.external_identifiers.items() %}
+      toggleIconType('{{ sys_id }}');
+    {% endfor %}
+  });
+</script>

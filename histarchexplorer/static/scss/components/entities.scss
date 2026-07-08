@@ -387,4 +387,144 @@
   max-width: 100%;
   border: none;
   box-shadow: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.5rem;
+
+  > ul {
+    width: 100%;
+  }
+
+  .tree-header {
+    width: 100%;
+  }
+}
+
+.treeview-control-button {
+  max-width: 32px;
+  max-height: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.treeview-search-input-wrapper {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+
+  .treeview-search-input {
+    width: 100%;
+    height: 32px;
+    max-height: 32px;
+    box-sizing: border-box;
+  }
+}
+
+.treeview-button-container {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 0.25rem;
+  height: 32px;
+}
+
+
+/* ===== Browse filter sidebar (push layout on desktop, overlay on mobile) ===== */
+$filter-sidebar-width: 500px;
+
+.browse-body-wrapper {
+  align-items: flex-start;
+  position: relative;
+}
+
+.browse-main-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.filter-sidebar {
+  width: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  box-sizing: border-box;
+}
+
+.filter-sidebar.open {
+  width: $filter-sidebar-width;
+}
+
+.filter-sidebar-inner {
+  width: $filter-sidebar-width;
+  height: calc(100vh - var(--navbar-height) - 52px - 3rem);
+  overflow-y: auto;
+  margin: 0 1rem 1rem 0;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+}
+
+.filter-sidebar-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: var(--card-bg, #fff);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.filter-sidebar-backdrop {
+  display: none;
+}
+
+@include breakpoint-down('small') {
+  .filter-sidebar {
+    position: fixed;
+    top: var(--navbar-height);
+    right: 0;
+    height: calc(100vh - var(--navbar-height));
+    z-index: 1040;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .filter-sidebar.open {
+    width: min(85vw, #{$filter-sidebar-width});
+  }
+
+  .filter-sidebar-inner {
+    width: min(85vw, #{$filter-sidebar-width});
+    height: 100%;
+    margin: 0;
+  }
+
+  .filter-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: var(--navbar-height) 0 0 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 1039;
+  }
+
+  .filter-sidebar-backdrop.show {
+    display: block;
+  }
+}
+
+/* Uniform sizing for the filter sidebar's Reset/Apply buttons */
+.filter-btn {
+  min-width: 4.5rem;
+}
+
+/* Fixed square icon-only buttons (remove sort level / add sort level) */
+.filter-icon-btn {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

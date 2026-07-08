@@ -1,56 +1,192 @@
-{% import '_macros.html' as ui %}
-<div id="map-sidebar-content container-fluid ">
-  <div class="row">
-    <div class="col">
-      <h2 id="feature-{{ entity.id }}">
-        {{ entity.title }}
-        <a href="{{ url_for('entity_view', id_=entity.id) }}">
-          <i class="bi bi-box-arrow-up-right"></i>
-        </a>
-      </h2>
-      <h5>
-        {% for type in entity.types %}
-          {% if type.is_standard %}
-            <p>{{ type.title | upper }}</p>
-          {% endif %}
-        {% endfor %}
-      </h5>
-    </div>
+{# Map right sidebar: clicked feature, its stratigraphic units and, per #}
+{# unit, the linked artifacts and human remains - rendered sequentially. #}
 
-    <div class="row ">
-      <p>{{ entity.description[current_language] }}</p>
-    </div>
+{% macro image_src(file_obj, width, height) -%}
+  {%- if file_obj.iiif_base_path -%}
+    {{ file_obj.iiif_base_path }}/full/!{{ width }},{{ height }}/0/default.jpg
+  {%- else -%}
+    {{ file_obj.url }}
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro pick_description(descriptions) -%}
+  {%- if descriptions is mapping -%}
+    {{ descriptions.get('en') or descriptions.get('de')
+      or (descriptions.values() | list | first) }}
+  {%- elif descriptions -%}
+    {{ descriptions }}
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro type_popover(type) -%}
+{%- set content %}
+<div class="popover-content text-start">
+  <div>
+    <a href="{{ url_for('entity_view', id_=type.id) }}"
+       style="color: var(--entity-color-types); text-decoration: none;">
+      <strong>{{ type.title }}</strong>
+    </a>
   </div>
-  <div class="row">
-    <div class="col-4">
-      {% if main_image %}
-        {{ ui.overview_image(main_image, manifests) }}
-      {% endif %}
+  {% set desc = pick_description(type.descriptions) | trim %}
+  {% if desc %}
+    <div class="text-muted mt-1 small">{{ desc }}</div>
+  {% endif %}
+  {% set ancestors = [] %}
+  {% for entry in type.type_hierarchy or [] %}
+    {% if entry.identifier.split('/')[-1] | int != type.id %}
+      {% set _ = ancestors.append(entry) %}
+    {% endif %}
+  {% endfor %}
+  {% if ancestors %}
+    {% set parent = ancestors[-1] %}
+    {% set root = ancestors[0] %}
+    <div class="mt-2 small">
+      <strong>Subcategory of:</strong>
+      <a href="{{ url_for('entity_view',
+            id_=parent.identifier.split('/')[-1] | int) }}"
+         style="color: var(--entity-color-types); text-decoration: none;">
+        {{ parent.label }}</a>
     </div>
+    <div class="mt-1 small">
+      <strong>Hierarchy:</strong>
+      <a href="{{ url_for('entity_view',
+            id_=root.identifier.split('/')[-1] | int) }}"
+         style="color: var(--entity-color-types); text-decoration: none;">
+        {{ root.label }}</a>
+    </div>
+  {% endif %}
+</div>
+{% endset -%}
+{{ content }}
+{%- endmacro %}
 
-    {% if categorized_types %}
-      <div class="attribute-area col-8">
-        <!-- Attributes -->
-        <span class="tile-label">{{ _('attributes') | upper }}</span>
-        <div class="categorized-types">
-          {% for label, value in categorized_types.items() %}
-            <p class="tile-sub-label text-uppercase mt-3">
-              {{ value[0]['icon'] | safe }} {{ label.replace('_', ' ').title() }}</p>
-            {% for type in value %}
-              <div class="badge custom-badge text-wrap m-1">
-                <h6 class="m-0 text-center">
-                  {{ type.type.title }}
-                  {% if type.type.value and type.type.unit %}:
-                    {{ type.type.value }}
-                    {{ type.type.unit }}
-                  {% endif %}
-                </h6>
-              </div>
-            {% endfor %}
+{% macro type_badge(type) -%}
+  {% set vu = ': ' ~ type.value ~ ' ' ~ type.unit
+    if type.value and type.unit else '' %}
+  <div class="badge custom-badge text-wrap m-1" role="button"
+       tabindex="0" style="cursor: pointer;"
+       data-bs-toggle="popover" data-bs-html="true"
+       data-bs-content="{{ type_popover(type) | trim | forceescape }}">
+    <h6 class="m-0 text-center">{{ type.title }}{{ vu }}</h6>
+  </div>
+{%- endmacro %}
+
+{% macro type_badges(categorized_types) -%}
+  {% if categorized_types %}
+    <div class="mt-2">
+      {% for bucket, items in categorized_types.items() %}
+        {% set division = items[0].division if items else None %}
+        <p class="tile-sub-label text-uppercase mt-3 mb-1">
+          {% if division and division.iconUrl %}
+            <img src="{{ division.iconUrl }}" class="attribute-icon">
+          {% elif division and division.icon %}
+            {{ division.icon | safe }}
+          {% endif %}
+          {{ bucket.replace('_', ' ') | title }}
+        </p>
+        {% for item in items %}
+          {{ type_badge(item.type) }}
+        {% endfor %}
+      {% endfor %}
+    </div>
+  {% endif %}
+{%- endmacro %}
+
+{% macro images_block(block) -%}
+  {% if block.images %}
+    {% if block.images | length == 1 %}
+      {% set img = block.images[0] %}
+      <img class="img-fluid rounded border mt-2"
+           src="{{ image_src(img, 480, 320) }}"
+           alt="Image for {{ block.title }}">
+    {% else %}
+      {% set carousel_id = 'carousel-' ~ block.system_class ~ '-' ~ block.id %}
+      <div id="{{ carousel_id }}" class="carousel slide mt-2 border rounded">
+        <div class="carousel-inner">
+          {% for img in block.images %}
+            <div class="carousel-item {{ 'active' if loop.first }}">
+              <img class="d-block w-100 rounded"
+                   src="{{ image_src(img, 480, 320) }}"
+                   alt="Image {{ loop.index }} for {{ block.title }}">
+            </div>
           {% endfor %}
         </div>
+        <button class="carousel-control-prev" type="button"
+                data-bs-target="#{{ carousel_id }}" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button"
+                data-bs-target="#{{ carousel_id }}" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
       </div>
     {% endif %}
-  </div>
-</div>
+  {% endif %}
+{%- endmacro %}
 
+{# Maps a system_class to its configured entity-color CSS variable key. #}
+{% set entity_color_keys = {
+  'feature': 'feature',
+  'stratigraphic_unit': 'stratigraphic_unit',
+  'artifact': 'items',
+  'human_remains': 'items',
+  'place': 'places'} %}
+
+{% macro entity_card(block, heading_class) -%}
+  {% set desc = pick_description(block.description) | trim %}
+  {% set color_key = entity_color_keys.get(block.system_class, '') %}
+  <div class="map-sidebar-card mb-3">
+    <div class="map-sidebar-title map-sidebar-heading mb-2 d-flex flex-wrap
+      align-items-center gap-2 {{ heading_class }}">
+      <a href="{{ url_for('entity_view', id_=block.id) }}"
+         style="text-decoration: none;
+           {% if color_key %}color: var(--entity-color-{{ color_key }});{% endif %}">
+        {{ block.title }}</a>
+      {% for type in block.main_types %}
+        {{ type_badge(type) }}
+      {% endfor %}
+    </div>
+    {% if block.year_span %}
+      <p class="text-muted small mb-0">{{ block.year_span }}</p>
+    {% endif %}
+
+    {% if desc %}
+      <p class="small mt-2 mb-0">{{ desc }}</p>
+    {% endif %}
+    <div class="map-sidebar-detail-row d-flex flex-wrap gap-3 mt-2">
+      {% if block.categorized_types %}
+        <div class="map-sidebar-types">
+          {{ type_badges(block.categorized_types) }}
+        </div>
+      {% endif %}
+      {% if block.images %}
+        <div class="map-sidebar-media">
+          {{ images_block(block) }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{%- endmacro %}
+
+{% if sidebar is defined and sidebar %}
+  <div class="container-fluid" id="map-sidebar-content">
+    {{ entity_card(sidebar.feature, 'fs-2 fw-bold') }}
+
+    {% for group in sidebar.groups %}
+      {# Indent the whole stratigraphic-unit group so it is clearly #}
+      {# visible where a unit and its sub-entities begin. #}
+      <div class=" mt-3">
+        {{ entity_card(group.su, 'fs-3 fw-semibold') }}
+        {% if group.children %}
+          <div class="">
+            {% for child in group.children %}
+              {{ entity_card(child, 'fs-4 fw-semibold') }}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

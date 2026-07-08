@@ -8,6 +8,7 @@ except ImportError:
 
 # Application metadata
 VERSION = '0.4.0'
+
 LANGUAGES = {
     'de': 'Deutsch',
     'en': 'English',
@@ -65,7 +66,7 @@ else:
 
 # Data handling
 CLASSES_TO_SKIP = {  # Entity classes excluded from processing
-    'object_location', 'type', 'appellation', 'administrative_unit',
+    'object_location', 'appellation', 'administrative_unit',
     'source_translation', 'type_tools', 'reference_system'}
 
 # Entity groups shown in views
@@ -77,7 +78,8 @@ VIEW_CLASSES = {
     'events': ('acquisition', 'event', 'activity', 'creation', 'move',
                'production', 'modification'),
     'sources': ('source', 'bibliography', 'external_reference', 'edition'),
-    'files': ('file',)}
+    'files': ('file',),
+    'types': ('type',)}
 
 # # Commonly used standard entity types
 # STANDARD_TYPES = [
@@ -87,7 +89,6 @@ VIEW_CLASSES = {
 #     'Place', 'Feature', 'Stratigraphic unit']
 
 ADD_FILES_FOR_OVERVIEW = 2
-
 
 # Icons displayed in sidebar, mapped to entity IDs
 SIDEBAR_ICONS = {
