@@ -208,11 +208,10 @@
                     </label>
                 </span>
                 <span>
-                <button type="button" class="btn btn-warning" id="reset-type-btn-{{ tab_name }}">
+                <button type="button" class="btn btn-warning" id="reset-type-btn-{{ tab_name }}" onclick="deselectTree{{ tab_name }}()">
                     Reset
                 </button>
-                <button type="button" class="btn btn-primary" id="apply-type-btn-{{ tab_name }}"
-                        onclick="filtertypes{{ tab_name }}()" ;>
+                <button type="button" class="btn btn-primary" id="apply-type-btn-{{ tab_name }}" onclick="filterTypes{{ tab_name }}()">
                     Apply
                 </button>
                 </span>

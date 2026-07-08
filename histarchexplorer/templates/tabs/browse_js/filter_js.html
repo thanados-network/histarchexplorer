@@ -604,7 +604,6 @@ for (const tree of {{ tab_name }}TreesToBuild) {
         }
     });
 
-
     if (!window.{{ tab_name }}TreeInstances) {
         window.{{ tab_name }}TreeInstances = {};
     }
@@ -616,7 +615,21 @@ for (const tree of {{ tab_name }}TreesToBuild) {
 
 let selectedNodes{{ tab_name }} = [];
 
-function filtertypes{{ tab_name }}() {
+// Deselects all currently selected nodes across every tree of this tab
+function deselectTree{{ tab_name }}() {
+    for (const tree of {{ tab_name }}TreesToBuild) {
+        const treeInstance = window.{{ tab_name }}TreeInstances[tree];
+        if (!treeInstance) continue;
+        treeInstance.getSelectedNodes().forEach(node => {
+            treeInstance.selectNodeById(node.id, false);
+        });
+        treeInstance.selectedNodeIds = [];
+        treeInstance.selectedNodeIdsWithChildren = [];
+    }
+    filterTypes{{ tab_name }}();
+}
+
+function filterTypes{{ tab_name }}() {
     selectedNodes{{ tab_name }} = [];
     if (document.getElementById("include-subcategories-{{ tab_name }}").checked) {
         for (const tree of {{ tab_name }}TreesToBuild) {
@@ -630,5 +643,6 @@ function filtertypes{{ tab_name }}() {
     //console.log(selectedNodes{{ tab_name }})
     applyCombinedFilter{{ tab_name }}()
 }
+
 
 </script> {# Filter Search Sort #}
