@@ -387,12 +387,37 @@
   max-width: 100%;
   border: none;
   box-shadow: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+
+  > ul {
+    width: 100%;
+  }
+
+  .tree-header {
+    width: 100%;
+  }
 }
 
 .treeview-control-button {
   max-width: 32px;
   max-height: 32px;
 }
+
+.treeview-search-input-wrapper {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.treeview-button-container {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 0.25rem;
+}
+
 
 /* ===== Browse filter sidebar (push layout on desktop, overlay on mobile) ===== */
 $filter-sidebar-width: 500px;
