@@ -317,7 +317,7 @@ function rebuildTreeWithFilteredData{{ tab_name }}() {
         // Create Treeview with marked data (unavailable nodes have selectable: false)
         const treeview = new Treeview({
             containerId: `{{ tab_name }}Tree${tree}`,
-            data: markedTreeData[tree], // Library will automatically apply .not-selectable class
+            data: markedTreeData[tree][0].children, // Library will automatically apply .not-selectable class, remove root node
             searchEnabled: true,
             nodeNameKey: 'label',
             initiallyExpanded: false,
@@ -586,7 +586,7 @@ for (const tree of {{ tab_name }}TreesToBuild) {
     // Create a Treeview instance – store it in an object instead of dynamic variable
     const treeview = new Treeview({
         containerId: `{{ tab_name }}Tree${tree}`,   // ID of the HTML element to render the tree into
-        data: {{ tab_name }}Data.treeData[tree],   // Use bracket notation to access the property
+        data: {{ tab_name }}Data.treeData[tree][0].children,   // Use bracket notation to access the property, remove root node
         searchEnabled: true,
         nodeNameKey: 'label',
         initiallyExpanded: false,
