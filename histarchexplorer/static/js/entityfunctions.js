@@ -128,7 +128,9 @@ function createSortLevel(id, fields, classList, typeIds,) {
       </select>
     </div>
     <div class="col-auto">
-      <button type="button" class="btn btn-outline-danger remove-sort-level">Remove</button>
+      <button type="button" class="btn btn-danger btn-sm filter-icon-btn remove-sort-level" title="Remove">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
   `;
 

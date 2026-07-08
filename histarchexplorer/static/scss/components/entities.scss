@@ -468,3 +468,18 @@ $filter-sidebar-width: 500px;
     display: block;
   }
 }
+
+/* Uniform sizing for the filter sidebar's Reset/Apply buttons */
+.filter-btn {
+  min-width: 4.5rem;
+}
+
+/* Fixed square icon-only buttons (remove sort level / add sort level) */
+.filter-icon-btn {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -96,12 +96,12 @@
                                 </label>
                             </span>
                             <span>
-                                <button type="button" class="btn btn-warning btn-sm"
+                                <button type="button" class="btn btn-warning btn-sm filter-btn"
                                         id="reset-type-btn-{{ tab_name }}"
                                         onclick="deselectTree{{ tab_name }}()">
                                     Reset
                                 </button>
-                                <button type="button" class="btn btn-primary btn-sm"
+                                <button type="button" class="btn btn-primary btn-sm filter-btn"
                                         id="apply-type-btn-{{ tab_name }}"
                                         onclick="filterTypes{{ tab_name }}()">
                                     Apply
@@ -129,24 +129,26 @@
                                 <label class="form-label">Direction</label>
                             </div>
                             <div class="col-auto">
-                                <button type="button"
-                                        class="btn btn-outline-danger remove-sort-level opacity-0 disabled">
-                                    Remove
+                                <button type="button" title="Remove"
+                                        class="btn btn-danger btn-sm filter-icon-btn remove-sort-level opacity-0 disabled">
+                                    <i class="bi bi-x-lg"></i>
                                 </button>
                             </div>
                         </div>
                         <div id="sort-levels-{{ tab_name }}">
                         </div>
                         <div class="d-flex justify-content-between mt-3">
-                            <button type="button" class="btn btn-outline-primary"
-                                    id="add-sort-level-{{ tab_name }}">
-                                Add Sort Level
+                            <button type="button" class="btn btn-primary btn-sm filter-icon-btn"
+                                    id="add-sort-level-{{ tab_name }}" title="Add Sort Level">
+                                <i class="bi bi-plus-lg"></i>
                             </button>
                             <span>
-                                <button type="button" class="btn btn-warning" id="reset-sort-btn-{{ tab_name }}">
+                                <button type="button" class="btn btn-warning btn-sm filter-btn"
+                                        id="reset-sort-btn-{{ tab_name }}">
                                     Reset
                                 </button>
-                                <button type="button" class="btn btn-primary" id="apply-sort-btn-{{ tab_name }}">
+                                <button type="button" class="btn btn-primary btn-sm filter-btn"
+                                        id="apply-sort-btn-{{ tab_name }}">
                                     Apply
                                 </button>
                             </span>
