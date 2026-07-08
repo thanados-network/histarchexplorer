@@ -389,6 +389,11 @@
   box-shadow: none;
 }
 
+.treeview-control-button {
+  max-width: 32px;
+  max-height: 32px;
+}
+
 /* ===== Browse filter sidebar (push layout on desktop, overlay on mobile) ===== */
 $filter-sidebar-width: 500px;
 

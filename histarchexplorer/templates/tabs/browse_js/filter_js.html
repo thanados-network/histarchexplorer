@@ -319,6 +319,7 @@ function rebuildTreeWithFilteredData{{ tab_name }}() {
             containerId: `{{ tab_name }}Tree${tree}`,
             data: markedTreeData[tree][0].children, // Library will automatically apply .not-selectable class, remove root node
             searchEnabled: true,
+            buttonStyle: 'bootstrapIcons',
             nodeNameKey: 'label',
             initiallyExpanded: false,
             checkboxSelectionEnabled: true,
@@ -588,6 +589,7 @@ for (const tree of {{ tab_name }}TreesToBuild) {
         containerId: `{{ tab_name }}Tree${tree}`,   // ID of the HTML element to render the tree into
         data: {{ tab_name }}Data.treeData[tree][0].children,   // Use bracket notation to access the property, remove root node
         searchEnabled: true,
+        buttonStyle: 'bootstrapIcons',
         nodeNameKey: 'label',
         initiallyExpanded: false,
         checkboxSelectionEnabled: true,
