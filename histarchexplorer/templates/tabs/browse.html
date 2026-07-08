@@ -97,32 +97,24 @@
         </div>
     </div>
 
-    <div class="dropdown">
-        <button type="button" class="btn btn-outline-secondary d-flex align-items-center gap-2"
-                data-bs-toggle="dropdown"
-                title="Change View">
-            <i id="{{ tab_name }}-dropdown-btn-icon" class="bi bi-list-ul"></i>
+    <div class="btn-group" role="group" aria-label="Change View">
+        <button id="{{ tab_name }}-list-btn" type="button"
+                class="btn btn-outline-secondary active" onclick="{{ tab_name }}ToggleView('table')"
+                title="List">
+            <i class="bi bi-list-ul"></i>
         </button>
-
-        <ul class="dropdown-menu">
-            <li>
-                <a id="{{ tab_name }}-list-btn" class="dropdown-item btn" onclick="{{ tab_name }}ToggleView('table')">
-                    <i class="bi bi-list-ul me-2"></i> List
-                </a>
-            </li>
-            {% if tab_name in ["places", "items"] %}
-                <li>
-                    <a id="{{ tab_name }}-map-btn" class="dropdown-item btn" onclick="{{ tab_name }}ToggleView('map')">
-                        <i class="bi bi-geo-alt-fill me-2"></i> Map
-                    </a>
-                </li>
-            {% endif %}
-            <li>
-                <a id="{{ tab_name }}-tiles-btn" class="dropdown-item btn" onclick="{{ tab_name }}ToggleView('tile')">
-                    <i class="bi bi-grid-3x3-gap-fill me-2"></i> Tiles
-                </a>
-            </li>
-        </ul>
+        {% if tab_name in ["places", "items"] %}
+            <button id="{{ tab_name }}-map-btn" type="button"
+                    class="btn btn-outline-secondary" onclick="{{ tab_name }}ToggleView('map')"
+                    title="Map">
+                <i class="bi bi-geo-alt-fill"></i>
+            </button>
+        {% endif %}
+        <button id="{{ tab_name }}-tiles-btn" type="button"
+                class="btn btn-outline-secondary" onclick="{{ tab_name }}ToggleView('tile')"
+                title="Tiles">
+            <i class="bi bi-grid-3x3-gap-fill"></i>
+        </button>
     </div>
 
 
