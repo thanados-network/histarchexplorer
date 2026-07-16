@@ -435,6 +435,12 @@
 
 
 /* ===== Browse header ===== */
+.preset-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
 .browse-header {
   display: flex;
   align-items: center;

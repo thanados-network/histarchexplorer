@@ -39,7 +39,17 @@
                    placeholder="Search / Filter">
             <button class="btn btn-outline-secondary" type="button"
                     id="clearFilter{{ tab_name }}">&times;</button>
+
         </div>
+        <div class="dropdown" id="{{ tab_name }}-presets-dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false"
+                        title="Predefined Filters">
+                    <i class="bi bi-bookmark"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end"
+                    id="{{ tab_name }}-presets-menu"></ul>
+            </div>
     </div>
 
     <div class="browse-header-right">
@@ -70,6 +80,40 @@
     </div>
 
 </div>
+
+<script>
+(function () {
+    const menu = document.getElementById('{{ tab_name }}-presets-menu');
+    if (!menu || !Array.isArray(predefinedFilters) || predefinedFilters.length === 0) return;
+
+    predefinedFilters.forEach((preset, index) => {
+        const li = document.createElement('li');
+        const btn = document.createElement('button');
+        btn.className = 'dropdown-item d-flex align-items-center gap-2';
+        btn.type = 'button';
+        btn.title = preset.description || '';
+
+        if (preset.icon) {
+            const img = document.createElement('img');
+            img.src = preset.icon;
+            img.alt = '';
+            img.classList.add('preset-icon');
+            btn.appendChild(img);
+        }
+
+        const label = document.createElement('span');
+        label.textContent = preset.label;
+        btn.appendChild(label);
+
+        btn.addEventListener('click', () => {
+            console.log('Predefined filter selected:', preset);
+        });
+
+        li.appendChild(btn);
+        menu.appendChild(li);
+    });
+})();
+</script>
 
 
 <div class="browse-body-wrapper d-flex">
