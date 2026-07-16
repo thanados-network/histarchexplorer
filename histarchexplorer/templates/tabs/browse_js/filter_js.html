@@ -327,6 +327,158 @@ function rebuildTreeWithFilteredData{{ tab_name }}(tree) {
 }
 
 
+// Apply a predefined filter preset programmatically
+function applyPreset{{ tab_name }}(preset) {
+    const fp = preset.filter_parameters || {};
+
+    // --- Reset all filters first ---
+    document.getElementById('filterInput{{ tab_name }}').value = '';
+
+    document.querySelectorAll(`#csSelect{{tab_name}} input[type="checkbox"]`)
+        .forEach(cb => { cb.checked = false; });
+
+    document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]`)
+        .forEach(cb => { cb.checked = false; });
+
+    const resetBeginEl{{ tab_name }} = document.getElementById(
+        'sliderBegin{{ tab_name }}');
+    if (resetBeginEl{{ tab_name }}?.noUiSlider) {
+        const beginVals{{ tab_name }} =
+            {{ tab_name }}Data.timelineBegin.map(e => e.string);
+        resetBeginEl{{ tab_name }}.noUiSlider.set(
+            [beginVals{{ tab_name }}[0],
+             beginVals{{ tab_name }}[beginVals{{ tab_name }}.length - 1]]);
+    }
+
+    const resetEndEl{{ tab_name }} = document.getElementById(
+        'sliderEnd{{ tab_name }}');
+    if (resetEndEl{{ tab_name }}?.noUiSlider) {
+        const endVals{{ tab_name }} =
+            {{ tab_name }}Data.timelineEnd.map(e => e.string);
+        resetEndEl{{ tab_name }}.noUiSlider.set(
+            [endVals{{ tab_name }}[0],
+             endVals{{ tab_name }}[endVals{{ tab_name }}.length - 1]]);
+    }
+
+    const resetNoBegin{{ tab_name }} = document.getElementById(
+        'includeNoBegin{{ tab_name }}');
+    if (resetNoBegin{{ tab_name }}) resetNoBegin{{ tab_name }}.checked = true;
+
+    const resetNoEnd{{ tab_name }} = document.getElementById(
+        'includeNoEnd{{ tab_name }}');
+    if (resetNoEnd{{ tab_name }}) resetNoEnd{{ tab_name }}.checked = true;
+
+    for (const tree of {{ tab_name }}TreesToBuild) {
+        const inst = window.{{ tab_name }}TreeInstances[tree];
+        if (inst) {
+            inst.getSelectedNodes().forEach(n => inst.selectNodeById(n.id, false));
+            inst.selectedNodeIds = [];
+            inst.selectedNodeIdsWithChildren = [];
+        }
+        const subCb = document.getElementById(
+            `include-subcategories-{{ tab_name }}-${tree}`);
+        if (subCb) subCb.checked = false;
+    }
+
+    // --- Case study checkboxes ---
+    document.querySelectorAll(`#csSelect{{tab_name}} input[type="checkbox"]`)
+        .forEach(cb => {
+            cb.checked = fp.case_study_ids
+                ? fp.case_study_ids.map(String).includes(cb.value)
+                : false;
+        });
+
+    // --- Class checkboxes ---
+    document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]`)
+        .forEach(cb => {
+            cb.checked = fp.classes
+                ? fp.classes.includes(cb.value)
+                : false;
+        });
+
+    // --- Begin date slider ---
+    const sliderBeginEl{{ tab_name }} = document.getElementById(
+        'sliderBegin{{ tab_name }}');
+    if (sliderBeginEl{{ tab_name }}?.noUiSlider) {
+        const vals = sliderBeginEl{{ tab_name }}.noUiSlider.get();
+        const from = fp.begin_from !== undefined ? fp.begin_from : vals[0];
+        const to = fp.begin_to !== undefined ? fp.begin_to : vals[1];
+        sliderBeginEl{{ tab_name }}.noUiSlider.set([from, to]);
+    }
+
+    // --- End date slider ---
+    const sliderEndEl{{ tab_name }} = document.getElementById(
+        'sliderEnd{{ tab_name }}');
+    if (sliderEndEl{{ tab_name }}?.noUiSlider) {
+        const vals = sliderEndEl{{ tab_name }}.noUiSlider.get();
+        const from = fp.end_from !== undefined ? fp.end_from : vals[0];
+        const to = fp.end_to !== undefined ? fp.end_to : vals[1];
+        sliderEndEl{{ tab_name }}.noUiSlider.set([from, to]);
+    }
+
+    // --- Include no-date checkboxes ---
+    const noBeginCb{{ tab_name }} = document.getElementById(
+        'includeNoBegin{{ tab_name }}');
+    if (noBeginCb{{ tab_name }}) {
+        noBeginCb{{ tab_name }}.checked =
+            fp.include_no_begin !== undefined ? fp.include_no_begin : true;
+    }
+    const noEndCb{{ tab_name }} = document.getElementById(
+        'includeNoEnd{{ tab_name }}');
+    if (noEndCb{{ tab_name }}) {
+        noEndCb{{ tab_name }}.checked =
+            fp.include_no_end !== undefined ? fp.include_no_end : true;
+    }
+
+    // --- Type tree selection ---
+    // First deselect all trees
+    for (const tree of {{ tab_name }}TreesToBuild) {
+        const inst = window.{{ tab_name }}TreeInstances[tree];
+        if (inst) {
+            inst.getSelectedNodes().forEach(n => inst.selectNodeById(n.id, false));
+            inst.selectedNodeIds = [];
+            inst.selectedNodeIdsWithChildren = [];
+        }
+    }
+
+    if (fp.type_ids && fp.type_ids.length > 0) {
+        for (const tree of {{ tab_name }}TreesToBuild) {
+            const inst = window.{{ tab_name }}TreeInstances[tree];
+            if (!inst) continue;
+            fp.type_ids.forEach(id => {
+                try { inst.selectNodeById(id, true); } catch (e) { /* not in this tree */ }
+            });
+            inst.selectedNodeIds = inst.getSelectedNodes().map(n => n.id);
+            inst.selectedNodeIdsWithChildren =
+                inst.getSelectedNodesAndChildrenValues('id');
+
+            // Honour include_subtypes via the checkbox
+            const subCb = document.getElementById(
+                `include-subcategories-{{ tab_name }}-${tree}`);
+            if (subCb) subCb.checked = fp.include_subtypes !== false;
+        }
+    }
+
+    // --- Tab visibility ---
+    if (Array.isArray(preset.tabs) && preset.tabs.length > 0) {
+        tabsToLoad.forEach(tab => {
+            const isVisible = preset.tabs.includes(tab);
+            document.querySelectorAll(`.to-remove-${tab}`).forEach(el => {
+                el.classList.toggle('d-none', !isVisible);
+            });
+        });
+    } else {
+        tabsToLoad.forEach(tab => {
+            document.querySelectorAll(`.to-remove-${tab}`).forEach(el => {
+                el.classList.remove('d-none');
+            });
+        });
+    }
+
+    // Rebuild selectedNodes and apply
+    filterTypes{{ tab_name }}();
+}
+
 // applyCombinedFilter function
 function applyCombinedFilter{{ tab_name }}() {
     const textValue = document.getElementById(`filterInput{{tab_name}}`).value.trim();

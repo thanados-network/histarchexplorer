@@ -106,7 +106,9 @@
         btn.appendChild(label);
 
         btn.addEventListener('click', () => {
-            console.log('Predefined filter selected:', preset);
+            if (typeof applyPreset{{ tab_name }} === 'function') {
+                applyPreset{{ tab_name }}(preset);
+            }
         });
 
         li.appendChild(btn);
