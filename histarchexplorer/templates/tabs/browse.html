@@ -29,41 +29,45 @@
 </script>
 <div id="{{ tab_name }}-breadcrumbs" class="breadcrumbs ms-3"></div>
 
-<div id="{{ tab_name }}-header"
-     class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3 mt-3 ms-3 me-3">
+<div id="{{ tab_name }}-header" class="browse-header">
 
-    <h3 class="m-0">{{ tab_name[0]|upper }}{{ tab_name[1:] }}<span id="{{ tab_name }}-subcount"></span></h3>
+    <div class="browse-header-left">
+        <h3 class="m-0">{{ tab_name[0]|upper }}{{ tab_name[1:] }}<span id="{{ tab_name }}-subcount"></span></h3>
 
-    <div class="input-group" style="max-width: 600px;">
-        <input type="text" id="filterInput{{ tab_name }}" class="form-control" placeholder="Search / Filter">
-        <button class="btn btn-outline-secondary" type="button" id="clearFilter{{ tab_name }}">&times;</button>
+        <div class="input-group browse-header-search">
+            <input type="text" id="filterInput{{ tab_name }}" class="form-control"
+                   placeholder="Search / Filter">
+            <button class="btn btn-outline-secondary" type="button"
+                    id="clearFilter{{ tab_name }}">&times;</button>
+        </div>
     </div>
 
-    <div class="btn-group" role="group" aria-label="Change View">
-        <button id="{{ tab_name }}-list-btn" type="button"
-                class="btn btn-outline-secondary active" onclick="{{ tab_name }}ToggleView('table')"
-                title="List">
-            <i class="bi bi-list-ul"></i>
-        </button>
-        {% if tab_name in ["places", "items"] %}
-            <button id="{{ tab_name }}-map-btn" type="button"
-                    class="btn btn-outline-secondary" onclick="{{ tab_name }}ToggleView('map')"
-                    title="Map">
-                <i class="bi bi-geo-alt-fill"></i>
+    <div class="browse-header-right">
+        <div class="btn-group" role="group" aria-label="Change View">
+            <button id="{{ tab_name }}-list-btn" type="button"
+                    class="btn btn-outline-secondary active" onclick="{{ tab_name }}ToggleView('table')"
+                    title="List">
+                <i class="bi bi-list-ul"></i>
             </button>
-        {% endif %}
-        <button id="{{ tab_name }}-tiles-btn" type="button"
-                class="btn btn-outline-secondary" onclick="{{ tab_name }}ToggleView('tile')"
-                title="Tiles">
-            <i class="bi bi-grid-3x3-gap-fill"></i>
+            {% if tab_name in ["places", "items"] %}
+                <button id="{{ tab_name }}-map-btn" type="button"
+                        class="btn btn-outline-secondary" onclick="{{ tab_name }}ToggleView('map')"
+                        title="Map">
+                    <i class="bi bi-geo-alt-fill"></i>
+                </button>
+            {% endif %}
+            <button id="{{ tab_name }}-tiles-btn" type="button"
+                    class="btn btn-outline-secondary" onclick="{{ tab_name }}ToggleView('tile')"
+                    title="Tiles">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+            </button>
+        </div>
+
+        <button type="button" class="btn btn-outline-secondary" id="{{ tab_name }}-filter-toggle-btn"
+                title="Filters">
+            <i class="bi bi-funnel"></i>
         </button>
     </div>
-
-    <button type="button" class="btn btn-outline-secondary" id="{{ tab_name }}-filter-toggle-btn"
-            title="Filters">
-        <i class="bi bi-funnel"></i>
-    </button>
-
 
 </div>
 
