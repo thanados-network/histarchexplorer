@@ -41,7 +41,7 @@
                     id="clearFilter{{ tab_name }}">&times;</button>
 
         </div>
-        <div class="dropdown" id="{{ tab_name }}-presets-dropdown">
+        <div class="dropdown d-none" id="{{ tab_name }}-presets-dropdown">
                 <button class="btn btn-outline-secondary dropdown-toggle" type="button"
                         data-bs-toggle="dropdown" aria-expanded="false"
                         title="Predefined Filters">
@@ -85,6 +85,7 @@
 (function () {
     const menu = document.getElementById('{{ tab_name }}-presets-menu');
     if (!menu || !Array.isArray(predefinedFilters) || predefinedFilters.length === 0) return;
+    document.getElementById('{{ tab_name }}-presets-dropdown').classList.remove('d-none');
 
     predefinedFilters.forEach((preset, index) => {
         const li = document.createElement('li');
