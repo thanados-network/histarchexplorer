@@ -485,25 +485,59 @@ function applyPreset{{ tab_name }}(preset) {
         }
     }
 
-    // --- Tab visibility ---
-    if (Array.isArray(preset.tabs) && preset.tabs.length > 0) {
-        tabsToLoad.forEach(tab => {
-            const isVisible = preset.tabs.includes(tab);
-            document.querySelectorAll(`.to-remove-${tab}`).forEach(el => {
-                el.classList.toggle('d-none', !isVisible);
-            });
-        });
-    } else {
-        tabsToLoad.forEach(tab => {
-            document.querySelectorAll(`.to-remove-${tab}`).forEach(el => {
-                el.classList.remove('d-none');
-            });
-        });
+    // Rebuild selectedNodes and apply — suppress filter-changed event
+    window.{{ tab_name }}PresetApplying = true;
+    filterTypes{{ tab_name }}();
+    // Allow one tick for applyCombinedFilter to finish before re-enabling
+    setTimeout(() => { window.{{ tab_name }}PresetApplying = false; }, 0);
+}
+
+// Register in global preset registry so other tabs can call this
+if (!window.applyPresetFns) window.applyPresetFns = {};
+window.applyPresetFns['{{ tab_name }}'] = applyPreset{{ tab_name }};
+
+// Reset all filters on this tab to their initial (page-load) state
+function resetFilter{{ tab_name }}() {
+    document.getElementById('filterInput{{ tab_name }}').value = '';
+
+    document.querySelectorAll(`#csSelect{{tab_name}} input[type="checkbox"]`)
+        .forEach(cb => { cb.checked = false; });
+    document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]`)
+        .forEach(cb => { cb.checked = false; });
+
+    const rBegin = document.getElementById('sliderBegin{{ tab_name }}');
+    if (rBegin?.noUiSlider) {
+        const bv = {{ tab_name }}Data.timelineBegin.map(e => e.string);
+        rBegin.noUiSlider.set([bv[0], bv[bv.length - 1]]);
+    }
+    const rEnd = document.getElementById('sliderEnd{{ tab_name }}');
+    if (rEnd?.noUiSlider) {
+        const ev = {{ tab_name }}Data.timelineEnd.map(e => e.string);
+        rEnd.noUiSlider.set([ev[0], ev[ev.length - 1]]);
     }
 
-    // Rebuild selectedNodes and apply
+    const noBegin = document.getElementById('includeNoBegin{{ tab_name }}');
+    if (noBegin) noBegin.checked = true;
+    const noEnd = document.getElementById('includeNoEnd{{ tab_name }}');
+    if (noEnd) noEnd.checked = true;
+
+    for (const tree of {{ tab_name }}TreesToBuild) {
+        const inst = window.{{ tab_name }}TreeInstances[tree];
+        if (inst) {
+            inst.getSelectedNodes().forEach(n => inst.selectNodeById(n.id, false));
+            inst.selectedNodeIds = [];
+            inst.selectedNodeIdsWithChildren = [];
+        }
+        const subCb = document.getElementById(
+            `include-subcategories-{{ tab_name }}-${tree}`);
+        if (subCb) subCb.checked = false;
+    }
+
     filterTypes{{ tab_name }}();
 }
+
+if (!window.resetFilterFns) window.resetFilterFns = {};
+window.resetFilterFns['{{ tab_name }}'] = resetFilter{{ tab_name }};
 
 // applyCombinedFilter function
 function applyCombinedFilter{{ tab_name }}() {
@@ -625,7 +659,13 @@ function applyCombinedFilter{{ tab_name }}() {
     } else {
         table{{ tab_name }}.clearFilter();
     }
-    update{{ tab_name }}Counter()
+    update{{ tab_name }}Counter();
+
+    // Notify badge of manual filter change (skip when preset is being applied)
+    if (!window.{{ tab_name }}PresetApplying) {
+        document.dispatchEvent(
+            new CustomEvent('{{ tab_name }}-filter-changed'));
+    }
 }
 
 
