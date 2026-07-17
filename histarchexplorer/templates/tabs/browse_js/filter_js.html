@@ -327,6 +327,22 @@ function rebuildTreeWithFilteredData{{ tab_name }}(tree) {
 }
 
 
+// Find the nearest available slider string for a given ISO date string
+function findNearestSliderValue(isoString, timeline) {
+    if (!isoString || !timeline || timeline.length === 0) return null;
+    const target = calculateTimeBP(isoString);
+    let nearest = timeline[0];
+    let minDiff = Math.abs(timeline[0].number - target);
+    for (const entry of timeline) {
+        const diff = Math.abs(entry.number - target);
+        if (diff < minDiff) {
+            minDiff = diff;
+            nearest = entry;
+        }
+    }
+    return nearest.string;
+}
+
 // Apply a predefined filter preset programmatically
 function applyPreset{{ tab_name }}(preset) {
     const fp = preset.filter_parameters || {};
@@ -400,9 +416,14 @@ function applyPreset{{ tab_name }}(preset) {
     const sliderBeginEl{{ tab_name }} = document.getElementById(
         'sliderBegin{{ tab_name }}');
     if (sliderBeginEl{{ tab_name }}?.noUiSlider) {
-        const vals = sliderBeginEl{{ tab_name }}.noUiSlider.get();
-        const from = fp.begin_from !== undefined ? fp.begin_from : vals[0];
-        const to = fp.begin_to !== undefined ? fp.begin_to : vals[1];
+        const bTimeline = {{ tab_name }}Data.timelineBegin;
+        const bVals = sliderBeginEl{{ tab_name }}.noUiSlider.get();
+        const from = fp.begin_from !== undefined
+            ? findNearestSliderValue(fp.begin_from, bTimeline) ?? bVals[0]
+            : bVals[0];
+        const to = fp.begin_to !== undefined
+            ? findNearestSliderValue(fp.begin_to, bTimeline) ?? bVals[1]
+            : bVals[1];
         sliderBeginEl{{ tab_name }}.noUiSlider.set([from, to]);
     }
 
@@ -410,9 +431,14 @@ function applyPreset{{ tab_name }}(preset) {
     const sliderEndEl{{ tab_name }} = document.getElementById(
         'sliderEnd{{ tab_name }}');
     if (sliderEndEl{{ tab_name }}?.noUiSlider) {
-        const vals = sliderEndEl{{ tab_name }}.noUiSlider.get();
-        const from = fp.end_from !== undefined ? fp.end_from : vals[0];
-        const to = fp.end_to !== undefined ? fp.end_to : vals[1];
+        const eTimeline = {{ tab_name }}Data.timelineEnd;
+        const eVals = sliderEndEl{{ tab_name }}.noUiSlider.get();
+        const from = fp.end_from !== undefined
+            ? findNearestSliderValue(fp.end_from, eTimeline) ?? eVals[0]
+            : eVals[0];
+        const to = fp.end_to !== undefined
+            ? findNearestSliderValue(fp.end_to, eTimeline) ?? eVals[1]
+            : eVals[1];
         sliderEndEl{{ tab_name }}.noUiSlider.set([from, to]);
     }
 

@@ -30,22 +30,25 @@ const predefinedFilters = [
         icon: "https://thanados.net/static/images/icons/logo_big.png",
         tabs: ["places", "items", "features"],
         filter_parameters: {
-            case_study_ids: [181731]
+            case_study_ids: [181731],
+            begin_from: "0399-01-01",
+            begin_to: "0601-01-01",
+            end_from: "0700-01-01",
+            end_to: "0700-02-01",
+            include_no_begin: false,
+            include_no_end: false
         }
     },
     {
-        label: "Type 285 (incl. subtypes)",
-        description: "Show only entities of type 285 and all its subtypes.",
+        label: "Churches before 1300",
+        description: "Churches before 1300",
         icon: null,
         tabs: [],
         filter_parameters: {
             type_ids: [285],
             include_subtypes: true,
-            begin_from: "-0800-01-01",
-            begin_to: "-0400-01-01",
-            end_from: "-0800-01-01",
-            end_to: "-0400-01-01",
-            include_no_begin: true,
+            begin_to: "1251-01-01",
+            include_no_begin: false,
             include_no_end: true
         }
     }
