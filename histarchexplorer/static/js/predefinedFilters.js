@@ -43,16 +43,14 @@ const predefinedFilters = [
     {
         label: "Thanados",
         description: "Show only entities belonging to the Thanados project.",
-        icon: "https://thanados.net/static/images/icons/logo_big.png",
-        tabs: [],
+        tabs: ["places", "features", "items"],
         filter_parameters: {
             case_study_ids: [181731],
+            classes: ["place", "artifact", "feature"],
+            include_subtypes: true,
             begin_from: "0399-01-01",
-            begin_to: "0601-01-01",
-            end_from: "0700-01-01",
-            end_to: "0700-02-01",
-            include_no_begin: false,
-            include_no_end: false
+            include_no_begin: true,
+            include_no_end: true
         }
     },
     {
