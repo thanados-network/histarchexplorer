@@ -7,6 +7,18 @@
                     aria-label="Close"></button>
         </div>
 
+        <div id="active-filters-{{ tab_name }}" class="d-none p-2 border-bottom">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <small class="text-muted fw-semibold text-uppercase">Active Filters</small>
+                <button type="button"
+                        class="btn btn-outline-secondary btn-sm"
+                        id="reset-all-filters-{{ tab_name }}">
+                    Reset all
+                </button>
+            </div>
+            <div id="active-filter-badges-{{ tab_name }}" class="d-flex flex-wrap gap-1"></div>
+        </div>
+
         <div class="accordion accordion-flush" id="filter-accordion-{{ tab_name }}">
 
             <div class="accordion-item d-none" id="classDropdown{{ tab_name }}">

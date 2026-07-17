@@ -115,7 +115,10 @@
         badge.classList.remove('d-inline-flex', 'btn-outline-secondary', 'opacity-50');
     }
 
-    function resetAllToInitial() {
+    window.hideBadgeFns = window.hideBadgeFns || {};
+    window.hideBadgeFns['{{ tab_name }}'] = hideBadge;
+
+    window.resetAllToInitial = function resetAllToInitial() {
         // Restore all tabs
         tabsToLoad.forEach(tab => {
             document.querySelectorAll(`.to-remove-${tab}`).forEach(el => {
@@ -127,7 +130,9 @@
         tabsToLoad.forEach(tab => {
             if (typeof fns[tab] === 'function') fns[tab]();
         });
-        hideBadge();
+        // Hide all badges
+        const hideFns = window.hideBadgeFns || {};
+        Object.values(hideFns).forEach(fn => fn());
     }
 
     badgeClose.addEventListener('click', resetAllToInitial);

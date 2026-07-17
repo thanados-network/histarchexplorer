@@ -539,6 +539,114 @@ function resetFilter{{ tab_name }}() {
 if (!window.resetFilterFns) window.resetFilterFns = {};
 window.resetFilterFns['{{ tab_name }}'] = resetFilter{{ tab_name }};
 
+// Update the active-filter badges panel in the sidebar
+function updateActiveFilterBadges{{ tab_name }}() {
+    const container = document.getElementById(
+        'active-filter-badges-{{ tab_name }}');
+    const panel = document.getElementById('active-filters-{{ tab_name }}');
+    if (!container || !panel) return;
+
+    const frag = document.createDocumentFragment();
+
+    function makeBadge(label, colorClass, onClose) {
+        const span = document.createElement('span');
+        span.className = `badge d-inline-flex align-items-center gap-1 ${colorClass}`;
+        const text = document.createElement('span');
+        text.textContent = label;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-close btn-close-white btn-sm';
+        btn.style.fontSize = '0.6em';
+        btn.setAttribute('aria-label', 'Remove');
+        btn.addEventListener('click', () => {
+            onClose();
+            applyCombinedFilter{{ tab_name }}();
+        });
+        span.appendChild(text);
+        span.appendChild(btn);
+        frag.appendChild(span);
+    }
+
+    // --- Classes ---
+    document.querySelectorAll(
+        `#classSelect{{tab_name}} input[type="checkbox"]:checked`
+    ).forEach(cb => {
+        const lbl = document.querySelector(
+            `label[for="${cb.id}"]`);
+        const label = lbl ? lbl.textContent.trim() : cb.value;
+        makeBadge(label, 'bg-primary', () => { cb.checked = false; });
+    });
+
+    // --- Projects (case studies) ---
+    document.querySelectorAll(
+        `#csSelect{{tab_name}} input[type="checkbox"]:checked`
+    ).forEach(cb => {
+        const lbl = document.querySelector(`label[for="${cb.id}"]`);
+        const label = lbl ? lbl.textContent.trim() : cb.value;
+        makeBadge(label, 'bg-success', () => { cb.checked = false; });
+    });
+
+    // --- Types (from tree instances) ---
+    for (const tree of {{ tab_name }}TreesToBuild) {
+        const inst = window.{{ tab_name }}TreeInstances[tree];
+        if (!inst) continue;
+        inst.getSelectedNodes().forEach(node => {
+            const nodeLabel = node.label || node.name || String(node.id);
+            makeBadge(nodeLabel, 'bg-warning text-dark', () => {
+                try { inst.selectNodeById(node.id, false); } catch (e) { /* */ }
+                inst.selectedNodeIds = inst.getSelectedNodes().map(
+                    n => n.id);
+                inst.selectedNodeIdsWithChildren =
+                    inst.getSelectedNodesAndChildrenValues('id');
+                filterTypes{{ tab_name }}();
+            });
+        });
+    }
+
+    // --- Chronology (begin slider) ---
+    const bEl = document.getElementById('sliderBegin{{ tab_name }}');
+    if (bEl?.noUiSlider) {
+        const bVals = bEl.noUiSlider.get();
+        const bAll = {{ tab_name }}Data.timelineBegin.map(e => e.string);
+        const bIsDefault = bVals[0] === bAll[0] &&
+            bVals[1] === bAll[bAll.length - 1];
+        if (!bIsDefault) {
+            const label = `Begin: ${bVals[0]} – ${bVals[1]}`;
+            makeBadge(label, 'bg-secondary', () => {
+                bEl.noUiSlider.set([bAll[0], bAll[bAll.length - 1]]);
+            });
+        }
+    }
+
+    // --- Chronology (end slider) ---
+    const eEl = document.getElementById('sliderEnd{{ tab_name }}');
+    if (eEl?.noUiSlider) {
+        const eVals = eEl.noUiSlider.get();
+        const eAll = {{ tab_name }}Data.timelineEnd.map(e => e.string);
+        const eIsDefault = eVals[0] === eAll[0] &&
+            eVals[1] === eAll[eAll.length - 1];
+        if (!eIsDefault) {
+            const label = `End: ${eVals[0]} – ${eVals[1]}`;
+            makeBadge(label, 'bg-secondary', () => {
+                eEl.noUiSlider.set([eAll[0], eAll[eAll.length - 1]]);
+            });
+        }
+    }
+
+    container.innerHTML = '';
+    container.appendChild(frag);
+    panel.classList.toggle('d-none', container.childElementCount === 0);
+}
+
+document.getElementById('reset-all-filters-{{ tab_name }}')
+    ?.addEventListener('click', () => {
+        if (typeof window.resetAllToInitial === 'function') {
+            window.resetAllToInitial();
+        } else {
+            resetFilter{{ tab_name }}();
+        }
+    });
+
 // applyCombinedFilter function
 function applyCombinedFilter{{ tab_name }}() {
     const textValue = document.getElementById(`filterInput{{tab_name}}`).value.trim();
@@ -666,6 +774,8 @@ function applyCombinedFilter{{ tab_name }}() {
         document.dispatchEvent(
             new CustomEvent('{{ tab_name }}-filter-changed'));
     }
+
+    updateActiveFilterBadges{{ tab_name }}();
 }
 
 
