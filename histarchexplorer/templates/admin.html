@@ -31,6 +31,7 @@
             {'id': 'sidebar-visibility-settings', 'label': _('Visibility Settings')},
             {'id': 'sidebar-colors', 'label': _('Class colors')},
             {'id': 'sidebar-type-divisions', 'label': _('Type Divisions')},
+            {'id': 'sidebar-predefined-filters', 'label': _('Predefined Filters')},
             {'id': 'sidebar-external-identifiers', 'label': _('External Identifiers')},
             {'id': 'sidebar-projects-content', 'label': _('Projects')},
             {'id': 'sidebar-stakeholders-content', 'label': _('Stakeholders')},
@@ -157,6 +158,18 @@
               <div class="card-body">
                 <h5 class="card-title">{{ _('external identifiers') | upper }}</h5>
                 {% include 'admin/external_identifiers.html' %}
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane fade {% if ns.active_sidebar == 'sidebar-predefined-filters' %}show active{% endif %}"
+            id="sidebar-predefined-filters" role="tabpanel"
+            aria-labelledby="sidebar-predefined-filters-tab" tabindex="0">
+            <div class="card mt-3 mb-5">
+              <div class="card-body">
+                <h5 class="card-title">{{ _('Predefined Filters') | upper }}</h5>
+                {% include 'admin/predefined_filter.html' %}
               </div>
             </div>
           </div>

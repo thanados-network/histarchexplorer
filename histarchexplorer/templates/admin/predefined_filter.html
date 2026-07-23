@@ -1,0 +1,180 @@
+<p class="text-muted">{{ _('Drag filters to change their display order.') }}</p>
+<div class="accordion" id="predefinedFiltersList">
+  {% for predefined_filter in predefined_filters %}
+    <div class="accordion-item" data-id="{{ predefined_filter.id }}"
+         data-filter="{{ predefined_filter | tojson | forceescape }}">
+      <h2 class="accordion-header d-flex">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#predefinedFilter{{ predefined_filter.id }}">
+          <i class="bi bi-grip-vertical me-2 text-muted"></i>{{ predefined_filter.label }}
+        </button>
+      </h2>
+      <div id="predefinedFilter{{ predefined_filter.id }}" class="accordion-collapse collapse">
+        <div class="accordion-body d-flex justify-content-between align-items-center">
+          <span>{{ predefined_filter.description }}</span>
+          <span class="btn-group">
+            <button class="btn btn-outline-primary edit-predefined-filter" type="button">
+              <i class="bi bi-pencil"></i> {{ _('Edit') }}
+            </button>
+            <form method="post"
+                  action="{{ url_for('remove_predefined_filter', filter_id=predefined_filter.id) }}">
+              <input type="hidden" name="active_sidebar" value="sidebar-predefined-filters">
+              <button class="btn btn-outline-danger" type="submit"
+                      onclick="return confirm('{{ _('Delete this predefined filter?') }}');">
+                <i class="bi bi-trash"></i> {{ _('Delete') }}
+              </button>
+            </form>
+          </span>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+<div class="text-end mt-4">
+  <button class="btn btn-primary" id="add-predefined-filter" type="button">
+    <i class="bi bi-plus-lg"></i> {{ _('Add predefined filter') }}
+  </button>
+</div>
+
+<div class="modal fade" id="predefinedFilterModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content">
+    <form method="post" id="predefined-filter-form">
+      <input type="hidden" name="active_sidebar" value="sidebar-predefined-filters">
+      <div class="modal-header"><h5 class="modal-title">{{ _('Predefined Filter') }}</h5>
+        <button class="btn-close" type="button" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label mb-0" for="predefined-filter-label-input">
+                {{ _('Label') }}
+              </label>
+              <div class="btn-group btn-group-sm" role="group"
+                   aria-label="{{ _('Language selector') }}">
+                {% for code, name in available_languages.items() %}
+                  <button type="button"
+                          class="btn btn-sm btn-lang-switch predefined-lang-btn"
+                          data-field="label"
+                          data-lang="{{ code }}"
+                          title="{{ name }}">
+                    {{ code | upper }}
+                  </button>
+                {% endfor %}
+              </div>
+            </div>
+            <input class="form-control"
+                   id="predefined-filter-label-input"
+                   data-field="label"
+                   autocomplete="off">
+            {% for code in available_languages.keys() %}
+              <input type="hidden" name="label_{{ code }}" data-hidden-field="label"
+                     data-lang="{{ code }}">
+            {% endfor %}
+          </div>
+
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label mb-0" for="predefined-filter-description-input">
+                {{ _('Description') }}
+              </label>
+              <div class="btn-group btn-group-sm" role="group"
+                   aria-label="{{ _('Language selector') }}">
+                {% for code, name in available_languages.items() %}
+                  <button type="button"
+                          class="btn btn-sm btn-lang-switch predefined-lang-btn"
+                          data-field="description"
+                          data-lang="{{ code }}"
+                          title="{{ name }}">
+                    {{ code | upper }}
+                  </button>
+                {% endfor %}
+              </div>
+            </div>
+            <input class="form-control"
+                   id="predefined-filter-description-input"
+                   data-field="description"
+                   autocomplete="off">
+            {% for code in available_languages.keys() %}
+              <input type="hidden" name="description_{{ code }}"
+                     data-hidden-field="description" data-lang="{{ code }}">
+            {% endfor %}
+          </div>
+          <div class="col-md-4"><label class="form-label">{{ _('Icon Type') }}</label>
+            <select class="form-select" name="icon_type" id="filter-icon-type">
+              <option value="">{{ _('None') }}</option><option value="css">{{ _('Bootstrap Icon Class') }}</option>
+              <option value="img">{{ _('SVG Icon File') }}</option></select></div>
+          <div class="col-md-5"><label class="form-label">{{ _('Icon value') }}</label>
+            <input class="form-control" name="icon_value" id="filter-icon-value"
+                   placeholder="bi-bookmark">
+            <select class="form-select d-none" id="filter-icon-file">
+              <option value="">{{ _('Select Icon...') }}</option>
+              {% for icon in admin_instance.icons %}
+                <option value="{{ icon.filename }}">{{ icon.filename }}</option>
+              {% endfor %}
+            </select></div>
+          <div class="col-md-3"><label class="form-label">{{ _('Preview:') }}</label>
+            <div class="border rounded p-2" id="filter-icon-preview"></div></div>
+          <div class="col-md-6"><label class="form-label">{{ _('Tabs') }}</label>
+            <select class="form-select" name="tabs" id="predefined-filter-tabs"
+                    multiple size="6"
+                    placeholder="{{ _('Select tabs') }}">
+              {% for tab, classes in view_classes.items() %}
+                <option value="{{ tab }}">{{ tab }}</option>
+              {% endfor %}
+            </select><small class="text-muted">{{ _('Leave empty to show all tabs.') }}</small></div>
+          <div class="col-md-6"><label class="form-label">{{ _('Classes') }}</label>
+            <select class="form-select" name="classes" id="predefined-filter-classes"
+                    multiple size="6"
+                    placeholder="{{ _('Select classes') }}">
+              {% for tab, classes in view_classes.items() %}
+                <optgroup label="{{ tab }}">
+                  {% for class_name in classes %}
+                    <option value="{{ class_name }}">{{ class_name }}</option>
+                  {% endfor %}
+                </optgroup>
+              {% endfor %}
+            </select></div>
+          <div class="col-md-6"><label class="form-label">{{ _('Case studies') }}</label>
+            <select class="form-select" name="case_study_ids"
+                    id="predefined-filter-case-studies" multiple size="6"
+                    placeholder="{{ _('Select case studies') }}">
+              {% for project in all_projects %}
+                {% set project_name = project.name %}
+                {% set project_acronym = project.acronym %}
+                {% if project_name is mapping %}
+                  {% set first_name = (project_name.values() | list | first)
+                                     if project_name else project.id %}
+                  {% set display_name = project_name.get(current_language)
+                                        or project_name.get('en')
+                                        or first_name %}
+                {% else %}
+                  {% set display_name = project_name %}
+                {% endif %}
+                <option value="{{ project.id }}">
+                  {{ project_acronym or display_name }}
+                </option>
+              {% endfor %}
+            </select></div>
+          <div class="col-md-6"><label class="form-label">{{ _('Type IDs (comma-separated)') }}</label>
+            <input class="form-control" name="type_ids"><div class="form-check mt-2">
+              <input class="form-check-input" type="checkbox" name="include_subtypes" id="include-subtypes">
+              <label class="form-check-label" for="include-subtypes">{{ _('Include subtypes') }}</label></div></div>
+          {% for field in ['begin_from', 'begin_to', 'end_from', 'end_to'] %}
+            <div class="col-md-3"><label class="form-label">{{ _(field.replace('_', ' ')) }}</label>
+              <input class="form-control" name="{{ field }}" placeholder="YYYY-MM-DD" pattern="-?\d{4,}-\d{2}-\d{2}"></div>
+          {% endfor %}
+          <div class="col-12 d-flex gap-4"><div class="form-check"><input class="form-check-input" type="checkbox" name="include_no_begin" id="include-no-begin" checked>
+            <label class="form-check-label" for="include-no-begin">{{ _('Include entities without begin date') }}</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" name="include_no_end" id="include-no-end" checked>
+            <label class="form-check-label" for="include-no-end">{{ _('Include entities without end date') }}</label></div></div>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+        <button class="btn btn-primary" type="submit">{{ _('Save') }}</button></div>
+    </form>
+  </div></div>
+</div>
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='node_modules/tom-select/dist/css/tom-select.bootstrap5.min.css') }}">
+<script src="{{ url_for('static', filename='node_modules/tom-select/dist/js/tom-select.complete.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin_predefined_filters.js') }}"></script>
