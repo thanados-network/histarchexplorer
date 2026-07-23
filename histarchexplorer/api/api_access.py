@@ -91,6 +91,22 @@ class ApiAccess:
             timeout=20).json()
 
     @staticmethod
+    @cache.memoize()
+    def get_subunits(id_: int) -> dict[str, Any]:
+        """Fetch the complete ordered hierarchy below an entity.
+
+        The response is expected to contain feature, stratigraphic-unit,
+        artifact, and human-remains cards with their display metadata.
+        """
+        response = requests.get(
+            f"{app.config['API_URL']}subunits/{id_}",
+            headers=g.api_headers,
+            proxies=PROXIES,
+            timeout=30)
+        response.raise_for_status()
+        return response.json()
+
+    @staticmethod
     def get_by_system_class(
             class_: str,
             parser: Parser) -> list[dict[str, Any]]:

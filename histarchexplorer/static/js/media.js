@@ -232,19 +232,31 @@ function createVideo(image) {
 
 function createImage(image, alt) {
   const img = document.createElement("img");
-  img.src = image.iiif_base_path
+
+  // Primary and fallback URLs
+  const primary = image.iiif_base_path
     ? `${image.iiif_base_path}/full/400,/0/default.jpg`
     : image.url;
+  const fallback = image.url || "/static/images/placeholder.png";
+
+  img.src = primary;
   img.alt = alt;
+
+  // Catch network or server errors (e.g. 404 / 500)
+  img.addEventListener("error", () => {
+    console.warn(`⚠️ IIIF image failed, falling back to ${fallback}`);
+    if (img.src !== fallback) img.src = fallback;
+  });
+
   return img;
 }
 
 function createPDF(image, alt) {
   const wrapper = document.createElement("div");
-
-
   const img = document.createElement("img");
-  img.src = `${image.iiif_base_path}/full/400,/0/default.jpg`;
+  img.src = image.iiif_base_path
+    ? `${image.iiif_base_path}/full/400,/0/default.jpg`
+    : "/static/images/placeholder.png";
   img.alt = alt;
   wrapper.appendChild(img);
   return wrapper;

@@ -3,7 +3,14 @@
 // ============================================================
 
 function relayout(delay = 0) {
-
+    if (!window.overviewGrid) return;
+    if (delay > 0) {
+        setTimeout(() => {
+            window.overviewGrid.refreshItems().layout();
+        }, delay);
+    } else {
+        window.overviewGrid.refreshItems().layout();
+    }
 }
 
 // Utility helpers ------------------------------------------------------------
@@ -172,12 +179,16 @@ function renderEntityCard(entity, mainImage) {
 
     let avatar = "";
     const sysClass = (entity.system_class || "").toLowerCase();
-    if (["group", "person"].includes(sysClass) && mainImage?.url)
-        avatar = `<img src="${mainImage.url}" alt="${entity.title}"/>`;
-    else
+    if (["group", "person"].includes(sysClass) && (mainImage?.iiif_base_path || mainImage?.url)) {
+        const primary = mainImage.iiif_base_path
+            ? `${mainImage.iiif_base_path}/full/400,/0/default.jpg`
+            : mainImage.url;
+        avatar = `<img src="${primary}" alt="${entity.title}" onerror="this.onerror=null;this.src='${mainImage.url || systemIconPath(sysClass)}';"/>`;
+    } else {
         avatar = `<img src="${systemIconPath(
             entity.system_class
         )}" alt="${entity.system_class}">`;
+    }
 
     const types = formatTypeTitles(entity.types);
     const dateStr = dateTemplate(entity.start, entity.end);
@@ -679,7 +690,7 @@ function renderExternalReferences(entity, settings = {}) {
     const citeButton = data.citeButton || {};
     const refreshButton = data.refreshButton || {};
     const mainImage = data.mainImage;
-    const initialImages = data.initialImage;
+    const initialImages = data.initialImages;
     const allImages = (data.images || []).filter(img => img?.from_super_entity === false);
     const additionalFilesOverview = window.additionalFilesOverview || 0;
     const externalIdentifiersSettings = data.externalIdentifiersSettings || {};
@@ -716,13 +727,21 @@ function renderExternalReferences(entity, settings = {}) {
             const section = systemClassMap[sc] || "";
             const isPersonOrGroup = ["group", "person"].includes(sc);
             const cardInner = isPersonOrGroup
-                ? `
+                ? (() => {
+                    const primary = mainImage?.iiif_base_path
+                        ? `${mainImage.iiif_base_path}/full/400,/0/default.jpg`
+                        : mainImage?.url;
+                    const imgHtml = (mainImage?.iiif_base_path || mainImage?.url)
+                        ? `<img src="${primary}" alt="${entity.title}" onerror="this.onerror=null;this.src='${mainImage?.url || systemIconPath(sc)}';"/>`
+                        : "";
+                    return `
         <div class="entity-card__icon">
-          ${mainImage?.url ? `<img src="${mainImage.url}" alt="${entity.title}"/>` : ""}
+          ${imgHtml}
         </div>
         <div class="hierarchy-card-label" data-system-class="${sc}">${entity.title || ""}</div>
         <div class="entity-date"><p>${dateTemplate(entity.start, entity.end)}</p></div>
-      `
+      `;
+                })()
                 : `
         <div class="main-entity-ellipse main-entity-ellipse--${section}">
            <!-- <div class="entity-card__icon">
