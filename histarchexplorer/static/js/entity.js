@@ -1,6 +1,17 @@
 let loadedTabs = []
 let notYetClickedTabs = tabsToLoad
 
+function initContentPopovers(container) {
+    container.querySelectorAll('[data-bs-toggle="popover"]').forEach(trigger => {
+        bootstrap.Popover.getOrCreateInstance(trigger, {
+            html: true,
+            sanitize: false,
+            trigger: 'click',
+            placement: 'bottom',
+            container: 'body'});
+    });
+}
+
 document.getElementById('toggleSidebar').addEventListener('click', function () {
     const nav_sidebar = document.getElementById('nav-sidebar');
     const root = document.documentElement;
@@ -88,6 +99,8 @@ async function loadHTML(id, tab, index, totalTabs) {
     for (const script of scripts) {
         await loadScript(script);
     }
+
+    initContentPopovers(targetElement);
 
     loadedTabs.push(tab);
     //console.log(`HTML, CSS, and scripts for "${tab}" loaded in correct order!`);

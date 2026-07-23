@@ -168,6 +168,16 @@
   border-left-color: var(--entity-color-stratigraphic_unit, #adb5bd) !important;
 }
 
+.map-sidebar-single-image {
+  display: inline-block;
+  max-width: 100%;
+
+  img {
+    width: auto !important;
+    max-width: 100%;
+  }
+}
+
 /* Map right sidebar: types on the left, image on the right, wrapping */
 /* below each other when there is not enough horizontal space. */
 .map-sidebar-detail-row {

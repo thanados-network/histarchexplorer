@@ -223,7 +223,8 @@ def _subunit_block(entity: dict[str, Any]) -> dict[str, Any] | None:
         'year_span': compact_year_span(
             PresentationView(
                 id=id_, system_class=system_class, view_class='', title=title,
-                description=None, aliases=None, start=None, end=None, when=when)),
+                description=None, aliases=None, start=None, end=None,
+                when=when)),
         'main_types': [type_ for type_ in types if type_.is_standard],
         'categorized_types': get_categorized_types(types),
         'description': _subunit_description(entity.get('description')),
@@ -244,6 +245,26 @@ def _subunits_graph_nodes(data: dict[str, Any]) -> dict[int, dict[str, Any]]:
             if isinstance(item, dict) and isinstance(item.get('id'), int):
                 nodes[item['id']] = item
     return nodes
+
+
+def _subunits_graph_files(data: Any) -> list[dict[str, Any]]:
+    """Adapt public subunits media records to presentation-view files."""
+    if not isinstance(data, list):
+        return []
+    files = []
+    for file_ in data:
+        if not isinstance(file_, dict):
+            continue
+        file_data = file_.copy()
+        if not isinstance(file_data.get('url'), str) and not isinstance(
+                file_data.get('IIIFBasePath'), str):
+            continue
+        file_data['title'] = file_data.get('title') or file_data.get('name')
+        file_data['publicShareable'] = True
+        file_data['license'] = file_data.get('license') or 'public'
+        file_data['fromSuperEntity'] = False
+        files.append(file_data)
+    return files
 
 
 def _subunits_graph_card(node: dict[str, Any]) -> dict[str, Any] | None:
@@ -291,7 +312,7 @@ def _subunits_graph_card(node: dict[str, Any]) -> dict[str, Any] | None:
         'description': properties.get('description'),
         'when': when,
         'types': types,
-        'files': properties.get('files') or []})
+        'files': _subunits_graph_files(properties.get('files'))})
 
 
 def _graph_children(

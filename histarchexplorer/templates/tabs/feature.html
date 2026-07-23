@@ -92,22 +92,61 @@
   {% endif %}
 {%- endmacro %}
 
+{% macro image_caption(img) -%}
+  <figcaption class="mt-2 text-center small text-muted">
+    {{ img.title }}
+    {% set details %}
+      {% if img.license %}
+        <div><strong>{{ _('License') }}:</strong> {{ img.license }}</div>
+      {% endif %}
+      {% if img.creator %}
+        <div><strong>{{ _('Creator') }}:</strong> {{ img.creator }}</div>
+      {% endif %}
+      {% if img.license_holder %}
+        <div><strong>{{ _('License holder') }}:</strong>
+          {{ img.license_holder }}</div>
+      {% endif %}
+    {% endset %}
+    {% if details | trim %}
+      <button type="button" class="btn btn-sm btn-light ms-2"
+              data-bs-toggle="popover" data-bs-html="true"
+              data-bs-title="{{ img.title }}"
+              data-bs-content="{{ details | trim | forceescape }}"
+              aria-label="{{ _('Show image information') }}">
+        <i class="bi bi-info-circle" aria-hidden="true"></i>
+      </button>
+    {% endif %}
+  </figcaption>
+{%- endmacro %}
+
+{% macro image_item(img, width, height, css_class='') -%}
+  <figure class="position-relative mb-0 {{ css_class }}">
+    <img class="d-block w-100 rounded"
+         src="{{ image_src(img, width, height) }}"
+         alt="{{ img.title }}">
+    <a class="btn btn-sm btn-light position-absolute top-0 end-0 m-2"
+       href="{{ url_for('view_media', render_type='image', id_=img.id) }}"
+       target="_blank" rel="noopener"
+       aria-label="{{ _('Open full view') }}" title="{{ _('Open full view') }}">
+      <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i>
+    </a>
+    {{ image_caption(img) }}
+  </figure>
+{%- endmacro %}
+
 {% macro images_block(block) -%}
   {% if block.images %}
     {% if block.images | length == 1 %}
       {% set img = block.images[0] %}
-      <img class="img-fluid rounded border mt-2"
-           src="{{ image_src(img, 480, 320) }}"
-           alt="Image for {{ block.title }}">
+      {{ image_item(img, 480, 320,
+                    'map-sidebar-single-image border rounded mt-2') }}
     {% else %}
       {% set carousel_id = 'carousel-' ~ block.system_class ~ '-' ~ block.id %}
       <div id="{{ carousel_id }}" class="carousel slide mt-2 border rounded">
         <div class="carousel-inner">
           {% for img in block.images %}
             <div class="carousel-item {{ 'active' if loop.first }}">
-              <img class="d-block w-100 rounded"
-                   src="{{ image_src(img, 480, 320) }}"
-                   alt="Image {{ loop.index }} for {{ block.title }}">
+              {{ image_item(img, 480, 320) }}
             </div>
           {% endfor %}
         </div>
