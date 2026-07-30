@@ -133,3 +133,23 @@ def test_update_general_settings_with_id(authenticated_client: FlaskClient):
         'site_title': 'T', 'contact_email': 'e@e.com', 'case_study_id': '0'
     }, follow_redirects=True)
     assert rv.status_code == 200
+
+
+def test_order_predefined_filters_route(authenticated_client: FlaskClient):
+    criteria = [
+        {'order': '1', 'id': '11'},
+        {'order': 2, 'id': 12}
+    ]
+    with patch(
+            'histarchexplorer.views.admin.update_predefined_filter_order') as mock_update:
+        rv = authenticated_client.post(
+            '/admin/predefined_filters/order',
+            json={'criteria': criteria},
+            follow_redirects=True)
+
+    assert rv.status_code == 200
+    assert rv.get_json() == {'status': 'ok'}
+    mock_update.assert_called_once_with([
+        {'order': 1, 'id': 11},
+        {'order': 2, 'id': 12}
+    ])

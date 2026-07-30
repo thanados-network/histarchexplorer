@@ -98,7 +98,7 @@
 <script>
   let divisionCounter = {{ settings.type_divisions.items() | length }};
 
-  const iconUrls = {
+  const typeDivisionIconUrls = {
     {% for icon in admin_instance.icons %}
       "{{ icon.filename }}": "{{ get_icon_url(icon.filename) }}",
     {% endfor %}
@@ -164,8 +164,8 @@
     } else if (typeSelect.value === 'img') {
       const imgSelect = document.getElementById(`img_select_${index}`);
       const selectedIcon = imgSelect ? imgSelect.value : '';
-      if (selectedIcon && iconUrls[selectedIcon]) {
-        previewContainer.innerHTML = `<img src="${iconUrls[selectedIcon]}" ` +
+      if (selectedIcon && typeDivisionIconUrls[selectedIcon]) {
+        previewContainer.innerHTML = `<img src="${typeDivisionIconUrls[selectedIcon]}" ` +
           `style="max-height: 32px; max-width: 32px; object-fit: contain;" alt="preview">`;
       } else {
         previewContainer.innerHTML = '';

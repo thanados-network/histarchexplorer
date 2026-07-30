@@ -326,6 +326,22 @@ def delete_predefined_filter(filter_id: int) -> None:
 
 
 def update_predefined_filter_order(params: list[dict[str, int]]) -> None:
+    if not params:
+        return
+
+    g.cursor.execute(
+        'SELECT COALESCE(MAX(sortorder), 0) AS max_sortorder '
+        'FROM tng.predefined_filters')
+    max_sortorder = g.cursor.fetchone()['max_sortorder']
+    temp_offset = max_sortorder + len(params) + 1
+
+    temp_params = [
+        {'temp_order': row['order'] + temp_offset, 'id': row['id']}
+        for row in params]
+    g.cursor.executemany(
+        'UPDATE tng.predefined_filters SET sortorder = %(temp_order)s '
+        'WHERE id = %(id)s', temp_params)
+
     g.cursor.executemany(
         'UPDATE tng.predefined_filters SET sortorder = %(order)s '
         'WHERE id = %(id)s', params)

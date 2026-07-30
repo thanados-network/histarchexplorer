@@ -93,7 +93,7 @@
     if (!element || typeof TomSelect !== 'function' || element.tomselect) {
       return;
     }
-    new TomSelect(element, {
+    const select = new TomSelect(element, {
       plugins: {
         remove_button: {
           title: 'Remove this item'
@@ -102,8 +102,10 @@
       create: false,
       hideSelected: true,
       closeAfterSelect: false,
-      maxOptions: null
+      maxOptions: null,
+      dropdownParent: 'body'
     });
+    if (select.dropdown) select.dropdown.style.zIndex = '2000';
   }
 
   function updateIconPreview() {
@@ -115,12 +117,13 @@
     if (iconType.value === 'css' && iconValue.value) {
       const icon = document.createElement('i');
       icon.className = iconValue.value.includes('bi ') ? iconValue.value : `bi ${iconValue.value}`;
+      icon.classList.add('fs-5');
       preview.appendChild(icon);
     } else if (iconType.value === 'img' && iconValue.value) {
       const image = document.createElement('img');
       image.src = `/static/images/icons/${iconValue.value}`;
       image.alt = '';
-      image.className = 'img-fluid';
+      image.className = 'w-100 h-100';
       preview.appendChild(image);
     }
   }
@@ -162,10 +165,41 @@
     populate(null);
     modal.show();
   });
+
+  function updatePositions() {
+    const filterElements = list.querySelectorAll('.predefined-filter-item');
+    filterElements.forEach((el, index) => {
+      const position = el.querySelector('.position');
+      if (position) position.textContent = index + 1;
+    });
+  }
+
+  function getCriteria() {
+    return Array.from(list.querySelectorAll('.predefined-filter-item')).map(
+      (item, index) => ({
+        id: item.dataset.id,
+        order: index + 1
+      }));
+  }
+
+  async function saveOrder() {
+    const criteria = getCriteria();
+    if (!criteria.length) return;
+    try {
+      const response = await fetch('/admin/predefined_filters/order', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({criteria})
+      });
+      if (!response.ok) throw new Error('Unable to save filter order.');
+    } catch (error) {
+      window.alert(error.message);
+    }
+  }
+
   list.addEventListener('click', event => {
     const button = event.target.closest('.edit-predefined-filter');
     if (!button) return;
-    populate(JSON.parse(button.closest('.accordion-item').dataset.filter));
+    populate(JSON.parse(button.closest('.predefined-filter-item').dataset.filter));
     modal.show();
   });
   iconType.addEventListener('change', updateIconPreview);
@@ -183,23 +217,16 @@
   initializeMultiSelect(classesSelect);
   initializeMultiSelect(caseStudiesSelect);
   initializeLanguageFields();
+
   new Sortable(list, {
     animation: 150,
-    handle: '.accordion-button',
+    handle: '.predefined-filter-drag-handle',
+    draggable: '.predefined-filter-item',
     onEnd: async () => {
-      const criteria = Array.from(list.children).map((item, index) => ({
-        id: item.dataset.id,
-        order: index + 1
-      }));
-      try {
-        const response = await fetch('/admin/predefined_filters/order', {
-          method: 'POST', headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({criteria})
-        });
-        if (!response.ok) throw new Error('Unable to save filter order.');
-      } catch (error) {
-        window.alert(error.message);
-      }
+      updatePositions();
+      await saveOrder();
     }
   });
+
+  updatePositions();
 })();

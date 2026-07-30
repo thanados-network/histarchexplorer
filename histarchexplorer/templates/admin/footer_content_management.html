@@ -13,7 +13,6 @@
           {% endif %}
         {% endfor %}
       </div>
-      <button type="submit" class="btn btn-primary mt-3">{{ _('Save Footer Order') }}</button>
     </div>
   </div>
 
@@ -59,11 +58,50 @@ document.addEventListener('DOMContentLoaded', function () {
   const orderInput = document.getElementById('footer-logo-order-input');
   const form = document.getElementById('footer-logos-form');
   const checkboxes = document.querySelectorAll('.logo-checkbox');
+  let isSavingOrder = false;
+
+  function getSelectedLogoIds() {
+    const checkedCheckboxes = document.querySelectorAll('.logo-checkbox:checked');
+    return Array.from(checkedCheckboxes).map(cb => cb.value);
+  }
 
   function updateOrderInput() {
     const logoElements = sortableLogosContainer.querySelectorAll('.card');
     const logoIds = Array.from(logoElements).map(el => el.getAttribute('data-id'));
     orderInput.value = JSON.stringify(logoIds);
+  }
+
+  async function saveOrderOnTheFly() {
+    if (!form || isSavingOrder) return;
+
+    const currentOrder = Array.from(
+      sortableLogosContainer.querySelectorAll('.card')).map(
+      el => el.getAttribute('data-id'));
+    if (!currentOrder.length) return;
+
+    isSavingOrder = true;
+    const formData = new FormData();
+    formData.append('active_sidebar', 'sidebar-footer-content');
+    formData.append('footer_logo_order', JSON.stringify(currentOrder));
+    getSelectedLogoIds().forEach(logoId => {
+      formData.append('footer_logos', logoId);
+    });
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+      });
+
+      if (!response.ok) {
+        console.error('Unable to save footer order.');
+      }
+    } catch (error) {
+      console.error('Unable to save footer order.', error);
+    } finally {
+      isSavingOrder = false;
+    }
   }
 
   function updateSortableList() {
@@ -110,9 +148,10 @@ document.addEventListener('DOMContentLoaded', function () {
     new Sortable(sortableLogosContainer, {
       animation: 150,
       ghostClass: 'blue-background-class',
-      onEnd: function () {
+      onEnd: async function () {
         updatePositions();
         updateOrderInput();
+        await saveOrderOnTheFly();
       }
     });
   }

@@ -167,7 +167,7 @@
 </form>
 
 <script>
-  const iconUrls = {
+  const externalIdentifierIconUrls = {
     {% for icon in admin_instance.icons %}
       "{{ icon.filename }}": "{{ get_icon_url(icon.filename) }}",
     {% endfor %}
@@ -226,8 +226,8 @@
     } else if (typeSelect.value === 'img') {
       const imgSelect = document.getElementById(`img_select_${sysId}`);
       const selectedIcon = imgSelect ? imgSelect.value : '';
-      if (selectedIcon && iconUrls[selectedIcon]) {
-        previewContainer.innerHTML = `<img src="${iconUrls[selectedIcon]}" ` +
+      if (selectedIcon && externalIdentifierIconUrls[selectedIcon]) {
+        previewContainer.innerHTML = `<img src="${externalIdentifierIconUrls[selectedIcon]}" ` +
           `style="max-height: 32px; max-width: 32px; object-fit: contain;" alt="preview">`;
       } else {
         previewContainer.innerHTML = '';
