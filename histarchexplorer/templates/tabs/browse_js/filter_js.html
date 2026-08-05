@@ -898,10 +898,6 @@ for (const tree of {{ tab_name }}TreesToBuild) {
                                 id="reset-type-btn-{{ tab_name }}-${tree}">
                             Reset
                         </button>
-                        <button type="button" class="btn btn-primary btn-sm filter-btn"
-                                id="apply-type-btn-{{ tab_name }}-${tree}">
-                            Apply
-                        </button>
                     </span>
                 </div>
             </div>
@@ -912,8 +908,6 @@ for (const tree of {{ tab_name }}TreesToBuild) {
 
     accordionItem.querySelector(`#reset-type-btn-{{ tab_name }}-${tree}`)
         ?.addEventListener('click', () => deselectTree{{ tab_name }}(tree));
-    accordionItem.querySelector(`#apply-type-btn-{{ tab_name }}-${tree}`)
-        ?.addEventListener('click', () => filterTypes{{ tab_name }}());
 
     document.getElementById(`typesCollapse{{ tab_name }}${tree}`)
         ?.addEventListener('shown.bs.collapse', () => {
@@ -938,6 +932,7 @@ for (const tree of {{ tab_name }}TreesToBuild) {
         onSelectionChange: (selectedNodesData) => {
             window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = selectedNodesData.map(node => node.id);
             window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = treeview.getSelectedNodesAndChildrenValues('id');
+            filterTypes{{ tab_name }}();
         }
     });
 
