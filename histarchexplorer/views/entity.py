@@ -7,9 +7,11 @@ from typing import Any, Optional
 
 from flask import abort, g, render_template, request
 
-from histarchexplorer import app, cache
+from histarchexplorer import app
+from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.presentation_view import (
     EntityTypeModel, File, PresentationView, Relation)
+from histarchexplorer.api.util import get_description_translated
 from histarchexplorer.utils.view_util import (
     get_cite_button, get_refresh_button)
 from histarchexplorer.views.entities import get_browse_list_entities
@@ -65,7 +67,8 @@ def get_entity_images(
     if not main_image and images:
         main_image = images.pop(0)
     initial_images = images[:g.additional_files_for_overview]
-    images.append(main_image)
+    if main_image:
+        images.append(main_image)
     return main_image, initial_images, images
 
 
@@ -161,121 +164,263 @@ def build_sidebar_block(view: PresentationView) -> dict[str, Any]:
         'images': get_valid_images(view)}
 
 
+def _subunit_items(entity: dict[str, Any], keys: tuple[str, ...]) \
+        -> list[dict[str, Any]]:
+    """Return the first valid ordered child collection from an entity."""
+    for key in keys:
+        items = entity.get(key)
+        if isinstance(items, list):
+            return [item for item in items if isinstance(item, dict)]
+    return []
+
+
+def _subunit_description(value: Any) -> dict[str, str] | None:
+    if isinstance(value, dict):
+        return value
+    if isinstance(value, str):
+        return get_description_translated(value)
+    return None
+
+
+def _subunit_types(data: Any) -> list[EntityTypeModel]:
+    """Parse type cards while discarding malformed upstream entries."""
+    if not isinstance(data, list):
+        return []
+    types = []
+    for raw_type in data:
+        if not isinstance(raw_type, dict) or 'id' not in raw_type:
+            continue
+        type_data = raw_type.copy()
+        if not isinstance(type_data.get('typeHierarchy'), list):
+            type_data['typeHierarchy'] = []
+        try:
+            types.extend(PresentationView.parse_types([type_data]))
+        except (TypeError, ValueError, KeyError) as error:
+            app.logger.warning('Ignoring malformed subunits type: %s', error)
+    return types
+
+
+def _subunit_block(entity: dict[str, Any]) -> dict[str, Any] | None:
+    """Convert one subunits entity card to the existing template contract."""
+    id_ = entity.get('id')
+    title = entity.get('title')
+    system_class = entity.get('systemClass')
+    if not isinstance(id_, int) or not isinstance(title, str):
+        app.logger.warning('Ignoring malformed subunits entity card')
+        return None
+    if system_class not in {
+            'feature', 'stratigraphic_unit', 'artifact', 'human_remains'}:
+        app.logger.warning('Ignoring unsupported subunits class: %s',
+                           system_class)
+        return None
+    when = PresentationView.parse_time_range(entity.get('when'))
+    files = PresentationView.parse_file(entity.get('files', []))
+    types = _subunit_types(entity.get('types'))
+    return {
+        'id': id_,
+        'title': title,
+        'system_class': system_class,
+        'year_span': compact_year_span(
+            PresentationView(
+                id=id_, system_class=system_class, view_class='', title=title,
+                description=None, aliases=None, start=None, end=None,
+                when=when)),
+        'main_types': [type_ for type_ in types if type_.is_standard],
+        'categorized_types': get_categorized_types(types),
+        'description': _subunit_description(entity.get('description')),
+        'images': get_valid_images(
+            PresentationView(
+                id=id_, system_class=system_class, view_class='', title=title,
+                description=None, aliases=None, start=None, end=None,
+                files=files))}
+
+
+def _subunits_graph_nodes(data: dict[str, Any]) -> dict[int, dict[str, Any]]:
+    """Index the flat node graph returned by the subunits endpoint."""
+    nodes = {}
+    for items in data.values():
+        if not isinstance(items, list):
+            continue
+        for item in items:
+            if isinstance(item, dict) and isinstance(item.get('id'), int):
+                nodes[item['id']] = item
+    return nodes
+
+
+def _subunits_graph_files(data: Any) -> list[dict[str, Any]]:
+    """Adapt public subunits media records to presentation-view files."""
+    if not isinstance(data, list):
+        return []
+    files = []
+    for file_ in data:
+        if not isinstance(file_, dict):
+            continue
+        file_data = file_.copy()
+        if not isinstance(file_data.get('url'), str) and not isinstance(
+                file_data.get('IIIFBasePath'), str):
+            continue
+        file_data['title'] = file_data.get('title') or file_data.get('name')
+        file_data['publicShareable'] = True
+        file_data['license'] = file_data.get('license') or 'public'
+        file_data['fromSuperEntity'] = False
+        files.append(file_data)
+    return files
+
+
+def _subunits_graph_card(node: dict[str, Any]) -> dict[str, Any] | None:
+    """Adapt a flat graph node to the existing subunits card input."""
+    properties = node.get('properties')
+    if not isinstance(properties, dict):
+        properties = {}
+    types = []
+    standard_type = properties.get('standardType')
+    if isinstance(standard_type, dict):
+        types.append({
+            'id': standard_type.get('id'),
+            'title': standard_type.get('name'),
+            'descriptions': standard_type.get('description'),
+            'isStandard': True,
+            'typeHierarchy': standard_type.get('typeHierarchy', [])})
+    raw_types = properties.get('types')
+    if not isinstance(raw_types, list):
+        raw_types = []
+    for type_ in raw_types:
+        if not isinstance(type_, dict):
+            continue
+        types.append({
+            'id': type_.get('id'),
+            'title': type_.get('name'),
+            'descriptions': type_.get('description'),
+            'isStandard': False,
+            'typeHierarchy': type_.get('typeHierarchy', []),
+            'value': type_.get('value'),
+            'unit': type_.get('unit')})
+    timespan = properties.get('timespan')
+    when = {}
+    if isinstance(timespan, dict):
+        when = {
+            'start': {
+                'earliest': timespan.get('earliestBegin'),
+                'latest': timespan.get('latestBegin')},
+            'end': {
+                'earliest': timespan.get('earliestEnd'),
+                'latest': timespan.get('latestEnd')}}
+    return _subunit_block({
+        'id': node.get('id'),
+        'title': properties.get('name'),
+        'systemClass': node.get('openatlasClassName'),
+        'description': properties.get('description'),
+        'when': when,
+        'types': types,
+        'files': _subunits_graph_files(properties.get('files'))})
+
+
+def _graph_children(
+        node: dict[str, Any],
+        nodes: dict[int, dict[str, Any]],
+        system_class: str) -> list[dict[str, Any]]:
+    """Return ordered children of one class from a flat subunits graph."""
+    children = []
+    child_ids = node.get('children')
+    if not isinstance(child_ids, list):
+        return children
+    for child_id in child_ids:
+        child = nodes.get(child_id)
+        if child and child.get('openatlasClassName') == system_class:
+            children.append(child)
+    return children
+
+
+def _normalize_subunits_graph(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Build the template hierarchy from the endpoint's flat node graph."""
+    nodes = _subunits_graph_nodes(data)
+    hierarchy = []
+    for root in nodes.values():
+        for feature_data in _graph_children(root, nodes, 'feature'):
+            feature = _subunits_graph_card(feature_data)
+            if not feature:
+                continue
+            groups = []
+            for su_data in _graph_children(
+                    feature_data, nodes, 'stratigraphic_unit'):
+                su = _subunits_graph_card(su_data)
+                if not su:
+                    continue
+                children = []
+                for system_class in ('artifact', 'human_remains'):
+                    for child_data in _graph_children(
+                            su_data, nodes, system_class):
+                        child = _subunits_graph_card(child_data)
+                        if child:
+                            children.append(child)
+                groups.append({'su': su, 'children': children})
+            hierarchy.append({'feature': feature, 'groups': groups})
+    return hierarchy
+
+
+def normalize_subunits_data(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Normalize an ordered `features → subunits → children` response."""
+    if not isinstance(data, dict):
+        return []
+    if not isinstance(data.get('features'), list):
+        return _normalize_subunits_graph(data)
+    features = _subunit_items(data, ('features',))
+    if data.get('systemClass') == 'feature':
+        features = [data]
+    hierarchy = []
+    for feature_data in features:
+        feature = _subunit_block(feature_data)
+        if not feature or feature['system_class'] != 'feature':
+            continue
+        groups = []
+        for su_data in _subunit_items(
+                feature_data,
+                ('subunits', 'stratigraphicUnits', 'stratigraphic_units')):
+            su = _subunit_block(su_data)
+            if not su or su['system_class'] != 'stratigraphic_unit':
+                continue
+            children = []
+            for child_data in _subunit_items(
+                    su_data,
+                    ('children', 'artifacts', 'humanRemains', 'human_remains')):
+                child = _subunit_block(child_data)
+                if child and child['system_class'] in {
+                        'artifact', 'human_remains'}:
+                    children.append(child)
+            groups.append({'su': su, 'children': children})
+        hierarchy.append({'feature': feature, 'groups': groups})
+    return hierarchy
+
+
+def get_subunits_root_id(id_: int) -> int:
+    """Return the place ID required by the subunits endpoint."""
+    hierarchy = get_hierarchy(PresentationView.from_api(id_))
+    if hierarchy:
+        return hierarchy[-1].id
+    return id_
+
+
 def get_map_sidebar_data(id_: int) -> dict[str, Any]:
     """Assemble the hierarchical view-model for the map sidebar.
 
-    Returns the clicked feature followed by each linked stratigraphic
-    unit, with that unit's artifacts and human remains grouped directly
-    beneath it (sequential per stratigraphic unit).
+    Selects the clicked feature from the shared hierarchy response.
     """
-    feature = PresentationView.from_api(id_)
-    groups = []
-    for su_rel in feature.relations.get('stratigraphic_unit', []):
-        if not is_part_of(su_rel, feature.id):
-            continue
-        su_view = PresentationView.from_api(su_rel.id)
-        children = []
-        for system_class in ('artifact', 'human_remains'):
-            for child_rel in feature.relations.get(system_class, []):
-                if is_part_of(child_rel, su_rel.id):
-                    children.append(build_sidebar_block(
-                        PresentationView.from_api(child_rel.id)))
-        groups.append({
-            'su': build_sidebar_block(su_view),
-            'children': children})
-    return {
-        'feature': build_sidebar_block(feature),
-        'groups': groups}
+    root_id = get_subunits_root_id(id_)
+    hierarchy = normalize_subunits_data(ApiAccess.get_subunits(root_id))
+    for item in hierarchy:
+        if item['feature']['id'] == id_:
+            return item
+    return {}
 
 
-@cache.memoize()
 def get_catalogue_data(id_: int) -> list[dict[str, Any]]:
     """Assemble the hierarchical view-model for the catalogue.
 
-    Returns a list of all features, each containing its stratigraphic units,
-    artifacts, and human remains.
+    Returns the cached hierarchy's features, stratigraphic units, artifacts,
+    and human remains.
     """
-    # TODO: Replace this implementation with a new API endpoint specifically
-    # designed to fetch the complete hierarchical catalogue data in a single
-    # request to avoid N+1 queries.
-    entity = PresentationView.from_api(id_)
-    if entity.system_class == 'feature':
-        features = [entity]
-        sus = entity.relations.get('stratigraphic_unit', [])
-        artifacts = entity.relations.get('artifact', [])
-        remains = entity.relations.get('human_remains', [])
-    else:
-        features = sorted(
-            entity.relations.get('feature', []),
-            key=lambda f: f.name)
-        sus = entity.relations.get('stratigraphic_unit', [])
-        artifacts = entity.relations.get('artifact', [])
-        remains = entity.relations.get('human_remains', [])
-
-    su_parent_map = {}
-    for su in sus:
-        for rt in su.relation_types or []:
-            if rt.get('property') == 'crm:P46i_forms_part_of':
-                su_parent_map[su.id] = rt.get('relationTo')
-
-    child_parent_map = {}
-    for child in artifacts + remains:
-        for rt in child.relation_types or []:
-            if rt.get('property') == 'crm:P46i_forms_part_of':
-                child_parent_map[child.id] = rt.get('relationTo')
-
-    loaded_features = {}
-    for f in features:
-        if f.id == entity.id:
-            loaded_features[f.id] = entity
-        else:
-            try:
-                loaded_features[f.id] = PresentationView.from_api(f.id)
-            except Exception as e:
-                app.logger.error(f"Failed to load feature {f.id}: {e}")
-
-    loaded_sus = {}
-    for su in sus:
-        try:
-            loaded_sus[su.id] = PresentationView.from_api(su.id)
-        except Exception as e:
-            app.logger.error(f"Failed to load SU {su.id}: {e}")
-
-    loaded_children = {}
-    for child in artifacts + remains:
-        try:
-            loaded_children[child.id] = PresentationView.from_api(child.id)
-        except Exception as e:
-            app.logger.error(f"Failed to load child {child.id}: {e}")
-
-    catalogue_data = []
-    for f in features:
-        if f.id not in loaded_features:
-            continue
-        feature_view = loaded_features[f.id]
-
-        groups = []
-        for su in sus:
-            if (su_parent_map.get(su.id) != f.id
-                    or su.id not in loaded_sus):
-                continue
-            su_view = loaded_sus[su.id]
-
-            children = []
-            for child in artifacts + remains:
-                if (child_parent_map.get(child.id) == su.id
-                        and child.id in loaded_children):
-                    children.append(build_sidebar_block(
-                        loaded_children[child.id]))
-
-            groups.append({
-                'su': build_sidebar_block(su_view),
-                'children': children})
-
-        catalogue_data.append({
-            'feature': build_sidebar_block(feature_view),
-            'groups': groups})
-    return catalogue_data
+    root_id = get_subunits_root_id(id_)
+    return normalize_subunits_data(ApiAccess.get_subunits(root_id))
 
 
 @app.route('/get_entity/<int:id_>/<tab_name>')
@@ -302,9 +447,12 @@ def get_entity(id_: int, tab_name: str) -> str:
 
     match tab_name:
         case 'feature':
+            sidebar = get_map_sidebar_data(id_)
+            if not sidebar:
+                abort(404)
             return render_template(
                 'tabs/feature.html',
-                sidebar=get_map_sidebar_data(id_))
+                sidebar=sidebar)
         case 'catalogue':
             catalogue_data = get_catalogue_data(id_)
             if not catalogue_data:

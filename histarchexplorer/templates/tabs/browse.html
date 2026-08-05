@@ -91,6 +91,7 @@
 
 <script>
 (function () {
+    const predefinedFilters = {{ predefined_filters | tojson }};
     const menu = document.getElementById('{{ tab_name }}-presets-menu');
     if (!menu || !Array.isArray(predefinedFilters) || predefinedFilters.length === 0) return;
     document.getElementById('{{ tab_name }}-presets-dropdown').classList.remove('d-none');
@@ -147,9 +148,14 @@
         btn.type = 'button';
         btn.title = preset.description || '';
 
-        if (preset.icon) {
+        if (preset.icon && preset.icon.type === 'css') {
+            const icon = document.createElement('i');
+            icon.className = preset.icon.value.includes('bi ')
+                ? preset.icon.value : `bi ${preset.icon.value}`;
+            btn.appendChild(icon);
+        } else if (preset.icon && preset.icon.type === 'img') {
             const img = document.createElement('img');
-            img.src = preset.icon;
+            img.src = `/static/images/icons/${preset.icon.value}`;
             img.alt = '';
             img.classList.add('preset-icon');
             btn.appendChild(img);

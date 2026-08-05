@@ -687,4 +687,18 @@ GRANT SELECT,USAGE ON SEQUENCE tng.licenses_id_seq TO openatlas;
 -- PostgreSQL database dump complete
 --
 
+CREATE TABLE tng.predefined_filters (
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    sortorder integer NOT NULL UNIQUE,
+    label jsonb NOT NULL DEFAULT '{}',
+    description jsonb NOT NULL DEFAULT '{}',
+    icon jsonb,
+    tabs jsonb NOT NULL DEFAULT '[]',
+    filter_parameters jsonb NOT NULL DEFAULT '{}'
+);
+
+ALTER TABLE tng.predefined_filters OWNER TO openatlas;
+GRANT ALL ON TABLE tng.predefined_filters TO openatlas;
+GRANT USAGE, SELECT ON SEQUENCE tng.predefined_filters_id_seq TO openatlas;
+
 

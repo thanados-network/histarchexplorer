@@ -288,6 +288,65 @@ def update_sort_order(table: str, params: list[dict[str, int]]) -> None:
         params)
 
 
+def get_predefined_filters() -> list[dict[str, Any]]:
+    """Return predefined filters in their configured display order."""
+    g.cursor.execute('''
+        SELECT id, sortorder, label, description, icon, tabs,
+               filter_parameters
+        FROM tng.predefined_filters
+        ORDER BY sortorder, id''')
+    return g.cursor.fetchall()
+
+
+def add_predefined_filter(data: dict[str, Any]) -> None:
+    g.cursor.execute('''
+        INSERT INTO tng.predefined_filters
+            (sortorder, label, description, icon, tabs, filter_parameters)
+        VALUES (
+            (SELECT COALESCE(MAX(sortorder), 0) + 1
+             FROM tng.predefined_filters),
+            %(label)s::jsonb, %(description)s::jsonb, %(icon)s,
+            %(tabs)s::jsonb, %(filter_parameters)s::jsonb)''', data)
+
+
+def update_predefined_filter(filter_id: int, data: dict[str, Any]) -> None:
+    g.cursor.execute('''
+        UPDATE tng.predefined_filters
+        SET label = %(label)s::jsonb,
+            description = %(description)s::jsonb,
+            icon = %(icon)s,
+            tabs = %(tabs)s::jsonb,
+            filter_parameters = %(filter_parameters)s::jsonb
+        WHERE id = %(id)s''', {**data, 'id': filter_id})
+
+
+def delete_predefined_filter(filter_id: int) -> None:
+    g.cursor.execute(
+        'DELETE FROM tng.predefined_filters WHERE id = %s', (filter_id,))
+
+
+def update_predefined_filter_order(params: list[dict[str, int]]) -> None:
+    if not params:
+        return
+
+    g.cursor.execute(
+        'SELECT COALESCE(MAX(sortorder), 0) AS max_sortorder '
+        'FROM tng.predefined_filters')
+    max_sortorder = g.cursor.fetchone()['max_sortorder']
+    temp_offset = max_sortorder + len(params) + 1
+
+    temp_params = [
+        {'temp_order': row['order'] + temp_offset, 'id': row['id']}
+        for row in params]
+    g.cursor.executemany(
+        'UPDATE tng.predefined_filters SET sortorder = %(temp_order)s '
+        'WHERE id = %(id)s', temp_params)
+
+    g.cursor.executemany(
+        'UPDATE tng.predefined_filters SET sortorder = %(order)s '
+        'WHERE id = %(id)s', params)
+
+
 def check_sortorder() -> int:
     g.cursor.execute(
         '''

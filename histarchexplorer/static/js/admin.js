@@ -777,9 +777,11 @@ sortableDivs.forEach((item) => {
 function makeSortables(containerDiv) {
   new Sortable(containerDiv, {
     animation: 150,
-    handle: '.d-flex',
+    handle: '.connected-link-drag-handle',
+    draggable: '.connected-link-item',
     onEnd: function (evt) {
-      const items = Array.from(containerDiv.getElementsByClassName('d-flex'));
+      const items = Array.from(
+        containerDiv.getElementsByClassName('connected-link-item'));
       items.forEach((item, index) => {
         item.setAttribute("data-order", index + 1);
       });
@@ -788,7 +790,9 @@ function makeSortables(containerDiv) {
         order: item.getAttribute("data-order"),
         id: item.getAttribute("data-id")
       }));
-      saveSortOrder(sortedItems, 'links');
+      if (sortedItems.length) {
+        saveSortOrder(sortedItems, 'links');
+      }
     }
   });
 }

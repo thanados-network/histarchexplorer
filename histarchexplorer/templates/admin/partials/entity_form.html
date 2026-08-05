@@ -168,13 +168,17 @@
     <i class="bi bi-link-45deg me-2"></i>{{ _('CONNECTED ENTITIES') }}
   </h6>
   
-  <div id="{{ tab_item.target }}-links" class="link-divs mb-4">
+  <div id="{{ tab_item.target }}-links-{{ entity.id }}" class="link-divs mb-4">
     {% for link in processed_links_by_entity.get(entity.id, []) %}
-      <div class="card mb-2 border shadow-sm bg-light bg-opacity-50">
+      <div class="card mb-2 border shadow-sm bg-light bg-opacity-50 connected-link-item"
+           data-id="{{ link.link_id }}">
         <div class="card-body py-2 px-3">
           <div class="row align-items-center g-2">
             <div class="col-auto">
-              <i title="moveUpDown" class="bi bi-arrow-down-up text-muted cursor-move"></i>
+              <i title="moveUpDown"
+                 class="bi bi-arrow-down-up text-muted cursor-move connected-link-drag-handle"
+                 role="button"
+                 aria-label="{{ _('Drag to reorder') }}"></i>
             </div>
             <div class="col">
               <span class="badge bg-white text-dark border me-2">{{ link.config_property_display_label }}</span>

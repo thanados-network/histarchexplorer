@@ -23,7 +23,8 @@
     "sortablejs": "^1.15.2",
     "svg-pan-zoom": "^3.6.2",
     "tabulator-tables": "^6.3.1",
-    "tinymce": "^8.2.2"
+    "tinymce": "^8.2.2",
+    "tom-select": "^2.6.2"
   },
   "repository": {
     "type": "git",
