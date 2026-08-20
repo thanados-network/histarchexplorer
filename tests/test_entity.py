@@ -1,7 +1,9 @@
-from flask.testing import FlaskClient
-from unittest.mock import patch, MagicMock
 from dataclasses import dataclass, field
 from typing import List, Optional
+from unittest.mock import patch
+
+from flask.testing import FlaskClient
+
 
 @dataclass
 class MockPresentationView:
@@ -13,6 +15,7 @@ class MockPresentationView:
     relations: dict = field(default_factory=dict)
     external_references: List = field(default_factory=list)
     geometries: List = field(default_factory=list)
+    references: List = field(default_factory=list)
     time_range: Optional[dict] = None
     system_class: str = "place"
     title: str = "Test Title"

@@ -102,7 +102,7 @@ class ApiAccess:
             f"{app.config['API_URL']}subunits/{id_}",
             headers=g.api_headers,
             proxies=PROXIES,
-            timeout=30)
+            timeout=60)
         response.raise_for_status()
         return response.json()
 

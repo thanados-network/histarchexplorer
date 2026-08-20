@@ -20,6 +20,10 @@
     font-weight: 600;
     background-color: var(--bs-light-bg-subtle);
   }
+  .catalogue-toc .nav-link.toc-place.active {
+    border-left-color: var(--entity-color-places, #9b59b6);
+    color: var(--entity-color-places, #9b59b6);
+  }
   .catalogue-toc .nav-link.toc-feature.active {
     border-left-color: var(--entity-color-feature, #2471a3);
     color: var(--entity-color-feature, #2471a3);
@@ -66,25 +70,32 @@
 
     <!-- Catalogue List -->
     <div class="col-md-10" id="catalogue-list">
-      {% for item in catalogue %}
-        <div id="entity-{{ item.feature.id }}" class="catalogue-feature-section mb-5">
-          {{ entity_card(item.feature, 'fs-2 fw-bold') }}
-
-          {% for group in item.groups %}
-            <div id="entity-{{ group.su.id }}" class=" ms-md-3 ps-md-3 mt-3">
-              {{ entity_card(group.su, 'fs-3 fw-semibold') }}
-              {% if group.children %}
-                <div class="ms-md-3 ps-md-3">
-                  {% for child in group.children %}
-                    <div id="entity-{{ child.id }}" class="mt-2">
-                      {{ entity_card(child, 'fs-4 fw-semibold') }}
-                    </div>
-                  {% endfor %}
-                </div>
-              {% endif %}
-            </div>
-          {% endfor %}
+      {% for place_item in catalogue %}
+        <div id="entity-{{ place_item.place.id }}" class="catalogue-place-section mb-5">
+          {{ entity_card(place_item.place, 'fs-1 fw-bold') }}
         </div>
+
+        {% for item in place_item.features %}
+          <div id="entity-{{ item.feature.id }}"
+               class="catalogue-feature-section mb-5 ms-md-3 ps-md-3">
+            {{ entity_card(item.feature, 'fs-2 fw-bold') }}
+
+            {% for group in item.groups %}
+              <div id="entity-{{ group.su.id }}" class="ms-md-3 ps-md-3 mt-3">
+                {{ entity_card(group.su, 'fs-3 fw-semibold') }}
+                {% if group.children %}
+                  <div class="ms-md-3 ps-md-3">
+                    {% for child in group.children %}
+                      <div id="entity-{{ child.id }}" class="mt-2">
+                        {{ entity_card(child, 'fs-4 fw-semibold') }}
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
       {% endfor %}
     </div>
 
@@ -93,18 +104,27 @@
       <div class="position-sticky" style="top: 1rem; max-height: calc(100vh - 8rem); overflow-y: auto;">
         <h5 class="mb-3">{{ _('Catalogue') }}</h5>
         <nav class="nav flex-column catalogue-toc">
-          {% for item in catalogue %}
-            <a class="nav-link fw-bold py-1 text-truncate toc-feature" href="#entity-{{ item.feature.id }}">
-              {{ item.feature.title }}
+          {% for place_item in catalogue %}
+            <a class="nav-link fw-bold py-1 text-truncate toc-place"
+               href="#entity-{{ place_item.place.id }}">
+              {{ place_item.place.title }}
             </a>
-            {% for group in item.groups %}
-              <a class="nav-link small ps-3 py-1 text-truncate toc-su" href="#entity-{{ group.su.id }}">
-                {{ group.su.title }}
+            {% for item in place_item.features %}
+              <a class="nav-link fw-bold py-1 text-truncate toc-feature ps-3"
+                 href="#entity-{{ item.feature.id }}">
+                {{ item.feature.title }}
               </a>
-              {% for child in group.children %}
-                <a class="nav-link extra-small ps-4 py-1 text-truncate toc-child" href="#entity-{{ child.id }}">
-                  {{ child.title }}
+              {% for group in item.groups %}
+                <a class="nav-link small py-1 text-truncate toc-su ps-4"
+                   href="#entity-{{ group.su.id }}">
+                  {{ group.su.title }}
                 </a>
+                {% for child in group.children %}
+                  <a class="nav-link extra-small py-1 text-truncate toc-child ps-5"
+                     href="#entity-{{ child.id }}">
+                    {{ child.title }}
+                  </a>
+                {% endfor %}
               {% endfor %}
             {% endfor %}
           {% endfor %}
