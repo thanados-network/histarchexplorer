@@ -59,23 +59,24 @@
   }
 </style>
 
+
 <div class="breadcrumbs m-1"></div>
 <div class="container-fluid py-3">
-
   <div class="row">
+
     <!-- Catalogue List -->
     <div class="col-md-10" id="catalogue-list">
       {% for item in catalogue %}
-        <div id="feature-{{ item.feature.id }}" class="catalogue-feature-section mb-5">
+        <div id="entity-{{ item.feature.id }}" class="catalogue-feature-section mb-5">
           {{ entity_card(item.feature, 'fs-2 fw-bold') }}
 
           {% for group in item.groups %}
-            <div id="su-{{ group.su.id }}" class=" ms-md-3 ps-md-3 mt-3">
+            <div id="entity-{{ group.su.id }}" class=" ms-md-3 ps-md-3 mt-3">
               {{ entity_card(group.su, 'fs-3 fw-semibold') }}
               {% if group.children %}
                 <div class="ms-md-3 ps-md-3">
                   {% for child in group.children %}
-                    <div id="child-{{ child.id }}" class="mt-2">
+                    <div id="entity-{{ child.id }}" class="mt-2">
                       {{ entity_card(child, 'fs-4 fw-semibold') }}
                     </div>
                   {% endfor %}
@@ -93,15 +94,15 @@
         <h5 class="mb-3">{{ _('Catalogue') }}</h5>
         <nav class="nav flex-column catalogue-toc">
           {% for item in catalogue %}
-            <a class="nav-link fw-bold py-1 text-truncate toc-feature" href="#feature-{{ item.feature.id }}">
+            <a class="nav-link fw-bold py-1 text-truncate toc-feature" href="#entity-{{ item.feature.id }}">
               {{ item.feature.title }}
             </a>
             {% for group in item.groups %}
-              <a class="nav-link small ps-3 py-1 text-truncate toc-su" href="#su-{{ group.su.id }}">
+              <a class="nav-link small ps-3 py-1 text-truncate toc-su" href="#entity-{{ group.su.id }}">
                 {{ group.su.title }}
               </a>
               {% for child in group.children %}
-                <a class="nav-link extra-small ps-4 py-1 text-truncate toc-child" href="#child-{{ child.id }}">
+                <a class="nav-link extra-small ps-4 py-1 text-truncate toc-child" href="#entity-{{ child.id }}">
                   {{ child.title }}
                 </a>
               {% endfor %}
@@ -147,9 +148,7 @@
     }, observerOptions);
 
     const targets = document.querySelectorAll(
-      '#catalogue-list [id^="feature-"], ' +
-      '#catalogue-list [id^="su-"], ' +
-      '#catalogue-list [id^="child-"]'
+      '#catalogue-list [id^="entity-"]'
     );
     targets.forEach(target => observer.observe(target));
 
