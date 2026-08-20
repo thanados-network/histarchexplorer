@@ -29,7 +29,7 @@ def test_get_subunits_fetches_and_caches_hierarchy():
         f"{app.config['API_URL']}subunits/50505",
         headers={'Authorization': 'Bearer test'},
         proxies=PROXIES,
-        timeout=30)
+        timeout=60)
     response.raise_for_status.assert_called_once_with()
 
 

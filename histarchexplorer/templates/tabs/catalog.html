@@ -71,15 +71,13 @@
     <!-- Catalogue List -->
     <div class="col-md-10" id="catalogue-list">
       {% for place_item in catalogue %}
-        {% if place_item.place %}
-          <div id="entity-{{ place_item.place.id }}" class="catalogue-place-section mb-5">
-            {{ entity_card(place_item.place, 'fs-1 fw-bold') }}
-          </div>
-        {% endif %}
+        <div id="entity-{{ place_item.place.id }}" class="catalogue-place-section mb-5">
+          {{ entity_card(place_item.place, 'fs-1 fw-bold') }}
+        </div>
 
         {% for item in place_item.features %}
           <div id="entity-{{ item.feature.id }}"
-               class="catalogue-feature-section mb-5{% if place_item.place %} ms-md-3 ps-md-3{% endif %}">
+               class="catalogue-feature-section mb-5 ms-md-3 ps-md-3">
             {{ entity_card(item.feature, 'fs-2 fw-bold') }}
 
             {% for group in item.groups %}
@@ -107,26 +105,22 @@
         <h5 class="mb-3">{{ _('Catalogue') }}</h5>
         <nav class="nav flex-column catalogue-toc">
           {% for place_item in catalogue %}
-            {% if place_item.place %}
-              <a class="nav-link fw-bold py-1 text-truncate toc-place"
-                 href="#entity-{{ place_item.place.id }}">
-                {{ place_item.place.title }}
-              </a>
-            {% endif %}
+            <a class="nav-link fw-bold py-1 text-truncate toc-place"
+               href="#entity-{{ place_item.place.id }}">
+              {{ place_item.place.title }}
+            </a>
             {% for item in place_item.features %}
-              <a class="nav-link fw-bold py-1 text-truncate toc-feature{% if place_item.place %} ps-3{% endif %}"
+              <a class="nav-link fw-bold py-1 text-truncate toc-feature ps-3"
                  href="#entity-{{ item.feature.id }}">
                 {{ item.feature.title }}
               </a>
               {% for group in item.groups %}
-                {% set su_ps = 'ps-4' if place_item.place else 'ps-3' %}
-                <a class="nav-link small py-1 text-truncate toc-su {{ su_ps }}"
+                <a class="nav-link small py-1 text-truncate toc-su ps-4"
                    href="#entity-{{ group.su.id }}">
                   {{ group.su.title }}
                 </a>
                 {% for child in group.children %}
-                  {% set child_ps = 'ps-5' if place_item.place else 'ps-4' %}
-                  <a class="nav-link extra-small py-1 text-truncate toc-child {{ child_ps }}"
+                  <a class="nav-link extra-small py-1 text-truncate toc-child ps-5"
                      href="#entity-{{ child.id }}">
                     {{ child.title }}
                   </a>

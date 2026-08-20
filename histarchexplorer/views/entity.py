@@ -346,54 +346,31 @@ def _normalize_subunits_graph(data: dict[str, Any]) -> list[dict[str, Any]]:
         node for node in nodes.values()
         if node.get('openatlasClassName') == 'place']
 
-    if place_nodes:
-        for place_data in place_nodes:
-            place = _subunits_graph_card(place_data)
-            features = []
-            for feature_data in _graph_children(place_data, nodes, 'feature'):
-                feature = _subunits_graph_card(feature_data)
-                if not feature:
-                    continue
-                groups = []
-                for su_data in _graph_children(
-                        feature_data, nodes, 'stratigraphic_unit'):
-                    su = _subunits_graph_card(su_data)
-                    if not su:
-                        continue
-                    children = []
-                    for system_class in ('artifact', 'human_remains'):
-                        for child_data in _graph_children(
-                                su_data, nodes, system_class):
-                            child = _subunits_graph_card(child_data)
-                            if child:
-                                children.append(child)
-                    groups.append({'su': su, 'children': children})
-                features.append({'feature': feature, 'groups': groups})
-            hierarchy.append({'place': place, 'features': features})
-    else:
+    for place_data in place_nodes:
+        place = _subunits_graph_card(place_data)
+        if not place:
+            continue
         features = []
-        for root in nodes.values():
-            for feature_data in _graph_children(root, nodes, 'feature'):
-                feature = _subunits_graph_card(feature_data)
-                if not feature:
+        for feature_data in _graph_children(place_data, nodes, 'feature'):
+            feature = _subunits_graph_card(feature_data)
+            if not feature:
+                continue
+            groups = []
+            for su_data in _graph_children(
+                    feature_data, nodes, 'stratigraphic_unit'):
+                su = _subunits_graph_card(su_data)
+                if not su:
                     continue
-                groups = []
-                for su_data in _graph_children(
-                        feature_data, nodes, 'stratigraphic_unit'):
-                    su = _subunits_graph_card(su_data)
-                    if not su:
-                        continue
-                    children = []
-                    for system_class in ('artifact', 'human_remains'):
-                        for child_data in _graph_children(
-                                su_data, nodes, system_class):
-                            child = _subunits_graph_card(child_data)
-                            if child:
-                                children.append(child)
-                    groups.append({'su': su, 'children': children})
-                features.append({'feature': feature, 'groups': groups})
-        if features:
-            hierarchy.append({'place': None, 'features': features})
+                children = []
+                for system_class in ('artifact', 'human_remains'):
+                    for child_data in _graph_children(
+                            su_data, nodes, system_class):
+                        child = _subunits_graph_card(child_data)
+                        if child:
+                            children.append(child)
+                groups.append({'su': su, 'children': children})
+            features.append({'feature': feature, 'groups': groups})
+        hierarchy.append({'place': place, 'features': features})
     return hierarchy
 
 
@@ -434,39 +411,27 @@ def normalize_subunits_data(data: dict[str, Any]) -> list[dict[str, Any]]:
         hierarchy = []
         for place_data in places:
             place = _subunit_block(place_data)
+            if not place:
+                continue
             features = []
             for feature_data in _subunit_items(place_data, ('features',)):
                 f_item = _normalize_feature(feature_data)
                 if f_item:
                     features.append(f_item)
-            if place or features:
-                hierarchy.append({'place': place, 'features': features})
+            hierarchy.append({'place': place, 'features': features})
         return hierarchy
 
     if data.get('systemClass') == 'place':
         place = _subunit_block(data)
+        if not place:
+            return []
         features = []
         for feature_data in _subunit_items(data, ('features',)):
             f_item = _normalize_feature(feature_data)
             if f_item:
                 features.append(f_item)
-        if place or features:
-            return [{'place': place, 'features': features}]
-        return []
+        return [{'place': place, 'features': features}]
 
-    if data.get('systemClass') == 'feature':
-        f_item = _normalize_feature(data)
-        if f_item:
-            return [{'place': None, 'features': [f_item]}]
-        return []
-
-    features = []
-    for feature_data in _subunit_items(data, ('features',)):
-        f_item = _normalize_feature(feature_data)
-        if f_item:
-            features.append(f_item)
-    if features:
-        return [{'place': None, 'features': features}]
     return []
 
 
@@ -489,8 +454,6 @@ def get_map_sidebar_data(id_: int) -> dict[str, Any]:
         for item in place_item.get('features', []):
             if item.get('feature', {}).get('id') == id_:
                 return item
-        if place_item.get('feature', {}).get('id') == id_:
-            return place_item
     return {}
 
 

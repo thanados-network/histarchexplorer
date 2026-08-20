@@ -173,15 +173,19 @@ def test_get_subunits_root_id_keeps_place_id():
 
 
 def test_hierarchy_data_uses_containing_place_subunits():
-    payload = {'features': [{
-        'id': 1,
-        'title': 'Feature',
-        'systemClass': 'feature',
-        'subunits': []}, {
-        'id': 2,
-        'title': 'Other feature',
-        'systemClass': 'feature',
-        'subunits': []}]}
+    payload = {
+        'id': 50505,
+        'title': 'Place',
+        'systemClass': 'place',
+        'features': [{
+            'id': 1,
+            'title': 'Feature',
+            'systemClass': 'feature',
+            'subunits': []}, {
+            'id': 2,
+            'title': 'Other feature',
+            'systemClass': 'feature',
+            'subunits': []}]}
     with app.test_request_context(), patch(
             'histarchexplorer.views.entity.ApiAccess.get_subunits',
             return_value=payload) as get_subunits, patch(
