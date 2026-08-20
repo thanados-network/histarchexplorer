@@ -116,6 +116,27 @@
 
 <script>
   (function() {
+    const currentId = {{ entity_id }};
+    const scrollToCurrent = () => {
+      const activeTarget = document.getElementById('entity-' + currentId);
+      if (activeTarget) {
+        activeTarget.scrollIntoView({ block: 'start' });
+      }
+    };
+
+    const catalogueTab = document.getElementById('tab-pane-catalogue');
+    if (catalogueTab && catalogueTab.classList.contains('active')) {
+      scrollToCurrent();
+    } else if (catalogueTab) {
+      const tabBtn = document.querySelector(
+        '[data-bs-target="#tab-pane-catalogue"]');
+      if (tabBtn) {
+        tabBtn.addEventListener('shown.bs.tab', scrollToCurrent, { once: true });
+      }
+    }
+  })();
+
+  (function() {
     const scrollContainer = document.querySelector('.entity-content');
     if (!scrollContainer) return;
 
@@ -141,7 +162,7 @@
           const activeLink = document.querySelector(`.catalogue-toc a[href="#${id}"]`);
           if (activeLink) {
             activeLink.classList.add('active');
-            activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            activeLink.scrollIntoView({ block: 'nearest'});
           }
         }
       });
@@ -167,10 +188,10 @@
             l.classList.remove('active');
           });
           link.classList.add('active');
-          link.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          link.scrollIntoView({ block: 'nearest'});
 
           // Scroll the content
-          targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          targetElement.scrollIntoView({block: 'start' });
 
           const resetFlag = () => {
             isClickScrolling = false;
