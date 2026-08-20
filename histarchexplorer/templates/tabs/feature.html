@@ -97,7 +97,7 @@
     {{ img.title }}
     {% set details %}
       {% if img.license %}
-        <div><strong>{{ _('License') }}:</strong> {{ img.license }}</div>
+        <div><strong>{{ _('License') }}:</strong> {{ img.license }} {{ img }}</div>
       {% endif %}
       {% if img.creator %}
         <div><strong>{{ _('Creator') }}:</strong> {{ img.creator }}</div>
@@ -138,8 +138,8 @@
   {% if block.images %}
     {% if block.images | length == 1 %}
       {% set img = block.images[0] %}
-      {{ image_item(img, 480, 320,
-                    'map-sidebar-single-image border rounded mt-2') }}
+      {{ image_item(
+      img, 480, 320, 'map-sidebar-single-image border rounded mt-2') }}
     {% else %}
       {% set carousel_id = 'carousel-' ~ block.system_class ~ '-' ~ block.id %}
       <div id="{{ carousel_id }}" class="carousel slide mt-2 border rounded">

@@ -120,10 +120,12 @@ function checkAndRemoveSpinner(totalTabs) {
             //console.log("Spinner removed.");
         });
 
-        if (typeof entityId !== 'undefined' && entityId > 0) {
-            console.log(`Triggering background cache for entity: ${entityId}`);
-            fetch(`/api/cache-related/${entityId}`);
-        }
+        // In production, background caching for related entities (children, super entities, relations)
+        // can be enabled here to pre-warm the cache after the entity view is loaded.
+        // if (typeof entityId !== 'undefined' && entityId > 0) {
+        //     console.log(`Triggering background cache for entity: ${entityId}`);
+        //     fetch(`/api/cache-related/${entityId}`);
+        // }
     }
 }
 
