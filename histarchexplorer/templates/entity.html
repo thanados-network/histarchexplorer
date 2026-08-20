@@ -71,6 +71,9 @@
                                     id="tab-{{ item.route }}" data-bs-toggle="tab"
                                     title="{{ item.label if item.label else item.route }}"
                                     data-bs-target="#tab-pane-{{ item.route }}" role="tab"
+                                    {% if item.route == "catalogue" %}
+                                    data-scroll-target="entity-{{ entity_id }}"
+                                    {% endif %}
                                     aria-controls="tab-pane-{{ item.route }}"
                                     aria-selected="{{ 'true' if loop.first else 'false' }}">
 
@@ -140,5 +143,22 @@
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/entity.js') }}"></script>
+    <script>
+        document.addEventListener('shown.bs.tab', function (event) {
+            console.log("Tab shown:", event.target.id);
+            const tab = event.target;
+
+            const scrollTarget = tab.getAttribute('data-scroll-target');
+            if (!scrollTarget) {
+                window.location.hash = '';
+                return;
+            }
+            const targetAnchor = '#' + scrollTarget;
+            window.location.hash = '#' + scrollTarget;
+            setTimeout(() => {window.location.href = targetAnchor;},500)
+
+
+        });
+    </script>
 {% endblock %}
 
