@@ -395,8 +395,8 @@ def normalize_subunits_data(data: dict[str, Any]) -> list[dict[str, Any]]:
 def get_subunits_root_id(id_: int) -> int:
     """Return the place ID required by the subunits endpoint."""
     hierarchy = get_hierarchy(PresentationView.from_api(id_))
-    if hierarchy:
-        return hierarchy[-1].id
+    if len(hierarchy) >= 1:
+        return hierarchy[0].id
     return id_
 
 
@@ -420,6 +420,7 @@ def get_catalogue_data(id_: int) -> list[dict[str, Any]]:
     and human remains.
     """
     root_id = get_subunits_root_id(id_)
+    print(root_id)
     return normalize_subunits_data(ApiAccess.get_subunits(root_id))
 
 
