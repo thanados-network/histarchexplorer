@@ -162,6 +162,11 @@ setTimeout(() => placesToggleView('map'), 500);
 {% if tab_name == "items" %}
 setTimeout(() => itemsToggleView('tile'), 500);
 {% endif %}
+
+{% if tab_name == "features" %}
+setTimeout(() => featuresToggleView('tile'), 500);
+{% endif %}
+
 document.getElementById('toggleSidebar').addEventListener('click', function () {
     adjustTableHeight{{tab_name}}();
     adjustTileHeight{{ tab_name }}()
