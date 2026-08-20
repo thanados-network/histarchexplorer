@@ -203,6 +203,7 @@
 
                     // Scroll the content
                     targetElement.scrollIntoView({block: 'start'});
+                    window.location.hash = '#' + targetId;
 
                     const resetFlag = () => {
                         isClickScrolling = false;
