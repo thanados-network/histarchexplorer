@@ -1,7 +1,10 @@
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import patch, MagicMock
 from flask.testing import FlaskClient
+
 from histarchexplorer.api.presentation_view import PresentationView
+
 
 @pytest.fixture
 def mock_entity():
@@ -55,7 +58,7 @@ def test_entities_view(authenticated_client: FlaskClient) -> None:
         assert rv.status_code == 200
         assert b'E1' in rv.data
 
-from histarchexplorer.api.presentation_view import File, Relation, EntityTypeModel
+from histarchexplorer.api.presentation_view import Relation, EntityTypeModel
 
 def test_entity_view_tabs(authenticated_client: FlaskClient) -> None:
     with patch('histarchexplorer.api.presentation_view.PresentationView.from_api') as mock_from_api, \
@@ -105,19 +108,87 @@ def _build_sub_view(id_, system_class, title, description, types=None,
 
 
 def test_get_entity_tabs(authenticated_client: FlaskClient) -> None:
-    from histarchexplorer.api.presentation_view import (
-        TimePointModel, TimeRangeModel)
-    with patch('histarchexplorer.api.presentation_view.PresentationView.from_api') as mock_from_api, \
-         patch('histarchexplorer.models.settings.Settings.load_from_db') as mock_settings, \
-         patch('histarchexplorer.views.entity.get_browse_list_entities') as mock_sub:
+    subunits_payload = {
+        'id': 100,
+        'title': 'Test Place',
+        'systemClass': 'place',
+        'features': [{
+            'id': 1,
+            'title': 'Test Feature',
+            'systemClass': 'feature',
+            'description': {'en': 'Feature description'},
+            'types': [{
+                'id': 200,
+                'title': 'Grave',
+                'isStandard': True,
+                'typeHierarchy': []}],
+            'subunits': [{
+                'id': 10,
+                'title': 'SU 10',
+                'systemClass': 'stratigraphic_unit',
+                'description': {'en': 'Primary burial cut'},
+                'when': {
+                    'start': {'earliest': '-0050-01-01'},
+                    'end': {'latest': '0120-12-31'}},
+                'types': [{
+                    'id': 101,
+                    'title': 'Grave fill',
+                    'isStandard': False,
+                    'typeHierarchy': []}],
+                'children': [{
+                    'id': 20,
+                    'title': 'Artifact A',
+                    'systemClass': 'artifact',
+                    'description': {
+                        'en': 'Bronze brooch with spiral motif'},
+                    'files': [{
+                        'id': 901,
+                        'title': 'img',
+                        'mimetype': 'image/jpeg',
+                        'license': 'CC',
+                        'publicShareable': True,
+                        'url': 'https://example.org/valid.jpg',
+                        'IIIFBasePath': 'https://iiif.example.org/901',
+                        'fromSuperEntity': False}, {
+                        'id': 902,
+                        'title': 'inherited',
+                        'mimetype': 'image/jpeg',
+                        'license': 'CC',
+                        'publicShareable': True,
+                        'url': 'https://example.org/inherited.jpg',
+                        'IIIFBasePath': 'https://iiif.example.org/902',
+                        'fromSuperEntity': True}]}, {
+                    'id': 30,
+                    'title': 'Remains R',
+                    'systemClass': 'human_remains',
+                    'description': {
+                        'en': 'Adult individual, supine position'}}]}, {
+                'id': 11,
+                'title': 'SU 11',
+                'systemClass': 'stratigraphic_unit',
+                'description': {'en': 'Secondary deposit'},
+                'children': [{
+                    'id': 21,
+                    'title': 'Artifact B',
+                    'systemClass': 'artifact',
+                    'description': {'en': 'Iron nail fragment'}}]}]}]}
+
+    with patch(
+        'histarchexplorer.api.presentation_view.PresentationView.from_api'
+    ) as mock_from_api, patch(
+        'histarchexplorer.models.settings.Settings.load_from_db'
+    ) as mock_settings, patch(
+        'histarchexplorer.views.entity.get_browse_list_entities'
+    ) as mock_sub, patch(
+        'histarchexplorer.views.entity.ApiAccess.get_subunits',
+        return_value=subunits_payload
+    ):
 
         settings = Settings()
         settings.access_restriction = False
         mock_settings.return_value = settings
         mock_sub.return_value = {'counts': {}}
 
-        # Clicked feature with two stratigraphic units and finds linked
-        # to each unit.
         feature = PresentationView(
             id=1, system_class="feature", view_class="feature",
             title="Test Feature", description={"en": "Feature description"},
@@ -131,61 +202,9 @@ def test_get_entity_tabs(authenticated_client: FlaskClient) -> None:
         feature.types = [feature_main_type]
         feature.files = []
         feature.references = []
-        feature.relations = {
-            'stratigraphic_unit': [
-                Relation(
-                    id=10, name='SU 10', system_class='stratigraphic_unit',
-                    relation_types=_part_of(1)),
-                Relation(
-                    id=11, name='SU 11', system_class='stratigraphic_unit',
-                    relation_types=_part_of(1))],
-            'artifact': [
-                Relation(
-                    id=20, name='Artifact A', system_class='artifact',
-                    relation_types=_part_of(10)),
-                Relation(
-                    id=21, name='Artifact B', system_class='artifact',
-                    relation_types=_part_of(11))],
-            'human_remains': [
-                Relation(
-                    id=30, name='Remains R', system_class='human_remains',
-                    relation_types=_part_of(10))]}
+        feature.relations = {}
 
-        su10_type = EntityTypeModel(
-            id=101, title='Grave fill', descriptions={'en': 'Fill type'},
-            is_standard=False, type_hierarchy=[], value=None, unit=None,
-            division={'label': 'case study'})
-        su10 = _build_sub_view(
-            10, 'stratigraphic_unit', 'SU 10', 'Primary burial cut',
-            types=[su10_type])
-        su10.when = TimeRangeModel(
-            start=TimePointModel(earliest='-0050-01-01T00:00:00'),
-            end=TimePointModel(latest='0120-12-31T00:00:00'))
-        su11 = _build_sub_view(
-            11, 'stratigraphic_unit', 'SU 11', 'Secondary deposit')
-
-        valid_image = File(
-            id=901, title='img', license='CC', public=True,
-            url='https://example.org/valid.jpg', mime_type='image/jpeg',
-            iiif_base_path='https://iiif.example.org/901',
-            from_super_entity=False, render_type='image')
-        super_image = File(
-            id=902, title='inherited', license='CC', public=True,
-            url='https://example.org/inherited.jpg', mime_type='image/jpeg',
-            iiif_base_path='https://iiif.example.org/902',
-            from_super_entity=True, render_type='image')
-        artifact_a = _build_sub_view(
-            20, 'artifact', 'Artifact A', 'Bronze brooch with spiral motif',
-            files=[valid_image, super_image])
-        artifact_b = _build_sub_view(
-            21, 'artifact', 'Artifact B', 'Iron nail fragment')
-        remains_r = _build_sub_view(
-            30, 'human_remains', 'Remains R',
-            'Adult individual, supine position')
-
-        views = {
-            1: feature, 10: su10, 11: su11,
-            20: artifact_a, 21: artifact_b, 30: remains_r}
+        views = {1: feature}
         mock_from_api.side_effect = lambda id_: views[id_]
 
         tabs = ['overview', 'map', 'media', 'subunits', 'feature']
@@ -228,14 +247,31 @@ def test_get_rastermaps(authenticated_client: FlaskClient) -> None:
 
 
 def test_catalogue_tab(authenticated_client: FlaskClient) -> None:
-    from histarchexplorer.api.presentation_view import (
-        TimePointModel, TimeRangeModel)
+    subunits_payload = {
+        'id': 1,
+        'title': 'Test Place',
+        'systemClass': 'place',
+        'features': [{
+            'id': 2,
+            'title': 'Test Feature',
+            'systemClass': 'feature',
+            'description': {'en': 'Feature description'},
+            'subunits': [{
+                'id': 10,
+                'title': 'SU 10',
+                'systemClass': 'stratigraphic_unit',
+                'description': {'en': 'Burial cut'},
+                'children': []}]}]}
+
     with patch(
         'histarchexplorer.api.presentation_view.'
         'PresentationView.from_api'
     ) as mock_from_api, patch(
         'histarchexplorer.models.settings.Settings.load_from_db'
-    ) as mock_settings:
+    ) as mock_settings, patch(
+        'histarchexplorer.views.entity.ApiAccess.get_subunits',
+        return_value=subunits_payload
+    ):
 
         settings = Settings()
         settings.access_restriction = False

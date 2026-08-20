@@ -11,6 +11,9 @@ from histarchexplorer.views.entity import (
 
 def test_normalize_subunits_data_preserves_card_hierarchy():
     payload = {
+        'id': 100,
+        'title': 'Excavation Site',
+        'systemClass': 'place',
         'features': [{
             'id': 1,
             'title': 'Feature',
@@ -64,27 +67,52 @@ def test_normalize_subunits_data_preserves_card_hierarchy():
         g.type_divisions = {}
         hierarchy = normalize_subunits_data(payload)
 
-    assert [group['su']['id'] for group in hierarchy[0]['groups']] == [2, 6]
-    feature = hierarchy[0]['feature']
+    assert hierarchy[0]['place']['id'] == 100
+    assert hierarchy[0]['place']['title'] == 'Excavation Site'
+    features = hierarchy[0]['features']
+    assert [group['su']['id'] for group in features[0]['groups']] == [2, 6]
+    feature = features[0]['feature']
     assert feature['year_span'] == '500 BC – 100 AD'
     assert feature['description'] == {'en': 'Feature description'}
     assert feature['main_types'][0].title == 'Standard'
-    artifact = hierarchy[0]['groups'][0]['children'][0]
+    artifact = features[0]['groups'][0]['children'][0]
     assert artifact['images'][0].id == 4
-    assert hierarchy[0]['groups'][1]['children'][0]['id'] == 7
+    assert features[0]['groups'][1]['children'][0]['id'] == 7
+
+
+def test_normalize_subunits_data_with_places_list():
+    payload = {
+        'places': [{
+            'id': 100,
+            'title': 'Site A',
+            'systemClass': 'place',
+            'features': [{
+                'id': 1,
+                'title': 'Feature 1',
+                'systemClass': 'feature',
+                'subunits': []}]}]}
+    with app.test_request_context():
+        g.type_divisions = {}
+        hierarchy = normalize_subunits_data(payload)
+
+    assert len(hierarchy) == 1
+    assert hierarchy[0]['place']['id'] == 100
+    assert hierarchy[0]['features'][0]['feature']['id'] == 1
 
 
 def test_normalize_subunits_data_skips_malformed_entries():
     with app.test_request_context():
         g.type_divisions = {}
         assert normalize_subunits_data({
-            'features': [{'id': 'not-an-int', 'systemClass': 'feature'}]}) == []
+            'features': [{'id': 'not-an-int',
+                          'systemClass': 'feature'}]}) == []
 
 
 def test_normalize_subunits_data_adapts_flat_graph_response():
     payload = {'50505': [{
         'id': 50505,
         'openatlasClassName': 'place',
+        'properties': {'name': 'Place title'},
         'children': [56623]}, {
         'id': 56623,
         'openatlasClassName': 'feature',
@@ -116,14 +144,17 @@ def test_normalize_subunits_data_adapts_flat_graph_response():
         g.type_divisions = {}
         hierarchy = normalize_subunits_data(payload)
 
-    assert hierarchy[0]['feature']['id'] == 56623
-    assert hierarchy[0]['feature']['year_span'] == '500 BC – 100 AD'
-    assert hierarchy[0]['feature']['main_types'][0].title == 'Grave'
-    assert hierarchy[0]['feature']['images'][0].title == 'Feature image'
-    assert hierarchy[0]['feature']['images'][0].iiif_base_path == (
+    assert hierarchy[0]['place']['id'] == 50505
+    assert hierarchy[0]['place']['title'] == 'Place title'
+    features = hierarchy[0]['features']
+    assert features[0]['feature']['id'] == 56623
+    assert features[0]['feature']['year_span'] == '500 BC – 100 AD'
+    assert features[0]['feature']['main_types'][0].title == 'Grave'
+    assert features[0]['feature']['images'][0].title == 'Feature image'
+    assert features[0]['feature']['images'][0].iiif_base_path == (
         'https://images.example.org/11.bmp')
-    assert hierarchy[0]['groups'][0]['su']['id'] == 56624
-    assert hierarchy[0]['groups'][0]['children'][0]['id'] == 56625
+    assert features[0]['groups'][0]['su']['id'] == 56624
+    assert features[0]['groups'][0]['children'][0]['id'] == 56625
 
 
 def test_get_subunits_root_id_uses_containing_place():
@@ -158,7 +189,7 @@ def test_hierarchy_data_uses_containing_place_subunits():
             return_value=50505) as get_root_id:
         g.type_divisions = {}
         assert get_map_sidebar_data(2)['feature']['title'] == 'Other feature'
-        assert len(get_catalogue_data(1)) == 2
+        assert len(get_catalogue_data(1)[0]['features']) == 2
 
     assert get_root_id.call_args_list[0].args == (2,)
     assert get_root_id.call_args_list[1].args == (1,)
@@ -168,19 +199,23 @@ def test_hierarchy_data_uses_containing_place_subunits():
 
 def test_hierarchy_routes_render_from_subunits(
         authenticated_client: FlaskClient):
-    payload = {'features': [{
-        'id': 1,
-        'title': 'Feature title',
-        'systemClass': 'feature',
-        'files': [{
-            'id': 11,
-            'title': 'Feature image',
-            'mimetype': 'image/jpeg',
-            'license': 'CC-BY',
-            'publicShareable': True,
-            'url': 'https://example.org/image.jpg',
-            'fromSuperEntity': False}],
-        'subunits': []}]}
+    payload = {
+        'id': 50505,
+        'title': 'Place Title',
+        'systemClass': 'place',
+        'features': [{
+            'id': 1,
+            'title': 'Feature title',
+            'systemClass': 'feature',
+            'files': [{
+                'id': 11,
+                'title': 'Feature image',
+                'mimetype': 'image/jpeg',
+                'license': 'CC-BY',
+                'publicShareable': True,
+                'url': 'https://example.org/image.jpg',
+                'fromSuperEntity': False}],
+            'subunits': []}]}
     with patch('histarchexplorer.views.entity.ApiAccess.get_subunits',
                return_value=payload), patch(
             'histarchexplorer.views.entity.get_subunits_root_id',
@@ -191,7 +226,10 @@ def test_hierarchy_routes_render_from_subunits(
     assert feature.status_code == 200
     assert catalogue.status_code == 200
     assert b'Feature title' in feature.data
-    assert b'feature-1' in catalogue.data
+    assert b'Place Title' in catalogue.data
+    assert b'toc-place' in catalogue.data
+    assert b'Feature title' in catalogue.data
+    assert b'entity-1' in catalogue.data
     for response in (feature, catalogue):
         assert b'Feature image' in response.data
         assert b'/view/image/11' in response.data
