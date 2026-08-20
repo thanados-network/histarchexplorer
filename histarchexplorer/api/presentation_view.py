@@ -450,7 +450,7 @@ class PresentationView:
                 'map_overlay': 'true'},
             headers=g.api_headers,
             proxies=PROXIES,
-            timeout=30)
+            timeout=60)
         response.raise_for_status()
         data = response.json()
 
