@@ -147,81 +147,10 @@
 </div>
 
 <script>
-    (function () {
-        const scrollContainer = document.querySelector('.entity-content');
-        if (!scrollContainer) return;
-
-        let isClickScrolling = false;
-        let clickScrollTimeout = null;
-
-        // Highlight active TOC item on scroll
-        const observerOptions = {
-            root: scrollContainer,
-            rootMargin: '-10% 0px -70% 0px',
-            threshold: 0
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            if (isClickScrolling) return;
-
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const id = entry.target.getAttribute('id');
-                    document.querySelectorAll('.catalogue-toc .nav-link').forEach(link => {
-                        link.classList.remove('active');
-                    });
-                    const activeLink = document.querySelector(`.catalogue-toc a[href="#${id}"]`);
-                    if (activeLink) {
-                        activeLink.classList.add('active');
-                        activeLink.scrollIntoView({block: 'nearest'});
-                    }
-                }
-            });
-        }, observerOptions);
-
-        const targets = document.querySelectorAll(
-            '#catalogue-list [id^="entity-"]'
-        );
-        targets.forEach(target => observer.observe(target));
-
-        // Smooth scroll on TOC link click
-        document.querySelectorAll('.catalogue-toc a').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = link.getAttribute('href').substring(1);
-                const targetElement = document.getElementById(targetId);
-                if (targetElement) {
-                    isClickScrolling = true;
-                    if (clickScrollTimeout) clearTimeout(clickScrollTimeout);
-
-                    // Immediately highlight the clicked link
-                    document.querySelectorAll('.catalogue-toc .nav-link').forEach(l => {
-                        l.classList.remove('active');
-                    });
-                    link.classList.add('active');
-                    link.scrollIntoView({block: 'nearest'});
-
-                    // Scroll the content
-                    targetElement.scrollIntoView({block: 'start'});
-                    window.location.hash = '#' + targetId;
-
-                    const resetFlag = () => {
-                        isClickScrolling = false;
-                    };
-
-                    if ('onscrollend' in window || 'onscrollend' in scrollContainer) {
-                        scrollContainer.addEventListener('scrollend', resetFlag, {once: true});
-                    } else {
-                        clickScrollTimeout = setTimeout(resetFlag, 1000);
-                    }
-                }
-            });
-        });
-    })();
-
-
-    let anchor = `#entity-${entityId}`;
-
-    window.location.href = anchor
-
+    const cataloguePane = document.getElementById('tab-pane-catalogue');
+    if (cataloguePane && cataloguePane.classList.contains('active')) {
+        const anchor = `#entity-${entityId}`;
+        window.location.href = anchor;
+        window.location.hash = anchor;
+    }
 </script>

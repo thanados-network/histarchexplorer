@@ -150,11 +150,12 @@
 
             const scrollTarget = tab.getAttribute('data-scroll-target');
             if (!scrollTarget) {
+                console.log("No scroll target found for tab:", tab);
                 window.location.hash = '';
                 return;
             }
             const targetAnchor = '#' + scrollTarget;
-            window.location.hash = '#' + scrollTarget;
+            //window.location.hash = '#' + scrollTarget;
             setTimeout(() => {window.location.href = targetAnchor;},500)
 
 
