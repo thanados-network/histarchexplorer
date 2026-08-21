@@ -139,7 +139,7 @@ function adjustTableHeight{{ tab_name }}() {
         const breadcrumbHeight = breadcrumbCont.offsetHeight;
 
         // 100vh - 96px - headerHeight - 3rem
-        const maxHeight = window.innerHeight - 96 - headerHeight - breadcrumbHeight - (3 * 16); // 3rem = 48px
+        const maxHeight = window.innerHeight - 80 - headerHeight - breadcrumbHeight - (3 * 16); // 3rem = 48px
         table.style.maxHeight = `${maxHeight}px`;
         {% if tab_name in ['places','items'] %}
             mapContainer{{tab_name}}.style.height = `${maxHeight + 16}px`;
