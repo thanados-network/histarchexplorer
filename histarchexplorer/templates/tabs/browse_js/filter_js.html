@@ -302,9 +302,9 @@ function rebuildTreeWithFilteredData{{ tab_name }}(tree) {
         showSelectAllButton: true,
         showInvertSelectionButton: true,
         onSelectionChange: (selectedNodesData) => {
-            // Only available nodes will be selectable, so no filtering needed here
             window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = selectedNodesData.map(node => node.id);
             window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = treeview.getSelectedNodesAndChildrenValues('id');
+            filterTypes{{ tab_name }}();
         }
     });
 
@@ -351,10 +351,14 @@ function applyPreset{{ tab_name }}(preset) {
     document.getElementById('filterInput{{ tab_name }}').value = '';
 
     document.querySelectorAll(`#csSelect{{tab_name}} input[type="checkbox"]`)
-        .forEach(cb => { cb.checked = false; });
+        .forEach(cb => {
+            cb.checked = false;
+        });
 
     document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]`)
-        .forEach(cb => { cb.checked = false; });
+        .forEach(cb => {
+            cb.checked = false;
+        });
 
     const resetBeginEl{{ tab_name }} = document.getElementById(
         'sliderBegin{{ tab_name }}');
@@ -363,7 +367,7 @@ function applyPreset{{ tab_name }}(preset) {
             {{ tab_name }}Data.timelineBegin.map(e => e.string);
         resetBeginEl{{ tab_name }}.noUiSlider.set(
             [beginVals{{ tab_name }}[0],
-             beginVals{{ tab_name }}[beginVals{{ tab_name }}.length - 1]]);
+                beginVals{{ tab_name }}[beginVals{{ tab_name }}.length - 1]]);
     }
 
     const resetEndEl{{ tab_name }} = document.getElementById(
@@ -373,7 +377,7 @@ function applyPreset{{ tab_name }}(preset) {
             {{ tab_name }}Data.timelineEnd.map(e => e.string);
         resetEndEl{{ tab_name }}.noUiSlider.set(
             [endVals{{ tab_name }}[0],
-             endVals{{ tab_name }}[endVals{{ tab_name }}.length - 1]]);
+                endVals{{ tab_name }}[endVals{{ tab_name }}.length - 1]]);
     }
 
     const resetNoBegin{{ tab_name }} = document.getElementById(
@@ -472,7 +476,10 @@ function applyPreset{{ tab_name }}(preset) {
             const inst = window.{{ tab_name }}TreeInstances[tree];
             if (!inst) continue;
             fp.type_ids.forEach(id => {
-                try { inst.selectNodeById(id, true); } catch (e) { /* not in this tree */ }
+                try {
+                    inst.selectNodeById(id, true);
+                } catch (e) { /* not in this tree */
+                }
             });
             inst.selectedNodeIds = inst.getSelectedNodes().map(n => n.id);
             inst.selectedNodeIdsWithChildren =
@@ -489,7 +496,9 @@ function applyPreset{{ tab_name }}(preset) {
     window.{{ tab_name }}PresetApplying = true;
     filterTypes{{ tab_name }}();
     // Allow one tick for applyCombinedFilter to finish before re-enabling
-    setTimeout(() => { window.{{ tab_name }}PresetApplying = false; }, 0);
+    setTimeout(() => {
+        window.{{ tab_name }}PresetApplying = false;
+    }, 0);
 }
 
 // Register in global preset registry so other tabs can call this
@@ -501,9 +510,13 @@ function resetFilter{{ tab_name }}() {
     document.getElementById('filterInput{{ tab_name }}').value = '';
 
     document.querySelectorAll(`#csSelect{{tab_name}} input[type="checkbox"]`)
-        .forEach(cb => { cb.checked = false; });
+        .forEach(cb => {
+            cb.checked = false;
+        });
     document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]`)
-        .forEach(cb => { cb.checked = false; });
+        .forEach(cb => {
+            cb.checked = false;
+        });
 
     const rBegin = document.getElementById('sliderBegin{{ tab_name }}');
     if (rBegin?.noUiSlider) {
@@ -574,7 +587,9 @@ function updateActiveFilterBadges{{ tab_name }}() {
         const lbl = document.querySelector(
             `label[for="${cb.id}"]`);
         const label = lbl ? lbl.textContent.trim() : cb.value;
-        makeBadge(label, 'bg-primary', () => { cb.checked = false; });
+        makeBadge(label, 'bg-primary', () => {
+            cb.checked = false;
+        });
     });
 
     // --- Projects (case studies) ---
@@ -583,7 +598,9 @@ function updateActiveFilterBadges{{ tab_name }}() {
     ).forEach(cb => {
         const lbl = document.querySelector(`label[for="${cb.id}"]`);
         const label = lbl ? lbl.textContent.trim() : cb.value;
-        makeBadge(label, 'bg-success', () => { cb.checked = false; });
+        makeBadge(label, 'bg-success', () => {
+            cb.checked = false;
+        });
     });
 
     // --- Types (from tree instances) ---
@@ -593,7 +610,10 @@ function updateActiveFilterBadges{{ tab_name }}() {
         inst.getSelectedNodes().forEach(node => {
             const nodeLabel = node.label || node.name || String(node.id);
             makeBadge(nodeLabel, 'bg-warning text-dark', () => {
-                try { inst.selectNodeById(node.id, false); } catch (e) { /* */ }
+                try {
+                    inst.selectNodeById(node.id, false);
+                } catch (e) { /* */
+                }
                 inst.selectedNodeIds = inst.getSelectedNodes().map(
                     n => n.id);
                 inst.selectedNodeIdsWithChildren =
