@@ -71,9 +71,9 @@ const {{ tab_name }}Data = {}
 {{ tab_name }}Data.tableData = getEntitiesForTab('{{ tab_name }}');
 {{ tab_name }}Data.typeIds = [...new Set({{ tab_name }}Data.tableData.map(item => item.type_id))];
 if ('{{ tab_name }}' == 'subunits') {
-    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains'], ["standard"], {{ tab_name }}Data.typeIds)
+    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains'], ["standard"], null)
 } else {
-    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, viewClasses.{{ tab_name }}, ["standard"], {{ tab_name }}Data.typeIds)
+    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, viewClasses.{{ tab_name }}, ["standard"], null)
 }
 
 {{ tab_name }}Data.fields = getKeysWithValues({{ tab_name }}Data.tableData)
