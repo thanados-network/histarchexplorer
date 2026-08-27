@@ -8,7 +8,29 @@
                     aria-label="Close"></button>
         </div>
         <div class="p-3">
-            {# Style controls will go here #}
+            <p class="text-muted small mb-2">Layers</p>
+            <ul class="list-unstyled style-layer-list"
+                id="style-layer-list-{{ tab_name }}"></ul>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="style-layer-modal-{{ tab_name }}" tabindex="-1"
+     aria-labelledby="style-layer-modal-label-{{ tab_name }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"
+                    id="style-layer-modal-label-{{ tab_name }}">Style Layer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>
@@ -31,5 +53,117 @@
         .addEventListener('click', () => closeStyleSidebar{{ tab_name }}());
     document.getElementById('style-sidebar-backdrop-{{ tab_name }}')
         .addEventListener('click', () => closeStyleSidebar{{ tab_name }}());
+
+    (function initLayerToggles{{ tab_name }}() {
+        const list = document.getElementById(
+            'style-layer-list-{{ tab_name }}');
+        list.addEventListener('change', (e) => {
+            const cb = e.target;
+            if (!cb.classList.contains('style-layer-toggle')) return;
+            const item = cb.closest('.style-layer-item');
+            const layerIds = item.dataset.layers.split(',');
+            const visibility = cb.checked ? 'visible' : 'none';
+            layerIds.forEach(id => {
+                if (map{{ tab_name }}.getLayer(id)) {
+                    map{{ tab_name }}.setLayoutProperty(
+                        id, 'visibility', visibility);
+                }
+            });
+        });
+    })();
+
+    function populateStyleLayers{{ tab_name }}(features) {
+        const polygonSvg =
+            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">' +
+            '<polygon points="1,11 3,4 7,2 13,5 15,12 6,14" fill="#088" fill-opacity="0.4"' +
+            ' stroke="#004747" stroke-width="1.5" stroke-dasharray="3,2"/></svg>';
+        const lineSvg =
+            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">' +
+            '<polyline points="1,13 5,5 10,10 15,3" fill="none"' +
+            ' stroke="#088" stroke-width="2" stroke-dasharray="4,2"/></svg>';
+        const pointSvg =
+            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">' +
+            '<circle cx="8" cy="8" r="6" fill="#088"/></svg>';
+        const layerDefs = [
+            {
+                key: 'Polygon',
+                label: 'Polygons',
+                svg: polygonSvg,
+                title: 'Polygon',
+                layers: [
+                    '{{ tab_name }}-layer-fill',
+                    '{{ tab_name }}-layer-outline']
+            },
+            {
+                key: 'LineString',
+                label: 'Lines',
+                svg: lineSvg,
+                title: 'Line',
+                layers: ['{{ tab_name }}-layer-line']
+            },
+            {
+                key: 'Point',
+                label: 'Points',
+                svg: pointSvg,
+                title: 'Point',
+                layers: [
+                    '{{ tab_name }}-layer-circle',
+                    '{{ tab_name }}-layer-representative-points']
+            }
+        ];
+        const counts = { Polygon: 0, LineString: 0, Point: 0 };
+        features.forEach(f => {
+            const t = f.geometry.type;
+            if (t === 'MultiPolygon') counts.Polygon++;
+            else if (t === 'MultiLineString') counts.LineString++;
+            else if (t === 'MultiPoint') counts.Point++;
+            else if (counts[t] !== undefined) counts[t]++;
+        });
+        const list = document.getElementById(
+            'style-layer-list-{{ tab_name }}');
+        const frag = document.createDocumentFragment();
+        layerDefs.forEach(def => {
+            if (!counts[def.key]) return;
+            const li = document.createElement('li');
+            li.className = 'style-layer-item d-flex align-items-center gap-2';
+            li.dataset.layers = def.layers.join(',');
+            li.addEventListener('dblclick', (e) => {
+                if (e.target.type === 'checkbox') return;
+                const titleEl = document.getElementById(
+                    'style-layer-modal-label-{{ tab_name }}');
+                titleEl.innerHTML = '';
+                const iconWrap = document.createElement('span');
+                iconWrap.className = 'style-layer-icon me-2';
+                iconWrap.innerHTML = def.svg;
+                const textNode = document.createTextNode(
+                    def.label + ' (' + counts[def.key] + ')');
+                titleEl.append(iconWrap, textNode);
+                const modal = new bootstrap.Modal(
+                    document.getElementById(
+                        'style-layer-modal-{{ tab_name }}'));
+                modal.show();
+            });
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.className = 'form-check-input style-layer-toggle';
+            cb.checked = true;
+            const label = document.createElement('label');
+            label.className = 'd-flex align-items-center gap-2 flex-grow-1';
+            label.title = 'Double click to style layer';
+            const icon = document.createElement('span');
+            icon.className = 'style-layer-icon';
+            icon.title = def.title;
+            icon.innerHTML = def.svg;
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = def.label;
+            const countSpan = document.createElement('span');
+            countSpan.className = 'style-layer-count ms-auto text-muted small';
+            countSpan.textContent = counts[def.key];
+            label.append(icon, nameSpan, countSpan);
+            li.append(cb, label);
+            frag.appendChild(li);
+        });
+        list.appendChild(frag);
+    }
 </script>
 {% endif %}

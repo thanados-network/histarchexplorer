@@ -579,13 +579,14 @@ $style-sidebar-width: 400px;
   width: $style-sidebar-width;
   height: 100%;
   overflow-y: auto;
+  background-color: #fff;
 }
 
 .style-sidebar-header {
   position: sticky;
   top: 0;
   z-index: 2;
-  background-color: var(--card-bg, #fff);
+  background-color: #fff;
 }
 
 .style-sidebar-backdrop {
@@ -598,6 +599,32 @@ $style-sidebar-width: 400px;
 
 .style-sidebar-backdrop.show {
   display: block;
+}
+
+.style-layer-list {
+  margin: 0;
+  padding: 0;
+}
+
+.style-layer-item {
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  label {
+    cursor: pointer;
+    margin: 0;
+    width: 100%;
+  }
+}
+
+.style-layer-icon {
+  font-size: 1rem;
+  color: #088;
+  flex-shrink: 0;
 }
 
 .style-sidebar-ctrl-btn {

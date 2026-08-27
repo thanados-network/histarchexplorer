@@ -158,6 +158,8 @@
     map{{ tab_name }}.addControl(
         new StyleSidebarControl{{ tab_name }}(), 'top-left');
 
+    populateStyleLayers{{ tab_name }}(featureCollection{{ tab_name }}.features);
+
 });
 
     map{{ tab_name }}.on('click', (e) => {
