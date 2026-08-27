@@ -25,7 +25,137 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-0">
+                <div class="d-flex" style="min-height: 260px;">
+                    <nav class="nav flex-column nav-pills style-modal-nav border-end p-2"
+                         id="style-modal-nav-{{ tab_name }}" role="tablist"
+                         aria-orientation="vertical">
+                        <button class="nav-link active d-flex align-items-center gap-2"
+                                id="sml-single-tab-{{ tab_name }}"
+                                data-bs-toggle="pill"
+                                data-bs-target="#sml-single-{{ tab_name }}"
+                                type="button" role="tab"
+                                aria-controls="sml-single-{{ tab_name }}"
+                                aria-selected="true">
+                            <i class="bi bi-circle-fill"></i>
+                            Single Color
+                        </button>
+                        <button class="nav-link d-flex align-items-center gap-2"
+                                id="sml-graduated-tab-{{ tab_name }}"
+                                data-bs-toggle="pill"
+                                data-bs-target="#sml-graduated-{{ tab_name }}"
+                                type="button" role="tab"
+                                aria-controls="sml-graduated-{{ tab_name }}"
+                                aria-selected="false">
+                            <i class="bi bi-palette2"></i>
+                            Graduated Color
+                        </button>
+                        <button class="nav-link d-flex align-items-center gap-2"
+                                id="sml-multiple-tab-{{ tab_name }}"
+                                data-bs-toggle="pill"
+                                data-bs-target="#sml-multiple-{{ tab_name }}"
+                                type="button" role="tab"
+                                aria-controls="sml-multiple-{{ tab_name }}"
+                                aria-selected="false">
+                            <i class="bi bi-palette-fill"></i>
+                            Multiple Colors
+                        </button>
+                    </nav>
+                    <div class="tab-content flex-grow-1 p-3"
+                         id="style-modal-tab-content-{{ tab_name }}">
+                        <div class="tab-pane fade show active"
+                             id="sml-single-{{ tab_name }}"
+                             role="tabpanel"
+                             aria-labelledby="sml-single-tab-{{ tab_name }}">
+                            <div id="sml-single-form-{{ tab_name }}">
+                                <div class="sml-fill-group">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold small mb-1"
+                                               for="sml-fill-color-{{ tab_name }}">
+                                            Fill Color
+                                        </label>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="color"
+                                                   class="form-control form-control-color"
+                                                   id="sml-fill-color-{{ tab_name }}"
+                                                   value="#008888">
+                                            <span class="text-muted small"
+                                                  id="sml-fill-color-val-{{ tab_name }}">#008888</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold small mb-1"
+                                               for="sml-fill-opacity-{{ tab_name }}">
+                                            Fill Opacity
+                                            <span class="text-muted ms-1"
+                                                  id="sml-fill-opacity-val-{{ tab_name }}">0.5</span>
+                                        </label>
+                                        <input type="range" class="form-range"
+                                               id="sml-fill-opacity-{{ tab_name }}"
+                                               min="0" max="1" step="0.05" value="0.5">
+                                    </div>
+                                </div>
+                                <hr class="sml-fill-group sml-outline-group">
+                                <div class="mb-3 sml-outline-group">
+                                    <label class="form-label fw-semibold small mb-1"
+                                           for="sml-outline-color-{{ tab_name }}">
+                                        Outline Color
+                                    </label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="color"
+                                               class="form-control form-control-color"
+                                               id="sml-outline-color-{{ tab_name }}"
+                                               value="#004747">
+                                        <span class="text-muted small"
+                                              id="sml-outline-color-val-{{ tab_name }}">#004747</span>
+                                    </div>
+                                </div>
+                                <div class="mb-3 sml-outline-group">
+                                    <label class="form-label fw-semibold small mb-1"
+                                           for="sml-outline-width-{{ tab_name }}">
+                                        Outline Width
+                                        <span class="text-muted ms-1"
+                                              id="sml-outline-width-val-{{ tab_name }}">1</span>px
+                                    </label>
+                                    <input type="range" class="form-range"
+                                           id="sml-outline-width-{{ tab_name }}"
+                                           min="0" max="10" step="0.5" value="1">
+                                </div>
+                                <div class="mb-3 sml-outline-group">
+                                    <label class="form-label fw-semibold small mb-1"
+                                           for="sml-outline-opacity-{{ tab_name }}">
+                                        Outline Opacity
+                                        <span class="text-muted ms-1"
+                                              id="sml-outline-opacity-val-{{ tab_name }}">1</span>
+                                    </label>
+                                    <input type="range" class="form-range"
+                                           id="sml-outline-opacity-{{ tab_name }}"
+                                           min="0" max="1" step="0.05" value="1">
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-secondary"
+                                            id="sml-reset-{{ tab_name }}">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                        Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade"
+                             id="sml-graduated-{{ tab_name }}"
+                             role="tabpanel"
+                             aria-labelledby="sml-graduated-tab-{{ tab_name }}">
+                            <p class="text-muted">Graduated Color – coming soon.</p>
+                        </div>
+                        <div class="tab-pane fade"
+                             id="sml-multiple-{{ tab_name }}"
+                             role="tabpanel"
+                             aria-labelledby="sml-multiple-tab-{{ tab_name }}">
+                            <p class="text-muted">Multiple Colors – coming soon.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary"
@@ -70,6 +200,265 @@
                 }
             });
         });
+    })();
+
+    const layerDefaults{{ tab_name }} = {
+        Polygon: {
+            fillColor: '#008888', fillOpacity: 0.5,
+            outlineColor: '#004747', outlineWidth: 1, outlineOpacity: 1
+        },
+        LineString: {
+            outlineColor: '#008888', outlineWidth: 2, outlineOpacity: 1
+        },
+        Point: {
+            fillColor: '#008888', fillOpacity: 1
+        }
+    };
+
+    let activeLayerKey{{ tab_name }} = null;
+
+    function buildSvgPolygon{{ tab_name }}(fill, fillOp, stroke, strokeW, strokeOp) {
+        const sw = Math.max(0.5, strokeW);
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"' +
+            ' viewBox="0 0 16 16"><polygon points="1,11 3,4 7,2 13,5 15,12 6,14"' +
+            ' fill="' + fill + '" fill-opacity="' + fillOp + '"' +
+            ' stroke="' + stroke + '" stroke-width="' + sw + '"' +
+            ' stroke-opacity="' + strokeOp + '" stroke-dasharray="3,2"/></svg>';
+    }
+
+    function buildSvgLine{{ tab_name }}(stroke, strokeW, strokeOp) {
+        const sw = Math.max(0.5, strokeW);
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"' +
+            ' viewBox="0 0 16 16"><polyline points="1,13 5,5 10,10 15,3"' +
+            ' fill="none" stroke="' + stroke + '" stroke-width="' + sw + '"' +
+            ' stroke-opacity="' + strokeOp + '" stroke-dasharray="4,2"/></svg>';
+    }
+
+    function buildSvgPoint{{ tab_name }}(fill, fillOp) {
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"' +
+            ' viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"' +
+            ' fill="' + fill + '" fill-opacity="' + fillOp + '"/></svg>';
+    }
+
+    function updateSidebarIcon{{ tab_name }}(key, svg) {
+        const list = document.getElementById('style-layer-list-{{ tab_name }}');
+        const items = list.querySelectorAll('.style-layer-item');
+        items.forEach(li => {
+            const layers = li.dataset.layers || '';
+            const isMatch = (
+                (key === 'Polygon' && layers.includes('layer-fill')) ||
+                (key === 'LineString' && layers.includes('layer-line')) ||
+                (key === 'Point' && layers.includes('layer-circle'))
+            );
+            if (isMatch) {
+                const iconEl = li.querySelector('.style-layer-icon');
+                if (iconEl) iconEl.innerHTML = svg;
+            }
+        });
+    }
+
+    function applyPolygonStyle{{ tab_name }}(s) {
+        const map = map{{ tab_name }};
+        if (map.getLayer('{{ tab_name }}-layer-fill')) {
+            map.setPaintProperty(
+                '{{ tab_name }}-layer-fill', 'fill-color', s.fillColor);
+            map.setPaintProperty(
+                '{{ tab_name }}-layer-fill', 'fill-opacity', s.fillOpacity);
+        }
+        if (map.getLayer('{{ tab_name }}-layer-outline')) {
+            map.setPaintProperty(
+                '{{ tab_name }}-layer-outline', 'line-color', s.outlineColor);
+            map.setPaintProperty(
+                '{{ tab_name }}-layer-outline', 'line-width', s.outlineWidth);
+            map.setPaintProperty(
+                '{{ tab_name }}-layer-outline', 'line-opacity', s.outlineOpacity);
+        }
+        const svg = buildSvgPolygon{{ tab_name }}(
+            s.fillColor, s.fillOpacity,
+            s.outlineColor, s.outlineWidth, s.outlineOpacity);
+        updateSidebarIcon{{ tab_name }}('Polygon', svg);
+    }
+
+    function applyLineStyle{{ tab_name }}(s) {
+        const map = map{{ tab_name }};
+        if (map.getLayer('{{ tab_name }}-layer-line')) {
+            map.setPaintProperty(
+                '{{ tab_name }}-layer-line', 'line-color', s.outlineColor);
+            map.setPaintProperty(
+                '{{ tab_name }}-layer-line', 'line-width', s.outlineWidth);
+            map.setPaintProperty(
+                '{{ tab_name }}-layer-line', 'line-opacity', s.outlineOpacity);
+        }
+        const svg = buildSvgLine{{ tab_name }}(
+            s.outlineColor, s.outlineWidth, s.outlineOpacity);
+        updateSidebarIcon{{ tab_name }}('LineString', svg);
+    }
+
+    function applyPointStyle{{ tab_name }}(s) {
+        const map = map{{ tab_name }};
+        ['{{ tab_name }}-layer-circle',
+         '{{ tab_name }}-layer-representative-points'].forEach(id => {
+            if (map.getLayer(id)) {
+                map.setPaintProperty(id, 'circle-color', s.fillColor);
+                map.setPaintProperty(id, 'circle-opacity', s.fillOpacity);
+            }
+        });
+        const svg = buildSvgPoint{{ tab_name }}(s.fillColor, s.fillOpacity);
+        updateSidebarIcon{{ tab_name }}('Point', svg);
+    }
+
+    function applyCurrentStyle{{ tab_name }}() {
+        const key = activeLayerKey{{ tab_name }};
+        if (!key) return;
+        const s = readFormValues{{ tab_name }}();
+        if (key === 'Polygon') applyPolygonStyle{{ tab_name }}(s);
+        else if (key === 'LineString') applyLineStyle{{ tab_name }}(s);
+        else if (key === 'Point') applyPointStyle{{ tab_name }}(s);
+    }
+
+    function readMapValues{{ tab_name }}(key) {
+        const map = map{{ tab_name }};
+        const d = layerDefaults{{ tab_name }}[key];
+        if (key === 'Polygon') {
+            const fillLayer = '{{ tab_name }}-layer-fill';
+            const outlineLayer = '{{ tab_name }}-layer-outline';
+            return {
+                fillColor: map.getLayer(fillLayer)
+                    ? map.getPaintProperty(fillLayer, 'fill-color') || d.fillColor
+                    : d.fillColor,
+                fillOpacity: map.getLayer(fillLayer)
+                    ? (map.getPaintProperty(fillLayer, 'fill-opacity') ?? d.fillOpacity)
+                    : d.fillOpacity,
+                outlineColor: map.getLayer(outlineLayer)
+                    ? map.getPaintProperty(outlineLayer, 'line-color') || d.outlineColor
+                    : d.outlineColor,
+                outlineWidth: map.getLayer(outlineLayer)
+                    ? (map.getPaintProperty(outlineLayer, 'line-width') ?? d.outlineWidth)
+                    : d.outlineWidth,
+                outlineOpacity: map.getLayer(outlineLayer)
+                    ? (map.getPaintProperty(outlineLayer, 'line-opacity') ?? d.outlineOpacity)
+                    : d.outlineOpacity
+            };
+        }
+        if (key === 'LineString') {
+            const lineLayer = '{{ tab_name }}-layer-line';
+            return {
+                outlineColor: map.getLayer(lineLayer)
+                    ? map.getPaintProperty(lineLayer, 'line-color') || d.outlineColor
+                    : d.outlineColor,
+                outlineWidth: map.getLayer(lineLayer)
+                    ? (map.getPaintProperty(lineLayer, 'line-width') ?? d.outlineWidth)
+                    : d.outlineWidth,
+                outlineOpacity: map.getLayer(lineLayer)
+                    ? (map.getPaintProperty(lineLayer, 'line-opacity') ?? d.outlineOpacity)
+                    : d.outlineOpacity
+            };
+        }
+        if (key === 'Point') {
+            const circleLayer = '{{ tab_name }}-layer-circle';
+            return {
+                fillColor: map.getLayer(circleLayer)
+                    ? map.getPaintProperty(circleLayer, 'circle-color') || d.fillColor
+                    : d.fillColor,
+                fillOpacity: map.getLayer(circleLayer)
+                    ? (map.getPaintProperty(circleLayer, 'circle-opacity') ?? d.fillOpacity)
+                    : d.fillOpacity
+            };
+        }
+        return d;
+    }
+
+    function readFormValues{{ tab_name }}() {
+        return {
+            fillColor: document.getElementById(
+                'sml-fill-color-{{ tab_name }}').value,
+            fillOpacity: parseFloat(document.getElementById(
+                'sml-fill-opacity-{{ tab_name }}').value),
+            outlineColor: document.getElementById(
+                'sml-outline-color-{{ tab_name }}').value,
+            outlineWidth: parseFloat(document.getElementById(
+                'sml-outline-width-{{ tab_name }}').value),
+            outlineOpacity: parseFloat(document.getElementById(
+                'sml-outline-opacity-{{ tab_name }}').value)
+        };
+    }
+
+    function setFormValues{{ tab_name }}(s) {
+        const fc = document.getElementById('sml-fill-color-{{ tab_name }}');
+        const fov = document.getElementById('sml-fill-opacity-{{ tab_name }}');
+        const oc = document.getElementById('sml-outline-color-{{ tab_name }}');
+        const ow = document.getElementById('sml-outline-width-{{ tab_name }}');
+        const oop = document.getElementById('sml-outline-opacity-{{ tab_name }}');
+        if (s.fillColor !== undefined) {
+            fc.value = s.fillColor;
+            document.getElementById(
+                'sml-fill-color-val-{{ tab_name }}').textContent = s.fillColor;
+        }
+        if (s.fillOpacity !== undefined) {
+            fov.value = s.fillOpacity;
+            document.getElementById(
+                'sml-fill-opacity-val-{{ tab_name }}').textContent = s.fillOpacity;
+        }
+        if (s.outlineColor !== undefined) {
+            oc.value = s.outlineColor;
+            document.getElementById(
+                'sml-outline-color-val-{{ tab_name }}').textContent = s.outlineColor;
+        }
+        if (s.outlineWidth !== undefined) {
+            ow.value = s.outlineWidth;
+            document.getElementById(
+                'sml-outline-width-val-{{ tab_name }}').textContent = s.outlineWidth;
+        }
+        if (s.outlineOpacity !== undefined) {
+            oop.value = s.outlineOpacity;
+            document.getElementById(
+                'sml-outline-opacity-val-{{ tab_name }}').textContent = s.outlineOpacity;
+        }
+    }
+
+    (function initSingleColorForm{{ tab_name }}() {
+        const modalEl = document.getElementById(
+            'style-layer-modal-{{ tab_name }}');
+
+        modalEl.addEventListener('show.bs.modal', () => {
+            const key = activeLayerKey{{ tab_name }};
+            const isLine = key === 'LineString';
+            const isPoint = key === 'Point';
+            document.querySelectorAll(
+                '#sml-single-form-{{ tab_name }} .sml-fill-group'
+            ).forEach(el => el.classList.toggle('d-none', isLine));
+            document.querySelectorAll(
+                '#sml-single-form-{{ tab_name }} .sml-outline-group'
+            ).forEach(el => el.classList.toggle('d-none', isPoint));
+        });
+
+        const ids = [
+            'sml-fill-color-{{ tab_name }}',
+            'sml-fill-opacity-{{ tab_name }}',
+            'sml-outline-color-{{ tab_name }}',
+            'sml-outline-width-{{ tab_name }}',
+            'sml-outline-opacity-{{ tab_name }}'
+        ];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('input', () => {
+                const val = el.value;
+                const base = id.replace(/-{{ tab_name }}$/, '');
+                const valEl = document.getElementById(
+                    base + '-val-{{ tab_name }}');
+                if (valEl) valEl.textContent = val;
+                applyCurrentStyle{{ tab_name }}();
+            });
+        });
+
+        document.getElementById('sml-reset-{{ tab_name }}')
+            .addEventListener('click', () => {
+                const key = activeLayerKey{{ tab_name }};
+                if (!key) return;
+                const defaults = layerDefaults{{ tab_name }}[key];
+                setFormValues{{ tab_name }}(defaults);
+                applyCurrentStyle{{ tab_name }}();
+            });
     })();
 
     function populateStyleLayers{{ tab_name }}(features) {
@@ -127,8 +516,9 @@
             const li = document.createElement('li');
             li.className = 'style-layer-item d-flex align-items-center gap-2';
             li.dataset.layers = def.layers.join(',');
-            li.addEventListener('dblclick', (e) => {
+            li.addEventListener('click', (e) => {
                 if (e.target.type === 'checkbox') return;
+                activeLayerKey{{ tab_name }} = def.key;
                 const titleEl = document.getElementById(
                     'style-layer-modal-label-{{ tab_name }}');
                 titleEl.innerHTML = '';
@@ -138,6 +528,8 @@
                 const textNode = document.createTextNode(
                     def.label + ' (' + counts[def.key] + ')');
                 titleEl.append(iconWrap, textNode);
+                setFormValues{{ tab_name }}(
+                    readMapValues{{ tab_name }}(def.key));
                 const modal = new bootstrap.Modal(
                     document.getElementById(
                         'style-layer-modal-{{ tab_name }}'));
@@ -149,7 +541,7 @@
             cb.checked = true;
             const label = document.createElement('label');
             label.className = 'd-flex align-items-center gap-2 flex-grow-1';
-            label.title = 'Double click to style layer';
+            label.title = 'Click to style layer';
             const icon = document.createElement('span');
             icon.className = 'style-layer-icon';
             icon.title = def.title;
