@@ -138,6 +138,26 @@
     setPointer(mapVectorLayers{{ tab_name }}, mapRef);
     highlightFeatures([], mapRef);
 
+    // 6. Add style sidebar control (top-left)
+    class StyleSidebarControl{{ tab_name }} {
+        onAdd() {
+            this._btn = document.createElement('button');
+            this._btn.className = 'maplibregl-ctrl-icon style-sidebar-ctrl-btn';
+            this._btn.title = 'Style geometries';
+            this._btn.innerHTML = '<i class="bi bi-palette"></i>';
+            this._btn.addEventListener(
+                'click', () => openStyleSidebar{{ tab_name }}());
+            this._container = document.createElement('div');
+            this._container.className =
+                'maplibregl-ctrl maplibregl-ctrl-group';
+            this._container.appendChild(this._btn);
+            return this._container;
+        }
+        onRemove() { this._container.remove(); }
+    }
+    map{{ tab_name }}.addControl(
+        new StyleSidebarControl{{ tab_name }}(), 'top-left');
+
 });
 
     map{{ tab_name }}.on('click', (e) => {

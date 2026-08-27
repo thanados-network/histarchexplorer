@@ -1,0 +1,35 @@
+{% if tab_name in ['places', 'items'] %}
+<div id="style-sidebar-backdrop-{{ tab_name }}" class="style-sidebar-backdrop"></div>
+<div id="style-sidebar-{{ tab_name }}" class="style-sidebar">
+    <div class="style-sidebar-inner">
+        <div class="style-sidebar-header d-flex justify-content-between align-items-center p-2 border-bottom">
+            <h5 class="m-0">Style</h5>
+            <button type="button" class="btn-close" id="style-sidebar-close-{{ tab_name }}"
+                    aria-label="Close"></button>
+        </div>
+        <div class="p-3">
+            {# Style controls will go here #}
+        </div>
+    </div>
+</div>
+<script> {# Style Sidebar Toggle #}
+    function openStyleSidebar{{ tab_name }}() {
+        const sidebar = document.getElementById('style-sidebar-{{ tab_name }}');
+        const backdrop = document.getElementById(
+            'style-sidebar-backdrop-{{ tab_name }}');
+        sidebar.classList.add('open');
+        backdrop.classList.add('show');
+    }
+    function closeStyleSidebar{{ tab_name }}() {
+        const sidebar = document.getElementById('style-sidebar-{{ tab_name }}');
+        const backdrop = document.getElementById(
+            'style-sidebar-backdrop-{{ tab_name }}');
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('show');
+    }
+    document.getElementById('style-sidebar-close-{{ tab_name }}')
+        .addEventListener('click', () => closeStyleSidebar{{ tab_name }}());
+    document.getElementById('style-sidebar-backdrop-{{ tab_name }}')
+        .addEventListener('click', () => closeStyleSidebar{{ tab_name }}());
+</script>
+{% endif %}

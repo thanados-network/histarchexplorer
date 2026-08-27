@@ -218,7 +218,9 @@
         </div>
 
         {% if tab_name in ['places', 'items'] %}
-            <div id="map-{{ tab_name }}" class="map-container d-none"></div>
+            <div id="map-{{ tab_name }}" class="map-container d-none">
+                {% include "/tabs/browse_js/style_sidebar.html" %}
+            </div>
         {% endif %}
     </div>
 
