@@ -926,5 +926,27 @@ VALUES
      '{"en": "Churches before 1300"}', NULL, '["places"]',
      '{"type_ids": [285], "include_subtypes": true, "begin_to": "1251-01-01", "include_no_begin": false, "include_no_end": true}');
 
-\unrestrict dFwdtbapHGK4BIT8MqV1Ba0bdYdDKh8kH8q0UTQ6WMoz2Yn046Z57YDaLzkjvB2
 
+
+
+--
+-- Name: schema_migrations; Type: TABLE; Schema: tng; Owner: openatlas
+--
+
+CREATE TABLE tng.schema_migrations (
+    version character varying(50) NOT NULL,
+    applied_at timestamp with time zone DEFAULT now()
+);
+
+ALTER TABLE tng.schema_migrations OWNER TO openatlas;
+
+ALTER TABLE ONLY tng.schema_migrations
+    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+COPY tng.schema_migrations (version) FROM stdin;
+0.1.0
+0.2.0
+0.3.0
+0.4.0
+0.5.0
+\.
