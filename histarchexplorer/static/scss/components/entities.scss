@@ -502,7 +502,6 @@ $filter-sidebar-width: 500px;
   overflow-y: auto;
   margin: 0 1rem 1rem 0;
   border: 1px solid #dee2e6;
-  border-radius: 8px;
 }
 
 .filter-sidebar-header {
@@ -510,8 +509,6 @@ $filter-sidebar-width: 500px;
   top: 0;
   z-index: 2;
   background-color: var(--card-bg, #fff);
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
 }
 
 .filter-sidebar-backdrop {
