@@ -701,4 +701,18 @@ ALTER TABLE tng.predefined_filters OWNER TO openatlas;
 GRANT ALL ON TABLE tng.predefined_filters TO openatlas;
 GRANT USAGE, SELECT ON SEQUENCE tng.predefined_filters_id_seq TO openatlas;
 
+--
+-- Name: schema_migrations; Type: TABLE; Schema: tng; Owner: openatlas
+--
+
+CREATE TABLE tng.schema_migrations (
+    version character varying(50) NOT NULL,
+    applied_at timestamp with time zone DEFAULT now()
+);
+
+ALTER TABLE tng.schema_migrations OWNER TO openatlas;
+
+ALTER TABLE ONLY tng.schema_migrations
+    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
 

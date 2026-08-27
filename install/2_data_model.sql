@@ -328,6 +328,13 @@ SELECT pg_catalog.setval('tng.maps_id_seq', 1, true);
 
 SELECT pg_catalog.setval('tng.properties_id_seq', 1, false);
 
+COPY tng.schema_migrations (version) FROM stdin;
+0.1.0
+0.2.0
+0.3.0
+0.4.0
+0.5.0
+\.
 
 --
 -- PostgreSQL database dump complete
