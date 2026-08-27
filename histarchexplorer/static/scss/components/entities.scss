@@ -92,6 +92,7 @@
 .map-container {
   opacity: 0;
   transition: opacity 1000ms ease-in-out;
+  position: relative;
 }
 
 /* ===== Container & Grid Base ===== */
@@ -551,6 +552,60 @@ $filter-sidebar-width: 500px;
 /* Uniform sizing for the filter sidebar's Reset/Apply buttons */
 .filter-btn {
   min-width: 4.5rem;
+}
+
+/* ===== Style sidebar (map overlay, slides in from the left) ===== */
+$style-sidebar-width: 400px;
+
+.style-sidebar {
+  width: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  z-index: 1040;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+}
+
+.style-sidebar.open {
+  width: min(85vw, #{$style-sidebar-width});
+}
+
+.style-sidebar-inner {
+  width: $style-sidebar-width;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.style-sidebar-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: var(--card-bg, #fff);
+}
+
+.style-sidebar-backdrop {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1039;
+}
+
+.style-sidebar-backdrop.show {
+  display: block;
+}
+
+.style-sidebar-ctrl-btn {
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Fixed square icon-only buttons (remove sort level / add sort level) */
