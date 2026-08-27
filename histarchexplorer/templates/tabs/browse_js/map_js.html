@@ -149,12 +149,19 @@
         if (!clickedFeatures.length) return;
         //console.log('clickedFeatures', clickedFeatures);
 
-        const featureNames = clickedFeatures.map(f =>
+        const seenIds = new Set();
+        const uniqueFeatures = clickedFeatures.filter(f => {
+            if (seenIds.has(f.properties.id)) return false;
+            seenIds.add(f.properties.id);
+            return true;
+        });
+
+        const featureNames = uniqueFeatures.map(f =>
             `<button class="map-popup-hoverlink" data-id="${f.properties.id}" onclick="window.location.href='/entity/${f.properties.id}'">
     ${f.properties.name} (${f.properties.class})
   </button>`
         );
-        featureIds = clickedFeatures.map(f => f.properties.id);
+        featureIds = uniqueFeatures.map(f => f.properties.id);
 
         highlightFeatures(featureIds, map{{ tab_name }});
 
