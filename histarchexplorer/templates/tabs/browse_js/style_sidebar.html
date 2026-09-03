@@ -2,34 +2,214 @@
 <div id="style-sidebar-backdrop-{{ tab_name }}" class="style-sidebar-backdrop"></div>
 <div id="style-sidebar-{{ tab_name }}" class="style-sidebar">
     <div class="style-sidebar-inner">
-        <div class="style-sidebar-header d-flex justify-content-between align-items-center p-2 border-bottom">
+        <div class="style-sidebar-header d-flex justify-content-between
+                    align-items-center p-2 border-bottom">
             <h5 class="m-0">Style</h5>
-            <button type="button" class="btn-close" id="style-sidebar-close-{{ tab_name }}"
+            <button type="button" class="btn-close"
+                    id="style-sidebar-close-{{ tab_name }}"
                     aria-label="Close"></button>
         </div>
         <div class="p-3">
-            {# Style controls will go here #}
+            <p class="text-muted small mb-2 text-uppercase fw-semibold">
+                Layers</p>
+            <ul class="list-unstyled m-0"
+                id="layer-list-{{ tab_name }}"></ul>
         </div>
     </div>
 </div>
-<script> {# Style Sidebar Toggle #}
+<script> {# Style Sidebar Toggle & Layer List #}
+    function toggleStyleSidebar{{ tab_name }}() {
+        const sidebar = document.getElementById(
+            'style-sidebar-{{ tab_name }}');
+        sidebar.classList.toggle('open');
+        setTimeout(() => {
+            if (typeof map{{ tab_name }} !== 'undefined' && map{{ tab_name }}) {
+                map{{ tab_name }}.resize();
+            }
+        }, 350);
+    }
     function openStyleSidebar{{ tab_name }}() {
-        const sidebar = document.getElementById('style-sidebar-{{ tab_name }}');
-        const backdrop = document.getElementById(
-            'style-sidebar-backdrop-{{ tab_name }}');
-        sidebar.classList.add('open');
-        backdrop.classList.add('show');
+        const sidebar = document.getElementById(
+            'style-sidebar-{{ tab_name }}');
+        if (!sidebar.classList.contains('open')) {
+            toggleStyleSidebar{{ tab_name }}();
+        }
     }
     function closeStyleSidebar{{ tab_name }}() {
-        const sidebar = document.getElementById('style-sidebar-{{ tab_name }}');
-        const backdrop = document.getElementById(
-            'style-sidebar-backdrop-{{ tab_name }}');
-        sidebar.classList.remove('open');
-        backdrop.classList.remove('show');
+        const sidebar = document.getElementById(
+            'style-sidebar-{{ tab_name }}');
+        if (sidebar.classList.contains('open')) {
+            toggleStyleSidebar{{ tab_name }}();
+        }
     }
     document.getElementById('style-sidebar-close-{{ tab_name }}')
         .addEventListener('click', () => closeStyleSidebar{{ tab_name }}());
     document.getElementById('style-sidebar-backdrop-{{ tab_name }}')
         .addEventListener('click', () => closeStyleSidebar{{ tab_name }}());
+
+    const layerDefs{{ tab_name }} = [
+        {
+            type: 'Polygon',
+            label: 'Polygon',
+            layers: [
+                '{{ tab_name }}-layer-fill',
+                '{{ tab_name }}-layer-outline'
+            ],
+            svg: `<svg width="20" height="20" viewBox="0 0 20 20"
+                       xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="4" width="16" height="12" rx="1"
+                      fill="#088" fill-opacity="0.5"
+                      stroke="#004747" stroke-width="1.5"/>
+            </svg>`
+        },
+        {
+            type: 'LineString',
+            label: 'LineString',
+            layers: ['{{ tab_name }}-layer-line'],
+            svg: `<svg width="20" height="20" viewBox="0 0 20 20"
+                       xmlns="http://www.w3.org/2000/svg">
+                <polyline points="2,16 7,6 13,12 18,4"
+                          fill="none" stroke="#088" stroke-width="2.5"
+                          stroke-linejoin="round"
+                          stroke-linecap="round"/>
+            </svg>`
+        },
+        {
+            type: 'Point',
+            label: 'Point',
+            layers: [
+                '{{ tab_name }}-layer-circle',
+                '{{ tab_name }}-layer-representative-points'
+            ],
+            svg: `<svg width="20" height="20" viewBox="0 0 20 20"
+                       xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="7" fill="#088"/>
+            </svg>`
+        }
+    ];
+
+    const hiddenLayerTypes{{ tab_name }} = new Set();
+
+    function getGeomCategory{{ tab_name }}(geomType) {
+        if (geomType === 'Polygon' || geomType === 'MultiPolygon') {
+            return 'Polygon';
+        }
+        if (geomType === 'LineString' || geomType === 'MultiLineString') {
+            return 'LineString';
+        }
+        return 'Point';
+    }
+
+    function updateLayerList{{ tab_name }}(features) {
+        const counts = { Polygon: 0, LineString: 0, Point: 0 };
+        features.forEach(f => {
+            const cat = getGeomCategory{{ tab_name }}(f.geometry.type);
+            counts[cat]++;
+        });
+
+        const list = document.getElementById('layer-list-{{ tab_name }}');
+        list.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+
+        layerDefs{{ tab_name }}.forEach(def => {
+            const count = counts[def.type];
+            if (count === 0) return;
+
+            const li = document.createElement('li');
+            li.className =
+                'layer-list-item d-flex align-items-center gap-2 py-1';
+
+            const cbId = `layer-cb-{{ tab_name }}-${def.type}`;
+            const isVisible = !hiddenLayerTypes{{ tab_name }}.has(def.type);
+
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.className = 'form-check-input flex-shrink-0 mt-0';
+            cb.id = cbId;
+            cb.checked = isVisible;
+            cb.dataset.layerType = def.type;
+            cb.addEventListener('change', () => {
+                if (cb.checked) {
+                    hiddenLayerTypes{{ tab_name }}.delete(def.type);
+                } else {
+                    hiddenLayerTypes{{ tab_name }}.add(def.type);
+                }
+                applyLayerVisibility{{ tab_name }}();
+            });
+
+            const cbSpan = document.createElement('span');
+            cbSpan.className = 'd-flex align-items-center';
+            cbSpan.appendChild(cb);
+
+            const svgWrapper = document.createElement('span');
+            svgWrapper.className = 'flex-shrink-0';
+            svgWrapper.innerHTML = def.svg;
+
+            const labelEl = document.createElement('span');
+            labelEl.className = 'flex-grow-1';
+            labelEl.textContent = def.label;
+
+            const badge = document.createElement('span');
+            badge.className = 'badge text-bg-secondary ms-1';
+            badge.textContent = count;
+
+            const infoSpan = document.createElement('span');
+            infoSpan.className =
+                'd-flex align-items-center gap-2 flex-grow-1 layer-info-btn';
+            infoSpan.appendChild(svgWrapper);
+            infoSpan.appendChild(labelEl);
+            infoSpan.appendChild(badge);
+            infoSpan.addEventListener('click', () => {
+                const modal = document.getElementById(
+                    'layer-style-modal-{{ tab_name }}');
+                const bsModal = bootstrap.Modal.getOrCreateInstance(modal);
+                modal.dataset.layerType = def.type;
+                bsModal.show();
+            });
+
+            li.appendChild(cbSpan);
+            li.appendChild(infoSpan);
+            fragment.appendChild(li);
+        });
+
+        list.appendChild(fragment);
+    }
+
+    function applyLayerVisibility{{ tab_name }}() {
+        layerDefs{{ tab_name }}.forEach(def => {
+            const visibility = hiddenLayerTypes{{ tab_name }}.has(def.type)
+                ? 'none' : 'visible';
+            def.layers.forEach(layerId => {
+                if (map{{ tab_name }}.getLayer(layerId)) {
+                    map{{ tab_name }}.setLayoutProperty(
+                        layerId, 'visibility', visibility);
+                }
+            });
+        });
+    }
 </script>
+
+<div class="modal fade" id="layer-style-modal-{{ tab_name }}" tabindex="-1"
+     aria-labelledby="layer-style-modal-label-{{ tab_name }}"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"
+                    id="layer-style-modal-label-{{ tab_name }}">
+                    Layer Style</h5>
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">Platzhalter – Inhalt folgt.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">Schließen</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endif %}

@@ -138,7 +138,10 @@
     setPointer(mapVectorLayers{{ tab_name }}, mapRef);
     highlightFeatures([], mapRef);
 
-    // 6. Add style sidebar control (top-left)
+    // 6. Initial layer list
+    updateLayerList{{ tab_name }}(featureCollection{{ tab_name }}.features);
+
+    // 7. Add style sidebar control (top-left)
     class StyleSidebarControl{{ tab_name }} {
         onAdd() {
             this._btn = document.createElement('button');
@@ -232,6 +235,8 @@ table{{ tab_name }}.on("dataFiltered", function (filters, rows) {
     const filteredFeatures{{ tab_name }} = featureCollection{{ tab_name }}.features.filter(
         f => filteredIDdata{{ tab_name }}.includes(f.properties.id)
     );
+
+    updateLayerList{{ tab_name }}(filteredFeatures{{ tab_name }});
 
     const src = map{{ tab_name }}.getSource('{{ tab_name }}-source');
     if (src) {

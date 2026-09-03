@@ -206,6 +206,7 @@
 
 
 <div class="browse-body-wrapper d-flex">
+    {% include "/tabs/browse_js/style_sidebar.html" %}
     <div class="browse-main-content flex-grow-1">
         <div id="table-{{ tab_name }}" class="tabulator-container"></div>
         <div id="tile-{{ tab_name }}" class="tile-container d-none">
@@ -218,9 +219,7 @@
         </div>
 
         {% if tab_name in ['places', 'items'] %}
-            <div id="map-{{ tab_name }}" class="map-container d-none">
-                {% include "/tabs/browse_js/style_sidebar.html" %}
-            </div>
+            <div id="map-{{ tab_name }}" class="map-container d-none"></div>
         {% endif %}
     </div>
 

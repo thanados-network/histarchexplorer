@@ -554,8 +554,8 @@ $filter-sidebar-width: 500px;
   min-width: 4.5rem;
 }
 
-/* ===== Style sidebar (map overlay, slides in from the left) ===== */
-$style-sidebar-width: 400px;
+/* ===== Style sidebar (slides in from the right, like filter sidebar) ===== */
+$style-sidebar-width: 300px;
 
 .style-sidebar {
   width: 0;
@@ -563,12 +563,6 @@ $style-sidebar-width: 400px;
   overflow: hidden;
   transition: width 0.3s ease;
   box-sizing: border-box;
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  z-index: 1040;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
 }
 
 .style-sidebar.open {
@@ -577,27 +571,65 @@ $style-sidebar-width: 400px;
 
 .style-sidebar-inner {
   width: $style-sidebar-width;
-  height: 100%;
+  height: calc(100vh - var(--navbar-height) - 70px);
   overflow-y: auto;
+  border: 1px solid #dee2e6;
+  background-color: #fff;
 }
 
 .style-sidebar-header {
   position: sticky;
   top: 0;
   z-index: 2;
-  background-color: var(--card-bg, #fff);
+  background-color: #fff;
 }
 
 .style-sidebar-backdrop {
   display: none;
-  position: absolute;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  z-index: 1039;
 }
 
-.style-sidebar-backdrop.show {
-  display: block;
+.layer-info-btn {
+  border-radius: 4px;
+  padding: 2px 4px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.07);
+    cursor: pointer;
+  }
+}
+
+@include breakpoint-down('small') {
+  .style-sidebar {
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    height: calc(100vh - var(--navbar-height));
+    z-index: 1040;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .style-sidebar.open {
+    width: min(85vw, #{$style-sidebar-width});
+  }
+
+  .style-sidebar-inner {
+    width: min(85vw, #{$style-sidebar-width});
+    height: 100%;
+    margin: 0;
+  }
+
+  .style-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: var(--navbar-height) 0 0 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 1039;
+  }
+
+  .style-sidebar-backdrop.show {
+    display: block;
+  }
 }
 
 .style-sidebar-ctrl-btn {
