@@ -413,7 +413,7 @@
     }
 </script>
 
-<div class="modal fade" id="layer-style-modal-{{ tab_name }}" tabindex="-1"
+<div class="modal fade layer-style-modal" id="layer-style-modal-{{ tab_name }}" tabindex="-1"
      aria-labelledby="layer-style-modal-label-{{ tab_name }}"
      aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -428,11 +428,10 @@
             </div>
             <div class="modal-body p-0">
                 <div class="d-flex">
-                    <div class="nav flex-column nav-pills border-end p-2 gap-1"
+                    <div class="nav flex-column nav-pills border-end layer-style-nav-sidebar"
                          id="layer-style-tabs-{{ tab_name }}"
                          role="tablist"
-                         aria-orientation="vertical"
-                         style="min-width: 3rem;">
+                         aria-orientation="vertical">
                         <button class="nav-link active p-2"
                                 id="tab-overview-{{ tab_name }}"
                                 data-bs-toggle="pill"
@@ -451,7 +450,7 @@
                                 title="Single Color Options"
                                 data-bs-placement="right"
                                 data-bs-toggle-tooltip>
-                            <i class="bi bi-palette fs-5"></i>
+                            <i class="bi bi-paint-bucket fs-5"></i>
                         </button>
                         <button class="nav-link p-2"
                                 id="tab-multi-{{ tab_name }}"
@@ -461,7 +460,7 @@
                                 title="Multiple Color Options"
                                 data-bs-placement="right"
                                 data-bs-toggle-tooltip>
-                            <i class="bi bi-palette2 fs-5"></i>
+                            <i class="bi bi-palette fs-5"></i>
                         </button>
                         <button class="nav-link p-2"
                                 id="tab-gradient-{{ tab_name }}"
@@ -471,7 +470,7 @@
                                 title="Gradient Color Options"
                                 data-bs-placement="right"
                                 data-bs-toggle-tooltip>
-                            <i class="bi bi-rainbow fs-5"></i>
+                            <i class="bi bi-palette2 fs-5"></i>
                         </button>
                     </div>
                     <div class="tab-content flex-grow-1 p-3"
@@ -507,10 +506,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary"
-                        data-bs-dismiss="modal">Schließen</button>
             </div>
         </div>
     </div>
