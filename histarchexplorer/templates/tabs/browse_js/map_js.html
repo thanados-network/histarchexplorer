@@ -137,6 +137,9 @@
     // 5. Init interactions
     setPointer(mapVectorLayers{{ tab_name }}, mapRef);
     highlightFeatures([], mapRef);
+    addTerrain(mapRef);
+    addSkybox(mapRef);
+    addControls(mapRef);
 
     // 6. Initial layer list
     updateLayerList{{ tab_name }}(featureCollection{{ tab_name }}.features);

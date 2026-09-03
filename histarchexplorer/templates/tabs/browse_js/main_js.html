@@ -49,10 +49,6 @@ function {{tab_name}}ToggleView(view) {
 
     {% if tab_name in ["places", "items"] %}
         if (!{{ tab_name }}MapLoaded) {
-            addTerrain(map{{ tab_name }});
-            addSkybox(map{{ tab_name }});
-            addControls(map{{ tab_name }});
-
             setTimeout(() => {
                 if (!bounds{{ tab_name }}.isEmpty() && !onePointFeature{{ tab_name }}) {
                     map{{ tab_name }}.fitBounds(bounds{{ tab_name }}, {padding: 20});
