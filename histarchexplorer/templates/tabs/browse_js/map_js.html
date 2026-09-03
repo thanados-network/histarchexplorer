@@ -16,6 +16,9 @@
     };
     processRepresentativePoints(featureCollection{{ tab_name }});
 
+    filteredIDdata{{ tab_name }} = featureCollection{{ tab_name }}.features.map(
+        f => f.properties.id);
+
     const bounds{{ tab_name }} = new maplibregl.LngLatBounds();
     featureCollection{{ tab_name }}.features.forEach(extendBounds{{ tab_name }});
     const center{{ tab_name }} = bounds{{ tab_name }}.getCenter();
@@ -141,8 +144,14 @@
     addSkybox(mapRef);
     addControls(mapRef);
 
-    // 6. Initial layer list
-    updateLayerList{{ tab_name }}(featureCollection{{ tab_name }}.features);
+    // 6. Initial layer list & overview
+    const initialFiltered{{ tab_name }} =
+        featureCollection{{ tab_name }}.features.filter(
+            f => filteredIDdata{{ tab_name }}.includes(f.properties.id));
+    updateLayerList{{ tab_name }}(initialFiltered{{ tab_name }});
+    updateOverview{{ tab_name }}(
+        featureCollection{{ tab_name }}.features,
+        initialFiltered{{ tab_name }});
 
     // 7. Add style sidebar control (top-left)
     class StyleSidebarControl{{ tab_name }} {
@@ -240,6 +249,9 @@ table{{ tab_name }}.on("dataFiltered", function (filters, rows) {
     );
 
     updateLayerList{{ tab_name }}(filteredFeatures{{ tab_name }});
+    updateOverview{{ tab_name }}(
+        featureCollection{{ tab_name }}.features,
+        filteredFeatures{{ tab_name }});
 
     const src = map{{ tab_name }}.getSource('{{ tab_name }}-source');
     if (src) {

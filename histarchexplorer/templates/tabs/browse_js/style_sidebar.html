@@ -89,6 +89,8 @@
     ];
 
     const hiddenLayerTypes{{ tab_name }} = new Set();
+    let cachedAllFeatures{{ tab_name }} = [];
+    let cachedFilteredFeatures{{ tab_name }} = [];
 
     function getGeomCategory{{ tab_name }}(geomType) {
         if (geomType === 'Polygon' || geomType === 'MultiPolygon') {
@@ -175,6 +177,93 @@
         list.appendChild(fragment);
     }
 
+    function buildClassGeomKey(cls, geomCat) {
+        return cls + '||' + geomCat;
+    }
+
+    const viewClasses{{ tab_name }} = new Set(
+        {{ config['VIEW_CLASSES'].get(tab_name, []) | list | tojson }});
+
+    function getOverviewStats{{ tab_name }}(
+            allFeatures, filteredFeatures, geomTypeFilter) {
+        const total = {};
+        const filtered = {};
+        allFeatures.forEach(f => {
+            const cls = (f.properties && f.properties.class) || 'Unknown';
+            if (!viewClasses{{ tab_name }}.has(cls)) { return; }
+            const cat = getGeomCategory{{ tab_name }}(f.geometry.type);
+            if (geomTypeFilter && cat !== geomTypeFilter) { return; }
+            const key = buildClassGeomKey(cls, cat);
+            total[key] = (total[key] || 0) + 1;
+        });
+        filteredFeatures.forEach(f => {
+            const cls = (f.properties && f.properties.class) || 'Unknown';
+            if (!viewClasses{{ tab_name }}.has(cls)) { return; }
+            const cat = getGeomCategory{{ tab_name }}(f.geometry.type);
+            if (geomTypeFilter && cat !== geomTypeFilter) { return; }
+            const key = buildClassGeomKey(cls, cat);
+            filtered[key] = (filtered[key] || 0) + 1;
+        });
+        return { total, filtered };
+    }
+
+    function formatClassName(cls) {
+        return cls.replace(/_/g, ' ')
+            .replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function updateOverview{{ tab_name }}(
+            allFeatures, filteredFeatures, geomTypeFilter) {
+        cachedAllFeatures{{ tab_name }} = allFeatures;
+        cachedFilteredFeatures{{ tab_name }} = filteredFeatures;
+        const pane = document.getElementById(
+            'pane-overview-{{ tab_name }}');
+        const { total, filtered } = getOverviewStats{{ tab_name }}(
+            allFeatures, filteredFeatures, geomTypeFilter);
+        const keys = Object.keys(total).sort();
+        if (keys.length === 0) {
+            pane.innerHTML =
+                '<p class="text-muted small">No data available.</p>';
+            return;
+        }
+        const fragment = document.createDocumentFragment();
+        const table = document.createElement('table');
+        table.className = 'table table-sm table-hover mb-0';
+        const thead = document.createElement('thead');
+        thead.innerHTML = '<tr>' +
+            '<th class="text-muted fw-normal small">Class</th>' +
+            '<th class="text-muted fw-normal small">Geometry</th>' +
+            '<th class="text-muted fw-normal small text-end">Count</th>' +
+            '</tr>';
+        table.appendChild(thead);
+        const tbody = document.createElement('tbody');
+        keys.forEach(key => {
+            const parts = key.split('||');
+            const cls = parts[0];
+            const geomCat = parts[1];
+            const tot = total[key] || 0;
+            const filt = filtered[key] || 0;
+            const tr = document.createElement('tr');
+            const tdCls = document.createElement('td');
+            tdCls.className = 'small';
+            tdCls.textContent = formatClassName(cls);
+            const tdGeom = document.createElement('td');
+            tdGeom.className = 'small text-muted';
+            tdGeom.textContent = geomCat + 's';
+            const tdCount = document.createElement('td');
+            tdCount.className = 'small text-end';
+            tdCount.textContent = filt + ' of ' + tot;
+            tr.appendChild(tdCls);
+            tr.appendChild(tdGeom);
+            tr.appendChild(tdCount);
+            tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        fragment.appendChild(table);
+        pane.innerHTML = '';
+        pane.appendChild(fragment);
+    }
+
     function applyLayerVisibility{{ tab_name }}() {
         layerDefs{{ tab_name }}.forEach(def => {
             const visibility = hiddenLayerTypes{{ tab_name }}.has(def.type)
@@ -192,7 +281,7 @@
 <div class="modal fade" id="layer-style-modal-{{ tab_name }}" tabindex="-1"
      aria-labelledby="layer-style-modal-label-{{ tab_name }}"
      aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"
@@ -202,8 +291,85 @@
                         data-bs-dismiss="modal"
                         aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p class="text-muted">Platzhalter – Inhalt folgt.</p>
+            <div class="modal-body p-0">
+                <div class="d-flex">
+                    <div class="nav flex-column nav-pills border-end p-2 gap-1"
+                         id="layer-style-tabs-{{ tab_name }}"
+                         role="tablist"
+                         aria-orientation="vertical"
+                         style="min-width: 3rem;">
+                        <button class="nav-link active p-2"
+                                id="tab-overview-{{ tab_name }}"
+                                data-bs-toggle="pill"
+                                data-bs-target="#pane-overview-{{ tab_name }}"
+                                type="button" role="tab"
+                                title="Overview"
+                                data-bs-placement="right"
+                                data-bs-toggle-tooltip>
+                            <i class="bi bi-info-circle fs-5"></i>
+                        </button>
+                        <button class="nav-link p-2"
+                                id="tab-single-{{ tab_name }}"
+                                data-bs-toggle="pill"
+                                data-bs-target="#pane-single-{{ tab_name }}"
+                                type="button" role="tab"
+                                title="Single Color Options"
+                                data-bs-placement="right"
+                                data-bs-toggle-tooltip>
+                            <i class="bi bi-palette fs-5"></i>
+                        </button>
+                        <button class="nav-link p-2"
+                                id="tab-multi-{{ tab_name }}"
+                                data-bs-toggle="pill"
+                                data-bs-target="#pane-multi-{{ tab_name }}"
+                                type="button" role="tab"
+                                title="Multiple Color Options"
+                                data-bs-placement="right"
+                                data-bs-toggle-tooltip>
+                            <i class="bi bi-palette2 fs-5"></i>
+                        </button>
+                        <button class="nav-link p-2"
+                                id="tab-gradient-{{ tab_name }}"
+                                data-bs-toggle="pill"
+                                data-bs-target="#pane-gradient-{{ tab_name }}"
+                                type="button" role="tab"
+                                title="Gradient Color Options"
+                                data-bs-placement="right"
+                                data-bs-toggle-tooltip>
+                            <i class="bi bi-rainbow fs-5"></i>
+                        </button>
+                    </div>
+                    <div class="tab-content flex-grow-1 p-3"
+                         id="layer-style-tab-content-{{ tab_name }}">
+                        <div class="tab-pane fade show active"
+                             id="pane-overview-{{ tab_name }}"
+                             role="tabpanel"
+                             aria-labelledby="tab-overview-{{ tab_name }}">
+                            <p class="text-muted">Overview – Platzhalter.</p>
+                        </div>
+                        <div class="tab-pane fade"
+                             id="pane-single-{{ tab_name }}"
+                             role="tabpanel"
+                             aria-labelledby="tab-single-{{ tab_name }}">
+                            <p class="text-muted">
+                                Single Color Options – Platzhalter.</p>
+                        </div>
+                        <div class="tab-pane fade"
+                             id="pane-multi-{{ tab_name }}"
+                             role="tabpanel"
+                             aria-labelledby="tab-multi-{{ tab_name }}">
+                            <p class="text-muted">
+                                Multiple Color Options – Platzhalter.</p>
+                        </div>
+                        <div class="tab-pane fade"
+                             id="pane-gradient-{{ tab_name }}"
+                             role="tabpanel"
+                             aria-labelledby="tab-gradient-{{ tab_name }}">
+                            <p class="text-muted">
+                                Gradient Color Options – Platzhalter.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary"
@@ -212,4 +378,29 @@
         </div>
     </div>
 </div>
+<script> {# Layer Style Modal Tooltips #}
+(function () {
+    const modalEl = document.getElementById(
+        'layer-style-modal-{{ tab_name }}');
+    modalEl.addEventListener('show.bs.modal', () => {
+        const layerType = modalEl.dataset.layerType || null;
+        const titleEl = modalEl.querySelector('.modal-title');
+        if (titleEl && layerType) {
+            titleEl.textContent = 'Layer Style – ' + layerType;
+        }
+        updateOverview{{ tab_name }}(
+            cachedAllFeatures{{ tab_name }},
+            cachedFilteredFeatures{{ tab_name }},
+            layerType);
+    });
+    modalEl.addEventListener('shown.bs.modal', () => {
+        modalEl.querySelectorAll('[data-bs-toggle-tooltip]')
+            .forEach(el => {
+                if (!bootstrap.Tooltip.getInstance(el)) {
+                    new bootstrap.Tooltip(el, {trigger: 'hover'});
+                }
+            });
+    });
+})();
+</script>
 {% endif %}
