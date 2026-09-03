@@ -89,6 +89,141 @@
     ];
 
     const hiddenLayerTypes{{ tab_name }} = new Set();
+
+    const defaultStyles{{ tab_name }} = {
+        Polygon: {
+            fillColor: '#008888',
+            outlineColor: '#004747',
+            outlineWidth: 1.5,
+            opacity: 0.5
+        },
+        LineString: { color: '#008888', lineWidth: 2.5, opacity: 1 },
+        Point: {
+            color: '#008888',
+            strokeColor: '#000000',
+            strokeWidth: 1,
+            radius: 7,
+            opacity: 1
+        }
+    };
+
+    const currentStyles{{ tab_name }} = {
+        Polygon: Object.assign(
+            {}, defaultStyles{{ tab_name }}.Polygon),
+        LineString: Object.assign(
+            {}, defaultStyles{{ tab_name }}.LineString),
+        Point: Object.assign(
+            {}, defaultStyles{{ tab_name }}.Point)
+    };
+
+    function applyPolygonStyle{{ tab_name }}() {
+        const s = currentStyles{{ tab_name }}.Polygon;
+        const m = map{{ tab_name }};
+        if (m.getLayer('{{ tab_name }}-layer-fill')) {
+            m.setPaintProperty(
+                '{{ tab_name }}-layer-fill',
+                'fill-color', s.fillColor);
+            m.setPaintProperty(
+                '{{ tab_name }}-layer-fill',
+                'fill-opacity', s.opacity);
+        }
+        if (m.getLayer('{{ tab_name }}-layer-outline')) {
+            m.setPaintProperty(
+                '{{ tab_name }}-layer-outline',
+                'line-color', s.outlineColor);
+            m.setPaintProperty(
+                '{{ tab_name }}-layer-outline',
+                'line-width', s.outlineWidth);
+        }
+    }
+
+    function applyLineStringStyle{{ tab_name }}() {
+        const s = currentStyles{{ tab_name }}.LineString;
+        const m = map{{ tab_name }};
+        if (m.getLayer('{{ tab_name }}-layer-line')) {
+            m.setPaintProperty(
+                '{{ tab_name }}-layer-line', 'line-color', s.color);
+            m.setPaintProperty(
+                '{{ tab_name }}-layer-line',
+                'line-width', s.lineWidth);
+            m.setPaintProperty(
+                '{{ tab_name }}-layer-line',
+                'line-opacity', s.opacity);
+        }
+    }
+
+    function applyPointStyle{{ tab_name }}() {
+        const s = currentStyles{{ tab_name }}.Point;
+        const m = map{{ tab_name }};
+        [
+            '{{ tab_name }}-layer-circle',
+            '{{ tab_name }}-layer-representative-points'
+        ].forEach(lid => {
+            if (m.getLayer(lid)) {
+                m.setPaintProperty(lid, 'circle-color', s.color);
+                m.setPaintProperty(
+                    lid, 'circle-radius', s.radius);
+                m.setPaintProperty(
+                    lid, 'circle-opacity', s.opacity);
+                m.setPaintProperty(
+                    lid, 'circle-stroke-color', s.strokeColor);
+                m.setPaintProperty(
+                    lid, 'circle-stroke-width', s.strokeWidth);
+            }
+        });
+    }
+
+    function updateLayerSvg{{ tab_name }}(type) {
+        const s = currentStyles{{ tab_name }}[type];
+        const def = layerDefs{{ tab_name }}.find(d => d.type === type);
+        if (!def) { return; }
+        if (type === 'Polygon') {
+            def.svg = `<svg width="20" height="20" viewBox="0 0 20 20"
+                           xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="4" width="16" height="12" rx="1"
+                      fill="${s.fillColor}"
+                      fill-opacity="${s.opacity}"
+                      stroke="${s.outlineColor}"
+                      stroke-width="${s.outlineWidth}"/>
+            </svg>`;
+        } else if (type === 'LineString') {
+            def.svg = `<svg width="20" height="20" viewBox="0 0 20 20"
+                           xmlns="http://www.w3.org/2000/svg">
+                <polyline points="2,16 7,6 13,12 18,4"
+                          fill="none" stroke="${s.color}"
+                          stroke-width="${s.lineWidth}"
+                          stroke-linejoin="round"
+                          stroke-linecap="round"/>
+            </svg>`;
+        } else if (type === 'Point') {
+            def.svg = `<svg width="20" height="20" viewBox="0 0 20 20"
+                           xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10"
+                        r="${Math.min(s.radius, 9)}"
+                        fill="${s.color}"
+                        stroke="${s.strokeColor}"
+                        stroke-width="${s.strokeWidth}"/>
+            </svg>`;
+        }
+    }
+
+    function refreshLayerListSvg{{ tab_name }}(type) {
+        updateLayerSvg{{ tab_name }}(type);
+        const def = layerDefs{{ tab_name }}.find(d => d.type === type);
+        if (!def) { return; }
+        const list = document.getElementById(
+            'layer-list-{{ tab_name }}');
+        list.querySelectorAll('.layer-info-btn').forEach(span => {
+            const lbl = span.querySelector('span.flex-grow-1');
+            if (lbl && lbl.textContent === def.label) {
+                const svgWrapper =
+                    span.querySelector('span.flex-shrink-0');
+                if (svgWrapper) {
+                    svgWrapper.innerHTML = def.svg;
+                }
+            }
+        });
+    }
     let cachedAllFeatures{{ tab_name }} = [];
     let cachedFilteredFeatures{{ tab_name }} = [];
 
@@ -351,8 +486,10 @@
                              id="pane-single-{{ tab_name }}"
                              role="tabpanel"
                              aria-labelledby="tab-single-{{ tab_name }}">
-                            <p class="text-muted">
-                                Single Color Options – Platzhalter.</p>
+                            <div id="single-color-form-{{ tab_name }}">
+                                <p class="text-muted small">
+                                    Open a layer to edit its style.</p>
+                            </div>
                         </div>
                         <div class="tab-pane fade"
                              id="pane-multi-{{ tab_name }}"
@@ -378,8 +515,175 @@
         </div>
     </div>
 </div>
-<script> {# Layer Style Modal Tooltips #}
+<script> {# Layer Style Modal – Single Color Form & Tooltips #}
 (function () {
+
+    function makeColorRow(labelText, key, styleObj) {
+        const row = document.createElement('div');
+        row.className = 'mb-3';
+        const lbl = document.createElement('label');
+        lbl.className = 'form-label small fw-semibold mb-1';
+        lbl.textContent = labelText;
+        const picker = document.createElement('input');
+        picker.type = 'color';
+        picker.className = 'form-control form-control-color';
+        picker.value = styleObj[key];
+        picker.dataset.key = key;
+        row.appendChild(lbl);
+        row.appendChild(picker);
+        return { row, picker };
+    }
+
+    function makeRangeRow(labelText, key, styleObj, min, max, step) {
+        const row = document.createElement('div');
+        row.className = 'mb-3';
+        const lbl = document.createElement('label');
+        lbl.className = 'form-label small fw-semibold mb-1';
+        lbl.textContent = labelText;
+        const inputGroup = document.createElement('div');
+        inputGroup.className = 'd-flex align-items-center gap-2';
+        const range = document.createElement('input');
+        range.type = 'range';
+        range.className = 'form-range flex-grow-1';
+        range.min = min; range.max = max; range.step = step;
+        range.value = styleObj[key];
+        const numInput = document.createElement('input');
+        numInput.type = 'number';
+        numInput.className = 'form-control form-control-sm';
+        numInput.style.width = '5rem';
+        numInput.min = min; numInput.max = max; numInput.step = step;
+        numInput.value = styleObj[key];
+        range.addEventListener('input', () => {
+            numInput.value = range.value;
+        });
+        numInput.addEventListener('input', () => {
+            range.value = numInput.value;
+        });
+        inputGroup.appendChild(range);
+        inputGroup.appendChild(numInput);
+        row.appendChild(lbl);
+        row.appendChild(inputGroup);
+        return { row, range, numInput };
+    }
+
+    function buildSingleColorForm{{ tab_name }}(type) {
+        const container = document.getElementById(
+            'single-color-form-{{ tab_name }}');
+        container.innerHTML = '';
+        const s = currentStyles{{ tab_name }}[type];
+        const defaults = defaultStyles{{ tab_name }}[type];
+        const inputs = {};
+
+        if (type === 'Polygon') {
+            const { row: r1, picker: p1 } =
+                makeColorRow('Fill Color', 'fillColor', s);
+            const { row: r2, picker: p2 } =
+                makeColorRow('Outline Color', 'outlineColor', s);
+            const { row: r3, range: rng3, numInput: n3 } =
+                makeRangeRow('Outline Width', 'outlineWidth', s,
+                    0.5, 10, 0.5);
+            const { row: r4, range: rng4, numInput: n4 } =
+                makeRangeRow('Opacity', 'opacity', s, 0, 1, 0.05);
+            inputs.fillColor = p1;
+            inputs.outlineColor = p2;
+            inputs.outlineWidth = { range: rng3, num: n3 };
+            inputs.opacity = { range: rng4, num: n4 };
+            container.appendChild(r1);
+            container.appendChild(r2);
+            container.appendChild(r3);
+            container.appendChild(r4);
+        } else if (type === 'LineString') {
+            const { row: r1, picker: p1 } =
+                makeColorRow('Color', 'color', s);
+            const { row: r2, range: rng2, numInput: n2 } =
+                makeRangeRow('Line Width', 'lineWidth', s, 0.5, 20, 0.5);
+            const { row: r3, range: rng3, numInput: n3 } =
+                makeRangeRow('Opacity', 'opacity', s, 0, 1, 0.05);
+            inputs.color = p1;
+            inputs.lineWidth = { range: rng2, num: n2 };
+            inputs.opacity = { range: rng3, num: n3 };
+            container.appendChild(r1);
+            container.appendChild(r2);
+            container.appendChild(r3);
+        } else if (type === 'Point') {
+            const { row: r1, picker: p1 } =
+                makeColorRow('Color', 'color', s);
+            const { row: r2, picker: p2 } =
+                makeColorRow('Stroke Color', 'strokeColor', s);
+            const { row: r3, range: rng3, numInput: n3 } =
+                makeRangeRow('Stroke Width', 'strokeWidth', s, 0, 10, 0.5);
+            const { row: r4, range: rng4, numInput: n4 } =
+                makeRangeRow('Radius', 'radius', s, 1, 30, 1);
+            const { row: r5, range: rng5, numInput: n5 } =
+                makeRangeRow('Opacity', 'opacity', s, 0, 1, 0.05);
+            inputs.color = p1;
+            inputs.strokeColor = p2;
+            inputs.strokeWidth = { range: rng3, num: n3 };
+            inputs.radius = { range: rng4, num: n4 };
+            inputs.opacity = { range: rng5, num: n5 };
+            container.appendChild(r1);
+            container.appendChild(r2);
+            container.appendChild(r3);
+            container.appendChild(r4);
+            container.appendChild(r5);
+        }
+
+        const btnRow = document.createElement('div');
+        btnRow.className = 'd-flex gap-2 mt-3';
+
+        const applyBtn = document.createElement('button');
+        applyBtn.type = 'button';
+        applyBtn.className = 'btn btn-primary btn-sm';
+        applyBtn.textContent = 'Apply';
+        applyBtn.addEventListener('click', () => {
+            const st = currentStyles{{ tab_name }}[type];
+            if (type === 'Polygon') {
+                st.fillColor = inputs.fillColor.value;
+                st.outlineColor = inputs.outlineColor.value;
+                st.outlineWidth =
+                    parseFloat(inputs.outlineWidth.num.value);
+                st.opacity = parseFloat(inputs.opacity.num.value);
+                applyPolygonStyle{{ tab_name }}();
+            } else if (type === 'LineString') {
+                st.color = inputs.color.value;
+                st.lineWidth = parseFloat(inputs.lineWidth.num.value);
+                st.opacity = parseFloat(inputs.opacity.num.value);
+                applyLineStringStyle{{ tab_name }}();
+            } else if (type === 'Point') {
+                st.color = inputs.color.value;
+                st.strokeColor = inputs.strokeColor.value;
+                st.strokeWidth =
+                    parseFloat(inputs.strokeWidth.num.value);
+                st.radius = parseFloat(inputs.radius.num.value);
+                st.opacity = parseFloat(inputs.opacity.num.value);
+                applyPointStyle{{ tab_name }}();
+            }
+            refreshLayerListSvg{{ tab_name }}(type);
+        });
+
+        const resetBtn = document.createElement('button');
+        resetBtn.type = 'button';
+        resetBtn.className = 'btn btn-outline-secondary btn-sm';
+        resetBtn.textContent = 'Reset';
+        resetBtn.addEventListener('click', () => {
+            Object.assign(
+                currentStyles{{ tab_name }}[type], defaults);
+            if (type === 'Polygon') {
+                applyPolygonStyle{{ tab_name }}();
+            } else if (type === 'LineString') {
+                applyLineStringStyle{{ tab_name }}();
+            } else if (type === 'Point') {
+                applyPointStyle{{ tab_name }}();
+            }
+            refreshLayerListSvg{{ tab_name }}(type);
+            buildSingleColorForm{{ tab_name }}(type);
+        });
+
+        btnRow.appendChild(applyBtn);
+        btnRow.appendChild(resetBtn);
+        container.appendChild(btnRow);
+    }
+
     const modalEl = document.getElementById(
         'layer-style-modal-{{ tab_name }}');
     modalEl.addEventListener('show.bs.modal', () => {
@@ -392,6 +696,9 @@
             cachedAllFeatures{{ tab_name }},
             cachedFilteredFeatures{{ tab_name }},
             layerType);
+        if (layerType) {
+            buildSingleColorForm{{ tab_name }}(layerType);
+        }
     });
     modalEl.addEventListener('shown.bs.modal', () => {
         modalEl.querySelectorAll('[data-bs-toggle-tooltip]')

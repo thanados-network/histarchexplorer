@@ -73,7 +73,12 @@
         {
             id: '{{ tab_name }}-layer-circle',
             type: 'circle',
-            paint: { 'circle-radius': 9, 'circle-color': '#088' },
+            paint: {
+                'circle-radius': 9,
+                'circle-color': '#088',
+                'circle-stroke-color': '#000000',
+                'circle-stroke-width': 1
+            },
             filter: ['all', ['==', ['geometry-type'], 'Point'], ['!', ['has', 'representative']]]
         },
         {
@@ -89,6 +94,8 @@
                     {{ z }}.0, ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], {{ z }}.0]]]{% if not loop.last %},{% endif %}
                     {% endfor %}
                 ],
+                'circle-stroke-color': '#000000',
+                'circle-stroke-width': 1,
                 'circle-stroke-opacity': [
                     'step', ['zoom'],
                     ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], 0]]],
