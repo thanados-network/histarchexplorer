@@ -747,8 +747,12 @@
         '#808000', '#ffd8b1', '#000075', '#a9a9a9', '#ffffff'
     ];
 
-    const multiClassColors{{ tab_name }} = {};
-    const multiTypeColors{{ tab_name }}  = {};
+    const multiClassColors{{ tab_name }} = {
+        Polygon: {}, LineString: {}, Point: {}
+    };
+    const multiTypeColors{{ tab_name }}  = {
+        Polygon: {}, LineString: {}, Point: {}
+    };
     const multiSharedOpts{{ tab_name }} = {
         Polygon:    { outlineWidth: 1.5, opacity: 0.5 },
         LineString: { lineWidth: 2.5,    opacity: 1   },
@@ -883,8 +887,8 @@
             const svgWrap = li.querySelector('.multi-sym, .multi-sym-type');
             if (svgWrap) {
                 let color = '#888888';
-                if (cls) color = multiClassColors{{ tab_name }}[cls] || color;
-                else if (tid) color = multiTypeColors{{ tab_name }}[tid] || color;
+                if (cls) color = multiClassColors{{ tab_name }}[type][cls] || color;
+                else if (tid) color = multiTypeColors{{ tab_name }}[type][tid] || color;
                 svgWrap.innerHTML = makeMultiSvg{{ tab_name }}(type, color);
             }
         });
@@ -908,24 +912,19 @@
 
         const allF = cachedAllFeatures{{ tab_name }};
         const filtF = cachedFilteredFeatures{{ tab_name }};
-        const totalByType = {};
         const filtByType  = {};
         const entitiesById = {};
         {{ tab_name }}Data.tableData.forEach(e => entitiesById[e.id] = e);
 
+        const filteredIds = new Set(filteredIDdata{{ tab_name }});
+
         allF.forEach(f => {
-            const cat = getGeomCategory{{ tab_name }}(f.geometry.type);
-            if (cat !== type) { return; }
             const eid = f.properties && f.properties.id;
-            const entity = entitiesById[eid];
-            if (entity && entity.type_id) {
-                totalByType[entity.type_id] = (totalByType[entity.type_id] || 0) + 1;
-            }
-        });
-        filtF.forEach(f => {
+            if (!filteredIds.has(eid)) return;
+
             const cat = getGeomCategory{{ tab_name }}(f.geometry.type);
-            if (cat !== type) { return; }
-            const eid = f.properties && f.properties.id;
+            if (cat !== type) return;
+
             const entity = entitiesById[eid];
             if (entity && entity.type_id) {
                 filtByType[entity.type_id] = (filtByType[entity.type_id] || 0) + 1;
@@ -940,10 +939,10 @@
             const classNodes = tree[classKey];
             if (!Array.isArray(classNodes)) return;
 
-            // Pre-check if this branch has any geometries
+            // Pre-check if this branch has any filtered geometries of current type
             const branchHasGeom = classNodes.some(node => {
                 const check = (n) => {
-                    if (totalByType[n.id] > 0) return true;
+                    if ((filtByType[n.id] || 0) > 0) return true;
                     if (n.children) return n.children.some(check);
                     return false;
                 };
@@ -959,63 +958,73 @@
             }
 
             const processNode = (node, depth, baseColor, colorLevel) => {
-                const count = totalByType[node.id] || 0;
-                if (count === 0) {
+                const filtCount = filtByType[node.id] || 0;
+
+                // Check if this node or any of its children have active geometries
+                const hasActiveGeom = (n) => {
+                    if ((filtByType[n.id] || 0) > 0) return true;
+                    if (n.children) return n.children.some(hasActiveGeom);
+                    return false;
+                };
+
+                if (!hasActiveGeom(node)) return;
+
+                if (filtCount > 0) {
+                    if (!multiTypeColors{{ tab_name }}[type][node.id]) {
+                        const nodeColor = baseColor ?
+                            adjustColor{{ tab_name }}(baseColor, colorLevel * 15) :
+                            multiNextColor{{ tab_name }}();
+                        multiTypeColors{{ tab_name }}[type][node.id] = nodeColor;
+                    }
+                    const color = multiTypeColors{{ tab_name }}[type][node.id];
+                    const effectiveNodeColor = color;
+
+                    const li = document.createElement('li');
+                    li.className = 'd-flex align-items-center gap-2 py-1';
+                    li.dataset.tid = node.id;
+
+                    const svgWrap = document.createElement('span');
+                    svgWrap.className = 'flex-shrink-0 multi-sym-type';
+                    svgWrap.innerHTML = makeMultiSvg{{ tab_name }}(type, color);
+                    svgWrap.style.cursor = 'pointer';
+
+                    const picker = document.createElement('input');
+                    picker.type = 'color';
+                    picker.value = color;
+                    picker.style.cssText =
+                        'position:absolute;opacity:0;width:0;height:0;';
+                    picker.addEventListener('input', () => {
+                        multiTypeColors{{ tab_name }}[type][node.id] = picker.value;
+                        svgWrap.innerHTML =
+                            makeMultiSvg{{ tab_name }}(type, picker.value);
+                    });
+                    svgWrap.appendChild(picker);
+                    svgWrap.addEventListener('click', () => picker.click());
+
+                    const label = document.createElement('span');
+                    label.className = 'flex-grow-1 small text-truncate';
+                    label.textContent = node.label;
+
+                    const badge = document.createElement('span');
+                    badge.className = 'badge text-bg-secondary ms-1';
+                    badge.textContent = filtCount;
+
+                    li.appendChild(svgWrap);
+                    li.appendChild(label);
+                    li.appendChild(badge);
+                    fragment.appendChild(li);
+
+                    if (node.children) {
+                        node.children.forEach(c =>
+                            processNode(c, depth + 1, baseColor || effectiveNodeColor,
+                                        (baseColor ? colorLevel + 1 : 1)));
+                    }
+                } else {
+                    // Node has no geometries but children do, so just process children
                     if (node.children) {
                         node.children.forEach(c =>
                             processNode(c, depth + 1, baseColor, colorLevel));
                     }
-                    return;
-                }
-
-                const nodeColor = baseColor ?
-                    adjustColor{{ tab_name }}(baseColor, colorLevel * 15) :
-                    multiNextColor{{ tab_name }}();
-
-                if (!multiTypeColors{{ tab_name }}[node.id]) {
-                    multiTypeColors{{ tab_name }}[node.id] = nodeColor;
-                }
-                const color = multiTypeColors{{ tab_name }}[node.id];
-
-                const li = document.createElement('li');
-                li.className = 'd-flex align-items-center gap-2 py-1';
-                li.dataset.tid = node.id;
-
-                const svgWrap = document.createElement('span');
-                svgWrap.className = 'flex-shrink-0 multi-sym-type';
-                svgWrap.innerHTML = makeMultiSvg{{ tab_name }}(type, color);
-                svgWrap.style.cursor = 'pointer';
-
-                const picker = document.createElement('input');
-                picker.type = 'color';
-                picker.value = color;
-                picker.style.cssText =
-                    'position:absolute;opacity:0;width:0;height:0;';
-                picker.addEventListener('input', () => {
-                    multiTypeColors{{ tab_name }}[node.id] = picker.value;
-                    svgWrap.innerHTML =
-                        makeMultiSvg{{ tab_name }}(type, picker.value);
-                });
-                svgWrap.appendChild(picker);
-                svgWrap.addEventListener('click', () => picker.click());
-
-                const label = document.createElement('span');
-                label.className = 'flex-grow-1 small text-truncate';
-                label.textContent = node.label;
-
-                const badge = document.createElement('span');
-                badge.className = 'badge text-bg-secondary ms-1';
-                badge.textContent = filtByType[node.id] || 0;
-
-                li.appendChild(svgWrap);
-                li.appendChild(label);
-                li.appendChild(badge);
-                fragment.appendChild(li);
-
-                if (node.children) {
-                    node.children.forEach(c =>
-                        processNode(c, depth + 1, baseColor || nodeColor,
-                                    (baseColor ? colorLevel + 1 : 1)));
                 }
             };
 
@@ -1043,27 +1052,23 @@
 
         const allF = cachedAllFeatures{{ tab_name }};
         const filtF = cachedFilteredFeatures{{ tab_name }};
-        const totalByClass = {};
         const filtByClass  = {};
+        const filteredIds = new Set(filteredIDdata{{ tab_name }});
 
         allF.forEach(f => {
+            const eid = f.properties && f.properties.id;
+            if (!filteredIds.has(eid)) return;
+
             const cat = getGeomCategory{{ tab_name }}(f.geometry.type);
-            if (cat !== type) { return; }
-            const cls = (f.properties && f.properties.class)
-                || 'Unknown';
-            if (!viewClasses{{ tab_name }}.has(cls)) { return; }
-            totalByClass[cls] = (totalByClass[cls] || 0) + 1;
-        });
-        filtF.forEach(f => {
-            const cat = getGeomCategory{{ tab_name }}(f.geometry.type);
-            if (cat !== type) { return; }
-            const cls = (f.properties && f.properties.class)
-                || 'Unknown';
-            if (!viewClasses{{ tab_name }}.has(cls)) { return; }
+            if (cat !== type) return;
+
+            const cls = (f.properties && f.properties.class) || 'Unknown';
+            if (!viewClasses{{ tab_name }}.has(cls)) return;
+
             filtByClass[cls] = (filtByClass[cls] || 0) + 1;
         });
 
-        const classes = Object.keys(totalByClass).sort();
+        const classes = Object.keys(filtByClass).sort();
         if (classes.length === 0) {
             btnRow.classList.add('d-none');
             return;
@@ -1071,12 +1076,14 @@
 
         const fragment = document.createDocumentFragment();
         classes.forEach(cls => {
-            if (!multiClassColors{{ tab_name }}[cls]) {
-                multiClassColors{{ tab_name }}[cls] =
+            const count = filtByClass[cls] || 0;
+            if (count === 0) return;
+
+            if (!multiClassColors{{ tab_name }}[type][cls]) {
+                multiClassColors{{ tab_name }}[type][cls] =
                     multiNextColor{{ tab_name }}();
             }
-            const color = multiClassColors{{ tab_name }}[cls];
-            const count = filtByClass[cls] || 0;
+            const color = multiClassColors{{ tab_name }}[type][cls];
 
             const li = document.createElement('li');
             li.className =
@@ -1095,7 +1102,7 @@
             picker.style.cssText =
                 'position:absolute;opacity:0;width:0;height:0;';
             picker.addEventListener('input', () => {
-                multiClassColors{{ tab_name }}[cls] = picker.value;
+                multiClassColors{{ tab_name }}[type][cls] = picker.value;
                 svgWrap.innerHTML =
                     makeMultiSvg{{ tab_name }}(type, picker.value);
             });
@@ -1125,9 +1132,9 @@
         const mode = (sel && sel.value) || 'class';
         let colors = [];
         if (mode === 'class') {
-            colors = Object.values(multiClassColors{{ tab_name }});
+            colors = Object.values(multiClassColors{{ tab_name }}[type]);
         } else {
-            colors = Object.values(multiTypeColors{{ tab_name }});
+            colors = Object.values(multiTypeColors{{ tab_name }}[type]);
         }
         const c0 = colors[0] || '#888888';
         const c1 = colors[1] || c0;
@@ -1185,18 +1192,19 @@
 
         let colorExpr = '#888888';
         if (mode === 'class') {
-            const classes = Object.keys(multiClassColors{{ tab_name }});
+            const classes = Object.keys(multiClassColors{{ tab_name }}[type]);
             if (classes.length === 0) { return; }
             colorExpr = ['match', ['get', 'class']];
             classes.forEach(cls => {
-                colorExpr.push(cls, multiClassColors{{ tab_name }}[cls]);
+                colorExpr.push(cls, multiClassColors{{ tab_name }}[type][cls]);
             });
             colorExpr.push('#888888');
         } else if (mode === 'type') {
             const eidMatches = [];
+            const typeColors = multiTypeColors{{ tab_name }}[type];
             {{ tab_name }}Data.tableData.forEach(e => {
-                if (e.type_id && multiTypeColors{{ tab_name }}[e.type_id]) {
-                    eidMatches.push(e.id, multiTypeColors{{ tab_name }}[e.type_id]);
+                if (e.type_id && typeColors[e.type_id]) {
+                    eidMatches.push(e.id, typeColors[e.type_id]);
                 }
             });
             if (eidMatches.length === 0) { return; }
@@ -1271,10 +1279,8 @@
     function resetMultiColor{{ tab_name }}() {
         const type = multiCurrentLayerType{{ tab_name }};
         if (!type) { return; }
-        Object.keys(multiClassColors{{ tab_name }}).forEach(
-            k => delete multiClassColors{{ tab_name }}[k]);
-        Object.keys(multiTypeColors{{ tab_name }}).forEach(
-            k => delete multiTypeColors{{ tab_name }}[k]);
+        multiClassColors{{ tab_name }}[type] = {};
+        multiTypeColors{{ tab_name }}[type] = {};
         multiPaletteIdx{{ tab_name }} = 0;
         const defaults = {
             Polygon:    { outlineWidth: 1.5, opacity: 0.5 },
@@ -1337,6 +1343,18 @@
             layerType);
         if (layerType) {
             buildSingleColorForm{{ tab_name }}(layerType);
+        }
+        // Reset multi color selection to initial state
+        const multiSel = document.getElementById(
+            'multi-color-select-{{ tab_name }}');
+        if (multiSel) {
+            multiSel.value = '';
+            document.getElementById(
+                'multi-class-list-{{ tab_name }}').innerHTML = '';
+            const multiBtnRow = document.getElementById(
+                'multi-btn-row-{{ tab_name }}');
+            if (multiBtnRow) multiBtnRow.classList.add('d-none');
+            buildMultiSharedOpts{{ tab_name }}(null);
         }
     });
     modalEl.addEventListener('shown.bs.modal', () => {
