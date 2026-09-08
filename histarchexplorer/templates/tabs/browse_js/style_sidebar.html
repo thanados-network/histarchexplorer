@@ -748,6 +748,7 @@
     ];
 
     const multiClassColors{{ tab_name }} = {};
+    const multiTypeColors{{ tab_name }}  = {};
     const multiSharedOpts{{ tab_name }} = {
         Polygon:    { outlineWidth: 1.5, opacity: 0.5 },
         LineString: { lineWidth: 2.5,    opacity: 1   },
@@ -762,6 +763,25 @@
             multiPaletteIdx{{ tab_name }} % CARTO_PALETTE.length];
         multiPaletteIdx{{ tab_name }}++;
         return c;
+    }
+
+    /**
+     * Lightens/darkens a color (for type gradations)
+     */
+    function adjustColor{{ tab_name }}(color, percent) {
+        const num = parseInt(color.replace("#", ""), 16);
+        // If percent is 0, return original color
+        if (percent === 0) return color;
+        const amt = Math.round(2.55 * percent);
+        const R = (num >> 16) + amt;
+        const G = ((num >> 8) & 0x00FF) + amt;
+        const B = (num & 0x0000FF) + amt;
+        return "#" + (
+            0x1000000 +
+            (R < 255 ? (R < 0 ? 0 : R) : 255) * 0x10000 +
+            (G < 255 ? (G < 0 ? 0 : G) : 255) * 0x100 +
+            (B < 255 ? (B < 0 ? 0 : B) : 255)
+        ).toString(16).slice(1);
     }
 
     function makeMultiSvg{{ tab_name }}(type, color) {
@@ -859,14 +879,150 @@
             'multi-class-list-{{ tab_name }}');
         list.querySelectorAll('li').forEach(li => {
             const cls = li.dataset.cls;
-            const svgWrap = li.querySelector('.multi-sym');
-            if (svgWrap && cls) {
-                const color = multiClassColors{{ tab_name }}[cls]
-                    || '#888888';
-                svgWrap.innerHTML =
-                    makeMultiSvg{{ tab_name }}(type, color);
+            const tid = li.dataset.tid;
+            const svgWrap = li.querySelector('.multi-sym, .multi-sym-type');
+            if (svgWrap) {
+                let color = '#888888';
+                if (cls) color = multiClassColors{{ tab_name }}[cls] || color;
+                else if (tid) color = multiTypeColors{{ tab_name }}[tid] || color;
+                svgWrap.innerHTML = makeMultiSvg{{ tab_name }}(type, color);
             }
         });
+    }
+
+    function buildMultiTypeList{{ tab_name }}(type) {
+        multiCurrentLayerType{{ tab_name }} = type;
+        const list = document.getElementById(
+            'multi-class-list-{{ tab_name }}');
+        list.innerHTML = '';
+        const btnRow = document.getElementById(
+            'multi-btn-row-{{ tab_name }}');
+
+        if (!type) {
+            btnRow.classList.add('d-none');
+            buildMultiSharedOpts{{ tab_name }}(null);
+            return;
+        }
+
+        buildMultiSharedOpts{{ tab_name }}(type);
+
+        const allF = cachedAllFeatures{{ tab_name }};
+        const filtF = cachedFilteredFeatures{{ tab_name }};
+        const totalByType = {};
+        const filtByType  = {};
+        const entitiesById = {};
+        {{ tab_name }}Data.tableData.forEach(e => entitiesById[e.id] = e);
+
+        allF.forEach(f => {
+            const cat = getGeomCategory{{ tab_name }}(f.geometry.type);
+            if (cat !== type) { return; }
+            const eid = f.properties && f.properties.id;
+            const entity = entitiesById[eid];
+            if (entity && entity.type_id) {
+                totalByType[entity.type_id] = (totalByType[entity.type_id] || 0) + 1;
+            }
+        });
+        filtF.forEach(f => {
+            const cat = getGeomCategory{{ tab_name }}(f.geometry.type);
+            if (cat !== type) { return; }
+            const eid = f.properties && f.properties.id;
+            const entity = entitiesById[eid];
+            if (entity && entity.type_id) {
+                filtByType[entity.type_id] = (filtByType[entity.type_id] || 0) + 1;
+            }
+        });
+
+        const tree = {{ tab_name }}Data.treeData;
+        const fragment = document.createDocumentFragment();
+        btnRow.classList.remove('d-none');
+
+        Object.keys(tree).forEach((classKey, branchIdx) => {
+            const classNodes = tree[classKey];
+            if (!Array.isArray(classNodes)) return;
+
+            // Pre-check if this branch has any geometries
+            const branchHasGeom = classNodes.some(node => {
+                const check = (n) => {
+                    if (totalByType[n.id] > 0) return true;
+                    if (n.children) return n.children.some(check);
+                    return false;
+                };
+                return check(node);
+            });
+
+            if (!branchHasGeom) return;
+
+            if (fragment.childNodes.length > 0) {
+                const hr = document.createElement('hr');
+                hr.className = 'my-2 opacity-25 w-100';
+                fragment.appendChild(hr);
+            }
+
+            const processNode = (node, depth, baseColor, colorLevel) => {
+                const count = totalByType[node.id] || 0;
+                if (count === 0) {
+                    if (node.children) {
+                        node.children.forEach(c =>
+                            processNode(c, depth + 1, baseColor, colorLevel));
+                    }
+                    return;
+                }
+
+                const nodeColor = baseColor ?
+                    adjustColor{{ tab_name }}(baseColor, colorLevel * 15) :
+                    multiNextColor{{ tab_name }}();
+
+                if (!multiTypeColors{{ tab_name }}[node.id]) {
+                    multiTypeColors{{ tab_name }}[node.id] = nodeColor;
+                }
+                const color = multiTypeColors{{ tab_name }}[node.id];
+
+                const li = document.createElement('li');
+                li.className = 'd-flex align-items-center gap-2 py-1';
+                li.dataset.tid = node.id;
+
+                const svgWrap = document.createElement('span');
+                svgWrap.className = 'flex-shrink-0 multi-sym-type';
+                svgWrap.innerHTML = makeMultiSvg{{ tab_name }}(type, color);
+                svgWrap.style.cursor = 'pointer';
+
+                const picker = document.createElement('input');
+                picker.type = 'color';
+                picker.value = color;
+                picker.style.cssText =
+                    'position:absolute;opacity:0;width:0;height:0;';
+                picker.addEventListener('input', () => {
+                    multiTypeColors{{ tab_name }}[node.id] = picker.value;
+                    svgWrap.innerHTML =
+                        makeMultiSvg{{ tab_name }}(type, picker.value);
+                });
+                svgWrap.appendChild(picker);
+                svgWrap.addEventListener('click', () => picker.click());
+
+                const label = document.createElement('span');
+                label.className = 'flex-grow-1 small text-truncate';
+                label.textContent = node.label;
+
+                const badge = document.createElement('span');
+                badge.className = 'badge text-bg-secondary ms-1';
+                badge.textContent = filtByType[node.id] || 0;
+
+                li.appendChild(svgWrap);
+                li.appendChild(label);
+                li.appendChild(badge);
+                fragment.appendChild(li);
+
+                if (node.children) {
+                    node.children.forEach(c =>
+                        processNode(c, depth + 1, baseColor || nodeColor,
+                                    (baseColor ? colorLevel + 1 : 1)));
+                }
+            };
+
+            classNodes.forEach(node => processNode(node, 0, null, 0));
+        });
+
+        list.appendChild(fragment);
     }
 
     function buildMultiClassList{{ tab_name }}(type) {
@@ -964,7 +1120,15 @@
     }
 
     function makeMultiLayerSvg{{ tab_name }}(type) {
-        const colors = Object.values(multiClassColors{{ tab_name }});
+        const sel = document.getElementById(
+            'multi-color-select-{{ tab_name }}');
+        const mode = (sel && sel.value) || 'class';
+        let colors = [];
+        if (mode === 'class') {
+            colors = Object.values(multiClassColors{{ tab_name }});
+        } else {
+            colors = Object.values(multiTypeColors{{ tab_name }});
+        }
         const c0 = colors[0] || '#888888';
         const c1 = colors[1] || c0;
         const s = multiSharedOpts{{ tab_name }}[type];
@@ -1013,16 +1177,33 @@
     function applyMultiColor{{ tab_name }}() {
         const type = multiCurrentLayerType{{ tab_name }};
         if (!type) { return; }
+        const sel = document.getElementById(
+            'multi-color-select-{{ tab_name }}');
+        const mode = sel.value;
         const m = map{{ tab_name }};
         const s = multiSharedOpts{{ tab_name }}[type];
-        const classes = Object.keys(multiClassColors{{ tab_name }});
-        if (classes.length === 0) { return; }
 
-        const colorExpr = ['match', ['get', 'class']];
-        classes.forEach(cls => {
-            colorExpr.push(cls, multiClassColors{{ tab_name }}[cls]);
-        });
-        colorExpr.push('#888888');
+        let colorExpr = '#888888';
+        if (mode === 'class') {
+            const classes = Object.keys(multiClassColors{{ tab_name }});
+            if (classes.length === 0) { return; }
+            colorExpr = ['match', ['get', 'class']];
+            classes.forEach(cls => {
+                colorExpr.push(cls, multiClassColors{{ tab_name }}[cls]);
+            });
+            colorExpr.push('#888888');
+        } else if (mode === 'type') {
+            const eidMatches = [];
+            {{ tab_name }}Data.tableData.forEach(e => {
+                if (e.type_id && multiTypeColors{{ tab_name }}[e.type_id]) {
+                    eidMatches.push(e.id, multiTypeColors{{ tab_name }}[e.type_id]);
+                }
+            });
+            if (eidMatches.length === 0) { return; }
+            colorExpr = ['match', ['get', 'id']];
+            eidMatches.forEach(val => colorExpr.push(val));
+            colorExpr.push('#888888');
+        }
 
         if (type === 'Polygon') {
             if (m.getLayer('{{ tab_name }}-layer-fill')) {
@@ -1092,6 +1273,8 @@
         if (!type) { return; }
         Object.keys(multiClassColors{{ tab_name }}).forEach(
             k => delete multiClassColors{{ tab_name }}[k]);
+        Object.keys(multiTypeColors{{ tab_name }}).forEach(
+            k => delete multiTypeColors{{ tab_name }}[k]);
         multiPaletteIdx{{ tab_name }} = 0;
         const defaults = {
             Polygon:    { outlineWidth: 1.5, opacity: 0.5 },
@@ -1111,7 +1294,10 @@
             applyPointStyle{{ tab_name }}();
             refreshLayerListSvg{{ tab_name }}('Point');
         }
-        buildMultiClassList{{ tab_name }}(type);
+        const sel = document.getElementById(
+            'multi-color-select-{{ tab_name }}');
+        if (sel.value === 'class') buildMultiClassList{{ tab_name }}(type);
+        else if (sel.value === 'type') buildMultiTypeList{{ tab_name }}(type);
     }
 
     const modalEl = document.getElementById(
@@ -1124,10 +1310,11 @@
 
     document.getElementById('multi-color-select-{{ tab_name }}')
         .addEventListener('change', function () {
+            const layerType = modalEl.dataset.layerType || null;
             if (this.value === 'class') {
-                const layerType =
-                    modalEl.dataset.layerType || null;
                 buildMultiClassList{{ tab_name }}(layerType);
+            } else if (this.value === 'type') {
+                buildMultiTypeList{{ tab_name }}(layerType);
             } else {
                 document.getElementById(
                     'multi-class-list-{{ tab_name }}').innerHTML = '';
