@@ -494,7 +494,7 @@
                              id="pane-multi-{{ tab_name }}"
                              role="tabpanel"
                              aria-labelledby="tab-multi-{{ tab_name }}">
-                            <div class="mb-2">
+                            <div class="mb-2 d-none">
                                 <label class="form-label small fw-semibold mb-1"
                                        for="multi-color-select-{{ tab_name }}">
                                     Color by Property
@@ -825,6 +825,7 @@
     function buildMultiSharedOpts{{ tab_name }}(type) {
         const container = document.getElementById(
             'multi-shared-opts-{{ tab_name }}');
+        if (!container) return;
         container.innerHTML = '';
         if (!type) { return; }
         const s = multiSharedOpts{{ tab_name }}[type];
@@ -898,6 +899,7 @@
         multiCurrentLayerType{{ tab_name }} = type;
         const list = document.getElementById(
             'multi-class-list-{{ tab_name }}');
+        if (!list) return;
         list.innerHTML = '';
         const btnRow = document.getElementById(
             'multi-btn-row-{{ tab_name }}');
@@ -997,6 +999,7 @@
                         multiTypeColors{{ tab_name }}[type][node.id] = picker.value;
                         svgWrap.innerHTML =
                             makeMultiSvg{{ tab_name }}(type, picker.value);
+                        applyMultiColor{{ tab_name }}('type');
                     });
                     svgWrap.appendChild(picker);
                     svgWrap.addEventListener('click', () => picker.click());
@@ -1038,6 +1041,7 @@
         multiCurrentLayerType{{ tab_name }} = type;
         const list = document.getElementById(
             'multi-class-list-{{ tab_name }}');
+        if (!list) return;
         list.innerHTML = '';
         const btnRow = document.getElementById(
             'multi-btn-row-{{ tab_name }}');
@@ -1105,6 +1109,7 @@
                 multiClassColors{{ tab_name }}[type][cls] = picker.value;
                 svgWrap.innerHTML =
                     makeMultiSvg{{ tab_name }}(type, picker.value);
+                applyMultiColor{{ tab_name }}('class');
             });
             svgWrap.appendChild(picker);
             svgWrap.addEventListener('click', () => picker.click());
@@ -1126,10 +1131,10 @@
         btnRow.classList.remove('d-none');
     }
 
-    function makeMultiLayerSvg{{ tab_name }}(type) {
+    function makeMultiLayerSvg{{ tab_name }}(type, modeArg) {
         const sel = document.getElementById(
             'multi-color-select-{{ tab_name }}');
-        const mode = (sel && sel.value) || 'class';
+        const mode = modeArg || (sel && sel.value) || 'class';
         let colors = [];
         if (mode === 'class') {
             colors = Object.values(multiClassColors{{ tab_name }}[type]);
@@ -1181,30 +1186,60 @@
         </svg>`;
     }
 
-    function applyMultiColor{{ tab_name }}() {
-        const type = multiCurrentLayerType{{ tab_name }};
+    function applyMultiColor{{ tab_name }}(modeArg) {
+        let type = multiCurrentLayerType{{ tab_name }};
+        if (!type) {
+            const modal = document.getElementById(
+                'layer-style-modal-{{ tab_name }}');
+            type = modal.dataset.layerType || null;
+        }
         if (!type) { return; }
+
         const sel = document.getElementById(
             'multi-color-select-{{ tab_name }}');
-        const mode = sel.value;
+        let mode = (modeArg && typeof modeArg === 'string') ? modeArg : null;
+        if (!mode) {
+            if (sel && sel.value) {
+                mode = sel.value;
+            } else {
+                const tree = {{ tab_name }}Data.treeData;
+                mode = (tree && Object.keys(tree).length > 0) ? 'type' : 'class';
+            }
+        }
         const m = map{{ tab_name }};
         const s = multiSharedOpts{{ tab_name }}[type];
 
         let colorExpr = '#888888';
         if (mode === 'class') {
-            const classes = Object.keys(multiClassColors{{ tab_name }}[type]);
-            if (classes.length === 0) { return; }
-            colorExpr = ['match', ['get', 'class']];
-            classes.forEach(cls => {
-                colorExpr.push(cls, multiClassColors{{ tab_name }}[type][cls]);
-            });
+            const colors = multiClassColors{{ tab_name }}[type];
+            const classes = Object.keys(colors);
+            if (classes.length === 0) {
+                // Try to build them if missing
+                buildMultiClassList{{ tab_name }}(type);
+                const newColors = multiClassColors{{ tab_name }}[type];
+                const newClasses = Object.keys(newColors);
+                if (newClasses.length === 0) return;
+                colorExpr = ['match', ['get', 'class']];
+                newClasses.forEach(cls => {
+                    colorExpr.push(cls, newColors[cls]);
+                });
+            } else {
+                colorExpr = ['match', ['get', 'class']];
+                classes.forEach(cls => {
+                    colorExpr.push(cls, colors[cls]);
+                });
+            }
             colorExpr.push('#888888');
         } else if (mode === 'type') {
+            const colors = multiTypeColors{{ tab_name }}[type];
+            if (Object.keys(colors).length === 0) {
+                // Try to build them if missing
+                buildMultiTypeList{{ tab_name }}(type);
+            }
             const eidMatches = [];
-            const typeColors = multiTypeColors{{ tab_name }}[type];
             {{ tab_name }}Data.tableData.forEach(e => {
-                if (e.type_id && typeColors[e.type_id]) {
-                    eidMatches.push(e.id, typeColors[e.type_id]);
+                if (e.type_id && colors[e.type_id]) {
+                    eidMatches.push(e.id, colors[e.type_id]);
                 }
             });
             if (eidMatches.length === 0) { return; }
@@ -1223,6 +1258,9 @@
                     'fill-opacity', s.opacity);
             }
             if (m.getLayer('{{ tab_name }}-layer-outline')) {
+                m.setPaintProperty(
+                    '{{ tab_name }}-layer-outline',
+                    'line-color', (mode === 'class' ? '#004747' : '#000000'));
                 m.setPaintProperty(
                     '{{ tab_name }}-layer-outline',
                     'line-width', s.outlineWidth);
@@ -1259,7 +1297,7 @@
         const def = layerDefs{{ tab_name }}.find(
             d => d.type === type);
         if (def) {
-            def.svg = makeMultiLayerSvg{{ tab_name }}(type);
+            def.svg = makeMultiLayerSvg{{ tab_name }}(type, mode);
             const layerList = document.getElementById(
                 'layer-list-{{ tab_name }}');
             layerList.querySelectorAll(
@@ -1275,6 +1313,8 @@
             });
         }
     }
+
+    window.applyMultiColor{{ tab_name }} = applyMultiColor{{ tab_name }};
 
     function resetMultiColor{{ tab_name }}() {
         const type = multiCurrentLayerType{{ tab_name }};
@@ -1330,9 +1370,53 @@
                 buildMultiSharedOpts{{ tab_name }}(null);
             }
         });
+    function initLayerStyle{{ tab_name }}() {
+        const types = ['Polygon', 'LineString', 'Point'];
+        const tree = {{ tab_name }}Data.treeData;
+        const hasTree = tree && Object.keys(tree).length > 0;
+        const classes = classList{{ tab_name }};
+        const hasClasses = classes && classes.length >= 1;
+
+        if (!hasTree && !hasClasses) return;
+
+        // Determine mode: prioritize type if tree data exists
+        const mode = hasTree ? 'type' : 'class';
+
+        types.forEach(t => {
+            // Only apply if there are geometries of this type
+            const hasGeom = cachedAllFeatures{{ tab_name }}.some(f =>
+                getGeomCategory{{ tab_name }}(f.geometry.type) === t
+            );
+            if (!hasGeom) return;
+
+            multiCurrentLayerType{{ tab_name }} = t;
+            if (mode === 'type') {
+                // Ensure colors are generated
+                buildMultiTypeList{{ tab_name }}(t);
+                applyMultiColor{{ tab_name }}('type');
+            } else {
+                // Ensure colors are generated
+                buildMultiClassList{{ tab_name }}(t);
+                applyMultiColor{{ tab_name }}('class');
+            }
+        });
+
+        // Ensure current type is set back to null if modal is not open,
+        // but don't clear the color caches!
+        if (!modalEl.classList.contains('show')) {
+            const list = document.getElementById('multi-class-list-{{ tab_name }}');
+            if (list) list.innerHTML = '';
+            const btnRow = document.getElementById('multi-btn-row-{{ tab_name }}');
+            if (btnRow) btnRow.classList.add('d-none');
+            buildMultiSharedOpts{{ tab_name }}(null);
+            multiCurrentLayerType{{ tab_name }} = null;
+        }
+    }
+
     modalEl.addEventListener('show.bs.modal', () => {
         buildMultiColorSelect{{ tab_name }}();
         const layerType = modalEl.dataset.layerType || null;
+        if (layerType) multiCurrentLayerType{{ tab_name }} = layerType;
         const titleEl = modalEl.querySelector('.modal-title');
         if (titleEl && layerType) {
             titleEl.textContent = 'Layer Style – ' + layerType;
@@ -1344,17 +1428,30 @@
         if (layerType) {
             buildSingleColorForm{{ tab_name }}(layerType);
         }
-        // Reset multi color selection to initial state
+        // Set default selection to Types if available, otherwise Classes
         const multiSel = document.getElementById(
             'multi-color-select-{{ tab_name }}');
         if (multiSel) {
-            multiSel.value = '';
-            document.getElementById(
-                'multi-class-list-{{ tab_name }}').innerHTML = '';
-            const multiBtnRow = document.getElementById(
-                'multi-btn-row-{{ tab_name }}');
-            if (multiBtnRow) multiBtnRow.classList.add('d-none');
-            buildMultiSharedOpts{{ tab_name }}(null);
+            const hasType = [...multiSel.options].some(o => o.value === 'type');
+            const hasClass = [...multiSel.options].some(o => o.value === 'class');
+
+            if (hasType) {
+                multiSel.value = 'type';
+                buildMultiTypeList{{ tab_name }}(layerType);
+                applyMultiColor{{ tab_name }}();
+            } else if (hasClass) {
+                multiSel.value = 'class';
+                buildMultiClassList{{ tab_name }}(layerType);
+                applyMultiColor{{ tab_name }}();
+            } else {
+                multiSel.value = '';
+                document.getElementById(
+                    'multi-class-list-{{ tab_name }}').innerHTML = '';
+                const multiBtnRow = document.getElementById(
+                    'multi-btn-row-{{ tab_name }}');
+                if (multiBtnRow) multiBtnRow.classList.add('d-none');
+                buildMultiSharedOpts{{ tab_name }}(null);
+            }
         }
     });
     modalEl.addEventListener('shown.bs.modal', () => {
@@ -1365,6 +1462,16 @@
                 }
             });
     });
+
+    // Expose functions to global scope for map_js.html
+    window.initLayerStyle{{ tab_name }} = initLayerStyle{{ tab_name }};
+    window.applyMultiColor{{ tab_name }} = applyMultiColor{{ tab_name }};
+    window.updateOverview{{ tab_name }} = updateOverview{{ tab_name }};
+    window.updateLayerList{{ tab_name }} = updateLayerList{{ tab_name }};
+    window.openStyleSidebar{{ tab_name }} = openStyleSidebar{{ tab_name }};
+    window.closeStyleSidebar{{ tab_name }} = closeStyleSidebar{{ tab_name }};
+    window.toggleStyleSidebar{{ tab_name }} = toggleStyleSidebar{{ tab_name }};
+
 })();
 </script>
 {% endif %}
