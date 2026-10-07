@@ -577,7 +577,8 @@ function renderExternalReferences(entity, settings = {}) {
         if (sysSettings.disabled) return;
 
         renderedCount++;
-        const linkUrl = ref.reference_url || (ref.resolver_url
+        console.log(ref.identifier)
+        const linkUrl = ref.identifier || (ref.resolver_url
             ? ref.resolver_url.replace("$1", ref.identifier)
             : "#");
 
