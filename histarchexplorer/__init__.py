@@ -1,5 +1,5 @@
-import time
 import os
+import time
 from typing import Any
 
 import psycopg2.extras
@@ -11,14 +11,15 @@ from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 from werkzeug import Response
 
+from histarchexplorer.database.admin import (get_predefined_filters,
+                                             synchronize_assets_with_db,
+                                             synchronize_logos_with_db,
+                                             synchronize_teams_with_db)
+from histarchexplorer.models.admin import Admin
 from histarchexplorer.models.config import (
     ConfigEntity, Link, Properties, get_config_classes)
 from histarchexplorer.models.search import SearchService
 from histarchexplorer.models.settings import Settings
-from histarchexplorer.models.admin import Admin
-from histarchexplorer.database.admin import (
-    synchronize_logos_with_db, synchronize_assets_with_db,
-    synchronize_teams_with_db)
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
@@ -165,6 +166,14 @@ def before_request() -> Response | None:
     g.search_service = SearchService(app)
     g.case_study_ids = [
         config.case_study for config in g.config_entities if config.case_study]
+    g.predefined_filters = get_predefined_filters()
+    for predefined_filter in g.predefined_filters:
+        for key in ('label', 'description'):
+            values = predefined_filter[key]
+            predefined_filter[f'{key}_values'] = values
+            predefined_filter[key] = (
+                values.get(g.language) or values.get(g.preferred_language)
+                or values.get('en') or next(iter(values.values()), ''))
 
     g.pending_upgrades = []
     if current_user.is_authenticated:
@@ -213,6 +222,7 @@ def inject_globals() -> dict[str, Any]:
         'view_classes': g.view_classes,
         'admin_fields': g.admin_fields,
         'additional_files_for_overview': g.additional_files_for_overview,
+        'predefined_filters': g.predefined_filters,
         'count': 0,
         'pending_upgrades': getattr(g, 'pending_upgrades', []),
         'system_class_map': {

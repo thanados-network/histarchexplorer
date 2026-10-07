@@ -901,5 +901,52 @@ GRANT SELECT,USAGE ON SEQUENCE tng.licenses_id_seq TO openatlas;
 -- PostgreSQL database dump complete
 --
 
-\unrestrict dFwdtbapHGK4BIT8MqV1Ba0bdYdDKh8kH8q0UTQ6WMoz2Yn046Z57YDaLzkjvB2
+CREATE TABLE tng.predefined_filters (
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    sortorder integer NOT NULL UNIQUE,
+    label jsonb NOT NULL DEFAULT '{}',
+    description jsonb NOT NULL DEFAULT '{}',
+    icon jsonb,
+    tabs jsonb NOT NULL DEFAULT '[]',
+    filter_parameters jsonb NOT NULL DEFAULT '{}'
+);
 
+ALTER TABLE tng.predefined_filters OWNER TO openatlas;
+GRANT ALL ON TABLE tng.predefined_filters TO openatlas;
+GRANT USAGE, SELECT ON SEQUENCE tng.predefined_filters_id_seq TO openatlas;
+
+INSERT INTO tng.predefined_filters
+    (sortorder, label, description, icon, tabs, filter_parameters)
+VALUES
+    (1, '{"en": "Thanados"}',
+     '{"en": "Show only entities belonging to the Thanados project."}',
+     NULL, '["places", "features", "items"]',
+     '{"case_study_ids": [181731], "classes": ["place", "artifact", "feature"], "include_subtypes": true, "begin_from": "0399-01-01", "include_no_begin": true, "include_no_end": true}'),
+    (2, '{"en": "Churches before 1300"}',
+     '{"en": "Churches before 1300"}', NULL, '["places"]',
+     '{"type_ids": [285], "include_subtypes": true, "begin_to": "1251-01-01", "include_no_begin": false, "include_no_end": true}');
+
+
+
+
+--
+-- Name: schema_migrations; Type: TABLE; Schema: tng; Owner: openatlas
+--
+
+CREATE TABLE tng.schema_migrations (
+    version character varying(50) NOT NULL,
+    applied_at timestamp with time zone DEFAULT now()
+);
+
+ALTER TABLE tng.schema_migrations OWNER TO openatlas;
+
+ALTER TABLE ONLY tng.schema_migrations
+    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+COPY tng.schema_migrations (version) FROM stdin;
+0.1.0
+0.2.0
+0.3.0
+0.4.0
+0.5.0
+\.

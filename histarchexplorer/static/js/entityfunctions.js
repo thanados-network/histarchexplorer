@@ -183,7 +183,7 @@ function collectAndGroupMatchingData(jsonData, keysToMatch, categoriesToMatch, t
             }))
 
             .filter(entry => entry.id && (
-                typeIds.includes(entry.id) || (entry.children?.length > 0)
+                typeIds === null || typeIds.includes(entry.id) || (entry.children?.length > 0)
             ));
 
 
@@ -218,7 +218,7 @@ function cloneWithChildren(items, typeIds) {
 
             const filteredChildren = cloneWithChildren(item.children, typeIds);
 
-            if (typeIds.includes(item.id) || filteredChildren.length > 0) {
+            if (typeIds === null || typeIds.includes(item.id) || filteredChildren.length > 0) {
                 return {
                     id: item.id,
                     label: item.name,

@@ -1,4 +1,5 @@
 from typing import Any, List, Optional
+
 from flask import g
 
 
@@ -107,7 +108,7 @@ def get_linked_entities(pub_id: int) -> List[dict[str, Any]]:
 
 def get_all_projects() -> List[dict[str, Any]]:
     sql = """
-        SELECT e.id, e.name
+        SELECT e.id, e.name, e.acronym
         FROM tng.entities e
         JOIN tng.classes c ON e.class_id = c.id
         WHERE c.name IN ('project', 'main-project')

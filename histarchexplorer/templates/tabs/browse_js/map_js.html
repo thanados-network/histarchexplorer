@@ -16,6 +16,9 @@
     };
     processRepresentativePoints(featureCollection{{ tab_name }});
 
+    filteredIDdata{{ tab_name }} = featureCollection{{ tab_name }}.features.map(
+        f => f.properties.id);
+
     const bounds{{ tab_name }} = new maplibregl.LngLatBounds();
     featureCollection{{ tab_name }}.features.forEach(extendBounds{{ tab_name }});
     const center{{ tab_name }} = bounds{{ tab_name }}.getCenter();
@@ -70,7 +73,12 @@
         {
             id: '{{ tab_name }}-layer-circle',
             type: 'circle',
-            paint: { 'circle-radius': 9, 'circle-color': '#088' },
+            paint: {
+                'circle-radius': 9,
+                'circle-color': '#088',
+                'circle-stroke-color': '#000000',
+                'circle-stroke-width': 1
+            },
             filter: ['all', ['==', ['geometry-type'], 'Point'], ['!', ['has', 'representative']]]
         },
         {
@@ -86,6 +94,8 @@
                     {{ z }}.0, ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], {{ z }}.0]]]{% if not loop.last %},{% endif %}
                     {% endfor %}
                 ],
+                'circle-stroke-color': '#000000',
+                'circle-stroke-width': 1,
                 'circle-stroke-opacity': [
                     'step', ['zoom'],
                     ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], 0]]],
@@ -137,6 +147,39 @@
     // 5. Init interactions
     setPointer(mapVectorLayers{{ tab_name }}, mapRef);
     highlightFeatures([], mapRef);
+    addTerrain(mapRef);
+    addSkybox(mapRef);
+    addControls(mapRef);
+
+    // 6. Initial layer list & overview
+    const initialFiltered{{ tab_name }} =
+        featureCollection{{ tab_name }}.features.filter(
+            f => filteredIDdata{{ tab_name }}.includes(f.properties.id));
+    updateLayerList{{ tab_name }}(initialFiltered{{ tab_name }});
+    updateOverview{{ tab_name }}(
+        featureCollection{{ tab_name }}.features,
+        initialFiltered{{ tab_name }});
+    initLayerStyle{{ tab_name }}();
+
+    // 7. Add style sidebar control (top-left)
+    class StyleSidebarControl{{ tab_name }} {
+        onAdd() {
+            this._btn = document.createElement('button');
+            this._btn.className = 'maplibregl-ctrl-icon style-sidebar-ctrl-btn';
+            this._btn.title = 'Style geometries';
+            this._btn.innerHTML = '<i class="bi bi-palette"></i>';
+            this._btn.addEventListener(
+                'click', () => openStyleSidebar{{ tab_name }}());
+            this._container = document.createElement('div');
+            this._container.className =
+                'maplibregl-ctrl maplibregl-ctrl-group';
+            this._container.appendChild(this._btn);
+            return this._container;
+        }
+        onRemove() { this._container.remove(); }
+    }
+    map{{ tab_name }}.addControl(
+        new StyleSidebarControl{{ tab_name }}(), 'top-left');
 
 });
 
@@ -149,12 +192,19 @@
         if (!clickedFeatures.length) return;
         //console.log('clickedFeatures', clickedFeatures);
 
-        const featureNames = clickedFeatures.map(f =>
+        const seenIds = new Set();
+        const uniqueFeatures = clickedFeatures.filter(f => {
+            if (seenIds.has(f.properties.id)) return false;
+            seenIds.add(f.properties.id);
+            return true;
+        });
+
+        const featureNames = uniqueFeatures.map(f =>
             `<button class="map-popup-hoverlink" data-id="${f.properties.id}" onclick="window.location.href='/entity/${f.properties.id}'">
     ${f.properties.name} (${f.properties.class})
   </button>`
         );
-        featureIds = clickedFeatures.map(f => f.properties.id);
+        featureIds = uniqueFeatures.map(f => f.properties.id);
 
         highlightFeatures(featureIds, map{{ tab_name }});
 
@@ -205,6 +255,11 @@ table{{ tab_name }}.on("dataFiltered", function (filters, rows) {
     const filteredFeatures{{ tab_name }} = featureCollection{{ tab_name }}.features.filter(
         f => filteredIDdata{{ tab_name }}.includes(f.properties.id)
     );
+
+    updateLayerList{{ tab_name }}(filteredFeatures{{ tab_name }});
+    updateOverview{{ tab_name }}(
+        featureCollection{{ tab_name }}.features,
+        filteredFeatures{{ tab_name }});
 
     const src = map{{ tab_name }}.getSource('{{ tab_name }}-source');
     if (src) {

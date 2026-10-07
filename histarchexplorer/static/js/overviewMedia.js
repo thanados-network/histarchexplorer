@@ -75,7 +75,7 @@ function createOverviewMediaTile(file) {
       break;
     default:
       const fallback = document.createElement("img");
-      fallback.src = file.url || "/static/img/placeholder.png";
+      fallback.src = file.url || "/static/images/placeholder.png";
       fallback.alt = alt;
       imageDiv.appendChild(fallback);
   }
@@ -167,7 +167,7 @@ function createImage(file, alt) {
   const primary = file.iiif_base_path
     ? `${file.iiif_base_path}/full/400,/0/default.jpg`
     : file.url;
-  const fallback = file.url || "/static/img/placeholder.png";
+  const fallback = file.url || "/static/images/placeholder.png";
 
   img.src = primary;
   img.alt = alt;
@@ -187,7 +187,7 @@ function createPDF(file, alt) {
   const img = document.createElement("img");
   img.src = file.iiif_base_path
     ? `${file.iiif_base_path}/full/400,/0/default.jpg`
-    : "/static/img/placeholder.png";
+    : "/static/images/placeholder.png";
   img.alt = alt;
   wrapper.appendChild(img);
   return wrapper;

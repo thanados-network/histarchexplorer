@@ -55,7 +55,7 @@ DROP TABLE IF EXISTS tng.entities;
 DROP TABLE IF EXISTS tng.classes;
 DROP FUNCTION IF EXISTS tng.getdates(first timestamp without time zone, last timestamp without time zone, comment text);
 DROP FUNCTION IF EXISTS tng.delete_links_on_config_delete();
-DROP SCHEMA IF EXISTS tng;
+DROP SCHEMA IF EXISTS tng CASCADE;
 --
 -- Name: tng; Type: SCHEMA; Schema: -; Owner: openatlas
 --
@@ -686,5 +686,33 @@ GRANT SELECT,USAGE ON SEQUENCE tng.licenses_id_seq TO openatlas;
 --
 -- PostgreSQL database dump complete
 --
+
+CREATE TABLE tng.predefined_filters (
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    sortorder integer NOT NULL UNIQUE,
+    label jsonb NOT NULL DEFAULT '{}',
+    description jsonb NOT NULL DEFAULT '{}',
+    icon jsonb,
+    tabs jsonb NOT NULL DEFAULT '[]',
+    filter_parameters jsonb NOT NULL DEFAULT '{}'
+);
+
+ALTER TABLE tng.predefined_filters OWNER TO openatlas;
+GRANT ALL ON TABLE tng.predefined_filters TO openatlas;
+GRANT USAGE, SELECT ON SEQUENCE tng.predefined_filters_id_seq TO openatlas;
+
+--
+-- Name: schema_migrations; Type: TABLE; Schema: tng; Owner: openatlas
+--
+
+CREATE TABLE tng.schema_migrations (
+    version character varying(50) NOT NULL,
+    applied_at timestamp with time zone DEFAULT now()
+);
+
+ALTER TABLE tng.schema_migrations OWNER TO openatlas;
+
+ALTER TABLE ONLY tng.schema_migrations
+    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
 
 

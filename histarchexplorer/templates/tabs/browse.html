@@ -29,46 +29,184 @@
 </script>
 <div id="{{ tab_name }}-breadcrumbs" class="breadcrumbs ms-3"></div>
 
-<div id="{{ tab_name }}-header"
-     class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3 mt-3 ms-3 me-3">
+<div id="{{ tab_name }}-header" class="browse-header">
 
-    <h3 class="m-0">{{ tab_name[0]|upper }}{{ tab_name[1:] }}<span id="{{ tab_name }}-subcount"></span></h3>
+    <div class="browse-header-left">
+        <h3 class="m-0">{{ tab_name[0]|upper }}{{ tab_name[1:] }}<span id="{{ tab_name }}-subcount"></span></h3>
 
-    <div class="input-group" style="max-width: 600px;">
-        <input type="text" id="filterInput{{ tab_name }}" class="form-control" placeholder="Search / Filter">
-        <button class="btn btn-outline-secondary" type="button" id="clearFilter{{ tab_name }}">&times;</button>
+        <div class="input-group browse-header-search">
+            <input type="text" id="filterInput{{ tab_name }}" class="form-control"
+                   placeholder="Search / Filter">
+            <button class="btn btn-outline-secondary" type="button"
+                    id="clearFilter{{ tab_name }}">&times;</button>
+
+        </div>
+        <div class="dropdown d-none" id="{{ tab_name }}-presets-dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false"
+                        title="Topics">
+                    <i class="bi bi-bookmark"></i>
+                    <span class="d-none d-sm-inline ms-1">Topics</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end"
+                    id="{{ tab_name }}-presets-menu"></ul>
+            </div>
+        <span class="btn btn-outline-secondary d-none align-items-center gap-1"
+              id="{{ tab_name }}-preset-badge">
+            <span id="{{ tab_name }}-preset-badge-label"></span>
+            <button type="button" class="btn-close btn-sm"
+                    id="{{ tab_name }}-preset-badge-close"
+                    aria-label="Remove filter"></button>
+        </span>
     </div>
 
-    <div class="btn-group" role="group" aria-label="Change View">
-        <button id="{{ tab_name }}-list-btn" type="button"
-                class="btn btn-outline-secondary active" onclick="{{ tab_name }}ToggleView('table')"
-                title="List">
-            <i class="bi bi-list-ul"></i>
-        </button>
-        {% if tab_name in ["places", "items"] %}
-            <button id="{{ tab_name }}-map-btn" type="button"
-                    class="btn btn-outline-secondary" onclick="{{ tab_name }}ToggleView('map')"
-                    title="Map">
-                <i class="bi bi-geo-alt-fill"></i>
+    <div class="browse-header-right">
+        <div class="btn-group" role="group" aria-label="Change View">
+            <button id="{{ tab_name }}-list-btn" type="button"
+                    class="btn btn-outline-secondary active" onclick="{{ tab_name }}ToggleView('table')"
+                    title="List">
+                <i class="bi bi-list-ul"></i>
             </button>
-        {% endif %}
-        <button id="{{ tab_name }}-tiles-btn" type="button"
-                class="btn btn-outline-secondary" onclick="{{ tab_name }}ToggleView('tile')"
-                title="Tiles">
-            <i class="bi bi-grid-3x3-gap-fill"></i>
+            {% if tab_name in ["places", "items"] %}
+                <button id="{{ tab_name }}-map-btn" type="button"
+                        class="btn btn-outline-secondary" onclick="{{ tab_name }}ToggleView('map')"
+                        title="Map">
+                    <i class="bi bi-geo-alt-fill"></i>
+                </button>
+            {% endif %}
+            <button id="{{ tab_name }}-tiles-btn" type="button"
+                    class="btn btn-outline-secondary" onclick="{{ tab_name }}ToggleView('tile')"
+                    title="Tiles">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+            </button>
+        </div>
+
+        <button type="button" class="btn btn-outline-secondary" id="{{ tab_name }}-filter-toggle-btn"
+                title="Filters">
+            <i class="bi bi-funnel"></i>
         </button>
     </div>
-
-    <button type="button" class="btn btn-outline-secondary" id="{{ tab_name }}-filter-toggle-btn"
-            title="Filters">
-        <i class="bi bi-funnel"></i>
-    </button>
-
 
 </div>
 
+<script>
+(function () {
+    const predefinedFilters = {{ predefined_filters | tojson }};
+    const menu = document.getElementById('{{ tab_name }}-presets-menu');
+    if (!menu || !Array.isArray(predefinedFilters) || predefinedFilters.length === 0) return;
+    document.getElementById('{{ tab_name }}-presets-dropdown').classList.remove('d-none');
+
+    const badge = document.getElementById('{{ tab_name }}-preset-badge');
+    const badgeLabel = document.getElementById('{{ tab_name }}-preset-badge-label');
+    const badgeClose = document.getElementById('{{ tab_name }}-preset-badge-close');
+
+    function showBadge(label) {
+        badgeLabel.textContent = label;
+        badge.classList.remove('d-none', 'opacity-50');
+        badge.classList.add('d-inline-flex', 'btn-outline-secondary');
+    }
+
+    function markBadgeModified() {
+        if (badge.classList.contains('d-none')) return;
+        badge.classList.add('opacity-50');
+    }
+
+    function hideBadge() {
+        badge.classList.add('d-none');
+        badge.classList.remove('d-inline-flex', 'btn-outline-secondary', 'opacity-50');
+    }
+
+    window.hideBadgeFns = window.hideBadgeFns || {};
+    window.hideBadgeFns['{{ tab_name }}'] = hideBadge;
+
+    window.resetAllToInitial = function resetAllToInitial() {
+        // Restore all tabs
+        tabsToLoad.forEach(tab => {
+            document.querySelectorAll(`.to-remove-${tab}`).forEach(el => {
+                el.classList.remove('d-none');
+            });
+        });
+        // Reset filters on all tabs
+        const fns = window.resetFilterFns || {};
+        tabsToLoad.forEach(tab => {
+            if (typeof fns[tab] === 'function') fns[tab]();
+        });
+        // Hide all badges
+        const hideFns = window.hideBadgeFns || {};
+        Object.values(hideFns).forEach(fn => fn());
+    }
+
+    badgeClose.addEventListener('click', resetAllToInitial);
+
+    // Listen for manual filter changes on this tab
+    document.addEventListener('{{ tab_name }}-filter-changed', markBadgeModified);
+
+    predefinedFilters.forEach((preset, index) => {
+        const li = document.createElement('li');
+        const btn = document.createElement('button');
+        btn.className = 'dropdown-item d-flex align-items-center gap-2';
+        btn.type = 'button';
+        btn.title = preset.description || '';
+
+        if (preset.icon && preset.icon.type === 'css') {
+            const icon = document.createElement('i');
+            icon.className = preset.icon.value.includes('bi ')
+                ? preset.icon.value : `bi ${preset.icon.value}`;
+            btn.appendChild(icon);
+        } else if (preset.icon && preset.icon.type === 'img') {
+            const img = document.createElement('img');
+            img.src = `/static/images/icons/${preset.icon.value}`;
+            img.alt = '';
+            img.classList.add('preset-icon');
+            btn.appendChild(img);
+        }
+
+        const label = document.createElement('span');
+        label.textContent = preset.label;
+        btn.appendChild(label);
+
+        btn.addEventListener('click', () => {
+            const tabsInPreset = Array.isArray(preset.tabs) && preset.tabs.length > 0
+                ? preset.tabs
+                : tabsToLoad;
+
+            // Apply tab visibility
+            tabsToLoad.forEach(tab => {
+                const isVisible = tabsInPreset.includes(tab);
+                document.querySelectorAll(`.to-remove-${tab}`).forEach(el => {
+                    el.classList.toggle('d-none', !isVisible);
+                });
+            });
+
+            // Apply filters on every tab that is part of this preset
+            const fns = window.applyPresetFns || {};
+            tabsInPreset.forEach(tab => {
+                if (typeof fns[tab] === 'function') fns[tab](preset);
+            });
+
+            // If the currently active tab is now hidden, switch to the first
+            // visible tab from the preset
+            const activeLink = document.querySelector('#nav-sidebar .nav-link.active');
+            const activeTab = activeLink
+                ? activeLink.id.replace(/^tab-/, '')
+                : null;
+            if (activeTab && !tabsInPreset.includes(activeTab)) {
+                const firstLink = document.getElementById(`tab-${tabsInPreset[0]}`);
+                if (firstLink) firstLink.click();
+            }
+
+            showBadge(preset.label);
+        });
+
+        li.appendChild(btn);
+        menu.appendChild(li);
+    });
+})();
+</script>
+
 
 <div class="browse-body-wrapper d-flex">
+    {% include "/tabs/browse_js/style_sidebar.html" %}
     <div class="browse-main-content flex-grow-1">
         <div id="table-{{ tab_name }}" class="tabulator-container"></div>
         <div id="tile-{{ tab_name }}" class="tile-container d-none">

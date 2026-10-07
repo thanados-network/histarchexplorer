@@ -5,6 +5,7 @@ from histarchexplorer.database.admin import (
     get_config_class_by_id, add_new_map, update_sort_order,
     get_licenses, get_file_licenses,
     get_all_logos_from_db, get_all_assets_from_db, get_openatlas_entity)
+from histarchexplorer.database.admin import update_predefined_filter_order
 from histarchexplorer.models.config import get_config_classes
 from histarchexplorer import get_sidebar_icons, get_type_divisions
 from unittest.mock import MagicMock, patch
@@ -89,3 +90,31 @@ def test_get_openatlas_entity(app_instance):
         g.openatlas_cursor = MagicMock()
         g.openatlas_cursor.fetchone.return_value = {'id': 1}
         assert get_openatlas_entity(1) == {'id': 1}
+
+
+def test_update_predefined_filter_order_uses_two_phase_update(app_instance):
+    with app_instance.test_request_context():
+        g.cursor = MagicMock()
+        g.cursor.fetchone.return_value = {'max_sortorder': 2}
+        params = [{'id': 1, 'order': 2}, {'id': 2, 'order': 1}]
+
+        update_predefined_filter_order(params)
+
+        g.cursor.execute.assert_called_once_with(
+            'SELECT COALESCE(MAX(sortorder), 0) AS max_sortorder '
+            'FROM tng.predefined_filters')
+        assert g.cursor.executemany.call_count == 2
+
+        first_sql, first_params = g.cursor.executemany.call_args_list[0][0]
+        assert first_sql == (
+            'UPDATE tng.predefined_filters SET sortorder = %(temp_order)s '
+            'WHERE id = %(id)s')
+        assert first_params == [
+            {'temp_order': 7, 'id': 1},
+            {'temp_order': 6, 'id': 2}]
+
+        second_sql, second_params = g.cursor.executemany.call_args_list[1][0]
+        assert second_sql == (
+            'UPDATE tng.predefined_filters SET sortorder = %(order)s '
+            'WHERE id = %(id)s')
+        assert second_params == params

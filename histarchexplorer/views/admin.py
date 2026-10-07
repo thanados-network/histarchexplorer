@@ -1,32 +1,45 @@
-import os
 import json
+import os
 import re
 import subprocess
-from typing import Optional
 from datetime import datetime
-from werkzeug.utils import secure_filename
-from PIL import Image
+from typing import Optional
 
-from flask import (
-    abort, current_app, flash, g, jsonify, redirect, render_template,
-    request, url_for, send_file, send_from_directory)
+from PIL import Image
+from flask import (abort, current_app, flash, g, jsonify, redirect,
+                   render_template, request, send_file, send_from_directory,
+                   url_for)
 from flask_babel import gettext as _
 from flask_login import current_user, login_required
 from werkzeug import Response
+from werkzeug.utils import secure_filename
 
 from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import ApiAccess
-from histarchexplorer.database.admin import (
-    update_sort_order, add_logo_to_db, delete_logo_from_db, rename_logo_in_db,
-    add_asset_to_db, delete_asset_from_db, rename_asset_in_db,
-    add_file_to_db, delete_file_from_db, rename_file_in_db)
-from histarchexplorer.database.publications import (
-    get_publications, add_publication, update_publication, delete_publication,
-    link_publication_to_entities, get_all_projects)
+from histarchexplorer.database.admin import (add_asset_to_db, add_file_to_db,
+                                             add_logo_to_db,
+                                             add_predefined_filter,
+                                             delete_asset_from_db,
+                                             delete_file_from_db,
+                                             delete_logo_from_db,
+                                             delete_predefined_filter,
+                                             rename_asset_in_db,
+                                             rename_file_in_db,
+                                             rename_logo_in_db,
+                                             update_predefined_filter,
+                                             update_predefined_filter_order,
+                                             update_sort_order)
 from histarchexplorer.database.map import check_if_map_id_exist
-from histarchexplorer.forms.admin import (
-    MapForm, GeneralSettingsForm, LicenseForm, FileUploadForm,
-    FileLicenseForm, FileRenameForm, FileDeleteForm)
+from histarchexplorer.database.publications import (add_publication,
+                                                    delete_publication,
+                                                    get_all_projects,
+                                                    get_publications,
+                                                    link_publication_to_entities,
+                                                    update_publication)
+from histarchexplorer.forms.admin import (FileDeleteForm, FileLicenseForm,
+                                          FileRenameForm, FileUploadForm,
+                                          GeneralSettingsForm, LicenseForm,
+                                          MapForm)
 from histarchexplorer.models.admin import Admin
 from histarchexplorer.utils.doi import fetch_doi_metadata
 from histarchexplorer.utils.view_util import find_children_by_id
@@ -91,7 +104,8 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                         'sidebar-general-settings-group' |
                         'sidebar-about-content' |
                         'sidebar-outcome' | 'sidebar-search-content' |
-                        'sidebar-external-identifiers'):
+                        'sidebar-external-identifiers' |
+                        'sidebar-predefined-filters'):
                     active_main_sidebar_id = tab
 
                 case _:
@@ -248,6 +262,105 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         file_license_form=file_license_form,
         file_rename_form=FileRenameForm(),
         file_delete_form=FileDeleteForm())
+
+
+def _predefined_filter_data() -> dict[str, str]:
+    """Validate and serialize a predefined-filter form submission."""
+    type_ids = request.form.get('type_ids', '').strip()
+    if type_ids:
+        try:
+            type_ids_list = [int(value.strip()) for value in type_ids.split(',')]
+        except ValueError as error:
+            raise ValueError(_('Type IDs must be comma-separated integers.')) from error
+    else:
+        type_ids_list = []
+
+    date_keys = ('begin_from', 'begin_to', 'end_from', 'end_to')
+    parameters: dict[str, object] = {
+        'case_study_ids': [int(value) for value in request.form.getlist('case_study_ids')],
+        'type_ids': type_ids_list,
+        'include_subtypes': request.form.get('include_subtypes') == 'on',
+        'classes': request.form.getlist('classes'),
+        'include_no_begin': request.form.get('include_no_begin') == 'on',
+        'include_no_end': request.form.get('include_no_end') == 'on'}
+    for key in date_keys:
+        value = request.form.get(key, '').strip()
+        if value:
+            if not re.fullmatch(r'-?\d{4,}-\d{2}-\d{2}', value):
+                raise ValueError(_('Dates must use the YYYY-MM-DD format.'))
+            parameters[key] = value
+
+    label = {
+        language: request.form.get(f'label_{language}', '').strip()
+        for language in g.available_languages}
+    description = {
+        language: request.form.get(f'description_{language}', '').strip()
+        for language in g.available_languages}
+    if not any(label.values()):
+        raise ValueError(_('A label is required in at least one language.'))
+
+    icon_type = request.form.get('icon_type', '')
+    icon_value = request.form.get('icon_value', '').strip()
+    icon = None
+    if icon_type == 'css' and icon_value:
+        icon = {'type': 'css', 'value': icon_value}
+    elif icon_type == 'img' and icon_value:
+        icon = {'type': 'img', 'value': icon_value}
+    return {
+        'label': json.dumps({key: value for key, value in label.items() if value}),
+        'description': json.dumps({key: value for key, value in description.items() if value}),
+        'icon': json.dumps(icon) if icon else None,
+        'tabs': json.dumps(request.form.getlist('tabs')),
+        'filter_parameters': json.dumps(parameters)}
+
+
+@app.route('/admin/predefined_filters/add', methods=['POST'])
+@login_required
+def add_predefined_filter_route() -> Response:
+    check_manager_user()
+    try:
+        add_predefined_filter(_predefined_filter_data())
+        flash(_('Predefined filter added successfully.'), 'success')
+    except ValueError as error:
+        flash(str(error), 'danger')
+    return _redirect_to_admin_tab('sidebar-predefined-filters')
+
+
+@app.route('/admin/predefined_filters/<int:filter_id>/edit', methods=['POST'])
+@login_required
+def edit_predefined_filter(filter_id: int) -> Response:
+    check_manager_user()
+    try:
+        update_predefined_filter(filter_id, _predefined_filter_data())
+        flash(_('Predefined filter updated successfully.'), 'success')
+    except ValueError as error:
+        flash(str(error), 'danger')
+    return _redirect_to_admin_tab('sidebar-predefined-filters')
+
+
+@app.route('/admin/predefined_filters/<int:filter_id>/delete', methods=['POST'])
+@login_required
+def remove_predefined_filter(filter_id: int) -> Response:
+    check_manager_user()
+    delete_predefined_filter(filter_id)
+    flash(_('Predefined filter deleted successfully.'), 'success')
+    return _redirect_to_admin_tab('sidebar-predefined-filters')
+
+
+@app.route('/admin/predefined_filters/order', methods=['POST'])
+@login_required
+def order_predefined_filters() -> tuple[Response, int] | Response:
+    check_manager_user()
+    try:
+        criteria = request.get_json().get('criteria', [])
+        if not isinstance(criteria, list):
+            raise ValueError
+        update_predefined_filter_order([
+            {'order': int(row['order']), 'id': int(row['id'])}
+            for row in criteria])
+    except (AttributeError, KeyError, TypeError, ValueError):
+        return jsonify({'error': 'Invalid data format.'}), 400
+    return jsonify({'status': 'ok'})
 
 
 @app.route('/admin/update_type_divisions', methods=['POST'])

@@ -21,3 +21,10 @@
   font-size: 0.65rem;
   line-height: 1.2;
 }
+
+.ts-wrapper.multi .ts-control > .item {
+  position: static;
+  display: inline-flex;
+  width: auto;
+  margin: 0 0.5rem 0.4rem 0;
+}

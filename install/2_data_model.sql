@@ -18,6 +18,17 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+INSERT INTO tng.predefined_filters
+    (sortorder, label, description, icon, tabs, filter_parameters)
+VALUES
+    (1, '{"en": "Thanados"}',
+     '{"en": "Show only entities belonging to the Thanados project."}',
+     NULL, '["places", "features", "items"]',
+     '{"case_study_ids": [181731], "classes": ["place", "artifact", "feature"], "include_subtypes": true, "begin_from": "0399-01-01", "include_no_begin": true, "include_no_end": true}'),
+    (2, '{"en": "Churches before 1300"}',
+     '{"en": "Churches before 1300"}', NULL, '["places"]',
+     '{"type_ids": [285], "include_subtypes": true, "begin_to": "1251-01-01", "include_no_begin": false, "include_no_end": true}');
+
 --
 -- Data for Name: classes; Type: TABLE DATA; Schema: tng; Owner: openatlas
 --
@@ -317,6 +328,13 @@ SELECT pg_catalog.setval('tng.maps_id_seq', 1, true);
 
 SELECT pg_catalog.setval('tng.properties_id_seq', 1, false);
 
+INSERT INTO tng.schema_migrations (version) VALUES
+('0.1.0'),
+('0.2.0'),
+('0.3.0'),
+('0.4.0'),
+('0.5.0')
+ON CONFLICT (version) DO NOTHING;
 
 --
 -- PostgreSQL database dump complete

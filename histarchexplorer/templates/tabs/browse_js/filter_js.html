@@ -267,6 +267,7 @@ function addEnhancedUnavailableStyles{{ tab_name }}() {
 
 // Function to rebuild a single tree with filtered data
 function rebuildTreeWithFilteredData{{ tab_name }}(tree) {
+    const treeId = tree.replace(/[^a-zA-Z0-9_-]/g, '_');
     const filteredData = getFilteredTableData{{ tab_name }}();
     const validTypeIds = getValidTypeIdsWithAncestors{{ tab_name }}(filteredData, {{ tab_name }}Data.treeData);
 
@@ -276,7 +277,7 @@ function rebuildTreeWithFilteredData{{ tab_name }}(tree) {
     // Add our enhanced styling
     addEnhancedUnavailableStyles{{ tab_name }}();
 
-    const treeContainer = document.getElementById(`{{ tab_name }}Tree${tree}`);
+    const treeContainer = document.getElementById(`{{ tab_name }}Tree${treeId}`);
     if (!treeContainer) return; // Safety check
 
     // Store current selection before rebuilding
@@ -290,7 +291,7 @@ function rebuildTreeWithFilteredData{{ tab_name }}(tree) {
 
     // Create Treeview with marked data (unavailable nodes have selectable: false)
     const treeview = new Treeview({
-        containerId: `{{ tab_name }}Tree${tree}`,
+        containerId: `{{ tab_name }}Tree${treeId}`,
         data: markedTreeData[tree][0].children, // Library will automatically apply .not-selectable class, remove root node
         searchEnabled: true,
         buttonStyle: 'bootstrapIcons',
@@ -302,9 +303,9 @@ function rebuildTreeWithFilteredData{{ tab_name }}(tree) {
         showSelectAllButton: true,
         showInvertSelectionButton: true,
         onSelectionChange: (selectedNodesData) => {
-            // Only available nodes will be selectable, so no filtering needed here
             window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = selectedNodesData.map(node => node.id);
             window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = treeview.getSelectedNodesAndChildrenValues('id');
+            filterTypes{{ tab_name }}();
         }
     });
 
@@ -326,6 +327,349 @@ function rebuildTreeWithFilteredData{{ tab_name }}(tree) {
     }
 }
 
+
+// Find the nearest available slider string for a given ISO date string
+function findNearestSliderValue(isoString, timeline) {
+    if (!isoString || !timeline || timeline.length === 0) return null;
+    const target = calculateTimeBP(isoString);
+    let nearest = timeline[0];
+    let minDiff = Math.abs(timeline[0].number - target);
+    for (const entry of timeline) {
+        const diff = Math.abs(entry.number - target);
+        if (diff < minDiff) {
+            minDiff = diff;
+            nearest = entry;
+        }
+    }
+    return nearest.string;
+}
+
+// Apply a predefined filter preset programmatically
+function applyPreset{{ tab_name }}(preset) {
+    const fp = preset.filter_parameters || {};
+
+    // --- Reset all filters first ---
+    document.getElementById('filterInput{{ tab_name }}').value = '';
+
+    document.querySelectorAll(`#csSelect{{tab_name}} input[type="checkbox"]`)
+        .forEach(cb => {
+            cb.checked = false;
+        });
+
+    document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]`)
+        .forEach(cb => {
+            cb.checked = false;
+        });
+
+    const resetBeginEl{{ tab_name }} = document.getElementById(
+        'sliderBegin{{ tab_name }}');
+    if (resetBeginEl{{ tab_name }}?.noUiSlider) {
+        const beginVals{{ tab_name }} =
+            {{ tab_name }}Data.timelineBegin.map(e => e.string);
+        resetBeginEl{{ tab_name }}.noUiSlider.set(
+            [beginVals{{ tab_name }}[0],
+                beginVals{{ tab_name }}[beginVals{{ tab_name }}.length - 1]]);
+    }
+
+    const resetEndEl{{ tab_name }} = document.getElementById(
+        'sliderEnd{{ tab_name }}');
+    if (resetEndEl{{ tab_name }}?.noUiSlider) {
+        const endVals{{ tab_name }} =
+            {{ tab_name }}Data.timelineEnd.map(e => e.string);
+        resetEndEl{{ tab_name }}.noUiSlider.set(
+            [endVals{{ tab_name }}[0],
+                endVals{{ tab_name }}[endVals{{ tab_name }}.length - 1]]);
+    }
+
+    const resetNoBegin{{ tab_name }} = document.getElementById(
+        'includeNoBegin{{ tab_name }}');
+    if (resetNoBegin{{ tab_name }}) resetNoBegin{{ tab_name }}.checked = true;
+
+    const resetNoEnd{{ tab_name }} = document.getElementById(
+        'includeNoEnd{{ tab_name }}');
+    if (resetNoEnd{{ tab_name }}) resetNoEnd{{ tab_name }}.checked = true;
+
+    for (const tree of {{ tab_name }}TreesToBuild) {
+        const treeId = tree.replace(/[^a-zA-Z0-9_-]/g, '_');
+        const inst = window.{{ tab_name }}TreeInstances[tree];
+        if (inst) {
+            inst.getSelectedNodes().forEach(n => inst.selectNodeById(n.id, false));
+            inst.selectedNodeIds = [];
+            inst.selectedNodeIdsWithChildren = [];
+        }
+        const subCb = document.getElementById(
+            `include-subcategories-{{ tab_name }}-${treeId}`);
+        if (subCb) subCb.checked = false;
+    }
+
+    // --- Case study checkboxes ---
+    document.querySelectorAll(`#csSelect{{tab_name}} input[type="checkbox"]`)
+        .forEach(cb => {
+            cb.checked = fp.case_study_ids
+                ? fp.case_study_ids.map(String).includes(cb.value)
+                : false;
+        });
+
+    // --- Class checkboxes ---
+    document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]`)
+        .forEach(cb => {
+            cb.checked = fp.classes
+                ? fp.classes.includes(cb.value)
+                : false;
+        });
+
+    // --- Begin date slider ---
+    const sliderBeginEl{{ tab_name }} = document.getElementById(
+        'sliderBegin{{ tab_name }}');
+    if (sliderBeginEl{{ tab_name }}?.noUiSlider) {
+        const bTimeline = {{ tab_name }}Data.timelineBegin;
+        const bVals = sliderBeginEl{{ tab_name }}.noUiSlider.get();
+        const from = fp.begin_from !== undefined
+            ? findNearestSliderValue(fp.begin_from, bTimeline) ?? bVals[0]
+            : bVals[0];
+        const to = fp.begin_to !== undefined
+            ? findNearestSliderValue(fp.begin_to, bTimeline) ?? bVals[1]
+            : bVals[1];
+        sliderBeginEl{{ tab_name }}.noUiSlider.set([from, to]);
+    }
+
+    // --- End date slider ---
+    const sliderEndEl{{ tab_name }} = document.getElementById(
+        'sliderEnd{{ tab_name }}');
+    if (sliderEndEl{{ tab_name }}?.noUiSlider) {
+        const eTimeline = {{ tab_name }}Data.timelineEnd;
+        const eVals = sliderEndEl{{ tab_name }}.noUiSlider.get();
+        const from = fp.end_from !== undefined
+            ? findNearestSliderValue(fp.end_from, eTimeline) ?? eVals[0]
+            : eVals[0];
+        const to = fp.end_to !== undefined
+            ? findNearestSliderValue(fp.end_to, eTimeline) ?? eVals[1]
+            : eVals[1];
+        sliderEndEl{{ tab_name }}.noUiSlider.set([from, to]);
+    }
+
+    // --- Include no-date checkboxes ---
+    const noBeginCb{{ tab_name }} = document.getElementById(
+        'includeNoBegin{{ tab_name }}');
+    if (noBeginCb{{ tab_name }}) {
+        noBeginCb{{ tab_name }}.checked =
+            fp.include_no_begin !== undefined ? fp.include_no_begin : true;
+    }
+    const noEndCb{{ tab_name }} = document.getElementById(
+        'includeNoEnd{{ tab_name }}');
+    if (noEndCb{{ tab_name }}) {
+        noEndCb{{ tab_name }}.checked =
+            fp.include_no_end !== undefined ? fp.include_no_end : true;
+    }
+
+    // --- Type tree selection ---
+    // First deselect all trees
+    for (const tree of {{ tab_name }}TreesToBuild) {
+        const inst = window.{{ tab_name }}TreeInstances[tree];
+        if (inst) {
+            inst.getSelectedNodes().forEach(n => inst.selectNodeById(n.id, false));
+            inst.selectedNodeIds = [];
+            inst.selectedNodeIdsWithChildren = [];
+        }
+    }
+
+    if (fp.type_ids && fp.type_ids.length > 0) {
+        for (const tree of {{ tab_name }}TreesToBuild) {
+            const inst = window.{{ tab_name }}TreeInstances[tree];
+            if (!inst) continue;
+            fp.type_ids.forEach(id => {
+                try {
+                    inst.selectNodeById(id, true);
+                } catch (e) { /* not in this tree */
+                }
+            });
+            inst.selectedNodeIds = inst.getSelectedNodes().map(n => n.id);
+            inst.selectedNodeIdsWithChildren =
+                inst.getSelectedNodesAndChildrenValues('id');
+
+            // Honour include_subtypes via the checkbox
+            const treeId = tree.replace(/[^a-zA-Z0-9_-]/g, '_');
+            const subCb = document.getElementById(
+                `include-subcategories-{{ tab_name }}-${treeId}`);
+            if (subCb) subCb.checked = fp.include_subtypes !== false;
+        }
+    }
+
+    // Rebuild selectedNodes and apply — suppress filter-changed event
+    window.{{ tab_name }}PresetApplying = true;
+    filterTypes{{ tab_name }}();
+    // Allow one tick for applyCombinedFilter to finish before re-enabling
+    setTimeout(() => {
+        window.{{ tab_name }}PresetApplying = false;
+    }, 0);
+}
+
+// Register in global preset registry so other tabs can call this
+if (!window.applyPresetFns) window.applyPresetFns = {};
+window.applyPresetFns['{{ tab_name }}'] = applyPreset{{ tab_name }};
+
+// Reset all filters on this tab to their initial (page-load) state
+function resetFilter{{ tab_name }}() {
+    document.getElementById('filterInput{{ tab_name }}').value = '';
+
+    document.querySelectorAll(`#csSelect{{tab_name}} input[type="checkbox"]`)
+        .forEach(cb => {
+            cb.checked = false;
+        });
+    document.querySelectorAll(`#classSelect{{tab_name}} input[type="checkbox"]`)
+        .forEach(cb => {
+            cb.checked = false;
+        });
+
+    const rBegin = document.getElementById('sliderBegin{{ tab_name }}');
+    if (rBegin?.noUiSlider) {
+        const bv = {{ tab_name }}Data.timelineBegin.map(e => e.string);
+        rBegin.noUiSlider.set([bv[0], bv[bv.length - 1]]);
+    }
+    const rEnd = document.getElementById('sliderEnd{{ tab_name }}');
+    if (rEnd?.noUiSlider) {
+        const ev = {{ tab_name }}Data.timelineEnd.map(e => e.string);
+        rEnd.noUiSlider.set([ev[0], ev[ev.length - 1]]);
+    }
+
+    const noBegin = document.getElementById('includeNoBegin{{ tab_name }}');
+    if (noBegin) noBegin.checked = true;
+    const noEnd = document.getElementById('includeNoEnd{{ tab_name }}');
+    if (noEnd) noEnd.checked = true;
+
+    for (const tree of {{ tab_name }}TreesToBuild) {
+        const treeId = tree.replace(/[^a-zA-Z0-9_-]/g, '_');
+        const inst = window.{{ tab_name }}TreeInstances[tree];
+        if (inst) {
+            inst.getSelectedNodes().forEach(n => inst.selectNodeById(n.id, false));
+            inst.selectedNodeIds = [];
+            inst.selectedNodeIdsWithChildren = [];
+        }
+        const subCb = document.getElementById(
+            `include-subcategories-{{ tab_name }}-${treeId}`);
+        if (subCb) subCb.checked = false;
+    }
+
+    filterTypes{{ tab_name }}();
+}
+
+if (!window.resetFilterFns) window.resetFilterFns = {};
+window.resetFilterFns['{{ tab_name }}'] = resetFilter{{ tab_name }};
+
+// Update the active-filter badges panel in the sidebar
+function updateActiveFilterBadges{{ tab_name }}() {
+    const container = document.getElementById(
+        'active-filter-badges-{{ tab_name }}');
+    const panel = document.getElementById('active-filters-{{ tab_name }}');
+    if (!container || !panel) return;
+
+    const frag = document.createDocumentFragment();
+
+    function makeBadge(label, colorClass, onClose) {
+        const span = document.createElement('span');
+        span.className = `badge d-inline-flex align-items-center gap-1 ${colorClass}`;
+        const text = document.createElement('span');
+        text.textContent = label;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-close btn-close-white btn-sm';
+        btn.style.fontSize = '0.6em';
+        btn.setAttribute('aria-label', 'Remove');
+        btn.addEventListener('click', () => {
+            onClose();
+            applyCombinedFilter{{ tab_name }}();
+        });
+        span.appendChild(text);
+        span.appendChild(btn);
+        frag.appendChild(span);
+    }
+
+    // --- Classes ---
+    document.querySelectorAll(
+        `#classSelect{{tab_name}} input[type="checkbox"]:checked`
+    ).forEach(cb => {
+        const lbl = document.querySelector(
+            `label[for="${cb.id}"]`);
+        const label = lbl ? lbl.textContent.trim() : cb.value;
+        makeBadge(label, 'bg-primary', () => {
+            cb.checked = false;
+        });
+    });
+
+    // --- Projects (case studies) ---
+    document.querySelectorAll(
+        `#csSelect{{tab_name}} input[type="checkbox"]:checked`
+    ).forEach(cb => {
+        const lbl = document.querySelector(`label[for="${cb.id}"]`);
+        const label = lbl ? lbl.textContent.trim() : cb.value;
+        makeBadge(label, 'bg-success', () => {
+            cb.checked = false;
+        });
+    });
+
+    // --- Types (from tree instances) ---
+    for (const tree of {{ tab_name }}TreesToBuild) {
+        const inst = window.{{ tab_name }}TreeInstances[tree];
+        if (!inst) continue;
+        inst.getSelectedNodes().forEach(node => {
+            const nodeLabel = node.label || node.name || String(node.id);
+            makeBadge(nodeLabel, 'bg-warning text-dark', () => {
+                try {
+                    inst.selectNodeById(node.id, false);
+                } catch (e) { /* */
+                }
+                inst.selectedNodeIds = inst.getSelectedNodes().map(
+                    n => n.id);
+                inst.selectedNodeIdsWithChildren =
+                    inst.getSelectedNodesAndChildrenValues('id');
+                filterTypes{{ tab_name }}();
+            });
+        });
+    }
+
+    // --- Chronology (begin slider) ---
+    const bEl = document.getElementById('sliderBegin{{ tab_name }}');
+    if (bEl?.noUiSlider) {
+        const bVals = bEl.noUiSlider.get();
+        const bAll = {{ tab_name }}Data.timelineBegin.map(e => e.string);
+        const bIsDefault = bVals[0] === bAll[0] &&
+            bVals[1] === bAll[bAll.length - 1];
+        if (!bIsDefault) {
+            const label = `Begin: ${bVals[0]} – ${bVals[1]}`;
+            makeBadge(label, 'bg-secondary', () => {
+                bEl.noUiSlider.set([bAll[0], bAll[bAll.length - 1]]);
+            });
+        }
+    }
+
+    // --- Chronology (end slider) ---
+    const eEl = document.getElementById('sliderEnd{{ tab_name }}');
+    if (eEl?.noUiSlider) {
+        const eVals = eEl.noUiSlider.get();
+        const eAll = {{ tab_name }}Data.timelineEnd.map(e => e.string);
+        const eIsDefault = eVals[0] === eAll[0] &&
+            eVals[1] === eAll[eAll.length - 1];
+        if (!eIsDefault) {
+            const label = `End: ${eVals[0]} – ${eVals[1]}`;
+            makeBadge(label, 'bg-secondary', () => {
+                eEl.noUiSlider.set([eAll[0], eAll[eAll.length - 1]]);
+            });
+        }
+    }
+
+    container.innerHTML = '';
+    container.appendChild(frag);
+    panel.classList.toggle('d-none', container.childElementCount === 0);
+}
+
+document.getElementById('reset-all-filters-{{ tab_name }}')
+    ?.addEventListener('click', () => {
+        if (typeof window.resetAllToInitial === 'function') {
+            window.resetAllToInitial();
+        } else {
+            resetFilter{{ tab_name }}();
+        }
+    });
 
 // applyCombinedFilter function
 function applyCombinedFilter{{ tab_name }}() {
@@ -447,7 +791,15 @@ function applyCombinedFilter{{ tab_name }}() {
     } else {
         table{{ tab_name }}.clearFilter();
     }
-    update{{ tab_name }}Counter()
+    update{{ tab_name }}Counter();
+
+    // Notify badge of manual filter change (skip when preset is being applied)
+    if (!window.{{ tab_name }}PresetApplying) {
+        document.dispatchEvent(
+            new CustomEvent('{{ tab_name }}-filter-changed'));
+    }
+
+    updateActiveFilterBadges{{ tab_name }}();
 }
 
 
@@ -544,35 +896,32 @@ if (!window.{{ tab_name }}TreeInstances) {
 
 for (const tree of {{ tab_name }}TreesToBuild) {
     const treeLabel = tree.replace('_', ' ').replace(/^./, c => c.toUpperCase());
+    const treeId = tree.replace(/[^a-zA-Z0-9_-]/g, '_');
 
     const accordionItem = document.createElement('div');
     accordionItem.classList.add('accordion-item');
     accordionItem.innerHTML = `
         <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#typesCollapse{{ tab_name }}${tree}">
+                    data-bs-target="#typesCollapse{{ tab_name }}${treeId}">
                 ${treeLabel} types
             </button>
         </h2>
-        <div id="typesCollapse{{ tab_name }}${tree}" class="accordion-collapse collapse">
+        <div id="typesCollapse{{ tab_name }}${treeId}" class="accordion-collapse collapse">
             <div class="p-3">
-                <div id="{{ tab_name }}Tree${tree}" class="tree-container typeTreeSelector"></div>
+                <div id="{{ tab_name }}Tree${treeId}" class="tree-container typeTreeSelector"></div>
                 <div class="d-flex justify-content-between align-items-center mt-2">
                     <span class="form-check">
                         <input class="form-check-input" checked type="checkbox"
-                               id="include-subcategories-{{ tab_name }}-${tree}">
-                        <label class="form-check-label" for="include-subcategories-{{ tab_name }}-${tree}">
+                               id="include-subcategories-{{ tab_name }}-${treeId}">
+                        <label class="form-check-label" for="include-subcategories-{{ tab_name }}-${treeId}">
                             Include subcategories
                         </label>
                     </span>
                     <span>
                         <button type="button" class="btn btn-warning btn-sm filter-btn"
-                                id="reset-type-btn-{{ tab_name }}-${tree}">
+                                id="reset-type-btn-{{ tab_name }}-${treeId}">
                             Reset
-                        </button>
-                        <button type="button" class="btn btn-primary btn-sm filter-btn"
-                                id="apply-type-btn-{{ tab_name }}-${tree}">
-                            Apply
                         </button>
                     </span>
                 </div>
@@ -582,19 +931,19 @@ for (const tree of {{ tab_name }}TreesToBuild) {
 
     {{ tab_name }}CurrentContainer.appendChild(accordionItem);
 
-    accordionItem.querySelector(`#reset-type-btn-{{ tab_name }}-${tree}`)
-        .addEventListener('click', () => deselectTree{{ tab_name }}(tree));
-    accordionItem.querySelector(`#apply-type-btn-{{ tab_name }}-${tree}`)
-        .addEventListener('click', () => filterTypes{{ tab_name }}());
+    accordionItem.querySelector(`#reset-type-btn-{{ tab_name }}-${treeId}`)
+        ?.addEventListener('click', () => deselectTree{{ tab_name }}(tree));
 
-    document.getElementById(`typesCollapse{{ tab_name }}${tree}`)
-        .addEventListener('shown.bs.collapse', () => {
+    document.getElementById(`typesCollapse{{ tab_name }}${treeId}`)
+        ?.addEventListener('shown.bs.collapse', () => {
             rebuildTreeWithFilteredData{{ tab_name }}(tree);
         });
 
     // Create a Treeview instance – store it in an object instead of dynamic variable
+    if (!{{ tab_name }}Data.treeData[tree]?.[0]?.children) continue;
+
     const treeview = new Treeview({
-        containerId: `{{ tab_name }}Tree${tree}`,   // ID of the HTML element to render the tree into
+        containerId: `{{ tab_name }}Tree${treeId}`,   // ID of the HTML element to render the tree into
         data: {{ tab_name }}Data.treeData[tree][0].children,   // Use bracket notation to access the property, remove root node
         searchEnabled: true,
         buttonStyle: 'bootstrapIcons',
@@ -608,6 +957,7 @@ for (const tree of {{ tab_name }}TreesToBuild) {
         onSelectionChange: (selectedNodesData) => {
             window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = selectedNodesData.map(node => node.id);
             window.{{ tab_name }}TreeInstances[tree].selectedNodeIdsWithChildren = treeview.getSelectedNodesAndChildrenValues('id');
+            filterTypes{{ tab_name }}();
         }
     });
 
@@ -637,7 +987,8 @@ function filterTypes{{ tab_name }}() {
     for (const tree of {{ tab_name }}TreesToBuild) {
         const treeInstance = window.{{ tab_name }}TreeInstances[tree];
         if (!treeInstance) continue;
-        const checkbox = document.getElementById(`include-subcategories-{{ tab_name }}-${tree}`);
+        const treeId = tree.replace(/[^a-zA-Z0-9_-]/g, '_');
+        const checkbox = document.getElementById(`include-subcategories-{{ tab_name }}-${treeId}`);
         const includeSubcategories = checkbox ? checkbox.checked : true;
         if (includeSubcategories) {
             selectedNodes{{ tab_name }}.push(...treeInstance.selectedNodeIdsWithChildren);

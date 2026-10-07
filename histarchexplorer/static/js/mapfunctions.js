@@ -13,20 +13,33 @@ function addSkybox(map) {
 }
 
 function addTerrain(map) {
-    const terrainUrl = 'https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=E7Jrgaazm79UlTuEI5f5';
+    const terrainUrl =
+        'https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json' +
+        '?key=E7Jrgaazm79UlTuEI5f5';
 
-    map.addSource('terrainSource', {type: 'raster-dem', url: terrainUrl, tileSize: 256});
-    map.addSource('hillshadeSource', {type: 'raster-dem', url: terrainUrl, tileSize: 256});
+    function _doAddTerrain() {
+        if (map.getSource('terrainSource')) return;
+        map.addSource('terrainSource', {
+            type: 'raster-dem', url: terrainUrl, tileSize: 256});
+        map.addSource('hillshadeSource', {
+            type: 'raster-dem', url: terrainUrl, tileSize: 256});
+        map.addLayer({
+            id: 'hills',
+            type: 'hillshade',
+            source: 'hillshadeSource',
+            layout: {visibility: 'visible'},
+            paint: {'hillshade-shadow-color': 'rgba(71,59,36,0.56)'}
+        });
+        map.addControl(
+            new maplibregl.TerrainControl(
+                {source: 'terrainSource', exaggeration: 1}));
+    }
 
-    map.addLayer({
-        id: 'hills',
-        type: 'hillshade',
-        source: 'hillshadeSource',
-        layout: {visibility: 'visible'},
-        paint: {'hillshade-shadow-color': 'rgba(71,59,36,0.56)'}
-    });
-
-    map.addControl(new maplibregl.TerrainControl({source: 'terrainSource', exaggeration: 1}));
+    if (map.isStyleLoaded()) {
+        _doAddTerrain();
+    } else {
+        map.once('style.load', _doAddTerrain);
+    }
 }
 
 function addGeoJsonSources(map, data) {

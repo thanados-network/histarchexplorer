@@ -49,10 +49,6 @@ function {{tab_name}}ToggleView(view) {
 
     {% if tab_name in ["places", "items"] %}
         if (!{{ tab_name }}MapLoaded) {
-            addTerrain(map{{ tab_name }});
-            addSkybox(map{{ tab_name }});
-            addControls(map{{ tab_name }});
-
             setTimeout(() => {
                 if (!bounds{{ tab_name }}.isEmpty() && !onePointFeature{{ tab_name }}) {
                     map{{ tab_name }}.fitBounds(bounds{{ tab_name }}, {padding: 20});
@@ -71,9 +67,9 @@ const {{ tab_name }}Data = {}
 {{ tab_name }}Data.tableData = getEntitiesForTab('{{ tab_name }}');
 {{ tab_name }}Data.typeIds = [...new Set({{ tab_name }}Data.tableData.map(item => item.type_id))];
 if ('{{ tab_name }}' == 'subunits') {
-    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains'], ["standard"], {{ tab_name }}Data.typeIds)
+    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains'], ["standard"], null)
 } else {
-    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, viewClasses.{{ tab_name }}, ["standard"], {{ tab_name }}Data.typeIds)
+    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, viewClasses.{{ tab_name }}, ["standard"], null)
 }
 
 {{ tab_name }}Data.fields = getKeysWithValues({{ tab_name }}Data.tableData)
@@ -139,7 +135,7 @@ function adjustTableHeight{{ tab_name }}() {
         const breadcrumbHeight = breadcrumbCont.offsetHeight;
 
         // 100vh - 96px - headerHeight - 3rem
-        const maxHeight = window.innerHeight - 96 - headerHeight - breadcrumbHeight - (3 * 16); // 3rem = 48px
+        const maxHeight = window.innerHeight - 80 - headerHeight - breadcrumbHeight - (3 * 16); // 3rem = 48px
         table.style.maxHeight = `${maxHeight}px`;
         {% if tab_name in ['places','items'] %}
             mapContainer{{tab_name}}.style.height = `${maxHeight + 16}px`;
@@ -155,6 +151,18 @@ window.addEventListener("resize", function () {
 
 // Run on initial load
 adjustTableHeight{{tab_name}}();
+{% if tab_name == "places" %}
+setTimeout(() => placesToggleView('map'), 500);
+{% endif %}
+
+{% if tab_name == "items" %}
+setTimeout(() => itemsToggleView('tile'), 500);
+{% endif %}
+
+{% if tab_name == "features" %}
+setTimeout(() => featuresToggleView('tile'), 500);
+{% endif %}
+
 document.getElementById('toggleSidebar').addEventListener('click', function () {
     adjustTableHeight{{tab_name}}();
     adjustTileHeight{{ tab_name }}()
@@ -164,5 +172,7 @@ document.getElementById('tab-{{ tab_name }}').addEventListener('click', function
     adjustTableHeight{{tab_name}}();
     adjustTileHeight{{ tab_name }}()
 })
+
+
 
 </script>
