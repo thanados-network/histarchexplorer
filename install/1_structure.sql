@@ -55,7 +55,7 @@ DROP TABLE IF EXISTS tng.entities;
 DROP TABLE IF EXISTS tng.classes;
 DROP FUNCTION IF EXISTS tng.getdates(first timestamp without time zone, last timestamp without time zone, comment text);
 DROP FUNCTION IF EXISTS tng.delete_links_on_config_delete();
-DROP SCHEMA IF EXISTS tng;
+DROP SCHEMA IF EXISTS tng CASCADE;
 --
 -- Name: tng; Type: SCHEMA; Schema: -; Owner: openatlas
 --
