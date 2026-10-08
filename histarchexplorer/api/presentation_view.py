@@ -12,6 +12,7 @@ from histarchexplorer.api.util import (
     get_description_translated,
     get_divisions,
     get_render_type, split_date_string)
+from histarchexplorer.services.entity_cache import record_entity_cached
 
 
 @dataclass
@@ -467,7 +468,7 @@ class PresentationView:
                 split_date_string(when_data.end.earliest),
                 split_date_string(when_data.end.latest))
 
-        return cls(
+        view = cls(
             id=data["id"],
             system_class=data.get("systemClass", ""),
             view_class=data.get("viewClass", ""),
@@ -494,6 +495,8 @@ class PresentationView:
             relations=cls.parse_relations(data.get("relations", {})),
             start=start_date,
             end=end_date)
+        record_entity_cached(entity_id)
+        return view
 
     @staticmethod
     def merge_references(

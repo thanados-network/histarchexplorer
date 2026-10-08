@@ -2,17 +2,17 @@ from typing import Optional
 
 from flask import (
     Response, g, jsonify, redirect, request, session, url_for)
-from flask_babel import gettext as _
 from flask.typing import ResponseValue
+from flask_babel import gettext as _
 from flask_login import login_required
 
-from histarchexplorer import app, cache
+from histarchexplorer import app
 from histarchexplorer.api.api_access import ApiAccess
-from histarchexplorer.api.presentation_view import PresentationView
 from histarchexplorer.database.map import get_map_tilestring
 from histarchexplorer.models.config import ConfigEntity
-from histarchexplorer.utils.view_util import (
-    get_view_class_count, slugify, render_page_template)
+from histarchexplorer.services.entity_cache import forget_entity
+from histarchexplorer.utils.view_util import (get_view_class_count,
+                                              render_page_template, slugify)
 
 
 @app.route('/')
@@ -136,7 +136,7 @@ def refresh_cache(id_: int) -> ResponseValue | tuple[ResponseValue, int]:
             error message with HTTP 500 on failure.
     """
     try:
-        cache.delete_memoized(PresentationView.from_api, PresentationView, id_)
+        forget_entity(id_)
         return redirect(url_for('entity_view', id_=id_))
     except Exception as e:
         return jsonify({

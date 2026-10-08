@@ -18,6 +18,65 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
+#: templates/admin.html templates/admin/menu_management.html:89
+#: templates/admin/vocabulary_settings.html:4
+msgid "Vocabulary"
+msgstr "Vocabulary"
+
+#: templates/admin/vocabulary_settings.html:9
+msgid ""
+"Leave both lists empty to show the entire vocabulary. "
+"Use only one filter list."
+msgstr ""
+"Leave both lists empty to show the entire vocabulary. "
+"Use only one filter list."
+
+#: templates/admin/vocabulary_settings.html:10
+msgid "These filters affect only the viewer, not access to the vocabulary API."
+msgstr "These filters affect only the viewer, not access to the vocabulary API."
+
+#: templates/admin/vocabulary_settings.html:16
+msgid "Included Type IDs"
+msgstr "Included Type IDs"
+
+#: templates/admin/vocabulary_settings.html:19
+msgid ""
+"Comma-separated positive IDs. Include their subtrees and necessary "
+"ancestors."
+msgstr ""
+"Comma-separated positive IDs. Include their subtrees and necessary "
+"ancestors."
+
+#: templates/admin/vocabulary_settings.html:31
+msgid "Excluded Type IDs"
+msgstr "Excluded Type IDs"
+
+#: templates/admin/vocabulary_settings.html:34
+msgid ""
+"Comma-separated positive IDs. Hide these types and all their descendants."
+msgstr ""
+"Comma-separated positive IDs. Hide these types and all their descendants."
+
+#: templates/admin/vocabulary_settings.html:11
+msgid "Viewer title"
+msgstr "Viewer title"
+
+#: templates/admin/vocabulary_settings.html:15
+msgid ""
+"Leave empty to use the default title in the widget language. "
+"This does not change the menu label."
+msgstr ""
+"Leave empty to use the default title in the widget language. "
+"This does not change the menu label."
+
+#: views/admin.py:538
+msgid "Use positive, comma-separated IDs in only one filter list."
+msgstr "Use positive, comma-separated IDs in only one filter list."
+
+#: views/admin.py:547
+msgid "Vocabulary settings updated successfully."
+msgstr "Vocabulary settings updated successfully."
+
 #: api/util.py:43 api/util.py:45 api/util.py:46 api/util.py:51
 msgid "BC"
 msgstr "BC"
@@ -2207,6 +2266,82 @@ msgstr "User not found."
 msgid "Failed to clear cache: %(error)s"
 msgstr "Failed to clear cache: %(error)s"
 
+#: templates/admin/cache.html:2
+msgid "Not started"
+msgstr "Not started"
+
+#: templates/admin/cache.html:2
+msgid "Queued"
+msgstr "Queued"
+
+#: templates/admin/cache.html:2
+msgid "Running"
+msgstr "Running"
+
+#: templates/admin/cache.html:3
+msgid "Completed"
+msgstr "Completed"
+
+#: templates/admin/cache.html:3
+msgid "Completed with errors"
+msgstr "Completed with errors"
+
+#: templates/admin/cache.html:4
+msgid "Failed"
+msgstr "Failed"
+
+#: templates/admin/cache.html:4
+msgid "Interrupted"
+msgstr "Interrupted"
+
+#: templates/admin/cache.html:8
+msgid "Vocabulary cache"
+msgstr "Vocabulary cache"
+
+#: templates/admin/cache.html:11
+msgid "Status"
+msgstr "Status"
+
+#: templates/admin/cache.html:13
+msgid "Type details"
+msgstr "Type details"
+
+#: templates/admin/cache.html:15
+msgid "Failed details"
+msgstr "Failed details"
+
+#: templates/admin/cache.html:17
+msgid "Started"
+msgstr "Started"
+
+#: templates/admin/cache.html:19
+msgid "Last update"
+msgstr "Last update"
+
+#: templates/admin/cache.html:21
+msgid "Finished"
+msgstr "Finished"
+
+#: templates/admin/cache.html:25
+msgid ""
+"System refresh preloads the full vocabulary independently of viewer filters. "
+"Reload to see progress."
+msgstr ""
+"System refresh preloads the full vocabulary independently of viewer filters. "
+"Reload to see progress."
+
+#: views/admin.py:1423
+msgid "Vocabulary cache preload started in background."
+msgstr "Vocabulary cache preload started in background."
+
+#: views/admin.py:1426
+msgid "Vocabulary cache preload is already running."
+msgstr "Vocabulary cache preload is already running."
+
+#: views/admin.py:1429
+msgid "Could not start vocabulary cache preload."
+msgstr "Could not start vocabulary cache preload."
+
 #~ msgid "Save"
 #~ msgstr "Save"
 
@@ -2259,3 +2394,77 @@ msgstr "Failed to clear cache: %(error)s"
 #~ "%(project_name)s (%(year)s). %(title)s. Retrieved"
 #~ " from %(url)s (Accessed: %(date)s)"
 
+msgid "up to 1 day"
+msgstr "up to 1 day"
+
+msgid "up to 3 days"
+msgstr "up to 3 days"
+
+msgid "up to 7 days"
+msgstr "up to 7 days"
+
+msgid "older than 7 days"
+msgstr "older than 7 days"
+
+msgid "Processed"
+msgstr "Processed"
+
+msgid "Recent errors"
+msgstr "Recent errors"
+
+msgid "Cache backend"
+msgstr "Cache backend"
+
+msgid "cached entries"
+msgstr "cached entries"
+
+msgid "Size"
+msgstr "Size"
+
+msgid "Hit rate"
+msgstr "Hit rate"
+
+msgid "Lifetime"
+msgstr "Lifetime"
+
+msgid "days"
+msgstr "days"
+
+msgid "Entity cache"
+msgstr "Entity cache"
+
+msgid "entities cached (last warm-up list)"
+msgstr "entities cached (last warm-up list)"
+
+msgid "Entities are refetched after %(days)s days on access or by the warm-up."
+msgstr "Entities are refetched after %(days)s days on access or by the warm-up."
+
+msgid "Fetched"
+msgstr "Fetched"
+
+msgid "Already cached"
+msgstr "Already cached"
+
+msgid "Entity warm-up"
+msgstr "Entity warm-up"
+
+msgid "Statistics are updated every two minutes; job progress refreshes automatically."
+msgstr "Statistics are updated every two minutes; job progress refreshes automatically."
+
+msgid "Last computed"
+msgstr "Last computed"
+
+msgid "Refetches entities older than the maximum age and caches new ones."
+msgstr "Refetches entities older than the maximum age and caches new ones."
+
+msgid "refresh outdated entities"
+msgstr "refresh outdated entities"
+
+msgid "Entity cache warm-up started in background."
+msgstr "Entity cache warm-up started in background."
+
+msgid "An entity cache warm-up is already running."
+msgstr "An entity cache warm-up is already running."
+
+msgid "Could not start entity cache warm-up."
+msgstr "Could not start entity cache warm-up."

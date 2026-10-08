@@ -475,6 +475,12 @@ document.getElementById('warmEntityCache')?.addEventListener('click', function (
   }
 });
 
+document.getElementById('refreshStaleEntities')?.addEventListener('click', function () {
+  if (confirm('Refetch all entities older than the maximum age? This will take some time.')) {
+    window.location.href = '/admin/refresh-stale-entities';
+  }
+});
+
 document.getElementById('refreshEntityCache')?.addEventListener('click', function () {
   if (confirm('Are you sure you want to refresh the whole entity cache? This will take some time.')) {
     window.location.href = '/admin/refresh-entity-cache';

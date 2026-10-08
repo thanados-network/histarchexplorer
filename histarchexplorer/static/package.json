@@ -19,6 +19,7 @@
     "mirador": "^4.0.0-alpha.17",
     "muuri": "^0.9.5",
     "nouislider": "^15.8.1",
+    "openatlas-vocabulary-viewer": "github:thanados-network/vocabulary-viewer",
     "quercus.js": "^0.5.1",
     "sortablejs": "^1.15.2",
     "svg-pan-zoom": "^3.6.2",

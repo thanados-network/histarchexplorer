@@ -1,86 +1,47 @@
 #!/usr/bin/env python3
+"""Warm, refresh or age-refresh the entity cache in the background.
+
+Modes: ``warm`` fetches only uncached entities, ``stale`` additionally
+refetches entities older than ENTITY_CACHE_MAX_AGE_DAYS (suitable for a
+weekly cron job) and ``refresh`` refetches everything. Started by the
+admin dashboard with an inherited lock; run directly it takes the lock
+itself and exits quietly if another warm-up is active.
+"""
+
 import argparse
-import concurrent.futures
-import time
-from typing import Any, Optional
+import os
 
-import requests
-
-from config.default import API_URL
-
-# Configuration
-API_BASE = "http://127.0.0.1:5000"
-MAX_WORKERS = 2
+from histarchexplorer import app
+from histarchexplorer.services.cache_jobs import timestamp
+from histarchexplorer.services.entity_cache import (
+    JOB_DEFAULTS, MODES, entity_job, run_entity_warmup)
 
 
-def get_by_system_class(
-        case_study_ids: Optional[list[int]] = None) -> list[dict[str, Any]]:
-    query_params: dict[str, str | int | list[str] | list[int]] = {
-        'type_id': case_study_ids if case_study_ids is not None else [],
-        'limit': 0,
-        'show': ["none"],
-        'format': "lpx"}
-    try:
-        response = requests.get(
-            f"{API_URL}system_class/all",
-            params=query_params,
-            timeout=60)
-        response.raise_for_status()
-        data = response.json()
-        return data.get('results', [])
-
-    except requests.RequestException as e:
-        print(f"API Error: {e}")
-        return []
-
-
-def refresh_entity_cache(entity_id: int) -> None:
-    """Clear and rebuild cache for one entity via admin endpoint."""
-    time.sleep(1)
-    url = f"{API_BASE}/refresh-cache/{entity_id}"
-    try:
-        requests.post(url, timeout=60)
-    except Exception as e:
-        print(f"Error refreshing {entity_id}: {e}")
-
-
-def warm_entity_cache(entity_id: int) -> None:
-    """Just trigger the cached endpoint."""
-    time.sleep(1)
-    url = f"{API_BASE}/presentation-view/{entity_id}"
-    try:
-        requests.get(url, timeout=60)
-    except Exception as e:
-        print(f"Error warming {entity_id}: {e}")
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Warm or refresh entity cache.")
-    parser.add_argument(
-        "--refresh",
-        action="store_true",
-        help="Clear and rebuild cache before warming.")
-    parser.add_argument(
-        "--case-studies",
-        nargs="+",
-        type=int,
-        help="List of case study IDs to fetch entities from (e.g. "
-             "--case-studies 1 2 3)")
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--mode', choices=MODES, default='warm')
+    parser.add_argument('--case-studies', nargs='+', type=int, default=[])
+    parser.add_argument('--lock-fd', type=int)
     args = parser.parse_args()
-    if args.case_studies:
-        entities = get_by_system_class(args.case_studies)
-    else:
-        entities = get_by_system_class()
+    with app.app_context():
+        job = entity_job()
+        fd = args.lock_fd
+        if fd is None:
+            fd = job.lock()
+            if fd is None:
+                return 0
+            job.write(**dict(
+                JOB_DEFAULTS, state='queued', mode=args.mode,
+                started_at=timestamp()))
+        try:
+            state = run_entity_warmup(job, args.mode, args.case_studies)
+        except BaseException:
+            job.write(state='failed', finished_at=timestamp())
+            raise
+        finally:
+            os.close(fd)
+    return int(state == 'failed')
 
-    ids = [int(e["features"][0]["@id"].rsplit("/", 1)[-1]) for e in entities]
 
-    func = refresh_entity_cache if args.refresh else warm_entity_cache
-
-    with concurrent.futures.ThreadPoolExecutor(
-            max_workers=MAX_WORKERS) as executor:
-        executor.map(func, ids)
-
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    raise SystemExit(main())

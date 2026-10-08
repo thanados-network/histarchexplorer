@@ -14,6 +14,37 @@ PROXIES = {
 class ApiAccess:
 
     @staticmethod
+    def _get_vocabulary(endpoint: str) -> dict[str, Any]:
+        """Fetch a fixed versioned vocabulary endpoint, rejecting bad data."""
+        base = app.config['API_URL'].rstrip('/')
+        if not base.endswith('/1'):
+            base += '/1'
+        response = requests.get(
+            f'{base}/vocabulary/{endpoint}',
+            headers=g.api_headers,
+            proxies=PROXIES,
+            timeout=60)
+        response.raise_for_status()
+        payload = response.json()
+        if not isinstance(payload, dict):
+            raise ValueError('Invalid vocabulary payload')
+        return payload
+
+    @staticmethod
+    @cache.memoize()
+    def get_vocabulary_tree() -> dict[str, Any]:
+        """Return the unchanged vocabulary tree from the shared cache."""
+        return ApiAccess._get_vocabulary('tree')
+
+    @staticmethod
+    @cache.memoize()
+    def get_vocabulary_detail(id_: int) -> dict[str, Any]:
+        """Return the unchanged detail of a positive vocabulary type ID."""
+        if type(id_) is not int or id_ <= 0:
+            raise ValueError('Vocabulary IDs must be positive integers')
+        return ApiAccess._get_vocabulary(str(id_))
+
+    @staticmethod
     def get_system_class_count(parser: Parser) -> dict[str, Any]:
         """Fetch the number of entities grouped by system class.
 

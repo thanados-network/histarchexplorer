@@ -18,6 +18,69 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
+#: templates/admin.html templates/admin/menu_management.html:89
+#: templates/admin/vocabulary_settings.html:4
+msgid "Vocabulary"
+msgstr "Vokabular"
+
+#: templates/admin/vocabulary_settings.html:9
+msgid ""
+"Leave both lists empty to show the entire vocabulary. "
+"Use only one filter list."
+msgstr ""
+"Lassen Sie beide Listen leer, um das gesamte Vokabular anzuzeigen. "
+"Verwenden Sie nur eine Filterliste."
+
+#: templates/admin/vocabulary_settings.html:10
+msgid "These filters affect only the viewer, not access to the vocabulary API."
+msgstr ""
+"Diese Filter betreffen nur die Anzeige, nicht den Zugriff auf die "
+"Vokabular-API."
+
+#: templates/admin/vocabulary_settings.html:16
+msgid "Included Type IDs"
+msgstr "Eingeschlossene Typ-IDs"
+
+#: templates/admin/vocabulary_settings.html:19
+msgid ""
+"Comma-separated positive IDs. Include their subtrees and necessary "
+"ancestors."
+msgstr ""
+"Kommagetrennte positive IDs. Die zugehörigen Teilbäume und erforderlichen "
+"übergeordneten Typen werden eingeschlossen."
+
+#: templates/admin/vocabulary_settings.html:31
+msgid "Excluded Type IDs"
+msgstr "Ausgeschlossene Typ-IDs"
+
+#: templates/admin/vocabulary_settings.html:34
+msgid ""
+"Comma-separated positive IDs. Hide these types and all their descendants."
+msgstr ""
+"Kommagetrennte positive IDs. Diese Typen und alle untergeordneten Typen "
+"werden ausgeblendet."
+
+#: templates/admin/vocabulary_settings.html:11
+msgid "Viewer title"
+msgstr "Titel des Viewers"
+
+#: templates/admin/vocabulary_settings.html:15
+msgid ""
+"Leave empty to use the default title in the widget language. "
+"This does not change the menu label."
+msgstr ""
+"Leer lassen, um den Standardtitel in der Sprache des Widgets zu verwenden. "
+"Die Menübezeichnung bleibt unverändert."
+
+#: views/admin.py:538
+msgid "Use positive, comma-separated IDs in only one filter list."
+msgstr ""
+"Verwenden Sie positive, kommagetrennte IDs in nur einer Filterliste."
+
+#: views/admin.py:547
+msgid "Vocabulary settings updated successfully."
+msgstr "Vokabulareinstellungen erfolgreich aktualisiert."
+
 #: api/util.py:43 api/util.py:45 api/util.py:46 api/util.py:51
 msgid "BC"
 msgstr "v.Chr."
@@ -2219,6 +2282,83 @@ msgstr "Benutzer nicht gefunden."
 msgid "Failed to clear cache: %(error)s"
 msgstr "Cache konnte nicht geleert werden: %(error)s"
 
+#: templates/admin/cache.html:2
+msgid "Not started"
+msgstr "Nicht gestartet"
+
+#: templates/admin/cache.html:2
+msgid "Queued"
+msgstr "In der Warteschlange"
+
+#: templates/admin/cache.html:2
+msgid "Running"
+msgstr "Wird ausgeführt"
+
+#: templates/admin/cache.html:3
+msgid "Completed"
+msgstr "Abgeschlossen"
+
+#: templates/admin/cache.html:3
+msgid "Completed with errors"
+msgstr "Mit Fehlern abgeschlossen"
+
+#: templates/admin/cache.html:4
+msgid "Failed"
+msgstr "Fehlgeschlagen"
+
+#: templates/admin/cache.html:4
+msgid "Interrupted"
+msgstr "Unterbrochen"
+
+#: templates/admin/cache.html:8
+msgid "Vocabulary cache"
+msgstr "Vokabular-Cache"
+
+#: templates/admin/cache.html:11
+msgid "Status"
+msgstr "Status"
+
+#: templates/admin/cache.html:13
+msgid "Type details"
+msgstr "Typdetails"
+
+#: templates/admin/cache.html:15
+msgid "Failed details"
+msgstr "Fehlgeschlagene Detailabfragen"
+
+#: templates/admin/cache.html:17
+msgid "Started"
+msgstr "Gestartet"
+
+#: templates/admin/cache.html:19
+msgid "Last update"
+msgstr "Letzte Aktualisierung"
+
+#: templates/admin/cache.html:21
+msgid "Finished"
+msgstr "Beendet"
+
+#: templates/admin/cache.html:25
+msgid ""
+"System refresh preloads the full vocabulary independently of viewer filters. "
+"Reload to see progress."
+msgstr ""
+"Die Systemaktualisierung lädt das gesamte Vokabular unabhängig von den "
+"Anzeigefiltern vorab in den Cache. Laden Sie die Seite neu, um den Fortschritt "
+"zu sehen."
+
+#: views/admin.py:1423
+msgid "Vocabulary cache preload started in background."
+msgstr "Das Vorladen des Vokabular-Caches wurde im Hintergrund gestartet."
+
+#: views/admin.py:1426
+msgid "Vocabulary cache preload is already running."
+msgstr "Das Vorladen des Vokabular-Caches läuft bereits."
+
+#: views/admin.py:1429
+msgid "Could not start vocabulary cache preload."
+msgstr "Das Vorladen des Vokabular-Caches konnte nicht gestartet werden."
+
 #~ msgid "address"
 #~ msgstr "Adresse"
 
@@ -2384,3 +2524,77 @@ msgstr "Cache konnte nicht geleert werden: %(error)s"
 #~ "%(project_name)s (%(year)s). %(title)s. Abgerufen"
 #~ " von %(url)s (Abgerufen am: %(date)s)"
 
+msgid "up to 1 day"
+msgstr "bis 1 Tag"
+
+msgid "up to 3 days"
+msgstr "bis 3 Tage"
+
+msgid "up to 7 days"
+msgstr "bis 7 Tage"
+
+msgid "older than 7 days"
+msgstr "älter als 7 Tage"
+
+msgid "Processed"
+msgstr "Verarbeitet"
+
+msgid "Recent errors"
+msgstr "Letzte Fehler"
+
+msgid "Cache backend"
+msgstr "Cache-Backend"
+
+msgid "cached entries"
+msgstr "Einträge im Cache"
+
+msgid "Size"
+msgstr "Größe"
+
+msgid "Hit rate"
+msgstr "Trefferquote"
+
+msgid "Lifetime"
+msgstr "Lebensdauer"
+
+msgid "days"
+msgstr "Tage"
+
+msgid "Entity cache"
+msgstr "Entitäten-Cache"
+
+msgid "entities cached (last warm-up list)"
+msgstr "Entitäten im Cache (laut letzter Warm-up-Liste)"
+
+msgid "Entities are refetched after %(days)s days on access or by the warm-up."
+msgstr "Entitäten werden nach %(days)s Tagen beim Aufruf oder durch den Warm-up neu geladen."
+
+msgid "Fetched"
+msgstr "Geladen"
+
+msgid "Already cached"
+msgstr "Bereits im Cache"
+
+msgid "Entity warm-up"
+msgstr "Entitäten-Warm-up"
+
+msgid "Statistics are updated every two minutes; job progress refreshes automatically."
+msgstr "Statistiken werden alle zwei Minuten aktualisiert; der Fortschritt der Jobs aktualisiert sich automatisch."
+
+msgid "Last computed"
+msgstr "Zuletzt berechnet"
+
+msgid "Refetches entities older than the maximum age and caches new ones."
+msgstr "Lädt Entitäten, die älter als das Höchstalter sind, neu und cached neue Entitäten."
+
+msgid "refresh outdated entities"
+msgstr "veraltete Entitäten aktualisieren"
+
+msgid "Entity cache warm-up started in background."
+msgstr "Entitäten-Warm-up im Hintergrund gestartet."
+
+msgid "An entity cache warm-up is already running."
+msgstr "Ein Entitäten-Warm-up läuft bereits."
+
+msgid "Could not start entity cache warm-up."
+msgstr "Entitäten-Warm-up konnte nicht gestartet werden."

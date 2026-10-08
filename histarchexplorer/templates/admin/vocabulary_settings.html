@@ -1,0 +1,53 @@
+<form method="post" action="{{ url_for('update_vocabulary_settings') }}">
+  <input type="hidden" name="active_sidebar" value="sidebar-vocabulary-settings">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0 text-secondary">{{ _('Vocabulary') }}</h4>
+    <button type="submit" class="btn btn-primary shadow-sm">
+      <i class="bi bi-save"></i> {{ _('Save All Settings') }}
+    </button>
+  </div>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <label for="vocabulary-title" class="form-label fw-bold">{{ _('Viewer title') }}</label>
+      <input id="vocabulary-title" type="text" class="form-control" name="title"
+             aria-describedby="vocabulary-title-help" value="{{ settings.vocabulary_title }}">
+      <p id="vocabulary-title-help" class="text-muted small mt-2 mb-0">
+        {{ _('Leave empty to use the default title in the widget language. This does not change the menu label.') }}
+      </p>
+    </div>
+  </div>
+  <p class="text-muted">{{ _('Leave both lists empty to show the entire vocabulary. Use only one filter list.') }}</p>
+  <p class="text-muted small">{{ _('These filters affect only the viewer, not access to the vocabulary API.') }}</p>
+  <div class="row g-4 mb-5">
+    <div class="col-md-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <label for="vocabulary-include" class="form-label text-success fw-bold">
+            <i class="bi bi-plus-circle me-1"></i>{{ _('Included Type IDs') }}
+          </label>
+          <p id="vocabulary-include-help" class="text-muted small">
+            {{ _('Comma-separated positive IDs. Include their subtrees and necessary ancestors.') }}
+          </p>
+          <input id="vocabulary-include" type="text" class="form-control" name="include_ids"
+                 aria-describedby="vocabulary-include-help"
+                 value="{{ settings.vocabulary_include_ids | join(', ') }}" placeholder="101, 102, 103">
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <label for="vocabulary-exclude" class="form-label text-danger fw-bold">
+            <i class="bi bi-dash-circle me-1"></i>{{ _('Excluded Type IDs') }}
+          </label>
+          <p id="vocabulary-exclude-help" class="text-muted small">
+            {{ _('Comma-separated positive IDs. Hide these types and all their descendants.') }}
+          </p>
+          <input id="vocabulary-exclude" type="text" class="form-control" name="exclude_ids"
+                 aria-describedby="vocabulary-exclude-help"
+                 value="{{ settings.vocabulary_exclude_ids | join(', ') }}" placeholder="201, 202">
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

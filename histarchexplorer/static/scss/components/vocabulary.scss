@@ -1,0 +1,17 @@
+.vocabulary-page openatlas-vocabulary-viewer {
+  display: block;
+  --oa-font-family: 'Inter', system-ui, sans-serif;
+  --oa-font-size: 1rem;
+  --oa-height: max(420px, calc(100dvh - var(--navbar-height) - 5rem));
+}
+
+body.dark .vocabulary-page openatlas-vocabulary-viewer {
+  --oa-bg: var(--about-dark);
+  --oa-text: var(--dark-text);
+  --oa-muted: #adb5bd;
+  --oa-border: #495057;
+  --oa-hover-bg: #263b2c;
+  --oa-link: #9ad49a;
+  --oa-badge-bg: #263b2c;
+  --oa-badge-text: #9ad49a;
+}

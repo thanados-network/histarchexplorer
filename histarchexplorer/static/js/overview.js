@@ -568,9 +568,6 @@ function renderExternalReferences(entity, settings = {}) {
     let renderedCount = 0;
 
     refs.forEach((ref) => {
-        // QUICKFIX/TODO: Once a dedicated API endpoint for external reference systems is available,
-        // we should look up settings by system ID. Currently, we match by name since the API returns
-        // the external identifier value instead of the system ID in ref.id.
         const sysSettings = Object.values(settings).find(s =>
             s.name && s.name.toLowerCase() ===
             (ref.reference_system || "").toLowerCase()) || {};

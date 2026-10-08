@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+{% block content %}
+  <div class="page-wrapper vocabulary-page pb-3">
+    <div class="container">
+      <openatlas-vocabulary-viewer
+        tree-endpoint="{{ url_for('vocabulary_tree') }}"
+        detail-endpoint="{{ detail_endpoint }}"
+        bootstrap-url="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css') }}"
+        lang="{{ widget_language }}"
+        {% if settings.vocabulary_title %}
+        header-title="{{ settings.vocabulary_title }}"
+        {% endif %}
+        {% if settings.vocabulary_include_ids %}
+        include-ids='{{ settings.vocabulary_include_ids | tojson }}'
+        {% elif settings.vocabulary_exclude_ids %}
+        exclude-ids='{{ settings.vocabulary_exclude_ids | tojson }}'
+        {% endif %}>
+      </openatlas-vocabulary-viewer>
+    </div>
+  </div>
+  {% set module_path = 'node_modules/openatlas-vocabulary-viewer/openatlas-vocabulary-viewer.js' %}
+  <script type="module" src="{{ url_for('static', filename=module_path) }}"></script>
+{% endblock %}

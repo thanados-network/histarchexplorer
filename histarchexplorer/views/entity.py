@@ -12,6 +12,7 @@ from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.presentation_view import (
     EntityTypeModel, File, PresentationView, Relation)
 from histarchexplorer.api.util import get_description_translated
+from histarchexplorer.services.entity_cache import ensure_entity_fresh
 from histarchexplorer.utils.view_util import (
     get_cite_button, get_refresh_button)
 from histarchexplorer.views.entities import get_browse_list_entities
@@ -764,6 +765,7 @@ def presentation_view(id_: int) -> dict[str, Any]:
         dict: Serialized JSON structure matching the fields defined in
             the `PresentationView` class.
     """
+    ensure_entity_fresh(id_)
     return asdict(PresentationView.from_api(id_))
 
 
@@ -791,6 +793,7 @@ def entity_data(id_: int) -> dict[str, Any]:
             - initialImage (list[dict]): Initial media thumbnails.
             - images (list[dict]): All public shareable file objects.
     """
+    ensure_entity_fresh(id_)
     entity = PresentationView.from_api(id_)
     data = get_sub_count(entity)
     hierarchy = {

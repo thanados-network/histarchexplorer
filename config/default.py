@@ -7,7 +7,7 @@ except ImportError:
     redis = None  # type: ignore
 
 # Application metadata
-VERSION = '0.5.0'
+VERSION = '0.6.0'
 
 LANGUAGES = {
     'de': 'Deutsch',

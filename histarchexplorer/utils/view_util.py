@@ -55,6 +55,9 @@ def inject_menu() -> dict[str, Any]:
     if menu_config.get('search', {}).get('show', True):
         navbar.append({'search': _('detailed search')})
 
+    if menu_config.get('vocabulary', {}).get('show', True):
+        navbar.append({'vocabulary': _('Vocabulary')})
+
     if menu_config.get('publications', {}).get('show', True):
         navbar.append({'publications': _('Publications')})
 

@@ -1,30 +1,129 @@
-<div class="button-card me-3">
-  <button id="refreshSystemCache" class="btn btn-info"
-          data-bs-toggle="tooltip"
-          title="{{ _('Refreshes the system cache.') }}">
-    {{ _('refresh system cache') | upper }}
-  </button>
-</div>
+{% set job_states = {
+  'idle': _('Not started'), 'queued': _('Queued'), 'running': _('Running'),
+  'completed': _('Completed'), 'partial': _('Completed with errors'),
+  'failed': _('Failed'), 'interrupted': _('Interrupted')
+} %}
+{% set stats = cache_statistics %}
+{% set backend = stats.backend %}
+{% set entities = stats.entities %}
+{% set buckets = [
+  ('day', _('up to 1 day')), ('three_days', _('up to 3 days')),
+  ('week', _('up to 7 days')), ('older', _('older than 7 days'))
+] %}
 
-<div class="button-card me-3">
-  <button id="warmEntityCache" class="btn btn-warning" data-bs-toggle="tooltip"
-          title="{{ _('This will cache all not cached entities.') }}">
-    {{ _('warm entity cache') | upper }}
-  </button>
+{% macro job_card(key, title, job, done, extra_rows=[]) %}
+<div class="card h-100 shadow-sm" data-cache-job="{{ key }}" data-state-labels='{{ job_states | tojson }}'
+     data-job-active="{{ 'true' if job.state in ('queued', 'running') else 'false' }}">
+  <div class="card-body">
+    <h5 class="card-title">{{ title }}</h5>
+    <p class="mb-2">
+      <span class="badge bg-secondary" data-job-field="state">{{ job_states.get(job.state, job.state) }}</span>
+      {% if job.mode %}<span class="badge bg-light text-dark border" data-job-field="mode">{{ job.mode }}</span>{% endif %}
+    </p>
+    <progress class="w-100" max="{{ job.total or 1 }}" value="{{ done }}" data-job-progress></progress>
+    <dl class="row mb-0 small">
+      <dt class="col-6">{{ _('Processed') }}</dt>
+      <dd class="col-6"><span data-job-field="done">{{ done }}</span> / <span data-job-field="total">{{ job.total }}</span></dd>
+      {% for field, label in extra_rows %}
+      <dt class="col-6">{{ label }}</dt>
+      <dd class="col-6" data-job-field="{{ field }}">{{ job[field] }}</dd>
+      {% endfor %}
+      <dt class="col-6">{{ _('Started') }}</dt>
+      <dd class="col-6" data-job-field="started_at">{{ job.started_at or '—' }}</dd>
+      <dt class="col-6">{{ _('Finished') }}</dt>
+      <dd class="col-6" data-job-field="finished_at">{{ job.finished_at or '—' }}</dd>
+    </dl>
+    {% if job.errors %}
+    <details class="mt-2 small">
+      <summary>{{ _('Recent errors') }}</summary>
+      <ul class="mb-0">
+        {% for error in job.errors %}
+        <li>#{{ error.id }}: {{ error.error }}</li>
+        {% endfor %}
+      </ul>
+    </details>
+    {% endif %}
+  </div>
 </div>
+{% endmacro %}
 
-<div class="button-card me-3">
-  <button id="refreshEntityCache" class="btn btn-danger" data-bs-toggle="tooltip"
-          title="{{ _('This completely refreshes the cache.') }}">
-    {{ _('refresh entity cache') | upper }}
-  </button>
+<div class="w-100" id="cacheDashboard" data-status-url="{{ url_for('cache_status') }}">
+  <div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ _('Cache backend') }}</h5>
+          <p class="display-6 mb-1">{{ backend.entries if backend.entries is defined else '—' }}</p>
+          <p class="text-muted small mb-2">{{ _('cached entries') }}</p>
+          <dl class="row mb-0 small">
+            <dt class="col-6">{{ _('Type') }}</dt>
+            <dd class="col-6">{{ backend.type }}</dd>
+            <dt class="col-6">{{ _('Size') }}</dt>
+            <dd class="col-6">{{ backend.memory or '—' }}</dd>
+            <dt class="col-6">{{ _('Hit rate') }}</dt>
+            <dd class="col-6">{{ (backend.hit_rate ~ ' %') if backend.hit_rate is not none and backend.hit_rate is defined else '—' }}</dd>
+            <dt class="col-6">{{ _('Lifetime') }}</dt>
+            <dd class="col-6">{{ backend.ttl_days }} {{ _('days') }}</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ _('Entity cache') }}</h5>
+          <p class="display-6 mb-1">{{ entities.cached }} / {{ entities.known }}</p>
+          <p class="text-muted small mb-2">{{ _('entities cached (last warm-up list)') }}</p>
+          <table class="table table-sm small mb-0">
+            <tbody>
+              {% for key, label in buckets %}
+              <tr>
+                <td>{{ label }}</td>
+                <td class="text-end">{{ entities.buckets[key] }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <p class="text-muted small mt-2 mb-0">
+            {{ _('Entities are refetched after %(days)s days on access or by the warm-up.', days=entities.max_age_days | int) }}
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+      {{ job_card('entities', _('Entity warm-up'), entity_cache_status, entity_cache_status.processed,
+                  [('fetched', _('Fetched')), ('skipped', _('Already cached')), ('failed', _('Failed'))]) }}
+    </div>
+    <div class="col-md-6 col-xl-3">
+      {{ job_card('vocabulary', _('Vocabulary cache'), vocabulary_cache_status, vocabulary_cache_status.successful,
+                  [('failed', _('Failed'))]) }}
+    </div>
+  </div>
+  <p class="text-muted small">
+    {{ _('Statistics are updated every two minutes; job progress refreshes automatically.') }}
+    {{ _('Last computed') }}: {{ stats.computed_at }}
+  </p>
+
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <button id="refreshSystemCache" class="btn btn-info" data-bs-toggle="tooltip"
+            title="{{ _('Refreshes the system cache.') }}">
+      {{ _('refresh system cache') | upper }}
+    </button>
+    <button id="warmEntityCache" class="btn btn-warning" data-bs-toggle="tooltip"
+            title="{{ _('This will cache all not cached entities.') }}">
+      {{ _('warm entity cache') | upper }}
+    </button>
+    <button id="refreshStaleEntities" class="btn btn-warning" data-bs-toggle="tooltip"
+            title="{{ _('Refetches entities older than the maximum age and caches new ones.') }}">
+      {{ _('refresh outdated entities') | upper }}
+    </button>
+    <button id="refreshEntityCache" class="btn btn-danger" data-bs-toggle="tooltip"
+            title="{{ _('This completely refreshes the cache.') }}">
+      {{ _('refresh entity cache') | upper }}
+    </button>
+    <button id="clearCacheButton" class="btn btn-warning" data-bs-toggle="tooltip"
+            title="{{ _('Clear the cache to free up space') }}">
+      {{ _('clear cache') | upper }}
+    </button>
+  </div>
 </div>
-
-<div class="button-card me-3">
-  <button id="clearCacheButton" class="btn btn-warning"
-          data-bs-toggle="tooltip"
-          title="{{ _('Clear the cache to free up space') }}">
-    {{ _('clear cache') | upper }}
-  </button>
-</div>
-

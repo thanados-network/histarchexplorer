@@ -41,6 +41,12 @@ from histarchexplorer.forms.admin import (FileDeleteForm, FileLicenseForm,
                                           GeneralSettingsForm, LicenseForm,
                                           MapForm)
 from histarchexplorer.models.admin import Admin
+from histarchexplorer.models.settings import (
+    parse_vocabulary_ids, validate_vocabulary_filters)
+from histarchexplorer.services.entity_cache import (
+    entity_job, get_cache_statistics, start_entity_warmup)
+from histarchexplorer.services.vocabulary_cache import (
+    get_vocabulary_cache_status, start_vocabulary_refresh)
 from histarchexplorer.utils.doi import fetch_doi_metadata
 from histarchexplorer.utils.view_util import find_children_by_id
 from histarchexplorer.views.views import type_tree
@@ -101,6 +107,7 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
                         'sidebar-stakeholders-content' |
                         'sidebar-colors' | 'sidebar-type-divisions' |
                         'sidebar-visibility-settings' |
+                        'sidebar-vocabulary-settings' |
                         'sidebar-general-settings-group' |
                         'sidebar-about-content' |
                         'sidebar-outcome' | 'sidebar-search-content' |
@@ -223,6 +230,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
 
     return render_template(
         "admin.html",
+        vocabulary_cache_status=get_vocabulary_cache_status(),
+        entity_cache_status=entity_job().status(),
+        cache_statistics=get_cache_statistics(),
         project_tabs=project_tabs,
         stakeholder_tabs=stakeholder_tabs,
         tabs=all_tabs,
@@ -518,6 +528,33 @@ def update_menu_management() -> Response:
         flash(_('Error updating menu settings'), 'error')
 
     return _redirect_to_admin_tab('sidebar-menu-management')
+
+
+@app.route('/admin/update_vocabulary_settings', methods=['POST'])
+@login_required
+def update_vocabulary_settings() -> Response:
+    """Persist the widget title and mutually exclusive viewer-only filters."""
+    check_manager_user()
+    try:
+        include, exclude = validate_vocabulary_filters(
+            parse_vocabulary_ids(request.form.get('include_ids', '')),
+            parse_vocabulary_ids(request.form.get('exclude_ids', '')))
+    except ValueError:
+        flash(_(
+            'Use positive, comma-separated IDs in only one filter list.'),
+            'danger')
+        return _redirect_to_admin_tab('sidebar-vocabulary-settings')
+
+    g.settings.vocabulary_include_ids = include
+    g.settings.vocabulary_exclude_ids = exclude
+    g.settings.vocabulary_title = request.form.get('title', '').strip()
+    try:
+        g.settings.save_to_db()
+        flash(_('Vocabulary settings updated successfully.'), 'success')
+    except Exception:
+        app.logger.exception('Failed to update vocabulary settings')
+        flash(_('Error updating settings'), 'danger')
+    return _redirect_to_admin_tab('sidebar-vocabulary-settings')
 
 
 @app.route('/admin/update_legal_notice', methods=['POST'])
@@ -1327,6 +1364,7 @@ def make_reset() -> None:
 @app.route('/admin/clear-cache')
 @login_required
 def clear_cache() -> Response:
+    check_manager_user()
     cache.clear()
     flash(_('cache cleared'), 'success')
     return _redirect_to_admin_tab('sidebar-cache-options')
@@ -1335,41 +1373,57 @@ def clear_cache() -> Response:
 @app.route("/admin/warm-entity-cache")
 @login_required
 def warm_entity_cache() -> Response:
-    trigger_cache_warmup(False)
-    flash(_("Cache warmup started in background (refresh mode)"), 'success')
+    """Cache all entities that are not cached yet."""
+    trigger_cache_warmup('warm')
+    return _redirect_to_admin_tab('sidebar-cache-options')
+
+
+@app.route("/admin/refresh-stale-entities")
+@login_required
+def refresh_stale_entities() -> Response:
+    """Refetch entities older than the maximum age and cache new ones."""
+    trigger_cache_warmup('stale')
     return _redirect_to_admin_tab('sidebar-cache-options')
 
 
 @app.route("/admin/refresh-entity-cache")
 @login_required
 def refresh_entity_cache() -> Response:
-    trigger_cache_warmup(True)
-    flash(_("Cache warmup started in background."), 'success')
+    """Refetch every entity regardless of its age."""
+    trigger_cache_warmup('refresh')
     return _redirect_to_admin_tab('sidebar-cache-options')
 
 
-def trigger_cache_warmup(refresh: bool = False) -> None:
-    """Trigger external cache warm-up process."""
+@app.route('/admin/cache-status')
+@login_required
+def cache_status() -> Response:
+    """Return live job progress as JSON for the cache dashboard."""
+    check_manager_user()
+    return jsonify(
+        entities=entity_job().status(),
+        vocabulary=get_vocabulary_cache_status())
+
+
+def trigger_cache_warmup(mode: str = 'warm') -> None:
+    """Start the detached entity warm-up and report the outcome."""
+    check_manager_user()
+    case_study_ids = list(getattr(g, 'case_study_ids', None) or [])
     try:
-        args: list[str] = ["python3", "warm_entity_cache.py"]
-        if refresh:
-            args.append("--refresh")
-        if hasattr(g, "case_study_ids") and g.case_study_ids:
-            ids_str: str = " ".join(str(i) for i in g.case_study_ids)
-            args.extend(["--case-studies", ids_str])
-        with subprocess.Popen(
-                args,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL) as _proc:
-            pass
-    except Exception as e:
-        flash(_("Error warming cache: %(error)s", error=str(e)), "error")
-        abort(404)
+        if start_entity_warmup(mode, case_study_ids):
+            flash(_('Entity cache warm-up started in background.'),
+                  'success')
+        else:
+            flash(_('An entity cache warm-up is already running.'), 'info')
+    except Exception:
+        app.logger.exception('Failed to start entity cache warm-up')
+        flash(_('Could not start entity cache warm-up.'), 'danger')
 
 
 @app.route('/admin/refresh-system-cache')
 @login_required
 def refresh_system_cache() -> Response:
+    """Refresh general API caches and start full vocabulary preloading."""
+    check_manager_user()
     cache.delete_memoized(ApiAccess.get_type_tree)
     cache.delete_memoized(ApiAccess.get_files_of_entities)
     cache.delete_memoized(ApiAccess.get_system_class_count)
@@ -1382,6 +1436,15 @@ def refresh_system_cache() -> Response:
         ApiAccess.get_entities_count_by_case_studies(case_study)
 
     flash(_('system cache refreshed'), 'success')
+    try:
+        if start_vocabulary_refresh():
+            flash(_('Vocabulary cache preload started in background.'),
+                  'success')
+        else:
+            flash(_('Vocabulary cache preload is already running.'), 'info')
+    except Exception:
+        app.logger.exception('Failed to start vocabulary cache preload')
+        flash(_('Could not start vocabulary cache preload.'), 'danger')
     return _redirect_to_admin_tab('sidebar-cache-options')
 
 

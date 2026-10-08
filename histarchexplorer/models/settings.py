@@ -1,11 +1,48 @@
 import json
-from typing import Any, Dict, List, Union
+import logging
+import re
+from typing import Annotated, Any, Dict, List, Union
 
-from pydantic import BaseModel, Field, TypeAdapter
+from pydantic import (
+    BaseModel, Field, TypeAdapter, field_validator, model_validator)
 from pydantic_core import PydanticUndefined
 
 from histarchexplorer.database.settings import (
     create_settings_table, get_settings, save_settings)
+
+logger = logging.getLogger(__name__)
+
+
+def parse_vocabulary_ids(value: str) -> list[int]:
+    """Parse positive ASCII IDs, retaining the first occurrence of each."""
+    if not isinstance(value, str):
+        raise ValueError('Vocabulary IDs must be comma-separated integers.')
+    if not value.strip():
+        return []
+
+    ids = []
+    for token in value.split(','):
+        token = token.strip()
+        if not re.fullmatch(r'[0-9]+', token) or int(token) <= 0:
+            raise ValueError('Vocabulary IDs must be positive ASCII integers.')
+        ids.append(int(token))
+    return list(dict.fromkeys(ids))
+
+
+def validate_vocabulary_filters(
+        include: list, exclude: list) -> tuple[list[int], list[int]]:
+    """Validate raw ID lists and enforce mutually exclusive filter modes."""
+    normalized = []
+    for ids in (include, exclude):
+        if not isinstance(ids, list) or any(
+                type(entity_id) is not int or entity_id <= 0
+                for entity_id in ids):
+            raise ValueError(
+                'Vocabulary filters require positive integer IDs.')
+        normalized.append(list(dict.fromkeys(ids)))
+    if normalized[0] and normalized[1]:
+        raise ValueError('Vocabulary include and exclude filters conflict.')
+    return normalized[0], normalized[1]
 
 
 def _migrate_type_divisions(
@@ -66,6 +103,9 @@ class Settings(BaseModel):
     hidden_types: list[int] = []
     shown_ids: list[int] = []
     hidden_ids: list[int] = []
+    vocabulary_include_ids: list[Annotated[int, Field(strict=True, gt=0)]] = []
+    vocabulary_exclude_ids: list[Annotated[int, Field(strict=True, gt=0)]] = []
+    vocabulary_title: str = ''
     case_study_type_id: int = 8240
     nav_logo: str = 'thanados_light.svg'
     footer_logos: list[int] = []
@@ -97,6 +137,7 @@ class Settings(BaseModel):
         'publications': {'show': True, 'page_type': 'default'},
         'outcome': {'show': True, 'page_type': 'default'},
         'search': {'show': True, 'page_type': 'default'},
+        'vocabulary': {'show': True, 'page_type': 'default'},
         'footer': {'show': True, 'page_type': 'default'}}
     type_divisions: Dict[str, Dict[str, Union[str, List[int], None]]] = Field(
         default_factory=lambda: {
@@ -125,6 +166,32 @@ class Settings(BaseModel):
     external_identifiers: dict[str, dict[str, Any]] = Field(
         default_factory=dict)
 
+    @model_validator(mode='before')
+    @classmethod
+    def validate_vocabulary_settings(cls, data: Any) -> Any:
+        """Validate vocabulary filters before Pydantic can coerce IDs."""
+        if isinstance(data, dict):
+            data = data.copy()
+            include, exclude = validate_vocabulary_filters(
+                data.get('vocabulary_include_ids', []),
+                data.get('vocabulary_exclude_ids', []))
+            data['vocabulary_include_ids'] = include
+            data['vocabulary_exclude_ids'] = exclude
+        return data
+
+    @field_validator('menu_management')
+    @classmethod
+    def normalize_vocabulary_menu(cls, menu: dict) -> dict:
+        """Preserve vocabulary visibility and supported page types."""
+        menu = menu.copy()
+        vocabulary = menu.get('vocabulary', {})
+        vocabulary = vocabulary.copy() if isinstance(vocabulary, dict) else {}
+        vocabulary.setdefault('show', True)
+        if vocabulary.get('page_type') not in ('default', 'individual'):
+            vocabulary['page_type'] = 'default'
+        menu['vocabulary'] = vocabulary
+        return menu
+
     @classmethod
     def load_from_db(cls) -> 'Settings':
         """Load and merge settings configurations from the database.
@@ -138,6 +205,17 @@ class Settings(BaseModel):
         db_settings_raw = {row['key']: row['value'] for row in get_settings()}
 
         merged_settings_data = {**default_settings, **db_settings_raw}
+
+        try:
+            include, exclude = validate_vocabulary_filters(
+                merged_settings_data['vocabulary_include_ids'],
+                merged_settings_data['vocabulary_exclude_ids'])
+        except ValueError:
+            logger.warning(
+                'Invalid stored vocabulary filters; resetting both to [].')
+            include, exclude = [], []
+        merged_settings_data['vocabulary_include_ids'] = include
+        merged_settings_data['vocabulary_exclude_ids'] = exclude
 
         for key in ['menu_management', 'type_divisions']:
             default_val = default_settings.get(key, {})
@@ -172,6 +250,12 @@ class Settings(BaseModel):
         Dumps setting attributes and writes them as key-value pairs into the
         database's settings table.
         """
+        include, exclude = validate_vocabulary_filters(
+            self.vocabulary_include_ids, self.vocabulary_exclude_ids)
+        self.vocabulary_include_ids = include
+        self.vocabulary_exclude_ids = exclude
+        self.menu_management = self.normalize_vocabulary_menu(
+            self.menu_management)
         for key, value in self.model_dump().items():
             save_settings(key, value)
 
