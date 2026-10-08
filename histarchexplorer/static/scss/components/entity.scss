@@ -15,7 +15,7 @@
 .entity-content {
   background-color: var(--ov-bg);
   height: calc(100vh - var(--navbar-height));
-  overflow-y: auto;
+  overflow: hidden;
   width: calc(100vw - var(--sidebar-width));
   @media (max-width: 764px) {
     width: 100vw;

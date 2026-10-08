@@ -680,3 +680,23 @@ $style-sidebar-width: 300px;
   align-items: center;
   justify-content: center;
 }
+
+.layer-legend-list {
+    margin-top: 0.25rem;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    transition: height 0.35s ease;
+
+    li {
+        font-size: 0.85rem;
+        padding-left: 0.5rem;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.2em 0.5em;
+    }
+
+    hr {
+        margin: 0.25rem 0;
+    }
+}

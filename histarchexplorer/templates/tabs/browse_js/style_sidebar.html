@@ -254,7 +254,10 @@
 
             const li = document.createElement('li');
             li.className =
-                'layer-list-item d-flex align-items-center gap-2 py-1';
+                'layer-list-item flex-column py-1';
+
+            const row = document.createElement('div');
+            row.className = 'd-flex align-items-center gap-2 w-100';
 
             const cbId = `layer-cb-{{ tab_name }}-${def.type}`;
             const isVisible = !hiddenLayerTypes{{ tab_name }}.has(def.type);
@@ -296,7 +299,7 @@
             infoSpan.appendChild(svgWrapper);
             infoSpan.appendChild(labelEl);
             infoSpan.appendChild(badge);
-            infoSpan.addEventListener('click', () => {
+            infoSpan.addEventListener('click', (e) => {
                 const modal = document.getElementById(
                     'layer-style-modal-{{ tab_name }}');
                 const bsModal = bootstrap.Modal.getOrCreateInstance(modal);
@@ -304,8 +307,50 @@
                 bsModal.show();
             });
 
-            li.appendChild(cbSpan);
-            li.appendChild(infoSpan);
+            const toggle = document.createElement('span');
+            toggle.className = 'flex-shrink-0 cursor-pointer px-1 d-flex align-items-center';
+            toggle.innerHTML = '<i class="bi bi-chevron-down small"></i>';
+            toggle.style.transition = 'transform 0.3s ease';
+            toggle.dataset.expanded = 'false';
+
+            const legendList = document.createElement('ul');
+            legendList.className = 'layer-legend-list list-unstyled ps-4 mt-1 collapse w-100';
+            legendList.id = `layer-legend-{{ tab_name }}-${def.type}`;
+
+            const bsCollapse = new bootstrap.Collapse(legendList, {
+                toggle: false
+            });
+
+            legendList.addEventListener('show.bs.collapse', () => {
+                toggle.style.transform = 'rotate(180deg)';
+                toggle.dataset.expanded = 'true';
+                // Populate legend if empty
+                if (legendList.children.length === 0) {
+                    const tree = {{ tab_name }}Data.treeData;
+                    const hasTree = tree && Object.keys(tree).length > 0;
+                    if (hasTree) {
+                        buildMultiTypeList{{ tab_name }}(def.type, legendList);
+                    } else {
+                        buildMultiClassList{{ tab_name }}(def.type, legendList);
+                    }
+                }
+            });
+
+            legendList.addEventListener('hide.bs.collapse', () => {
+                toggle.style.transform = 'rotate(0deg)';
+                toggle.dataset.expanded = 'false';
+            });
+
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                bsCollapse.toggle();
+            });
+
+            row.appendChild(cbSpan);
+            row.appendChild(infoSpan);
+            row.appendChild(toggle);
+            li.appendChild(row);
+            li.appendChild(legendList);
             fragment.appendChild(li);
         });
 
@@ -880,24 +925,29 @@
     }
 
     function refreshMultiClassList{{ tab_name }}(type) {
-        const list = document.getElementById(
-            'multi-class-list-{{ tab_name }}');
-        list.querySelectorAll('li').forEach(li => {
-            const cls = li.dataset.cls;
-            const tid = li.dataset.tid;
-            const svgWrap = li.querySelector('.multi-sym, .multi-sym-type');
-            if (svgWrap) {
-                let color = '#888888';
-                if (cls) color = multiClassColors{{ tab_name }}[type][cls] || color;
-                else if (tid) color = multiTypeColors{{ tab_name }}[type][tid] || color;
-                svgWrap.innerHTML = makeMultiSvg{{ tab_name }}(type, color);
-            }
+        const lists = [
+            document.getElementById('multi-class-list-{{ tab_name }}'),
+            document.getElementById(`layer-legend-{{ tab_name }}-${type}`)
+        ];
+        lists.forEach(list => {
+            if (!list) return;
+            list.querySelectorAll('li').forEach(li => {
+                const cls = li.dataset.cls;
+                const tid = li.dataset.tid;
+                const svgWrap = li.querySelector('.multi-sym, .multi-sym-type');
+                if (svgWrap) {
+                    let color = '#888888';
+                    if (cls) color = multiClassColors{{ tab_name }}[type][cls] || color;
+                    else if (tid) color = multiTypeColors{{ tab_name }}[type][tid] || color;
+                    svgWrap.innerHTML = makeMultiSvg{{ tab_name }}(type, color);
+                }
+            });
         });
     }
 
-    function buildMultiTypeList{{ tab_name }}(type) {
+    function buildMultiTypeList{{ tab_name }}(type, targetList) {
         multiCurrentLayerType{{ tab_name }} = type;
-        const list = document.getElementById(
+        const list = targetList || document.getElementById(
             'multi-class-list-{{ tab_name }}');
         if (!list) return;
         list.innerHTML = '';
@@ -905,21 +955,23 @@
             'multi-btn-row-{{ tab_name }}');
 
         if (!type) {
-            btnRow.classList.add('d-none');
+            if (btnRow) btnRow.classList.add('d-none');
             buildMultiSharedOpts{{ tab_name }}(null);
             return;
         }
 
-        buildMultiSharedOpts{{ tab_name }}(type);
+        // Shared opts only for modal
+        if (!targetList) {
+            buildMultiSharedOpts{{ tab_name }}(type);
+        }
 
         const allF = cachedAllFeatures{{ tab_name }};
-        const filtF = cachedFilteredFeatures{{ tab_name }};
-        const filtByType  = {};
         const entitiesById = {};
         {{ tab_name }}Data.tableData.forEach(e => entitiesById[e.id] = e);
 
         const filteredIds = new Set(filteredIDdata{{ tab_name }});
 
+        const filtByType  = {};
         allF.forEach(f => {
             const eid = f.properties && f.properties.id;
             if (!filteredIds.has(eid)) return;
@@ -935,7 +987,7 @@
 
         const tree = {{ tab_name }}Data.treeData;
         const fragment = document.createDocumentFragment();
-        btnRow.classList.remove('d-none');
+        if (btnRow && !targetList) btnRow.classList.remove('d-none');
 
         Object.keys(tree).forEach((classKey, branchIdx) => {
             const classNodes = tree[classKey];
@@ -1000,6 +1052,8 @@
                         svgWrap.innerHTML =
                             makeMultiSvg{{ tab_name }}(type, picker.value);
                         applyMultiColor{{ tab_name }}('type');
+                        // Update other instances of this type's SVG (e.g. in sidebar legend)
+                        refreshMultiClassList{{ tab_name }}(type);
                     });
                     svgWrap.appendChild(picker);
                     svgWrap.addEventListener('click', () => picker.click());
@@ -1037,9 +1091,9 @@
         list.appendChild(fragment);
     }
 
-    function buildMultiClassList{{ tab_name }}(type) {
+    function buildMultiClassList{{ tab_name }}(type, targetList) {
         multiCurrentLayerType{{ tab_name }} = type;
-        const list = document.getElementById(
+        const list = targetList || document.getElementById(
             'multi-class-list-{{ tab_name }}');
         if (!list) return;
         list.innerHTML = '';
@@ -1047,15 +1101,17 @@
             'multi-btn-row-{{ tab_name }}');
 
         if (!type) {
-            btnRow.classList.add('d-none');
+            if (btnRow) btnRow.classList.add('d-none');
             buildMultiSharedOpts{{ tab_name }}(null);
             return;
         }
 
-        buildMultiSharedOpts{{ tab_name }}(type);
+        // Shared opts only for modal
+        if (!targetList) {
+            buildMultiSharedOpts{{ tab_name }}(type);
+        }
 
         const allF = cachedAllFeatures{{ tab_name }};
-        const filtF = cachedFilteredFeatures{{ tab_name }};
         const filtByClass  = {};
         const filteredIds = new Set(filteredIDdata{{ tab_name }});
 
@@ -1074,7 +1130,7 @@
 
         const classes = Object.keys(filtByClass).sort();
         if (classes.length === 0) {
-            btnRow.classList.add('d-none');
+            if (btnRow && !targetList) btnRow.classList.add('d-none');
             return;
         }
 
@@ -1399,6 +1455,16 @@
                 buildMultiClassList{{ tab_name }}(t);
                 applyMultiColor{{ tab_name }}('class');
             }
+
+            // Also populate sidebar legend if it exists and is expanded
+            const sidebarLegend = document.getElementById(`layer-legend-{{ tab_name }}-${t}`);
+            if (sidebarLegend && !sidebarLegend.classList.contains('d-none')) {
+                if (mode === 'type') {
+                    buildMultiTypeList{{ tab_name }}(t, sidebarLegend);
+                } else {
+                    buildMultiClassList{{ tab_name }}(t, sidebarLegend);
+                }
+            }
         });
 
         // Ensure current type is set back to null if modal is not open,
@@ -1471,6 +1537,8 @@
     window.openStyleSidebar{{ tab_name }} = openStyleSidebar{{ tab_name }};
     window.closeStyleSidebar{{ tab_name }} = closeStyleSidebar{{ tab_name }};
     window.toggleStyleSidebar{{ tab_name }} = toggleStyleSidebar{{ tab_name }};
+    window.buildMultiTypeList{{ tab_name }} = buildMultiTypeList{{ tab_name }};
+    window.buildMultiClassList{{ tab_name }} = buildMultiClassList{{ tab_name }};
 
 })();
 </script>
