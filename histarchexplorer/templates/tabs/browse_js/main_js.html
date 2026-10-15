@@ -32,6 +32,22 @@ function {{tab_name}}ToggleView(view) {
         }
     });
 
+    // Handle Style Sidebar visibility: only show if map is active
+    {% if tab_name in ['places', 'items'] %}
+        const styleSidebar = document.getElementById('style-sidebar-{{ tab_name }}');
+        const styleBackdrop = document.getElementById('style-sidebar-backdrop-{{ tab_name }}');
+        if (view !== 'map') {
+            if (typeof closeStyleSidebar{{ tab_name }} === 'function') {
+                closeStyleSidebar{{ tab_name }}();
+            }
+            if (styleSidebar) styleSidebar.classList.add('d-none');
+            if (styleBackdrop) styleBackdrop.classList.add('d-none');
+        } else {
+            if (styleSidebar) styleSidebar.classList.remove('d-none');
+            if (styleBackdrop) styleBackdrop.classList.remove('d-none');
+        }
+    {% endif %}
+
     // 2. Highlight the active view button in the button group
     const viewButtonMap = {
         table: `${tabName}-list-btn`,
