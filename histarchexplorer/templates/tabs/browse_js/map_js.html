@@ -19,199 +19,6 @@
     filteredIDdata{{ tab_name }} = featureCollection{{ tab_name }}.features.map(
         f => f.properties.id);
 
-    const bounds{{ tab_name }} = new maplibregl.LngLatBounds();
-    featureCollection{{ tab_name }}.features.forEach(extendBounds{{ tab_name }});
-    const center{{ tab_name }} = bounds{{ tab_name }}.getCenter();
-    const onePointFeature{{ tab_name }} = (featureCollection{{ tab_name }}.features.length === 1 && featureCollection{{ tab_name }}.features[0].geometry.type === 'Point');
-
-    const map{{tab_name}} = new maplibregl.Map({
-        container: 'map-{{ tab_name }}',
-        style: 'https://api.maptiler.com/maps/topo-v2/style.json?key=E7Jrgaazm79UlTuEI5f5',
-        maxPitch: 85,
-        maxZoom: 25,
-        center: center{{ tab_name }}, // starting position [lng, lat]
-
-    });
-
-    const mapVectorLayers{{ tab_name }} = [
-        '{{ tab_name }}-layer-fill',
-        '{{ tab_name }}-layer-line',
-        '{{ tab_name }}-layer-circle',
-        '{{ tab_name }}-layer-representative-points'
-    ]
-
-    map{{tab_name}}.on('load', () => {
-    const mapRef = map{{tab_name}};
-    const sourceId = '{{ tab_name }}-source';
-
-    // 1. Add the GeoJSON source
-    mapRef.addSource(sourceId, {
-        type: 'geojson',
-        data: featureCollection{{ tab_name }}
-    });
-
-    // 2. Define base layers
-    const baseLayers = [
-        {
-            id: '{{ tab_name }}-layer-fill',
-            type: 'fill',
-            paint: { 'fill-color': '#088', 'fill-opacity': 0.5 },
-            filter: ['==', '$type', 'Polygon']
-        },
-        {
-            id: '{{ tab_name }}-layer-outline',
-            type: 'line',
-            paint: { 'line-color': '#004747', 'line-width': 1 },
-            filter: ['==', '$type', 'Polygon']
-        },
-        {
-            id: '{{ tab_name }}-layer-line',
-            type: 'line',
-            paint: { 'line-color': '#088', 'line-width': 2 },
-            filter: ['==', '$type', 'LineString']
-        },
-        {
-            id: '{{ tab_name }}-layer-circle',
-            type: 'circle',
-            paint: {
-                'circle-radius': 9,
-                'circle-color': '#088',
-                'circle-stroke-color': '#000000',
-                'circle-stroke-width': 1
-            },
-            filter: ['all', ['==', ['geometry-type'], 'Point'], ['!', ['has', 'representative']]]
-        },
-        {
-            id: '{{ tab_name }}-layer-representative-points',
-            type: 'circle',
-            paint: {
-                'circle-radius': 9,
-                'circle-color': '#088',
-                'circle-opacity': [
-                    'step', ['zoom'],
-                    ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], 0]]],
-                    {% for z in range(1, 26) %}
-                    {{ z }}.0, ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], {{ z }}.0]]]{% if not loop.last %},{% endif %}
-                    {% endfor %}
-                ],
-                'circle-stroke-color': '#000000',
-                'circle-stroke-width': 1,
-                'circle-stroke-opacity': [
-                    'step', ['zoom'],
-                    ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], 0]]],
-                    {% for z in range(1, 26) %}
-                    {{ z }}.0, ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], {{ z }}.0]]]{% if not loop.last %},{% endif %}
-                    {% endfor %}
-                ]
-            },
-            filter: ['all', ['==', ['geometry-type'], 'Point'], ['has', 'representative']]
-        }
-    ];
-
-    // 3. Define highlight layers
-    const highlightLayers = [
-        {
-            id: 'highlight-polygon',
-            type: 'fill',
-            paint: { 'fill-color': '#FF4444', 'fill-opacity': 0.5 },
-            filter: ['==', '$type', 'Polygon']
-        },
-        {
-            id: 'highlight-polygon-outline',
-            type: 'line',
-            paint: { 'line-color': 'rgba(255,255,255,0.8)', 'line-width': 3 },
-            filter: ['==', '$type', 'Polygon']
-        },
-        {
-            id: 'highlight-linestring',
-            type: 'line',
-            paint: { 'line-color': 'rgba(255,68,68,0.63)', 'line-width': 3 },
-            filter: ['==', '$type', 'LineString']
-        },
-        {
-            id: 'highlight-points',
-            type: 'circle',
-            paint: { 'circle-color': 'rgba(255,68,68,0.86)', 'circle-radius': 12 },
-            filter: ['==', '$type', 'Point']
-        }
-    ];
-
-    // 4. Add all layers in one go
-    [...baseLayers, ...highlightLayers].forEach(layer => {
-        mapRef.addLayer({
-            source: sourceId,
-            ...layer
-        });
-    });
-
-    // 5. Init interactions
-    setPointer(mapVectorLayers{{ tab_name }}, mapRef);
-    highlightFeatures([], mapRef);
-    addTerrain(mapRef);
-    addSkybox(mapRef);
-    addControls(mapRef);
-
-    // 6. Initial layer list & overview
-    const initialFiltered{{ tab_name }} =
-        featureCollection{{ tab_name }}.features.filter(
-            f => filteredIDdata{{ tab_name }}.includes(f.properties.id));
-    updateLayerList{{ tab_name }}(initialFiltered{{ tab_name }});
-    updateOverview{{ tab_name }}(
-        featureCollection{{ tab_name }}.features,
-        initialFiltered{{ tab_name }});
-    initLayerStyle{{ tab_name }}();
-
-    // 7. Add style sidebar control (top-left)
-    class StyleSidebarControl{{ tab_name }} {
-        onAdd() {
-            this._btn = document.createElement('button');
-            this._btn.className = 'maplibregl-ctrl-icon style-sidebar-ctrl-btn';
-            this._btn.title = 'Style geometries';
-            this._btn.innerHTML = '<i class="bi bi-palette"></i>';
-            this._btn.addEventListener(
-                'click', () => openStyleSidebar{{ tab_name }}());
-            this._container = document.createElement('div');
-            this._container.className =
-                'maplibregl-ctrl maplibregl-ctrl-group';
-            this._container.appendChild(this._btn);
-            return this._container;
-        }
-        onRemove() { this._container.remove(); }
-    }
-    map{{ tab_name }}.addControl(
-        new StyleSidebarControl{{ tab_name }}(), 'top-left');
-
-});
-
-    map{{ tab_name }}.on('click', (e) => {
-        highlightFeatures([], map{{ tab_name }})
-        const clickedFeatures = map{{ tab_name }}.queryRenderedFeatures(e.point, {
-            layers: mapVectorLayers{{ tab_name }}
-        });
-
-        if (!clickedFeatures.length) return;
-        //console.log('clickedFeatures', clickedFeatures);
-
-        const seenIds = new Set();
-        const uniqueFeatures = clickedFeatures.filter(f => {
-            if (seenIds.has(f.properties.id)) return false;
-            seenIds.add(f.properties.id);
-            return true;
-        });
-
-        const featureNames = uniqueFeatures.map(f =>
-            `<button class="map-popup-hoverlink" data-id="${f.properties.id}" onclick="window.location.href='/entity/${f.properties.id}'">
-    ${f.properties.name} (${f.properties.class})
-  </button>`
-        );
-        featureIds = uniqueFeatures.map(f => f.properties.id);
-
-        highlightFeatures(featureIds, map{{ tab_name }});
-
-        showPopup(e.lngLat, featureNames, map{{ tab_name }});
-    });
-
-
     function extendBounds{{ tab_name }}(feature) {
         const {type, coordinates} = feature.geometry;
 
@@ -246,38 +53,247 @@
         }
     }
 
-table{{ tab_name }}.on("dataFiltered", function (filters, rows) {
-    filteredIDdata{{ tab_name }} = rows.map(row => row.getData().id);
-
-    //console.log('Stored filtered data:', filteredIDdata{{ tab_name }}.length);
-    //console.log(filteredIDdata{{ tab_name }});
-
-    const filteredFeatures{{ tab_name }} = featureCollection{{ tab_name }}.features.filter(
-        f => filteredIDdata{{ tab_name }}.includes(f.properties.id)
+    const bounds{{ tab_name }} = new maplibregl.LngLatBounds();
+    featureCollection{{ tab_name }}.features.forEach(extendBounds{{ tab_name }});
+    const center{{ tab_name }} = bounds{{ tab_name }}.getCenter();
+    const onePointFeature{{ tab_name }} = (
+        featureCollection{{ tab_name }}.features.length === 1 &&
+        featureCollection{{ tab_name }}.features[0].geometry.type === 'Point'
     );
 
-    updateLayerList{{ tab_name }}(filteredFeatures{{ tab_name }});
-    updateOverview{{ tab_name }}(
-        featureCollection{{ tab_name }}.features,
-        filteredFeatures{{ tab_name }});
+    let map{{ tab_name }} = null;
 
-    const src = map{{ tab_name }}.getSource('{{ tab_name }}-source');
-    if (src) {
-        src.setData({
-            type: 'FeatureCollection',
-            features: filteredFeatures{{ tab_name }}
+    const mapVectorLayers{{ tab_name }} = [
+        '{{ tab_name }}-layer-fill',
+        '{{ tab_name }}-layer-line',
+        '{{ tab_name }}-layer-circle',
+        '{{ tab_name }}-layer-representative-points'
+    ];
+
+    function initMap{{ tab_name }}() {
+        if (map{{ tab_name }}) return;
+
+        map{{ tab_name }} = new maplibregl.Map({
+            container: 'map-{{ tab_name }}',
+            style: 'https://api.maptiler.com/maps/topo-v2/style.json?key=E7Jrgaazm79UlTuEI5f5',
+            maxPitch: 85,
+            maxZoom: 25,
+            center: center{{ tab_name }}, // starting position [lng, lat]
         });
-    } else {
-        // Wait until the map is loaded
-        map{{ tab_name }}.on('load', () => {
-            map{{ tab_name }}.getSource('{{ tab_name }}-source').setData({
-                type: 'FeatureCollection',
-                features: filteredFeatures{{ tab_name }}
+
+        const mapRef = map{{ tab_name }};
+        const sourceId = '{{ tab_name }}-source';
+
+        mapRef.on('load', () => {
+            const currentFiltered = featureCollection{{ tab_name }}.features.filter(
+                f => filteredIDdata{{ tab_name }}.includes(f.properties.id)
+            );
+
+            // 1. Add the GeoJSON source
+            mapRef.addSource(sourceId, {
+                type: 'geojson',
+                data: {
+                    type: "FeatureCollection",
+                    features: currentFiltered
+                }
             });
+
+            // 2. Define base layers
+            const baseLayers = [
+                {
+                    id: '{{ tab_name }}-layer-fill',
+                    type: 'fill',
+                    paint: { 'fill-color': '#088', 'fill-opacity': 0.5 },
+                    filter: ['==', '$type', 'Polygon']
+                },
+                {
+                    id: '{{ tab_name }}-layer-outline',
+                    type: 'line',
+                    paint: { 'line-color': '#004747', 'line-width': 1 },
+                    filter: ['==', '$type', 'Polygon']
+                },
+                {
+                    id: '{{ tab_name }}-layer-line',
+                    type: 'line',
+                    paint: { 'line-color': '#088', 'line-width': 2 },
+                    filter: ['==', '$type', 'LineString']
+                },
+                {
+                    id: '{{ tab_name }}-layer-circle',
+                    type: 'circle',
+                    paint: {
+                        'circle-radius': 9,
+                        'circle-color': '#088',
+                        'circle-stroke-color': '#000000',
+                        'circle-stroke-width': 1
+                    },
+                    filter: ['all', ['==', ['geometry-type'], 'Point'], ['!', ['has', 'representative']]]
+                },
+                {
+                    id: '{{ tab_name }}-layer-representative-points',
+                    type: 'circle',
+                    paint: {
+                        'circle-radius': 9,
+                        'circle-color': '#088',
+                        'circle-opacity': [
+                            'step', ['zoom'],
+                            ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], 0]]],
+                            {% for z in range(1, 26) %}
+                            {{ z }}.0, ['max', 0,
+                                ['min', 1, ['-', ['get', 'hide_point_zoom'], {{ z }}.0]]
+                            ]{% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        ],
+                        'circle-stroke-color': '#000000',
+                        'circle-stroke-width': 1,
+                        'circle-stroke-opacity': [
+                            'step', ['zoom'],
+                            ['max', 0, ['min', 1, ['-', ['get', 'hide_point_zoom'], 0]]],
+                            {% for z in range(1, 26) %}
+                            {{ z }}.0, ['max', 0,
+                                ['min', 1, ['-', ['get', 'hide_point_zoom'], {{ z }}.0]]
+                            ]{% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        ]
+                    },
+                    filter: ['all', ['==', ['geometry-type'], 'Point'], ['has', 'representative']]
+                }
+            ];
+
+            // 3. Define highlight layers
+            const highlightLayers = [
+                {
+                    id: 'highlight-polygon',
+                    type: 'fill',
+                    paint: { 'fill-color': '#FF4444', 'fill-opacity': 0.5 },
+                    filter: ['==', '$type', 'Polygon']
+                },
+                {
+                    id: 'highlight-polygon-outline',
+                    type: 'line',
+                    paint: { 'line-color': 'rgba(255,255,255,0.8)', 'line-width': 3 },
+                    filter: ['==', '$type', 'Polygon']
+                },
+                {
+                    id: 'highlight-linestring',
+                    type: 'line',
+                    paint: { 'line-color': 'rgba(255,68,68,0.63)', 'line-width': 3 },
+                    filter: ['==', '$type', 'LineString']
+                },
+                {
+                    id: 'highlight-points',
+                    type: 'circle',
+                    paint: { 'circle-color': 'rgba(255,68,68,0.86)', 'circle-radius': 12 },
+                    filter: ['==', '$type', 'Point']
+                }
+            ];
+
+            // 4. Add all layers in one go
+            [...baseLayers, ...highlightLayers].forEach(layer => {
+                mapRef.addLayer({
+                    source: sourceId,
+                    ...layer
+                });
+            });
+
+            // 5. Init interactions
+            setPointer(mapVectorLayers{{ tab_name }}, mapRef);
+            highlightFeatures([], mapRef);
+            addTerrain(mapRef);
+            addSkybox(mapRef);
+            addControls(mapRef);
+
+            // 6. Initial layer list & overview
+            updateLayerList{{ tab_name }}(currentFiltered);
+            updateOverview{{ tab_name }}(
+                featureCollection{{ tab_name }}.features,
+                currentFiltered
+            );
+            initLayerStyle{{ tab_name }}();
+
+            // 7. Add style sidebar control (top-left)
+            class StyleSidebarControl{{ tab_name }} {
+                onAdd() {
+                    this._btn = document.createElement('button');
+                    this._btn.className = 'maplibregl-ctrl-icon style-sidebar-ctrl-btn';
+                    this._btn.title = 'Style geometries';
+                    this._btn.innerHTML = '<i class="bi bi-palette"></i>';
+                    this._btn.addEventListener(
+                        'click', () => openStyleSidebar{{ tab_name }}());
+                    this._container = document.createElement('div');
+                    this._container.className =
+                        'maplibregl-ctrl maplibregl-ctrl-group';
+                    this._container.appendChild(this._btn);
+                    return this._container;
+                }
+                onRemove() { this._container.remove(); }
+            }
+            mapRef.addControl(
+                new StyleSidebarControl{{ tab_name }}(), 'top-left');
+        });
+
+        mapRef.on('click', (e) => {
+            highlightFeatures([], mapRef);
+            const clickedFeatures = mapRef.queryRenderedFeatures(e.point, {
+                layers: mapVectorLayers{{ tab_name }}
+            });
+
+            if (!clickedFeatures.length) return;
+
+            const seenIds = new Set();
+            const uniqueFeatures = clickedFeatures.filter(f => {
+                if (seenIds.has(f.properties.id)) return false;
+                seenIds.add(f.properties.id);
+                return true;
+            });
+
+            const featureNames = uniqueFeatures.map(f =>
+                `<button class="map-popup-hoverlink" data-id="${f.properties.id}" ` +
+                `onclick="window.location.href='/entity/${f.properties.id}'">` +
+                `${f.properties.name} (${f.properties.class})</button>`
+            );
+            const featureIds = uniqueFeatures.map(f => f.properties.id);
+
+            highlightFeatures(featureIds, mapRef);
+            showPopup(e.lngLat, featureNames, mapRef);
         });
     }
-});
 
+    window.initMap{{ tab_name }} = initMap{{ tab_name }};
+
+    table{{ tab_name }}.on("dataFiltered", function (filters, rows) {
+        filteredIDdata{{ tab_name }} = rows.map(row => row.getData().id);
+
+        const filteredFeatures{{ tab_name }} = featureCollection{{ tab_name }}.features.filter(
+            f => filteredIDdata{{ tab_name }}.includes(f.properties.id)
+        );
+
+        if (map{{ tab_name }}) {
+            updateLayerList{{ tab_name }}(filteredFeatures{{ tab_name }});
+            updateOverview{{ tab_name }}(
+                featureCollection{{ tab_name }}.features,
+                filteredFeatures{{ tab_name }}
+            );
+
+            const src = map{{ tab_name }}.getSource('{{ tab_name }}-source');
+            if (src) {
+                src.setData({
+                    type: 'FeatureCollection',
+                    features: filteredFeatures{{ tab_name }}
+                });
+            } else {
+                map{{ tab_name }}.on('load', () => {
+                    const loadedSrc = map{{ tab_name }}.getSource('{{ tab_name }}-source');
+                    if (loadedSrc) {
+                        loadedSrc.setData({
+                            type: 'FeatureCollection',
+                            features: filteredFeatures{{ tab_name }}
+                        });
+                    }
+                });
+            }
+        }
+    });
 
 {% endif %}
 

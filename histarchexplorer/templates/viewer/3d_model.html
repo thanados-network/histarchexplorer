@@ -63,7 +63,10 @@
   </div>
 
   <script
+    src="{{ url_for('static', filename='node_modules/@google/model-viewer/dist/model-viewer-umd.js') }}"></script>
+  <script
     src="{{ url_for('static', filename='js/viewer/3d_model.js') }}"></script>
-<script src="{{ url_for('static', filename='js/viewer/viewer_info.js') }}"></script>
+  <script
+    src="{{ url_for('static', filename='js/viewer/viewer_info.js') }}"></script>
 
 {% endblock %}

@@ -119,6 +119,7 @@
     function applyPolygonStyle{{ tab_name }}() {
         const s = currentStyles{{ tab_name }}.Polygon;
         const m = map{{ tab_name }};
+        if (!m) return;
         if (m.getLayer('{{ tab_name }}-layer-fill')) {
             m.setPaintProperty(
                 '{{ tab_name }}-layer-fill',
@@ -140,6 +141,7 @@
     function applyLineStringStyle{{ tab_name }}() {
         const s = currentStyles{{ tab_name }}.LineString;
         const m = map{{ tab_name }};
+        if (!m) return;
         if (m.getLayer('{{ tab_name }}-layer-line')) {
             m.setPaintProperty(
                 '{{ tab_name }}-layer-line', 'line-color', s.color);
@@ -155,6 +157,7 @@
     function applyPointStyle{{ tab_name }}() {
         const s = currentStyles{{ tab_name }}.Point;
         const m = map{{ tab_name }};
+        if (!m) return;
         [
             '{{ tab_name }}-layer-circle',
             '{{ tab_name }}-layer-representative-points'
@@ -445,6 +448,7 @@
     }
 
     function applyLayerVisibility{{ tab_name }}() {
+        if (!map{{ tab_name }}) return;
         layerDefs{{ tab_name }}.forEach(def => {
             const visibility = hiddenLayerTypes{{ tab_name }}.has(def.type)
                 ? 'none' : 'visible';
@@ -1263,6 +1267,7 @@
             }
         }
         const m = map{{ tab_name }};
+        if (!m) return;
         const s = multiSharedOpts{{ tab_name }}[type];
 
         let colorExpr = '#888888';

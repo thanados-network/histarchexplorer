@@ -106,6 +106,10 @@
         badge.classList.add('d-inline-flex', 'btn-outline-secondary');
     }
 
+    if (window.currentActivePreset) {
+        showBadge(window.currentActivePreset.label);
+    }
+
     function markBadgeModified() {
         if (badge.classList.contains('d-none')) return;
         badge.classList.add('opacity-50');
@@ -120,6 +124,7 @@
     window.hideBadgeFns['{{ tab_name }}'] = hideBadge;
 
     window.resetAllToInitial = function resetAllToInitial() {
+        window.currentActivePreset = null;
         // Restore all tabs
         tabsToLoad.forEach(tab => {
             document.querySelectorAll(`.to-remove-${tab}`).forEach(el => {
@@ -166,6 +171,7 @@
         btn.appendChild(label);
 
         btn.addEventListener('click', () => {
+            window.currentActivePreset = preset;
             const tabsInPreset = Array.isArray(preset.tabs) && preset.tabs.length > 0
                 ? preset.tabs
                 : tabsToLoad;

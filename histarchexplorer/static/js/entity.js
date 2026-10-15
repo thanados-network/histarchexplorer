@@ -29,106 +29,109 @@ document.getElementById('toggleSidebar').addEventListener('click', function () {
 });
 
 let loadedCount = 0; // Track completed tab loads
+const loadingTabs = new Set();
+
+function showSidebarTabHeaders(tabs) {
+    tabs.forEach(tab => {
+        document.querySelectorAll(`li.to-remove-${tab}`).forEach(el => {
+            el.classList.remove('d-none');
+        });
+    });
+}
+
+function removeSpinner() {
+    document.querySelectorAll(".to-remove-spinner").forEach(element => {
+        element.remove();
+    });
+}
 
 async function loadHTML(id, tab, index, totalTabs) {
-    //console.log(id)
-    //console.log(tab)
+    let urlbase = `/get_entity/${id}/${tab}`;
+    if (id === 0) urlbase = `/get_entities/${tab}`;
 
-    let urlbase = `/get_entity/${id}/${tab}`
-    if (id === 0) urlbase = `/get_entities/${tab}`
-    //console.log(urlbase)
-    if (id === 0) urlbase = `/get_entities/${tab}`
-    //console.log(urlbase)
+    try {
+        const response = await fetch(urlbase);
 
-    const response = await fetch(urlbase);
+        if (response.status === 404) {
+            console.error(`Error 404: Content for tab "${tab}" not found.`);
+            document.querySelectorAll(`.to-remove-${tab}`).forEach(element => {
+                element.remove();
+            });
+            loadedCount++;
+            removeSpinner();
+            return;
+        }
 
-    if (response.status === 404) {
-        console.error(`Error 404: Content for tab "${tab}" not found.`);
+        if (response.status !== 200) {
+            console.error(`Unexpected response status: ${response.status}`);
+            return;
+        }
 
-        document.querySelectorAll(`.to-remove-${tab}`).forEach(element => {
-            element.remove();
-            //console.log(`Removed element with class "to-remove-${tab}".`);
+        document.querySelectorAll(`li.to-remove-${tab}`).forEach(element => {
+            element.classList.remove('d-none');
+        });
+        const pane = document.getElementById(`tab-pane-${tab}`);
+        if (pane) pane.classList.remove('d-none');
+
+        const htmlText = await response.text();
+        const targetElement = document.getElementById(`pane-content-${tab}`);
+
+        if (!targetElement) {
+            console.error("Target element not found!");
+            return;
+        }
+
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlText;
+
+        const cssPromises = Array.from(tempDiv.querySelectorAll('link[rel="stylesheet"]')).map(link => {
+            return new Promise(resolve => {
+                if (!document.querySelector(`link[href="${link.href}"]`)) {
+                    const newLink = document.createElement('link');
+                    newLink.rel = 'stylesheet';
+                    newLink.href = link.href;
+                    newLink.onload = resolve;
+                    document.head.appendChild(newLink);
+                } else {
+                    resolve();
+                }
+            });
         });
 
-        loadedCount++; // Increase count even for missing tabs
-        checkAndRemoveSpinner(totalTabs);
-        return;
-    }
+        await Promise.all(cssPromises);
 
-    if (response.status !== 200) {
-        console.error(`Unexpected response status: ${response.status}`);
-        return;
-    }
+        targetElement.innerHTML = tempDiv.innerHTML;
 
-    document.querySelectorAll(`.to-remove-${tab}`).forEach(element => {
-        element.classList.toggle('d-none');
-        //console.log(`Removed element with class "to-remove-${tab}".`);
-    });
+        const scripts = Array.from(tempDiv.querySelectorAll('script'));
+        if (tab === tabsToLoad[0]) notYetClickedTabs = notYetClickedTabs.filter(item => item !== tab);
+        for (const script of scripts) {
+            await loadScript(script);
+        }
 
-    const htmlText = await response.text();
-    const targetElement = document.getElementById(`pane-content-${tab}`);
+        initContentPopovers(targetElement);
 
-    if (!targetElement) {
-        console.error("Target element not found!");
-        return;
-    }
+        if (!loadedTabs.includes(tab)) {
+            loadedTabs.push(tab);
+        }
 
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlText;
-
-    const cssPromises = Array.from(tempDiv.querySelectorAll('link[rel="stylesheet"]')).map(link => {
-        return new Promise(resolve => {
-            if (!document.querySelector(`link[href="${link.href}"]`)) {
-                const newLink = document.createElement('link');
-                newLink.rel = 'stylesheet';
-                newLink.href = link.href;
-                newLink.onload = resolve;
-                document.head.appendChild(newLink);
-            } else {
-                resolve(); // Already loaded
-            }
-        });
-    });
-
-    await Promise.all(cssPromises);
-
-    targetElement.innerHTML = tempDiv.innerHTML;
-
-    const scripts = Array.from(tempDiv.querySelectorAll('script'));
-    if (tab === tabsToLoad[0]) notYetClickedTabs = notYetClickedTabs.filter(item => item !== tab);
-    for (const script of scripts) {
-        await loadScript(script);
-    }
-
-    initContentPopovers(targetElement);
-
-    loadedTabs.push(tab);
-    //console.log(`HTML, CSS, and scripts for "${tab}" loaded in correct order!`);
-    //console.log(loadedTabs);
-
-
-    loadedCount++; // Increase count when a tab is fully loaded
-    checkAndRemoveSpinner(totalTabs);
-}
-
-// Function to check if all tabs are loaded and remove the spinner
-function checkAndRemoveSpinner(totalTabs) {
-    console.log(`checkAndRemoveSpinner: loadedCount=${loadedCount}, totalTabs=${totalTabs}`);
-    if (loadedCount >= totalTabs) {
-        document.querySelectorAll(".to-remove-spinner").forEach(element => {
-            element.remove();
-            //console.log("Spinner removed.");
-        });
-
-        // In production, background caching for related entities (children, super entities, relations)
-        // can be enabled here to pre-warm the cache after the entity view is loaded.
-        // if (typeof entityId !== 'undefined' && entityId > 0) {
-        //     console.log(`Triggering background cache for entity: ${entityId}`);
-        //     fetch(`/api/cache-related/${entityId}`);
-        // }
+        loadedCount++;
+        removeSpinner();
+    } catch (err) {
+        console.error(`Error loading HTML for tab ${tab}:`, err);
     }
 }
 
+async function ensureTabLoaded(id, tab) {
+    if (!tab || loadedTabs.includes(tab) || loadingTabs.has(tab)) {
+        return;
+    }
+    loadingTabs.add(tab);
+    try {
+        await loadHTML(id, tab, loadedTabs.length, tabsToLoad.length);
+    } finally {
+        loadingTabs.delete(tab);
+    }
+}
 
 // Load a script dynamically and wait for it to finish loading
 function loadScript(script) {
@@ -148,29 +151,27 @@ function loadScript(script) {
 }
 
 if (entityId == 0) {
-    loadedCount = loadedTabs.length;
-    if (loadedCount >= tabsToLoad.length) {
-        checkAndRemoveSpinner(tabsToLoad.length);
-    } else {
-        tabsToLoad.forEach((tab, index) => {
-            if (!loadedTabs.includes(tab)) {
-                loadHTML(entityId, tab, index, tabsToLoad.length);
-            }
-        });
-    }
+    showSidebarTabHeaders(tabsToLoad);
+    const initialTab = (typeof initialActiveTab !== 'undefined' && initialActiveTab)
+        ? initialActiveTab
+        : (tabsToLoad[0] || 'places');
+    ensureTabLoaded(entityId, initialTab);
 } else {
-    (async function loadTabs() {
-        // Wait until the entity data is fetched
+    (async function initIndividualEntityTabs() {
         const data = await window.entityData;
         if (!data) {
             console.error("❌ Failed to load entityData.");
             return;
         }
 
-        if (!data.spatial.features.length > 0) tabsToLoad = tabsToLoad.filter(t => t !== 'map');
+        if (!data.spatial?.features?.length > 0) {
+            tabsToLoad = tabsToLoad.filter(t => t !== 'map');
+            document.querySelectorAll('.to-remove-map').forEach(el => el.remove());
+        }
 
-        if (data.hierarchy.subs === 0) {
+        if (data.hierarchy?.subs === 0) {
             tabsToLoad = tabsToLoad.filter(t => t !== 'subunits');
+            document.querySelectorAll('.to-remove-subunits').forEach(el => el.remove());
         }
 
         if (
@@ -181,20 +182,23 @@ if (entityId == 0) {
             )
         ) {
             tabsToLoad = tabsToLoad.filter(t => t !== 'media');
+            document.querySelectorAll('.to-remove-media').forEach(el => el.remove());
         }
 
-        loadedCount = loadedTabs.length;
-        if (loadedCount >= tabsToLoad.length) {
-            checkAndRemoveSpinner(tabsToLoad.length);
-        } else {
-            tabsToLoad.forEach((tab, index) => {
-                if (!loadedTabs.includes(tab)) {
-                    loadHTML(entityId, tab, index, tabsToLoad.length);
-                }
-            });
-        }
+        showSidebarTabHeaders(tabsToLoad);
+        const initialTab = (typeof initialActiveTab !== 'undefined' && initialActiveTab)
+            ? initialActiveTab
+            : (tabsToLoad[0] || 'overview');
+        ensureTabLoaded(entityId, initialTab);
     })();
 }
+
+document.addEventListener('show.bs.tab', function (event) {
+    const tabName = event.target.id.replace(/^tab-/, '');
+    if (tabName && tabsToLoad.includes(tabName)) {
+        ensureTabLoaded(entityId, tabName);
+    }
+});
 
 document.addEventListener('DOMContentLoaded', function () {
     // Activate a tab by name, optionally skipping pushState (for popstate navigation)

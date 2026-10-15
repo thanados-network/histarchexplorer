@@ -11,6 +11,7 @@
 
         let tabsToLoad = {{ sidebar_elements | sort(attribute='order') | map(attribute='route') | list | tojson }};
         const entityId = {{ entity_id }};
+        const initialActiveTab = "{{ active_tab }}";
 
         {% if entity_id == 0 %}
             const data = {{ data | tojson }};

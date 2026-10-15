@@ -508,6 +508,16 @@ function applyPreset{{ tab_name }}(preset) {
 if (!window.applyPresetFns) window.applyPresetFns = {};
 window.applyPresetFns['{{ tab_name }}'] = applyPreset{{ tab_name }};
 
+if (window.currentActivePreset) {
+    const pTabs = Array.isArray(window.currentActivePreset.tabs) &&
+        window.currentActivePreset.tabs.length > 0
+        ? window.currentActivePreset.tabs
+        : (typeof tabsToLoad !== 'undefined' ? tabsToLoad : []);
+    if (pTabs.includes('{{ tab_name }}')) {
+        applyPreset{{ tab_name }}(window.currentActivePreset);
+    }
+}
+
 // Reset all filters on this tab to their initial (page-load) state
 function resetFilter{{ tab_name }}() {
     document.getElementById('filterInput{{ tab_name }}').value = '';

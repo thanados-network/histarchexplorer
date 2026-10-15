@@ -64,15 +64,23 @@ function {{tab_name}}ToggleView(view) {
     if (activeBtn) activeBtn.classList.add("active");
 
     {% if tab_name in ["places", "items"] %}
-        if (!{{ tab_name }}MapLoaded) {
-            setTimeout(() => {
-                if (!bounds{{ tab_name }}.isEmpty() && !onePointFeature{{ tab_name }}) {
-                    map{{ tab_name }}.fitBounds(bounds{{ tab_name }}, {padding: 20});
-                    document.getElementById('map-{{ tab_name }}').style.opacity = "1"
+        if (view === "map") {
+            if (!{{ tab_name }}MapLoaded) {
+                if (typeof initMap{{ tab_name }} === 'function') {
+                    initMap{{ tab_name }}();
                 }
-            }, 500);
+                setTimeout(() => {
+                    if (map{{ tab_name }} && !bounds{{ tab_name }}.isEmpty() && !onePointFeature{{ tab_name }}) {
+                        map{{ tab_name }}.fitBounds(bounds{{ tab_name }}, {padding: 20});
+                        const mapEl = document.getElementById('map-{{ tab_name }}');
+                        if (mapEl) mapEl.style.opacity = "1";
+                    }
+                }, 500);
 
-            {{ tab_name }}MapLoaded = true
+                {{ tab_name }}MapLoaded = true;
+            } else if (map{{ tab_name }}) {
+                map{{ tab_name }}.resize();
+            }
         }
     {% endif %}
 }
@@ -83,9 +91,15 @@ const {{ tab_name }}Data = {}
 {{ tab_name }}Data.tableData = getEntitiesForTab('{{ tab_name }}');
 {{ tab_name }}Data.typeIds = [...new Set({{ tab_name }}Data.tableData.map(item => item.type_id))];
 if ('{{ tab_name }}' == 'subunits') {
-    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains'], ["standard"], null)
+    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(
+        typeTreeData,
+        ['place', 'feature', 'stratigraphic_unit', 'artifact', 'human_remains'],
+        ["standard"], null
+    );
 } else {
-    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(typeTreeData, viewClasses.{{ tab_name }}, ["standard"], null)
+    {{ tab_name }}Data.treeData = collectAndGroupMatchingData(
+        typeTreeData, viewClasses.{{ tab_name }}, ["standard"], null
+    );
 }
 
 {{ tab_name }}Data.fields = getKeysWithValues({{ tab_name }}Data.tableData)
@@ -154,7 +168,9 @@ function adjustTableHeight{{ tab_name }}() {
         const maxHeight = window.innerHeight - 80 - headerHeight - breadcrumbHeight - (3 * 16); // 3rem = 48px
         table.style.maxHeight = `${maxHeight}px`;
         {% if tab_name in ['places','items'] %}
-            mapContainer{{tab_name}}.style.height = `${maxHeight + 16}px`;
+            if (mapContainer{{tab_name}}) {
+                mapContainer{{tab_name}}.style.height = `${maxHeight + 16}px`;
+            }
         {% endif %}
     }, 500);
 }
