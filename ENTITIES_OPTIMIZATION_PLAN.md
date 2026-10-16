@@ -270,17 +270,27 @@ Jetzt werden die Tabellendaten pro Tab bei Bedarf in handlichen Blöcken (z. B. 
 
 ### Phase 5: Bereinigung & Memory-Leak-Prävention
 
-#### 5.1 Skripte modularisieren
-* **Problem**: `tabs/browse_js/*.html` wird 7 Mal in den DOM gehängt.
-* **Lösung**:
-  * Gemeinsame Logik in eine externe JS-Datei `static/js/browseTab.js` als wiederverwendbare Klasse oder Modul auslagern (`class BrowseTabManager`).
-  * `browse.html` übergibt nur noch die Konfiguration (`{ tabName: "places", ... }`).
-* Dadurch entfallen ~12.000 Zeilen redundanter inline-HTML-Code im DOM.
+#### 5.1 Skripte modularisieren & Redundanzen eliminieren
+* **Auslagerung globaler Bibliotheken**:
+  * `mapfunctions.js` wird nun einmalig in `layout.html` eingebunden und gecacht, statt bei jedem Tab-Wechsel erneut per Inline-Script in den DOM injiziert zu werden.
+  * In `browse.html` werden `map_js.html` und `style_sidebar.html` nur noch für Tabs mit Karten (`places`, `items`) inkludiert. Für die anderen 5 Kategorien (`actors`, `events`, etc.) entfallen jeweils ~80 KB ungenutzter HTML/JS-Code pro Aufruf.
+  * Dynamisches Script-Loading in `entity.js` bereinigt DOM-Knoten für Inline-Skripte nach der Ausführung (`newScript.remove()`) und dedupliziert externe Skripte per `script[src]`.
+  * IIIF-Depictions-Cache (`iiifMap`) wird tab-übergreifend in `window.iiifDepictionsCache` geteilt, um doppelte LPX-Netzwerkanfragen zu vermeiden.
 
-#### 5.2 Aufräumen beim Tab-Wechsel
-* Beim Umschalten von Tabs oder Zerstören von Grids:
-  * Event-Listener deregistrieren (`removeEventListener`).
-  * `map.remove()` bzw. WebGL-Kontext bei Inaktivität oder Tab-Schließen freigeben.
+#### 5.2 Aufräumen & Event-Listener-Scoping beim Tab-Wechsel
+* **Event-Listener-Scoping**:
+  * In `filter_js.html`: Globaler `document.addEventListener("change", ...)` wurde durch zielgerichtete Container-Listener auf `#classSelect<tab>` und `#csSelect<tab>` ersetzt (automatische Garbage-Collection bei Tab-Entfernung).
+  * In `tiles_js.html`: Redundante, unabgemeldete Event-Listener auf `window.addEventListener("resize", ...)` und `#toggleSidebar` wurden entfernt.
+  * In `main_js.html`: `handleWindowResize` und Sidebar-Toggle prüfen nun aktiv `pane.classList.contains('active')`, wodurch keine Layout-Berechnungen mehr für inaktive, unsichtbare (0px) Tabs ausgeführt werden.
+  * Alle implizit globalen JS-Variablen (`tileContainer`, `mapContainer`, `theCurrentPage`) wurden durch `const`/`let` sauber gekapselt.
+
+#### Status: ABGESCHLOSSEN (16. Oktober 2026)
+
+#### Verifikation Phase 5
+* [x] Redundante `mapfunctions.js`-Injektionen pro Tab-Ladevorgang beseitigt.
+* [x] DOM wird nicht mehr mit veralteten `<script>`-Tags überflutet.
+* [x] Event-Listener auf `document` und `window` sind bereinigt bzw. auf aktive Tabs beschränkt.
+* [x] Alle 448 Tests laufen fehlerfrei durch (`uv run pytest` -> 448 passed).
 
 ---
 

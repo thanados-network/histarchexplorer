@@ -139,14 +139,20 @@ function loadScript(script) {
         const newScript = document.createElement('script');
 
         if (script.src) {
+            if (document.querySelector(`script[src="${script.src}"]`)) {
+                resolve();
+                return;
+            }
             newScript.src = script.src;
             newScript.onload = resolve;
+            newScript.onerror = resolve;
+            document.head.appendChild(newScript);
         } else {
             newScript.textContent = script.textContent;
+            document.body.appendChild(newScript);
+            newScript.remove();
             resolve();
         }
-
-        document.body.appendChild(newScript);
     });
 }
 

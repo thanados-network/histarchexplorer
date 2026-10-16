@@ -83,16 +83,24 @@ if (classList{{ tab_name }}.length > 1) {
     });
 }
 
-let {{ tab_name}}CsIds = []
+let {{ tab_name }}CsIds = [];
 
-document.addEventListener("change", function (e) {
-    if (e.target.matches(`#classSelect{{ tab_name }} input[type="checkbox"]`)) {
-        applyCombinedFilter{{ tab_name }}();
-    }
-    if (e.target.matches(`#csSelect{{ tab_name }} input[type="checkbox"]`)) {
-        applyCombinedFilter{{ tab_name }}();
-    }
-})
+const classSelectContainer{{ tab_name }} = document.getElementById("classSelect{{ tab_name }}");
+if (classSelectContainer{{ tab_name }}) {
+    classSelectContainer{{ tab_name }}.addEventListener("change", function (e) {
+        if (e.target && e.target.matches('input[type="checkbox"]')) {
+            applyCombinedFilter{{ tab_name }}();
+        }
+    });
+}
+const csSelectContainer{{ tab_name }} = document.getElementById("csSelect{{ tab_name }}");
+if (csSelectContainer{{ tab_name }}) {
+    csSelectContainer{{ tab_name }}.addEventListener("change", function (e) {
+        if (e.target && e.target.matches('input[type="checkbox"]')) {
+            applyCombinedFilter{{ tab_name }}();
+        }
+    });
+}
 
 if ({{ tab_name }}Data.caseStudies.length > 1) {
     const csSelect{{ tab_name }} = document.getElementById("csSelect{{ tab_name }}");

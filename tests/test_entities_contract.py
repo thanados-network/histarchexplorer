@@ -288,3 +288,29 @@ def test_get_entities_places_payload_reduced(
     assert '"geometries": {"features": [], "type": "FeatureCollection"}' in (
         html)
 
+
+def test_phase5_non_map_tabs_omit_map_scripts(
+        authenticated_client: FlaskClient) -> None:
+    """Verify non-map tabs omit style_sidebar and map_js templates."""
+    rv = authenticated_client.get('/get_entities/actors')
+    assert rv.status_code == 200
+    html = rv.data.decode('utf-8')
+    assert 'initMapactors' not in html
+    assert 'style-sidebar-actors' not in html
+
+    rv_places = authenticated_client.get('/get_entities/places')
+    assert rv_places.status_code == 200
+    places_html = rv_places.data.decode('utf-8')
+    assert 'initMapplaces' in places_html
+    assert 'style-sidebar-places' in places_html
+
+
+def test_phase5_mapfunctions_in_layout(
+        authenticated_client: FlaskClient) -> None:
+    """Verify mapfunctions.js is loaded once in the main layout."""
+    rv = authenticated_client.get('/entities')
+    assert rv.status_code == 200
+    html = rv.data.decode('utf-8')
+    assert 'src="/static/js/mapfunctions.js"' in html
+
+

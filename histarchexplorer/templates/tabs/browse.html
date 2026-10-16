@@ -1,6 +1,4 @@
-{% if not subunits %}
-  <script type="text/javascript" src="/static/js/mapfunctions.js"></script>
-{% endif %}
+
 <script>
     {% if subunits %}
       const typeTreeData = {{ typetree_data|tojson}}
@@ -237,7 +235,9 @@
 
 
 <div class="browse-body-wrapper d-flex">
-    {% include "/tabs/browse_js/style_sidebar.html" %}
+    {% if tab_name in ['places', 'items'] %}
+        {% include "/tabs/browse_js/style_sidebar.html" %}
+    {% endif %}
     <div class="browse-main-content flex-grow-1">
         <div id="table-{{ tab_name }}" class="tabulator-container"></div>
         <div id="tile-{{ tab_name }}" class="tile-container d-none">
@@ -264,7 +264,9 @@
 
 {% include "/tabs/browse_js/filter_js.html" %}
 
-{% include "/tabs/browse_js/map_js.html" %}
+{% if tab_name in ['places', 'items'] %}
+    {% include "/tabs/browse_js/map_js.html" %}
+{% endif %}
 
 {% include "/tabs/browse_js/tiles_js.html" %}
 

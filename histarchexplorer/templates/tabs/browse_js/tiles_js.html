@@ -15,8 +15,9 @@
        IIIF helpers + cache (small and local to tiles)
     ----------------------------------------------------------- */
 
-    // Cache: entityId -> IIIFBasePath (string) or null
-    const iiifMap{{ tab_name }} = new Map();
+    // Cache: entityId -> IIIFBasePath (string) or null (shared across tabs)
+    window.iiifDepictionsCache = window.iiifDepictionsCache || new Map();
+    const iiifMap{{ tab_name }} = window.iiifDepictionsCache;
 
     // Build a sized IIIF image URL from the IIIFBasePath we get in LPX
     function buildIiifSizedUrl{{ tab_name }}(iiifObjOrBase, w = 200, h = 360) {
@@ -307,18 +308,17 @@
         setTimeout(function () {
             const header = document.getElementById(`{{tab_name}}-header`);
             const breadcrumbCont = document.getElementById(`{{tab_name}}-breadcrumbs`);
-            tileContainer{{tab_name}} = document.getElementById(`grid-container-{{tab_name}}`);
+            const tileGridCont = document.getElementById(`grid-container-{{tab_name}}`);
 
-            if (!header || !tileContainer{{tab_name}}) return;
+            if (!header || !tileGridCont) return;
 
             const headerHeight = header.offsetHeight;
-            const breadcrumbHeight = breadcrumbCont.offsetHeight;
+            const breadcrumbHeight = breadcrumbCont ? breadcrumbCont.offsetHeight : 0;
 
-            const maxHeight = window.innerHeight - 96 - headerHeight - breadcrumbHeight - (3 * 16) - 40; // Same calculation as table
+            const maxHeight = window.innerHeight - 96 - headerHeight - breadcrumbHeight - (3 * 16) - 40;
 
-
-            tileContainer{{tab_name}}.style.height = `${maxHeight}px`;
-            tileContainer{{tab_name}}.style.maxHeight = `${maxHeight}px`;
+            tileGridCont.style.height = `${maxHeight}px`;
+            tileGridCont.style.maxHeight = `${maxHeight}px`;
 
             if (grid{{ tab_name }}) {
                 grid{{ tab_name }}.refreshItems().layout();
@@ -327,14 +327,11 @@
     }
 
     function goToTilePage{{ tab_name }}(pageNum) {
-        //console.log('Going to tile page:', pageNum);
-
         // Change the table page (this will trigger our event listener)
         table{{ tab_name }}.setPage(pageNum);
 
         // Destroy and recreate the grid (same approach as toggle view)
         if (grid{{ tab_name }}) {
-            //console.log('Destroying existing grid for page change');
             grid{{ tab_name }}.destroy();
             grid{{ tab_name }} = null;
         }
@@ -348,7 +345,6 @@
         // Initialize Muuri with delay
         setTimeout(() => {
             grid{{ tab_name }} = new Muuri('#tile-{{ tab_name }} .grid');
-            //console.log('Muuri re-initialized with items:', grid{{ tab_name }}.getItems().length);
             grid{{ tab_name }}.refreshItems().layout();
         }, 100);
     }
@@ -360,8 +356,7 @@
         // Use tracked filtered data
         const totalData = filteredData{{ tab_name }}.length;
         const pageSize = table{{ tab_name }}.getPageSize();
-        theCurrentPage = table{{ tab_name }}.getPage();
-        const currentPage = theCurrentPage;
+        const currentPage = table{{ tab_name }}.getPage();
         const totalPages = Math.ceil(totalData / pageSize);
 
         const startItem = ((currentPage - 1) * pageSize) + 1;
@@ -422,8 +417,8 @@
         // rows = alle gefilterten Zeilen in sortierter Reihenfolge
         filteredData{{ tab_name }} = rows.map(r => r.getData());
 
-        tileContainer{{tab_name}} = document.getElementById('tile-{{ tab_name }}');
-        if (grid{{ tab_name }} && tileContainer{{tab_name}} && !tileContainer{{tab_name}}.classList.contains('d-none')) {
+        const tileCont = document.getElementById('tile-{{ tab_name }}');
+        if (grid{{ tab_name }} && tileCont && !tileCont.classList.contains('d-none')) {
             populateGridWithData{{ tab_name }}();
             createTilePagination{{ tab_name }}();
             setTimeout(() => grid{{ tab_name }}.refreshItems().layout(), 50);
@@ -431,36 +426,28 @@
     });
 
     table{{ tab_name }}.on("pageLoaded", function (pageno) {
-        //console.log('Table page changed to:', pageno);
-        // Update tile pagination if it exists
         if (document.getElementById('tile-pagination-{{ tab_name }}')) {
             createTilePagination{{ tab_name }}();
         }
-        // If grid exists, refresh it with current page data
         if (grid{{ tab_name }}) {
             populateGridWithData{{ tab_name }}();
         }
     });
 
     table{{ tab_name }}.on("dataFiltered", function (filters, rows) {
-        //console.log('Table data filtered, rows count:', rows.length);
         filteredData{{ tab_name }} = rows.map(row => row.getData());
-        //console.log('Stored filtered data:', filteredData{{ tab_name }}.length);
 
-        // If grid exists and is visible, update it
-        tileContainer{{tab_name}} = document.getElementById('tile-{{ tab_name }}');
-        if (grid{{ tab_name }} && tileContainer{{tab_name}} && !tileContainer{{tab_name}}.classList.contains('d-none')) {
-            //console.log('Updating grid due to filter change');
+        const tileCont = document.getElementById('tile-{{ tab_name }}');
+        if (grid{{ tab_name }} && tileCont && !tileCont.classList.contains('d-none')) {
             populateGridWithData{{ tab_name }}();
             createTilePagination{{ tab_name }}();
         }
     });
 
     // If we're currently viewing tiles, rebuild the grid properly
-    let tileContainer{{tab_name}} = document.getElementById('tile-{{ tab_name }}');
-    if (grid{{ tab_name }} && tileContainer{{tab_name}} && !tileContainer{{tab_name}}.classList.contains('d-none')) {
-        //console.log('Filter applied, rebuilding grid');
-
+    const initialTileCont{{ tab_name }} = document.getElementById('tile-{{ tab_name }}');
+    if (grid{{ tab_name }} && initialTileCont{{ tab_name }} &&
+        !initialTileCont{{ tab_name }}.classList.contains('d-none')) {
         grid{{ tab_name }}.destroy();
         grid{{ tab_name }} = null;
 
@@ -471,7 +458,6 @@
 
         setTimeout(() => {
             grid{{ tab_name }} = new Muuri('#tile-{{ tab_name }} .grid');
-            //console.log('Grid rebuilt after filter with items:', grid{{ tab_name }}.getItems().length);
             grid{{ tab_name }}.refreshItems().layout();
         }, 100);
     }
@@ -479,14 +465,4 @@
     function relayoutTiles{{ tab_name }}() {
         if (grid{{ tab_name }}) grid{{ tab_name }}.refreshItems().layout();
     }
-
-    // Run on resize
-    window.addEventListener("resize", function () {
-        relayoutTiles{{ tab_name }}();
-    });
-
-    document.getElementById('toggleSidebar').addEventListener('click', function () {
-        setTimeout(relayoutTiles{{ tab_name }}, 150);
-    });
-
 </script>

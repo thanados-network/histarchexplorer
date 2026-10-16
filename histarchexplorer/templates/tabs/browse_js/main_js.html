@@ -186,13 +186,17 @@ function adjustTableHeight{{ tab_name }}() {
 }
 
 // Run on resize
-window.addEventListener("resize", function () {
-    adjustTableHeight{{tab_name}}();
-    adjustTileHeight{{ tab_name }}();
-});
+function handleWindowResize{{ tab_name }}() {
+    const pane = document.getElementById('tab-pane-{{ tab_name }}');
+    if (pane && pane.classList.contains('active')) {
+        adjustTableHeight{{ tab_name }}();
+        adjustTileHeight{{ tab_name }}();
+    }
+}
+window.addEventListener("resize", handleWindowResize{{ tab_name }});
 
 // Run on initial load
-adjustTableHeight{{tab_name}}();
+adjustTableHeight{{ tab_name }}();
 {% if tab_name == "places" %}
 setTimeout(() => placesToggleView('map'), 500);
 {% endif %}
@@ -205,15 +209,24 @@ setTimeout(() => itemsToggleView('tile'), 500);
 setTimeout(() => featuresToggleView('tile'), 500);
 {% endif %}
 
-document.getElementById('toggleSidebar').addEventListener('click', function () {
-    adjustTableHeight{{tab_name}}();
-    adjustTileHeight{{ tab_name }}()
-})
+const sidebarToggle{{ tab_name }} = document.getElementById('toggleSidebar');
+if (sidebarToggle{{ tab_name }}) {
+    sidebarToggle{{ tab_name }}.addEventListener('click', function () {
+        const pane = document.getElementById('tab-pane-{{ tab_name }}');
+        if (pane && pane.classList.contains('active')) {
+            adjustTableHeight{{ tab_name }}();
+            adjustTileHeight{{ tab_name }}();
+        }
+    });
+}
 
-document.getElementById('tab-{{ tab_name }}').addEventListener('click', function () {
-    adjustTableHeight{{tab_name}}();
-    adjustTileHeight{{ tab_name }}()
-})
+const tabLink{{ tab_name }} = document.getElementById('tab-{{ tab_name }}');
+if (tabLink{{ tab_name }}) {
+    tabLink{{ tab_name }}.addEventListener('click', function () {
+        adjustTableHeight{{ tab_name }}();
+        adjustTileHeight{{ tab_name }}();
+    });
+}
 
 
 
