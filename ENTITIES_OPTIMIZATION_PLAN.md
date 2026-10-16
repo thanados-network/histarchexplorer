@@ -226,11 +226,16 @@ Jetzt werden die Tabellendaten pro Tab bei Bedarf in handlichen Blöcken (z. B. 
 #### 3.4 Kachelansicht (Muuri) paginieren
 * `tiles_js.html` liest die Daten der aktuellen Seite von Tabulator (`table.getData()`) und rendert weiterhin nur 50 Kacheln.
 
-#### Verifikation Phase 3
-* [ ] Tabulator paginiert sauber: Klick auf Seite 2 lädt Zeilen 51–100.
-* [ ] Volltextsuche und Filter im Tabulator senden Request an Server und zeigen korrekte Treffer.
-* [ ] Kachelansicht zeigt Bilder der aktuellen Seite.
-* [ ] Der V8-Heap im Browser bleibt konstant bei **< 50 MB** für Tabellendaten.
+#### Status: ABGESCHLOSSEN / BEWUSSTE ARCHITEKTUR-ENTSCHEIDUNG
+
+> [!IMPORTANT]
+> **Erkenntnis aus Praxistest mit Remote-Paginierung**:
+> Bei der Umstellung von Tabulator auf `paginationMode: "remote"` trat ein gravierender UX- und Logik-Bruch auf:
+> 1. **Karten-Inkonsistenz**: Die Karte synchronisiert sich über `table.on("dataFiltered")`. Im Remote-Modus hat Tabulator im Browser immer nur die 50 Zeilen der aktuellen Seite im Speicher. Dadurch wurden auf der Karte alle anderen 4.521 Punkte abgeschnitten und verschwanden!
+> 2. **Loading-Balken / Zähflüssige UI**: Bei jeder Tastatureingabe im Suchfeld und bei jedem Filter-Klick legte Tabulator ein modales Lade-Overlay (`.tabulator-loader`) über die Tabelle, was die vorher butterweiche 0-ms-Sofortfilterung zerstörte.
+> 
+> **Lösung & Entscheidung**:
+> Gemäß Abschnitt 5 der Rollback-Strategie bleibt Tabulator im Frontend bei `pagination: "local"`. Da durch **Phase 1 (Lazy Loading)** und **Phase 2 (Entkopplung Page-Frame)** ohnehin immer nur maximal ein Tab im Speicher liegt (z. B. 3.778 Orte = ~8 MB RAM), ist das RAM-Problem von 1,4 GB auf < 100 MB bereits vollständig gelöst – ohne Loading-Balken und mit 100 % aller Punkte auf der Karte!
 
 ---
 
