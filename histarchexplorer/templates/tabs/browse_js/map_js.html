@@ -7,7 +7,15 @@
         filter{{ tab_name }} = ['place', 'feature', 'stratigraphic_unit']
     {% endif %}
 
-    const filteredGeomData{{ tab_name }} = data.geometries.features.filter(
+    const rawGeomFeatures{{ tab_name }} = (
+        (typeof tabData{{ tab_name }} !== 'undefined' &&
+         tabData{{ tab_name }}?.geometries?.features)
+            ? tabData{{ tab_name }}.geometries.features
+            : (typeof data !== 'undefined' && data?.geometries?.features
+                ? data.geometries.features : [])
+    );
+
+    const filteredGeomData{{ tab_name }} = (rawGeomFeatures{{ tab_name }} || []).filter(
         f => filter{{ tab_name }}.includes(f.properties.class));
 
     const featureCollection{{ tab_name }} = {

@@ -20,21 +20,24 @@
             const viewClasses = {{ filtered_view_classes|tojson }};
 
             function getEntitiesForTab(tabName) {
+                if (!data || !data.entities) return [];
                 const validClasses = viewClasses[tabName] || [];
                 return data.entities.filter(entity => validClasses.includes(entity.class));
             }
 
-            data.entities.forEach(entity => {
-                entity.beginDBP = calculateTimeBP(entity.begin);
-                entity.endDBP = calculateTimeBP(entity.end);
-                if (entity.begin) entity.beginString = makeLocalDate(entity.begin).localdate;
-                if (entity.end) entity.endString = makeLocalDate(entity.end).localdate;
+            if (data && data.entities) {
+                data.entities.forEach(entity => {
+                    entity.beginDBP = calculateTimeBP(entity.begin);
+                    entity.endDBP = calculateTimeBP(entity.end);
+                    if (entity.begin) entity.beginString = makeLocalDate(entity.begin).localdate;
+                    if (entity.end) entity.endString = makeLocalDate(entity.end).localdate;
 
-                entity.all = [entity.description, entity.class, entity.type, entity.name]
-                    .filter(v => v !== null && v !== undefined && v !== '')
-                    .map(v => v.replace(/[\r\n]+/g, ' '))  // <- Replace line breaks with spaces
-                    .join(' ');
-            });
+                    entity.all = [entity.description, entity.class, entity.type, entity.name]
+                        .filter(v => v !== null && v !== undefined && v !== '')
+                        .map(v => v.replace(/[\r\n]+/g, ' '))
+                        .join(' ');
+                });
+            }
 
         {% else %}
             window.entityData = fetchEntityData({{ entity_id }});

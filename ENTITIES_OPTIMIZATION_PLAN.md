@@ -169,11 +169,13 @@ Es braucht **weder** die 64.660 Entitäten-Details noch die 9.066 GeoJSON-Featur
   * In `entity.html`:
     * Die 23 MB JSON-Injektion `const data = {{ data | tojson }};` entfällt für `entity_id == 0`.
 
+#### Status: ABGESCHLOSSEN (16. Oktober 2026)
+
 #### Verifikation Phase 2
-* [ ] Test `curl -s http://localhost:5000/entities | wc -c`: Die HTML-Größe sinkt von **27,8 MB auf unter 50 KB**!
-* [ ] Die Seitenladezeit sinkt drastisch.
-* [ ] Subunits auf Einzelseiten (`/entity/<id>/subunits`) funktionieren weiterhin vollständig.
-* [ ] Alle Unit- und Integrationstests laufen fehlerfrei durch.
+* [x] Test `curl -s http://localhost:5000/entities | wc -c`: Die HTML-Größe sinkt von **26,67 MB auf 30.094 Bytes (99,89 % Reduktion)**!
+* [x] Die Seitenladezeit sinkt von **~6,2s auf ~0,126s** drastisch.
+* [x] Subunits auf Einzelseiten (`/entity/<id>/subunits`) funktionieren weiterhin vollständig.
+* [x] Alle Unit- und Integrationstests laufen fehlerfrei durch (`uv run pytest` -> 441 passed).
 
 ---
 

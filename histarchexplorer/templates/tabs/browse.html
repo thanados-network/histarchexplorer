@@ -25,6 +25,31 @@
 
 
 
+    {% elif tab_data %}
+      const tabData{{ tab_name }} = {{ tab_data | tojson }};
+      const tabTypeTreeData{{ tab_name }} = {{ typetree_data | tojson }};
+
+      if (typeof data !== 'undefined' && data) {
+        if (tabData{{ tab_name }}.cs_ids) {
+          data.cs_ids = tabData{{ tab_name }}.cs_ids;
+        }
+      }
+
+      tabData{{ tab_name }}.entities.forEach(entity => {
+        entity.beginDBP = calculateTimeBP(entity.begin);
+        entity.endDBP = calculateTimeBP(entity.end);
+        if (entity.begin) entity.beginString = makeLocalDate(entity.begin).localdate;
+        if (entity.end) entity.endString = makeLocalDate(entity.end).localdate;
+
+        entity.all = [entity.description, entity.class, entity.type, entity.name]
+            .filter(v => v !== null && v !== undefined && v !== '')
+            .map(v => v.replace(/[\r\n]+/g, ' '))
+            .join(' ');
+      });
+
+      function getEntitiesForTab_{{ tab_name }}() {
+        return tabData{{ tab_name }}.entities;
+      }
     {% endif %}
 </script>
 <div id="{{ tab_name }}-breadcrumbs" class="breadcrumbs ms-3"></div>

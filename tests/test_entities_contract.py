@@ -13,7 +13,10 @@ from flask.testing import FlaskClient
 
 from histarchexplorer import app
 from histarchexplorer.models.settings import Settings
-from histarchexplorer.views.entities import get_browse_list_entities
+from histarchexplorer.views.entities import (
+    get_browse_list_entities,
+    get_browse_metadata,
+    get_browse_tab_data)
 
 
 @pytest.fixture(autouse=True)
@@ -158,13 +161,39 @@ def test_get_entities_partial_template(
 
 def test_baseline_metrics_recorded(
         authenticated_client: FlaskClient) -> None:
-    """Record baseline size and ensure response payload is measurable."""
+    """Verify that Phase 2 reduced /entities initial payload to < 50 KB."""
     rv = authenticated_client.get('/entities')
     assert rv.status_code == 200
     payload_size = len(rv.data)
-    # Current baseline is ~21-28 MB. We assert it is at least 1 MB
-    # so we detect when Phase 2 slashes this down to < 100 KB.
-    assert payload_size > 1_000_000
+    # Baseline was ~26.7 MB. Phase 2 decouples data and reduces to < 50 KB.
+    assert payload_size < 50_000
+    assert payload_size > 10_000
+
+
+def test_get_browse_metadata_contract() -> None:
+    """Verify return structure and keys of get_browse_metadata."""
+    with auth_request_context('/entities'):
+        meta = get_browse_metadata(0)
+        assert meta is not None
+        assert isinstance(meta, dict)
+        for key in ('totals', 'counts', 'cs_ids', 'shown classes'):
+            assert key in meta
+        # Should NOT contain full entities or geometries
+        assert 'entities' not in meta
+        assert 'geometries' not in meta
+
+
+def test_get_browse_tab_data_places() -> None:
+    """Verify get_browse_tab_data returns scoped entities and geometries."""
+    with auth_request_context('/entities'):
+        tab_data = get_browse_tab_data('places')
+        assert isinstance(tab_data, dict)
+        assert 'entities' in tab_data
+        assert 'geometries' in tab_data
+        assert len(tab_data['entities']) > 0
+        # All entities must belong to places classes
+        for ent in tab_data['entities']:
+            assert ent['class'] in ('place', 'feature', 'stratigraphic_unit')
 
 
 def test_phase1_lazy_loading_and_model_viewer_isolation(

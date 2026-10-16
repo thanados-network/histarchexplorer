@@ -46,15 +46,19 @@ def test_entity_view(authenticated_client: FlaskClient) -> None:
         assert rv.status_code == 200
 
 def test_entities_view(authenticated_client: FlaskClient) -> None:
-    with patch('histarchexplorer.database.entities.get_entities_list') as mock_get, \
-         patch('histarchexplorer.models.settings.Settings.load_from_db') as mock_settings:
-        
+    db_patch = patch(
+        'histarchexplorer.database.entities.get_entities_list')
+    settings_patch = patch(
+        'histarchexplorer.models.settings.Settings.load_from_db')
+    with db_patch as mock_get, settings_patch as mock_settings:
         settings = Settings()
         settings.access_restriction = False
         mock_settings.return_value = settings
-        
-        mock_get.return_value = [{"id": 1, "title": "E1", "openatlas_class_name": "site"}]
-        rv = authenticated_client.get('/entities/site')
+
+        mock_get.return_value = [
+            {"id": 1, "title": "E1", "class": "place", "type": None,
+             "name": "E1", "description": "", "begin": None, "end": None}]
+        rv = authenticated_client.get('/get_entities/places')
         assert rv.status_code == 200
         assert b'E1' in rv.data
 
