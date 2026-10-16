@@ -16,7 +16,7 @@
     );
 
     const filteredGeomData{{ tab_name }} = (rawGeomFeatures{{ tab_name }} || []).filter(
-        f => filter{{ tab_name }}.includes(f.properties.class));
+        f => filter{{ tab_name }}.includes(f.properties?.class));
 
     const featureCollection{{ tab_name }} = {
         type: "FeatureCollection",
@@ -24,10 +24,18 @@
     };
     processRepresentativePoints(featureCollection{{ tab_name }});
 
-    filteredIDdata{{ tab_name }} = featureCollection{{ tab_name }}.features.map(
-        f => f.properties.id);
+    let filteredIDdata{{ tab_name }} = (
+        typeof {{ tab_name }}Data !== 'undefined' && {{ tab_name }}Data?.tableData
+    )
+        ? {{ tab_name }}Data.tableData.map(e => e.id)
+        : (
+            (typeof tabData{{ tab_name }} !== 'undefined' && tabData{{ tab_name }}?.entities)
+                ? tabData{{ tab_name }}.entities.map(e => e.id)
+                : []
+        );
 
     function extendBounds{{ tab_name }}(feature) {
+        if (!feature || !feature.geometry) return;
         const {type, coordinates} = feature.geometry;
 
         const extend = (coord) => {
@@ -63,13 +71,21 @@
 
     const bounds{{ tab_name }} = new maplibregl.LngLatBounds();
     featureCollection{{ tab_name }}.features.forEach(extendBounds{{ tab_name }});
-    const center{{ tab_name }} = bounds{{ tab_name }}.getCenter();
-    const onePointFeature{{ tab_name }} = (
+
+    function getCenter{{ tab_name }}() {
+        return !bounds{{ tab_name }}.isEmpty()
+            ? bounds{{ tab_name }}.getCenter()
+            : [14.5, 47.5];
+    }
+
+    let onePointFeature{{ tab_name }} = (
         featureCollection{{ tab_name }}.features.length === 1 &&
-        featureCollection{{ tab_name }}.features[0].geometry.type === 'Point'
+        featureCollection{{ tab_name }}.features[0]?.geometry?.type === 'Point'
     );
 
     let map{{ tab_name }} = null;
+    let geometriesLoading{{ tab_name }} = false;
+    let geometriesLoaded{{ tab_name }} = featureCollection{{ tab_name }}.features.length > 0;
 
     const mapVectorLayers{{ tab_name }} = [
         '{{ tab_name }}-layer-fill',
@@ -78,15 +94,74 @@
         '{{ tab_name }}-layer-representative-points'
     ];
 
+    async function loadGeometries{{ tab_name }}() {
+        if (geometriesLoaded{{ tab_name }} || geometriesLoading{{ tab_name }}) return;
+        geometriesLoading{{ tab_name }} = true;
+        try {
+            const resp = await fetch('/api/browse/{{ tab_name }}/geometries');
+            if (!resp.ok) {
+                console.error(`Failed to load geometries for {{ tab_name }}: ${resp.status}`);
+                return;
+            }
+            const geojson = await resp.json();
+            const raw = geojson?.features || [];
+            const filtered = raw.filter(f => filter{{ tab_name }}.includes(f.properties?.class));
+            featureCollection{{ tab_name }}.features = filtered;
+            processRepresentativePoints(featureCollection{{ tab_name }});
+
+            featureCollection{{ tab_name }}.features.forEach(extendBounds{{ tab_name }});
+            onePointFeature{{ tab_name }} = (
+                featureCollection{{ tab_name }}.features.length === 1 &&
+                featureCollection{{ tab_name }}.features[0]?.geometry?.type === 'Point'
+            );
+            geometriesLoaded{{ tab_name }} = true;
+
+            const mapRef = map{{ tab_name }};
+            if (mapRef) {
+                const currentFiltered = featureCollection{{ tab_name }}.features.filter(
+                    f => filteredIDdata{{ tab_name }}.includes(f.properties.id)
+                );
+                const src = mapRef.getSource('{{ tab_name }}-source');
+                if (src) {
+                    src.setData({
+                        type: 'FeatureCollection',
+                        features: currentFiltered
+                    });
+                }
+                updateLayerList{{ tab_name }}(currentFiltered);
+                updateOverview{{ tab_name }}(
+                    featureCollection{{ tab_name }}.features,
+                    currentFiltered
+                );
+                if (typeof initLayerStyle{{ tab_name }} === 'function') {
+                    initLayerStyle{{ tab_name }}();
+                }
+                if (!bounds{{ tab_name }}.isEmpty() && !onePointFeature{{ tab_name }}) {
+                    mapRef.fitBounds(bounds{{ tab_name }}, {padding: 20});
+                    const mapEl = document.getElementById('map-{{ tab_name }}');
+                    if (mapEl) mapEl.style.opacity = "1";
+                }
+            }
+        } catch (err) {
+            console.error(`Error loading geometries for {{ tab_name }}:`, err);
+        } finally {
+            geometriesLoading{{ tab_name }} = false;
+        }
+    }
+
     function initMap{{ tab_name }}() {
         if (map{{ tab_name }}) return;
+
+        if (!geometriesLoaded{{ tab_name }}) {
+            loadGeometries{{ tab_name }}();
+        }
 
         map{{ tab_name }} = new maplibregl.Map({
             container: 'map-{{ tab_name }}',
             style: 'https://api.maptiler.com/maps/topo-v2/style.json?key=E7Jrgaazm79UlTuEI5f5',
             maxPitch: 85,
             maxZoom: 25,
-            center: center{{ tab_name }}, // starting position [lng, lat]
+            center: getCenter{{ tab_name }}(),
         });
 
         const mapRef = map{{ tab_name }};

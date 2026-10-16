@@ -1,6 +1,7 @@
 from typing import Any
 
-from flask import abort, g, render_template
+from flask import (
+    Response, abort, g, jsonify, render_template, request)
 
 from histarchexplorer import app
 from histarchexplorer.database import entities as db_entities
@@ -163,7 +164,8 @@ def get_browse_list_entities(
 
 def get_browse_tab_data(
         tab_name: str,
-        id_: int = 0) -> dict[str, Any]:
+        id_: int = 0,
+        include_geometries: bool = True) -> dict[str, Any]:
     """Fetch entity and geometry records restricted to a single browse tab.
 
     Instead of fetching all 64,000+ entities across all categories, this
@@ -181,7 +183,7 @@ def get_browse_tab_data(
     entities = db_entities.get_entities_list(where_sql, tuple(params))
 
     # Geometries are only used by tabs with map views (places, items)
-    if tab_name in ('places', 'items'):
+    if include_geometries and tab_name in ('places', 'items'):
         geometries = db_entities.get_geometries(where_sql, tuple(params))
     else:
         geometries = {'type': 'FeatureCollection', 'features': []}
@@ -268,7 +270,7 @@ def get_entities(tab_name: str) -> str:
 
     Returns the HTML segment corresponding to the specified browse tab.
     """
-    tab_data = get_browse_tab_data(tab_name)
+    tab_data = get_browse_tab_data(tab_name, include_geometries=False)
     tab_classes = app.config['VIEW_CLASSES'].get(tab_name, ())
     full_tree = type_tree().get_json()
     tab_tree = {
@@ -279,3 +281,24 @@ def get_entities(tab_name: str) -> str:
         tab_name=tab_name,
         tab_data=tab_data,
         typetree_data=tab_tree)
+
+
+@app.route('/api/browse/<tab_name>/geometries')
+def api_browse_geometries(tab_name: str) -> Response:
+    """Return GeoJSON FeatureCollection for a specific browse tab.
+
+    Loads geometries on-demand only when a user switches to map view,
+    preventing large GeoJSON payloads from blocking initial tab rendering.
+    """
+    if tab_name not in ('places', 'items'):
+        abort(404)
+
+    entity_id = request.args.get('entity_id', 0, type=int)
+    class_names = app.config['VIEW_CLASSES'].get(tab_name, ())
+    filter_res = _build_browse_filter(entity_id, extra_classes=class_names)
+    if filter_res is None:
+        return jsonify({'type': 'FeatureCollection', 'features': []})
+
+    where_sql, params, _ = filter_res
+    geometries = db_entities.get_geometries(where_sql, tuple(params))
+    return jsonify(geometries)

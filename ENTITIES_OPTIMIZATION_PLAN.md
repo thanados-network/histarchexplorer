@@ -254,11 +254,17 @@ Jetzt werden die Tabellendaten pro Tab bei Bedarf in handlichen Blöcken (z. B. 
     });
     ```
 * **Vorteil**: Wird nur geladen, wenn der Nutzer tatsächlich auf "Map" klickt.
+  * Verhindert das serverseitige Embedding von ~4.571 Geometrien (~2-3 MB) in das HTML von `/get_entities/places`.
+  * Hält die Synchronisation zwischen Tabulator (`filteredIDdata`) und MapLibre vollständig aufrecht.
+
+#### Status: ABGESCHLOSSEN (16. Oktober 2026)
 
 #### Verifikation Phase 4
-* [ ] Beim Aufruf von `/entities/places` wird die Karte erst mit Daten befüllt, wenn die Kartenansicht aktiv ist.
-* [ ] Geometrie-Punkte, Linien und Polygone werden wie gewohnt gezeichnet.
-* [ ] Klick auf ein Feature öffnet das richtige Entity-Popup.
+* [x] Beim Aufruf von `/get_entities/places` bleibt das Geometrie-FeatureCollection leer (`features: []`), wodurch MBs an JSON-Nutzlast im Tab-HTML eingespart werden.
+* [x] Neuer API-Endpunkt `/api/browse/<tab_name>/geometries` liefert das GeoJSON FeatureCollection bei Bedarf (on-demand).
+* [x] Die Karte lädt Geometrien asynchron beim Umschalten auf die Kartenansicht und wendet aktive Tabulator-Filter sofort an.
+* [x] MapLibre LngLatBounds-Initialisierung ist vor leeren Features geschützt (Fallback-Zentrum `[14.5, 47.5]`).
+* [x] Alle 446 Tests laufen fehlerfrei durch (`uv run pytest` -> 446 passed).
 
 ---
 

@@ -225,3 +225,66 @@ def test_phase1_map_on_demand_initialization(
     items_html = rv_items.data.decode('utf-8')
     assert 'function initMapitems()' in items_html
     assert 'let mapitems = null;' in items_html
+
+
+def test_get_browse_tab_data_without_geometries() -> None:
+    """Verify include_geometries=False returns empty FeatureCollection."""
+    with auth_request_context('/entities'):
+        tab_data = get_browse_tab_data('places', include_geometries=False)
+        assert isinstance(tab_data, dict)
+        assert 'geometries' in tab_data
+        assert tab_data['geometries']['type'] == 'FeatureCollection'
+        assert tab_data['geometries']['features'] == []
+        assert len(tab_data['entities']) > 0
+
+
+def test_api_browse_geometries_places_contract(
+        authenticated_client: FlaskClient) -> None:
+    """Verify places geometries endpoint returns GeoJSON FeatureCollection."""
+    rv = authenticated_client.get('/api/browse/places/geometries')
+    assert rv.status_code == 200
+    assert 'application/json' in rv.content_type
+    data = rv.get_json()
+    assert isinstance(data, dict)
+    assert data.get('type') == 'FeatureCollection'
+    features = data.get('features')
+    assert isinstance(features, list)
+    assert len(features) > 0
+    feature = features[0]
+    assert feature.get('type') == 'Feature'
+    assert 'geometry' in feature
+    assert 'properties' in feature
+    assert feature['properties']['class'] in (
+        'place', 'feature', 'stratigraphic_unit')
+
+
+def test_api_browse_geometries_items_contract(
+        authenticated_client: FlaskClient) -> None:
+    """Verify items geometries endpoint returns GeoJSON FeatureCollection."""
+    rv = authenticated_client.get('/api/browse/items/geometries')
+    assert rv.status_code == 200
+    assert 'application/json' in rv.content_type
+    data = rv.get_json()
+    assert isinstance(data, dict)
+    assert data.get('type') == 'FeatureCollection'
+    assert isinstance(data.get('features'), list)
+
+
+def test_api_browse_geometries_invalid_tab_returns_404(
+        authenticated_client: FlaskClient) -> None:
+    """Verify non-map tabs return 404 for geometries API."""
+    rv = authenticated_client.get('/api/browse/actors/geometries')
+    assert rv.status_code == 404
+
+
+def test_get_entities_places_payload_reduced(
+        authenticated_client: FlaskClient) -> None:
+    """Verify /get_entities/places omits geometries reducing payload size."""
+    rv = authenticated_client.get('/get_entities/places')
+    assert rv.status_code == 200
+    html = rv.data.decode('utf-8')
+    assert 'loadGeometriesplaces' in html
+    assert '/api/browse/places/geometries' in html
+    assert '"geometries": {"features": [], "type": "FeatureCollection"}' in (
+        html)
+
