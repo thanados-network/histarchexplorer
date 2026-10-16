@@ -29,6 +29,18 @@
   .fade:not(.show) {
     display: none;
   }
+
+  .tab-pane {
+    height: 100%;
+  }
+
+  #tab-pane-catalogue,
+  #tab-pane-overview,
+  #tab-pane-media,
+  #tab-pane-feature {
+    height: 100%;
+    overflow-y: auto;
+  }
 }
 
 #nav-sidebar {
