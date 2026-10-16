@@ -170,13 +170,23 @@
   }
 
   // Page calc
-  const allFilteredData = filteredData{{ tab_name }};
   const pageSize = table{{ tab_name }}.getPageSize();
   const currentPage = table{{ tab_name }}.getPage();
-  const totalPages = Math.max(1, Math.ceil(allFilteredData.length / pageSize));
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, allFilteredData.length);
-  const currentPageData = allFilteredData.slice(startIndex, endIndex);
+  let currentPageData;
+  let totalPages;
+
+  if (table{{ tab_name }}.options && table{{ tab_name }}.options.paginationMode === "remote") {
+    currentPageData = table{{ tab_name }}.getData();
+    totalPages = (typeof table{{ tab_name }}.getPageMax === 'function')
+      ? table{{ tab_name }}.getPageMax()
+      : 1;
+  } else {
+    const allFilteredData = filteredData{{ tab_name }} || [];
+    totalPages = Math.max(1, Math.ceil(allFilteredData.length / pageSize));
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, allFilteredData.length);
+    currentPageData = allFilteredData.slice(startIndex, endIndex);
+  }
 
   // Build nodes for real items
   const newNodes = currentPageData.map(item => createGridItem{{ tab_name }}(item));
@@ -357,12 +367,23 @@
         const paginationContainer = document.getElementById('tile-pagination-{{ tab_name }}');
         if (!paginationContainer) return;
 
-        // Use tracked filtered data
-        const totalData = filteredData{{ tab_name }}.length;
+        let totalData;
+        let totalPages;
         const pageSize = table{{ tab_name }}.getPageSize();
         theCurrentPage = table{{ tab_name }}.getPage();
         const currentPage = theCurrentPage;
-        const totalPages = Math.ceil(totalData / pageSize);
+
+        if (table{{ tab_name }}.options && table{{ tab_name }}.options.paginationMode === "remote") {
+            totalData = (typeof window.{{ tab_name }}TotalCount === 'number')
+                ? window.{{ tab_name }}TotalCount
+                : table{{ tab_name }}.getDataCount();
+            totalPages = (typeof table{{ tab_name }}.getPageMax === 'function')
+                ? table{{ tab_name }}.getPageMax()
+                : Math.max(1, Math.ceil(totalData / pageSize));
+        } else {
+            totalData = (filteredData{{ tab_name }} || []).length;
+            totalPages = Math.max(1, Math.ceil(totalData / pageSize));
+        }
 
         const startItem = ((currentPage - 1) * pageSize) + 1;
         const endItem = Math.min(currentPage * pageSize, totalData);
@@ -439,6 +460,15 @@
         // If grid exists, refresh it with current page data
         if (grid{{ tab_name }}) {
             populateGridWithData{{ tab_name }}();
+        }
+    });
+
+    table{{ tab_name }}.on("dataLoaded", function (data) {
+        tileContainer{{tab_name}} = document.getElementById('tile-{{ tab_name }}');
+        const tileVisible = tileContainer{{tab_name}} && !tileContainer{{tab_name}}.classList.contains('d-none');
+        if (grid{{ tab_name }} && tileVisible) {
+            populateGridWithData{{ tab_name }}();
+            createTilePagination{{ tab_name }}();
         }
     });
 

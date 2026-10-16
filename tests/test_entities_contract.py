@@ -12,8 +12,10 @@ import pytest
 from flask.testing import FlaskClient
 
 from histarchexplorer import app
+from histarchexplorer.database import entities as db_entities
 from histarchexplorer.models.settings import Settings
 from histarchexplorer.views.entities import (
+    _build_browse_filter,
     get_browse_list_entities,
     get_browse_metadata,
     get_browse_tab_data)
@@ -225,3 +227,70 @@ def test_phase1_map_on_demand_initialization(
     items_html = rv_items.data.decode('utf-8')
     assert 'function initMapitems()' in items_html
     assert 'let mapitems = null;' in items_html
+
+
+def test_get_entities_page_contract() -> None:
+    """Verify get_entities_page returns paginated entities and count."""
+    with auth_request_context('/entities'):
+        filter_res = _build_browse_filter(0, extra_classes=['place'])
+        assert filter_res is not None
+        where_sql, params, _ = filter_res
+
+        entities, total = db_entities.get_entities_page(
+            where_sql, tuple(params), limit=5, offset=0)
+        assert isinstance(entities, list)
+        assert isinstance(total, int)
+        assert len(entities) == 5
+        assert total >= 5
+        first = entities[0]
+        for field in ('id', 'name', 'class'):
+            assert field in first
+
+
+def test_get_distinct_dates_contract() -> None:
+    """Verify get_distinct_dates returns unique begin and end strings."""
+    with auth_request_context('/entities'):
+        filter_res = _build_browse_filter(0, extra_classes=['place'])
+        assert filter_res is not None
+        where_sql, params, _ = filter_res
+
+        begins, ends = db_entities.get_distinct_dates(
+            where_sql, tuple(params))
+        assert isinstance(begins, list)
+        assert isinstance(ends, list)
+        assert len(begins) > 0
+
+
+def test_api_browse_tab_contract(
+        authenticated_client: FlaskClient) -> None:
+    """Verify /api/browse/<tab_name> returns valid Tabulator JSON payload."""
+    rv = authenticated_client.get('/api/browse/places?page=1&size=10')
+    assert rv.status_code == 200
+    assert 'application/json' in rv.content_type
+    data = rv.get_json()
+    assert data is not None
+    assert 'data' in data
+    assert 'total' in data
+    assert 'last_page' in data
+    assert len(data['data']) == 10
+    assert data['total'] > 10
+    assert data['last_page'] >= 1
+
+    # Search filter
+    rv_s = authenticated_client.get(
+        '/api/browse/places?page=1&size=10&query=Wien')
+    assert rv_s.status_code == 200
+    data_s = rv_s.get_json()
+    assert data_s is not None
+    assert data_s['total'] <= data['total']
+
+
+def test_tabulator_remote_pagination_configured(
+        authenticated_client: FlaskClient) -> None:
+    """Verify Tabulator uses remote pagination mode and browse API URL."""
+    rv = authenticated_client.get('/get_entities/places')
+    assert rv.status_code == 200
+    html = rv.data.decode('utf-8')
+    assert 'paginationMode: "remote"' in html
+    assert '/api/browse/places' in html
+    assert 'buildBrowseApiUrlplaces' in html

@@ -1,6 +1,8 @@
+import math
 from typing import Any
 
-from flask import abort, g, render_template
+from flask import (
+    abort, g, jsonify, render_template, request, Response)
 
 from histarchexplorer import app
 from histarchexplorer.database import entities as db_entities
@@ -163,11 +165,14 @@ def get_browse_list_entities(
 
 def get_browse_tab_data(
         tab_name: str,
-        id_: int = 0) -> dict[str, Any]:
+        id_: int = 0,
+        limit: int | None = None) -> dict[str, Any]:
     """Fetch entity and geometry records restricted to a single browse tab.
 
     Instead of fetching all 64,000+ entities across all categories, this
     loads only the entities belonging to the requested tab category.
+    When limit is specified, it returns a fast lightweight page 1 payload
+    accompanied by category metadata and distinct timeline dates.
     """
     class_names = app.config['VIEW_CLASSES'].get(tab_name, ())
     filter_res = _build_browse_filter(id_, extra_classes=class_names)
@@ -175,10 +180,14 @@ def get_browse_tab_data(
         return {
             'entities': [],
             'geometries': {'type': 'FeatureCollection', 'features': []},
-            'cs_ids': []}
+            'cs_ids': [],
+            'classes': [],
+            'fields': [],
+            'distinct_begins': [],
+            'distinct_ends': [],
+            'total': 0}
 
     where_sql, params, data = filter_res
-    entities = db_entities.get_entities_list(where_sql, tuple(params))
 
     # Geometries are only used by tabs with map views (places, items)
     if tab_name in ('places', 'items'):
@@ -190,25 +199,60 @@ def get_browse_tab_data(
     if shown_case_studies := data['shown case studies']:
         cs_infos = db_entities.get_case_study_infos(
             g.language, g.settings.preferred_language)
-        for case_study in shown_case_studies:
-            ids = db_entities.get_case_study_ids(case_study)
-            if ids:
-                cs = {'id': case_study, 'ids': ids}
-                for row in cs_infos:
-                    if row['cs_id'] == cs['id']:
-                        if row['name']:
-                            cs['name'] = row['name']
-                            cs['acronym'] = row['name']
-                        if row['acronym']:
-                            cs['acronym'] = row['acronym']
-                        if row['description']:
-                            cs['description'] = row['description']
-                cs_ids.append(cs)
+        matching_cs = db_entities.get_matching_case_study_ids(
+            where_sql, tuple(params), shown_case_studies)
+        for cs_id in matching_cs:
+            row = next(
+                (r for r in cs_infos if r['cs_id'] == cs_id), None)
+            cs: dict[str, Any] = {'id': cs_id, 'ids': []}
+            if row:
+                if row['name']:
+                    cs['name'] = row['name']
+                    cs['acronym'] = row['name']
+                if row['acronym']:
+                    cs['acronym'] = row['acronym']
+                if row['description']:
+                    cs['description'] = row['description']
+            cs_ids.append(cs)
+
+    # Active classes for this tab
+    class_counts = db_entities.get_class_counts(where_sql, tuple(params))
+    classes = [
+        row['openatlas_class_name'] for row in class_counts
+        if row['count'] > 0]
+    total_count = sum(row['count'] for row in class_counts)
+
+    # Fields supported for this tab category
+    if tab_name in ('places', 'items', 'features'):
+        fields = [
+            'id', 'name', 'description', 'class', 'type', 'begin', 'end']
+    elif tab_name in ('actors', 'events'):
+        fields = ['id', 'name', 'description', 'class', 'begin', 'end']
+    else:
+        fields = ['id', 'name', 'description', 'class']
+
+    # Distinct dates for timeline sliders
+    if 'begin' in fields or 'end' in fields:
+        begins, ends = db_entities.get_distinct_dates(
+            where_sql, tuple(params))
+    else:
+        begins, ends = [], []
+
+    if limit is not None:
+        entities, _ = db_entities.get_entities_page(
+            where_sql, tuple(params), limit=limit, offset=0)
+    else:
+        entities = db_entities.get_entities_list(where_sql, tuple(params))
 
     return {
         'entities': entities,
         'geometries': geometries,
-        'cs_ids': cs_ids}
+        'cs_ids': cs_ids,
+        'classes': classes,
+        'fields': fields,
+        'distinct_begins': begins,
+        'distinct_ends': ends,
+        'total': total_count}
 
 
 def return_entities(tab_name: str | None, id_: int | None) -> str:
@@ -262,13 +306,94 @@ def entities(tab_name: str | None = None, id_: int | None = None) -> str:
     return return_entities(tab_name, id_)
 
 
+@app.route('/api/browse/<tab_name>')
+def api_browse_tab(tab_name: str) -> Response:
+    """Return paginated entity records formatted for remote Tabulator.
+
+    Accepts page, size, sorting, fulltext query, and optional filter
+    parameters (classes, types, entity IDs, parent entity ID).
+    """
+    page = request.args.get('page', 1, type=int)
+    size = request.args.get('size', 50, type=int)
+    if page < 1:
+        page = 1
+    if size < 1:
+        size = 50
+    elif size > 200:
+        size = 200
+
+    sort_field = request.args.get('sort_field')
+    sort_dir = request.args.get('sort_dir', 'asc')
+    search_term = request.args.get('query', '').strip() or None
+    id_ = request.args.get('id', 0, type=int)
+
+    classes_param = request.args.get('classes', '').strip()
+    if classes_param:
+        target_classes = [
+            c.strip() for c in classes_param.split(',') if c.strip()]
+    else:
+        target_classes = list(app.config['VIEW_CLASSES'].get(tab_name, ()))
+
+    filter_res = _build_browse_filter(id_, extra_classes=target_classes)
+    if filter_res is None:
+        return jsonify({'data': [], 'total': 0, 'last_page': 1})
+
+    where_sql, params, _ = filter_res
+    effective_params: list[Any] = list(params)
+    effective_clauses: list[str] = []
+
+    types_param = request.args.get('types', '').strip()
+    if types_param:
+        type_ids = [
+            int(t) for t in types_param.split(',')
+            if t.strip().lstrip('-').isdigit()]
+        if type_ids:
+            effective_clauses.append(
+                "e.id IN (SELECT a.id FROM model.entity a "
+                "JOIN model.link b ON a.id = b.domain_id "
+                "WHERE b.property_code = 'P2' AND b.range_id = ANY (%s))")
+            effective_params.append(type_ids)
+
+    entity_ids_param = request.args.get('entity_ids', '').strip()
+    if entity_ids_param:
+        ent_ids = [
+            int(i) for i in entity_ids_param.split(',')
+            if i.strip().lstrip('-').isdigit()]
+        if ent_ids:
+            effective_clauses.append("e.id = ANY (%s)")
+            effective_params.append(ent_ids)
+
+    if effective_clauses:
+        extra_sql = " AND ".join(effective_clauses)
+        if where_sql:
+            where_sql = f"{where_sql} AND {extra_sql}"
+        else:
+            where_sql = f"WHERE {extra_sql}"
+
+    offset = (page - 1) * size
+    entities, total_count = db_entities.get_entities_page(
+        where_sql,
+        tuple(effective_params),
+        limit=size,
+        offset=offset,
+        sort_field=sort_field,
+        sort_dir=sort_dir,
+        search_term=search_term)
+
+    last_page = max(1, math.ceil(total_count / size))
+    return jsonify({
+        'data': entities,
+        'total': total_count,
+        'last_page': last_page})
+
+
 @app.route('/get_entities/<tab_name>')
 def get_entities(tab_name: str) -> str:
     """Render the partial tab template for AJAX loading of browse results.
 
     Returns the HTML segment corresponding to the specified browse tab.
     """
-    tab_data = get_browse_tab_data(tab_name)
+    tab_data = get_browse_tab_data(tab_name, limit=50)
     tab_classes = app.config['VIEW_CLASSES'].get(tab_name, ())
     full_tree = type_tree().get_json()
     tab_tree = {

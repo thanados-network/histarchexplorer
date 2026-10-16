@@ -813,9 +813,13 @@ function applyCombinedFilter{{ tab_name }}() {
 }
 
 
-// Filter input event listener
+// Filter input event listener with debounce
+let filterInputTimeout{{ tab_name }} = null;
 filterInput{{ tab_name }}.addEventListener("input", function () {
-    applyCombinedFilter{{ tab_name }}();
+    clearTimeout(filterInputTimeout{{ tab_name }});
+    filterInputTimeout{{ tab_name }} = setTimeout(function () {
+        applyCombinedFilter{{ tab_name }}();
+    }, 250);
 });
 
 
