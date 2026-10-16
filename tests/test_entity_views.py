@@ -47,7 +47,7 @@ def test_entity_view(authenticated_client: FlaskClient) -> None:
 
 def test_entities_view(authenticated_client: FlaskClient) -> None:
     db_patch = patch(
-        'histarchexplorer.database.entities.get_entities_page')
+        'histarchexplorer.database.entities.get_entities_list')
     settings_patch = patch(
         'histarchexplorer.models.settings.Settings.load_from_db')
     with db_patch as mock_get, settings_patch as mock_settings:
@@ -55,9 +55,9 @@ def test_entities_view(authenticated_client: FlaskClient) -> None:
         settings.access_restriction = False
         mock_settings.return_value = settings
 
-        mock_get.return_value = ([
+        mock_get.return_value = [
             {"id": 1, "title": "E1", "class": "place", "type": None,
-             "name": "E1", "description": "", "begin": None, "end": None}], 1)
+             "name": "E1", "description": "", "begin": None, "end": None}]
         rv = authenticated_client.get('/get_entities/places')
         assert rv.status_code == 200
         assert b'E1' in rv.data

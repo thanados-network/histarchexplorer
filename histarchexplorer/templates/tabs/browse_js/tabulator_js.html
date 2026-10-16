@@ -178,17 +178,16 @@
     ];
 
     function update{{ tab_name }}Counter() {
-        const total = (typeof window.{{ tab_name }}TotalCount === 'number')
-            ? window.{{ tab_name }}TotalCount
-            : table{{ tab_name }}.getDataCount();
+        const total = table{{ tab_name }}.getDataCount();
+        const visible = table{{ tab_name }}.getDataCount("active");
+
         const el = document.getElementById("{{ tab_name }}-subcount");
-        if (el && total !== undefined) {
-            el.textContent = ` (${total})`;
+        if (el) {
+            el.textContent = ` (${visible} of ${total})`;
         }
     }
 
-    {% if subunits %}
-    const tabulatorConfig{{ tab_name }} = {
+    const table{{ tab_name }} = new Tabulator("#table-{{ tab_name }}", {
         layout: "fitColumns",
         responsiveLayout: "collapse",
         height: "calc( 100vh - 100px - 4rem)",
@@ -198,123 +197,12 @@
         paginationSizeSelector: [20, 50, 100],
         columns: columns{{ tab_name }},
         initialSort: [
-            { column: "name", dir: "asc" }
+        { column: "name", dir: "asc" }
         ],
         dataLoaded: function () {
             update{{ tab_name }}Counter();
-        }
-    };
-    {% else %}
-    function buildBrowseApiUrl{{ tab_name }}(url, params) {
-        const urlObj = new URL(url, window.location.origin);
-        urlObj.searchParams.set("page", params.page || 1);
-        urlObj.searchParams.set("size", params.size || 50);
-
-        if (params.sorters && params.sorters.length > 0) {
-            const col = params.sorters[0].field || params.sorters[0].column;
-            const dir = params.sorters[0].dir || "asc";
-            urlObj.searchParams.set("sort_field", col);
-            urlObj.searchParams.set("sort_dir", dir);
-        }
-
-        if (params.filter && Array.isArray(params.filter)) {
-            params.filter.forEach(f => {
-                if (Array.isArray(f)) {
-                    f.forEach(sf => {
-                        if (sf.field === "beginDBP" && sf.type === ">=") {
-                            urlObj.searchParams.set("begin_min", sf.value);
-                        }
-                        if (sf.field === "beginDBP" && sf.type === "<=") {
-                            urlObj.searchParams.set("begin_max", sf.value);
-                        }
-                        if (sf.field === "endDBP" && sf.type === ">=") {
-                            urlObj.searchParams.set("end_min", sf.value);
-                        }
-                        if (sf.field === "endDBP" && sf.type === "<=") {
-                            urlObj.searchParams.set("end_max", sf.value);
-                        }
-                    });
-                } else if (f && f.field) {
-                    if (f.field === "all") {
-                        urlObj.searchParams.set("query", f.value);
-                    } else if (f.field === "class") {
-                        const val = Array.isArray(f.value) ? f.value.join(",") : f.value;
-                        urlObj.searchParams.set("classes", val);
-                    } else if (f.field === "type_id") {
-                        const val = Array.isArray(f.value) ? f.value.join(",") : f.value;
-                        urlObj.searchParams.set("types", val);
-                    } else if (f.field === "id") {
-                        const val = Array.isArray(f.value) ? f.value.join(",") : f.value;
-                        urlObj.searchParams.set("entity_ids", val);
-                    } else if (f.field === "beginDBP") {
-                        if (f.type === ">=") urlObj.searchParams.set("begin_min", f.value);
-                        if (f.type === "<=") urlObj.searchParams.set("begin_max", f.value);
-                    } else if (f.field === "endDBP") {
-                        if (f.type === ">=") urlObj.searchParams.set("end_min", f.value);
-                        if (f.type === "<=") urlObj.searchParams.set("end_max", f.value);
-                    }
-                }
-            });
-        }
-        return urlObj.toString();
-    }
-
-    function handleBrowseApiResponse{{ tab_name }}(response) {
-        if (!response) return { data: [], last_page: 1 };
-
-        if (typeof response.total === "number") {
-            window.{{ tab_name }}TotalCount = response.total;
-            const subcountEl = document.getElementById("{{ tab_name }}-subcount");
-            if (subcountEl) {
-                subcountEl.textContent = ` (${response.total})`;
-            }
-        }
-
-        if (response.data && Array.isArray(response.data)) {
-            response.data.forEach(entity => {
-                entity.beginDBP = calculateTimeBP(entity.begin);
-                entity.endDBP = calculateTimeBP(entity.end);
-                if (entity.begin) entity.beginString = makeLocalDate(entity.begin).localdate;
-                if (entity.end) entity.endString = makeLocalDate(entity.end).localdate;
-
-                entity.all = [entity.description, entity.class, entity.type, entity.name]
-                    .filter(v => v !== null && v !== undefined && v !== '')
-                    .map(v => v.replace(/[\r\n]+/g, ' '))
-                    .join(' ');
-            });
-        }
-
-        return {
-            data: response.data || [],
-            last_page: response.last_page || 1
-        };
-    }
-
-    const tabulatorConfig{{ tab_name }} = {
-        layout: "fitColumns",
-        responsiveLayout: "collapse",
-        height: "calc( 100vh - 100px - 4rem)",
-        pagination: true,
-        paginationMode: "remote",
-        filterMode: "remote",
-        sortMode: "remote",
-        paginationSize: 50,
-        paginationSizeSelector: [20, 50, 100],
-        ajaxURL: "/api/browse/{{ tab_name }}{% if entity_id %}?id={{ entity_id }}{% endif %}",
-        ajaxURLGenerator: function(url, config, params) {
-            return buildBrowseApiUrl{{ tab_name }}(url, params);
         },
-        ajaxResponse: function(url, params, response) {
-            return handleBrowseApiResponse{{ tab_name }}(response);
-        },
-        columns: columns{{ tab_name }},
-        initialSort: [
-            { column: "name", dir: "asc" }
-        ]
-    };
-    {% endif %}
-
-    const table{{ tab_name }} = new Tabulator("#table-{{ tab_name }}", tabulatorConfig{{ tab_name }});
+    });
 
     table{{ tab_name }}.on("dataFiltered", update{{ tab_name }}Counter);
     table{{ tab_name }}.on("dataSorted", update{{ tab_name }}Counter);

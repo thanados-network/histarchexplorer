@@ -226,14 +226,11 @@ Jetzt werden die Tabellendaten pro Tab bei Bedarf in handlichen Blöcken (z. B. 
 #### 3.4 Kachelansicht (Muuri) paginieren
 * `tiles_js.html` liest die Daten der aktuellen Seite von Tabulator (`table.getData()`) und rendert weiterhin nur 50 Kacheln.
 
-#### Status: ABGESCHLOSSEN (16. Oktober 2026)
-
 #### Verifikation Phase 3
-* [x] Tabulator paginiert sauber remote: Klick auf Seite 2 lädt Zeilen 51–100 via `/api/browse/<tab_name>` in ~200 ms.
-* [x] Volltextsuche und Filter senden Request an Server und filtern direkt in PostgreSQL in ~200 ms.
-* [x] Kachelansicht zeigt Daten der aktuellen Seite und paginiert synchron via Tabulator.
-* [x] Der V8-Heap im Browser bleibt minimal: Tabellendaten werden in 50er-Blöcken (< 40 KB JSON) statt als 25.000 JS-Objekte ausgeliefert.
-* [x] Alle 445 Tests laufen erfolgreich durch (`uv run pytest` -> 445 passed).
+* [ ] Tabulator paginiert sauber: Klick auf Seite 2 lädt Zeilen 51–100.
+* [ ] Volltextsuche und Filter im Tabulator senden Request an Server und zeigen korrekte Treffer.
+* [ ] Kachelansicht zeigt Bilder der aktuellen Seite.
+* [ ] Der V8-Heap im Browser bleibt konstant bei **< 50 MB** für Tabellendaten.
 
 ---
 

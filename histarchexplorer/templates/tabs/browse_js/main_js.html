@@ -112,69 +112,46 @@ if ('{{ tab_name }}' == 'subunits') {
     );
 }
 
-{{ tab_name }}Data.fields = (typeof tabData{{ tab_name }} !== 'undefined' && tabData{{ tab_name }}.fields)
-    ? tabData{{ tab_name }}.fields
-    : getKeysWithValues({{ tab_name }}Data.tableData);
+{{ tab_name }}Data.fields = getKeysWithValues({{ tab_name }}Data.tableData)
+{{ tab_name }}Data.classes = [...new Set({{ tab_name }}Data.tableData.map(item => item.class))];
 
-{{ tab_name }}Data.classes = (typeof tabData{{ tab_name }} !== 'undefined' && tabData{{ tab_name }}.classes)
-    ? tabData{{ tab_name }}.classes
-    : [...new Set({{ tab_name }}Data.tableData.map(item => item.class))];
+{{ tab_name }}Data.timelineBegin = getSortedDistinctTimeline({{ tab_name }}Data.tableData, "beginString", "beginDBP");
+{{ tab_name }}Data.timelineEnd = getSortedDistinctTimeline({{ tab_name }}Data.tableData, "endString", "endDBP");
 
-if (typeof tabData{{ tab_name }} !== 'undefined' && tabData{{ tab_name }}.distinct_begins) {
-    {{ tab_name }}Data.timelineBegin = tabData{{ tab_name }}.distinct_begins.map(s => ({
-        string: makeLocalDate(s).localdate,
-        number: calculateTimeBP(s)
-    })).sort((a, b) => a.number - b.number);
-} else {
-    {{ tab_name }}Data.timelineBegin = getSortedDistinctTimeline(
-        {{ tab_name }}Data.tableData, "beginString", "beginDBP");
+const {{ tab_name }}Ids = new Set({{ tab_name }}Data.tableData.map(item => item.id));
+
+const {{ tab_name }}csMap = new Map();
+for (const csObject of (data?.cs_ids || [])) {
+    {{ tab_name }}csMap.set(csObject.id, csObject);
 }
 
-if (typeof tabData{{ tab_name }} !== 'undefined' && tabData{{ tab_name }}.distinct_ends) {
-    {{ tab_name }}Data.timelineEnd = tabData{{ tab_name }}.distinct_ends.map(s => ({
-        string: makeLocalDate(s).localdate,
-        number: calculateTimeBP(s)
-    })).sort((a, b) => a.number - b.number);
-} else {
-    {{ tab_name }}Data.timelineEnd = getSortedDistinctTimeline(
-        {{ tab_name }}Data.tableData, "endString", "endDBP");
-}
-
-if (typeof tabData{{ tab_name }} !== 'undefined' &&
-    tabData{{ tab_name }}.cs_ids && tabData{{ tab_name }}.cs_ids.length > 0) {
-    {{ tab_name }}Data.caseStudies = tabData{{ tab_name }}.cs_ids.map(cs => ({
-        id: cs.id,
-        name: cs.name,
-        acronym: cs.acronym || null,
-        description: cs.description || null
-    }));
-} else {
-    const {{ tab_name }}Ids = new Set({{ tab_name }}Data.tableData.map(item => item.id));
-    const {{ tab_name }}csMap = new Map();
-    for (const csObject of (data?.cs_ids || [])) {
-        {{ tab_name }}csMap.set(csObject.id, csObject);
-    }
-    const {{ tab_name }}matchingCsIds = new Set();
-    for (const csObject of (data?.cs_ids || [])) {
-        const individualEntityIds = csObject.ids.flat();
-        for (const entityId of individualEntityIds) {
-            if ({{ tab_name }}Ids.has(Number(entityId))) {
-                {{ tab_name }}matchingCsIds.add(csObject.id);
-                break;
-            }
-        }
-    }
+if (!{{ tab_name }}Data.caseStudies) {
     {{ tab_name }}Data.caseStudies = [];
-    for (const csId of {{ tab_name }}matchingCsIds) {
-        const csObject = {{ tab_name }}csMap.get(csId);
-        if (csObject) {
-            {{ tab_name }}Data.caseStudies.push({
-                id: csObject.id,
-                name: csObject.name,
-                acronym: csObject.acronym || null,
-                description: csObject.description || null
-            });
+}
+const {{ tab_name }}matchingCsIds = new Set();
+
+for (const csObject of (data?.cs_ids || [])) {
+    const individualEntityIds = csObject.ids.flat();
+    for (const entityId of individualEntityIds) {
+        if ({{ tab_name }}Ids.has(Number(entityId))) {
+            {{ tab_name }}matchingCsIds.add(csObject.id);
+            break;
         }
+    }
+}
+
+{{ tab_name }}Data.caseStudies = [];
+
+for (const csId of {{ tab_name }}matchingCsIds) {
+    const csObject = {{ tab_name }}csMap.get(csId);
+
+    if (csObject) {
+        {{ tab_name }}Data.caseStudies.push({
+            id: csObject.id,
+            name: csObject.name,
+            acronym: csObject.acronym || null,
+            description: csObject.description || null // Description is optional
+        });
     }
 }
 
