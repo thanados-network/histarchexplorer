@@ -45,6 +45,12 @@ function {{tab_name}}ToggleView(view) {
         } else {
             if (styleSidebar) styleSidebar.classList.remove('d-none');
             if (styleBackdrop) styleBackdrop.classList.remove('d-none');
+            // Auto-open on large screens when switching to map view
+            if (window.innerWidth >= 1200) {
+                if (typeof openStyleSidebar{{ tab_name }} === 'function') {
+                    openStyleSidebar{{ tab_name }}();
+                }
+            }
         }
     {% endif %}
 

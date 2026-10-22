@@ -173,6 +173,13 @@
             this._container = document.createElement('div');
             this._container.className =
                 'maplibregl-ctrl maplibregl-ctrl-group';
+
+            // Initially hide if sidebar is already open (e.g. auto-opened)
+            const sidebar = document.getElementById('style-sidebar-{{ tab_name }}');
+            if (sidebar && sidebar.classList.contains('open')) {
+                this._container.classList.add('d-none');
+            }
+
             this._container.appendChild(this._btn);
             return this._container;
         }
