@@ -219,9 +219,16 @@
     }
 
     function refreshLayerListSvg{{ tab_name }}(type) {
-        updateLayerSvg{{ tab_name }}(type);
+        const sel = document.getElementById('multi-color-select-{{ tab_name }}');
+        const tree = {{ tab_name }}Data.treeData;
+        const hasTree = tree && Object.keys(tree).length > 0;
+        const mode = (sel && sel.value) || (hasTree ? 'type' : 'class');
+
         const def = layerDefs{{ tab_name }}.find(d => d.type === type);
         if (!def) { return; }
+
+        def.svg = makeMultiLayerSvg{{ tab_name }}(type, mode);
+        
         const list = document.getElementById(
             'layer-list-{{ tab_name }}');
         list.querySelectorAll('.layer-info-btn').forEach(span => {
@@ -317,6 +324,8 @@
                     'layer-style-modal-{{ tab_name }}');
                 const bsModal = bootstrap.Modal.getOrCreateInstance(modal);
                 modal.dataset.layerType = def.type;
+                multiCurrentLayerType{{ tab_name }} = def.type;
+                buildMultiSharedOpts{{ tab_name }}(def.type);
                 bsModal.show();
             });
 
@@ -347,6 +356,8 @@
                         buildMultiClassList{{ tab_name }}(def.type, legendList);
                     }
                 }
+                // Ensure map reflects visibility and colors
+                applyLayerVisibility{{ tab_name }}();
             });
 
             legendList.addEventListener('hide.bs.collapse', () => {
@@ -367,7 +378,7 @@
             fragment.appendChild(li);
         });
 
-        list.appendChild(fragment);
+        if (list) list.appendChild(fragment);
     }
 
     function buildClassGeomKey(cls, geomCat) {
@@ -411,6 +422,7 @@
         cachedFilteredFeatures{{ tab_name }} = filteredFeatures;
         const pane = document.getElementById(
             'pane-overview-{{ tab_name }}');
+        if (!pane) return;
         const { total, filtered } = getOverviewStats{{ tab_name }}(
             allFeatures, filteredFeatures, geomTypeFilter);
         const keys = Object.keys(total).sort();
@@ -477,9 +489,6 @@
                     // Apply individual filters for classes/types
                     let filter = ['all'];
                     
-                    // Always respect the global ID filter if it exists (it's handled elsewhere but good to be safe)
-                    // Actually, the main source is already filtered by IDs.
-                    
                     if (mode === 'class') {
                         if (hiddenClasses{{ tab_name }}.size > 0) {
                             const validClasses = [...hiddenClasses{{ tab_name }}].filter(c => c !== null && c !== undefined);
@@ -520,8 +529,6 @@
                         }
                     } else {
                         try {
-                            // Some versions of MapLibre/Mapbox might prefer a neutral filter over null
-                            // for certain layer types if an error persists.
                             m.setFilter(layerId, null);
                         } catch (e) {
                             console.error('Error clearing filter for layer ' + layerId, e);
@@ -530,113 +537,31 @@
                 }
             });
         });
+        // Ensure colors are correct when visibility changes
+        const types = ['Point', 'Polygon', 'LineString'];
+        types.forEach(t => {
+            multiCurrentLayerType{{ tab_name }} = t;
+            applyMultiColor{{ tab_name }}(mode);
+        });
+        multiCurrentLayerType{{ tab_name }} = null;
     }
 </script>
 
 <div class="modal fade layer-style-modal" id="layer-style-modal-{{ tab_name }}" tabindex="-1"
      aria-labelledby="layer-style-modal-label-{{ tab_name }}"
      aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"
                     id="layer-style-modal-label-{{ tab_name }}">
-                    Layer Style</h5>
+                    Options</h5>
                 <button type="button" class="btn-close"
                         data-bs-dismiss="modal"
                         aria-label="Close"></button>
             </div>
-            <div class="modal-body p-0">
-                <div class="d-flex">
-                    <div class="nav flex-column nav-pills border-end layer-style-nav-sidebar"
-                         id="layer-style-tabs-{{ tab_name }}"
-                         role="tablist"
-                         aria-orientation="vertical">
-                        <button class="nav-link active p-2"
-                                id="tab-overview-{{ tab_name }}"
-                                data-bs-toggle="pill"
-                                data-bs-target="#pane-overview-{{ tab_name }}"
-                                type="button" role="tab"
-                                title="Overview"
-                                data-bs-placement="right"
-                                data-bs-toggle-tooltip>
-                            <i class="bi bi-info-circle fs-5"></i>
-                        </button>
-                        <button class="nav-link p-2"
-                                id="tab-single-{{ tab_name }}"
-                                data-bs-toggle="pill"
-                                data-bs-target="#pane-single-{{ tab_name }}"
-                                type="button" role="tab"
-                                title="Single Color Options"
-                                data-bs-placement="right"
-                                data-bs-toggle-tooltip>
-                            <i class="bi bi-paint-bucket fs-5"></i>
-                        </button>
-                        <button class="nav-link p-2 d-none"
-                                id="tab-multi-{{ tab_name }}"
-                                data-bs-toggle="pill"
-                                data-bs-target="#pane-multi-{{ tab_name }}"
-                                type="button" role="tab"
-                                title="Multiple Color Options"
-                                data-bs-placement="right"
-                                data-bs-toggle-tooltip>
-                            <i class="bi bi-palette fs-5"></i>
-                        </button>
-                        <button class="nav-link p-2"
-                                id="tab-gradient-{{ tab_name }}"
-                                data-bs-toggle="pill"
-                                data-bs-target="#pane-gradient-{{ tab_name }}"
-                                type="button" role="tab"
-                                title="Gradient Color Options"
-                                data-bs-placement="right"
-                                data-bs-toggle-tooltip>
-                            <i class="bi bi-palette2 fs-5"></i>
-                        </button>
-                    </div>
-                    <div class="tab-content flex-grow-1 p-3"
-                         id="layer-style-tab-content-{{ tab_name }}">
-                        <div class="tab-pane fade show active"
-                             id="pane-overview-{{ tab_name }}"
-                             role="tabpanel"
-                             aria-labelledby="tab-overview-{{ tab_name }}">
-                            <p class="text-muted">Overview – Platzhalter.</p>
-                        </div>
-                        <div class="tab-pane fade"
-                             id="pane-single-{{ tab_name }}"
-                             role="tabpanel"
-                             aria-labelledby="tab-single-{{ tab_name }}">
-                            <div id="single-color-form-{{ tab_name }}">
-                                <p class="text-muted small">
-                                    Open a layer to edit its style.</p>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade"
-                             id="pane-multi-{{ tab_name }}"
-                             role="tabpanel"
-                             aria-labelledby="tab-multi-{{ tab_name }}">
-                            <div class="mb-2 d-none">
-                                <label class="form-label small fw-semibold mb-1"
-                                       for="multi-color-select-{{ tab_name }}">
-                                    Color by Property
-                                </label>
-                                <select class="form-select form-select-sm"
-                                        id="multi-color-select-{{ tab_name }}">
-                                    <option value="" disabled selected>
-                                        – Select property –
-                                    </option>
-                                </select>
-                            </div>
-                            <div id="multi-shared-opts-{{ tab_name }}"></div>
-                        </div>
-                        <div class="tab-pane fade"
-                             id="pane-gradient-{{ tab_name }}"
-                             role="tabpanel"
-                             aria-labelledby="tab-gradient-{{ tab_name }}">
-                            <p class="text-muted">
-                                Gradient Color Options – Platzhalter.</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="modal-body p-3">
+                <div id="multi-shared-opts-{{ tab_name }}"></div>
             </div>
         </div>
     </div>
@@ -764,25 +689,30 @@
         applyBtn.addEventListener('click', () => {
             const st = currentStyles{{ tab_name }}[type];
             if (type === 'Polygon') {
-                st.fillColor = inputs.fillColor.value;
-                st.outlineColor = inputs.outlineColor.value;
-                st.outlineWidth =
-                    parseFloat(inputs.outlineWidth.num.value);
+                st.outlineWidth = parseFloat(inputs.outlineWidth.num.value);
                 st.opacity = parseFloat(inputs.opacity.num.value);
-                applyPolygonStyle{{ tab_name }}();
+
+                multiSharedOpts{{ tab_name }}.Polygon.outlineWidth = st.outlineWidth;
+                multiSharedOpts{{ tab_name }}.Polygon.opacity = st.opacity;
+                applyMultiColor{{ tab_name }}();
             } else if (type === 'LineString') {
-                st.color = inputs.color.value;
                 st.lineWidth = parseFloat(inputs.lineWidth.num.value);
                 st.opacity = parseFloat(inputs.opacity.num.value);
-                applyLineStringStyle{{ tab_name }}();
+
+                multiSharedOpts{{ tab_name }}.LineString.lineWidth = st.lineWidth;
+                multiSharedOpts{{ tab_name }}.LineString.opacity = st.opacity;
+                applyMultiColor{{ tab_name }}();
             } else if (type === 'Point') {
-                st.color = inputs.color.value;
                 st.strokeColor = inputs.strokeColor.value;
-                st.strokeWidth =
-                    parseFloat(inputs.strokeWidth.num.value);
+                st.strokeWidth = parseFloat(inputs.strokeWidth.num.value);
                 st.radius = parseFloat(inputs.radius.num.value);
                 st.opacity = parseFloat(inputs.opacity.num.value);
-                applyPointStyle{{ tab_name }}();
+
+                multiSharedOpts{{ tab_name }}.Point.strokeColor = st.strokeColor;
+                multiSharedOpts{{ tab_name }}.Point.strokeWidth = st.strokeWidth;
+                multiSharedOpts{{ tab_name }}.Point.radius = st.radius;
+                multiSharedOpts{{ tab_name }}.Point.opacity = st.opacity;
+                applyMultiColor{{ tab_name }}();
             }
             refreshLayerListSvg{{ tab_name }}(type);
         });
@@ -795,11 +725,11 @@
             Object.assign(
                 currentStyles{{ tab_name }}[type], defaults);
             if (type === 'Polygon') {
-                applyPolygonStyle{{ tab_name }}();
+                applyMultiColor{{ tab_name }}();
             } else if (type === 'LineString') {
-                applyLineStringStyle{{ tab_name }}();
+                applyMultiColor{{ tab_name }}();
             } else if (type === 'Point') {
-                applyPointStyle{{ tab_name }}();
+                applyMultiColor{{ tab_name }}();
             }
             refreshLayerListSvg{{ tab_name }}(type);
             buildSingleColorForm{{ tab_name }}(type);
@@ -970,15 +900,35 @@
             container.appendChild(wrap);
         }
 
+        function addColor(lbl, key) {
+            const wrap = document.createElement('div');
+            wrap.className = 'mb-2';
+            const label = document.createElement('label');
+            label.className = 'form-label small fw-semibold mb-1 d-block';
+            label.textContent = lbl;
+            const cp = document.createElement('input');
+            cp.type = 'color';
+            cp.className = 'form-control form-control-color w-100';
+            cp.value = s[key];
+            cp.addEventListener('input', () => {
+                s[key] = cp.value;
+                debouncedRefresh();
+            });
+            wrap.appendChild(label);
+            wrap.appendChild(cp);
+            container.appendChild(wrap);
+        }
+
         const debouncedRefresh = () => {
             if (window.syncTimeout{{ tab_name }}) clearTimeout(window.syncTimeout{{ tab_name }});
             window.syncTimeout{{ tab_name }} = setTimeout(() => {
+                applyMultiColor{{ tab_name }}();
                 refreshMultiClassList{{ tab_name }}(type);
             }, 100);
         };
 
         if (type === 'Polygon') {
-            addRange('Outline Width', 'outlineWidth', 0.5, 10, 0.5);
+            addRange('Outline Width', 'outlineWidth', 0, 10, 0.5);
             addRange('Opacity', 'opacity', 0, 1, 0.05);
         } else if (type === 'LineString') {
             addRange('Line Width', 'lineWidth', 0.5, 20, 0.5);
@@ -986,6 +936,7 @@
         } else if (type === 'Point') {
             addRange('Radius', 'radius', 1, 30, 1);
             addRange('Stroke Width', 'strokeWidth', 0, 10, 0.5);
+            addColor('Stroke Color', 'strokeColor');
             addRange('Opacity', 'opacity', 0, 1, 0.05);
         }
     }
@@ -1069,8 +1020,7 @@
     function buildMultiTypeList{{ tab_name }}(type, targetList) {
         multiCurrentLayerType{{ tab_name }} = type;
         const list = targetList;
-        if (!list) return;
-        list.innerHTML = '';
+        if (list) list.innerHTML = '';
         const btnRow = document.getElementById(
             'multi-btn-row-{{ tab_name }}');
 
@@ -1151,6 +1101,16 @@
                             multiNextColor{{ tab_name }}();
                         multiTypeColors{{ tab_name }}[type][node.id] = nodeColor;
                     }
+
+                    if (!list) {
+                        // If no list, still process children if any
+                        if (node.children) {
+                            node.children.forEach(c =>
+                                processNode(c, depth + 1, baseColor || multiTypeColors{{ tab_name }}[type][node.id], colorLevel + 1));
+                        }
+                        return;
+                    }
+
                     const color = multiTypeColors{{ tab_name }}[type][node.id];
                     const effectiveNodeColor = color;
 
@@ -1239,14 +1199,13 @@
             classNodes.forEach(node => processNode(node, 0, null, 0));
         });
 
-        list.appendChild(fragment);
+        if (list) list.appendChild(fragment);
     }
 
     function buildMultiClassList{{ tab_name }}(type, targetList) {
         multiCurrentLayerType{{ tab_name }} = type;
         const list = targetList;
-        if (!list) return;
-        list.innerHTML = '';
+        if (list) list.innerHTML = '';
         const btnRow = document.getElementById(
             'multi-btn-row-{{ tab_name }}');
 
@@ -1294,6 +1253,9 @@
                 multiClassColors{{ tab_name }}[type][cls] =
                     multiNextColor{{ tab_name }}();
             }
+
+            if (!list) return;
+
             const color = multiClassColors{{ tab_name }}[type][cls];
 
             const li = document.createElement('li');
@@ -1476,15 +1438,21 @@
                 buildMultiTypeList{{ tab_name }}(type);
             }
             const eidMatches = [];
-            {{ tab_name }}Data.tableData.forEach(e => {
-                if (e.type_id && colors[String(e.type_id)]) {
-                    eidMatches.push(e.id, colors[String(e.type_id)]);
-                }
-            });
-            if (eidMatches.length === 0) { return; }
-            colorExpr = ['match', ['get', 'id']];
-            eidMatches.forEach(val => colorExpr.push(val));
-            colorExpr.push('#888888');
+            if ({{ tab_name }}Data && {{ tab_name }}Data.tableData) {
+                {{ tab_name }}Data.tableData.forEach(e => {
+                    if (e.id && e.type_id && colors[String(e.type_id)]) {
+                        eidMatches.push(e.id, colors[String(e.type_id)]);
+                    }
+                });
+            }
+            if (eidMatches.length === 0) {
+                // Fallback if no specific matches found (e.g. initial load)
+                colorExpr = '#888888';
+            } else {
+                colorExpr = ['match', ['get', 'id']];
+                eidMatches.forEach(val => colorExpr.push(val));
+                colorExpr.push('#888888');
+            }
         }
 
         if (type === 'Polygon') {
@@ -1543,6 +1511,8 @@
                             lid, 'circle-opacity', (s.opacity !== null && s.opacity !== undefined) ? s.opacity : 1);
                         m.setPaintProperty(
                             lid, 'circle-stroke-width', (s.strokeWidth !== null && s.strokeWidth !== undefined) ? s.strokeWidth : 1);
+                        m.setPaintProperty(
+                            lid, 'circle-stroke-color', s.strokeColor || '#000000');
                     } catch (e) {
                         console.error('Error setting Point paint props for ' + lid, e);
                     }
@@ -1586,15 +1556,13 @@
         Object.assign(
             multiSharedOpts{{ tab_name }}[type], defaults[type]);
         if (type === 'Polygon') {
-            applyPolygonStyle{{ tab_name }}();
-            refreshLayerListSvg{{ tab_name }}('Polygon');
+            applyMultiColor{{ tab_name }}();
         } else if (type === 'LineString') {
-            applyLineStringStyle{{ tab_name }}();
-            refreshLayerListSvg{{ tab_name }}('LineString');
+            applyMultiColor{{ tab_name }}();
         } else if (type === 'Point') {
-            applyPointStyle{{ tab_name }}();
-            refreshLayerListSvg{{ tab_name }}('Point');
+            applyMultiColor{{ tab_name }}();
         }
+        refreshLayerListSvg{{ tab_name }}(type);
         const sel = document.getElementById(
             'multi-color-select-{{ tab_name }}');
         if (sel && sel.value === 'class') buildMultiClassList{{ tab_name }}(type);
@@ -1679,39 +1647,14 @@
     }
 
     modalEl.addEventListener('show.bs.modal', () => {
-        buildMultiColorSelect{{ tab_name }}();
         const layerType = modalEl.dataset.layerType || null;
-        if (layerType) multiCurrentLayerType{{ tab_name }} = layerType;
-        const titleEl = modalEl.querySelector('.modal-title');
-        if (titleEl && layerType) {
-            titleEl.textContent = 'Layer Style – ' + layerType;
-        }
-        updateOverview{{ tab_name }}(
-            cachedAllFeatures{{ tab_name }},
-            cachedFilteredFeatures{{ tab_name }},
-            layerType);
         if (layerType) {
-            buildSingleColorForm{{ tab_name }}(layerType);
-        }
-        // Set default selection to Types if available, otherwise Classes
-        const multiSel = document.getElementById(
-            'multi-color-select-{{ tab_name }}');
-        if (multiSel) {
-            const hasType = [...multiSel.options].some(o => o.value === 'type');
-            const hasClass = [...multiSel.options].some(o => o.value === 'class');
-
-            if (hasType) {
-                multiSel.value = 'type';
-                // buildMultiTypeList{{ tab_name }}(layerType); // No longer needed for modal
-                applyMultiColor{{ tab_name }}();
-            } else if (hasClass) {
-                multiSel.value = 'class';
-                // buildMultiClassList{{ tab_name }}(layerType); // No longer needed for modal
-                applyMultiColor{{ tab_name }}();
-            } else {
-                multiSel.value = '';
-                buildMultiSharedOpts{{ tab_name }}(null);
+            multiCurrentLayerType{{ tab_name }} = layerType;
+            const titleEl = modalEl.querySelector('.modal-title');
+            if (titleEl) {
+                titleEl.textContent = 'Options – ' + layerType;
             }
+            buildMultiSharedOpts{{ tab_name }}(layerType);
         }
     });
     modalEl.addEventListener('shown.bs.modal', () => {
@@ -1733,6 +1676,7 @@
     window.toggleStyleSidebar{{ tab_name }} = toggleStyleSidebar{{ tab_name }};
     window.buildMultiTypeList{{ tab_name }} = buildMultiTypeList{{ tab_name }};
     window.buildMultiClassList{{ tab_name }} = buildMultiClassList{{ tab_name }};
+    window.buildMultiSharedOpts{{ tab_name }} = buildMultiSharedOpts{{ tab_name }};
 
     // Auto-open on large screens
     if (window.innerWidth >= 1200) {
