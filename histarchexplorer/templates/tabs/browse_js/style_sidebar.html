@@ -972,12 +972,12 @@
             range.addEventListener('input', () => {
                 num.value = range.value;
                 s[key] = parseFloat(range.value);
-                refreshMultiClassList{{ tab_name }}(type);
+                debouncedRefresh();
             });
             num.addEventListener('input', () => {
                 range.value = num.value;
                 s[key] = parseFloat(num.value);
-                refreshMultiClassList{{ tab_name }}(type);
+                debouncedRefresh();
             });
             ig.appendChild(range);
             ig.appendChild(num);
@@ -985,6 +985,13 @@
             wrap.appendChild(ig);
             container.appendChild(wrap);
         }
+
+        const debouncedRefresh = () => {
+            if (window.syncTimeout{{ tab_name }}) clearTimeout(window.syncTimeout{{ tab_name }});
+            window.syncTimeout{{ tab_name }} = setTimeout(() => {
+                refreshMultiClassList{{ tab_name }}(type);
+            }, 100);
+        };
 
         if (type === 'Polygon') {
             addRange('Outline Width', 'outlineWidth', 0.5, 10, 0.5);
@@ -1038,38 +1045,39 @@
                     if (cls) color = multiClassColors{{ tab_name }}[type][cls] || color;
                     else if (tid) color = multiTypeColors{{ tab_name }}[type][tid] || color;
 
-                    // Sync existing picker if it exists
-                    const picker = svgWrap.querySelector('input[type="color"]');
-                    if (picker) {
-                        picker.value = color;
-                        // RE-ATTACH to ensure it has the latest closure/state if needed,
-                        // but better to just update value. Actually, listeners stay.
-                        // But wait, the makeMultiSvg replaces innerHTML, so picker is GONE.
-                        // We must re-append it.
-                    }
-
                     // Update existing SVG
                     svgWrap.innerHTML = makeMultiSvg{{ tab_name }}(type, color);
+                    svgWrap.style.position = 'relative';
 
-                    if (picker) {
-                        svgWrap.appendChild(picker);
-                    } else {
-                        // This shouldn't happen if build functions are correct,
-                        // but let's add it just in case one was missed
-                        const newPicker = document.createElement('input');
-                        newPicker.type = 'color';
-                        newPicker.value = color;
-                        newPicker.style.cssText = 'position:absolute;opacity:0;width:0;height:0;';
-                        newPicker.addEventListener('input', () => {
-                            if (cls) multiClassColors{{ tab_name }}[type][cls] = newPicker.value;
-                            else if (tid) multiTypeColors{{ tab_name }}[type][tid] = newPicker.value;
-                            svgWrap.innerHTML = makeMultiSvg{{ tab_name }}(type, newPicker.value);
-                            svgWrap.appendChild(newPicker); // Re-append after innerHTML change
+                    // Sync existing picker if it exists
+                    let picker = svgWrap.querySelector('input[type="color"]');
+                    if (!picker) {
+                        picker = document.createElement('input');
+                        picker.type = 'color';
+                        picker.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;padding:0;';
+                        picker.onclick = (e) => e.stopPropagation();
+                        picker.onchange = (e) => {
+                            e.stopPropagation();
+                            if (cls) multiClassColors{{ tab_name }}[type][cls] = picker.value;
+                            else if (tid) multiTypeColors{{ tab_name }}[type][tid] = picker.value;
                             applyMultiColor{{ tab_name }}(cls ? 'class' : 'type');
-                            refreshMultiClassList{{ tab_name }}(type);
-                        });
-                        svgWrap.appendChild(newPicker);
+                            if (window.syncTimeout{{ tab_name }}) clearTimeout(window.syncTimeout{{ tab_name }});
+                            window.syncTimeout{{ tab_name }} = setTimeout(() => {
+                                refreshMultiClassList{{ tab_name }}(type);
+                            }, 100);
+                        };
+                        picker.oninput = (e) => {
+                            e.stopPropagation();
+                            if (cls) multiClassColors{{ tab_name }}[type][cls] = picker.value;
+                            else if (tid) multiTypeColors{{ tab_name }}[type][tid] = picker.value;
+                            svgWrap.innerHTML = makeMultiSvg{{ tab_name }}(type, picker.value);
+                            svgWrap.appendChild(picker);
+                            applyMultiColor{{ tab_name }}(cls ? 'class' : 'type');
+                        };
                     }
+                    picker.value = color;
+                    svgWrap.appendChild(picker);
+                    svgWrap.onclick = (e) => e.stopPropagation();
                 }
             });
         });
@@ -1188,6 +1196,7 @@
 
                     const svgWrap = document.createElement('span');
                     svgWrap.className = 'flex-shrink-0 multi-sym-type';
+                    svgWrap.style.position = 'relative';
                     svgWrap.innerHTML = makeMultiSvg{{ tab_name }}(type, color);
                     svgWrap.style.cursor = 'pointer';
 
@@ -1195,21 +1204,27 @@
                     picker.type = 'color';
                     picker.value = color;
                     picker.style.cssText =
-                        'position:absolute;opacity:0;width:0;height:0;';
-                    picker.addEventListener('input', () => {
+                        'position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;padding:0;';
+                    picker.onclick = (e) => e.stopPropagation();
+                    picker.onchange = (e) => {
+                        e.stopPropagation();
+                        multiTypeColors{{ tab_name }}[type][node.id] = picker.value;
+                        applyMultiColor{{ tab_name }}('type');
+                        if (window.syncTimeout{{ tab_name }}) clearTimeout(window.syncTimeout{{ tab_name }});
+                        window.syncTimeout{{ tab_name }} = setTimeout(() => {
+                            refreshMultiClassList{{ tab_name }}(type);
+                        }, 100);
+                    };
+                    picker.oninput = (e) => {
+                        e.stopPropagation();
                         multiTypeColors{{ tab_name }}[type][node.id] = picker.value;
                         svgWrap.innerHTML =
                             makeMultiSvg{{ tab_name }}(type, picker.value);
-                        svgWrap.appendChild(picker); // Keep the picker element
+                        svgWrap.appendChild(picker);
                         applyMultiColor{{ tab_name }}('type');
-                        // Update other instances of this type's SVG (e.g. in sidebar legend)
-                        refreshMultiClassList{{ tab_name }}(type);
-                    });
-                    svgWrap.appendChild(picker);
-                    svgWrap.onclick = (e) => {
-                        e.stopPropagation();
-                        picker.click();
                     };
+                    svgWrap.appendChild(picker);
+                    svgWrap.onclick = (e) => e.stopPropagation();
 
                     const label = document.createElement('span');
                     label.className = 'flex-grow-1 small text-truncate';
@@ -1323,6 +1338,7 @@
 
             const svgWrap = document.createElement('span');
             svgWrap.className = 'flex-shrink-0 multi-sym';
+            svgWrap.style.position = 'relative';
             svgWrap.innerHTML = makeMultiSvg{{ tab_name }}(type, color);
             svgWrap.style.cursor = 'pointer';
             svgWrap.title = 'Pick color';
@@ -1331,21 +1347,27 @@
             picker.type = 'color';
             picker.value = color;
             picker.style.cssText =
-                'position:absolute;opacity:0;width:0;height:0;';
-            picker.addEventListener('input', () => {
+                'position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;padding:0;';
+            picker.onclick = (e) => e.stopPropagation();
+            picker.onchange = (e) => {
+                e.stopPropagation();
+                multiClassColors{{ tab_name }}[type][cls] = picker.value;
+                applyMultiColor{{ tab_name }}('class');
+                if (window.syncTimeout{{ tab_name }}) clearTimeout(window.syncTimeout{{ tab_name }});
+                window.syncTimeout{{ tab_name }} = setTimeout(() => {
+                    refreshMultiClassList{{ tab_name }}(type);
+                }, 100);
+            };
+            picker.oninput = (e) => {
+                e.stopPropagation();
                 multiClassColors{{ tab_name }}[type][cls] = picker.value;
                 svgWrap.innerHTML =
                     makeMultiSvg{{ tab_name }}(type, picker.value);
-                svgWrap.appendChild(picker); // Keep the picker element
+                svgWrap.appendChild(picker);
                 applyMultiColor{{ tab_name }}('class');
-                // Update other instances of this class's SVG
-                refreshMultiClassList{{ tab_name }}(type);
-            });
-            svgWrap.appendChild(picker);
-            svgWrap.onclick = (e) => {
-                e.stopPropagation();
-                picker.click();
             };
+            svgWrap.appendChild(picker);
+            svgWrap.onclick = (e) => e.stopPropagation();
 
             const labelEl = document.createElement('span');
             labelEl.className = 'flex-grow-1 small';
@@ -1471,8 +1493,8 @@
             }
             const eidMatches = [];
             {{ tab_name }}Data.tableData.forEach(e => {
-                if (e.type_id && colors[e.type_id]) {
-                    eidMatches.push(e.id, colors[e.type_id]);
+                if (e.type_id && colors[String(e.type_id)]) {
+                    eidMatches.push(e.id, colors[String(e.type_id)]);
                 }
             });
             if (eidMatches.length === 0) { return; }
