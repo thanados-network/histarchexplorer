@@ -487,13 +487,39 @@
 
                 if (isLayerVisible) {
                     // Apply individual filters for classes/types
+                    let baseFilter = null;
+
+                    // Recover initial filter from map_js.html logic
+                    // Note: Check for substring because IDs contain tab_name prefix
+                    if (layerId.indexOf('layer-circle') !== -1) {
+                        baseFilter = [
+                            'all',
+                            ['==', '$type', 'Point'],
+                            ['!has', 'representative'],
+                            ['!has', 'original_geom_type']
+                        ];
+                    } else if (layerId.indexOf('layer-representative-points') !== -1) {
+                        baseFilter = ['all', ['==', '$type', 'Point'], ['has', 'representative']];
+                    } else if (layerId.indexOf('layer-fill') !== -1 || layerId.indexOf('layer-outline') !== -1) {
+                        baseFilter = ['==', '$type', 'Polygon'];
+                    } else if (layerId.indexOf('layer-line') !== -1) {
+                        baseFilter = ['==', '$type', 'LineString'];
+                    }
+
                     let filter = ['all'];
-                    
+                    if (baseFilter) {
+                        if (baseFilter[0] === 'all') {
+                             for(let i=1; i<baseFilter.length; i++) filter.push(baseFilter[i]);
+                        } else {
+                             filter.push(baseFilter);
+                        }
+                    }
+
                     if (mode === 'class') {
                         if (hiddenClasses{{ tab_name }}.size > 0) {
                             const validClasses = [...hiddenClasses{{ tab_name }}].filter(c => c !== null && c !== undefined);
                             if (validClasses.length > 0) {
-                                filter.push(['!', ['in', ['get', 'class'], ['literal', validClasses]]]);
+                                filter.push(['!in', 'class', ...validClasses]);
                             }
                         }
                     } else if (mode === 'type') {
@@ -508,19 +534,16 @@
                                 });
                             }
                             if (hiddenEids.length > 0) {
-                                // Filter out null/undefined IDs just in case
-                                const validEids = hiddenEids.filter(id => id !== null && id !== undefined);
-                                if (validEids.length > 0) {
-                                    // Ensure IDs are numbers if MapLibre expects them based on feature data
-                                    const numericEids = validEids.map(id => Number(id)).filter(id => !isNaN(id));
-                                    if (numericEids.length > 0) {
-                                        filter.push(['!', ['in', ['get', 'id'], ['literal', numericEids]]]);
-                                    }
+                                // Ensure IDs are numbers if MapLibre expects them based on feature data
+                                const numericEids = hiddenEids.map(id => Number(id)).filter(id => !isNaN(id));
+                                if (numericEids.length > 0) {
+                                    filter.push(['!in', 'id', ...numericEids]);
                                 }
                             }
                         }
                     }
                     
+                    // Use the filter as long as it has elements beyond 'all'
                     if (filter.length > 1) {
                         try {
                             m.setFilter(layerId, filter);
@@ -788,7 +811,7 @@
         Polygon: {}, LineString: {}, Point: {}
     };
     const multiSharedOpts{{ tab_name }} = {
-        Polygon:    { outlineWidth: 1.5, opacity: 0.5 },
+        Polygon:    { outlineWidth: 1.5, outlineColor: '#004747', opacity: 0.5 },
         LineString: { lineWidth: 2.5,    opacity: 1   },
         Point:      { radius: 7, strokeWidth: 1,
                       strokeColor: '#000000', opacity: 1 }
@@ -829,9 +852,9 @@
                         xmlns="http://www.w3.org/2000/svg">
                 <rect x="2" y="4" width="16" height="12" rx="1"
                       fill="${color}"
-                      fill-opacity="${s.opacity}"
-                      stroke="#004747"
-                      stroke-width="${s.outlineWidth}"/>
+                      fill-opacity="1"
+                      stroke="${s.outlineColor}"
+                      stroke-width="1.5"/>
             </svg>`;
         }
         if (type === 'LineString') {
@@ -863,6 +886,22 @@
         container.innerHTML = '';
         if (!type) { return; }
         const s = multiSharedOpts{{ tab_name }}[type];
+
+        if (type === 'Polygon') {
+            const { row: r1, picker: p1 } = makeColorRow('Outline Color', 'outlineColor', s);
+            p1.addEventListener('input', () => {
+                s.outlineColor = p1.value;
+                debouncedRefresh();
+            });
+            container.appendChild(r1);
+        } else if (type === 'Point') {
+            const { row: r1, picker: p1 } = makeColorRow('Stroke Color', 'strokeColor', s);
+            p1.addEventListener('input', () => {
+                s.strokeColor = p1.value;
+                debouncedRefresh();
+            });
+            container.appendChild(r1);
+        }
 
         function addRange(lbl, key, min, max, step) {
             const wrap = document.createElement('div');
@@ -900,25 +939,6 @@
             container.appendChild(wrap);
         }
 
-        function addColor(lbl, key) {
-            const wrap = document.createElement('div');
-            wrap.className = 'mb-2';
-            const label = document.createElement('label');
-            label.className = 'form-label small fw-semibold mb-1 d-block';
-            label.textContent = lbl;
-            const cp = document.createElement('input');
-            cp.type = 'color';
-            cp.className = 'form-control form-control-color w-100';
-            cp.value = s[key];
-            cp.addEventListener('input', () => {
-                s[key] = cp.value;
-                debouncedRefresh();
-            });
-            wrap.appendChild(label);
-            wrap.appendChild(cp);
-            container.appendChild(wrap);
-        }
-
         const debouncedRefresh = () => {
             if (window.syncTimeout{{ tab_name }}) clearTimeout(window.syncTimeout{{ tab_name }});
             window.syncTimeout{{ tab_name }} = setTimeout(() => {
@@ -936,7 +956,6 @@
         } else if (type === 'Point') {
             addRange('Radius', 'radius', 1, 30, 1);
             addRange('Stroke Width', 'strokeWidth', 0, 10, 0.5);
-            addColor('Stroke Color', 'strokeColor');
             addRange('Opacity', 'opacity', 0, 1, 0.05);
         }
     }
@@ -1152,9 +1171,8 @@
                     picker.onchange = (e) => {
                         e.stopPropagation();
                         multiTypeColors{{ tab_name }}[type][node.id] = picker.value;
-                        applyMultiColor{{ tab_name }}('type');
-                        if (window.syncTimeout{{ tab_name }}) clearTimeout(window.syncTimeout{{ tab_name }});
-                        window.syncTimeout{{ tab_name }} = setTimeout(() => {
+                        applyMultiColor{{ tab_name }}('type', type);
+                        setTimeout(() => {
                             refreshMultiClassList{{ tab_name }}(type);
                         }, 100);
                     };
@@ -1164,7 +1182,7 @@
                         svgWrap.innerHTML =
                             makeMultiSvg{{ tab_name }}(type, picker.value);
                         svgWrap.appendChild(picker);
-                        applyMultiColor{{ tab_name }}('type');
+                        applyMultiColor{{ tab_name }}('type', type);
                     };
                     svgWrap.appendChild(picker);
                     svgWrap.onclick = (e) => e.stopPropagation();
@@ -1297,9 +1315,8 @@
             picker.onchange = (e) => {
                 e.stopPropagation();
                 multiClassColors{{ tab_name }}[type][cls] = picker.value;
-                applyMultiColor{{ tab_name }}('class');
-                if (window.syncTimeout{{ tab_name }}) clearTimeout(window.syncTimeout{{ tab_name }});
-                window.syncTimeout{{ tab_name }} = setTimeout(() => {
+                applyMultiColor{{ tab_name }}('class', type);
+                setTimeout(() => {
                     refreshMultiClassList{{ tab_name }}(type);
                 }, 100);
             };
@@ -1309,7 +1326,7 @@
                 svgWrap.innerHTML =
                     makeMultiSvg{{ tab_name }}(type, picker.value);
                 svgWrap.appendChild(picker);
-                applyMultiColor{{ tab_name }}('class');
+                applyMultiColor{{ tab_name }}('class', type);
             };
             svgWrap.appendChild(picker);
             svgWrap.onclick = (e) => e.stopPropagation();
@@ -1349,13 +1366,13 @@
             return `<svg width="20" height="20" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
                 <rect x="2" y="4" width="8" height="12" rx="1"
-                      fill="${c0}" fill-opacity="${s.opacity}"
-                      stroke="#004747"
-                      stroke-width="${s.outlineWidth}"/>
+                      fill="${c0}" fill-opacity="1"
+                      stroke="${s.outlineColor}"
+                      stroke-width="1.5"/>
                 <rect x="10" y="4" width="8" height="12" rx="1"
-                      fill="${c1}" fill-opacity="${s.opacity}"
-                      stroke="#004747"
-                      stroke-width="${s.outlineWidth}"/>
+                      fill="${c1}" fill-opacity="1"
+                      stroke="${s.outlineColor}"
+                      stroke-width="1.5"/>
             </svg>`;
         }
         if (type === 'LineString') {
@@ -1387,12 +1404,12 @@
         </svg>`;
     }
 
-    function applyMultiColor{{ tab_name }}(modeArg) {
-        let type = multiCurrentLayerType{{ tab_name }};
+    function applyMultiColor{{ tab_name }}(modeArg, typeArg) {
+        let type = typeArg || multiCurrentLayerType{{ tab_name }};
         if (!type) {
             const modal = document.getElementById(
                 'layer-style-modal-{{ tab_name }}');
-            type = modal.dataset.layerType || null;
+            if (modal) type = modal.dataset.layerType || null;
         }
         if (!type) { return; }
 
@@ -1413,42 +1430,33 @@
         let colorExpr = '#888888';
         if (mode === 'class') {
             const colors = multiClassColors{{ tab_name }}[type];
-            const classes = Object.keys(colors);
-            if (classes.length === 0) {
-                // Try to build them if missing
+            if (Object.keys(colors).length === 0) {
                 buildMultiClassList{{ tab_name }}(type);
-                const newColors = multiClassColors{{ tab_name }}[type];
-                const newClasses = Object.keys(newColors);
-                if (newClasses.length === 0) return;
-                colorExpr = ['match', ['get', 'class']];
-                newClasses.forEach(cls => {
-                    colorExpr.push(cls, newColors[cls]);
-                });
-            } else {
+            }
+            const currentColors = multiClassColors{{ tab_name }}[type];
+            const classes = Object.keys(currentColors);
+            if (classes.length > 0) {
                 colorExpr = ['match', ['get', 'class']];
                 classes.forEach(cls => {
-                    colorExpr.push(cls, colors[cls]);
+                    colorExpr.push(cls, currentColors[cls]);
                 });
+                colorExpr.push('#888888');
             }
-            colorExpr.push('#888888');
         } else if (mode === 'type') {
             const colors = multiTypeColors{{ tab_name }}[type];
             if (Object.keys(colors).length === 0) {
-                // Try to build them if missing
                 buildMultiTypeList{{ tab_name }}(type);
             }
+            const currentColors = multiTypeColors{{ tab_name }}[type];
             const eidMatches = [];
             if ({{ tab_name }}Data && {{ tab_name }}Data.tableData) {
                 {{ tab_name }}Data.tableData.forEach(e => {
-                    if (e.id && e.type_id && colors[String(e.type_id)]) {
-                        eidMatches.push(e.id, colors[String(e.type_id)]);
+                    if (e.id && e.type_id && currentColors[String(e.type_id)]) {
+                        eidMatches.push(e.id, currentColors[String(e.type_id)]);
                     }
                 });
             }
-            if (eidMatches.length === 0) {
-                // Fallback if no specific matches found (e.g. initial load)
-                colorExpr = '#888888';
-            } else {
+            if (eidMatches.length > 0) {
                 colorExpr = ['match', ['get', 'id']];
                 eidMatches.forEach(val => colorExpr.push(val));
                 colorExpr.push('#888888');
@@ -1472,7 +1480,7 @@
                 try {
                     m.setPaintProperty(
                         '{{ tab_name }}-layer-outline',
-                        'line-color', (mode === 'class' ? '#004747' : '#000000'));
+                        'line-color', (s.outlineColor !== null && s.outlineColor !== undefined) ? s.outlineColor : '#004747');
                     m.setPaintProperty(
                         '{{ tab_name }}-layer-outline',
                         'line-width', (s.outlineWidth !== null && s.outlineWidth !== undefined) ? s.outlineWidth : 1.5);
@@ -1641,7 +1649,7 @@
         // Ensure current type is set back to null if modal is not open,
         // but don't clear the color caches!
         if (!modalEl.classList.contains('show')) {
-            buildMultiSharedOpts{{ tab_name }}(null);
+            // buildMultiSharedOpts{{ tab_name }}(null); // Don't reset opts, they might be needed for applyMultiColor
             multiCurrentLayerType{{ tab_name }} = null;
         }
     }
