@@ -572,7 +572,7 @@
                                 data-bs-toggle-tooltip>
                             <i class="bi bi-paint-bucket fs-5"></i>
                         </button>
-                        <button class="nav-link p-2"
+                        <button class="nav-link p-2 d-none"
                                 id="tab-multi-{{ tab_name }}"
                                 data-bs-toggle="pill"
                                 data-bs-target="#pane-multi-{{ tab_name }}"
@@ -627,22 +627,6 @@
                                 </select>
                             </div>
                             <div id="multi-shared-opts-{{ tab_name }}"></div>
-                            <ul class="list-unstyled m-0"
-                                id="multi-class-list-{{ tab_name }}"></ul>
-                            <div id="multi-btn-row-{{ tab_name }}"
-                                 class="d-flex gap-2 mt-3
-                                        justify-content-end d-none">
-                                <button type="button"
-                                        class="btn btn-outline-secondary btn-sm"
-                                        id="multi-reset-btn-{{ tab_name }}">
-                                    Reset
-                                </button>
-                                <button type="button"
-                                        class="btn btn-primary btn-sm"
-                                        id="multi-apply-btn-{{ tab_name }}">
-                                    Apply
-                                </button>
-                            </div>
                         </div>
                         <div class="tab-pane fade"
                              id="pane-gradient-{{ tab_name }}"
@@ -1008,7 +992,6 @@
 
     function refreshMultiClassList{{ tab_name }}(type) {
         const lists = [
-            document.getElementById('multi-class-list-{{ tab_name }}'),
             document.getElementById(`layer-legend-{{ tab_name }}-${type}`)
         ];
         lists.forEach(list => {
@@ -1085,8 +1068,7 @@
 
     function buildMultiTypeList{{ tab_name }}(type, targetList) {
         multiCurrentLayerType{{ tab_name }} = type;
-        const list = targetList || document.getElementById(
-            'multi-class-list-{{ tab_name }}');
+        const list = targetList;
         if (!list) return;
         list.innerHTML = '';
         const btnRow = document.getElementById(
@@ -1125,7 +1107,8 @@
 
         const tree = {{ tab_name }}Data.treeData;
         const fragment = document.createDocumentFragment();
-        if (btnRow && !targetList) btnRow.classList.remove('d-none');
+        // btnRow no longer used for list in sidebar
+        // if (btnRow && !targetList) btnRow.classList.remove('d-none');
 
         Object.keys(tree).forEach((classKey, branchIdx) => {
             const classNodes = tree[classKey];
@@ -1261,8 +1244,7 @@
 
     function buildMultiClassList{{ tab_name }}(type, targetList) {
         multiCurrentLayerType{{ tab_name }} = type;
-        const list = targetList || document.getElementById(
-            'multi-class-list-{{ tab_name }}');
+        const list = targetList;
         if (!list) return;
         list.innerHTML = '';
         const btnRow = document.getElementById(
@@ -1298,7 +1280,8 @@
 
         const classes = Object.keys(filtByClass).sort();
         if (classes.length === 0) {
-            if (btnRow && !targetList) btnRow.classList.add('d-none');
+            // btnRow no longer used for list in sidebar
+            // if (btnRow && !targetList) btnRow.classList.add('d-none');
             return;
         }
 
@@ -1383,7 +1366,8 @@
             fragment.appendChild(li);
         });
         list.appendChild(fragment);
-        if (btnRow) btnRow.classList.remove('d-none');
+        // btnRow no longer used for list in sidebar
+        // if (btnRow) btnRow.classList.remove('d-none');
     }
 
     function makeMultiLayerSvg{{ tab_name }}(type, modeArg) {
@@ -1613,34 +1597,35 @@
         }
         const sel = document.getElementById(
             'multi-color-select-{{ tab_name }}');
-        if (sel.value === 'class') buildMultiClassList{{ tab_name }}(type);
-        else if (sel.value === 'type') buildMultiTypeList{{ tab_name }}(type);
+        if (sel && sel.value === 'class') buildMultiClassList{{ tab_name }}(type);
+        else if (sel && sel.value === 'type') buildMultiTypeList{{ tab_name }}(type);
     }
 
     const modalEl = document.getElementById(
         'layer-style-modal-{{ tab_name }}');
 
-    document.getElementById('multi-apply-btn-{{ tab_name }}')
-        .addEventListener('click', applyMultiColor{{ tab_name }});
-    document.getElementById('multi-reset-btn-{{ tab_name }}')
-        .addEventListener('click', resetMultiColor{{ tab_name }});
+    const multiApplyBtn = document.getElementById('multi-apply-btn-{{ tab_name }}');
+    if (multiApplyBtn) multiApplyBtn.addEventListener('click', applyMultiColor{{ tab_name }});
+    const multiResetBtn = document.getElementById('multi-reset-btn-{{ tab_name }}');
+    if (multiResetBtn) multiResetBtn.addEventListener('click', resetMultiColor{{ tab_name }});
 
-    document.getElementById('multi-color-select-{{ tab_name }}')
-        .addEventListener('change', function () {
+    const multiColorSelect = document.getElementById('multi-color-select-{{ tab_name }}');
+    if (multiColorSelect) {
+        multiColorSelect.addEventListener('change', function () {
             const layerType = modalEl.dataset.layerType || null;
             if (this.value === 'class') {
                 buildMultiClassList{{ tab_name }}(layerType);
             } else if (this.value === 'type') {
                 buildMultiTypeList{{ tab_name }}(layerType);
             } else {
-                document.getElementById(
-                    'multi-class-list-{{ tab_name }}').innerHTML = '';
-                document.getElementById(
-                    'multi-btn-row-{{ tab_name }}')
-                    .classList.add('d-none');
+                const multiClassList = document.getElementById('multi-class-list-{{ tab_name }}');
+                if (multiClassList) multiClassList.innerHTML = '';
+                const multiBtnRow = document.getElementById('multi-btn-row-{{ tab_name }}');
+                if (multiBtnRow) multiBtnRow.classList.add('d-none');
                 buildMultiSharedOpts{{ tab_name }}(null);
             }
         });
+    }
     function initLayerStyle{{ tab_name }}() {
         const types = ['Point', 'Polygon', 'LineString'];
         const tree = {{ tab_name }}Data.treeData;
@@ -1688,10 +1673,6 @@
         // Ensure current type is set back to null if modal is not open,
         // but don't clear the color caches!
         if (!modalEl.classList.contains('show')) {
-            const list = document.getElementById('multi-class-list-{{ tab_name }}');
-            if (list) list.innerHTML = '';
-            const btnRow = document.getElementById('multi-btn-row-{{ tab_name }}');
-            if (btnRow) btnRow.classList.add('d-none');
             buildMultiSharedOpts{{ tab_name }}(null);
             multiCurrentLayerType{{ tab_name }} = null;
         }
@@ -1721,19 +1702,14 @@
 
             if (hasType) {
                 multiSel.value = 'type';
-                buildMultiTypeList{{ tab_name }}(layerType);
+                // buildMultiTypeList{{ tab_name }}(layerType); // No longer needed for modal
                 applyMultiColor{{ tab_name }}();
             } else if (hasClass) {
                 multiSel.value = 'class';
-                buildMultiClassList{{ tab_name }}(layerType);
+                // buildMultiClassList{{ tab_name }}(layerType); // No longer needed for modal
                 applyMultiColor{{ tab_name }}();
             } else {
                 multiSel.value = '';
-                document.getElementById(
-                    'multi-class-list-{{ tab_name }}').innerHTML = '';
-                const multiBtnRow = document.getElementById(
-                    'multi-btn-row-{{ tab_name }}');
-                if (multiBtnRow) multiBtnRow.classList.add('d-none');
                 buildMultiSharedOpts{{ tab_name }}(null);
             }
         }
