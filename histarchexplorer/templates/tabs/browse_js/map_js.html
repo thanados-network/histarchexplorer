@@ -186,35 +186,44 @@
                 {
                     id: '{{ tab_name }}-layer-fill',
                     type: 'fill',
+                    source: sourceId,
                     paint: { 'fill-color': '#088', 'fill-opacity': 0.5 },
                     filter: ['==', '$type', 'Polygon']
                 },
                 {
                     id: '{{ tab_name }}-layer-outline',
                     type: 'line',
+                    source: sourceId,
                     paint: { 'line-color': '#004747', 'line-width': 1 },
                     filter: ['==', '$type', 'Polygon']
                 },
                 {
                     id: '{{ tab_name }}-layer-line',
                     type: 'line',
+                    source: sourceId,
                     paint: { 'line-color': '#088', 'line-width': 2 },
                     filter: ['==', '$type', 'LineString']
                 },
                 {
                     id: '{{ tab_name }}-layer-circle',
                     type: 'circle',
+                    source: sourceId,
                     paint: {
                         'circle-radius': 9,
                         'circle-color': '#088',
                         'circle-stroke-color': '#000000',
                         'circle-stroke-width': 1
                     },
-                    filter: ['all', ['==', ['geometry-type'], 'Point'], ['!', ['has', 'representative']]]
+                    filter: ['all',
+                        ['==', '$type', 'Point'],
+                        ['!has', 'representative'],
+                        ['!has', 'original_geom_type']
+                    ]
                 },
                 {
                     id: '{{ tab_name }}-layer-representative-points',
                     type: 'circle',
+                    source: sourceId,
                     paint: {
                         'circle-radius': 9,
                         'circle-color': '#088',
@@ -239,7 +248,7 @@
                             {% endfor %}
                         ]
                     },
-                    filter: ['all', ['==', ['geometry-type'], 'Point'], ['has', 'representative']]
+                    filter: ['all', ['==', '$type', 'Point'], ['has', 'representative']]
                 }
             ];
 
@@ -248,24 +257,28 @@
                 {
                     id: 'highlight-polygon',
                     type: 'fill',
+                    source: sourceId,
                     paint: { 'fill-color': '#FF4444', 'fill-opacity': 0.5 },
                     filter: ['==', '$type', 'Polygon']
                 },
                 {
                     id: 'highlight-polygon-outline',
                     type: 'line',
+                    source: sourceId,
                     paint: { 'line-color': 'rgba(255,255,255,0.8)', 'line-width': 3 },
                     filter: ['==', '$type', 'Polygon']
                 },
                 {
                     id: 'highlight-linestring',
                     type: 'line',
+                    source: sourceId,
                     paint: { 'line-color': 'rgba(255,68,68,0.63)', 'line-width': 3 },
                     filter: ['==', '$type', 'LineString']
                 },
                 {
                     id: 'highlight-points',
                     type: 'circle',
+                    source: sourceId,
                     paint: { 'circle-color': 'rgba(255,68,68,0.86)', 'circle-radius': 12 },
                     filter: ['==', '$type', 'Point']
                 }
@@ -273,10 +286,7 @@
 
             // 4. Add all layers in one go
             [...baseLayers, ...highlightLayers].forEach(layer => {
-                mapRef.addLayer({
-                    source: sourceId,
-                    ...layer
-                });
+                mapRef.addLayer(layer);
             });
 
             // 5. Init interactions
@@ -306,6 +316,13 @@
                     this._container = document.createElement('div');
                     this._container.className =
                         'maplibregl-ctrl maplibregl-ctrl-group';
+
+                    // Initially hide if sidebar is already open (e.g. auto-opened)
+                    const sidebar = document.getElementById('style-sidebar-{{ tab_name }}');
+                    if (sidebar && sidebar.classList.contains('open')) {
+                        this._container.classList.add('d-none');
+                    }
+
                     this._container.appendChild(this._btn);
                     return this._container;
                 }
