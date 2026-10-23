@@ -1,3 +1,4 @@
+import datetime
 from typing import Optional
 
 from flask import (
@@ -6,11 +7,13 @@ from flask.typing import ResponseValue
 from flask_babel import gettext as _
 from flask_login import login_required
 
-from histarchexplorer import app
+from histarchexplorer import app, cache
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.database.map import get_map_tilestring
 from histarchexplorer.models.config import ConfigEntity
 from histarchexplorer.services.entity_cache import forget_entity
+from histarchexplorer.services.statistics import (
+    get_landing_sites_geojson, get_landing_statistics)
 from histarchexplorer.utils.view_util import (get_view_class_count,
                                               render_page_template, slugify)
 
@@ -20,7 +23,8 @@ def index() -> str:
     """Render the main landing page of the application.
 
     This function fetches map settings, builds project showcase
-    cards, and renders the index template.
+    cards, aggregates scientific statistics, and renders the index
+    template.
     """
     map_data = g.settings.get_map_settings()
     map_ = None
@@ -56,15 +60,47 @@ def index() -> str:
             "image": p.image,
             "description": short_desc})
 
-    # This is just for the carousal
+    # This is just for the carousel
     project_cards = project_cards[:12]
+
+    case_study_tuple = tuple(g.case_study_ids)
+    landing_stats = get_landing_statistics(case_study_tuple)
+
+    # Portal citation metadata
+    current_year = datetime.datetime.now().year
+    portal_name = "Histarchexplorer"
+    if main_project and 'display' in main_project.name:
+        portal_name = main_project.name['display'].get('label', portal_name)
+
+    portal_url = request.url_root.rstrip('/')
+    citation_apa = (
+        f"{portal_name} ({current_year}). "
+        f"Research Data Repository. {portal_url}")
+    citation_bibtex = (
+        f"@misc{{{slugify(portal_name)}_{current_year},\n"
+        f"  title = {{{portal_name}}},\n"
+        f"  year = {{{current_year}}},\n"
+        f"  url = {{{portal_url}}}\n"
+        f"}}")
 
     return render_page_template(
         'index',
         map=map_,
         map_data=map_data,
         view_class_count=get_view_class_count(),
-        project_cards=project_cards)
+        project_cards=project_cards,
+        main_project=main_project,
+        landing_stats=landing_stats,
+        citation_apa=citation_apa,
+        citation_bibtex=citation_bibtex)
+
+
+@app.route('/api/landing/sites-geojson')
+def landing_sites_geojson() -> Response:
+    """Return compact clustered sites GeoJSON for the landing page."""
+    case_study_tuple = tuple(g.case_study_ids)
+    data = get_landing_sites_geojson(case_study_tuple)
+    return jsonify(data)
 
 
 @app.route('/language=<language>')

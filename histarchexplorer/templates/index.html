@@ -3,166 +3,474 @@
 {% block content %}
 
   <script>
-    const mapStyle = '{{ map  | safe }}'
-    const chosenMap = '{{ map | safe }}'
-    const imgString = '{{ map_data.index_img | safe }}'
-    const imgOrMap = '{{ map_data.img_map | safe }}'
+    window.landingMapStyle = '{{ map | safe if map else "" }}';
+    window.landingStats = {{ landing_stats | tojson | safe }};
   </script>
 
+  <div class="page-wrapper landing-page-wrapper">
+    <!-- Hero Section -->
+    <header
+      class="hero-section text-white position-relative overflow-hidden
+             {% if map_data.img_map == 'image' %}hero-with-bg{% endif %}"
+      {% if map_data.img_map == 'image' and map_data.index_img %}
+      style="background-image: linear-gradient(rgba(15, 23, 42, 0.78),
+             rgba(15, 23, 42, 0.88)), url('{{ map_data.index_img }}');"
+      {% endif %}>
+      <div class="container py-5 position-relative hero-content">
+        <div class="row justify-content-center text-center">
+          <div class="col-lg-10 col-xl-9">
+            <div
+              class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3
+                     rounded-pill bg-white bg-opacity-10 border border-white
+                     border-opacity-20 text-white-50 small">
+              <span class="badge bg-success rounded-pill px-2 py-1">{{ _('Open Science') }}</span>
+              <span>{{ _('FAIR Archaeological Research Repository') }}</span>
+            </div>
 
-  <div>
-    <div id="index-container">
-      <div class="button-container">
-        <a id="entities_mobile" class="text-center" href="#mobileAnchor">
-          <i class="bi bi-arrow-down-circle-fill"></i>
-        </a>
+            <h1 class="display-4 fw-bold mb-3 tracking-tight text-white">
+              {% if main_project and 'display' in main_project.name %}
+                {{ main_project.name['display']['label'] }}
+              {% else %}
+                Histarchexplorer
+              {% endif %}
+            </h1>
+
+            <p class="lead text-white-50 mb-4 px-md-5">
+              {% if main_project and main_project.description and 'display' in main_project.description
+                    and main_project.description['display']['label'] %}
+                {{ main_project.description['display']['label'] | striptags }}
+              {% else %}
+                {{ _('Wissenschaftliche Forschungsplattform für archäologische Bestattungs- und Siedlungsdaten.') }}
+              {% endif %}
+            </p>
+
+            <!-- Quick Search Bar -->
+            <div class="row justify-content-center mb-4">
+              <div class="col-md-9 col-lg-8">
+                <form action="{{ url_for('search') }}" method="GET" class="hero-search-form shadow-lg">
+                  <div class="input-group input-group-lg bg-white rounded-pill overflow-hidden p-1">
+                    <span class="input-group-text bg-transparent border-0 text-muted ps-3">
+                      <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text"
+                           name="q"
+                           class="form-control border-0 shadow-none px-2 text-dark"
+                           placeholder="{{ _('Fundorte, Befunde, Funde oder Literatur durchsuchen...') }}"
+                           aria-label="{{ _('Suche') }}">
+                    <button class="btn btn-primary rounded-pill px-4 fw-semibold" type="submit">
+                      {{ _('Suchen') }}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Action Badges / CTAs -->
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+              <a href="{{ url_for('entities') }}" class="btn btn-outline-light rounded-pill px-4 py-2">
+                <i class="bi bi-collection me-2"></i>{{ _('Forschungsdaten erkunden') }}
+              </a>
+              <a href="#spatial-section" class="btn btn-outline-light rounded-pill px-4 py-2">
+                <i class="bi bi-map me-2"></i>{{ _('Interaktive Karte') }}
+              </a>
+              <a href="{{ url_for('search') }}" class="btn btn-outline-light rounded-pill px-4 py-2">
+                <i class="bi bi-sliders me-2"></i>{{ _('Erweiterte Suche') }}
+              </a>
+            </div>
+
+            <!-- FAIR / Standards Badges -->
+            <div
+              class="d-flex flex-wrap justify-content-center gap-3 mt-4 pt-3
+                     border-top border-white border-opacity-10 small text-white-50">
+              <span><i class="bi bi-shield-check text-success me-1"></i>CC BY 4.0</span>
+              <span><i class="bi bi-diagram-3 text-info me-1"></i>CIDOC CRM</span>
+              <span><i class="bi bi-link-45deg text-warning me-1"></i>Linked Open Data</span>
+              <span><i class="bi bi-database-check text-success me-1"></i>REST API</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="carousel-overlay">
-        <div id="project-cards" class="project-carousel">
-          {% for p in project_cards %}
-            <div class="project-card-wrapper">
-              <a href="{{ url_for('about', slug=p.slug) }}"
-                 class="text-decoration-none">
-                <div class="project-card">
+    </header>
+
+    <!-- Case Studies / Projects Showcase -->
+    {% if project_cards %}
+    <section class="py-5 bg-body-tertiary border-bottom">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <span class="text-primary text-uppercase fw-bold small tracking-wider">
+              {{ _('Forschungsprojekte') }}
+            </span>
+            <h3 class="fw-bold mb-0 text-body">{{ _('Aktive Fallstudien & Korpora') }}</h3>
+          </div>
+          <a href="{{ url_for('about') }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+            {{ _('Alle anzeigen') }} <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+          {% for p in project_cards[:4] %}
+            <div class="col">
+              <a href="{{ url_for('about', slug=p.slug) }}" class="text-decoration-none">
+                <div class="card h-100 shadow-sm border-0 project-highlight-card">
                   {% if p.image %}
-                    <div class="project-card-img">
-                      <img src="{{ p.image }}" alt="{{ p.name }}">
+                    <div class="card-img-top-wrapper">
+                      <img src="{{ p.image }}" class="card-img-top" alt="{{ p.name }}">
                     </div>
                   {% else %}
-                    <div class="project-card-placeholder">{{ p.acronym }}</div>
+                    <div class="card-img-placeholder d-flex align-items-center justify-content-center fw-bold">
+                      {{ p.acronym or p.name[:3] }}
+                    </div>
                   {% endif %}
-                  {% if p.description %}
-                    <div
-                      class="project-card-desc">{{ p.description | safe }}</div>
-                  {% endif %}
+                  <div class="card-body">
+                    <span class="badge bg-primary-subtle text-primary mb-2">{{ p.acronym }}</span>
+                    <h5 class="card-title text-body fw-bold fs-6">{{ p.name }}</h5>
+                    {% if p.description %}
+                      <p class="card-text text-muted small">{{ p.description | striptags | truncate(100) }}</p>
+                    {% endif %}
+                  </div>
                 </div>
               </a>
             </div>
           {% endfor %}
         </div>
       </div>
+    </section>
+    {% endif %}
 
-      <div id="map"
-           class="{% if map_data.greyscale %}map-gray{% endif %}"></div>
-    </div>
+    <!-- Research Metrics / KPI Dashboard -->
+    <section class="py-5 border-bottom">
+      <div class="container">
+        <div class="text-center mb-5">
+          <span class="text-primary text-uppercase fw-bold small tracking-wider">{{ _('Datenbestand') }}</span>
+          <h2 class="fw-bold text-body">{{ _('Forschung in Zahlen') }}</h2>
+          <p class="text-muted">{{ _('Verifizierte wissenschaftliche Entitäten der integrierten Datenbanken.') }}</p>
+        </div>
 
-    <div id="counters" class="text-center pt-3">
-      <div class="row gx-0">
-        {% for view_class, details in view_class_count.items() %}
-          <div class="col-lg col-md-4">
-            <h5 class="statistic-counter">{{ details['count'] }}</h5>
-            <p>{{ _(view_class) | capitalize }}</p>
+        <div class="row g-3 g-md-4 text-center">
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card h-100 border-0 shadow-sm p-3 kpi-metric-card kpi-metric--places">
+              <div class="kpi-metric__icon mb-2"><i class="bi bi-geo-alt"></i></div>
+              <h3 class="fw-bold mb-0 text-body">
+                {{ landing_stats.kpis.places or view_class_count.places.count or 0 }}
+              </h3>
+              <p class="text-muted small mb-0">{{ _('Fundorte') }}</p>
+            </div>
           </div>
-        {% endfor %}
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card h-100 border-0 shadow-sm p-3 kpi-metric-card kpi-metric--features">
+              <div class="kpi-metric__icon mb-2"><i class="bi bi-layers"></i></div>
+              <h3 class="fw-bold mb-0 text-body">
+                {{ landing_stats.kpis.features or view_class_count.features.count or 0 }}
+              </h3>
+              <p class="text-muted small mb-0">{{ _('Befunde & Gräber') }}</p>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card h-100 border-0 shadow-sm p-3 kpi-metric-card kpi-metric--items">
+              <div class="kpi-metric__icon mb-2"><i class="bi bi-gem"></i></div>
+              <h3 class="fw-bold mb-0 text-body">
+                {{ landing_stats.kpis.artifacts or view_class_count.items.count or 0 }}
+              </h3>
+              <p class="text-muted small mb-0">{{ _('Fundobjekte') }}</p>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card h-100 border-0 shadow-sm p-3 kpi-metric-card kpi-metric--remains">
+              <div class="kpi-metric__icon mb-2"><i class="bi bi-person-standing"></i></div>
+              <h3 class="fw-bold mb-0 text-body">{{ landing_stats.kpis.human_remains or 0 }}</h3>
+              <p class="text-muted small mb-0">{{ _('Anthropologie') }}</p>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card h-100 border-0 shadow-sm p-3 kpi-metric-card kpi-metric--references">
+              <div class="kpi-metric__icon mb-2"><i class="bi bi-book"></i></div>
+              <h3 class="fw-bold mb-0 text-body">{{ landing_stats.kpis.references or 0 }}</h3>
+              <p class="text-muted small mb-0">{{ _('Quellen & Literatur') }}</p>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-lg-2">
+            <div class="card h-100 border-0 shadow-sm p-3 kpi-metric-card kpi-metric--files">
+              <div class="kpi-metric__icon mb-2"><i class="bi bi-image"></i></div>
+              <h3 class="fw-bold mb-0 text-body">{{ landing_stats.kpis.files or 0 }}</h3>
+              <p class="text-muted small mb-0">{{ _('Medien & 3D') }}</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Hover cards_home-->
-    <div id="mobileAnchor" class="cards_home_container">
-      {% for view_class, details in view_class_count.items() %}
-        <a href="{{ url_for('entities', tab_name=view_class) }}"
-           class="text-decoration-none">
-          <div id="{{ view_class | lower }}-card"
-               class="entity-card entity-card--{{ view_class | lower }}">
-            <div class="entity-card__icon">
-              <img
-                src="/static/images/entity_icons/{{ view_class[:-1] | lower }}.png"
-                onerror="this.src='/static/images/entity_icons/item.png'"
-                alt="{{ view_class }}">
-            </div>
-            <div class="entity-card__label">{{ _(view_class) | capitalize }}</div>
-            <div class="entity-card__description">Lorem ipsum dolor sit amet
-              consectetur. Risus malesuada feugiat
-              sit integer non. Nisl blandit at scelerisque id arcu nisi nisl
-              lacus.
+    <!-- Scientific Charts Section (Chronology & Typology) -->
+    {% if landing_stats.chronology or landing_stats.site_types %}
+    <section class="py-5 bg-body-tertiary border-bottom">
+      <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+          <div>
+            <span class="text-primary text-uppercase fw-bold small tracking-wider">{{ _('Analysen') }}</span>
+            <h3 class="fw-bold mb-0 text-body">{{ _('Wissenschaftliche Datenverteilung') }}</h3>
+          </div>
+          <div class="text-muted small">
+            <i class="bi bi-bar-chart-line me-1"></i>{{ _('Interaktive Histogramme') }}
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <!-- Chronology Chart -->
+          <div class="col-lg-7">
+            <div class="card h-100 border-0 shadow-sm p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0 text-body">
+                  <i class="bi bi-calendar-range text-primary me-2"></i>{{ _('Chronologische Verteilung') }}
+                </h5>
+                <span class="badge bg-secondary-subtle text-secondary">{{ _('Datiert n. Chr.') }}</span>
+              </div>
+              <p class="text-muted small mb-3">
+                {{ _('Verteilung der archäologischen Datierungen nach Jahrhunderten (Spätantike bis Mittelalter).') }}
+              </p>
+              <div class="chart-container position-relative" style="height: 280px;">
+                <canvas id="chronoChartCanvas"></canvas>
+              </div>
             </div>
           </div>
-        </a>
-      {% endfor %}
-    </div>
 
+          <!-- Typology Chart -->
+          <div class="col-lg-5">
+            <div class="card h-100 border-0 shadow-sm p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0 text-body">
+                  <i class="bi bi-pie-chart text-primary me-2"></i>{{ _('Typologische Gliederung') }}
+                </h5>
+                <div class="btn-group btn-group-sm" role="group">
+                  <button type="button" id="btnShowSiteTypes" class="btn btn-outline-secondary active">
+                    {{ _('Orte') }}
+                  </button>
+                  <button type="button" id="btnShowArtifactTypes" class="btn btn-outline-secondary">
+                    {{ _('Funde') }}
+                  </button>
+                </div>
+              </div>
+              <p class="text-muted small mb-3">
+                {{ _('Aufschlüsselung nach den meistdokumentierten Klassifikationen.') }}
+              </p>
+              <div class="chart-container position-relative" style="height: 280px;">
+                <canvas id="typologyChartCanvas"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Clustered Spatial Section (Lazy-Loaded Map) -->
+    <section id="spatial-section" class="py-5 border-bottom">
+      <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+          <div>
+            <span class="text-primary text-uppercase fw-bold small tracking-wider">{{ _('Geographie') }}</span>
+            <h3 class="fw-bold mb-0 text-body">{{ _('Räumliche Verteilung der Fundplätze') }}</h3>
+            <p class="text-muted small mb-0">
+              {{ _('Interaktive Fundstellenkarte mit ressourcenschonendem Clustering.') }}
+            </p>
+          </div>
+          <a href="{{ url_for('entities', tab_name='places') }}" class="btn btn-sm btn-outline-primary rounded-pill">
+            <i class="bi bi-arrows-fullscreen me-1"></i>{{ _('Vollständige Kartenansicht') }}
+          </a>
+        </div>
+
+        <div class="card border-0 shadow-sm overflow-hidden position-relative landing-map-card">
+          <!-- Loading Spinner -->
+          <div
+            id="map-loading-indicator"
+            class="position-absolute top-50 start-50 translate-middle text-center d-none z-3">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">{{ _('Laden...') }}</span>
+            </div>
+            <p class="small text-muted mt-2 fw-medium">{{ _('Lade Geodaten...') }}</p>
+          </div>
+
+          <!-- Map Container -->
+          <div
+            id="landing-cluster-map"
+            class="w-100 {% if map_data.greyscale %}map-gray{% endif %}"
+            style="height: 480px;"></div>
+
+          <!-- Quick Overlay Control -->
+          <div class="position-absolute bottom-0 start-0 m-3 z-2">
+            <button id="btnActivateMap" type="button" class="btn btn-sm btn-light shadow-sm rounded-pill d-none">
+              <i class="bi bi-geo-alt-fill text-primary me-1"></i>{{ _('Karte aktivieren') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Thematic Exploration Cards (Entry Points) -->
+    <section class="py-5 bg-body-tertiary border-bottom">
+      <div class="container">
+        <div class="text-center mb-5">
+          <span class="text-primary text-uppercase fw-bold small tracking-wider">{{ _('Systematik') }}</span>
+          <h2 class="fw-bold text-body">{{ _('Thematische Erkundung') }}</h2>
+          <p class="text-muted">{{ _('Wählen Sie einen thematischen Zugang zu den Forschungsbeständen.') }}</p>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+          <!-- Places -->
+          <div class="col">
+            <a href="{{ url_for('entities', tab_name='places') }}" class="text-decoration-none">
+              <div class="card h-100 border-0 shadow-sm p-4 thematic-entry-card thematic-entry--places">
+                <div class="thematic-entry__icon mb-3">
+                  <img src="/static/images/entity_icons/place.png"
+                       onerror="this.src='/static/images/entity_icons/item.png'"
+                       alt="Places">
+                </div>
+                <h5 class="fw-bold text-body mb-2">{{ _('Fundorte & Gräberfelder') }}</h5>
+                <p class="text-muted small mb-3">
+                  {{ _('Archäologische Fundstellen, Gräberfelder, Kirchen und Siedlungsstrukturen mit Koordinaten.') }}
+                </p>
+                <span class="btn btn-sm btn-outline-success rounded-pill align-self-start mt-auto">
+                  {{ _('Orte durchsuchen') }} <i class="bi bi-arrow-right ms-1"></i>
+                </span>
+              </div>
+            </a>
+          </div>
+
+          <!-- Features -->
+          <div class="col">
+            <a href="{{ url_for('entities', tab_name='features') }}" class="text-decoration-none">
+              <div class="card h-100 border-0 shadow-sm p-4 thematic-entry-card thematic-entry--features">
+                <div class="thematic-entry__icon mb-3">
+                  <img src="/static/images/entity_icons/feature.png"
+                       onerror="this.src='/static/images/entity_icons/item.png'"
+                       alt="Features">
+                </div>
+                <h5 class="fw-bold text-body mb-2">{{ _('Befunde & Strukturen') }}</h5>
+                <p class="text-muted small mb-3">
+                  {{ _('Grabkonstruktionen, Bestattungen, anthropologische Befunde und stratigraphische Einheiten.') }}
+                </p>
+                <span class="btn btn-sm btn-outline-secondary rounded-pill align-self-start mt-auto">
+                  {{ _('Befunde durchsuchen') }} <i class="bi bi-arrow-right ms-1"></i>
+                </span>
+              </div>
+            </a>
+          </div>
+
+          <!-- Items -->
+          <div class="col">
+            <a href="{{ url_for('entities', tab_name='items') }}" class="text-decoration-none">
+              <div class="card h-100 border-0 shadow-sm p-4 thematic-entry-card thematic-entry--items">
+                <div class="thematic-entry__icon mb-3">
+                  <img src="/static/images/entity_icons/item.png" alt="Items">
+                </div>
+                <h5 class="fw-bold text-body mb-2">{{ _('Materielle Kultur') }}</h5>
+                <p class="text-muted small mb-3">
+                  {{ _('Archäologische Artefakte, Schmuck, Keramik, Waffen, Trachtbestandteile und Skelettreste.') }}
+                </p>
+                <span class="btn btn-sm btn-outline-warning text-dark rounded-pill align-self-start mt-auto">
+                  {{ _('Objekte durchsuchen') }} <i class="bi bi-arrow-right ms-1"></i>
+                </span>
+              </div>
+            </a>
+          </div>
+
+          <!-- Sources / Research -->
+          <div class="col">
+            <a href="{{ url_for('entities', tab_name='sources') }}" class="text-decoration-none">
+              <div class="card h-100 border-0 shadow-sm p-4 thematic-entry-card thematic-entry--sources">
+                <div class="thematic-entry__icon mb-3">
+                  <img src="/static/images/entity_icons/source.png"
+                       onerror="this.src='/static/images/entity_icons/item.png'"
+                       alt="Sources">
+                </div>
+                <h5 class="fw-bold text-body mb-2">{{ _('Quellen & Literatur') }}</h5>
+                <p class="text-muted small mb-3">
+                  {{ _('Fachbibliographie, Primärquellen und Verknüpfungen zu externen Fachnormdaten.') }}
+                </p>
+                <span class="btn btn-sm btn-outline-dark rounded-pill align-self-start mt-auto">
+                  {{ _('Quellen ansehen') }} <i class="bi bi-arrow-right ms-1"></i>
+                </span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAIR Data, Citation & Open Science Section -->
+    <section class="py-5">
+      <div class="container">
+        <div class="row g-4 align-items-stretch">
+          <!-- Citation Module -->
+          <div class="col-lg-7">
+            <div class="card h-100 border-0 shadow-sm p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0 text-body">
+                  <i class="bi bi-quote text-primary me-2"></i>{{ _('Zitierempfehlung') }}
+                </h5>
+                <div class="btn-group btn-group-sm" role="group">
+                  <button type="button" id="tabCitationApa" class="btn btn-outline-secondary active">APA</button>
+                  <button type="button" id="tabCitationBibtex" class="btn btn-outline-secondary">BibTeX</button>
+                </div>
+              </div>
+              <p class="text-muted small mb-3">
+                {{ _('Bitte zitieren Sie bei wissenschaftlicher Nutzung dieses Repositoriums folgenden Nachweis:') }}
+              </p>
+              <div class="bg-body-secondary p-3 rounded-3 font-monospace small mb-3 overflow-auto"
+                   id="citationContent"
+                   data-apa="{{ citation_apa }}"
+                   data-bibtex="{{ citation_bibtex }}"
+                   style="max-height: 140px; white-space: pre-wrap;">{{ citation_apa }}</div>
+              <div class="d-flex justify-content-end">
+                <button type="button" id="btnCopyCitation" class="btn btn-sm btn-outline-primary rounded-pill">
+                  <i class="bi bi-clipboard me-1"></i>{{ _('Zitation kopieren') }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Open Data & Interfaces -->
+          <div class="col-lg-5">
+            <div class="card h-100 border-0 shadow-sm p-4">
+              <h5 class="fw-bold mb-3 text-body">
+                <i class="bi bi-box-arrow-up-right text-primary me-2"></i>{{ _('Offene Schnittstellen & Standards') }}
+              </h5>
+              <p class="text-muted small mb-3">
+                {{ _('Forschungsdaten nach FAIR-Kriterien (Findable, Accessible, Interoperable, Reusable):') }}
+              </p>
+              <ul class="list-unstyled small mb-4">
+                <li class="mb-2">
+                  <i class="bi bi-check2-circle text-success me-2"></i>
+                  <strong>CIDOC CRM:</strong> {{ _('Ontologische Datenmodellierung') }}
+                </li>
+                <li class="mb-2">
+                  <i class="bi bi-check2-circle text-success me-2"></i>
+                  <strong>LOD:</strong> {{ _('Verlinkt mit Wikidata, PeriodO, GeoNames & GND') }}
+                </li>
+                <li class="mb-2">
+                  <i class="bi bi-check2-circle text-success me-2"></i>
+                  <strong>REST-API:</strong> {{ _('Maschinenlesbarer Zugriff via JSON/GeoJSON') }}
+                </li>
+              </ul>
+              <div class="mt-auto">
+                <a href="{{ url_for('vocabulary') }}" class="btn btn-sm btn-outline-secondary rounded-pill me-2">
+                  <i class="bi bi-tags me-1"></i>{{ _('Vokabular') }}
+                </a>
+                <a href="{{ url_for('type_tree') }}"
+                   class="btn btn-sm btn-outline-secondary rounded-pill"
+                   target="_blank">
+                  <i class="bi bi-code-slash me-1"></i>{{ _('API Endpunkt') }}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <!-- Footer inside scrollable page-wrapper -->
+    {% include 'footer.html' %}
   </div>
 
-  {% include 'footer.html' %}
-
-
+  <!-- External JS modules for Landing Page -->
+  <script src="{{ url_for('static', filename='js/landingCharts.js') }}"></script>
   <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const container = document.getElementById("project-cards");
-      let cards = [...container.querySelectorAll(".project-card-wrapper")];
-
-      if (cards.length === 0) return;
-
-      const CLONE_COUNT = 4;  // how many cards are visible at once
-
-      // --- STEP 1: Clone first and last cards for infinite loop ---
-      const firstClones = cards.slice(0, CLONE_COUNT).map(c => c.cloneNode(true));
-      const lastClones = cards.slice(-CLONE_COUNT).map(c => c.cloneNode(true));
-
-      lastClones.forEach(cl => container.insertBefore(cl, container.firstChild));
-      firstClones.forEach(cl => container.appendChild(cl));
-
-      // Update cards list
-      cards = [...container.querySelectorAll(".project-card-wrapper")];
-
-      const style = getComputedStyle(container);
-      const gap = parseInt(style.columnGap || style.gap || "0", 10);
-      const cardWidth = cards[0].offsetWidth + gap;
-
-      // --- STEP 2: Start at the real first card (offset by the clone zone) ---
-      let index = CLONE_COUNT;
-      let scrollX = index * cardWidth;
-      container.scrollLeft = scrollX;
-
-      // --- Highlight center card ---
-      function highlightCards() {
-        const center = container.scrollLeft + container.offsetWidth / 2;
-
-        cards.forEach((card, i) => {
-          const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-          const dist = Math.abs(center - cardCenter);
-
-          card.classList.remove("active", "side");
-
-          if (dist < cardWidth * 0.6) {
-            card.classList.add("active");
-          } else if (dist < cardWidth * 1.6) {
-            card.classList.add("side");
-          }
-        });
-      }
-
-      // --- Auto-rotating infinite scroll ---
-      function rotate() {
-        index++;
-        const maxIndex = cards.length - CLONE_COUNT - 1;
-
-        if (index > maxIndex) {
-          // jump back to the real section
-          index = CLONE_COUNT + 1;
-          container.scrollLeft = (index - 1) * cardWidth;
-        }
-
-        const newScrollX = index * cardWidth;
-
-        container.scrollTo({
-          left: newScrollX,
-          behavior: "smooth"
-        });
-
-        setTimeout(highlightCards, 300);
-      }
-
-      // Scroll event keeps highlighting in sync
-      container.addEventListener("scroll", highlightCards);
-
-      highlightCards();
-      setInterval(rotate, 5000);
-    });
-  </script>
-
 
 {% endblock %}
