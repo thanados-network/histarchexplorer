@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-23 15:31+0200\n"
+"POT-Creation-Date: 2026-10-22 17:01+0200\n"
 "PO-Revision-Date: 2026-05-22 14:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sl\n"
@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.18.0\n"
 
 #: api/util.py:43 api/util.py:45 api/util.py:46 api/util.py:51
 msgid "BC"
@@ -80,7 +80,7 @@ msgid "URI"
 msgstr "URI"
 
 #: forms/admin.py:34 templates/admin/license_management.html:37
-#: templates/admin/predefined_filter.html:48
+#: templates/admin/predefined_filter.html:106
 msgid "Label"
 msgstr "Oznaka"
 
@@ -128,8 +128,8 @@ msgstr "prijava"
 msgid "Back to the entity"
 msgstr "Nazaj na entiteto"
 
-#: templates/_macros.html:59 templates/about.html:215 templates/entity.html:93
-#: templates/entity.html:113
+#: templates/_macros.html:59 templates/about.html:215 templates/entity.html:96
+#: templates/entity.html:116
 msgid "Loading"
 msgstr "Nalaganje"
 
@@ -137,7 +137,7 @@ msgstr "Nalaganje"
 msgid "Show details"
 msgstr "Prikaži podrobnosti"
 
-#: templates/about.html:66 views/admin.py:61
+#: templates/about.html:66 views/admin.py:78
 msgid "persons"
 msgstr "osebe"
 
@@ -149,7 +149,7 @@ msgstr "pregled podatkov"
 msgid "project data overview"
 msgstr "pregled projektnih podatkov"
 
-#: templates/about.html:153 views/admin.py:57
+#: templates/about.html:153 views/admin.py:74
 msgid "projects"
 msgstr "projekti"
 
@@ -202,7 +202,7 @@ msgstr "Splošne nastavitve"
 msgid "Visibility Settings"
 msgstr "Nastavitve vidnosti"
 
-#: templates/admin.html:32 templates/admin.html:133
+#: templates/admin.html:32 templates/admin.html:141
 msgid "Class colors"
 msgstr "Barve razredov"
 
@@ -210,7 +210,7 @@ msgstr "Barve razredov"
 msgid "Type Divisions"
 msgstr "Razdelitev tipov"
 
-#: templates/admin.html:34 templates/admin.html:171
+#: templates/admin.html:34 templates/admin.html:179
 msgid "Predefined Filters"
 msgstr ""
 
@@ -240,11 +240,11 @@ msgstr "Začetna stran"
 msgid "About"
 msgstr "O projektu"
 
-#: templates/admin.html:41 templates/publications.html:6 utils/view_util.py:59
+#: templates/admin.html:41 templates/publications.html:6 utils/view_util.py:62
 msgid "Publications"
 msgstr "Publikacije"
 
-#: templates/admin.html:42 utils/view_util.py:62
+#: templates/admin.html:42 utils/view_util.py:65
 msgid "Outcome"
 msgstr "Izid"
 
@@ -261,80 +261,352 @@ msgstr "Noga"
 msgid "Search"
 msgstr "Iskanje"
 
-#: templates/admin.html:46
+#: templates/admin.html:46 templates/admin/vocabulary_settings.html:4
+#: utils/view_util.py:59
+msgid "Vocabulary"
+msgstr ""
+
+#: templates/admin.html:47
 msgid "File Management"
 msgstr "Upravljanje datotek"
 
-#: templates/admin.html:47 templates/admin/logo_management.html:3
+#: templates/admin.html:48 templates/admin/logo_management.html:3
 msgid "Logo Management"
 msgstr "Upravljanje logotipov"
 
-#: templates/admin.html:48
+#: templates/admin.html:49
 msgid "Icons"
 msgstr "Ikone"
 
-#: templates/admin.html:49
+#: templates/admin.html:50
 msgid "Assets"
 msgstr "Sredstva"
 
-#: templates/admin.html:50
+#: templates/admin.html:51
 msgid "Team"
 msgstr "Ekipa"
 
-#: templates/admin.html:51
+#: templates/admin.html:52
 msgid "Licenses"
 msgstr "Licence"
 
-#: templates/admin.html:52
+#: templates/admin.html:53
 msgid "Maps"
 msgstr "Zemljevidi"
 
-#: templates/admin.html:53
+#: templates/admin.html:54
 msgid "Cache Options"
 msgstr "Možnosti predpomnilnika"
 
-#: templates/admin.html:54
+#: templates/admin.html:55
 msgid "Database Interface"
 msgstr "Vmesnik baze podatkov"
 
-#: templates/admin.html:106
+#: templates/admin.html:107
 msgid "general settings"
 msgstr "splošne nastavitve"
 
-#: templates/admin.html:120
+#: templates/admin.html:128
 msgid "visibility settings"
 msgstr "nastavitve vidnosti"
 
-#: templates/admin.html:146
+#: templates/admin.html:154
 msgid "type divisions"
 msgstr "razdelitev tipov"
 
-#: templates/admin.html:159 templates/tabs/overview.html:17
+#: templates/admin.html:167 templates/tabs/overview.html:17
 #, fuzzy
 msgid "external identifiers"
 msgstr "Zunanja referenca"
 
-#: templates/admin.html:184
+#: templates/admin.html:192
 msgid "cache options"
 msgstr "možnosti predpomnilnika"
 
-#: templates/admin.html:248 templates/admin/index_page_options.html:3
+#: templates/admin.html:256 templates/admin/index_page_options.html:3
 msgid "index page options"
 msgstr "možnosti indeksne strani"
 
-#: templates/admin.html:270
+#: templates/admin.html:278
 msgid "File Management Overview"
 msgstr "Pregled upravljanja datotek"
 
-#: templates/admin.html:271
+#: templates/admin.html:279
 msgid "Select a file management section from the sidebar to start editing."
 msgstr ""
 "Izberite razdelek za upravljanje datotek v stranski vrstici, da začnete "
 "urejati."
 
-#: templates/admin.html:323
+#: templates/admin.html:331
 msgid "maps"
 msgstr "zemljevidi"
+
+#: templates/index.html:26
+msgid "Open Science"
+msgstr ""
+
+#: templates/index.html:27
+msgid "FAIR Archaeological Research Repository"
+msgstr ""
+
+#: templates/index.html:43
+msgid ""
+"Wissenschaftliche Forschungsplattform für archäologische Bestattungs- und"
+" Siedlungsdaten."
+msgstr ""
+
+#: templates/index.html:58
+msgid "Fundorte, Befunde, Funde oder Literatur durchsuchen..."
+msgstr ""
+
+#: templates/index.html:59
+#, fuzzy
+msgid "Suche"
+msgstr "Vir"
+
+#: templates/index.html:61
+#, fuzzy
+msgid "Suchen"
+msgstr "Vir"
+
+#: templates/index.html:71
+msgid "Forschungsdaten erkunden"
+msgstr ""
+
+#: templates/index.html:74
+msgid "Interaktive Karte"
+msgstr ""
+
+#: templates/index.html:77
+msgid "Erweiterte Suche"
+msgstr ""
+
+#: templates/index.html:102
+msgid "Forschungsprojekte"
+msgstr ""
+
+#: templates/index.html:104
+msgid "Aktive Fallstudien & Korpora"
+msgstr ""
+
+#: templates/index.html:107
+msgid "Alle anzeigen"
+msgstr ""
+
+#: templates/index.html:145
+msgid "Datenbestand"
+msgstr ""
+
+#: templates/index.html:146
+msgid "Forschung in Zahlen"
+msgstr ""
+
+#: templates/index.html:147
+msgid "Verifizierte wissenschaftliche Entitäten der integrierten Datenbanken."
+msgstr ""
+
+#: templates/index.html:157
+msgid "Fundorte"
+msgstr ""
+
+#: templates/index.html:166
+msgid "Befunde & Gräber"
+msgstr ""
+
+#: templates/index.html:175
+msgid "Fundobjekte"
+msgstr ""
+
+#: templates/index.html:182
+msgid "Anthropologie"
+msgstr ""
+
+#: templates/index.html:189 templates/index.html:385
+msgid "Quellen & Literatur"
+msgstr ""
+
+#: templates/index.html:196
+msgid "Medien & 3D"
+msgstr ""
+
+#: templates/index.html:209
+msgid "Analysen"
+msgstr ""
+
+#: templates/index.html:210
+msgid "Wissenschaftliche Datenverteilung"
+msgstr ""
+
+#: templates/index.html:213
+msgid "Interaktive Histogramme"
+msgstr ""
+
+#: templates/index.html:223
+msgid "Chronologische Verteilung"
+msgstr ""
+
+#: templates/index.html:225
+msgid "Datiert n. Chr."
+msgstr ""
+
+#: templates/index.html:228
+msgid ""
+"Verteilung der archäologischen Datierungen nach Jahrhunderten (Spätantike"
+" bis Mittelalter)."
+msgstr ""
+
+#: templates/index.html:241
+msgid "Typologische Gliederung"
+msgstr ""
+
+#: templates/index.html:245
+#, fuzzy
+msgid "Orte"
+msgstr "drugo"
+
+#: templates/index.html:248
+msgid "Funde"
+msgstr ""
+
+#: templates/index.html:253
+msgid "Aufschlüsselung nach den meistdokumentierten Klassifikationen."
+msgstr ""
+
+#: templates/index.html:270
+msgid "Geographie"
+msgstr ""
+
+#: templates/index.html:271
+msgid "Räumliche Verteilung der Fundplätze"
+msgstr ""
+
+#: templates/index.html:273
+msgid "Interaktive Fundstellenkarte mit ressourcenschonendem Clustering."
+msgstr ""
+
+#: templates/index.html:277
+msgid "Vollständige Kartenansicht"
+msgstr ""
+
+#: templates/index.html:287
+msgid "Laden..."
+msgstr ""
+
+#: templates/index.html:289
+msgid "Lade Geodaten..."
+msgstr ""
+
+#: templates/index.html:301
+msgid "Karte aktivieren"
+msgstr ""
+
+#: templates/index.html:312
+msgid "Systematik"
+msgstr ""
+
+#: templates/index.html:313
+msgid "Thematische Erkundung"
+msgstr ""
+
+#: templates/index.html:314
+msgid "Wählen Sie einen thematischen Zugang zu den Forschungsbeständen."
+msgstr ""
+
+#: templates/index.html:327
+msgid "Fundorte & Gräberfelder"
+msgstr ""
+
+#: templates/index.html:329
+msgid ""
+"Archäologische Fundstellen, Gräberfelder, Kirchen und Siedlungsstrukturen"
+" mit Koordinaten."
+msgstr ""
+
+#: templates/index.html:332
+msgid "Orte durchsuchen"
+msgstr ""
+
+#: templates/index.html:347
+msgid "Befunde & Strukturen"
+msgstr ""
+
+#: templates/index.html:349
+msgid ""
+"Grabkonstruktionen, Bestattungen, anthropologische Befunde und "
+"stratigraphische Einheiten."
+msgstr ""
+
+#: templates/index.html:352
+msgid "Befunde durchsuchen"
+msgstr ""
+
+#: templates/index.html:365
+msgid "Materielle Kultur"
+msgstr ""
+
+#: templates/index.html:367
+msgid ""
+"Archäologische Artefakte, Schmuck, Keramik, Waffen, Trachtbestandteile "
+"und Skelettreste."
+msgstr ""
+
+#: templates/index.html:370
+msgid "Objekte durchsuchen"
+msgstr ""
+
+#: templates/index.html:387
+msgid ""
+"Fachbibliographie, Primärquellen und Verknüpfungen zu externen "
+"Fachnormdaten."
+msgstr ""
+
+#: templates/index.html:390
+msgid "Quellen ansehen"
+msgstr ""
+
+#: templates/index.html:408
+msgid "Zitierempfehlung"
+msgstr ""
+
+#: templates/index.html:416
+msgid ""
+"Bitte zitieren Sie bei wissenschaftlicher Nutzung dieses Repositoriums "
+"folgenden Nachweis:"
+msgstr ""
+
+#: templates/index.html:425
+msgid "Zitation kopieren"
+msgstr ""
+
+#: templates/index.html:435
+msgid "Offene Schnittstellen & Standards"
+msgstr ""
+
+#: templates/index.html:438
+msgid ""
+"Forschungsdaten nach FAIR-Kriterien (Findable, Accessible, Interoperable,"
+" Reusable):"
+msgstr ""
+
+#: templates/index.html:443
+msgid "Ontologische Datenmodellierung"
+msgstr ""
+
+#: templates/index.html:447
+msgid "Verlinkt mit Wikidata, PeriodO, GeoNames & GND"
+msgstr ""
+
+#: templates/index.html:451
+msgid "Maschinenlesbarer Zugriff via JSON/GeoJSON"
+msgstr ""
+
+#: templates/index.html:456
+msgid "Vokabular"
+msgstr ""
+
+#: templates/index.html:461
+msgid "API Endpunkt"
+msgstr ""
 
 #: templates/login.html:6
 msgid "Login"
@@ -371,7 +643,7 @@ msgstr "išči"
 msgid "All Years"
 msgstr ""
 
-#: templates/admin/manage_publications.html:47
+#: templates/admin/cache.html:59 templates/admin/manage_publications.html:47
 #: templates/admin/manage_publications.html:164 templates/publications.html:29
 #, fuzzy
 msgid "Type"
@@ -643,8 +915,8 @@ msgstr "Obstoječa sredstva"
 
 #: templates/admin/assets_management.html:60
 #: templates/admin/logo_management.html:52
-#: templates/admin/team_management.html:54 views/admin.py:159
-#: views/admin.py:754 views/admin.py:1701
+#: templates/admin/team_management.html:54 views/admin.py:177
+#: views/admin.py:802 views/admin.py:1775
 msgid "Select License..."
 msgstr "Izberi licenco..."
 
@@ -681,7 +953,7 @@ msgstr "Ali ste prepričani, da želite izbrisati to sredstvo?"
 #: templates/admin/logo_management.html:104
 #: templates/admin/partials/entity_form.html:148
 #: templates/admin/partials/modal_delete_confirm.html:13
-#: templates/admin/predefined_filter.html:24
+#: templates/admin/predefined_filter.html:36
 #: templates/admin/team_management.html:89
 msgid "Delete"
 msgstr "Izbriši"
@@ -690,35 +962,179 @@ msgstr "Izbriši"
 msgid "No assets have been uploaded yet."
 msgstr "Sredstva še niso bila naložena."
 
+#: templates/admin/cache.html:2
+msgid "Not started"
+msgstr ""
+
+#: templates/admin/cache.html:2
+msgid "Queued"
+msgstr ""
+
+#: templates/admin/cache.html:2
+#, fuzzy
+msgid "Running"
+msgstr "Opozorilo:"
+
+#: templates/admin/cache.html:3
+#, fuzzy
+msgid "Completed"
+msgstr "Potrdi izbris"
+
+#: templates/admin/cache.html:3
+msgid "Completed with errors"
+msgstr ""
+
+#: templates/admin/cache.html:4 templates/admin/cache.html:95
+#: templates/admin/cache.html:99
+#, fuzzy
+msgid "Failed"
+msgstr "Datoteka"
+
 #: templates/admin/cache.html:4
+msgid "Interrupted"
+msgstr ""
+
+#: templates/admin/cache.html:10
+msgid "up to 1 day"
+msgstr ""
+
+#: templates/admin/cache.html:10
+msgid "up to 3 days"
+msgstr ""
+
+#: templates/admin/cache.html:11
+msgid "up to 7 days"
+msgstr ""
+
+#: templates/admin/cache.html:11
+msgid "older than 7 days"
+msgstr ""
+
+#: templates/admin/cache.html:25
+#, fuzzy
+msgid "Processed"
+msgstr "Dostopano"
+
+#: templates/admin/cache.html:31
+#, fuzzy
+msgid "Started"
+msgstr "Začetna stran"
+
+#: templates/admin/cache.html:33
+msgid "Finished"
+msgstr ""
+
+#: templates/admin/cache.html:38
+msgid "Recent errors"
+msgstr ""
+
+#: templates/admin/cache.html:55
+#, fuzzy
+msgid "Cache backend"
+msgstr "predpomnilnik počiščen"
+
+#: templates/admin/cache.html:57
+#, fuzzy
+msgid "cached entries"
+msgstr "entitete"
+
+#: templates/admin/cache.html:61
+msgid "Size"
+msgstr ""
+
+#: templates/admin/cache.html:63
+msgid "Hit rate"
+msgstr ""
+
+#: templates/admin/cache.html:65
+msgid "Lifetime"
+msgstr ""
+
+#: templates/admin/cache.html:66
+msgid "days"
+msgstr ""
+
+#: templates/admin/cache.html:74
+#, fuzzy
+msgid "Entity cache"
+msgstr "ogrej predpomnilnik entitete"
+
+#: templates/admin/cache.html:76
+msgid "entities cached (last warm-up list)"
+msgstr ""
+
+#: templates/admin/cache.html:88
+#, python-format
+msgid "Entities are refetched after %(days)s days on access or by the warm-up."
+msgstr ""
+
+#: templates/admin/cache.html:94
+#, fuzzy
+msgid "Entity warm-up"
+msgstr "Tipi entitet"
+
+#: templates/admin/cache.html:95
+msgid "Fetched"
+msgstr ""
+
+#: templates/admin/cache.html:95
+#, fuzzy
+msgid "Already cached"
+msgstr "počisti predpomnilnik"
+
+#: templates/admin/cache.html:98
+#, fuzzy
+msgid "Vocabulary cache"
+msgstr "počisti predpomnilnik"
+
+#: templates/admin/cache.html:103
+msgid ""
+"Statistics are updated every two minutes; job progress refreshes "
+"automatically."
+msgstr ""
+
+#: templates/admin/cache.html:104
+msgid "Last computed"
+msgstr ""
+
+#: templates/admin/cache.html:109
 msgid "Refreshes the system cache."
 msgstr "Osveži sistemski predpomnilnik."
 
-#: templates/admin/cache.html:5
+#: templates/admin/cache.html:110
 msgid "refresh system cache"
 msgstr "osveži sistemski predpomnilnik"
 
-#: templates/admin/cache.html:11
+#: templates/admin/cache.html:113
 msgid "This will cache all not cached entities."
 msgstr "To bo predpomnilo vse entitete, ki še niso v predpomnilniku."
 
-#: templates/admin/cache.html:12
+#: templates/admin/cache.html:114
 msgid "warm entity cache"
 msgstr "ogrej predpomnilnik entitete"
 
-#: templates/admin/cache.html:18
+#: templates/admin/cache.html:117
+msgid "Refetches entities older than the maximum age and caches new ones."
+msgstr ""
+
+#: templates/admin/cache.html:118
+#, fuzzy
+msgid "refresh outdated entities"
+msgstr "osveži predpomnilnik entitete"
+
+#: templates/admin/cache.html:121
 msgid "This completely refreshes the cache."
 msgstr "To popolnoma osveži predpomnilnik."
 
-#: templates/admin/cache.html:19
+#: templates/admin/cache.html:122
 msgid "refresh entity cache"
 msgstr "osveži predpomnilnik entitete"
 
-#: templates/admin/cache.html:26
+#: templates/admin/cache.html:125
 msgid "Clear the cache to free up space"
 msgstr "Počisti predpomnilnik, da sprostiš prostor"
 
-#: templates/admin/cache.html:27
+#: templates/admin/cache.html:126
 msgid "clear cache"
 msgstr "počisti predpomnilnik"
 
@@ -727,7 +1143,7 @@ msgid "select a color"
 msgstr "izberi barvo"
 
 #: templates/admin/colors.html:71 templates/admin/legal_notice.html:29
-#: templates/admin/maps.html:94 templates/admin/partials/entity_form.html:243
+#: templates/admin/maps.html:94 templates/admin/partials/entity_form.html:247
 msgid "save"
 msgstr "shrani"
 
@@ -845,7 +1261,7 @@ msgstr ""
 #: templates/admin/partials/modal_image_selector.html:20
 #: templates/admin/partials/modal_image_selector.html:48
 #: templates/admin/partials/modal_image_selector.html:76
-#: templates/admin/predefined_filter.html:55
+#: templates/admin/predefined_filter.html:162
 msgid "None"
 msgstr "Brez"
 
@@ -865,21 +1281,21 @@ msgid "Disable display in Overview"
 msgstr "pregled podatkov"
 
 #: templates/admin/external_identifiers.html:92
-#: templates/admin/predefined_filter.html:53
+#: templates/admin/predefined_filter.html:160
 #: templates/admin/type_divisions.html:21
 #: templates/admin/type_divisions.html:202
 msgid "Icon Type"
 msgstr "Tip ikone"
 
 #: templates/admin/external_identifiers.html:105
-#: templates/admin/predefined_filter.html:55
+#: templates/admin/predefined_filter.html:163
 #: templates/admin/type_divisions.html:34
 #: templates/admin/type_divisions.html:215
 msgid "Bootstrap Icon Class"
 msgstr ""
 
 #: templates/admin/external_identifiers.html:116
-#: templates/admin/predefined_filter.html:56
+#: templates/admin/predefined_filter.html:164
 #: templates/admin/type_divisions.html:45
 #: templates/admin/type_divisions.html:225
 #, fuzzy
@@ -887,6 +1303,7 @@ msgid "SVG Icon File"
 msgstr "Vrednost ikone"
 
 #: templates/admin/external_identifiers.html:122
+#: templates/admin/predefined_filter.html:171
 #: templates/admin/type_divisions.html:51
 #: templates/admin/type_divisions.html:108
 #, fuzzy
@@ -894,7 +1311,6 @@ msgid "Select Icon..."
 msgstr "Izberi licenco..."
 
 #: templates/admin/external_identifiers.html:138
-#: templates/admin/predefined_filter.html:59
 #: templates/admin/type_divisions.html:67
 #: templates/admin/type_divisions.html:239
 msgid "Preview:"
@@ -919,23 +1335,19 @@ msgstr "shrani spremembe"
 msgid "Footer Order"
 msgstr "Vrstni red v nogi"
 
-#: templates/admin/footer_content_management.html:16
-msgid "Save Footer Order"
-msgstr "Shrani vrstni red v nogi"
-
-#: templates/admin/footer_content_management.html:22
+#: templates/admin/footer_content_management.html:21
 msgid "Select Footer Logos"
 msgstr "Izberi logotipe v nogi"
 
-#: templates/admin/footer_content_management.html:39
+#: templates/admin/footer_content_management.html:38
 msgid "Add to Footer"
 msgstr "Dodaj v nogo"
 
-#: templates/admin/footer_content_management.html:47
+#: templates/admin/footer_content_management.html:46
 msgid "Save Footer Selection"
 msgstr "Shrani izbor v nogi"
 
-#: templates/admin/footer_content_management.html:49
+#: templates/admin/footer_content_management.html:48
 #: templates/admin/logo_management.html:113
 msgid "No logos have been uploaded yet."
 msgstr "Logotipi še niso bili naloženi."
@@ -1223,7 +1635,7 @@ msgstr "publikacije"
 #: templates/admin/partials/modal_add_entry.html:219
 #: templates/admin/partials/modal_delete_confirm.html:14
 #: templates/admin/partials/modal_image_selector.html:101
-#: templates/admin/predefined_filter.html:91
+#: templates/admin/predefined_filter.html:276
 msgid "Cancel"
 msgstr "Prekliči"
 
@@ -1320,71 +1732,124 @@ msgstr "Posamezno"
 msgid "Drag filters to change their display order."
 msgstr ""
 
+#: templates/admin/partials/entity_form.html:181
+#: templates/admin/predefined_filter.html:11
+msgid "Drag to reorder"
+msgstr ""
+
 #: templates/admin/partials/entity_form.html:139
-#: templates/admin/predefined_filter.html:17
+#: templates/admin/predefined_filter.html:29
 msgid "Edit"
 msgstr "Uredi"
 
-#: templates/admin/predefined_filter.html:23
+#: templates/admin/predefined_filter.html:37
 msgid "Delete this predefined filter?"
 msgstr ""
 
-#: templates/admin/predefined_filter.html:35
+#: templates/admin/predefined_filter.html:81
+#, fuzzy
+msgid "All tabs"
+msgstr "Tip strani"
+
+#: templates/admin/predefined_filter.html:91
 msgid "Add predefined filter"
 msgstr ""
 
-#: templates/admin/predefined_filter.html:43
+#: templates/admin/predefined_filter.html:99
 msgid "Predefined Filter"
 msgstr ""
 
-#: templates/admin/predefined_filter.html:50
+#: templates/admin/predefined_filter.html:109
+#: templates/admin/predefined_filter.html:135
+#, fuzzy
+msgid "Language selector"
+msgstr "Deaktiviraj izbirnik jezika"
+
+#: templates/admin/predefined_filter.html:132
 #, fuzzy
 msgid "Description"
 msgstr "opis"
 
-#: templates/admin/predefined_filter.html:57
+#: templates/admin/predefined_filter.html:167
 #, fuzzy
-msgid "Icon value"
+msgid "Icon Value"
 msgstr "Tip ikone"
 
-#: templates/admin/predefined_filter.html:61
-msgid "Tabs"
+#: templates/admin/predefined_filter.html:178
+msgid "Preview"
 msgstr ""
 
-#: templates/admin/predefined_filter.html:66
-msgid "Leave empty to show all tabs."
+#: templates/admin/predefined_filter.html:188
+msgid "Begin from"
 msgstr ""
 
-#: templates/admin/predefined_filter.html:67
+#: templates/admin/predefined_filter.html:193
+msgid "Begin to"
+msgstr ""
+
+#: templates/admin/predefined_filter.html:202
+msgid "Include entities without begin date"
+msgstr ""
+
+#: templates/admin/predefined_filter.html:208
 #, fuzzy
-msgid "Classes"
-msgstr "Sredstva"
+msgid "End from"
+msgstr "Pridobljeno iz"
 
-#: templates/admin/predefined_filter.html:73
+#: templates/admin/predefined_filter.html:213
+#, fuzzy
+msgid "End to"
+msgstr "Izdaja"
+
+#: templates/admin/predefined_filter.html:222
+msgid "Include entities without end date"
+msgstr ""
+
+#: templates/admin/predefined_filter.html:227
 #, fuzzy
 msgid "Case studies"
 msgstr "Izberite vrednost"
 
-#: templates/admin/predefined_filter.html:77
+#: templates/admin/predefined_filter.html:230
+#, fuzzy
+msgid "Select case studies"
+msgstr "Izberite vrednost"
+
+#: templates/admin/predefined_filter.html:249
 #: templates/admin/type_divisions.html:75
 #: templates/admin/type_divisions.html:247
 msgid "Type IDs (comma-separated)"
 msgstr ""
 
-#: templates/admin/predefined_filter.html:80
+#: templates/admin/predefined_filter.html:252
 #, fuzzy
 msgid "Include subtypes"
 msgstr "Tip strani"
 
-#: templates/admin/predefined_filter.html:86
-msgid "Include entities without begin date"
+#: templates/admin/predefined_filter.html:254
+msgid "Tabs"
 msgstr ""
 
-#: templates/admin/predefined_filter.html:88
-msgid "Include entities without end date"
+#: templates/admin/predefined_filter.html:257
+#, fuzzy
+msgid "Select tabs"
+msgstr "izberi vlogo"
+
+#: templates/admin/predefined_filter.html:261
+msgid "Leave empty to show all tabs."
 msgstr ""
 
-#: templates/admin/predefined_filter.html:92
+#: templates/admin/predefined_filter.html:262
+#, fuzzy
+msgid "Classes"
+msgstr "Sredstva"
+
+#: templates/admin/predefined_filter.html:265
+#, fuzzy
+msgid "Select classes"
+msgstr "Izberite vrednost"
+
+#: templates/admin/predefined_filter.html:277
 #, fuzzy
 msgid "Save"
 msgstr "shrani"
@@ -1447,6 +1912,7 @@ msgid "Visibility Configuration"
 msgstr "Konfiguracija vidnosti"
 
 #: templates/admin/visibility_settings.html:7
+#: templates/admin/vocabulary_settings.html:6
 msgid "Save All Settings"
 msgstr "Shrani vse nastavitve"
 
@@ -1514,6 +1980,46 @@ msgstr "Izbrani razredi bodo skriti v brskalnem vmesniku."
 msgid "Save Visibility Settings"
 msgstr "Shrani nastavitve vidnosti"
 
+#: templates/admin/vocabulary_settings.html:11
+msgid "Viewer title"
+msgstr ""
+
+#: templates/admin/vocabulary_settings.html:15
+msgid ""
+"Leave empty to use the default title in the widget language. This does "
+"not change the menu label."
+msgstr ""
+
+#: templates/admin/vocabulary_settings.html:19
+msgid ""
+"Leave both lists empty to show the entire vocabulary. Use only one filter"
+" list."
+msgstr ""
+
+#: templates/admin/vocabulary_settings.html:20
+msgid "These filters affect only the viewer, not access to the vocabulary API."
+msgstr ""
+
+#: templates/admin/vocabulary_settings.html:26
+#, fuzzy
+msgid "Included Type IDs"
+msgstr "Tip strani"
+
+#: templates/admin/vocabulary_settings.html:29
+msgid ""
+"Comma-separated positive IDs. Include their subtrees and necessary "
+"ancestors."
+msgstr ""
+
+#: templates/admin/vocabulary_settings.html:41
+#, fuzzy
+msgid "Excluded Type IDs"
+msgstr "ID-ji skritih tipov"
+
+#: templates/admin/vocabulary_settings.html:44
+msgid "Comma-separated positive IDs. Hide these types and all their descendants."
+msgstr ""
+
 #: templates/admin/partials/case_study_modal.html:5
 #, fuzzy
 msgid "Select Case Studies"
@@ -1541,24 +2047,24 @@ msgstr "Prosimo, navedite"
 msgid "CONNECTED ENTITIES"
 msgstr "entitete"
 
-#: templates/admin/partials/entity_form.html:202
+#: templates/admin/partials/entity_form.html:206
 #, fuzzy
 msgid "ADD NEW CONNECTION"
 msgstr "izberi povezavo"
 
-#: templates/admin/partials/entity_form.html:206
+#: templates/admin/partials/entity_form.html:210
 msgid "select connection"
 msgstr "izberi povezavo"
 
-#: templates/admin/partials/entity_form.html:218
+#: templates/admin/partials/entity_form.html:222
 msgid "select node"
 msgstr "izberi vozlišče"
 
-#: templates/admin/partials/entity_form.html:229
+#: templates/admin/partials/entity_form.html:233
 msgid "select role"
 msgstr "izberi vlogo"
 
-#: templates/admin/partials/entity_form.html:230
+#: templates/admin/partials/entity_form.html:234
 msgid "not specified"
 msgstr "ni določeno"
 
@@ -1596,7 +2102,7 @@ msgstr "Potrdi izbris"
 msgid "Are you sure you want to delete"
 msgstr "Ali ste prepričani, da želite izbrisati"
 
-#: templates/tabs/catalog.html:91
+#: templates/tabs/catalog.html:117
 msgid "Catalogue"
 msgstr ""
 
@@ -1703,77 +2209,77 @@ msgstr "brskaj/izberi/najdi vse entitete"
 msgid "detailed search"
 msgstr "podrobno iskanje"
 
-#: utils/view_util.py:65
+#: utils/view_util.py:68
 msgid "about the project"
 msgstr "o projektu"
 
-#: utils/view_util.py:83
+#: utils/view_util.py:86
 msgid "Unknown"
 msgstr "Neznano"
 
-#: utils/view_util.py:141 utils/view_util.py:184
+#: utils/view_util.py:144 utils/view_util.py:187
 #, fuzzy
 msgid "Unknown Project"
 msgstr "glavni projekt"
 
-#: utils/view_util.py:144 utils/view_util.py:276
+#: utils/view_util.py:147 utils/view_util.py:279
 msgid "Accessed"
 msgstr "Dostopano"
 
-#: utils/view_util.py:150 utils/view_util.py:191 utils/view_util.py:282
+#: utils/view_util.py:153 utils/view_util.py:194 utils/view_util.py:285
 msgid "after"
 msgstr "po"
 
-#: utils/view_util.py:155 utils/view_util.py:195 utils/view_util.py:214
+#: utils/view_util.py:158 utils/view_util.py:198 utils/view_util.py:217
 #, fuzzy
 msgid "Unknown Author"
 msgstr "Neznano"
 
-#: utils/view_util.py:275
+#: utils/view_util.py:278
 msgid "Retrieved from"
 msgstr "Pridobljeno iz"
 
-#: views/admin.py:55
+#: views/admin.py:72
 msgid "main-project"
 msgstr "glavni projekt"
 
-#: views/admin.py:63
+#: views/admin.py:80
 msgid "institutions"
 msgstr "institucije"
 
-#: views/admin.py:65
+#: views/admin.py:82
 msgid "attributes"
 msgstr "atributi"
 
-#: views/admin.py:263
+#: views/admin.py:284
 #, fuzzy
 msgid "Type IDs must be comma-separated integers."
 msgstr "Neveljaven format ID. Uporabite s črko ločena cela števila."
 
-#: views/admin.py:279
+#: views/admin.py:300
 msgid "Dates must use the YYYY-MM-DD format."
 msgstr ""
 
-#: views/admin.py:289
+#: views/admin.py:310
 msgid "A label is required in at least one language."
 msgstr ""
 
-#: views/admin.py:312
+#: views/admin.py:333
 #, fuzzy
 msgid "Predefined filter added successfully."
 msgstr "Vnos uspešno dodan!"
 
-#: views/admin.py:324
+#: views/admin.py:345
 #, fuzzy
 msgid "Predefined filter updated successfully."
 msgstr "Glavni logotip uspešno posodobljen."
 
-#: views/admin.py:335
+#: views/admin.py:356
 #, fuzzy
 msgid "Predefined filter deleted successfully."
 msgstr "Vnos uspešno izbrisan!"
 
-#: views/admin.py:373
+#: views/admin.py:394
 #, python-format
 msgid ""
 "Invalid ID format for label \"%(label)s\". Please use comma-separated "
@@ -1782,288 +2288,297 @@ msgstr ""
 "Neveljaven format ID za oznako \"%(label)s\". Uporabite s črko ločena "
 "cela števila."
 
-#: views/admin.py:386
+#: views/admin.py:407
 msgid "Type divisions updated successfully."
 msgstr "Razdelitev tipov uspešno posodobljena."
 
-#: views/admin.py:389
+#: views/admin.py:410
 msgid "Error updating type divisions"
 msgstr "Napaka pri posodabljanju razdelitve tipov"
 
-#: views/admin.py:424
+#: views/admin.py:445
 #, fuzzy
 msgid "External identifiers updated successfully."
 msgstr "Pravno obvestilo uspešno posodobljeno."
 
-#: views/admin.py:427
+#: views/admin.py:448
 #, fuzzy
 msgid "Error updating external identifiers"
 msgstr "Zunanja referenca"
 
-#: views/admin.py:444
+#: views/admin.py:465
 msgid "Entity colors updated successfully."
 msgstr "Barve entitete uspešno posodobljene."
 
-#: views/admin.py:447
+#: views/admin.py:468
 msgid "Error updating entity colors"
 msgstr "Napaka pri posodabljanju barv entitet"
 
-#: views/admin.py:462
+#: views/admin.py:483
 msgid "Color added successfully."
 msgstr "Barva uspešno dodana."
 
-#: views/admin.py:465
+#: views/admin.py:486
 msgid "Error adding color"
 msgstr "Napaka pri dodajanju barve"
 
-#: views/admin.py:467
+#: views/admin.py:488
 msgid "Color already exists."
 msgstr "Barva že obstaja."
 
-#: views/admin.py:469
+#: views/admin.py:490
 msgid "Invalid HEX code."
 msgstr "Neveljavna HEX koda."
 
-#: views/admin.py:482
+#: views/admin.py:503
 msgid "Color deleted successfully."
 msgstr "Barva uspešno izbrisana."
 
-#: views/admin.py:485
+#: views/admin.py:506
 msgid "Error deleting color"
 msgstr "Napaka pri brisanju barve"
 
-#: views/admin.py:504
+#: views/admin.py:525
 msgid "Menu settings updated successfully."
 msgstr "Nastavitve menija uspešno posodobljene."
 
-#: views/admin.py:507
+#: views/admin.py:528
 msgid "Error updating menu settings"
 msgstr "Napaka pri posodabljanju nastavitev menija"
 
-#: views/admin.py:526
-msgid "Legal notice updated successfully."
-msgstr "Pravno obvestilo uspešno posodobljeno."
+#: views/admin.py:544
+msgid "Use positive, comma-separated IDs in only one filter list."
+msgstr ""
 
-#: views/admin.py:529 views/admin.py:646 views/admin.py:1167
+#: views/admin.py:553
+#, fuzzy
+msgid "Vocabulary settings updated successfully."
+msgstr "Nastavitve menija uspešno posodobljene."
+
+#: views/admin.py:556 views/admin.py:577 views/admin.py:694 views/admin.py:1215
 msgid "Error updating settings"
 msgstr "Napaka pri posodabljanju nastavitev"
 
-#: views/admin.py:539 views/admin.py:827 views/admin.py:1405
+#: views/admin.py:574
+msgid "Legal notice updated successfully."
+msgstr "Pravno obvestilo uspešno posodobljeno."
+
+#: views/admin.py:587 views/admin.py:875 views/admin.py:1479
 msgid "No file part"
 msgstr "Ni dela datoteke"
 
-#: views/admin.py:544 views/admin.py:832 views/admin.py:1410
+#: views/admin.py:592 views/admin.py:880 views/admin.py:1484
 msgid "No selected file"
 msgstr "Ni izbrane datoteke"
 
-#: views/admin.py:553
+#: views/admin.py:601
 #, python-format
 msgid "Logo \"%(name)s\" uploaded successfully."
 msgstr "Logotip \"%(name)s\" uspešno naložen."
 
-#: views/admin.py:567 views/admin.py:1433
+#: views/admin.py:615 views/admin.py:1507
 msgid "Invalid request for renaming."
 msgstr "Neveljavna zahteva za preimenovanje."
 
-#: views/admin.py:578
+#: views/admin.py:626
 msgid "Cannot rename default logos."
 msgstr "Privzetih logotipov ni mogoče preimenovati."
 
-#: views/admin.py:584 views/admin.py:1450 views/admin.py:1620
+#: views/admin.py:632 views/admin.py:1524 views/admin.py:1694
 msgid "Original file not found."
 msgstr "Izvirna datoteka ni bila najdena."
 
-#: views/admin.py:588 views/admin.py:1454 views/admin.py:1624
+#: views/admin.py:636 views/admin.py:1528 views/admin.py:1698
 msgid "A file with the new name already exists."
 msgstr "Datoteka z novim imenom že obstaja."
 
-#: views/admin.py:594
+#: views/admin.py:642
 #, python-format
 msgid "Logo renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "Logotip preimenovan iz \"%(old)s\" v \"%(new)s\"."
 
-#: views/admin.py:597 views/admin.py:1463 views/admin.py:1636
+#: views/admin.py:645 views/admin.py:1537 views/admin.py:1710
 #, python-format
 msgid "Error renaming file: %(error)s"
 msgstr "Napaka pri preimenovanju datoteke: %(error)s"
 
-#: views/admin.py:608 views/admin.py:1474
+#: views/admin.py:656 views/admin.py:1548
 msgid "No filename specified for deletion."
 msgstr "Ime datoteke za izbris ni določeno."
 
-#: views/admin.py:618
+#: views/admin.py:666
 #, python-format
 msgid "Logo \"%(name)s\" deleted successfully."
 msgstr "Logotip \"%(name)s\" uspešno izbrisan."
 
-#: views/admin.py:621 views/admin.py:1487 views/admin.py:1682
+#: views/admin.py:669 views/admin.py:1561 views/admin.py:1756
 #, python-format
 msgid "Error deleting file: %(error)s"
 msgstr "Napaka pri brisanju datoteke: %(error)s"
 
-#: views/admin.py:625
+#: views/admin.py:673
 #, python-format
 msgid "Default logo \"%(name)s\" deactivated."
 msgstr "Privzeti logotip \"%(name)s\" deaktiviran."
 
-#: views/admin.py:637 views/admin.py:657
+#: views/admin.py:685 views/admin.py:705
 msgid "No filename specified."
 msgstr "Ime datoteke ni določeno."
 
-#: views/admin.py:643
+#: views/admin.py:691
 msgid "Main logo updated successfully."
 msgstr "Glavni logotip uspešno posodobljen."
 
-#: views/admin.py:675
+#: views/admin.py:723
 msgid "Favicon updated successfully."
 msgstr "Favikona uspešno posodobljena."
 
-#: views/admin.py:678
+#: views/admin.py:726
 #, python-format
 msgid "Error creating favicon: %(error)s"
 msgstr "Napaka pri ustvarjanju favikone: %(error)s"
 
-#: views/admin.py:709
+#: views/admin.py:757
 msgid "Footer logos updated successfully."
 msgstr "Logotipi v nogi uspešno posodobljeni."
 
-#: views/admin.py:712
+#: views/admin.py:760
 msgid "Error updating footer logos"
 msgstr "Napaka pri posodabljanju logotipov v nogi"
 
-#: views/admin.py:728
+#: views/admin.py:776
 msgid "License added successfully."
 msgstr "Licenca uspešno dodana."
 
-#: views/admin.py:741
+#: views/admin.py:789
 msgid "License deleted successfully."
 msgstr "Licenca uspešno izbrisana."
 
-#: views/admin.py:768
+#: views/admin.py:816
 msgid "Logo license updated successfully."
 msgstr "Licenca logotipa uspešno posodobljena."
 
-#: views/admin.py:813
+#: views/admin.py:861
 msgid "Database backup failed. Check logs for details."
 msgstr "Varnostno kopiranje baze ni uspelo. Preverite dnevnike za podrobnosti."
 
-#: views/admin.py:816 views/admin.py:892
+#: views/admin.py:864 views/admin.py:940
 msgid "An unexpected error occurred. Check logs for details."
 msgstr "Prišlo je do nepričakovane napake. Preverite dnevnike za podrobnosti."
 
-#: views/admin.py:883
+#: views/admin.py:931
 msgid "Database restored successfully."
 msgstr "Baza podatkov uspešno obnovljena."
 
-#: views/admin.py:887
+#: views/admin.py:935
 msgid "Database restore failed. Check logs for details."
 msgstr "Obnova baze ni uspela. Preverite dnevnike za podrobnosti."
 
-#: views/admin.py:895
+#: views/admin.py:943
 msgid "Invalid file type. Please upload a .sql file."
 msgstr "Neveljaven tip datoteke. Prosimo, naložite .sql datoteko."
 
-#: views/admin.py:905
+#: views/admin.py:953
 msgid "Link deleted successfully"
 msgstr "Povezava uspešno izbrisana"
 
-#: views/admin.py:926
+#: views/admin.py:974
 msgid "Link added successfully"
 msgstr "Povezava uspešno dodana"
 
-#: views/admin.py:932
+#: views/admin.py:980
 msgid "Failed to add link: Invalid data provided"
 msgstr "Dodajanje povezave ni uspelo: Podani so neveljavni podatki"
 
-#: views/admin.py:983
+#: views/admin.py:1031
 msgid "Entry added successfully!"
 msgstr "Vnos uspešno dodan!"
 
-#: views/admin.py:987
+#: views/admin.py:1035
 #, python-format
 msgid "Error adding entry %(name)s: Only one main project allowed"
 msgstr "Napaka pri dodajanju vnosa %(name)s: Dovoljen je samo en glavni projekt"
 
-#: views/admin.py:992
+#: views/admin.py:1040
 #, python-format
 msgid "Error adding entry %(name)s: %(error)s"
 msgstr "Napaka pri dodajanju vnosa %(name)s: %(error)s"
 
-#: views/admin.py:1003
+#: views/admin.py:1051
 msgid "Main Project cannot be deleted"
 msgstr "Glavnega projekta ni mogoče izbrisati"
 
-#: views/admin.py:1006
+#: views/admin.py:1054
 msgid "Entry deleted successfully!"
 msgstr "Vnos uspešno izbrisan!"
 
-#: views/admin.py:1021
+#: views/admin.py:1069
 msgid "Configuration ID is required"
 msgstr "ID konfiguracije je obvezen"
 
-#: views/admin.py:1043
+#: views/admin.py:1091
 #, python-format
 msgid "\"%(name)s\" updated successfully"
 msgstr "\"%(name)s\" uspešno posodobljen"
 
-#: views/admin.py:1047
+#: views/admin.py:1095
 #, python-format
 msgid "Error updating \"%(name)s\": %(error)s"
 msgstr "Napaka pri posodabljanju \"%(name)s\": %(error)s"
 
-#: views/admin.py:1077
+#: views/admin.py:1125
 msgid "Map ID is required"
 msgstr "ID zemljevida je obvezen"
 
-#: views/admin.py:1094
+#: views/admin.py:1142
 msgid "Map updated successfully"
 msgstr "Zemljevid uspešno posodobljen"
 
-#: views/admin.py:1097
+#: views/admin.py:1145
 msgid "Invalid Map ID format"
 msgstr "Neveljaven format ID zemljevida"
 
-#: views/admin.py:1100
+#: views/admin.py:1148
 #, python-format
 msgid "Error updating map: %(error)s"
 msgstr "Napaka pri posodabljanju zemljevida: %(error)s"
 
-#: views/admin.py:1130
+#: views/admin.py:1178
 #, python-format
 msgid "Map %(name)s with ID %(id)s added successfully!"
 msgstr "Zemljevid %(name)s z ID %(id)s uspešno dodan!"
 
-#: views/admin.py:1136
+#: views/admin.py:1184
 #, python-format
 msgid "Error adding map %(name)s: %(error)s"
 msgstr "Napaka pri dodajanju zemljevida %(name)s: %(error)s"
 
-#: views/admin.py:1148
+#: views/admin.py:1196
 msgid "Map deleted successfully!"
 msgstr "Zemljevid uspešno izbrisan!"
 
-#: views/admin.py:1150
+#: views/admin.py:1198
 #, python-format
 msgid "Error deleting map: %(error)s"
 msgstr "Napaka pri brisanju zemljevida: %(error)s"
 
-#: views/admin.py:1164
+#: views/admin.py:1212
 msgid "Index background updated successfully"
 msgstr "Ozadje indeksa uspešno posodobljeno"
 
-#: views/admin.py:1198
+#: views/admin.py:1246
 msgid "Invalid ID format. Please use comma-separated integers."
 msgstr "Neveljaven format ID. Uporabite s črko ločena cela števila."
 
-#: views/admin.py:1203
+#: views/admin.py:1251
 msgid "Class visibility updated successfully."
 msgstr "Vidnost razreda uspešno posodobljena."
 
-#: views/admin.py:1264
+#: views/admin.py:1312
 msgid "Updated case study ID successfully"
 msgstr "ID študije primera uspešno posodobljen"
 
-#: views/admin.py:1267
+#: views/admin.py:1315
 msgid ""
 "Invalid Case Study ID. Must be a positive integer and its entity type "
 "must be \"type\"."
@@ -2071,126 +2586,139 @@ msgstr ""
 "Neveljaven ID študije primera. Biti mora pozitivno celo število, tip "
 "entitete pa mora biti \"Case Study\"."
 
-#: views/admin.py:1289
+#: views/admin.py:1337
 msgid "Reset is only allowed in debug or testing mode."
 msgstr ""
 
-#: views/admin.py:1293
+#: views/admin.py:1341
 msgid "reset database"
 msgstr "ponastavi bazo podatkov"
 
-#: views/admin.py:1320
+#: views/admin.py:1369
 msgid "cache cleared"
 msgstr "predpomnilnik počiščen"
 
-#: views/admin.py:1328
-msgid "Cache warmup started in background (refresh mode)"
-msgstr "Ogrevanje predpomnilnika se je začelo v ozadju (način osveževanja)"
-
-#: views/admin.py:1336
-msgid "Cache warmup started in background."
+#: views/admin.py:1413
+#, fuzzy
+msgid "Entity cache warm-up started in background."
 msgstr "Ogrevanje predpomnilnika se je začelo v ozadju."
 
-#: views/admin.py:1355
-#, python-format
-msgid "Error warming cache: %(error)s"
-msgstr "Napaka pri ogrevanju predpomnilnika: %(error)s"
+#: views/admin.py:1416
+msgid "An entity cache warm-up is already running."
+msgstr ""
 
-#: views/admin.py:1373
+#: views/admin.py:1419
+msgid "Could not start entity cache warm-up."
+msgstr ""
+
+#: views/admin.py:1438
 msgid "system cache refreshed"
 msgstr "sistemski predpomnilnik osvežen"
 
-#: views/admin.py:1419
+#: views/admin.py:1441
+#, fuzzy
+msgid "Vocabulary cache preload started in background."
+msgstr "Ogrevanje predpomnilnika se je začelo v ozadju."
+
+#: views/admin.py:1444
+msgid "Vocabulary cache preload is already running."
+msgstr ""
+
+#: views/admin.py:1447
+msgid "Could not start vocabulary cache preload."
+msgstr ""
+
+#: views/admin.py:1493
 #, python-format
 msgid "Asset \"%(name)s\" uploaded successfully."
 msgstr "Sredstvo \"%(name)s\" uspešno naloženo."
 
-#: views/admin.py:1444
+#: views/admin.py:1518
 msgid "Cannot rename default assets."
 msgstr "Privzetih sredstev ni mogoče preimenovati."
 
-#: views/admin.py:1460
+#: views/admin.py:1534
 #, python-format
 msgid "Asset renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "Sredstvo preimenovano iz \"%(old)s\" v \"%(new)s\"."
 
-#: views/admin.py:1484
+#: views/admin.py:1558
 #, python-format
 msgid "Asset \"%(name)s\" deleted successfully."
 msgstr "Sredstvo \"%(name)s\" uspešno izbrisano."
 
-#: views/admin.py:1491
+#: views/admin.py:1565
 #, python-format
 msgid "Default asset \"%(name)s\" deactivated."
 msgstr "Privzeto sredstvo \"%(name)s\" deaktivirano."
 
-#: views/admin.py:1509
+#: views/admin.py:1583
 msgid "Asset license updated successfully."
 msgstr "Licenca sredstva uspešno posodobljena."
 
-#: views/admin.py:1560 views/admin.py:1602 views/admin.py:1666
+#: views/admin.py:1634 views/admin.py:1676 views/admin.py:1740
 msgid "Invalid file type."
 msgstr "Neveljaven tip datoteke."
 
-#: views/admin.py:1569
+#: views/admin.py:1643
 #, python-format
 msgid "%(type)s \"%(name)s\" uploaded successfully."
 msgstr "%(type)s \"%(name)s\" uspešno naložen."
 
-#: views/admin.py:1614
+#: views/admin.py:1688
 msgid "Cannot rename default files."
 msgstr "Privzetih datotek ni mogoče preimenovati."
 
-#: views/admin.py:1631
+#: views/admin.py:1705
 #, python-format
 msgid "%(type)s renamed from \"%(old)s\" to \"%(new)s\"."
 msgstr "%(type)s uspešno preimenovan iz \"%(old)s\" v \"%(new)s\"."
 
-#: views/admin.py:1679
+#: views/admin.py:1753
 #, python-format
 msgid "%(type)s \"%(name)s\" deleted successfully."
 msgstr "%(type)s \"%(name)s\" uspešno izbrisan."
 
-#: views/admin.py:1686
+#: views/admin.py:1760
 #, python-format
 msgid "Default %(type)s \"%(name)s\" deactivated."
 msgstr "Privzeti %(type)s \"%(name)s\" deaktiviran."
 
-#: views/admin.py:1718
+#: views/admin.py:1792
 #, python-format
 msgid "%(type)s license updated successfully."
 msgstr "Licenca %(type)s uspešno posodobljena."
 
-#: views/admin.py:1733
+#: views/admin.py:1807
 #, fuzzy
 msgid "Publication added successfully."
 msgstr "Licenca uspešno dodana."
 
-#: views/admin.py:1743
+#: views/admin.py:1817
 #, fuzzy
 msgid "No publication ID provided."
 msgstr "Testna stran publikacij"
 
-#: views/admin.py:1753
+#: views/admin.py:1827
 #, fuzzy
 msgid "Publication updated successfully."
 msgstr "Favikona uspešno posodobljena."
 
-#: views/admin.py:1762
+#: views/admin.py:1836
 #, fuzzy
 msgid "Publication deleted successfully."
 msgstr "Licenca uspešno izbrisana."
 
-#: views/admin.py:1774
+#: views/admin.py:1848
 msgid "Could not fetch metadata for this DOI."
 msgstr ""
 
-#: views/admin.py:1786
+#: views/admin.py:1860
 #, fuzzy
 msgid "Publication types updated successfully."
 msgstr "Favikona uspešno posodobljena."
 
-#: views/admin.py:1789
+#: views/admin.py:1863
 #, fuzzy
 msgid "Error updating publication types"
 msgstr "Napaka pri posodabljanju nastavitev"
@@ -2207,7 +2735,7 @@ msgstr "Napačno geslo."
 msgid "User not found."
 msgstr "Uporabnik ni bil najden."
 
-#: views/views.py:143
+#: views/views.py:179
 #, python-format
 msgid "Failed to clear cache: %(error)s"
 msgstr "Čiščenje predpomnilnika ni uspelo: %(error)s"
@@ -2286,4 +2814,13 @@ msgstr "Čiščenje predpomnilnika ni uspelo: %(error)s"
 #~ msgstr ""
 #~ "%(project_name)s (%(year)s). %(title)s. Pridobljeno"
 #~ " iz %(url)s (Dostopano: %(date)s)"
+
+#~ msgid "Save Footer Order"
+#~ msgstr "Shrani vrstni red v nogi"
+
+#~ msgid "Cache warmup started in background (refresh mode)"
+#~ msgstr "Ogrevanje predpomnilnika se je začelo v ozadju (način osveževanja)"
+
+#~ msgid "Error warming cache: %(error)s"
+#~ msgstr "Napaka pri ogrevanju predpomnilnika: %(error)s"
 
