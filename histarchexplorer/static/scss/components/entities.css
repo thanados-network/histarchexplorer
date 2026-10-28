@@ -120,6 +120,26 @@ body {
     z-index: 1000;
 }
 
+.name-column-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.name-column-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.name-column-link:hover {
+    color: inherit;
+}
+
+.tabulator-row .tabulator-cell:has(.name-column-link) {
+    position: static;
+}
+
 .name-column-date-subtitle {
     color: grey;
 }
@@ -240,6 +260,8 @@ body {
 
 /* ===== Muuri Items ===== */
 .tile-container .grid .item {
+    color: inherit;
+    text-decoration: none;
     position: absolute !important; /* Muuri positions items absolutely */
     display: block !important;
     box-sizing: border-box;
@@ -256,6 +278,8 @@ body {
 }
 
 .tile-container .item-content {
+    color: #000000;
+    transition: transform 0.3s ease;
     position: relative;
     width: 100%;
     height: 100%;
@@ -276,35 +300,42 @@ body {
     letter-spacing: 0.5px;
     overflow: hidden;
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* Allow up to 3 lines */
+    -webkit-line-clamp: 6; /* Allow up to 6 lines */
     -webkit-box-orient: vertical;
+    overflow-wrap: anywhere;
+    hyphens: auto;
 }
 
 .tile-container .item-category {
-    color: #666;
     font-size: 14px;
     font-weight: 500;
     margin-bottom: 15px;
     text-transform: uppercase;
     letter-spacing: 0.3px;
+    overflow-wrap: anywhere;
 }
 
 .tile-container .item-date {
-    color: #888;
     font-size: 14px;
     font-weight: 500;
     margin-top: auto; /* Push to bottom */
     letter-spacing: 0.2px;
+    overflow-wrap: anywhere;
 }
 
 .tile-container .grid .item:hover {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
+    transform: translateY(-2px) scale(1.02);
     cursor: pointer;
 }
 
+.tile-container .grid .item:hover .item-content {
+    transform: scale(1.05);
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .tile-container .grid .item {
+    .tile-container .grid .item,
+    .tile-container .item-content {
         transition: none;
     }
 }
@@ -500,9 +531,6 @@ body {
     opacity: 0.4;
 }
 
-.tile-container .grid .item:hover .item-content {
-    opacity: 0.4;
-}
 
 /* Content on top */
 .tile-container .grid .item .item-content {

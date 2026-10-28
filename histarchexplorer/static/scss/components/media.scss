@@ -178,3 +178,16 @@ body.dark .grid-media .text-muted {
 .mirador-viewer {
   height: calc(100vh - var(--navbar-height));
 }
+
+/* IIIF logo inside the IIIF viewer button */
+.iiif-icon {
+  height: 1rem;
+  width: auto;
+  vertical-align: text-bottom;
+}
+
+/* Lightbox image (opened by the full view button) */
+.image-lightbox-img {
+  max-height: 80vh;
+  object-fit: contain;
+}

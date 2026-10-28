@@ -93,7 +93,7 @@
 {%- endmacro %}
 
 {% macro image_caption(img) -%}
-  <figcaption class="mt-2 text-center small text-muted">
+  <figcaption class="map-sidebar-image-caption mt-2 text-center small text-muted">
     {{ img.title }}
     {% set details %}
       {% if img.license %}
@@ -116,6 +116,13 @@
         <i class="bi bi-info-circle" aria-hidden="true"></i>
       </button>
     {% endif %}
+    <a class="btn btn-sm btn-light ms-2"
+       href="{{ url_for('view_media', render_type='image', id_=img.id) }}"
+       target="_blank" rel="noopener"
+       aria-label="{{ _('Open in IIIF viewer') }}"
+       title="{{ _('Open in IIIF viewer') }}">
+      <img class="iiif-icon" src="{{ url_for('static', filename='images/icons/iiif.svg') }}" alt="IIIF">
+    </a>
   </figcaption>
 {%- endmacro %}
 
@@ -124,12 +131,15 @@
     <img class="d-block w-100 rounded"
          src="{{ image_src(img, width, height) }}"
          alt="{{ img.title }}">
-    <a class="btn btn-sm btn-light position-absolute top-0 end-0 m-2"
-       href="{{ url_for('view_media', render_type='image', id_=img.id) }}"
-       target="_blank" rel="noopener"
-       aria-label="{{ _('Open full view') }}" title="{{ _('Open full view') }}">
+    <button type="button"
+            class="btn btn-sm btn-light position-absolute top-0 end-0 m-2"
+            data-lightbox-src="{{ image_src(img, 1600, 1600) | trim }}"
+            data-lightbox-fallback="{{ img.url or '' }}"
+            data-lightbox-title="{{ img.title or '' }}"
+            aria-label="{{ _('Open full view') }}"
+            title="{{ _('Open full view') }}">
       <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i>
-    </a>
+    </button>
     {{ image_caption(img) }}
   </figure>
 {%- endmacro %}

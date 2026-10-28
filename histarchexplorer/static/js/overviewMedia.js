@@ -111,6 +111,8 @@ if (file.description || file.license || file.creator || file.license_holder) {
   caption.appendChild(infoBtn);
 }
 
+if (file.render_type === "image") caption.appendChild(createIiifLink(file));
+
 // Append caption AFTER the media
 muuri.appendChild(caption);
 
@@ -120,8 +122,11 @@ muuri.appendChild(caption);
   viewBtn.innerHTML = `<i class="bi bi-arrows-fullscreen"></i>`;
   viewBtn.title = window.overviewTranslations?.openFullView || "Open full view";
   viewBtn.addEventListener("click", () => {
-    const type = file.render_type;
-    window.open(`/view/${type}/${file.id}`, "_blank");
+    if (file.render_type === "image") {
+      openImageLightbox({src: getLightboxSrc(file), fallback: file.url, title: file.title});
+      return;
+    }
+    window.open(`/view/${file.render_type}/${file.id}`, "_blank");
   });
   imageDiv.appendChild(viewBtn);
 

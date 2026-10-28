@@ -232,9 +232,12 @@
 
     function createGridItem{{ tab_name }}(data) {
 
-        const item = document.createElement('div');
+        const item = document.createElement('a');
         item.className = 'item';
         item.dataset.entityId = data.id; // NEW: so we can map images back to tiles
+        if (data.id) {
+            item.href = `/entity/${data.id}`;
+        }
 
         try {
             // Build date string
@@ -269,13 +272,6 @@
   </div>
 `;
 
-
-            // Add click handler
-            item.addEventListener('click', () => {
-                if (data.id) {
-                    window.location.href = `/entity/${data.id}`;
-                }
-            });
 
             return item;
 

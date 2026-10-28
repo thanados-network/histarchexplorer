@@ -135,31 +135,37 @@ function createMediaItem(image, posterMap) {
   }
 
   // --- Info popover ---
-  if (image.description || image.license || image.creator || image.license_holder) {
+  const hasInfo = image.description || image.license || image.creator || image.license_holder;
+  const hasIiif = image.render_type === "image";
+  if (hasInfo || hasIiif) {
     const caption = document.createElement("div");
     caption.className = "mt-2 text-center small text-muted";
     caption.textContent = image.title || "";
 
-    const popoverId = `popover-content-${image.id}`;
-    const hiddenDiv = document.createElement("div");
-    hiddenDiv.id = popoverId;
-    hiddenDiv.className = "d-none";
-    hiddenDiv.innerHTML = `
-      ${image.description ? `<div class="mb-2">${image.description}</div>` : ""}
-      ${image.license ? `<div><b>License:</b> ${image.license}</div>` : ""}
-      ${image.creator ? `<div><b>Creator:</b> ${image.creator}</div>` : ""}
-      ${image.license_holder ? `<div><b>License holder:</b> ${image.license_holder}</div>` : ""}
-    `;
-    caption.appendChild(hiddenDiv);
+    if (hasInfo) {
+      const popoverId = `popover-content-${image.id}`;
+      const hiddenDiv = document.createElement("div");
+      hiddenDiv.id = popoverId;
+      hiddenDiv.className = "d-none";
+      hiddenDiv.innerHTML = `
+        ${image.description ? `<div class="mb-2">${image.description}</div>` : ""}
+        ${image.license ? `<div><b>License:</b> ${image.license}</div>` : ""}
+        ${image.creator ? `<div><b>Creator:</b> ${image.creator}</div>` : ""}
+        ${image.license_holder ? `<div><b>License holder:</b> ${image.license_holder}</div>` : ""}
+      `;
+      caption.appendChild(hiddenDiv);
 
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "btn btn-sm btn-light ms-2";
-    btn.setAttribute("data-bs-toggle", "popover");
-    btn.setAttribute("data-bs-title", image.title || "");
-    btn.setAttribute("data-popover-content", `#${popoverId}`);
-    btn.innerHTML = `<i class="bi bi-info-circle"></i>`;
-    caption.appendChild(btn);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn btn-sm btn-light ms-2";
+      btn.setAttribute("data-bs-toggle", "popover");
+      btn.setAttribute("data-bs-title", image.title || "");
+      btn.setAttribute("data-popover-content", `#${popoverId}`);
+      btn.innerHTML = `<i class="bi bi-info-circle"></i>`;
+      caption.appendChild(btn);
+    }
+
+    if (hasIiif) caption.appendChild(createIiifLink(image));
 
     imageDiv.appendChild(caption);
   }
@@ -170,11 +176,11 @@ function createMediaItem(image, posterMap) {
   viewBtn.title = "Open full view";
 
   viewBtn.addEventListener("click", () => {
-    const originId = window.entityData?.entity?.id;
-    const type = image.render_type;
-    let url = `/view/${type}/${image.id}`;
-
-    window.open(url);
+    if (image.render_type === "image") {
+      openImageLightbox({src: getLightboxSrc(image), fallback: image.url, title: image.title});
+      return;
+    }
+    window.open(`/view/${image.render_type}/${image.id}`);
   });
 
   imageDiv.appendChild(viewBtn);

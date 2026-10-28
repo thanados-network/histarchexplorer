@@ -77,10 +77,18 @@
                     hoverTitle += `\n\n${description}`;
                 }
 
-                return `<div title="${hoverTitle}">` +
-                    `<span>${name}</span><br>` +
-                    `<span class="name-column-date-subtitle">${dateString}</span>` +
-                    `</div>`;
+                const link = document.createElement('a');
+                link.className = 'name-column-link';
+                link.href = `/entity/${id}`;
+                link.title = hoverTitle;
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'name-column-name';
+                nameSpan.textContent = name ?? '';
+                const subtitle = document.createElement('span');
+                subtitle.className = 'name-column-date-subtitle';
+                subtitle.textContent = dateString;
+                link.append(nameSpan, document.createElement('br'), subtitle);
+                return link;
             }
         },
         {
@@ -210,11 +218,14 @@
     table{{ tab_name }}.on("tableBuilt", update{{ tab_name }}Counter);
 
     table{{ tab_name }}.on("rowClick", function (e, row) {
-        const rowData = row.getData();
-        const id = rowData.id;
+        if (e.target.closest('a')) return; // native link handles it
+        const id = row.getData().id;
+        if (!id) return;
 
-        if (id) {
-            const url = `/entity/${id}`;
+        const url = `/entity/${id}`;
+        if (e.ctrlKey || e.metaKey) {
+            window.open(url, '_blank');
+        } else {
             window.location.href = url;
         }
     });

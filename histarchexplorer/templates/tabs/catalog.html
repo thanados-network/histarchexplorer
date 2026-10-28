@@ -2,7 +2,6 @@
 
 <style>
     .catalogue-toc {
-        border-left: 1px solid var(--bs-border-color);
         padding-left: 0.5rem;
     }
 
@@ -113,7 +112,7 @@
 
         <!-- TOC Sidebar -->
         <div class="col-md-2 d-none d-md-block" id="catalogue-sidebar">
-            <div class="position-sticky" style="top: 1rem; max-height: calc(100vh - 8rem); overflow-y: auto;">
+            <div class="position-sticky border rounded p-2" style="top: 1rem; max-height: calc(100vh - 8rem); overflow-y: auto;">
                 <h5 class="mb-3">{{ _('Catalogue') }}</h5>
                 <nav class="nav flex-column catalogue-toc">
                     {% for place_item in catalogue %}

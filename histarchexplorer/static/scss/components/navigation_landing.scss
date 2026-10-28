@@ -49,13 +49,14 @@
   width: var(--right-sidebar-width);
   min-width: 280px;
   overflow-x: hidden;
+  background: white !important; // overrides Bootstrap's .bg-body-secondary (!important) from entity.html
 }
 
 /* Draggable handle to resize the right sidebar (and the map next to it). */
 .right-sidebar-resizer {
   position: fixed;
   width: 8px;
-  z-index: 200001;
+  z-index: 1010; // above map and sidebar, below navbar (1030), offcanvas and modals (1045+)
   cursor: col-resize;
   display: none;
   background: transparent;
