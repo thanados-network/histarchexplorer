@@ -29,7 +29,8 @@
         style: 'https://api.maptiler.com/maps/topo-v2/style.json?key=E7Jrgaazm79UlTuEI5f5',
         maxPitch: 85,
         maxZoom: 25,
-        center: center{{ tab_name }}, // starting position [lng, lat]
+        center: center{{ tab_name }},
+        fadeDuration: 0// starting position [lng, lat]
 
     });
 
@@ -157,9 +158,9 @@
     // 5. Init interactions
     setPointer(mapVectorLayers{{ tab_name }}, mapRef);
     highlightFeatures([], mapRef);
-    addTerrain(mapRef);
     addSkybox(mapRef);
     addControls(mapRef);
+
 
     // 6. Initial layer list & overview
     const initialFiltered{{ tab_name }} =
@@ -197,6 +198,8 @@
     }
     map{{ tab_name }}.addControl(
         new StyleSidebarControl{{ tab_name }}(), 'top-left');
+
+    addTerrain(mapRef);
 
 });
 

@@ -17,29 +17,44 @@ function addTerrain(map) {
         'https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json' +
         '?key=E7Jrgaazm79UlTuEI5f5';
 
-    function _doAddTerrain() {
-        if (map.getSource('terrainSource')) return;
-        map.addSource('terrainSource', {
-            type: 'raster-dem', url: terrainUrl, tileSize: 256});
-        map.addSource('hillshadeSource', {
-            type: 'raster-dem', url: terrainUrl, tileSize: 256});
-        map.addLayer({
-            id: 'hills',
-            type: 'hillshade',
-            source: 'hillshadeSource',
-            layout: {visibility: 'visible'},
-            paint: {'hillshade-shadow-color': 'rgba(71,59,36,0.56)'}
-        });
-        map.addControl(
-            new maplibregl.TerrainControl(
-                {source: 'terrainSource', exaggeration: 1}));
+    // Nur EINE Quelle für beides registrieren
+    map.addSource('sharedTerrainSource', {
+        type: 'raster-dem',
+        url: terrainUrl,
+        tileSize: 256
+    });
+
+    // Dynamisch die ID des ersten Labels ermitteln, um den Hillshade darunterzulegen
+    const layers = map.getStyle().layers;
+    let beforeLayerId = undefined;
+
+    for (const layer of layers) {
+        // Sucht nach Vektor-Labels oder typischen Straßen-Text-Ebenen
+        if (layer.type === 'symbol' || layer.id.includes('label') || layer.id.includes('poi')) {
+            beforeLayerId = layer.id;
+            break;
+        }
     }
 
-    if (map.isStyleLoaded()) {
-        _doAddTerrain();
-    } else {
-        map.once('style.load', _doAddTerrain);
-    }
+    // Hillshade-Layer hinzufuegen (unter die Labels geschoben)
+    map.addLayer({
+        id: 'hills',
+        type: 'hillshade',
+        source: 'sharedTerrainSource', // Nutzt die geteilte Quelle
+        layout: {visibility: 'visible'},
+        paint: {
+            'hillshade-shadow-color': 'rgba(71,59,36,0.56)',
+            'hillshade-illumination-direction': 315 // Standard-Lichteinfall Nord-West
+        }
+    }, beforeLayerId); // <-- Verhindert das Überlagern der Labels!
+
+    // Terrain-Control für echtes 3D aktivieren
+    map.addControl(
+        new maplibregl.TerrainControl({
+            source: 'sharedTerrainSource',
+            exaggeration: 1
+        })
+    );
 }
 
 function addGeoJsonSources(map, data) {
@@ -134,8 +149,8 @@ function processRepresentativePoints(featureCollection) {
                 const deltaLng = (ne.lng - sw.lng) * Math.PI / 180;
 
                 const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-                          Math.cos(lat1) * Math.cos(lat2) *
-                          Math.sin(deltaLng / 2) * Math.sin(deltaLng / 2);
+                    Math.cos(lat1) * Math.cos(lat2) *
+                    Math.sin(deltaLng / 2) * Math.sin(deltaLng / 2);
                 const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
                 const size = 6371000 * c; // Earth radius in meters
 

@@ -72,20 +72,48 @@
     });
 
     function addTerrain() {
-        const terrainUrl = 'https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=E7Jrgaazm79UlTuEI5f5';
+        const terrainUrl =
+        'https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json' +
+        '?key=E7Jrgaazm79UlTuEI5f5';
 
-        map.addSource('terrainSource', {type: 'raster-dem', url: terrainUrl, tileSize: 256});
-        map.addSource('hillshadeSource', {type: 'raster-dem', url: terrainUrl, tileSize: 256});
+    // Nur EINE Quelle für beides registrieren
+    map.addSource('sharedTerrainSource', {
+        type: 'raster-dem',
+        url: terrainUrl,
+        tileSize: 256
+    });
 
-        map.addLayer({
-            id: 'hills',
-            type: 'hillshade',
-            source: 'hillshadeSource',
-            layout: {visibility: 'visible'},
-            paint: {'hillshade-shadow-color': 'rgba(71,59,36,0.56)'}
-        });
+    // Dynamisch die ID des ersten Labels ermitteln, um den Hillshade darunterzulegen
+    const layers = map.getStyle().layers;
+    let beforeLayerId = undefined;
 
-        map.addControl(new maplibregl.TerrainControl({source: 'terrainSource', exaggeration: 1}));
+    for (const layer of layers) {
+        // Sucht nach Vektor-Labels oder typischen Straßen-Text-Ebenen
+        if (layer.type === 'symbol' || layer.id.includes('label') || layer.id.includes('poi')) {
+            beforeLayerId = layer.id;
+            break;
+        }
+    }
+
+    // Hillshade-Layer hinzufuegen (unter die Labels geschoben)
+    map.addLayer({
+        id: 'hills',
+        type: 'hillshade',
+        source: 'sharedTerrainSource', // Nutzt die geteilte Quelle
+        layout: {visibility: 'visible'},
+        paint: {
+            'hillshade-shadow-color': 'rgba(71,59,36,0.56)',
+            'hillshade-illumination-direction': 315 // Standard-Lichteinfall Nord-West
+        }
+    }, beforeLayerId); // <-- Verhindert das Überlagern der Labels!
+
+    // Terrain-Control für echtes 3D aktivieren
+    map.addControl(
+        new maplibregl.TerrainControl({
+            source: 'sharedTerrainSource',
+            exaggeration: 1
+        })
+    );
     }
 
     function addSkybox() {
