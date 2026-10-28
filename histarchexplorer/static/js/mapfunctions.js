@@ -86,7 +86,7 @@ function highlightFeatures(featureIds = [], map) {
 function showPopup(lngLat, featureNames, map) {
     if (featureNames.length === 0) return;
 
-    new maplibregl.Popup({closeOnClick: true})
+    new maplibregl.Popup({closeOnClick: true, maxWidth: '400px'})
         .setLngLat(lngLat)
         .setHTML(featureNames.join('<br>'))
         .addTo(map);

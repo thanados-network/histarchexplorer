@@ -20,7 +20,6 @@
     const entity = data.entity;
     const mapData = data.overviewMap;
     // const name = entity.title || "Entity";
-    // console.log("✅ overviewMap.js: entity ready", name);
 
     const container = document.getElementById("muuri-map");
     if (!mapData || !container) {

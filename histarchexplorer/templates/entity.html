@@ -47,7 +47,6 @@
 
                 // Make it globally available
                 window.entityResolved = data;
-                // console.log("✅ entityData loaded globally", data);
 
                 // Continue normal initialization logic that depends on entity data
                 renderAllBreadcrumbs(data);
@@ -145,12 +144,10 @@
     <script src="{{ url_for('static', filename='js/entity.js') }}"></script>
     <script>
         document.addEventListener('shown.bs.tab', function (event) {
-            console.log("Tab shown:", event.target.id);
             const tab = event.target;
 
             const scrollTarget = tab.getAttribute('data-scroll-target');
             if (!scrollTarget) {
-                console.log("No scroll target found for tab:", tab);
                 window.location.hash = '';
                 return;
             }

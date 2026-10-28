@@ -31,14 +31,10 @@ document.getElementById('toggleSidebar').addEventListener('click', function () {
 let loadedCount = 0; // Track completed tab loads
 
 async function loadHTML(id, tab, index, totalTabs) {
-    //console.log(id)
-    //console.log(tab)
 
     let urlbase = `/get_entity/${id}/${tab}`
     if (id === 0) urlbase = `/get_entities/${tab}`
-    //console.log(urlbase)
     if (id === 0) urlbase = `/get_entities/${tab}`
-    //console.log(urlbase)
 
     const response = await fetch(urlbase);
 
@@ -47,7 +43,6 @@ async function loadHTML(id, tab, index, totalTabs) {
 
         document.querySelectorAll(`.to-remove-${tab}`).forEach(element => {
             element.remove();
-            //console.log(`Removed element with class "to-remove-${tab}".`);
         });
 
         loadedCount++; // Increase count even for missing tabs
@@ -62,7 +57,6 @@ async function loadHTML(id, tab, index, totalTabs) {
 
     document.querySelectorAll(`.to-remove-${tab}`).forEach(element => {
         element.classList.toggle('d-none');
-        //console.log(`Removed element with class "to-remove-${tab}".`);
     });
 
     const htmlText = await response.text();
@@ -103,8 +97,6 @@ async function loadHTML(id, tab, index, totalTabs) {
     initContentPopovers(targetElement);
 
     loadedTabs.push(tab);
-    //console.log(`HTML, CSS, and scripts for "${tab}" loaded in correct order!`);
-    //console.log(loadedTabs);
 
 
     loadedCount++; // Increase count when a tab is fully loaded
@@ -113,17 +105,14 @@ async function loadHTML(id, tab, index, totalTabs) {
 
 // Function to check if all tabs are loaded and remove the spinner
 function checkAndRemoveSpinner(totalTabs) {
-    console.log(`checkAndRemoveSpinner: loadedCount=${loadedCount}, totalTabs=${totalTabs}`);
     if (loadedCount >= totalTabs) {
         document.querySelectorAll(".to-remove-spinner").forEach(element => {
             element.remove();
-            //console.log("Spinner removed.");
         });
 
         // In production, background caching for related entities (children, super entities, relations)
         // can be enabled here to pre-warm the cache after the entity view is loaded.
         // if (typeof entityId !== 'undefined' && entityId > 0) {
-        //     console.log(`Triggering background cache for entity: ${entityId}`);
         //     fetch(`/api/cache-related/${entityId}`);
         // }
     }
@@ -244,7 +233,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (window[gridName]) {
                     window[gridName].refreshItems().layout();
                 }
-                //console.log(gridName)
             }, 500);
 
         });
@@ -339,10 +327,8 @@ document.querySelectorAll('#nav-sidebar .nav-link').forEach(button => {
         const isCurrentlyOpen = rightSidebar.classList.contains('right-expanded');
 
         if (!shouldBeOpen && isCurrentlyOpen) {
-            //console.log(`Tab "${tabName}" should be closed but is open.`);
             toggleRightSidebar(tabName, 'toggle');
         } else if (shouldBeOpen && !isCurrentlyOpen) {
-            //console.log(`Tab "${tabName}" should be open but is closed.`);
             toggleRightSidebar(tabName, 'toogle');
         }
     });

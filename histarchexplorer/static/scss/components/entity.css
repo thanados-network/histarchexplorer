@@ -121,6 +121,9 @@
   outline: none;
   border-radius: 4px;
 }
+.map-popup-hoverlink b {
+  font-weight: bold;
+}
 
 .pane-content-map {
   overflow: hidden;

@@ -228,7 +228,6 @@ function renderSubTile(entity) {
         .filter(Array.isArray)
         .flat();
     const relations = getAllSubunits(flat, entity.id);
-    console.log(relations)
 
     new Chart(ctx, {
         type: 'bar',
@@ -269,7 +268,6 @@ function renderSubTile(entity) {
         tabTrigger.show();
         setTimeout(() => {
     if (gridsubunits) gridsubunits.refreshItems().layout();
-      console.log("hallihallo");
   }, 500);
     })
 
@@ -574,7 +572,6 @@ function renderExternalReferences(entity, settings = {}) {
         if (sysSettings.disabled) return;
 
         renderedCount++;
-        console.log(ref.identifier)
         const linkUrl = ref.identifier || (ref.resolver_url
             ? ref.resolver_url.replace("$1", ref.identifier)
             : "#");

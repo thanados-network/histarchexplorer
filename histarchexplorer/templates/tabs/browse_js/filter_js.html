@@ -321,7 +321,6 @@ function rebuildTreeWithFilteredData{{ tab_name }}(tree) {
                 validSelections.forEach(id => treeview.selectNodeById(id, true));
                 window.{{ tab_name }}TreeInstances[tree].selectedNodeIds = validSelections;
             } catch (e) {
-                //console.log('Could not restore selections:', e);
             }
         }
     }
@@ -886,7 +885,6 @@ if ({{ tab_name }}Data.fields.includes("end")) {
 
 
 const {{ tab_name }}TreesToBuild = Object.keys({{ tab_name }}Data.treeData);
-//console.log({{ tab_name }}TreesToBuild);
 
 const {{ tab_name }}CurrentContainer = document.getElementById("{{ tab_name }}-tree-container");
 
@@ -996,7 +994,6 @@ function filterTypes{{ tab_name }}() {
             selectedNodes{{ tab_name }}.push(...treeInstance.selectedNodeIds);
         }
     }
-    //console.log(selectedNodes{{ tab_name }})
     applyCombinedFilter{{ tab_name }}()
 }
 

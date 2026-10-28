@@ -143,6 +143,11 @@
     outline: none;
     border-radius: 4px;
   }
+
+  // `all: unset` resets the bold default of <b>, so restore it
+  b {
+    font-weight: bold;
+  }
 }
 
 

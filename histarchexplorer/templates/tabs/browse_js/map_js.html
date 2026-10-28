@@ -203,6 +203,14 @@
 
 });
 
+    // Type label(s) of an entity, taken from the tab's table data
+    function getTypeLabel{{ tab_name }}(entityId) {
+        const types = {{ tab_name }}Data.tableData
+            .filter(item => item.id === entityId && item.type)
+            .map(item => item.type);
+        return [...new Set(types)].join(', ');
+    }
+
     map{{ tab_name }}.on('click', (e) => {
         highlightFeatures([], map{{ tab_name }})
         const clickedFeatures = map{{ tab_name }}.queryRenderedFeatures(e.point, {
@@ -210,7 +218,6 @@
         });
 
         if (!clickedFeatures.length) return;
-        //console.log('clickedFeatures', clickedFeatures);
 
         const seenIds = new Set();
         const uniqueFeatures = clickedFeatures.filter(f => {
@@ -219,11 +226,13 @@
             return true;
         });
 
-        const featureNames = uniqueFeatures.map(f =>
-            `<button class="map-popup-hoverlink" data-id="${f.properties.id}" onclick="window.location.href='/entity/${f.properties.id}'">
-    ${f.properties.name} (${f.properties.class})
-  </button>`
-        );
+        const featureNames = uniqueFeatures.map(f => {
+            const typeLabel = getTypeLabel{{ tab_name }}(f.properties.id);
+            const typeHtml = typeLabel ? ` <i>(${typeLabel})</i>` : '';
+            return `<a class="map-popup-hoverlink" data-id="${f.properties.id}" href="/entity/${f.properties.id}">
+    <b>${f.properties.name}</b>${typeHtml}
+  </a>`;
+        });
         featureIds = uniqueFeatures.map(f => f.properties.id);
 
         highlightFeatures(featureIds, map{{ tab_name }});
@@ -269,8 +278,6 @@
 table{{ tab_name }}.on("dataFiltered", function (filters, rows) {
     filteredIDdata{{ tab_name }} = rows.map(row => row.getData().id);
 
-    //console.log('Stored filtered data:', filteredIDdata{{ tab_name }}.length);
-    //console.log(filteredIDdata{{ tab_name }});
 
     const filteredFeatures{{ tab_name }} = featureCollection{{ tab_name }}.features.filter(
         f => filteredIDdata{{ tab_name }}.includes(f.properties.id)
