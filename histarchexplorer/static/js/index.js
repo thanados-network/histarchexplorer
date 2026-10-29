@@ -271,7 +271,18 @@ function setupCitationCopy() {
  */
 function cleanSearchDescription(rawDesc) {
   if (!rawDesc || typeof rawDesc !== 'string') return '';
-  const withoutMarkers = rawDesc
+  let text = rawDesc;
+  const lang = (document.documentElement.lang || 'en').slice(0, 2).toLowerCase();
+  const langRegex = new RegExp(`##${lang}_##([\\s\\S]*?)##_${lang}##`, 'i');
+  const enRegex = /##en_##([\s\S]*?)##_en##/i;
+  const anyBlockRegex = /##[a-z]{2}_##([\s\S]*?)##_[a-z]{2}##/i;
+
+  const langMatch = text.match(langRegex) || text.match(enRegex) || text.match(anyBlockRegex);
+  if (langMatch && langMatch[1]) {
+    text = langMatch[1];
+  }
+
+  const withoutMarkers = text
     .replace(/##[a-z]{2}_##/gi, '')
     .replace(/##_[a-z]{2}##/gi, '')
     .replace(/<[^>]*>/g, ' ')
@@ -326,10 +337,11 @@ function renderSearchResults(dropdown, results) {
     titleSpan.textContent = item.name || `#${entityId}`;
     topRow.appendChild(titleSpan);
 
-    if (item.system_class) {
+    const sysClass = item.systemClass || item.system_class;
+    if (sysClass) {
       const badge = document.createElement('span');
       badge.className = 'badge bg-secondary-subtle text-secondary rounded-pill small';
-      badge.textContent = String(item.system_class).replace(/_/g, ' ');
+      badge.textContent = String(sysClass).replace(/_/g, ' ');
       topRow.appendChild(badge);
     }
 
@@ -380,7 +392,7 @@ function setupHeroSearch() {
     activeIndex = -1;
     if (debounceTimer) clearTimeout(debounceTimer);
 
-    if (query.length < 2) {
+    if (query.length < 3) {
       dropdown.classList.add('d-none');
       dropdown.textContent = '';
       return;
@@ -391,7 +403,7 @@ function setupHeroSearch() {
       renderSearchStatus(dropdown, loadingLabel, true);
 
       try {
-        const url = `/search_live?q=${encodeURIComponent(query)}&system_class=all`;
+        const url = `/search_live?search=${encodeURIComponent(query)}`;
         const response = await fetch(url);
         if (currentReq !== requestCounter) return;
         if (!response.ok) {

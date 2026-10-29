@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-29 16:00+0100\n"
+"POT-Creation-Date: 2026-10-29 17:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,10 +18,13 @@ msgstr ""
 "Generated-By: Babel 2.17.0\n"
 
 #: api/util.py:43 api/util.py:45 api/util.py:46 api/util.py:51
+#: templates/search.html:24 templates/search.html:225 templates/search.html:226
 msgid "BC"
 msgstr ""
 
-#: api/util.py:43 api/util.py:45 api/util.py:46
+#: api/util.py:43 api/util.py:45 api/util.py:46 templates/search.html:25
+#: templates/search.html:228 templates/search.html:229
+#: templates/search.html:230
 msgid "AD"
 msgstr ""
 
@@ -90,7 +93,7 @@ msgstr ""
 msgid "file"
 msgstr ""
 
-#: forms/admin.py:52 templates/about.html:216 templates/tabs/feature.html:100
+#: forms/admin.py:52 templates/about.html:203 templates/tabs/feature.html:100
 #: templates/tabs/overview.html:12 templates/util/cite/modal.html:37
 msgid "License"
 msgstr ""
@@ -119,79 +122,79 @@ msgstr ""
 msgid "login"
 msgstr ""
 
-#: services/statistics.py:11 templates/search.html:67
+#: services/statistics.py:11
 msgid "Place"
 msgstr ""
 
-#: services/statistics.py:17 templates/search.html:75
+#: services/statistics.py:17
 msgid "Feature"
 msgstr ""
 
-#: services/statistics.py:23 templates/search.html:71
+#: services/statistics.py:23
 msgid "Stratigraphic Unit"
 msgstr ""
 
-#: services/statistics.py:29 templates/search.html:27
+#: services/statistics.py:29
 msgid "Artifact"
 msgstr ""
 
-#: services/statistics.py:35 templates/search.html:31
+#: services/statistics.py:35
 msgid "Human Remains"
 msgstr ""
 
-#: services/statistics.py:41 templates/search.html:17
+#: services/statistics.py:41
 msgid "Person"
 msgstr ""
 
-#: services/statistics.py:47 templates/search.html:21
+#: services/statistics.py:47
 msgid "Group"
 msgstr ""
 
-#: services/statistics.py:53 templates/search.html:37
+#: services/statistics.py:53
 msgid "Acquisition"
 msgstr ""
 
-#: services/statistics.py:59 templates/search.html:41
+#: services/statistics.py:59
 msgid "Event"
 msgstr ""
 
-#: services/statistics.py:65 templates/search.html:45
+#: services/statistics.py:65
 msgid "Activity"
 msgstr ""
 
-#: services/statistics.py:71 templates/search.html:49
+#: services/statistics.py:71
 msgid "Creation"
 msgstr ""
 
-#: services/statistics.py:77 templates/search.html:53
+#: services/statistics.py:77
 msgid "Move"
 msgstr ""
 
-#: services/statistics.py:83 templates/search.html:57
+#: services/statistics.py:83
 msgid "Production"
 msgstr ""
 
-#: services/statistics.py:89 templates/search.html:61
+#: services/statistics.py:89
 msgid "Modification"
 msgstr ""
 
-#: services/statistics.py:95 templates/search.html:81
+#: services/statistics.py:95
 msgid "Source"
 msgstr ""
 
-#: services/statistics.py:101 templates/search.html:85
+#: services/statistics.py:101
 msgid "Bibliography"
 msgstr ""
 
-#: services/statistics.py:107 templates/search.html:89
+#: services/statistics.py:107
 msgid "External Reference"
 msgstr ""
 
-#: services/statistics.py:113 templates/search.html:93
+#: services/statistics.py:113
 msgid "Edition"
 msgstr ""
 
-#: services/statistics.py:119 templates/search.html:99
+#: services/statistics.py:119
 msgid "File"
 msgstr ""
 
@@ -201,8 +204,7 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: services/statistics.py:133 templates/about.html:536 templates/index.html:214
-#: templates/search.html:64
+#: services/statistics.py:133 templates/about.html:523 templates/index.html:214
 msgid "Places"
 msgstr ""
 
@@ -238,7 +240,7 @@ msgstr ""
 msgid "Browse features"
 msgstr ""
 
-#: services/statistics.py:153 templates/search.html:24
+#: services/statistics.py:153
 msgid "Items"
 msgstr ""
 
@@ -256,7 +258,7 @@ msgstr ""
 msgid "Browse items"
 msgstr ""
 
-#: services/statistics.py:163 templates/search.html:14
+#: services/statistics.py:163
 msgid "Actors"
 msgstr ""
 
@@ -272,7 +274,7 @@ msgstr ""
 msgid "Browse actors"
 msgstr ""
 
-#: services/statistics.py:173 templates/search.html:34
+#: services/statistics.py:173
 msgid "Events"
 msgstr ""
 
@@ -290,7 +292,7 @@ msgstr ""
 msgid "Browse events"
 msgstr ""
 
-#: services/statistics.py:183 templates/search.html:78
+#: services/statistics.py:183
 msgid "Sources"
 msgstr ""
 
@@ -308,7 +310,7 @@ msgstr ""
 msgid "View sources"
 msgstr ""
 
-#: services/statistics.py:193 templates/search.html:96
+#: services/statistics.py:193
 msgid "Files"
 msgstr ""
 
@@ -342,7 +344,7 @@ msgstr ""
 msgid "Browse types"
 msgstr ""
 
-#: services/statistics.py:510
+#: services/statistics.py:513
 msgid "Explore topic"
 msgstr ""
 
@@ -370,11 +372,11 @@ msgstr ""
 msgid "Explore Research Data"
 msgstr ""
 
-#: templates/about.html:88 templates/about.html:283
+#: templates/about.html:88 templates/about.html:270
 msgid "Research Team"
 msgstr ""
 
-#: templates/about.html:93 templates/about.html:247 templates/index.html:149
+#: templates/about.html:93 templates/about.html:234 templates/index.html:149
 msgid "Dataset"
 msgstr ""
 
@@ -382,216 +384,218 @@ msgstr ""
 msgid "Cite Project"
 msgstr ""
 
-#: templates/about.html:127
+#: templates/about.html:114
 msgid "Project Profile"
 msgstr ""
 
-#: templates/about.html:129
+#: templates/about.html:116
 msgid "About the Project"
 msgstr ""
 
-#: templates/about.html:138
+#: templates/about.html:125
 msgid "Scientific research project within the Histarchexplorer repository."
 msgstr ""
 
-#: templates/about.html:149
+#: templates/about.html:136
 msgid "Key Facts"
 msgstr ""
 
-#: templates/about.html:156
+#: templates/about.html:143
 msgid "Acronym"
 msgstr ""
 
-#: templates/about.html:166
+#: templates/about.html:153
 msgid "Contributors"
 msgstr ""
 
-#: templates/about.html:172
+#: templates/about.html:159
 msgid "Institutions"
 msgstr ""
 
-#: templates/about.html:180 templates/about.html:725
+#: templates/about.html:167 templates/about.html:712
 msgid "Website"
 msgstr ""
 
-#: templates/about.html:195 templates/about.html:726
+#: templates/about.html:182 templates/about.html:713
 msgid "Email"
 msgstr ""
 
-#: templates/about.html:207 templates/about.html:728
+#: templates/about.html:194 templates/about.html:715
 msgid "Address"
 msgstr ""
 
-#: templates/about.html:251 templates/index.html:150
+#: templates/about.html:238 templates/index.html:150
 msgid "Research in Numbers"
 msgstr ""
 
-#: templates/about.html:253
+#: templates/about.html:240
 msgid "Project Data Overview"
 msgstr ""
 
-#: templates/about.html:285
+#: templates/about.html:272
 msgid "Contributors & Specialists"
 msgstr ""
 
-#: templates/about.html:297 templates/about.html:298
+#: templates/about.html:284 templates/about.html:285
 msgid "Filter team members..."
 msgstr ""
 
-#: templates/about.html:305
+#: templates/about.html:292
 msgid "Filter by role"
 msgstr ""
 
-#: templates/about.html:309
+#: templates/about.html:296
 msgid "All Roles"
 msgstr ""
 
-#: templates/about.html:393
+#: templates/about.html:380
 msgid "Profile"
 msgstr ""
 
-#: templates/about.html:403
+#: templates/about.html:390
 msgid "No team members match the selected filter."
 msgstr ""
 
-#: templates/about.html:415
+#: templates/about.html:402
 msgid "Governance & Partners"
 msgstr ""
 
-#: templates/about.html:417
+#: templates/about.html:404
 msgid "Participating Institutions & Sponsors"
 msgstr ""
 
-#: templates/about.html:481 templates/about.html:652
+#: templates/about.html:468 templates/about.html:639
 msgid "Details"
 msgstr ""
 
-#: templates/about.html:498 templates/index.html:176
+#: templates/about.html:485 templates/index.html:176
 msgid "Analyses"
 msgstr ""
 
-#: templates/about.html:499 templates/index.html:177
+#: templates/about.html:486 templates/index.html:177
 msgid "Scientific Data Distribution"
 msgstr ""
 
-#: templates/about.html:502 templates/index.html:180
+#: templates/about.html:489 templates/index.html:180
 msgid "Interactive Histograms"
 msgstr ""
 
-#: templates/about.html:512 templates/index.html:190
+#: templates/about.html:499 templates/index.html:190
 msgid "Chronological Distribution"
 msgstr ""
 
-#: templates/about.html:514 templates/index.html:192
+#: templates/about.html:501 templates/index.html:192
 msgid "Dated AD"
 msgstr ""
 
-#: templates/about.html:517 templates/index.html:195
+#: templates/about.html:504 templates/index.html:195
 msgid ""
 "Distribution of archaeological datings by century (Late Antiquity to "
 "Middle Ages)."
 msgstr ""
 
-#: templates/about.html:521 templates/index.html:199
+#: templates/about.html:508 templates/index.html:199
 msgid "Dating density"
 msgstr ""
 
-#: templates/about.html:522 templates/index.html:200 utils/view_util.py:17
+#: templates/about.html:509 templates/index.html:200 templates/search.html:29
+#: utils/view_util.py:17
 msgid "entities"
 msgstr ""
 
-#: templates/about.html:532 templates/index.html:210
+#: templates/about.html:519 templates/index.html:210
 msgid "Typological Breakdown"
 msgstr ""
 
-#: templates/about.html:539 templates/index.html:217
+#: templates/about.html:526 templates/index.html:217
 msgid "Finds"
 msgstr ""
 
-#: templates/about.html:544 templates/index.html:222
+#: templates/about.html:531 templates/index.html:222
 msgid "Breakdown by the most documented classifications."
 msgstr ""
 
-#: templates/about.html:561 templates/index.html:239
+#: templates/about.html:548 templates/index.html:239
 msgid "Geography"
 msgstr ""
 
-#: templates/about.html:562 templates/index.html:240
+#: templates/about.html:549 templates/index.html:240
 msgid "Spatial Distribution of Sites"
 msgstr ""
 
-#: templates/about.html:565 templates/index.html:243
+#: templates/about.html:552 templates/index.html:243
 msgid "Full Map View"
 msgstr ""
 
-#: templates/about.html:574 templates/about.html:734 templates/index.html:253
+#: templates/about.html:561 templates/about.html:721 templates/index.html:253
+#: templates/search.html:393
 msgid "Loading..."
 msgstr ""
 
-#: templates/about.html:576 templates/index.html:255
+#: templates/about.html:563 templates/index.html:255
 msgid "Loading spatial data..."
 msgstr ""
 
-#: templates/about.html:585 templates/index.html:262
+#: templates/about.html:572 templates/index.html:262
 msgid "View details"
 msgstr ""
 
-#: templates/about.html:590 templates/index.html:268
+#: templates/about.html:577 templates/index.html:268
 msgid "Activate map"
 msgstr ""
 
-#: templates/about.html:604 templates/index.html:105
+#: templates/about.html:591 templates/index.html:105
 msgid "Research Projects"
 msgstr ""
 
-#: templates/about.html:608 templates/index.html:107
+#: templates/about.html:595 templates/index.html:107
 msgid "Active Case Studies & Corpora"
 msgstr ""
 
-#: templates/about.html:610
+#: templates/about.html:597
 msgid "Further Projects in the Network"
 msgstr ""
 
-#: templates/about.html:616 templates/admin/projects_content.html:38
+#: templates/about.html:603 templates/admin/projects_content.html:38
 msgid "Main Project"
 msgstr ""
 
-#: templates/about.html:641 templates/publications.html:40
+#: templates/about.html:628 templates/publications.html:40
 msgid "Project"
 msgstr ""
 
-#: templates/about.html:673 templates/index.html:338
+#: templates/about.html:660 templates/index.html:338
 #: templates/util/cite/modal.html:12
 msgid "Recommended Citation"
 msgstr ""
 
-#: templates/about.html:681 templates/index.html:346
+#: templates/about.html:668 templates/index.html:346
 msgid ""
 "Please use the following reference when citing this repository in "
 "academic work:"
 msgstr ""
 
-#: templates/about.html:692 templates/index.html:357
+#: templates/about.html:679 templates/index.html:357
 msgid "Copied!"
 msgstr ""
 
-#: templates/about.html:693 templates/index.html:358
+#: templates/about.html:680 templates/index.html:358
 msgid "Copy citation"
 msgstr ""
 
-#: templates/about.html:704 templates/admin.html:43
+#: templates/about.html:691 templates/admin.html:43
 msgid "Legal Notice"
 msgstr ""
 
-#: templates/about.html:727
+#: templates/about.html:714
 msgid "ORCID"
 msgstr ""
 
-#: templates/about.html:729
+#: templates/about.html:716
 msgid "Relations & Roles"
 msgstr ""
 
-#: templates/about.html:741 templates/admin/partials/modal_add_entry.html:10
+#: templates/about.html:728 templates/admin/partials/modal_add_entry.html:10
 #: templates/admin/partials/modal_delete_confirm.html:7
 #: templates/admin/partials/modal_image_selector.html:9
 #: templates/publications.html:153 templates/util/cite/modal.html:84
@@ -663,8 +667,7 @@ msgid "Footer"
 msgstr ""
 
 #: templates/admin.html:45 templates/index.html:57 templates/index.html:61
-#: templates/publications.html:13 templates/search.html:108
-#: templates/search.html:110
+#: templates/publications.html:13 templates/search.html:76
 msgid "Search"
 msgstr ""
 
@@ -759,7 +762,7 @@ msgstr ""
 msgid "Searching..."
 msgstr ""
 
-#: templates/index.html:59
+#: templates/index.html:59 templates/search.html:416
 msgid "No results found"
 msgstr ""
 
@@ -865,59 +868,254 @@ msgstr ""
 msgid "No publications found matching your criteria."
 msgstr ""
 
-#: templates/search.html:11
-msgid "Filter by Type"
-msgstr ""
-
-#: templates/search.html:120
-msgid "Start typing above to see live results or press enter to run a search."
-msgstr ""
-
-#: templates/search.html:127
-msgid "Static Search Results"
-msgstr ""
-
-#: templates/search.html:131
-#, python-format
-msgid "No results found for \"%(query)s\""
-msgstr ""
-
-#: templates/search.html:247 templates/search_detail.html:4
+#: templates/search.html:17
 msgid "Unnamed"
 msgstr ""
 
-#: templates/search.html:248
-msgid "Load more"
+#: templates/search.html:18 templates/search.html:293
+msgid "All Classes"
 msgstr ""
 
-#: templates/search.html:249
-msgid "Type at least 3 characters..."
+#: templates/search.html:19 templates/search.html:139
+msgid "All Case Studies"
 msgstr ""
 
-#: templates/search.html:250
-#, python-format
-msgid "Loading live results for \"%(query)s\"..."
+#: templates/search.html:20 templates/search.html:395
+msgid "Searching OpenAtlas repository..."
 msgstr ""
 
-#: templates/search.html:251
-#, python-format
-msgid "No live results found for \"%(query)s\"."
+#: templates/search.html:21 templates/search.html:404
+msgid "Could not load search results. Please try again."
 msgstr ""
 
-#: templates/search.html:252
-msgid "Error loading live results."
+#: templates/search.html:22
+msgid "No matching entities found for the current filters."
 msgstr ""
 
-#: templates/search.html:253
-msgid "Select one or more types"
+#: templates/search.html:23
+msgid "View"
 msgstr ""
 
-#: templates/search_detail.html:11
-msgid "Coordinates"
+#: templates/search.html:26 templates/search.html:164
+msgid "Any period"
 msgstr ""
 
-#: templates/search_detail.html:14
-msgid "Back to search"
+#: templates/search.html:27
+msgid "from"
+msgstr ""
+
+#: templates/search.html:28
+msgid "until"
+msgstr ""
+
+#: templates/search.html:40
+msgid "OpenAtlas Discovery Engine"
+msgstr ""
+
+#: templates/search.html:44
+msgid "Advanced Research Search"
+msgstr ""
+
+#: templates/search.html:47
+msgid ""
+"Query archaeological sites, features, finds, actors, and sources across "
+"projects and periods."
+msgstr ""
+
+#: templates/search.html:64
+msgid "Search by name, place, or phonetic match (optional)..."
+msgstr ""
+
+#: templates/search.html:65
+msgid "Search query"
+msgstr ""
+
+#: templates/search.html:69 templates/search.html:70
+msgid "Clear search term"
+msgstr ""
+
+#: templates/search.html:99
+msgid "Search Filters & Parameters"
+msgstr ""
+
+#: templates/search.html:101
+msgid "Combine case studies, optional entity classes, and chronological bounds."
+msgstr ""
+
+#: templates/search.html:113
+msgid "Reset all"
+msgstr ""
+
+#: templates/search.html:124 templates/search.html:134
+msgid "Case Studies"
+msgstr ""
+
+#: templates/search.html:127
+msgid "Multi-select"
+msgstr ""
+
+#: templates/search.html:131
+msgid ""
+"Restrict search to specific research projects or search across all "
+"corpora."
+msgstr ""
+
+#: templates/search.html:159
+msgid "Timespan Chooser"
+msgstr ""
+
+#: templates/search.html:169
+msgid "Clear timespan"
+msgstr ""
+
+#: templates/search.html:179
+msgid "All Periods"
+msgstr ""
+
+#: templates/search.html:183
+msgid "Prehistory (1000 BC – 1 BC)"
+msgstr ""
+
+#: templates/search.html:187
+msgid "Antiquity (1 – 500 AD)"
+msgstr ""
+
+#: templates/search.html:191
+msgid "Early Middle Ages (500 – 1050)"
+msgstr ""
+
+#: templates/search.html:195
+msgid "High/Late Middle Ages (1050 – 1500)"
+msgstr ""
+
+#: templates/search.html:199
+msgid "Modern Era (1500 – 2000)"
+msgstr ""
+
+#: templates/search.html:214
+msgid "Start Year Slider"
+msgstr ""
+
+#: templates/search.html:222
+msgid "End Year Slider"
+msgstr ""
+
+#: templates/search.html:239 templates/search.html:248
+msgid "Start Year"
+msgstr ""
+
+#: templates/search.html:247
+msgid "e.g. -500 or 750"
+msgstr ""
+
+#: templates/search.html:250 templates/search.html:267
+msgid "BC/AD"
+msgstr ""
+
+#: templates/search.html:256 templates/search.html:265
+msgid "End Year"
+msgstr ""
+
+#: templates/search.html:264
+msgid "e.g. 1050"
+msgstr ""
+
+#: templates/search.html:280 templates/search.html:288
+msgid "Entity Class"
+msgstr ""
+
+#: templates/search.html:283
+msgid "Optional — leave on \"All Classes\" to include every entity type"
+msgstr ""
+
+#: templates/search.html:319
+msgid "Search Results"
+msgstr ""
+
+#: templates/search.html:324
+msgid "Showing matching entities from OpenAtlas API v1"
+msgstr ""
+
+#: templates/search.html:341
+msgid "Filter current table..."
+msgstr ""
+
+#: templates/search.html:342
+msgid "Filter current table"
+msgstr ""
+
+#: templates/search.html:348
+msgid "Sort"
+msgstr ""
+
+#: templates/search.html:351
+msgid "Name"
+msgstr ""
+
+#: templates/search.html:352
+msgid "Start Date"
+msgstr ""
+
+#: templates/search.html:353
+msgid "End Date"
+msgstr ""
+
+#: templates/search.html:359
+msgid "Toggle ascending/descending order"
+msgstr ""
+
+#: templates/search.html:367
+msgid "Rows"
+msgstr ""
+
+#: templates/search.html:380
+msgid "Export table to CSV"
+msgstr ""
+
+#: templates/search.html:407
+msgid "Retry"
+msgstr ""
+
+#: templates/search.html:418
+msgid ""
+"Try broadening your search term, clearing the entity class filter, or "
+"expanding the timespan."
+msgstr ""
+
+#: templates/search.html:421
+msgid "Reset filters"
+msgstr ""
+
+#: templates/search.html:433
+msgid "Entity"
+msgstr ""
+
+#: templates/search.html:437
+msgid "Class"
+msgstr ""
+
+#: templates/search.html:440
+msgid "Timespan"
+msgstr ""
+
+#: templates/search.html:444
+msgid "Case Study"
+msgstr ""
+
+#: templates/admin/predefined_filter.html:132 templates/search.html:445
+msgid "Description"
+msgstr ""
+
+#: templates/search.html:446
+msgid "Action"
+msgstr ""
+
+#: templates/search.html:463
+msgid "Previous"
+msgstr ""
+
+#: templates/search.html:471
+msgid "Next"
 msgstr ""
 
 #: templates/admin/about_content.html:3
@@ -1763,10 +1961,6 @@ msgstr ""
 #: templates/admin/predefined_filter.html:109
 #: templates/admin/predefined_filter.html:135
 msgid "Language selector"
-msgstr ""
-
-#: templates/admin/predefined_filter.html:132
-msgid "Description"
 msgstr ""
 
 #: templates/admin/predefined_filter.html:167

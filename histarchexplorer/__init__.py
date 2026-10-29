@@ -163,9 +163,9 @@ def before_request() -> Response | None:
         'attributes': 3,
         'main-project': 5}
     g.config_entities = ConfigEntity.get_all_localized()
-    g.search_service = SearchService(app)
     g.case_study_ids = [
         config.case_study for config in g.config_entities if config.case_study]
+    g.search_service = SearchService(app)
     g.predefined_filters = get_predefined_filters()
     for predefined_filter in g.predefined_filters:
         for key in ('label', 'description'):

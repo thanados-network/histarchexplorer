@@ -1,24 +1,262 @@
-.relative-wrapper {
-  position: relative;
+// =============================================================================
+// Search Page Component Styles (histarchexplorer/static/scss/components/search.scss)
+// =============================================================================
+
+.search-page-wrapper {
+  padding-top: 68px;
 }
 
-.live-popup {
+.search-hero-section {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #0f172a 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.search-hero-bar {
+  border-radius: 999px;
+}
+
+.search-filter-card,
+.search-results-card {
+  border-radius: 1rem;
+  background-color: var(--bs-body-bg);
+}
+
+.search-section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background-color: rgba(var(--bs-primary-rgb), 0.12);
+  color: var(--bs-primary);
+  font-size: 1.15rem;
+}
+
+.search-filter-block {
+  padding: 1.15rem;
+  border-radius: 0.85rem;
+  background-color: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color-translucent);
+}
+
+// Case Study & Entity Class Pills
+.search-filter-pill,
+.search-class-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.84rem;
+  font-weight: 500;
+  border-radius: 999px;
+  border: 1px solid var(--bs-border-color);
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  cursor: pointer;
+  transition: all 0.18s ease;
+
+  &:hover {
+    border-color: var(--bs-primary);
+    transform: translateY(-1px);
+  }
+
+  &.active {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(var(--bs-primary-rgb), 0.28);
+  }
+}
+
+// Era Preset Chips
+.search-era-chip {
+  font-size: 0.76rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--bs-border-color);
+  background-color: var(--bs-body-bg);
+  color: var(--bs-secondary-color);
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: var(--bs-primary);
+    color: var(--bs-primary);
+  }
+
+  &.active {
+    background-color: rgba(var(--bs-primary-rgb), 0.14);
+    border-color: var(--bs-primary);
+    color: var(--bs-primary);
+    font-weight: 600;
+  }
+}
+
+// Dual Range Slider
+.search-timespan-slider-wrap {
+  .extra-small {
+    font-size: 0.72rem;
+  }
+}
+
+.search-dual-slider {
+  position: relative;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.search-slider-track {
   position: absolute;
-  top: 100%; // Direkt unter dem Formular
   left: 0;
   right: 0;
-  background: #fff;
-  color: #000;
-  border: 1px solid #ccc;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  max-height: 300px;
-  overflow-y: auto;
-  display: none; // Standardmäßig ausgeblendet
-  padding: 8px;
-  font-size: 16px;
+  height: 0.38rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--bs-primary-rgb), 0.25) 0%,
+    rgba(var(--bs-primary-rgb), 0.65) 50%,
+    rgba(var(--bs-primary-rgb), 0.25) 100%
+  );
+}
 
-  &.show {
-    display: block;
+.search-range-input {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 0.38rem;
+  background: none;
+  pointer-events: none;
+  appearance: none;
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    pointer-events: auto;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    background: var(--bs-primary);
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    cursor: grab;
+  }
+
+  &::-moz-range-thumb {
+    pointer-events: auto;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    background: var(--bs-primary);
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    cursor: grab;
+  }
+}
+
+// Table & Class Badges
+.search-table-quickfilter {
+  min-width: 210px;
+}
+
+.search-results-table {
+  thead th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    color: var(--bs-secondary-color);
+    padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
+    border-bottom-width: 1px;
+  }
+
+  .sortable-th {
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      color: var(--bs-primary);
+    }
+
+    &.active-sort {
+      color: var(--bs-primary);
+
+      .sort-indicator {
+        color: var(--bs-primary) !important;
+      }
+    }
+  }
+}
+
+.search-entity-link {
+  color: var(--bs-body-color);
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--bs-primary);
+  }
+}
+
+.search-desc-cell {
+  max-width: 380px;
+}
+
+.search-desc-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+.search-table-class-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 999px;
+  background-color: rgba(var(--bs-secondary-rgb), 0.12);
+  color: var(--bs-secondary-color);
+
+  &.search-class-places {
+    background-color: rgba(37, 99, 235, 0.12);
+    color: #2563eb;
+  }
+
+  &.search-class-features,
+  &.search-class-stratigraphic_unit {
+    background-color: rgba(217, 119, 6, 0.12);
+    color: #d97706;
+  }
+
+  &.search-class-items {
+    background-color: rgba(5, 150, 105, 0.12);
+    color: #059669;
+  }
+
+  &.search-class-remains {
+    background-color: rgba(124, 58, 237, 0.12);
+    color: #7c3aed;
+  }
+
+  &.search-class-actors {
+    background-color: rgba(219, 39, 119, 0.12);
+    color: #db2777;
+  }
+
+  &.search-class-events {
+    background-color: rgba(234, 88, 12, 0.12);
+    color: #ea580c;
+  }
+
+  &.search-class-sources {
+    background-color: rgba(8, 145, 178, 0.12);
+    color: #0891b2;
+  }
+
+  &.search-class-files {
+    background-color: rgba(79, 70, 229, 0.12);
+    color: #4f46e5;
   }
 }

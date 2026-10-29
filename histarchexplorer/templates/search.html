@@ -1,380 +1,482 @@
 {% extends "layout.html" %}
+
 {% block content %}
-  <div class="container" style="padding-top: 120px;">
-    <div class="relative-wrapper">
-      <div class="static-search-form-wrapper">
-        <!-- 🔍 Search Form -->
-        <form method="POST" action="/search" id="static-search-form">
-          <div class="form-area-wrapper">
-            <!-- 🧠 Multi-select Dropdown with Choices.js -->
-            <div class="mb-4">
-              <label for="system-class-select" class="form-label">{{ _('Filter by Type') }}:</label>
-              <select class="form-select" id="system-class-select"
-                      name="system_class[]" multiple>
-                <optgroup label="{{ _('Actors') }}">
-                  <option value="person"
-                          {% if 'person' in system_classes %}selected{% endif %}>
-                    {{ _('Person') }}
-                  </option>
-                  <option value="group"
-                          {% if 'group' in system_classes %}selected{% endif %}>
-                    {{ _('Group') }}
-                  </option>
-                </optgroup>
-                <optgroup label="{{ _('Items') }}">
-                  <option value="artifact"
-                          {% if 'artifact' in system_classes %}selected{% endif %}>
-                    {{ _('Artifact') }}
-                  </option>
-                  <option value="human_remains"
-                          {% if 'human_remains' in system_classes %}selected{% endif %}>
-                    {{ _('Human Remains') }}
-                  </option>
-                </optgroup>
-                <optgroup label="{{ _('Events') }}">
-                  <option value="acquisition"
-                          {% if 'acquisition' in system_classes %}selected{% endif %}>
-                    {{ _('Acquisition') }}
-                  </option>
-                  <option value="event"
-                          {% if 'event' in system_classes %}selected{% endif %}>
-                    {{ _('Event') }}
-                  </option>
-                  <option value="activity"
-                          {% if 'activity' in system_classes %}selected{% endif %}>
-                    {{ _('Activity') }}
-                  </option>
-                  <option value="creation"
-                          {% if 'creation' in system_classes %}selected{% endif %}>
-                    {{ _('Creation') }}
-                  </option>
-                  <option value="move"
-                          {% if 'move' in system_classes %}selected{% endif %}>
-                    {{ _('Move') }}
-                  </option>
-                  <option value="production"
-                          {% if 'production' in system_classes %}selected{% endif %}>
-                    {{ _('Production') }}
-                  </option>
-                  <option value="modification"
-                          {% if 'modification' in system_classes %}selected{% endif %}>
-                    {{ _('Modification') }}
-                  </option>
-                </optgroup>
-                <optgroup label="{{ _('Places') }}">
-                  <option value="place"
-                          {% if 'place' in system_classes %}selected{% endif %}>
-                    {{ _('Place') }}
-                  </option>
-                  <option value="stratigraphic_unit"
-                          {% if 'stratigraphic_unit' in system_classes %}selected{% endif %}>
-                    {{ _('Stratigraphic Unit') }}
-                  </option>
-                  <option value="feature"
-                          {% if 'feature' in system_classes %}selected{% endif %}>
-                    {{ _('Feature') }}
-                  </option>
-                </optgroup>
-                <optgroup label="{{ _('Sources') }}">
-                  <option value="source"
-                          {% if 'source' in system_classes %}selected{% endif %}>
-                    {{ _('Source') }}
-                  </option>
-                  <option value="bibliography"
-                          {% if 'bibliography' in system_classes %}selected{% endif %}>
-                    {{ _('Bibliography') }}
-                  </option>
-                  <option value="external_reference"
-                          {% if 'external_reference' in system_classes %}selected{% endif %}>
-                    {{ _('External Reference') }}
-                  </option>
-                  <option value="edition"
-                          {% if 'edition' in system_classes %}selected{% endif %}>
-                    {{ _('Edition') }}
-                  </option>
-                </optgroup>
-                <optgroup label="{{ _('Files') }}">
-                  <option value="file"
-                          {% if 'file' in system_classes %}selected{% endif %}>
-                    {{ _('File') }}
-                  </option>
-                </optgroup>
-              </select>
+  <script>
+    window.SEARCH_CONFIG = {
+      availableCaseStudies: {{ available_case_studies | tojson | safe }},
+      availableClasses: {{ available_classes | tojson | safe }},
+      classMetaMap: {{ class_meta_map | tojson | safe }},
+      initialState: {{ initial_state | tojson | safe }}
+    };
+  </script>
+
+  <div class="page-wrapper landing-page-wrapper search-page-wrapper"
+       id="searchAppRoot"
+       data-api-url="{{ url_for('api_search') }}"
+       data-entity-base-url="/entity/"
+       data-label-unnamed="{{ _('Unnamed') }}"
+       data-label-all-classes="{{ _('All Classes') }}"
+       data-label-all-studies="{{ _('All Case Studies') }}"
+       data-label-loading="{{ _('Searching OpenAtlas repository...') }}"
+       data-label-error="{{ _('Could not load search results. Please try again.') }}"
+       data-label-empty="{{ _('No matching entities found for the current filters.') }}"
+       data-label-view="{{ _('View') }}"
+       data-label-bc="{{ _('BC') }}"
+       data-label-ad="{{ _('AD') }}"
+       data-label-any-time="{{ _('Any period') }}"
+       data-label-from="{{ _('from') }}"
+       data-label-until="{{ _('until') }}"
+       data-label-results="{{ _('entities') }}">
+
+    <!-- Hero Search Section -->
+    <header class="hero-section search-hero-section text-white position-relative">
+      <div class="container py-5 position-relative hero-content">
+        <div class="row justify-content-center text-center">
+          <div class="col-lg-10 col-xl-9">
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill
+                        bg-primary bg-opacity-25 border border-light border-opacity-25
+                        small mb-3">
+              <i class="bi bi-compass text-info"></i>
+              <span>{{ _('OpenAtlas Discovery Engine') }}</span>
             </div>
 
-            <!-- 🔍 Text Input + Button -->
-            <div class="input-group mb-3">
-              <input type="text" id="search-input" name="query"
-                     value="{{ query or '' }}" placeholder="{{ _('Search') }}..."
-                     class="form-control" autocomplete="off">
-              <button type="submit" class="btn btn-primary">{{ _('Search') }}</button>
+            <h1 class="display-5 fw-bold mb-2 tracking-tight text-white">
+              {{ _('Advanced Research Search') }}
+            </h1>
+            <p class="lead text-white-50 mb-4 px-md-5">
+              {{ _('Query archaeological sites, features, finds, actors, and sources across projects and periods.') }}
+            </p>
+
+            <!-- Primary Search Input Bar -->
+            <div class="row justify-content-center">
+              <div class="col-md-10 col-lg-9">
+                <form id="searchMainForm" class="search-hero-bar shadow-lg" novalidate>
+                  <div class="input-group input-group-lg bg-white rounded-pill overflow-hidden p-1">
+                    <span class="input-group-text bg-transparent border-0 text-muted ps-3">
+                      <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text"
+                           id="searchQueryInput"
+                           name="search"
+                           value="{{ initial_state.query or '' }}"
+                           autocomplete="off"
+                           class="form-control border-0 shadow-none px-2 text-dark"
+                           placeholder="{{ _('Search by name, place, or phonetic match (optional)...') }}"
+                           aria-label="{{ _('Search query') }}">
+                    <button type="button"
+                            id="searchClearQueryBtn"
+                            class="btn btn-link text-muted text-decoration-none px-2 d-none"
+                            title="{{ _('Clear search term') }}"
+                            aria-label="{{ _('Clear search term') }}">
+                      <i class="bi bi-x-circle-fill"></i>
+                    </button>
+                    <button type="submit"
+                            id="searchSubmitBtn"
+                            class="btn btn-primary rounded-pill px-4 fw-semibold">
+                      <i class="bi bi-search me-1"></i>{{ _('Search') }}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
-        </form>
+        </div>
       </div>
-    </div>
+    </header>
 
-    <!-- 👉 Hint when nothing has been searched yet -->
-    {% if not results and not query %}
-      <div style="padding: 100px 0; text-align: center; color: #888;">
-        <em>{{ _('Start typing above to see live results or press enter to run a search.') }}</em>
+    <!-- Main Filter & Results Section -->
+    <section class="py-5 bg-body-tertiary">
+      <div class="container">
+        <!-- Filter Workbench Card -->
+        <div class="card border-0 shadow-sm search-filter-card mb-4">
+          <div class="card-body p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 pb-3 border-bottom">
+              <div class="d-flex align-items-center gap-2">
+                <span class="search-section-icon">
+                  <i class="bi bi-sliders"></i>
+                </span>
+                <div>
+                  <h3 class="h5 fw-bold mb-0 text-body">{{ _('Search Filters & Parameters') }}</h3>
+                  <p class="text-muted small mb-0">
+                    {{ _('Combine case studies, optional entity classes, and chronological bounds.') }}
+                  </p>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span id="activeFilterCountBadge"
+                      class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 d-none">
+                  0
+                </span>
+                <button type="button"
+                        id="resetAllFiltersBtn"
+                        class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                  <i class="bi bi-arrow-counterclockwise me-1"></i>{{ _('Reset all') }}
+                </button>
+              </div>
+            </div>
+
+            <div class="row g-4">
+              <!-- 1. Case Studies Selector -->
+              <div class="col-lg-5">
+                <div class="search-filter-block h-100">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="form-label fw-semibold mb-0 small text-uppercase tracking-wider text-muted">
+                      <i class="bi bi-folder2-open me-1 text-primary"></i>{{ _('Case Studies') }}
+                    </label>
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill small">
+                      {{ _('Multi-select') }}
+                    </span>
+                  </div>
+                  <p class="text-muted small mb-3">
+                    {{ _('Restrict search to specific research projects or search across all corpora.') }}
+                  </p>
+                  <div class="d-flex flex-wrap gap-2" id="caseStudyPills" role="group"
+                       aria-label="{{ _('Case Studies') }}">
+                    <button type="button"
+                            class="search-filter-pill active"
+                            data-cs-id="all">
+                      <i class="bi bi-globe2"></i>
+                      <span>{{ _('All Case Studies') }}</span>
+                    </button>
+                    {% for cs in available_case_studies %}
+                      <button type="button"
+                              class="search-filter-pill"
+                              data-cs-id="{{ cs.id }}"
+                              title="{{ cs.name }}">
+                        <i class="bi bi-journal-bookmark"></i>
+                        <span>{{ cs.acronym }}</span>
+                      </button>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Chronological Timespan Chooser -->
+              <div class="col-lg-7">
+                <div class="search-filter-block h-100">
+                  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                    <label class="form-label fw-semibold mb-0 small text-uppercase tracking-wider text-muted">
+                      <i class="bi bi-clock-history me-1 text-primary"></i>{{ _('Timespan Chooser') }}
+                    </label>
+                    <div class="d-flex align-items-center gap-2">
+                      <span id="timespanSummaryBadge"
+                            class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">
+                        {{ _('Any period') }}
+                      </span>
+                      <button type="button"
+                              id="clearTimespanBtn"
+                              class="btn btn-sm btn-link text-muted p-0 text-decoration-none d-none"
+                              title="{{ _('Clear timespan') }}">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Quick Historical Period Presets -->
+                  <div class="d-flex flex-wrap gap-1 mb-3" id="timespanPresets">
+                    <button type="button" class="btn btn-xs search-era-chip active"
+                            data-start="" data-end="">
+                      {{ _('All Periods') }}
+                    </button>
+                    <button type="button" class="btn btn-xs search-era-chip"
+                            data-start="-1000" data-end="0">
+                      {{ _('Prehistory (1000 BC – 1 BC)') }}
+                    </button>
+                    <button type="button" class="btn btn-xs search-era-chip"
+                            data-start="1" data-end="500">
+                      {{ _('Antiquity (1 – 500 AD)') }}
+                    </button>
+                    <button type="button" class="btn btn-xs search-era-chip"
+                            data-start="500" data-end="1050">
+                      {{ _('Early Middle Ages (500 – 1050)') }}
+                    </button>
+                    <button type="button" class="btn btn-xs search-era-chip"
+                            data-start="1050" data-end="1500">
+                      {{ _('High/Late Middle Ages (1050 – 1500)') }}
+                    </button>
+                    <button type="button" class="btn btn-xs search-era-chip"
+                            data-start="1500" data-end="2000">
+                      {{ _('Modern Era (1500 – 2000)') }}
+                    </button>
+                  </div>
+
+                  <!-- Dual Range Slider -->
+                  <div class="search-timespan-slider-wrap mb-3 px-1">
+                    <div class="search-dual-slider">
+                      <div class="search-slider-track" id="timespanSliderTrack"></div>
+                      <input type="range"
+                             id="timespanSliderMin"
+                             class="search-range-input"
+                             min="-2000"
+                             max="2000"
+                             step="10"
+                             value="-2000"
+                             aria-label="{{ _('Start Year Slider') }}">
+                      <input type="range"
+                             id="timespanSliderMax"
+                             class="search-range-input"
+                             min="-2000"
+                             max="2000"
+                             step="10"
+                             value="2000"
+                             aria-label="{{ _('End Year Slider') }}">
+                    </div>
+                    <div class="d-flex justify-content-between text-muted extra-small mt-1">
+                      <span>2000 {{ _('BC') }}</span>
+                      <span>1000 {{ _('BC') }}</span>
+                      <span>0</span>
+                      <span>500 {{ _('AD') }}</span>
+                      <span>1000 {{ _('AD') }}</span>
+                      <span>2000 {{ _('AD') }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Exact Year / Date Inputs -->
+                  <div class="row g-2 align-items-center">
+                    <div class="col-sm-6">
+                      <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-body-secondary text-muted">
+                          <i class="bi bi-calendar-minus me-1"></i>{{ _('Start Year') }}
+                        </span>
+                        <input type="number"
+                               id="startDateInput"
+                               class="form-control"
+                               min="-50000"
+                               max="2100"
+                               step="1"
+                               placeholder="{{ _('e.g. -500 or 750') }}"
+                               aria-label="{{ _('Start Year') }}">
+                        <span class="input-group-text bg-body-tertiary text-muted small"
+                              id="startEraHint">{{ _('BC/AD') }}</span>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-body-secondary text-muted">
+                          <i class="bi bi-calendar-plus me-1"></i>{{ _('End Year') }}
+                        </span>
+                        <input type="number"
+                               id="endDateInput"
+                               class="form-control"
+                               min="-50000"
+                               max="2100"
+                               step="1"
+                               placeholder="{{ _('e.g. 1050') }}"
+                               aria-label="{{ _('End Year') }}">
+                        <span class="input-group-text bg-body-tertiary text-muted small"
+                              id="endEraHint">{{ _('BC/AD') }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Entity Class Selector (Optional) -->
+              <div class="col-12">
+                <div class="search-filter-block">
+                  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                    <div>
+                      <label class="form-label fw-semibold mb-0 small text-uppercase tracking-wider text-muted">
+                        <i class="bi bi-diagram-3 me-1 text-primary"></i>{{ _('Entity Class') }}
+                      </label>
+                      <span class="text-muted small ms-2">
+                        ({{ _('Optional — leave on "All Classes" to include every entity type') }})
+                      </span>
+                    </div>
+                  </div>
+                  <div class="d-flex flex-wrap gap-2" id="entityClassPills" role="group"
+                       aria-label="{{ _('Entity Class') }}">
+                    <button type="button"
+                            class="search-class-pill active"
+                            data-class-key="all">
+                      <i class="bi bi-layers-half"></i>
+                      <span>{{ _('All Classes') }}</span>
+                    </button>
+                    {% for cls in available_classes %}
+                      <button type="button"
+                              class="search-class-pill search-class-{{ cls.color_key }}"
+                              data-class-key="{{ cls.key }}">
+                        <i class="bi {{ cls.icon }}"></i>
+                        <span>{{ cls.label }}</span>
+                      </button>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results Table Card -->
+        <div class="card border-0 shadow-sm search-results-card">
+          <!-- Table Toolbar -->
+          <div class="card-header bg-transparent border-bottom p-4">
+            <div class="row g-3 align-items-center justify-content-between">
+              <div class="col-md-auto">
+                <div class="d-flex align-items-center gap-3">
+                  <div>
+                    <h3 class="h5 fw-bold mb-0 text-body d-flex align-items-center gap-2">
+                      <span>{{ _('Search Results') }}</span>
+                      <span id="resultsTotalBadge"
+                            class="badge bg-primary rounded-pill">0</span>
+                    </h3>
+                    <p class="text-muted small mb-0" id="resultsStatusSubtitle">
+                      {{ _('Showing matching entities from OpenAtlas API v1') }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sort, Page Size & Export Controls -->
+              <div class="col-md-auto">
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                  <!-- Instant Table Filter -->
+                  <div class="input-group input-group-sm search-table-quickfilter">
+                    <span class="input-group-text bg-body-tertiary border-end-0 text-muted">
+                      <i class="bi bi-funnel"></i>
+                    </span>
+                    <input type="text"
+                           id="tableQuickFilterInput"
+                           class="form-control border-start-0"
+                           placeholder="{{ _('Filter current table...') }}"
+                           aria-label="{{ _('Filter current table') }}">
+                  </div>
+
+                  <!-- Sort By -->
+                  <div class="input-group input-group-sm w-auto">
+                    <label class="input-group-text bg-body-tertiary text-muted" for="sortBySelect">
+                      <i class="bi bi-sort-alpha-down me-1"></i>{{ _('Sort') }}
+                    </label>
+                    <select id="sortBySelect" class="form-select">
+                      <option value="name">{{ _('Name') }}</option>
+                      <option value="start_date">{{ _('Start Date') }}</option>
+                      <option value="end_date">{{ _('End Date') }}</option>
+                    </select>
+                    <button type="button"
+                            id="sortOrderBtn"
+                            class="btn btn-outline-secondary"
+                            data-order="asc"
+                            title="{{ _('Toggle ascending/descending order') }}">
+                      <i class="bi bi-sort-down-alt" id="sortOrderIcon"></i>
+                    </button>
+                  </div>
+
+                  <!-- Page Size -->
+                  <div class="input-group input-group-sm w-auto">
+                    <label class="input-group-text bg-body-tertiary text-muted" for="limitSelect">
+                      {{ _('Rows') }}
+                    </label>
+                    <select id="limitSelect" class="form-select">
+                      <option value="25">25</option>
+                      <option value="50" selected>50</option>
+                      <option value="100">100</option>
+                    </select>
+                  </div>
+
+                  <!-- CSV Export -->
+                  <button type="button"
+                          id="exportCsvBtn"
+                          class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                          title="{{ _('Export table to CSV') }}">
+                    <i class="bi bi-download me-1"></i>CSV
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Table Body / Loading / Empty State -->
+          <div class="card-body p-0">
+            <!-- Loading State -->
+            <div id="searchLoadingState" class="text-center py-5 d-none">
+              <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">{{ _('Loading...') }}</span>
+              </div>
+              <p class="text-muted mb-0">{{ _('Searching OpenAtlas repository...') }}</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="searchErrorState" class="text-center py-5 d-none">
+              <div class="text-danger mb-2">
+                <i class="bi bi-exclamation-triangle display-6"></i>
+              </div>
+              <p class="text-muted mb-3" id="searchErrorMessage">
+                {{ _('Could not load search results. Please try again.') }}
+              </p>
+              <button type="button" id="retrySearchBtn" class="btn btn-sm btn-primary rounded-pill px-4">
+                <i class="bi bi-arrow-clockwise me-1"></i>{{ _('Retry') }}
+              </button>
+            </div>
+
+            <!-- Empty State -->
+            <div id="searchEmptyState" class="text-center py-5 d-none">
+              <div class="text-muted mb-2">
+                <i class="bi bi-inbox display-6"></i>
+              </div>
+              <h4 class="h6 fw-bold text-body mb-1">{{ _('No results found') }}</h4>
+              <p class="text-muted small mb-3">
+                {{ _('Try broadening your search term, clearing the entity class filter, or expanding the timespan.') }}
+              </p>
+              <button type="button" id="emptyResetBtn" class="btn btn-sm btn-outline-primary rounded-pill px-4">
+                {{ _('Reset filters') }}
+              </button>
+            </div>
+
+            <!-- Results Table -->
+            <div class="table-responsive" id="searchTableWrapper">
+              <table class="table table-hover align-middle mb-0 search-results-table"
+                     id="searchResultsTable">
+                <thead class="table-light">
+                  <tr>
+                    <th scope="col" class="ps-4 sortable-th" data-sort="name">
+                      <div class="d-flex align-items-center gap-1">
+                        <span>{{ _('Entity') }}</span>
+                        <i class="bi bi-arrow-down-up small text-muted sort-indicator"></i>
+                      </div>
+                    </th>
+                    <th scope="col">{{ _('Class') }}</th>
+                    <th scope="col" class="sortable-th" data-sort="start_date">
+                      <div class="d-flex align-items-center gap-1">
+                        <span>{{ _('Timespan') }}</span>
+                        <i class="bi bi-arrow-down-up small text-muted sort-indicator"></i>
+                      </div>
+                    </th>
+                    <th scope="col">{{ _('Case Study') }}</th>
+                    <th scope="col">{{ _('Description') }}</th>
+                    <th scope="col" class="text-end pe-4">{{ _('Action') }}</th>
+                  </tr>
+                </thead>
+                <tbody id="searchResultsTbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Pagination Footer -->
+          <div class="card-footer bg-transparent border-top p-3 px-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+              <div class="text-muted small" id="paginationSummaryText"></div>
+              <div class="d-flex align-items-center gap-2">
+                <button type="button"
+                        id="prevPageBtn"
+                        class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                        disabled>
+                  <i class="bi bi-chevron-left me-1"></i>{{ _('Previous') }}
+                </button>
+                <span class="badge bg-body-secondary text-body rounded-pill px-3 py-2"
+                      id="currentPageIndicator">1</span>
+                <button type="button"
+                        id="nextPageBtn"
+                        class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                        disabled>
+                  {{ _('Next') }}<i class="bi bi-chevron-right ms-1"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    {% endif %}
-
-    <!-- 📄 Static Search Results (rendered via JavaScript) -->
-    {% if results is defined and results|length > 0 %}
-      <div class="mt-5" id="static-results">
-        <h2>{{ _('Static Search Results') }}:</h2>
-        <ul id="static-result-list"></ul>
-      </div>
-    {% elif query %}
-      <p><em>{{ _('No results found for "%(query)s"', query=query) }}</em></p>
-    {% endif %}
-
-    <!-- The Live Search Popup is moved OUTSIDE the wrapper for proper overlay behavior -->
-    <div id="live-results" class="live-popup"></div>
+    </section>
   </div>
 
-  <!-- ✅ Include Choices.js CSS & JS -->
-  <link rel="stylesheet" href="/static/node_modules/choices.js/public/assets/styles/choices.min.css">
-  <script src="/static/node_modules/choices.js/public/assets/scripts/choices.min.js"></script>
-
-  <!-- ✅ CSS Styles -->
-  <style>
-    /* Live search popup styling (fixed as an overlay) */
-    #live-results {
-      display: none;
-      position: fixed;
-      top: 270px; /* adjust this value so that it appears below the search input */
-      left: 32%;
-      transform: translateX(-50%);
-      width: 600px; /* adjust as needed or use max-width: 90%; */
-      max-height: 300px;
-      overflow-y: auto;
-      z-index: 2000;
-      background: white;
-      border: 1px solid #ccc;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      padding: 8px;
-    }
-
-    #live-results.show {
-      display: block;
-    }
-
-    /* Default styles for the list items */
-    #static-result-list li {
-      background-color: transparent; /* No gray background by default */
-      cursor: pointer; /* Make the entire list item look clickable */
-    }
-
-    /* Apply background color when hovering over the result */
-    #static-result-list li:hover {
-      background-color: #f0f0f0; /* Gray background on hover */
-    }
-
-    /* Ensure the anchor tag takes up the full space of the list item */
-    #static-result-list li a {
-      display: block; /* Make the anchor a block-level element */
-      text-decoration: none; /* Remove the underline */
-      color: inherit; /* Inherit the text color */
-    }
-
-    /* Optional: Ensure the cursor remains a pointer on hover */
-    #static-result-list li a:hover {
-      cursor: pointer; /* Pointer cursor only when hovering over the text */
-    }
-
-
-    /* Default styles for the live result items */
-    #live-results div {
-      background-color: transparent; /* No gray background by default */
-      cursor: pointer; /* Make the entire div look clickable */
-    }
-
-    /* Apply background color when hovering over the live result */
-    #live-results div:hover {
-      background-color: #f0f0f0; /* Gray background on hover */
-    }
-
-    /* Ensure the anchor tag takes up the full space of the div */
-    #live-results a {
-      display: block; /* Make the anchor a block-level element */
-      text-decoration: none; /* Remove the underline */
-      color: inherit; /* Inherit the text color */
-    }
-
-    /* Optional: Ensure the cursor remains a pointer on hover */
-    #live-results a:hover {
-      cursor: pointer; /* Pointer cursor when hovering over the anchor */
-    }
-
-
-    /* Ensure our container and wrappers allow free expansion */
-    .relative-wrapper,
-    .form-area-wrapper,
-    .static-search-form-wrapper {
-      position: relative;
-      overflow: visible;
-    }
-
-    /* Choices.js dropdown styling */
-    .choices__list--dropdown {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      width: 100%;
-      z-index: 9999 !important;
-      background: white;
-      border: 1px solid #ccc;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    .container {
-      overflow: visible;
-      /* Optional: add bottom padding so the page doesn’t look cut off */
-      padding-bottom: 50px;
-    }
-
-    #system-class-select {
-      margin-bottom: 1rem;
-    }
-  </style>
-
-  <!-- ✅ JavaScript for Live Search and Static Search "Load More" functionality -->
-  <script>
-    const searchTranslations = {
-        unnamed: "{{ _('Unnamed') }}",
-        loadMore: "{{ _('Load more') }}",
-        typeAtLeast3: "{{ _('Type at least 3 characters...') }}",
-        loadingLive: "{{ _('Loading live results for \"%(query)s\"...', query='') }}",
-        noLiveResults: "{{ _('No live results found for \"%(query)s\".', query='') }}",
-        errorLoading: "{{ _('Error loading live results.') }}",
-        selectTypes: "{{ _('Select one or more types') }}"
-    };
-
-    document.addEventListener("DOMContentLoaded", function () {
-      // ---- Variables for Static Search Pagination ----
-      const staticResultList = document.getElementById('static-result-list');
-      // allResults is passed from the server as a JSON arrayyyyyyy
-      const allResults = {{ results|tojson|safe }};
-      let currentIndex = 0;
-      const batchSize = 10;
-
-      // Function to render next batch of static results
-      function renderNextBatch(count = batchSize) {
-        const nextBatch = allResults.slice(currentIndex, currentIndex + count);
-        for (const result of nextBatch) {
-          const li = document.createElement('li');
-          li.classList.add('mb-2');
-          li.innerHTML = `
-    <a href="/entity/${result.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
-        <strong>
-          ${result.name || searchTranslations.unnamed}
-        </strong>
-        (${result.system_class})
-        <br>
-        ${result.description ? result.description.slice(0, 300) + '<br>' : ''}
-    </a>
-`;
-          staticResultList.appendChild(li);
-        }
-        currentIndex += count;
-        // If more results remain and the "Load more" button is not in the DOM, append it.
-        if (currentIndex < allResults.length && !document.getElementById('load-more-btn')) {
-          const btnWrapper = document.createElement('div');
-          btnWrapper.className = 'text-center mt-3';
-          const btn = document.createElement('button');
-          btn.id = 'load-more-btn';
-          btn.className = 'btn btn-secondary';
-          btn.innerText = searchTranslations.loadMore;
-          btn.addEventListener('click', renderNextBatch);
-          btnWrapper.appendChild(btn);
-          document.getElementById('static-results').appendChild(btnWrapper);
-        }
-        // If no more results remain, remove the button if it exists.
-        if (currentIndex >= allResults.length) {
-          const existingBtn = document.getElementById('load-more-btn');
-          if (existingBtn) {
-            existingBtn.parentNode.remove();
-          }
-        }
-      }
-
-      // Render the first batch of static results, if they exist.
-      if (allResults && allResults.length) {
-        renderNextBatch();
-      }
-
-      // ---- Live Search Functionality ----
-      const input = document.getElementById('search-input');
-      const liveResultsBox = document.getElementById('live-results');
-
-      if (input) {
-        input.addEventListener('input', async function () {
-          const query = input.value.trim();
-          if (query.length < 3) {
-            liveResultsBox.innerHTML = `<p style='padding:8px; color:gray;'>${searchTranslations.typeAtLeast3}</p>`;
-            liveResultsBox.classList.remove('show');
-            return;
-          }
-
-          // Build selected classes query parameters
-          const selectedOptions = Array.from(document.querySelectorAll('#system-class-select option:checked'))
-              .map(opt => opt.value);
-          const classParams = selectedOptions.map(cls => `system_class=${encodeURIComponent(cls)}`).join('&');
-          const url = `/search_live?q=${encodeURIComponent(query)}&${classParams}`;
-
-          liveResultsBox.innerHTML = `<p style="padding:8px; color:blue;">
-            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            ${searchTranslations.loadingLive.replace('%(query)s', query)}
-          </p>`;
-          liveResultsBox.classList.add('show');
-
-          try {
-            const res = await fetch(url);
-            const liveResults = await res.json();
-            if (!Array.isArray(liveResults) || liveResults.length === 0) {
-              liveResultsBox.innerHTML = `<p style="padding:8px; color:orange;">${searchTranslations.noLiveResults.replace('%(query)s', query)}</p>`;
-            } else {
-              liveResultsBox.innerHTML = liveResults.map(r => `
-    <a href="/entity/${r.id.split('/').pop()}" style="text-decoration: none; color: inherit;">
-        <div class="p-2">
-            <strong>
-              ${r.name || searchTranslations.unnamed}
-            </strong><br>
-            <small>${r.description ? r.description.slice(0, 150) + '…' : ''}</small>
-        </div>
-    </a>
-`).join('');
-
-            }
-          } catch (err) {
-            console.error("Live search error:", err);
-            liveResultsBox.innerHTML = `<p style="padding:8px; color:red;">${searchTranslations.errorLoading}</p>`;
-          }
-        });
-
-        // Hide the live results popup when clicking outside the search form area.
-        document.addEventListener('click', function (e) {
-          const wrapper = document.querySelector('.relative-wrapper');
-          if (wrapper && !wrapper.contains(e.target)) {
-            liveResultsBox.classList.remove('show');
-          }
-        });
-      }
-
-      // ---- Choices.js Initialization ----
-      const selectElement = document.getElementById('system-class-select');
-      if (selectElement) {
-        new Choices(selectElement, {
-          removeItemButton: true,
-          shouldSort: false,
-          placeholder: true,
-          placeholderValue: searchTranslations.selectTypes,
-          maxItemCount: 15
-        });
-      }
-    });
-  </script>
+  <script src="{{ url_for('static', filename='js/search.js') }}"></script>
 {% endblock %}

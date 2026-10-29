@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-29 16:00+0100\n"
+"POT-Creation-Date: 2026-10-29 17:24+0100\n"
 "PO-Revision-Date: 2026-05-22 15:03+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: sr\n"
@@ -17,13 +17,16 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.18.0\n"
+"Generated-By: Babel 2.17.0\n"
 
 #: api/util.py:43 api/util.py:45 api/util.py:46 api/util.py:51
+#: templates/search.html:24 templates/search.html:225 templates/search.html:226
 msgid "BC"
 msgstr "p. n. e."
 
-#: api/util.py:43 api/util.py:45 api/util.py:46
+#: api/util.py:43 api/util.py:45 api/util.py:46 templates/search.html:25
+#: templates/search.html:228 templates/search.html:229
+#: templates/search.html:230
 msgid "AD"
 msgstr "n. e."
 
@@ -93,7 +96,7 @@ msgstr "Kategorija"
 msgid "file"
 msgstr "Datoteka"
 
-#: forms/admin.py:52 templates/about.html:216 templates/tabs/feature.html:100
+#: forms/admin.py:52 templates/about.html:203 templates/tabs/feature.html:100
 #: templates/tabs/overview.html:12 templates/util/cite/modal.html:37
 msgid "License"
 msgstr "Licenca"
@@ -124,79 +127,79 @@ msgstr "prikaži lozinku"
 msgid "login"
 msgstr "prijava"
 
-#: services/statistics.py:11 templates/search.html:67
+#: services/statistics.py:11
 msgid "Place"
 msgstr "Mesto"
 
-#: services/statistics.py:17 templates/search.html:75
+#: services/statistics.py:17
 msgid "Feature"
 msgstr "Odlika / Struktura"
 
-#: services/statistics.py:23 templates/search.html:71
+#: services/statistics.py:23
 msgid "Stratigraphic Unit"
 msgstr "Stratigrafska jedinica"
 
-#: services/statistics.py:29 templates/search.html:27
+#: services/statistics.py:29
 msgid "Artifact"
 msgstr "Artefakt"
 
-#: services/statistics.py:35 templates/search.html:31
+#: services/statistics.py:35
 msgid "Human Remains"
 msgstr "Ljudski ostaci"
 
-#: services/statistics.py:41 templates/search.html:17
+#: services/statistics.py:41
 msgid "Person"
 msgstr "Osoba"
 
-#: services/statistics.py:47 templates/search.html:21
+#: services/statistics.py:47
 msgid "Group"
 msgstr "Grupa"
 
-#: services/statistics.py:53 templates/search.html:37
+#: services/statistics.py:53
 msgid "Acquisition"
 msgstr "Akvizicija"
 
-#: services/statistics.py:59 templates/search.html:41
+#: services/statistics.py:59
 msgid "Event"
 msgstr "Događaj"
 
-#: services/statistics.py:65 templates/search.html:45
+#: services/statistics.py:65
 msgid "Activity"
 msgstr "Aktivnost"
 
-#: services/statistics.py:71 templates/search.html:49
+#: services/statistics.py:71
 msgid "Creation"
 msgstr "Kreacija"
 
-#: services/statistics.py:77 templates/search.html:53
+#: services/statistics.py:77
 msgid "Move"
 msgstr "Premestanje"
 
-#: services/statistics.py:83 templates/search.html:57
+#: services/statistics.py:83
 msgid "Production"
 msgstr "Produkcija"
 
-#: services/statistics.py:89 templates/search.html:61
+#: services/statistics.py:89
 msgid "Modification"
 msgstr "Modifikacija"
 
-#: services/statistics.py:95 templates/search.html:81
+#: services/statistics.py:95
 msgid "Source"
 msgstr "Izvor"
 
-#: services/statistics.py:101 templates/search.html:85
+#: services/statistics.py:101
 msgid "Bibliography"
 msgstr "Bibliografija"
 
-#: services/statistics.py:107 templates/search.html:89
+#: services/statistics.py:107
 msgid "External Reference"
 msgstr "Spoljna referenca"
 
-#: services/statistics.py:113 templates/search.html:93
+#: services/statistics.py:113
 msgid "Edition"
 msgstr "Izdanje"
 
-#: services/statistics.py:119 templates/search.html:99
+#: services/statistics.py:119
 msgid "File"
 msgstr "Датотека"
 
@@ -206,8 +209,7 @@ msgstr "Датотека"
 msgid "Type"
 msgstr "Тип"
 
-#: services/statistics.py:133 templates/about.html:536 templates/index.html:214
-#: templates/search.html:64
+#: services/statistics.py:133 templates/about.html:523 templates/index.html:214
 msgid "Places"
 msgstr "Mesta"
 
@@ -217,8 +219,8 @@ msgstr "Lokaliteti i nekropole"
 
 #: services/statistics.py:136
 msgid ""
-"Archaeological sites, cemeteries, churches, and settlement structures with "
-"coordinates."
+"Archaeological sites, cemeteries, churches, and settlement structures "
+"with coordinates."
 msgstr ""
 "Arheološki lokaliteti, nekropole, crkve i naseobinske strukture sa "
 "koordinatama."
@@ -237,15 +239,17 @@ msgstr "Celine i strukture"
 
 #: services/statistics.py:146
 msgid ""
-"Grave constructions, burials, anthropological features, and stratigraphic "
-"units."
-msgstr "Grobne konstrukcije, sahrane, antropološki nalazi i stratigrafske jedinice."
+"Grave constructions, burials, anthropological features, and stratigraphic"
+" units."
+msgstr ""
+"Grobne konstrukcije, sahrane, antropološki nalazi i stratigrafske "
+"jedinice."
 
 #: services/statistics.py:148
 msgid "Browse features"
 msgstr "Pregledaj celine"
 
-#: services/statistics.py:153 templates/search.html:24
+#: services/statistics.py:153
 msgid "Items"
 msgstr "Predmeti"
 
@@ -255,8 +259,8 @@ msgstr "Materijalna kultura"
 
 #: services/statistics.py:156
 msgid ""
-"Archaeological artifacts, jewelry, ceramics, weapons, dress accessories, and"
-" skeletal remains."
+"Archaeological artifacts, jewelry, ceramics, weapons, dress accessories, "
+"and skeletal remains."
 msgstr ""
 "Arheološki artefakti, nakit, keramika, oružje, delovi nošnje i skeletni "
 "ostaci."
@@ -265,7 +269,7 @@ msgstr ""
 msgid "Browse items"
 msgstr "Pregledaj predmete"
 
-#: services/statistics.py:163 templates/search.html:14
+#: services/statistics.py:163
 msgid "Actors"
 msgstr "Akteri"
 
@@ -281,7 +285,7 @@ msgstr "Историјске личности, појединци, инстит�
 msgid "Browse actors"
 msgstr "Прегледај актере"
 
-#: services/statistics.py:173 templates/search.html:34
+#: services/statistics.py:173
 msgid "Events"
 msgstr "Događaji"
 
@@ -291,15 +295,17 @@ msgstr "Догађаји и активности"
 
 #: services/statistics.py:176
 msgid ""
-"Historical events, archaeological activities, productions, movements, and "
-"acquisitions."
-msgstr "Историјски догађаји, археолошке активности, производње, кретања и аквизиције."
+"Historical events, archaeological activities, productions, movements, and"
+" acquisitions."
+msgstr ""
+"Историјски догађаји, археолошке активности, производње, кретања и "
+"аквизиције."
 
 #: services/statistics.py:178
 msgid "Browse events"
 msgstr "Прегледај догађаје"
 
-#: services/statistics.py:183 templates/search.html:78
+#: services/statistics.py:183
 msgid "Sources"
 msgstr "Izvori"
 
@@ -309,8 +315,8 @@ msgstr "Izvori i literatura"
 
 #: services/statistics.py:186
 msgid ""
-"Specialized bibliography, primary sources, and links to external authority "
-"files."
+"Specialized bibliography, primary sources, and links to external "
+"authority files."
 msgstr ""
 "Stručna bibliografija, primarni izvori i veze ka eksternim normativnim "
 "bazama."
@@ -319,7 +325,7 @@ msgstr ""
 msgid "View sources"
 msgstr "Prikaži izvore"
 
-#: services/statistics.py:193 templates/search.html:96
+#: services/statistics.py:193
 msgid "Files"
 msgstr "Datoteke"
 
@@ -353,7 +359,7 @@ msgstr "Контролисани речници, типолошке класиф
 msgid "Browse types"
 msgstr "Прегледај типове"
 
-#: services/statistics.py:510
+#: services/statistics.py:513
 msgid "Explore topic"
 msgstr "Истражи тему"
 
@@ -381,11 +387,11 @@ msgstr "Студија случаја и пројекат"
 msgid "Explore Research Data"
 msgstr "Istraži istraživačke podatke"
 
-#: templates/about.html:88 templates/about.html:283
+#: templates/about.html:88 templates/about.html:270
 msgid "Research Team"
 msgstr "Истраживачки тим"
 
-#: templates/about.html:93 templates/about.html:247 templates/index.html:149
+#: templates/about.html:93 templates/about.html:234 templates/index.html:149
 msgid "Dataset"
 msgstr "Skup podataka"
 
@@ -393,218 +399,222 @@ msgstr "Skup podataka"
 msgid "Cite Project"
 msgstr "Цитирај пројекат"
 
-#: templates/about.html:127
+#: templates/about.html:114
 msgid "Project Profile"
 msgstr "Профил пројекта"
 
-#: templates/about.html:129
+#: templates/about.html:116
 msgid "About the Project"
 msgstr "О пројекту"
 
-#: templates/about.html:138
+#: templates/about.html:125
 msgid "Scientific research project within the Histarchexplorer repository."
 msgstr "Научноистраживачки пројекат у репозиторијуму Histarchexplorer."
 
-#: templates/about.html:149
+#: templates/about.html:136
 msgid "Key Facts"
 msgstr "Кључни подаци"
 
-#: templates/about.html:156
+#: templates/about.html:143
 msgid "Acronym"
 msgstr "Акроним"
 
-#: templates/about.html:166
+#: templates/about.html:153
 msgid "Contributors"
 msgstr "Сарадници"
 
-#: templates/about.html:172
+#: templates/about.html:159
 msgid "Institutions"
 msgstr "Институције"
 
-#: templates/about.html:180 templates/about.html:725
+#: templates/about.html:167 templates/about.html:712
 msgid "Website"
 msgstr "Veb-sajt"
 
-#: templates/about.html:195 templates/about.html:726
+#: templates/about.html:182 templates/about.html:713
 msgid "Email"
 msgstr "Imejl"
 
-#: templates/about.html:207 templates/about.html:728
+#: templates/about.html:194 templates/about.html:715
 msgid "Address"
 msgstr "Adresa"
 
-#: templates/about.html:251 templates/index.html:150
+#: templates/about.html:238 templates/index.html:150
 msgid "Research in Numbers"
 msgstr "Istraživanje u brojevima"
 
-#: templates/about.html:253
+#: templates/about.html:240
 msgid "Project Data Overview"
 msgstr "Преглед података пројекта"
 
-#: templates/about.html:285
+#: templates/about.html:272
 msgid "Contributors & Specialists"
 msgstr "Сарадници и стручњаци"
 
-#: templates/about.html:297 templates/about.html:298
+#: templates/about.html:284 templates/about.html:285
 msgid "Filter team members..."
 msgstr "Филтрирај чланове тима..."
 
-#: templates/about.html:305
+#: templates/about.html:292
 msgid "Filter by role"
 msgstr "Филтрирај по улози"
 
-#: templates/about.html:309
+#: templates/about.html:296
 msgid "All Roles"
 msgstr "Све улоге"
 
-#: templates/about.html:393
+#: templates/about.html:380
 msgid "Profile"
 msgstr "Профил"
 
-#: templates/about.html:403
+#: templates/about.html:390
 msgid "No team members match the selected filter."
 msgstr "Ниједан члан тима не одговара изабраном филтеру."
 
-#: templates/about.html:415
+#: templates/about.html:402
 msgid "Governance & Partners"
 msgstr "Управљање и партнери"
 
-#: templates/about.html:417
+#: templates/about.html:404
 msgid "Participating Institutions & Sponsors"
 msgstr "Учествујуће институције и спонзори"
 
-#: templates/about.html:481 templates/about.html:652
+#: templates/about.html:468 templates/about.html:639
 msgid "Details"
 msgstr "Detalji"
 
-#: templates/about.html:498 templates/index.html:176
+#: templates/about.html:485 templates/index.html:176
 msgid "Analyses"
 msgstr "Analize"
 
-#: templates/about.html:499 templates/index.html:177
+#: templates/about.html:486 templates/index.html:177
 msgid "Scientific Data Distribution"
 msgstr "Raspodela naučnih podataka"
 
-#: templates/about.html:502 templates/index.html:180
+#: templates/about.html:489 templates/index.html:180
 msgid "Interactive Histograms"
 msgstr "Interaktivni histogrami"
 
-#: templates/about.html:512 templates/index.html:190
+#: templates/about.html:499 templates/index.html:190
 msgid "Chronological Distribution"
 msgstr "Hronološka raspodela"
 
-#: templates/about.html:514 templates/index.html:192
+#: templates/about.html:501 templates/index.html:192
 msgid "Dated AD"
 msgstr "Datovano n. e."
 
-#: templates/about.html:517 templates/index.html:195
+#: templates/about.html:504 templates/index.html:195
 msgid ""
-"Distribution of archaeological datings by century (Late Antiquity to Middle "
-"Ages)."
-msgstr "Raspodela arheoloških datovanja po vekovima (kasna antika do srednjeg veka)."
+"Distribution of archaeological datings by century (Late Antiquity to "
+"Middle Ages)."
+msgstr ""
+"Raspodela arheoloških datovanja po vekovima (kasna antika do srednjeg "
+"veka)."
 
-#: templates/about.html:521 templates/index.html:199
+#: templates/about.html:508 templates/index.html:199
 msgid "Dating density"
 msgstr "Gustina datovanja"
 
-#: templates/about.html:522 templates/index.html:200 utils/view_util.py:17
+#: templates/about.html:509 templates/index.html:200 templates/search.html:29
+#: utils/view_util.py:17
 msgid "entities"
 msgstr "entiteti"
 
-#: templates/about.html:532 templates/index.html:210
+#: templates/about.html:519 templates/index.html:210
 msgid "Typological Breakdown"
 msgstr "Tipološka podela"
 
-#: templates/about.html:539 templates/index.html:217
+#: templates/about.html:526 templates/index.html:217
 msgid "Finds"
 msgstr "Nalazi"
 
-#: templates/about.html:544 templates/index.html:222
+#: templates/about.html:531 templates/index.html:222
 msgid "Breakdown by the most documented classifications."
 msgstr "Podela prema najčešće dokumentovanim klasifikacijama."
 
-#: templates/about.html:561 templates/index.html:239
+#: templates/about.html:548 templates/index.html:239
 msgid "Geography"
 msgstr "Geografija"
 
-#: templates/about.html:562 templates/index.html:240
+#: templates/about.html:549 templates/index.html:240
 msgid "Spatial Distribution of Sites"
 msgstr "Prostorna raspodela lokaliteta"
 
-#: templates/about.html:565 templates/index.html:243
+#: templates/about.html:552 templates/index.html:243
 msgid "Full Map View"
 msgstr "Prikaz cele mape"
 
-#: templates/about.html:574 templates/about.html:734 templates/index.html:253
+#: templates/about.html:561 templates/about.html:721 templates/index.html:253
+#: templates/search.html:393
 msgid "Loading..."
 msgstr "Učitavanje..."
 
-#: templates/about.html:576 templates/index.html:255
+#: templates/about.html:563 templates/index.html:255
 msgid "Loading spatial data..."
 msgstr "Učitavanje prostornih podataka..."
 
-#: templates/about.html:585 templates/index.html:262
+#: templates/about.html:572 templates/index.html:262
 msgid "View details"
 msgstr "Prikaži detalje"
 
-#: templates/about.html:590 templates/index.html:268
+#: templates/about.html:577 templates/index.html:268
 msgid "Activate map"
 msgstr "Aktiviraj mapu"
 
-#: templates/about.html:604 templates/index.html:105
+#: templates/about.html:591 templates/index.html:105
 msgid "Research Projects"
 msgstr "Istraživački projekti"
 
-#: templates/about.html:608 templates/index.html:107
+#: templates/about.html:595 templates/index.html:107
 msgid "Active Case Studies & Corpora"
 msgstr "Aktivne studije slučaja i korpusi"
 
-#: templates/about.html:610
+#: templates/about.html:597
 msgid "Further Projects in the Network"
 msgstr "Други пројекти у мрежи"
 
-#: templates/about.html:616 templates/admin/projects_content.html:38
+#: templates/about.html:603 templates/admin/projects_content.html:38
 msgid "Main Project"
 msgstr "Главни пројекат"
 
-#: templates/about.html:641 templates/publications.html:40
+#: templates/about.html:628 templates/publications.html:40
 msgid "Project"
 msgstr "Пројекат"
 
-#: templates/about.html:673 templates/index.html:338
+#: templates/about.html:660 templates/index.html:338
 #: templates/util/cite/modal.html:12
 msgid "Recommended Citation"
 msgstr "Preporučeno citiranje"
 
-#: templates/about.html:681 templates/index.html:346
+#: templates/about.html:668 templates/index.html:346
 msgid ""
-"Please use the following reference when citing this repository in academic "
-"work:"
+"Please use the following reference when citing this repository in "
+"academic work:"
 msgstr ""
 "Molimo vas da prilikom naučnog korišćenja ovog repozitorijuma navedete "
 "sledeću referencu:"
 
-#: templates/about.html:692 templates/index.html:357
+#: templates/about.html:679 templates/index.html:357
 msgid "Copied!"
 msgstr "Kopirano!"
 
-#: templates/about.html:693 templates/index.html:358
+#: templates/about.html:680 templates/index.html:358
 msgid "Copy citation"
 msgstr "Kopiraj citat"
 
-#: templates/about.html:704 templates/admin.html:43
+#: templates/about.html:691 templates/admin.html:43
 msgid "Legal Notice"
 msgstr "Правно обавештење"
 
-#: templates/about.html:727
+#: templates/about.html:714
 msgid "ORCID"
 msgstr "ORCID"
 
-#: templates/about.html:729
+#: templates/about.html:716
 msgid "Relations & Roles"
 msgstr "Везе и улоге"
 
-#: templates/about.html:741 templates/admin/partials/modal_add_entry.html:10
+#: templates/about.html:728 templates/admin/partials/modal_add_entry.html:10
 #: templates/admin/partials/modal_delete_confirm.html:7
 #: templates/admin/partials/modal_image_selector.html:9
 #: templates/publications.html:153 templates/util/cite/modal.html:84
@@ -678,8 +688,7 @@ msgid "Footer"
 msgstr "Podnožje"
 
 #: templates/admin.html:45 templates/index.html:57 templates/index.html:61
-#: templates/publications.html:13 templates/search.html:108
-#: templates/search.html:110
+#: templates/publications.html:13 templates/search.html:76
 msgid "Search"
 msgstr "Pretraga"
 
@@ -756,15 +765,17 @@ msgstr "Pregled upravljanja datotekama"
 #: templates/admin.html:279
 msgid "Select a file management section from the sidebar to start editing."
 msgstr ""
-"Izaberite odeljak za upravljanje datotekama sa bočne trake da biste započeli"
-" uređivanje."
+"Izaberite odeljak za upravljanje datotekama sa bočne trake da biste "
+"započeli uređivanje."
 
 #: templates/admin.html:331
 msgid "maps"
 msgstr "mape"
 
 #: templates/index.html:36
-msgid "Scientific research platform for archaeological burial and settlement data."
+msgid ""
+"Scientific research platform for archaeological burial and settlement "
+"data."
 msgstr ""
 "Naučna istraživačka platforma za arheološke podatke o sahranjivanju i "
 "naseljima."
@@ -777,7 +788,7 @@ msgstr "Pretraži lokalitete, celine, nalaze ili literaturu..."
 msgid "Searching..."
 msgstr "Претрага..."
 
-#: templates/index.html:59
+#: templates/index.html:59 templates/search.html:416
 msgid "No results found"
 msgstr "Нема пронађених резултата"
 
@@ -894,62 +905,261 @@ msgstr "glavni projekat"
 msgid "No publications found matching your criteria."
 msgstr ""
 
-#: templates/search.html:11
-msgid "Filter by Type"
-msgstr "Filtriraj po tipu"
-
-#: templates/search.html:120
-msgid "Start typing above to see live results or press enter to run a search."
-msgstr ""
-"Počnite da kucate iznad da biste videli rezultate uživo ili pritisnite enter"
-" da pokrenete pretragu."
-
-#: templates/search.html:127
-msgid "Static Search Results"
-msgstr "Statični rezultati pretrage"
-
-#: templates/search.html:131
-#, python-format
-msgid "No results found for \"%(query)s\""
-msgstr "Nisu pronađeni rezultati za \"%(query)s\""
-
-#: templates/search.html:247 templates/search_detail.html:4
+#: templates/search.html:17
 msgid "Unnamed"
 msgstr "Neimenovano"
 
-#: templates/search.html:248
-msgid "Load more"
-msgstr "Učitaj još"
+#: templates/search.html:18 templates/search.html:293
+msgid "All Classes"
+msgstr "Sve klase"
 
-#: templates/search.html:249
-msgid "Type at least 3 characters..."
-msgstr "Ukucajte najmanje 3 karaktera..."
+#: templates/search.html:19 templates/search.html:139
+msgid "All Case Studies"
+msgstr "Sve studije slučaja"
 
-#: templates/search.html:250
-#, python-format
-msgid "Loading live results for \"%(query)s\"..."
-msgstr "Učitavanje rezultata uživo za \"%(query)s\"..."
+#: templates/search.html:20 templates/search.html:395
+msgid "Searching OpenAtlas repository..."
+msgstr "Pretraga OpenAtlas repozitorijuma..."
 
-#: templates/search.html:251
-#, python-format
-msgid "No live results found for \"%(query)s\"."
-msgstr "Nisu pronađeni rezultati uživo za \"%(query)s\"."
+#: templates/search.html:21 templates/search.html:404
+msgid "Could not load search results. Please try again."
+msgstr "Rezultati pretrage nisu mogli biti učitani. Pokušajte ponovo."
 
-#: templates/search.html:252
-msgid "Error loading live results."
-msgstr "Greška pri učitavanju rezultata uživo."
+#: templates/search.html:22
+msgid "No matching entities found for the current filters."
+msgstr "Nisu pronađeni odgovarajući entiteti za trenutne filtere."
 
-#: templates/search.html:253
-msgid "Select one or more types"
-msgstr "Izaberite jedan ili više tipova"
+#: templates/search.html:23
+msgid "View"
+msgstr "Pogledaj"
 
-#: templates/search_detail.html:11
-msgid "Coordinates"
-msgstr "Koordinate"
+#: templates/search.html:26 templates/search.html:164
+msgid "Any period"
+msgstr "Bilo koji period"
 
-#: templates/search_detail.html:14
-msgid "Back to search"
-msgstr "Nazad na pretragu"
+#: templates/search.html:27
+msgid "from"
+msgstr "od"
+
+#: templates/search.html:28
+msgid "until"
+msgstr "do"
+
+#: templates/search.html:40
+msgid "OpenAtlas Discovery Engine"
+msgstr "OpenAtlas pretraživač"
+
+#: templates/search.html:44
+msgid "Advanced Research Search"
+msgstr "Napredna istraživačka pretraga"
+
+#: templates/search.html:47
+msgid ""
+"Query archaeological sites, features, finds, actors, and sources across "
+"projects and periods."
+msgstr ""
+"Pretražujte arheološke lokalitete, celine, nalaze, aktere i izvore kroz "
+"projekte i periode."
+
+#: templates/search.html:64
+msgid "Search by name, place, or phonetic match (optional)..."
+msgstr "Pretraga po imenu, mestu ili fonetskom poklapanju (opciono)..."
+
+#: templates/search.html:65
+msgid "Search query"
+msgstr "Upit za pretragu"
+
+#: templates/search.html:69 templates/search.html:70
+msgid "Clear search term"
+msgstr "Obriši pojam za pretragu"
+
+#: templates/search.html:99
+msgid "Search Filters & Parameters"
+msgstr "Filteri i parametri pretrage"
+
+#: templates/search.html:101
+msgid "Combine case studies, optional entity classes, and chronological bounds."
+msgstr "Kombinujte studije slučaja, opcione klase entiteta i hronološke granice."
+
+#: templates/search.html:113
+msgid "Reset all"
+msgstr "Resetuj sve"
+
+#: templates/search.html:124 templates/search.html:134
+msgid "Case Studies"
+msgstr "Studije slučaja"
+
+#: templates/search.html:127
+msgid "Multi-select"
+msgstr "Višestruki izbor"
+
+#: templates/search.html:131
+msgid ""
+"Restrict search to specific research projects or search across all "
+"corpora."
+msgstr ""
+"Ograničite pretragu na određene istraživačke projekte ili pretražujte sve"
+" korpuse."
+
+#: templates/search.html:159
+msgid "Timespan Chooser"
+msgstr "Izbor vremenskog raspona"
+
+#: templates/search.html:169
+msgid "Clear timespan"
+msgstr "Obriši vremenski raspon"
+
+#: templates/search.html:179
+msgid "All Periods"
+msgstr "Svi periodi"
+
+#: templates/search.html:183
+msgid "Prehistory (1000 BC – 1 BC)"
+msgstr "Praistorija (1000 p. n. e. – 1 p. n. e.)"
+
+#: templates/search.html:187
+msgid "Antiquity (1 – 500 AD)"
+msgstr "Antika (1 – 500 n. e.)"
+
+#: templates/search.html:191
+msgid "Early Middle Ages (500 – 1050)"
+msgstr "Rani srednji vek (500 – 1050)"
+
+#: templates/search.html:195
+msgid "High/Late Middle Ages (1050 – 1500)"
+msgstr "Visoki/kasni srednji vek (1050 – 1500)"
+
+#: templates/search.html:199
+msgid "Modern Era (1500 – 2000)"
+msgstr "Novi vek (1500 – 2000)"
+
+#: templates/search.html:214
+msgid "Start Year Slider"
+msgstr "Klizač početne godine"
+
+#: templates/search.html:222
+msgid "End Year Slider"
+msgstr "Klizač krajnje godine"
+
+#: templates/search.html:239 templates/search.html:248
+msgid "Start Year"
+msgstr "Početna godina"
+
+#: templates/search.html:247
+msgid "e.g. -500 or 750"
+msgstr "npr. -500 ili 750"
+
+#: templates/search.html:250 templates/search.html:267
+msgid "BC/AD"
+msgstr "p. n. e./n. e."
+
+#: templates/search.html:256 templates/search.html:265
+msgid "End Year"
+msgstr "Krajnja godina"
+
+#: templates/search.html:264
+msgid "e.g. 1050"
+msgstr "npr. 1050"
+
+#: templates/search.html:280 templates/search.html:288
+msgid "Entity Class"
+msgstr "Klasa entiteta"
+
+#: templates/search.html:283
+msgid "Optional — leave on \"All Classes\" to include every entity type"
+msgstr "Opciono — ostavite na „Sve klase“ da uključite sve tipove entiteta"
+
+#: templates/search.html:319
+msgid "Search Results"
+msgstr "Rezultati pretrage"
+
+#: templates/search.html:324
+msgid "Showing matching entities from OpenAtlas API v1"
+msgstr "Prikaz odgovarajućih entiteta iz OpenAtlas API v1"
+
+#: templates/search.html:341
+msgid "Filter current table..."
+msgstr "Filtriraj trenutnu tabelu..."
+
+#: templates/search.html:342
+msgid "Filter current table"
+msgstr "Filtriraj trenutnu tabelu"
+
+#: templates/search.html:348
+msgid "Sort"
+msgstr "Sortiraj"
+
+#: templates/search.html:351
+msgid "Name"
+msgstr "Ime"
+
+#: templates/search.html:352
+msgid "Start Date"
+msgstr "Datum početka"
+
+#: templates/search.html:353
+msgid "End Date"
+msgstr "Datum završetka"
+
+#: templates/search.html:359
+msgid "Toggle ascending/descending order"
+msgstr "Promeni rastući/opadajući redosled"
+
+#: templates/search.html:367
+msgid "Rows"
+msgstr "Redovi"
+
+#: templates/search.html:380
+msgid "Export table to CSV"
+msgstr "Izvezi tabelu u CSV"
+
+#: templates/search.html:407
+msgid "Retry"
+msgstr "Pokušaj ponovo"
+
+#: templates/search.html:418
+msgid ""
+"Try broadening your search term, clearing the entity class filter, or "
+"expanding the timespan."
+msgstr ""
+"Pokušajte da proširite pojam za pretragu, uklonite filter klase entiteta "
+"ili proširite vremenski raspon."
+
+#: templates/search.html:421
+msgid "Reset filters"
+msgstr "Resetuj filtere"
+
+#: templates/search.html:433
+msgid "Entity"
+msgstr "Entitet"
+
+#: templates/search.html:437
+msgid "Class"
+msgstr "Klasa"
+
+#: templates/search.html:440
+msgid "Timespan"
+msgstr "Vremenski raspon"
+
+#: templates/search.html:444
+msgid "Case Study"
+msgstr "Studija slučaja"
+
+#: templates/admin/predefined_filter.html:132 templates/search.html:445
+msgid "Description"
+msgstr "Opis"
+
+#: templates/search.html:446
+msgid "Action"
+msgstr "Akcija"
+
+#: templates/search.html:463
+msgid "Previous"
+msgstr "Prethodna"
+
+#: templates/search.html:471
+msgid "Next"
+msgstr "Sledeća"
 
 #: templates/admin/about_content.html:3
 msgid "about section content"
@@ -965,20 +1175,21 @@ msgstr "Upravljanje sredstvima"
 
 #: templates/admin/assets_management.html:5
 msgid ""
-"The assets are general files, which can be used in individual pages. These "
-"can be all data types; some can be displayed, while some can only be "
-"downloaded."
+"The assets are general files, which can be used in individual pages. "
+"These can be all data types; some can be displayed, while some can only "
+"be downloaded."
 msgstr ""
 "Sredstva su opšte datoteke koje se mogu koristiti na pojedinačnim "
-"stranicama. To mogu biti svi tipovi podataka; neki se mogu prikazati, dok se"
-" neki mogu samo preuzeti."
+"stranicama. To mogu biti svi tipovi podataka; neki se mogu prikazati, dok"
+" se neki mogu samo preuzeti."
 
 #: templates/admin/assets_management.html:13
 msgid "Upload New Asset"
 msgstr "Otpremi novo sredstvo"
 
 #: templates/admin/assets_management.html:21
-#: templates/admin/icon_management.html:21 templates/admin/logo_management.html:21
+#: templates/admin/icon_management.html:21
+#: templates/admin/logo_management.html:21
 #: templates/admin/team_management.html:21
 msgid "Upload"
 msgstr "Otpremi"
@@ -992,28 +1203,33 @@ msgid "Existing Assets"
 msgstr "Postojeća sredstva"
 
 #: templates/admin/assets_management.html:60
-#: templates/admin/logo_management.html:52 templates/admin/team_management.html:54
-#: views/admin.py:177 views/admin.py:802 views/admin.py:1775
+#: templates/admin/logo_management.html:52
+#: templates/admin/team_management.html:54 views/admin.py:177
+#: views/admin.py:802 views/admin.py:1775
 msgid "Select License..."
 msgstr "Izaberi licencu..."
 
 #: templates/admin/assets_management.html:69
-#: templates/admin/logo_management.html:61 templates/admin/team_management.html:65
+#: templates/admin/logo_management.html:61
+#: templates/admin/team_management.html:65
 msgid "Attribution (if any)..."
 msgstr "Atribucija (ako postoji)..."
 
 #: templates/admin/assets_management.html:71
-#: templates/admin/logo_management.html:63 templates/admin/team_management.html:68
+#: templates/admin/logo_management.html:63
+#: templates/admin/team_management.html:68
 msgid "Save License"
 msgstr "Sačuvaj licencu"
 
 #: templates/admin/assets_management.html:80
-#: templates/admin/logo_management.html:94 templates/admin/team_management.html:77
+#: templates/admin/logo_management.html:94
+#: templates/admin/team_management.html:77
 msgid "New name..."
 msgstr "Novo ime..."
 
 #: templates/admin/assets_management.html:81
-#: templates/admin/logo_management.html:95 templates/admin/team_management.html:78
+#: templates/admin/logo_management.html:95
+#: templates/admin/team_management.html:78
 msgid "Rename"
 msgstr "Preimenuj"
 
@@ -1247,8 +1463,8 @@ msgstr "Upozorenje:"
 
 #: templates/admin/database.html:18
 msgid ""
-"Restoring a database will overwrite all current data. This action cannot be "
-"undone."
+"Restoring a database will overwrite all current data. This action cannot "
+"be undone."
 msgstr ""
 "Obnova baze podataka će prepisati sve trenutne podatke. Ova radnja se ne "
 "može opozvati."
@@ -1271,8 +1487,8 @@ msgstr "Resetovanje baze"
 
 #: templates/admin/database.html:39
 msgid ""
-"This will reset the entire database to the initial sample data. All custom "
-"data will be lost!"
+"This will reset the entire database to the initial sample data. All "
+"custom data will be lost!"
 msgstr ""
 "Ovo će resetovati celu bazu podataka na početne uzorke podataka. Svi "
 "prilagođeni podaci će biti izgubljeni!"
@@ -1343,32 +1559,37 @@ msgstr "pregled podataka"
 
 #: templates/admin/external_identifiers.html:92
 #: templates/admin/predefined_filter.html:160
-#: templates/admin/type_divisions.html:21 templates/admin/type_divisions.html:202
+#: templates/admin/type_divisions.html:21
+#: templates/admin/type_divisions.html:202
 msgid "Icon Type"
 msgstr "Tip ikone"
 
 #: templates/admin/external_identifiers.html:105
 #: templates/admin/predefined_filter.html:163
-#: templates/admin/type_divisions.html:34 templates/admin/type_divisions.html:215
+#: templates/admin/type_divisions.html:34
+#: templates/admin/type_divisions.html:215
 msgid "Bootstrap Icon Class"
 msgstr ""
 
 #: templates/admin/external_identifiers.html:116
 #: templates/admin/predefined_filter.html:164
-#: templates/admin/type_divisions.html:45 templates/admin/type_divisions.html:225
+#: templates/admin/type_divisions.html:45
+#: templates/admin/type_divisions.html:225
 #, fuzzy
 msgid "SVG Icon File"
 msgstr "Vrednost ikone"
 
 #: templates/admin/external_identifiers.html:122
 #: templates/admin/predefined_filter.html:171
-#: templates/admin/type_divisions.html:51 templates/admin/type_divisions.html:108
+#: templates/admin/type_divisions.html:51
+#: templates/admin/type_divisions.html:108
 #, fuzzy
 msgid "Select Icon..."
 msgstr "Izaberi licencu..."
 
 #: templates/admin/external_identifiers.html:138
-#: templates/admin/type_divisions.html:67 templates/admin/type_divisions.html:239
+#: templates/admin/type_divisions.html:67
+#: templates/admin/type_divisions.html:239
 msgid "Preview:"
 msgstr ""
 
@@ -1461,8 +1682,8 @@ msgid ""
 "This section is for managing SVG icons that can be used throughout the "
 "application."
 msgstr ""
-"Ovaj odeljak je za upravljanje SVG ikonama koje se mogu koristiti u celoj "
-"aplikaciji."
+"Ovaj odeljak je za upravljanje SVG ikonama koje se mogu koristiti u celoj"
+" aplikaciji."
 
 #: templates/admin/icon_management.html:13
 msgid "Upload New Icon"
@@ -1494,7 +1715,9 @@ msgid "choose index background"
 msgstr "izaberi pozadinu početne stranice"
 
 #: templates/admin/index_page_options.html:32
-msgid "Select whether to use a map or a static image as the landing page background."
+msgid ""
+"Select whether to use a map or a static image as the landing page "
+"background."
 msgstr ""
 
 #: templates/admin/index_page_options.html:44
@@ -1558,17 +1781,19 @@ msgstr "Da li ste sigurni?"
 #: templates/admin/logo_management.html:5
 msgid ""
 "The logo section is only for logos and can be used for the footer, site "
-"logo, project logos, and institution logos, as well as for individual pages."
+"logo, project logos, and institution logos, as well as for individual "
+"pages."
 msgstr ""
-"Odeljak za logotipe je namenjen isključivo logotipima i može se koristiti za"
-" podnožje, logo sajta, logotipe projekata i logotipe institucija, kao i za "
-"pojedinačne stranice."
+"Odeljak za logotipe je namenjen isključivo logotipima i može se koristiti"
+" za podnožje, logo sajta, logotipe projekata i logotipe institucija, kao "
+"i za pojedinačne stranice."
 
 #: templates/admin/logo_management.html:13
 msgid "Upload New Logo"
 msgstr "Otpremi novi logo"
 
-#: templates/admin/logo_management.html:25 templates/admin/team_management.html:25
+#: templates/admin/logo_management.html:25
+#: templates/admin/team_management.html:25
 msgid "Accepted formats: PNG, JPG, SVG, GIF."
 msgstr "Prihvatljivi formati: PNG, JPG, SVG, GIF."
 
@@ -1742,7 +1967,8 @@ msgid "cancel"
 msgstr "otkaži"
 
 #: templates/admin/maps.html:106 templates/admin/maps.html:116
-#: templates/admin/maps.html:150 templates/admin/partials/modal_add_entry.html:8
+#: templates/admin/maps.html:150
+#: templates/admin/partials/modal_add_entry.html:8
 #: templates/admin/partials/modal_add_entry.html:223
 #: templates/admin/projects_content.html:78
 #: templates/admin/stakeholders_content.html:67
@@ -1773,11 +1999,13 @@ msgstr "Prikaži"
 msgid "Page Type"
 msgstr "Tip stranice"
 
-#: templates/admin/menu_management.html:36 templates/admin/menu_management.html:72
+#: templates/admin/menu_management.html:36
+#: templates/admin/menu_management.html:72
 msgid "Default"
 msgstr "Podrazumevano"
 
-#: templates/admin/menu_management.html:45 templates/admin/menu_management.html:81
+#: templates/admin/menu_management.html:45
+#: templates/admin/menu_management.html:81
 msgid "Individual"
 msgstr "Individualno"
 
@@ -1815,11 +2043,6 @@ msgstr ""
 #: templates/admin/predefined_filter.html:135
 msgid "Language selector"
 msgstr ""
-
-#: templates/admin/predefined_filter.html:132
-#, fuzzy
-msgid "Description"
-msgstr "opis"
 
 #: templates/admin/predefined_filter.html:167
 msgid "Icon Value"
@@ -1863,7 +2086,8 @@ msgid "Select case studies"
 msgstr ""
 
 #: templates/admin/predefined_filter.html:249
-#: templates/admin/type_divisions.html:75 templates/admin/type_divisions.html:247
+#: templates/admin/type_divisions.html:75
+#: templates/admin/type_divisions.html:247
 msgid "Type IDs (comma-separated)"
 msgstr ""
 
@@ -1936,7 +2160,8 @@ msgstr "Da li ste sigurni da želite da obrišete ovu sliku?"
 msgid "No team images have been uploaded yet."
 msgstr "Slike tima još uvek nisu otpremljene."
 
-#: templates/admin/type_divisions.html:11 templates/admin/type_divisions.html:192
+#: templates/admin/type_divisions.html:11
+#: templates/admin/type_divisions.html:192
 #, fuzzy
 msgid "Division Label"
 msgstr "Dodaj podelu"
@@ -2024,14 +2249,14 @@ msgstr ""
 
 #: templates/admin/vocabulary_settings.html:15
 msgid ""
-"Leave empty to use the default title in the widget language. This does not "
-"change the menu label."
+"Leave empty to use the default title in the widget language. This does "
+"not change the menu label."
 msgstr ""
 
 #: templates/admin/vocabulary_settings.html:19
 msgid ""
-"Leave both lists empty to show the entire vocabulary. Use only one filter "
-"list."
+"Leave both lists empty to show the entire vocabulary. Use only one filter"
+" list."
 msgstr ""
 
 #: templates/admin/vocabulary_settings.html:20
@@ -2043,7 +2268,9 @@ msgid "Included Type IDs"
 msgstr ""
 
 #: templates/admin/vocabulary_settings.html:29
-msgid "Comma-separated positive IDs. Include their subtrees and necessary ancestors."
+msgid ""
+"Comma-separated positive IDs. Include their subtrees and necessary "
+"ancestors."
 msgstr ""
 
 #: templates/admin/vocabulary_settings.html:41
@@ -2539,7 +2766,9 @@ msgstr "Unos uspešno dodat!"
 #: views/admin.py:1035
 #, python-format
 msgid "Error adding entry %(name)s: Only one main project allowed"
-msgstr "Greška pri dodavanju unosa %(name)s: Dozvoljen je samo jedan glavni projekat"
+msgstr ""
+"Greška pri dodavanju unosa %(name)s: Dozvoljen je samo jedan glavni "
+"projekat"
 
 #: views/admin.py:1040
 #, python-format
@@ -2622,8 +2851,8 @@ msgstr "ID studije slučaja uspešno ažuriran"
 
 #: views/admin.py:1315
 msgid ""
-"Invalid Case Study ID. Must be a positive integer and its entity type must "
-"be \"type\"."
+"Invalid Case Study ID. Must be a positive integer and its entity type "
+"must be \"type\"."
 msgstr ""
 "Nevalidan ID studije slučaja. Mora biti pozitivan ceo broj i njegov tip "
 "entiteta mora biti \"Case Study\"."
@@ -2783,21 +3012,24 @@ msgstr "Čišćenje keša nije uspelo: %(error)s"
 #~ msgid ""
 #~ "The assets are general files, which "
 #~ "can be used in individual pages, "
-#~ "these can bne all datatypes, some can"
-#~ " be displayed some only be downloaded."
+#~ "these can bne all datatypes, some "
+#~ "can be displayed some only be "
+#~ "downloaded."
 #~ msgstr ""
 
 #~ msgid ""
-#~ "The logo sections is only for logos"
-#~ " and can be used for footer, site"
-#~ " logo, project logos and institution "
-#~ "logos, and also for indiviual pages."
+#~ "The logo sections is only for "
+#~ "logos and can be used for footer,"
+#~ " site logo, project logos and "
+#~ "institution logos, and also for "
+#~ "indiviual pages."
 #~ msgstr ""
 
 #~ msgid ""
 #~ "The team section only include person "
-#~ "fotos, which can be used at the "
-#~ "person management and for individual pages."
+#~ "fotos, which can be used at the"
+#~ " person management and for individual "
+#~ "pages."
 #~ msgstr ""
 
 #~ msgid "Save"
@@ -2846,8 +3078,8 @@ msgstr "Čišćenje keša nije uspelo: %(error)s"
 #~ msgstr "Tip stranice"
 
 #~ msgid ""
-#~ "%(project_name)s (%(year)s). %(title)s. Retrieved "
-#~ "from %(url)s (Accessed: %(date)s)"
+#~ "%(project_name)s (%(year)s). %(title)s. Retrieved"
+#~ " from %(url)s (Accessed: %(date)s)"
 #~ msgstr ""
 #~ "%(project_name)s (%(year)s). %(title)s. Preuzeto "
 #~ "sa %(url)s (Pristupljeno: %(date)s)"
@@ -2918,4 +3150,43 @@ msgstr "Čišćenje keša nije uspelo: %(error)s"
 
 #~ msgid "FAIR Archaeological Research Repository"
 #~ msgstr "FAIR arheološki istraživački repozitorijum"
+
+#~ msgid "Filter by Type"
+#~ msgstr "Filtriraj po tipu"
+
+#~ msgid "Start typing above to see live results or press enter to run a search."
+#~ msgstr ""
+#~ "Počnite da kucate iznad da biste "
+#~ "videli rezultate uživo ili pritisnite "
+#~ "enter da pokrenete pretragu."
+
+#~ msgid "Static Search Results"
+#~ msgstr "Statični rezultati pretrage"
+
+#~ msgid "No results found for \"%(query)s\""
+#~ msgstr "Nisu pronađeni rezultati za \"%(query)s\""
+
+#~ msgid "Load more"
+#~ msgstr "Učitaj još"
+
+#~ msgid "Type at least 3 characters..."
+#~ msgstr "Ukucajte najmanje 3 karaktera..."
+
+#~ msgid "Loading live results for \"%(query)s\"..."
+#~ msgstr "Učitavanje rezultata uživo za \"%(query)s\"..."
+
+#~ msgid "No live results found for \"%(query)s\"."
+#~ msgstr "Nisu pronađeni rezultati uživo za \"%(query)s\"."
+
+#~ msgid "Error loading live results."
+#~ msgstr "Greška pri učitavanju rezultata uživo."
+
+#~ msgid "Select one or more types"
+#~ msgstr "Izaberite jedan ili više tipova"
+
+#~ msgid "Coordinates"
+#~ msgstr "Koordinate"
+
+#~ msgid "Back to search"
+#~ msgstr "Nazad na pretragu"
 

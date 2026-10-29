@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from flask import g
 from flask.testing import FlaskClient
@@ -196,20 +196,31 @@ def test_build_dynamic_landing_sections_respects_shown_and_predefined_filters(
 
 
 def test_search_live_all_endpoint(
-        authenticated_client: FlaskClient,
-        mock_api_calls) -> None:
-    """Verify /search_live queries /search/all and returns results."""
-    mock_api_calls.return_value.json.return_value = {
-        'results': [{
-            'name': 'Thunau Burial Mounds',
-            'id': 'https://thanados.openatlas.eu/api/entity/119152',
-            'description': 'Early medieval burial mounds.',
-            'system_class': 'place',
-            'begin': '0800-01-01T00:00:00',
-            'end': '0850-12-31T00:00:00'}]}
-    rv = authenticated_client.get('/search_live?q=Thunau&system_class=all')
-    assert rv.status_code == 200
-    data = rv.get_json()
-    assert len(data) == 1
-    assert data[0]['name'] == 'Thunau Burial Mounds'
-    assert data[0]['system_class'] == 'place'
+        authenticated_client: FlaskClient) -> None:
+    """Verify /search_live queries /api/1/search and normalizes results."""
+    with patch('requests.get') as mock_get:
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {
+            'data': [{
+                'id': 119152,
+                'uuid': 'd77945ed-537e-476c-a716-df523982a162',
+                'name': 'Thunau Burial Mounds',
+                'description': 'Early medieval burial mounds.',
+                'systemClass': 'place',
+                'timespan': None}],
+            'totalItems': 1,
+            'first': 'https://thanados.openatlas.eu/api/1/search?page=1',
+            'last': 'https://thanados.openatlas.eu/api/1/search?page=1'}
+        rv = authenticated_client.get('/search_live?search=Thunau')
+        assert rv.status_code == 200
+        data = rv.get_json()
+        assert len(data) == 1
+        assert data[0]['id'] == '119152'
+        assert data[0]['name'] == 'Thunau Burial Mounds'
+        assert data[0]['systemClass'] == 'place'
+        assert data[0]['system_class'] == 'place'
+        called_url = mock_get.call_args.args[0]
+        called_params = mock_get.call_args.kwargs['params']
+        assert called_url.endswith('/1/search')
+        assert called_params['search'] == 'Thunau'
+        assert 'entityClass' not in called_params

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-29 16:00+0100\n"
+"POT-Creation-Date: 2026-10-29 17:24+0100\n"
 "PO-Revision-Date: 2026-05-22 14:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: hu\n"
@@ -16,13 +16,16 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.18.0\n"
+"Generated-By: Babel 2.17.0\n"
 
 #: api/util.py:43 api/util.py:45 api/util.py:46 api/util.py:51
+#: templates/search.html:24 templates/search.html:225 templates/search.html:226
 msgid "BC"
 msgstr "Kr. e."
 
-#: api/util.py:43 api/util.py:45 api/util.py:46
+#: api/util.py:43 api/util.py:45 api/util.py:46 templates/search.html:25
+#: templates/search.html:228 templates/search.html:229
+#: templates/search.html:230
 msgid "AD"
 msgstr "Kr. u."
 
@@ -92,7 +95,7 @@ msgstr "Kategória"
 msgid "file"
 msgstr "Fájl"
 
-#: forms/admin.py:52 templates/about.html:216 templates/tabs/feature.html:100
+#: forms/admin.py:52 templates/about.html:203 templates/tabs/feature.html:100
 #: templates/tabs/overview.html:12 templates/util/cite/modal.html:37
 msgid "License"
 msgstr "Licenc"
@@ -123,79 +126,79 @@ msgstr "jelszó megjelenítése"
 msgid "login"
 msgstr "bejelentkezés"
 
-#: services/statistics.py:11 templates/search.html:67
+#: services/statistics.py:11
 msgid "Place"
 msgstr "Hely"
 
-#: services/statistics.py:17 templates/search.html:75
+#: services/statistics.py:17
 msgid "Feature"
 msgstr "Jelenség"
 
-#: services/statistics.py:23 templates/search.html:71
+#: services/statistics.py:23
 msgid "Stratigraphic Unit"
 msgstr "Rétegtani egység"
 
-#: services/statistics.py:29 templates/search.html:27
+#: services/statistics.py:29
 msgid "Artifact"
 msgstr "Artefaktum"
 
-#: services/statistics.py:35 templates/search.html:31
+#: services/statistics.py:35
 msgid "Human Remains"
 msgstr "Emberi maradványok"
 
-#: services/statistics.py:41 templates/search.html:17
+#: services/statistics.py:41
 msgid "Person"
 msgstr "Személy"
 
-#: services/statistics.py:47 templates/search.html:21
+#: services/statistics.py:47
 msgid "Group"
 msgstr "Csoport"
 
-#: services/statistics.py:53 templates/search.html:37
+#: services/statistics.py:53
 msgid "Acquisition"
 msgstr "Szerzés"
 
-#: services/statistics.py:59 templates/search.html:41
+#: services/statistics.py:59
 msgid "Event"
 msgstr "Esemény"
 
-#: services/statistics.py:65 templates/search.html:45
+#: services/statistics.py:65
 msgid "Activity"
 msgstr "Tevékenység"
 
-#: services/statistics.py:71 templates/search.html:49
+#: services/statistics.py:71
 msgid "Creation"
 msgstr "Létrehozás"
 
-#: services/statistics.py:77 templates/search.html:53
+#: services/statistics.py:77
 msgid "Move"
 msgstr "Mozgatás"
 
-#: services/statistics.py:83 templates/search.html:57
+#: services/statistics.py:83
 msgid "Production"
 msgstr "Termelés"
 
-#: services/statistics.py:89 templates/search.html:61
+#: services/statistics.py:89
 msgid "Modification"
 msgstr "Módosítás"
 
-#: services/statistics.py:95 templates/search.html:81
+#: services/statistics.py:95
 msgid "Source"
 msgstr "Forrás"
 
-#: services/statistics.py:101 templates/search.html:85
+#: services/statistics.py:101
 msgid "Bibliography"
 msgstr "Bibliográfia"
 
-#: services/statistics.py:107 templates/search.html:89
+#: services/statistics.py:107
 msgid "External Reference"
 msgstr "Külső hivatkozás"
 
-#: services/statistics.py:113 templates/search.html:93
+#: services/statistics.py:113
 msgid "Edition"
 msgstr "Kiadás"
 
-#: services/statistics.py:119 templates/search.html:99
+#: services/statistics.py:119
 msgid "File"
 msgstr "Fájl"
 
@@ -205,8 +208,7 @@ msgstr "Fájl"
 msgid "Type"
 msgstr "Típus"
 
-#: services/statistics.py:133 templates/about.html:536 templates/index.html:214
-#: templates/search.html:64
+#: services/statistics.py:133 templates/about.html:523 templates/index.html:214
 msgid "Places"
 msgstr "Helyek"
 
@@ -216,8 +218,8 @@ msgstr "Lelőhelyek és temetők"
 
 #: services/statistics.py:136
 msgid ""
-"Archaeological sites, cemeteries, churches, and settlement structures with "
-"coordinates."
+"Archaeological sites, cemeteries, churches, and settlement structures "
+"with coordinates."
 msgstr ""
 "Régészeti lelőhelyek, temetők, templomok és településszerkezetek "
 "koordinátákkal."
@@ -236,15 +238,17 @@ msgstr "Objektumok és struktúrák"
 
 #: services/statistics.py:146
 msgid ""
-"Grave constructions, burials, anthropological features, and stratigraphic "
-"units."
-msgstr "Sírszerkezetek, temetkezések, antropológiai jelenségek és rétegtani egységek."
+"Grave constructions, burials, anthropological features, and stratigraphic"
+" units."
+msgstr ""
+"Sírszerkezetek, temetkezések, antropológiai jelenségek és rétegtani "
+"egységek."
 
 #: services/statistics.py:148
 msgid "Browse features"
 msgstr "Objektumok böngészése"
 
-#: services/statistics.py:153 templates/search.html:24
+#: services/statistics.py:153
 msgid "Items"
 msgstr "Tárgyak"
 
@@ -254,8 +258,8 @@ msgstr "Anyagi kultúra"
 
 #: services/statistics.py:156
 msgid ""
-"Archaeological artifacts, jewelry, ceramics, weapons, dress accessories, and"
-" skeletal remains."
+"Archaeological artifacts, jewelry, ceramics, weapons, dress accessories, "
+"and skeletal remains."
 msgstr ""
 "Régészeti leletek, ékszerek, kerámia, fegyverek, viseleti elemek és "
 "csontmaradványok."
@@ -264,7 +268,7 @@ msgstr ""
 msgid "Browse items"
 msgstr "Tárgyak böngészése"
 
-#: services/statistics.py:163 templates/search.html:14
+#: services/statistics.py:163
 msgid "Actors"
 msgstr "Szereplők"
 
@@ -280,7 +284,7 @@ msgstr "Történelmi személyek, egyének, intézmények és társadalmi csoport
 msgid "Browse actors"
 msgstr "Szereplők böngészése"
 
-#: services/statistics.py:173 templates/search.html:34
+#: services/statistics.py:173
 msgid "Events"
 msgstr "Események"
 
@@ -290,8 +294,8 @@ msgstr "Események és tevékenységek"
 
 #: services/statistics.py:176
 msgid ""
-"Historical events, archaeological activities, productions, movements, and "
-"acquisitions."
+"Historical events, archaeological activities, productions, movements, and"
+" acquisitions."
 msgstr ""
 "Történelmi események, régészeti tevékenységek, előállítások, mozgások és "
 "beszerzések."
@@ -300,7 +304,7 @@ msgstr ""
 msgid "Browse events"
 msgstr "Események böngészése"
 
-#: services/statistics.py:183 templates/search.html:78
+#: services/statistics.py:183
 msgid "Sources"
 msgstr "Források"
 
@@ -310,8 +314,8 @@ msgstr "Források és szakirodalom"
 
 #: services/statistics.py:186
 msgid ""
-"Specialized bibliography, primary sources, and links to external authority "
-"files."
+"Specialized bibliography, primary sources, and links to external "
+"authority files."
 msgstr ""
 "Szakbibliográfia, elsődleges források és hivatkozások külső normatív "
 "adatbázisokra."
@@ -320,7 +324,7 @@ msgstr ""
 msgid "View sources"
 msgstr "Források megtekintése"
 
-#: services/statistics.py:193 templates/search.html:96
+#: services/statistics.py:193
 msgid "Files"
 msgstr "Fájlok"
 
@@ -354,7 +358,7 @@ msgstr "Ellenőrzött szótárak, tipológiai osztályozások és hierarchikus f
 msgid "Browse types"
 msgstr "Típusok böngészése"
 
-#: services/statistics.py:510
+#: services/statistics.py:513
 msgid "Explore topic"
 msgstr "Téma felfedezése"
 
@@ -382,11 +386,11 @@ msgstr "Esettanulmány és projekt"
 msgid "Explore Research Data"
 msgstr "Kutatási adatok felfedezése"
 
-#: templates/about.html:88 templates/about.html:283
+#: templates/about.html:88 templates/about.html:270
 msgid "Research Team"
 msgstr "Kutatócsoport"
 
-#: templates/about.html:93 templates/about.html:247 templates/index.html:149
+#: templates/about.html:93 templates/about.html:234 templates/index.html:149
 msgid "Dataset"
 msgstr "Adatállomány"
 
@@ -394,218 +398,220 @@ msgstr "Adatállomány"
 msgid "Cite Project"
 msgstr "Projekt idézése"
 
-#: templates/about.html:127
+#: templates/about.html:114
 msgid "Project Profile"
 msgstr "Projektprofil"
 
-#: templates/about.html:129
+#: templates/about.html:116
 msgid "About the Project"
 msgstr "A projektről"
 
-#: templates/about.html:138
+#: templates/about.html:125
 msgid "Scientific research project within the Histarchexplorer repository."
 msgstr "Tudományos kutatási projekt a Histarchexplorer repozitóriumban."
 
-#: templates/about.html:149
+#: templates/about.html:136
 msgid "Key Facts"
 msgstr "Főbb adatok"
 
-#: templates/about.html:156
+#: templates/about.html:143
 msgid "Acronym"
 msgstr "Mozaikszó"
 
-#: templates/about.html:166
+#: templates/about.html:153
 msgid "Contributors"
 msgstr "Közreműködők"
 
-#: templates/about.html:172
+#: templates/about.html:159
 msgid "Institutions"
 msgstr "Intézmények"
 
-#: templates/about.html:180 templates/about.html:725
+#: templates/about.html:167 templates/about.html:712
 msgid "Website"
 msgstr "Weboldal"
 
-#: templates/about.html:195 templates/about.html:726
+#: templates/about.html:182 templates/about.html:713
 msgid "Email"
 msgstr "E-mail"
 
-#: templates/about.html:207 templates/about.html:728
+#: templates/about.html:194 templates/about.html:715
 msgid "Address"
 msgstr "Cím"
 
-#: templates/about.html:251 templates/index.html:150
+#: templates/about.html:238 templates/index.html:150
 msgid "Research in Numbers"
 msgstr "Kutatás számokban"
 
-#: templates/about.html:253
+#: templates/about.html:240
 msgid "Project Data Overview"
 msgstr "Projektadatok áttekintése"
 
-#: templates/about.html:285
+#: templates/about.html:272
 msgid "Contributors & Specialists"
 msgstr "Közreműködők és szakértők"
 
-#: templates/about.html:297 templates/about.html:298
+#: templates/about.html:284 templates/about.html:285
 msgid "Filter team members..."
 msgstr "Csapattagok szűrése..."
 
-#: templates/about.html:305
+#: templates/about.html:292
 msgid "Filter by role"
 msgstr "Szűrés szerepkör szerint"
 
-#: templates/about.html:309
+#: templates/about.html:296
 msgid "All Roles"
 msgstr "Minden szerepkör"
 
-#: templates/about.html:393
+#: templates/about.html:380
 msgid "Profile"
 msgstr "Profil"
 
-#: templates/about.html:403
+#: templates/about.html:390
 msgid "No team members match the selected filter."
 msgstr "Nincs a kiválasztott szűrőnek megfelelő csapattag."
 
-#: templates/about.html:415
+#: templates/about.html:402
 msgid "Governance & Partners"
 msgstr "Irányítás és partnerek"
 
-#: templates/about.html:417
+#: templates/about.html:404
 msgid "Participating Institutions & Sponsors"
 msgstr "Résztvevő intézmények és támogatók"
 
-#: templates/about.html:481 templates/about.html:652
+#: templates/about.html:468 templates/about.html:639
 msgid "Details"
 msgstr "Részletek"
 
-#: templates/about.html:498 templates/index.html:176
+#: templates/about.html:485 templates/index.html:176
 msgid "Analyses"
 msgstr "Elemzések"
 
-#: templates/about.html:499 templates/index.html:177
+#: templates/about.html:486 templates/index.html:177
 msgid "Scientific Data Distribution"
 msgstr "Tudományos adatok megoszlása"
 
-#: templates/about.html:502 templates/index.html:180
+#: templates/about.html:489 templates/index.html:180
 msgid "Interactive Histograms"
 msgstr "Interaktív hisztogramok"
 
-#: templates/about.html:512 templates/index.html:190
+#: templates/about.html:499 templates/index.html:190
 msgid "Chronological Distribution"
 msgstr "Kronológiai megoszlás"
 
-#: templates/about.html:514 templates/index.html:192
+#: templates/about.html:501 templates/index.html:192
 msgid "Dated AD"
 msgstr "Keltezés Kr. u."
 
-#: templates/about.html:517 templates/index.html:195
+#: templates/about.html:504 templates/index.html:195
 msgid ""
-"Distribution of archaeological datings by century (Late Antiquity to Middle "
-"Ages)."
+"Distribution of archaeological datings by century (Late Antiquity to "
+"Middle Ages)."
 msgstr ""
 "Régészeti keltezések megoszlása évszázadok szerint (késő antikvitástól a "
 "középkorig)."
 
-#: templates/about.html:521 templates/index.html:199
+#: templates/about.html:508 templates/index.html:199
 msgid "Dating density"
 msgstr "Keltezési sűrűség"
 
-#: templates/about.html:522 templates/index.html:200 utils/view_util.py:17
+#: templates/about.html:509 templates/index.html:200 templates/search.html:29
+#: utils/view_util.py:17
 msgid "entities"
 msgstr "entitások"
 
-#: templates/about.html:532 templates/index.html:210
+#: templates/about.html:519 templates/index.html:210
 msgid "Typological Breakdown"
 msgstr "Tipológiai felosztás"
 
-#: templates/about.html:539 templates/index.html:217
+#: templates/about.html:526 templates/index.html:217
 msgid "Finds"
 msgstr "Leletek"
 
-#: templates/about.html:544 templates/index.html:222
+#: templates/about.html:531 templates/index.html:222
 msgid "Breakdown by the most documented classifications."
 msgstr "Felosztás a leggyakrabban dokumentált osztályozások szerint."
 
-#: templates/about.html:561 templates/index.html:239
+#: templates/about.html:548 templates/index.html:239
 msgid "Geography"
 msgstr "Földrajz"
 
-#: templates/about.html:562 templates/index.html:240
+#: templates/about.html:549 templates/index.html:240
 msgid "Spatial Distribution of Sites"
 msgstr "Lelőhelyek térbeli eloszlása"
 
-#: templates/about.html:565 templates/index.html:243
+#: templates/about.html:552 templates/index.html:243
 msgid "Full Map View"
 msgstr "Teljes térképnézet"
 
-#: templates/about.html:574 templates/about.html:734 templates/index.html:253
+#: templates/about.html:561 templates/about.html:721 templates/index.html:253
+#: templates/search.html:393
 msgid "Loading..."
 msgstr "Betöltés..."
 
-#: templates/about.html:576 templates/index.html:255
+#: templates/about.html:563 templates/index.html:255
 msgid "Loading spatial data..."
 msgstr "Térinformatikai adatok betöltése..."
 
-#: templates/about.html:585 templates/index.html:262
+#: templates/about.html:572 templates/index.html:262
 msgid "View details"
 msgstr "Részletek megtekintése"
 
-#: templates/about.html:590 templates/index.html:268
+#: templates/about.html:577 templates/index.html:268
 msgid "Activate map"
 msgstr "Térkép aktiválása"
 
-#: templates/about.html:604 templates/index.html:105
+#: templates/about.html:591 templates/index.html:105
 msgid "Research Projects"
 msgstr "Kutatási projektek"
 
-#: templates/about.html:608 templates/index.html:107
+#: templates/about.html:595 templates/index.html:107
 msgid "Active Case Studies & Corpora"
 msgstr "Aktív esettanulmányok és korpuszok"
 
-#: templates/about.html:610
+#: templates/about.html:597
 msgid "Further Projects in the Network"
 msgstr "További projektek a hálózatban"
 
-#: templates/about.html:616 templates/admin/projects_content.html:38
+#: templates/about.html:603 templates/admin/projects_content.html:38
 msgid "Main Project"
 msgstr "Főprojekt"
 
-#: templates/about.html:641 templates/publications.html:40
+#: templates/about.html:628 templates/publications.html:40
 msgid "Project"
 msgstr "Projekt"
 
-#: templates/about.html:673 templates/index.html:338
+#: templates/about.html:660 templates/index.html:338
 #: templates/util/cite/modal.html:12
 msgid "Recommended Citation"
 msgstr "Ajánlott hivatkozás"
 
-#: templates/about.html:681 templates/index.html:346
+#: templates/about.html:668 templates/index.html:346
 msgid ""
-"Please use the following reference when citing this repository in academic "
-"work:"
+"Please use the following reference when citing this repository in "
+"academic work:"
 msgstr "Kérjük, tudományos felhasználás esetén az alábbi hivatkozást használja:"
 
-#: templates/about.html:692 templates/index.html:357
+#: templates/about.html:679 templates/index.html:357
 msgid "Copied!"
 msgstr "Másolva!"
 
-#: templates/about.html:693 templates/index.html:358
+#: templates/about.html:680 templates/index.html:358
 msgid "Copy citation"
 msgstr "Hivatkozás másolása"
 
-#: templates/about.html:704 templates/admin.html:43
+#: templates/about.html:691 templates/admin.html:43
 msgid "Legal Notice"
 msgstr "Impresszum"
 
-#: templates/about.html:727
+#: templates/about.html:714
 msgid "ORCID"
 msgstr "ORCID"
 
-#: templates/about.html:729
+#: templates/about.html:716
 msgid "Relations & Roles"
 msgstr "Kapcsolatok és szerepkörök"
 
-#: templates/about.html:741 templates/admin/partials/modal_add_entry.html:10
+#: templates/about.html:728 templates/admin/partials/modal_add_entry.html:10
 #: templates/admin/partials/modal_delete_confirm.html:7
 #: templates/admin/partials/modal_image_selector.html:9
 #: templates/publications.html:153 templates/util/cite/modal.html:84
@@ -679,8 +685,7 @@ msgid "Footer"
 msgstr "Lábléc"
 
 #: templates/admin.html:45 templates/index.html:57 templates/index.html:61
-#: templates/publications.html:13 templates/search.html:108
-#: templates/search.html:110
+#: templates/publications.html:13 templates/search.html:76
 msgid "Search"
 msgstr "Keresés"
 
@@ -756,15 +761,21 @@ msgstr "Fájlkezelés áttekintése"
 
 #: templates/admin.html:279
 msgid "Select a file management section from the sidebar to start editing."
-msgstr "Válasszon egy fájlkezelési részt az oldalsávból a szerkesztés megkezdéséhez."
+msgstr ""
+"Válasszon egy fájlkezelési részt az oldalsávból a szerkesztés "
+"megkezdéséhez."
 
 #: templates/admin.html:331
 msgid "maps"
 msgstr "térképek"
 
 #: templates/index.html:36
-msgid "Scientific research platform for archaeological burial and settlement data."
-msgstr "Tudományos kutatási platform régészeti temetkezési és települési adatokhoz."
+msgid ""
+"Scientific research platform for archaeological burial and settlement "
+"data."
+msgstr ""
+"Tudományos kutatási platform régészeti temetkezési és települési "
+"adatokhoz."
 
 #: templates/index.html:56
 msgid "Search sites, features, finds, or literature..."
@@ -774,7 +785,7 @@ msgstr "Lelőhelyek, objektumok, leletek vagy szakirodalom keresése..."
 msgid "Searching..."
 msgstr "Keresés..."
 
-#: templates/index.html:59
+#: templates/index.html:59 templates/search.html:416
 msgid "No results found"
 msgstr "Nincs találat"
 
@@ -891,62 +902,265 @@ msgstr "fő projekt"
 msgid "No publications found matching your criteria."
 msgstr ""
 
-#: templates/search.html:11
-msgid "Filter by Type"
-msgstr "Szűrés típus szerint"
-
-#: templates/search.html:120
-msgid "Start typing above to see live results or press enter to run a search."
-msgstr ""
-"Kezdjen el gépelni fent az élő eredményekhez, vagy nyomja meg az entert a "
-"kereséshez."
-
-#: templates/search.html:127
-msgid "Static Search Results"
-msgstr "Statikus keresési eredmények"
-
-#: templates/search.html:131
-#, python-format
-msgid "No results found for \"%(query)s\""
-msgstr "Nincs találat a következőhöz: \"%(query)s\""
-
-#: templates/search.html:247 templates/search_detail.html:4
+#: templates/search.html:17
 msgid "Unnamed"
 msgstr "Névtelen"
 
-#: templates/search.html:248
-msgid "Load more"
-msgstr "Továbbiak betöltése"
+#: templates/search.html:18 templates/search.html:293
+msgid "All Classes"
+msgstr "Minden osztály"
 
-#: templates/search.html:249
-msgid "Type at least 3 characters..."
-msgstr "Gépeljen be legalább 3 karaktert..."
+#: templates/search.html:19 templates/search.html:139
+msgid "All Case Studies"
+msgstr "Minden esettanulmány"
 
-#: templates/search.html:250
-#, python-format
-msgid "Loading live results for \"%(query)s\"..."
-msgstr "Élő eredmények betöltése a következőhöz: \"%(query)s\"..."
+#: templates/search.html:20 templates/search.html:395
+msgid "Searching OpenAtlas repository..."
+msgstr "Keresés az OpenAtlas adattárban..."
 
-#: templates/search.html:251
-#, python-format
-msgid "No live results found for \"%(query)s\"."
-msgstr "Nem találhatók élő eredmények a következőhöz: \"%(query)s\"."
+#: templates/search.html:21 templates/search.html:404
+msgid "Could not load search results. Please try again."
+msgstr "A keresési találatok nem tölthetők be. Kérjük, próbálja újra."
 
-#: templates/search.html:252
-msgid "Error loading live results."
-msgstr "Hiba az élő eredmények betöltésekor."
+#: templates/search.html:22
+msgid "No matching entities found for the current filters."
+msgstr "Nem található megfelelő entitás a jelenlegi szűrőkkel."
 
-#: templates/search.html:253
-msgid "Select one or more types"
-msgstr "Válasszon egy vagy több típust"
+#: templates/search.html:23
+msgid "View"
+msgstr "Megtekintés"
 
-#: templates/search_detail.html:11
-msgid "Coordinates"
-msgstr "Koordináták"
+#: templates/search.html:26 templates/search.html:164
+msgid "Any period"
+msgstr "Bármely korszak"
 
-#: templates/search_detail.html:14
-msgid "Back to search"
-msgstr "Vissza a kereséshez"
+#: templates/search.html:27
+msgid "from"
+msgstr "ettől:"
+
+#: templates/search.html:28
+msgid "until"
+msgstr "eddig:"
+
+#: templates/search.html:40
+msgid "OpenAtlas Discovery Engine"
+msgstr "OpenAtlas keresőmotor"
+
+#: templates/search.html:44
+msgid "Advanced Research Search"
+msgstr "Összetett kutatási keresés"
+
+#: templates/search.html:47
+msgid ""
+"Query archaeological sites, features, finds, actors, and sources across "
+"projects and periods."
+msgstr ""
+"Régészeti lelőhelyek, objektumok, leletek, szereplők és források keresése"
+" projektek és korszakok szerint."
+
+#: templates/search.html:64
+msgid "Search by name, place, or phonetic match (optional)..."
+msgstr "Keresés név, hely vagy fonetikus egyezés alapján (opcionális)..."
+
+#: templates/search.html:65
+msgid "Search query"
+msgstr "Keresőkifejezés"
+
+#: templates/search.html:69 templates/search.html:70
+msgid "Clear search term"
+msgstr "Keresőkifejezés törlése"
+
+#: templates/search.html:99
+msgid "Search Filters & Parameters"
+msgstr "Keresési szűrők és paraméterek"
+
+#: templates/search.html:101
+msgid "Combine case studies, optional entity classes, and chronological bounds."
+msgstr ""
+"Kombinálja az esettanulmányokat, az opcionális entitásosztályokat és az "
+"időhatárokat."
+
+#: templates/search.html:113
+msgid "Reset all"
+msgstr "Összes visszaállítása"
+
+#: templates/search.html:124 templates/search.html:134
+msgid "Case Studies"
+msgstr "Esettanulmányok"
+
+#: templates/search.html:127
+msgid "Multi-select"
+msgstr "Többszörös kijelölés"
+
+#: templates/search.html:131
+msgid ""
+"Restrict search to specific research projects or search across all "
+"corpora."
+msgstr ""
+"Szűkítse a keresést adott kutatási projektekre, vagy keressen az összes "
+"korpuszban."
+
+#: templates/search.html:159
+msgid "Timespan Chooser"
+msgstr "Időintervallum-választó"
+
+#: templates/search.html:169
+msgid "Clear timespan"
+msgstr "Időintervallum törlése"
+
+#: templates/search.html:179
+msgid "All Periods"
+msgstr "Minden korszak"
+
+#: templates/search.html:183
+msgid "Prehistory (1000 BC – 1 BC)"
+msgstr "Őskor (Kr. e. 1000 – Kr. e. 1)"
+
+#: templates/search.html:187
+msgid "Antiquity (1 – 500 AD)"
+msgstr "Ókor (Kr. u. 1 – 500)"
+
+#: templates/search.html:191
+msgid "Early Middle Ages (500 – 1050)"
+msgstr "Kora középkor (500 – 1050)"
+
+#: templates/search.html:195
+msgid "High/Late Middle Ages (1050 – 1500)"
+msgstr "Virágzó/késő középkor (1050 – 1500)"
+
+#: templates/search.html:199
+msgid "Modern Era (1500 – 2000)"
+msgstr "Újkor (1500 – 2000)"
+
+#: templates/search.html:214
+msgid "Start Year Slider"
+msgstr "Kezdőév csúszka"
+
+#: templates/search.html:222
+msgid "End Year Slider"
+msgstr "Záróév csúszka"
+
+#: templates/search.html:239 templates/search.html:248
+msgid "Start Year"
+msgstr "Kezdőév"
+
+#: templates/search.html:247
+msgid "e.g. -500 or 750"
+msgstr "pl. -500 vagy 750"
+
+#: templates/search.html:250 templates/search.html:267
+msgid "BC/AD"
+msgstr "Kr. e./u."
+
+#: templates/search.html:256 templates/search.html:265
+msgid "End Year"
+msgstr "Záróév"
+
+#: templates/search.html:264
+msgid "e.g. 1050"
+msgstr "pl. 1050"
+
+#: templates/search.html:280 templates/search.html:288
+msgid "Entity Class"
+msgstr "Entitásosztály"
+
+#: templates/search.html:283
+msgid "Optional — leave on \"All Classes\" to include every entity type"
+msgstr ""
+"Opcionális — hagyja a „Minden osztály” értéken az összes entitástípus "
+"bevonásához"
+
+#: templates/search.html:319
+msgid "Search Results"
+msgstr "Keresési találatok"
+
+#: templates/search.html:324
+msgid "Showing matching entities from OpenAtlas API v1"
+msgstr "Találatok megjelenítése az OpenAtlas API v1-ből"
+
+#: templates/search.html:341
+msgid "Filter current table..."
+msgstr "Aktuális táblázat szűrése..."
+
+#: templates/search.html:342
+msgid "Filter current table"
+msgstr "Aktuális táblázat szűrése"
+
+#: templates/search.html:348
+msgid "Sort"
+msgstr "Rendezés"
+
+#: templates/search.html:351
+msgid "Name"
+msgstr "Név"
+
+#: templates/search.html:352
+msgid "Start Date"
+msgstr "Kezdő dátum"
+
+#: templates/search.html:353
+msgid "End Date"
+msgstr "Záró dátum"
+
+#: templates/search.html:359
+msgid "Toggle ascending/descending order"
+msgstr "Növekvő/csökkenő sorrend váltása"
+
+#: templates/search.html:367
+msgid "Rows"
+msgstr "Sorok"
+
+#: templates/search.html:380
+msgid "Export table to CSV"
+msgstr "Táblázat exportálása CSV-be"
+
+#: templates/search.html:407
+msgid "Retry"
+msgstr "Újra"
+
+#: templates/search.html:418
+msgid ""
+"Try broadening your search term, clearing the entity class filter, or "
+"expanding the timespan."
+msgstr ""
+"Próbálja tágítani a keresőkifejezést, törölni az osztályszűrőt vagy "
+"bővíteni az időintervallumot."
+
+#: templates/search.html:421
+msgid "Reset filters"
+msgstr "Szűrők visszaállítása"
+
+#: templates/search.html:433
+msgid "Entity"
+msgstr "Entitás"
+
+#: templates/search.html:437
+msgid "Class"
+msgstr "Osztály"
+
+#: templates/search.html:440
+msgid "Timespan"
+msgstr "Időintervallum"
+
+#: templates/search.html:444
+msgid "Case Study"
+msgstr "Esettanulmány"
+
+#: templates/admin/predefined_filter.html:132 templates/search.html:445
+msgid "Description"
+msgstr "Leírás"
+
+#: templates/search.html:446
+msgid "Action"
+msgstr "Művelet"
+
+#: templates/search.html:463
+msgid "Previous"
+msgstr "Előző"
+
+#: templates/search.html:471
+msgid "Next"
+msgstr "Következő"
 
 #: templates/admin/about_content.html:3
 msgid "about section content"
@@ -962,20 +1176,21 @@ msgstr "Eszközkezelés"
 
 #: templates/admin/assets_management.html:5
 msgid ""
-"The assets are general files, which can be used in individual pages. These "
-"can be all data types; some can be displayed, while some can only be "
-"downloaded."
+"The assets are general files, which can be used in individual pages. "
+"These can be all data types; some can be displayed, while some can only "
+"be downloaded."
 msgstr ""
-"Az eszközök általános fájlok, amelyek egyedi oldalakon használhatók. Ezek "
-"bármilyen adattípusok lehetnek; némelyikük megjeleníthető, míg némelyikük "
-"csak letölthető."
+"Az eszközök általános fájlok, amelyek egyedi oldalakon használhatók. Ezek"
+" bármilyen adattípusok lehetnek; némelyikük megjeleníthető, míg "
+"némelyikük csak letölthető."
 
 #: templates/admin/assets_management.html:13
 msgid "Upload New Asset"
 msgstr "Új eszköz feltöltése"
 
 #: templates/admin/assets_management.html:21
-#: templates/admin/icon_management.html:21 templates/admin/logo_management.html:21
+#: templates/admin/icon_management.html:21
+#: templates/admin/logo_management.html:21
 #: templates/admin/team_management.html:21
 msgid "Upload"
 msgstr "Feltöltés"
@@ -989,28 +1204,33 @@ msgid "Existing Assets"
 msgstr "Létező eszközök"
 
 #: templates/admin/assets_management.html:60
-#: templates/admin/logo_management.html:52 templates/admin/team_management.html:54
-#: views/admin.py:177 views/admin.py:802 views/admin.py:1775
+#: templates/admin/logo_management.html:52
+#: templates/admin/team_management.html:54 views/admin.py:177
+#: views/admin.py:802 views/admin.py:1775
 msgid "Select License..."
 msgstr "Licenc kiválasztása..."
 
 #: templates/admin/assets_management.html:69
-#: templates/admin/logo_management.html:61 templates/admin/team_management.html:65
+#: templates/admin/logo_management.html:61
+#: templates/admin/team_management.html:65
 msgid "Attribution (if any)..."
 msgstr "Szerző megnevezése (ha van)..."
 
 #: templates/admin/assets_management.html:71
-#: templates/admin/logo_management.html:63 templates/admin/team_management.html:68
+#: templates/admin/logo_management.html:63
+#: templates/admin/team_management.html:68
 msgid "Save License"
 msgstr "Licenc mentése"
 
 #: templates/admin/assets_management.html:80
-#: templates/admin/logo_management.html:94 templates/admin/team_management.html:77
+#: templates/admin/logo_management.html:94
+#: templates/admin/team_management.html:77
 msgid "New name..."
 msgstr "Új név..."
 
 #: templates/admin/assets_management.html:81
-#: templates/admin/logo_management.html:95 templates/admin/team_management.html:78
+#: templates/admin/logo_management.html:95
+#: templates/admin/team_management.html:78
 msgid "Rename"
 msgstr "Átnevezés"
 
@@ -1244,11 +1464,11 @@ msgstr "Figyelem:"
 
 #: templates/admin/database.html:18
 msgid ""
-"Restoring a database will overwrite all current data. This action cannot be "
-"undone."
+"Restoring a database will overwrite all current data. This action cannot "
+"be undone."
 msgstr ""
-"Az adatbázis helyreállítása minden jelenlegi adatot felülír. Ez a művelet "
-"nem vonható vissza."
+"Az adatbázis helyreállítása minden jelenlegi adatot felülír. Ez a művelet"
+" nem vonható vissza."
 
 #: templates/admin/database.html:24
 msgid "Select SQL Dump File"
@@ -1268,11 +1488,11 @@ msgstr "Adatbázis visszaállítás"
 
 #: templates/admin/database.html:39
 msgid ""
-"This will reset the entire database to the initial sample data. All custom "
-"data will be lost!"
+"This will reset the entire database to the initial sample data. All "
+"custom data will be lost!"
 msgstr ""
-"Ez az egész adatbázist visszaállítja a kezdeti mintaadatokra. Minden egyedi "
-"adat elvész!"
+"Ez az egész adatbázist visszaállítja a kezdeti mintaadatokra. Minden "
+"egyedi adat elvész!"
 
 #: templates/admin/database.html:42
 msgid "Resets the entire database"
@@ -1340,32 +1560,37 @@ msgstr "adatáttekintés"
 
 #: templates/admin/external_identifiers.html:92
 #: templates/admin/predefined_filter.html:160
-#: templates/admin/type_divisions.html:21 templates/admin/type_divisions.html:202
+#: templates/admin/type_divisions.html:21
+#: templates/admin/type_divisions.html:202
 msgid "Icon Type"
 msgstr "Ikontípus"
 
 #: templates/admin/external_identifiers.html:105
 #: templates/admin/predefined_filter.html:163
-#: templates/admin/type_divisions.html:34 templates/admin/type_divisions.html:215
+#: templates/admin/type_divisions.html:34
+#: templates/admin/type_divisions.html:215
 msgid "Bootstrap Icon Class"
 msgstr ""
 
 #: templates/admin/external_identifiers.html:116
 #: templates/admin/predefined_filter.html:164
-#: templates/admin/type_divisions.html:45 templates/admin/type_divisions.html:225
+#: templates/admin/type_divisions.html:45
+#: templates/admin/type_divisions.html:225
 #, fuzzy
 msgid "SVG Icon File"
 msgstr "Ikonérték"
 
 #: templates/admin/external_identifiers.html:122
 #: templates/admin/predefined_filter.html:171
-#: templates/admin/type_divisions.html:51 templates/admin/type_divisions.html:108
+#: templates/admin/type_divisions.html:51
+#: templates/admin/type_divisions.html:108
 #, fuzzy
 msgid "Select Icon..."
 msgstr "Licenc kiválasztása..."
 
 #: templates/admin/external_identifiers.html:138
-#: templates/admin/type_divisions.html:67 templates/admin/type_divisions.html:239
+#: templates/admin/type_divisions.html:67
+#: templates/admin/type_divisions.html:239
 msgid "Preview:"
 msgstr ""
 
@@ -1413,8 +1638,8 @@ msgstr "Láthatósági konfiguráció"
 #: templates/admin/general_settings.html:23
 msgid "Please enter a positive integer for the Case Study Hierarchy ID."
 msgstr ""
-"Kérjük, adjon meg egy pozitív egész számot az esettanulmány hierarchia ID-"
-"hez."
+"Kérjük, adjon meg egy pozitív egész számot az esettanulmány hierarchia "
+"ID-hez."
 
 #: templates/admin/general_settings.html:32
 msgid "This ID links your project to the central hierarchy."
@@ -1459,7 +1684,9 @@ msgstr "Ikonkezelés"
 msgid ""
 "This section is for managing SVG icons that can be used throughout the "
 "application."
-msgstr "Ez a rész az alkalmazás egészében használható SVG ikonok kezelésére szolgál."
+msgstr ""
+"Ez a rész az alkalmazás egészében használható SVG ikonok kezelésére "
+"szolgál."
 
 #: templates/admin/icon_management.html:13
 msgid "Upload New Icon"
@@ -1491,7 +1718,9 @@ msgid "choose index background"
 msgstr "kezdőlap hátterének kiválasztása"
 
 #: templates/admin/index_page_options.html:32
-msgid "Select whether to use a map or a static image as the landing page background."
+msgid ""
+"Select whether to use a map or a static image as the landing page "
+"background."
 msgstr ""
 
 #: templates/admin/index_page_options.html:44
@@ -1555,17 +1784,19 @@ msgstr "Biztos benne?"
 #: templates/admin/logo_management.html:5
 msgid ""
 "The logo section is only for logos and can be used for the footer, site "
-"logo, project logos, and institution logos, as well as for individual pages."
+"logo, project logos, and institution logos, as well as for individual "
+"pages."
 msgstr ""
-"A logó rész csak logók számára fenntartott, és használható a lábléchez, az "
-"oldal logójához, projektlogókhoz és intézményi logókhoz, valamint egyedi "
-"oldalakhoz."
+"A logó rész csak logók számára fenntartott, és használható a lábléchez, "
+"az oldal logójához, projektlogókhoz és intézményi logókhoz, valamint "
+"egyedi oldalakhoz."
 
 #: templates/admin/logo_management.html:13
 msgid "Upload New Logo"
 msgstr "Új logó feltöltése"
 
-#: templates/admin/logo_management.html:25 templates/admin/team_management.html:25
+#: templates/admin/logo_management.html:25
+#: templates/admin/team_management.html:25
 msgid "Accepted formats: PNG, JPG, SVG, GIF."
 msgstr "Elfogadott formátumok: PNG, JPG, SVG, GIF."
 
@@ -1739,7 +1970,8 @@ msgid "cancel"
 msgstr "mégse"
 
 #: templates/admin/maps.html:106 templates/admin/maps.html:116
-#: templates/admin/maps.html:150 templates/admin/partials/modal_add_entry.html:8
+#: templates/admin/maps.html:150
+#: templates/admin/partials/modal_add_entry.html:8
 #: templates/admin/partials/modal_add_entry.html:223
 #: templates/admin/projects_content.html:78
 #: templates/admin/stakeholders_content.html:67
@@ -1770,11 +2002,13 @@ msgstr "Mutat"
 msgid "Page Type"
 msgstr "Oldaltípus"
 
-#: templates/admin/menu_management.html:36 templates/admin/menu_management.html:72
+#: templates/admin/menu_management.html:36
+#: templates/admin/menu_management.html:72
 msgid "Default"
 msgstr "Alapértelmezett"
 
-#: templates/admin/menu_management.html:45 templates/admin/menu_management.html:81
+#: templates/admin/menu_management.html:45
+#: templates/admin/menu_management.html:81
 msgid "Individual"
 msgstr "Egyéni"
 
@@ -1812,11 +2046,6 @@ msgstr ""
 #: templates/admin/predefined_filter.html:135
 msgid "Language selector"
 msgstr ""
-
-#: templates/admin/predefined_filter.html:132
-#, fuzzy
-msgid "Description"
-msgstr "leírás"
 
 #: templates/admin/predefined_filter.html:167
 msgid "Icon Value"
@@ -1860,7 +2089,8 @@ msgid "Select case studies"
 msgstr ""
 
 #: templates/admin/predefined_filter.html:249
-#: templates/admin/type_divisions.html:75 templates/admin/type_divisions.html:247
+#: templates/admin/type_divisions.html:75
+#: templates/admin/type_divisions.html:247
 msgid "Type IDs (comma-separated)"
 msgstr ""
 
@@ -1914,8 +2144,8 @@ msgid ""
 "The team section only includes person photos, which can be used in the "
 "person management and for individual pages."
 msgstr ""
-"A csapat rész csak személyfotókat tartalmaz, amelyek a személykezelésnél és "
-"egyedi oldalakon használhatók."
+"A csapat rész csak személyfotókat tartalmaz, amelyek a személykezelésnél "
+"és egyedi oldalakon használhatók."
 
 #: templates/admin/team_management.html:13
 msgid "Upload New Team Image"
@@ -1933,7 +2163,8 @@ msgstr "Biztosan törölni szeretné ezt a képet?"
 msgid "No team images have been uploaded yet."
 msgstr "Még nem töltöttek fel csapatképeket."
 
-#: templates/admin/type_divisions.html:11 templates/admin/type_divisions.html:192
+#: templates/admin/type_divisions.html:11
+#: templates/admin/type_divisions.html:192
 #, fuzzy
 msgid "Division Label"
 msgstr "Felosztás hozzáadása"
@@ -2021,14 +2252,14 @@ msgstr ""
 
 #: templates/admin/vocabulary_settings.html:15
 msgid ""
-"Leave empty to use the default title in the widget language. This does not "
-"change the menu label."
+"Leave empty to use the default title in the widget language. This does "
+"not change the menu label."
 msgstr ""
 
 #: templates/admin/vocabulary_settings.html:19
 msgid ""
-"Leave both lists empty to show the entire vocabulary. Use only one filter "
-"list."
+"Leave both lists empty to show the entire vocabulary. Use only one filter"
+" list."
 msgstr ""
 
 #: templates/admin/vocabulary_settings.html:20
@@ -2040,7 +2271,9 @@ msgid "Included Type IDs"
 msgstr ""
 
 #: templates/admin/vocabulary_settings.html:29
-msgid "Comma-separated positive IDs. Include their subtrees and necessary ancestors."
+msgid ""
+"Comma-separated positive IDs. Include their subtrees and necessary "
+"ancestors."
 msgstr ""
 
 #: templates/admin/vocabulary_settings.html:41
@@ -2538,7 +2771,9 @@ msgstr "Bejegyzés sikeresen hozzáadva!"
 #: views/admin.py:1035
 #, python-format
 msgid "Error adding entry %(name)s: Only one main project allowed"
-msgstr "Hiba a(z) %(name)s bejegyzés hozzáadásakor: Csak egy fő projekt engedélyezett"
+msgstr ""
+"Hiba a(z) %(name)s bejegyzés hozzáadásakor: Csak egy fő projekt "
+"engedélyezett"
 
 #: views/admin.py:1040
 #, python-format
@@ -2623,8 +2858,8 @@ msgstr "Esettanulmány ID sikeresen frissítve"
 
 #: views/admin.py:1315
 msgid ""
-"Invalid Case Study ID. Must be a positive integer and its entity type must "
-"be \"type\"."
+"Invalid Case Study ID. Must be a positive integer and its entity type "
+"must be \"type\"."
 msgstr ""
 "Érvénytelen esettanulmány ID. Pozitív egész számnak kell lennie, és az "
 "entitástípusnak \"Case Study\"-nak kell lennie."
@@ -2784,21 +3019,24 @@ msgstr "Nem sikerült a gyorsítótár ürítése: %(error)s"
 #~ msgid ""
 #~ "The assets are general files, which "
 #~ "can be used in individual pages, "
-#~ "these can bne all datatypes, some can"
-#~ " be displayed some only be downloaded."
+#~ "these can bne all datatypes, some "
+#~ "can be displayed some only be "
+#~ "downloaded."
 #~ msgstr ""
 
 #~ msgid ""
-#~ "The logo sections is only for logos"
-#~ " and can be used for footer, site"
-#~ " logo, project logos and institution "
-#~ "logos, and also for indiviual pages."
+#~ "The logo sections is only for "
+#~ "logos and can be used for footer,"
+#~ " site logo, project logos and "
+#~ "institution logos, and also for "
+#~ "indiviual pages."
 #~ msgstr ""
 
 #~ msgid ""
 #~ "The team section only include person "
-#~ "fotos, which can be used at the "
-#~ "person management and for individual pages."
+#~ "fotos, which can be used at the"
+#~ " person management and for individual "
+#~ "pages."
 #~ msgstr ""
 
 #~ msgid "Save"
@@ -2847,8 +3085,8 @@ msgstr "Nem sikerült a gyorsítótár ürítése: %(error)s"
 #~ msgstr "Oldaltípus"
 
 #~ msgid ""
-#~ "%(project_name)s (%(year)s). %(title)s. Retrieved "
-#~ "from %(url)s (Accessed: %(date)s)"
+#~ "%(project_name)s (%(year)s). %(title)s. Retrieved"
+#~ " from %(url)s (Accessed: %(date)s)"
 #~ msgstr ""
 #~ "%(project_name)s (%(year)s). %(title)s. Forrás: "
 #~ "%(url)s (Hozzáférés: %(date)s)"
@@ -2890,8 +3128,8 @@ msgstr "Nem sikerült a gyorsítótár ürítése: %(error)s"
 #~ "Research data following FAIR principles "
 #~ "(Findable, Accessible, Interoperable, Reusable):"
 #~ msgstr ""
-#~ "FAIR-alapelveknek megfelelő kutatási adatok "
-#~ "(Findable, Accessible, Interoperable, Reusable):"
+#~ "FAIR-alapelveknek megfelelő kutatási adatok"
+#~ " (Findable, Accessible, Interoperable, Reusable):"
 
 #~ msgid "Ontological data modeling"
 #~ msgstr "Ontológiai adatmodellezés"
@@ -2919,4 +3157,43 @@ msgstr "Nem sikerült a gyorsítótár ürítése: %(error)s"
 
 #~ msgid "FAIR Archaeological Research Repository"
 #~ msgstr "FAIR régészeti kutatási repozitórium"
+
+#~ msgid "Filter by Type"
+#~ msgstr "Szűrés típus szerint"
+
+#~ msgid "Start typing above to see live results or press enter to run a search."
+#~ msgstr ""
+#~ "Kezdjen el gépelni fent az élő "
+#~ "eredményekhez, vagy nyomja meg az entert"
+#~ " a kereséshez."
+
+#~ msgid "Static Search Results"
+#~ msgstr "Statikus keresési eredmények"
+
+#~ msgid "No results found for \"%(query)s\""
+#~ msgstr "Nincs találat a következőhöz: \"%(query)s\""
+
+#~ msgid "Load more"
+#~ msgstr "Továbbiak betöltése"
+
+#~ msgid "Type at least 3 characters..."
+#~ msgstr "Gépeljen be legalább 3 karaktert..."
+
+#~ msgid "Loading live results for \"%(query)s\"..."
+#~ msgstr "Élő eredmények betöltése a következőhöz: \"%(query)s\"..."
+
+#~ msgid "No live results found for \"%(query)s\"."
+#~ msgstr "Nem találhatók élő eredmények a következőhöz: \"%(query)s\"."
+
+#~ msgid "Error loading live results."
+#~ msgstr "Hiba az élő eredmények betöltésekor."
+
+#~ msgid "Select one or more types"
+#~ msgstr "Válasszon egy vagy több típust"
+
+#~ msgid "Coordinates"
+#~ msgstr "Koordináták"
+
+#~ msgid "Back to search"
+#~ msgstr "Vissza a kereséshez"
 
