@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-22 17:01+0200\n"
+"POT-Creation-Date: 2026-10-29 16:00+0100\n"
 "PO-Revision-Date: 2026-05-22 14:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -92,7 +92,7 @@ msgstr "Category"
 msgid "file"
 msgstr "File"
 
-#: forms/admin.py:52 templates/tabs/feature.html:100
+#: forms/admin.py:52 templates/about.html:216 templates/tabs/feature.html:100
 #: templates/tabs/overview.html:12 templates/util/cite/modal.html:37
 msgid "License"
 msgstr "License"
@@ -123,67 +123,500 @@ msgstr "show password"
 msgid "login"
 msgstr "login"
 
+#: services/statistics.py:11 templates/search.html:67
+msgid "Place"
+msgstr "Place"
+
+#: services/statistics.py:17 templates/search.html:75
+msgid "Feature"
+msgstr "Feature"
+
+#: services/statistics.py:23 templates/search.html:71
+msgid "Stratigraphic Unit"
+msgstr "Stratigraphic Unit"
+
+#: services/statistics.py:29 templates/search.html:27
+msgid "Artifact"
+msgstr "Artifact"
+
+#: services/statistics.py:35 templates/search.html:31
+msgid "Human Remains"
+msgstr "Human Remains"
+
+#: services/statistics.py:41 templates/search.html:17
+msgid "Person"
+msgstr "Person"
+
+#: services/statistics.py:47 templates/search.html:21
+msgid "Group"
+msgstr "Group"
+
+#: services/statistics.py:53 templates/search.html:37
+msgid "Acquisition"
+msgstr "Acquisition"
+
+#: services/statistics.py:59 templates/search.html:41
+msgid "Event"
+msgstr "Event"
+
+#: services/statistics.py:65 templates/search.html:45
+msgid "Activity"
+msgstr "Activity"
+
+#: services/statistics.py:71 templates/search.html:49
+msgid "Creation"
+msgstr "Creation"
+
+#: services/statistics.py:77 templates/search.html:53
+msgid "Move"
+msgstr "Move"
+
+#: services/statistics.py:83 templates/search.html:57
+msgid "Production"
+msgstr "Production"
+
+#: services/statistics.py:89 templates/search.html:61
+msgid "Modification"
+msgstr "Modification"
+
+#: services/statistics.py:95 templates/search.html:81
+msgid "Source"
+msgstr "Source"
+
+#: services/statistics.py:101 templates/search.html:85
+msgid "Bibliography"
+msgstr "Bibliography"
+
+#: services/statistics.py:107 templates/search.html:89
+msgid "External Reference"
+msgstr "External Reference"
+
+#: services/statistics.py:113 templates/search.html:93
+msgid "Edition"
+msgstr "Edition"
+
+#: services/statistics.py:119 templates/search.html:99
+msgid "File"
+msgstr "File"
+
+#: services/statistics.py:125 templates/admin/cache.html:59
+#: templates/admin/manage_publications.html:47
+#: templates/admin/manage_publications.html:164 templates/publications.html:29
+msgid "Type"
+msgstr "Type"
+
+#: services/statistics.py:133 templates/about.html:536 templates/index.html:214
+#: templates/search.html:64
+msgid "Places"
+msgstr "Places"
+
+#: services/statistics.py:134
+msgid "Sites & Cemeteries"
+msgstr "Sites & Cemeteries"
+
+#: services/statistics.py:136
+msgid ""
+"Archaeological sites, cemeteries, churches, and settlement structures with "
+"coordinates."
+msgstr ""
+"Archaeological sites, cemeteries, churches, and settlement structures with "
+"coordinates."
+
+#: services/statistics.py:138
+msgid "Browse places"
+msgstr "Browse places"
+
+#: services/statistics.py:143
+msgid "Features"
+msgstr "Features"
+
+#: services/statistics.py:144
+msgid "Features & Structures"
+msgstr "Features & Structures"
+
+#: services/statistics.py:146
+msgid ""
+"Grave constructions, burials, anthropological features, and stratigraphic "
+"units."
+msgstr ""
+"Grave constructions, burials, anthropological features, and stratigraphic "
+"units."
+
+#: services/statistics.py:148
+msgid "Browse features"
+msgstr "Browse features"
+
+#: services/statistics.py:153 templates/search.html:24
+msgid "Items"
+msgstr "Items"
+
+#: services/statistics.py:154
+msgid "Material Culture"
+msgstr "Material Culture"
+
+#: services/statistics.py:156
+msgid ""
+"Archaeological artifacts, jewelry, ceramics, weapons, dress accessories, and"
+" skeletal remains."
+msgstr ""
+"Archaeological artifacts, jewelry, ceramics, weapons, dress accessories, and"
+" skeletal remains."
+
+#: services/statistics.py:158
+msgid "Browse items"
+msgstr "Browse items"
+
+#: services/statistics.py:163 templates/search.html:14
+msgid "Actors"
+msgstr "Actors"
+
+#: services/statistics.py:164
+msgid "Actors & Groups"
+msgstr "Actors & Groups"
+
+#: services/statistics.py:166
+msgid "Historical persons, individuals, institutions, and social groups."
+msgstr "Historical persons, individuals, institutions, and social groups."
+
+#: services/statistics.py:168
+msgid "Browse actors"
+msgstr "Browse actors"
+
+#: services/statistics.py:173 templates/search.html:34
+msgid "Events"
+msgstr "Events"
+
+#: services/statistics.py:174
+msgid "Events & Activities"
+msgstr "Events & Activities"
+
+#: services/statistics.py:176
+msgid ""
+"Historical events, archaeological activities, productions, movements, and "
+"acquisitions."
+msgstr ""
+"Historical events, archaeological activities, productions, movements, and "
+"acquisitions."
+
+#: services/statistics.py:178
+msgid "Browse events"
+msgstr "Browse events"
+
+#: services/statistics.py:183 templates/search.html:78
+msgid "Sources"
+msgstr "Sources"
+
+#: services/statistics.py:184
+msgid "Sources & Literature"
+msgstr "Sources & Literature"
+
+#: services/statistics.py:186
+msgid ""
+"Specialized bibliography, primary sources, and links to external authority "
+"files."
+msgstr ""
+"Specialized bibliography, primary sources, and links to external authority "
+"files."
+
+#: services/statistics.py:188
+msgid "View sources"
+msgstr "View sources"
+
+#: services/statistics.py:193 templates/search.html:96
+msgid "Files"
+msgstr "Files"
+
+#: services/statistics.py:194
+msgid "Media & 3D"
+msgstr "Media & 3D"
+
+#: services/statistics.py:196
+msgid "Digital media assets, photographs, drawings, and 3D models of entities."
+msgstr "Digital media assets, photographs, drawings, and 3D models of entities."
+
+#: services/statistics.py:198
+msgid "Browse media"
+msgstr "Browse media"
+
+#: services/statistics.py:203
+msgid "Types"
+msgstr "Types"
+
+#: services/statistics.py:204
+msgid "Typology & Vocabulary"
+msgstr "Typology & Vocabulary"
+
+#: services/statistics.py:206
+msgid ""
+"Controlled vocabularies, typological classifications, and hierarchical "
+"concepts."
+msgstr ""
+"Controlled vocabularies, typological classifications, and hierarchical "
+"concepts."
+
+#: services/statistics.py:208
+msgid "Browse types"
+msgstr "Browse types"
+
+#: services/statistics.py:510
+msgid "Explore topic"
+msgstr "Explore topic"
+
 #: templates/_macros.html:11
 msgid "Back to the entity"
 msgstr "Back to the entity"
 
-#: templates/_macros.html:59 templates/about.html:215 templates/entity.html:96
-#: templates/entity.html:116
+#: templates/_macros.html:59 templates/entity.html:95 templates/entity.html:115
 msgid "Loading"
 msgstr "Loading"
 
-#: templates/about.html:57
-msgid "Show details"
-msgstr "Show details"
+#: templates/about.html:27
+msgid "Project navigation"
+msgstr "Project navigation"
 
-#: templates/about.html:66 views/admin.py:78
-msgid "persons"
-msgstr "persons"
+#: templates/about.html:56
+msgid "Research Network"
+msgstr "Research Network"
 
-#: templates/about.html:126
-msgid "data overview"
-msgstr "data overview"
+#: templates/about.html:58
+msgid "Case Study & Project"
+msgstr "Case Study & Project"
 
-#: templates/about.html:128
-msgid "project data overview"
-msgstr "project data overview"
+#: templates/about.html:84 templates/index.html:74
+msgid "Explore Research Data"
+msgstr "Explore Research Data"
 
-#: templates/about.html:153 views/admin.py:74
-msgid "projects"
-msgstr "projects"
+#: templates/about.html:88 templates/about.html:283
+msgid "Research Team"
+msgstr "Research Team"
 
-#: templates/about.html:178
-msgid "Details"
-msgstr "Details"
+#: templates/about.html:93 templates/about.html:247 templates/index.html:149
+msgid "Dataset"
+msgstr "Dataset"
 
-#: templates/about.html:194 templates/admin/legal_notice.html:2
-#: templates/admin/legal_notice.html:21
-msgid "legal notice"
-msgstr "legal notice"
+#: templates/about.html:97
+msgid "Cite Project"
+msgstr "Cite Project"
 
-#: templates/about.html:217
-msgid "close"
-msgstr "close"
+#: templates/about.html:127
+msgid "Project Profile"
+msgstr "Project Profile"
 
-#: templates/about.html:283
+#: templates/about.html:129
+msgid "About the Project"
+msgstr "About the Project"
+
+#: templates/about.html:138
+msgid "Scientific research project within the Histarchexplorer repository."
+msgstr "Scientific research project within the Histarchexplorer repository."
+
+#: templates/about.html:149
+msgid "Key Facts"
+msgstr "Key Facts"
+
+#: templates/about.html:156
+msgid "Acronym"
+msgstr "Acronym"
+
+#: templates/about.html:166
+msgid "Contributors"
+msgstr "Contributors"
+
+#: templates/about.html:172
+msgid "Institutions"
+msgstr "Institutions"
+
+#: templates/about.html:180 templates/about.html:725
 msgid "Website"
 msgstr "Website"
 
-#: templates/about.html:284
+#: templates/about.html:195 templates/about.html:726
 msgid "Email"
 msgstr "Email"
 
-#: templates/about.html:287
-msgid "ORCID"
-msgstr "ORCID"
-
-#: templates/about.html:290
+#: templates/about.html:207 templates/about.html:728
 msgid "Address"
 msgstr "Address"
 
-#: templates/about.html:299
-msgid "relations"
-msgstr "relations"
+#: templates/about.html:251 templates/index.html:150
+msgid "Research in Numbers"
+msgstr "Research in Numbers"
+
+#: templates/about.html:253
+msgid "Project Data Overview"
+msgstr "Project Data Overview"
+
+#: templates/about.html:285
+msgid "Contributors & Specialists"
+msgstr "Contributors & Specialists"
+
+#: templates/about.html:297 templates/about.html:298
+msgid "Filter team members..."
+msgstr "Filter team members..."
+
+#: templates/about.html:305
+msgid "Filter by role"
+msgstr "Filter by role"
+
+#: templates/about.html:309
+msgid "All Roles"
+msgstr "All Roles"
+
+#: templates/about.html:393
+msgid "Profile"
+msgstr "Profile"
+
+#: templates/about.html:403
+msgid "No team members match the selected filter."
+msgstr "No team members match the selected filter."
+
+#: templates/about.html:415
+msgid "Governance & Partners"
+msgstr "Governance & Partners"
+
+#: templates/about.html:417
+msgid "Participating Institutions & Sponsors"
+msgstr "Participating Institutions & Sponsors"
+
+#: templates/about.html:481 templates/about.html:652
+msgid "Details"
+msgstr "Details"
+
+#: templates/about.html:498 templates/index.html:176
+msgid "Analyses"
+msgstr "Analyses"
+
+#: templates/about.html:499 templates/index.html:177
+msgid "Scientific Data Distribution"
+msgstr "Scientific Data Distribution"
+
+#: templates/about.html:502 templates/index.html:180
+msgid "Interactive Histograms"
+msgstr "Interactive Histograms"
+
+#: templates/about.html:512 templates/index.html:190
+msgid "Chronological Distribution"
+msgstr "Chronological Distribution"
+
+#: templates/about.html:514 templates/index.html:192
+msgid "Dated AD"
+msgstr "Dated AD"
+
+#: templates/about.html:517 templates/index.html:195
+msgid ""
+"Distribution of archaeological datings by century (Late Antiquity to Middle "
+"Ages)."
+msgstr ""
+"Distribution of archaeological datings by century (Late Antiquity to Middle "
+"Ages)."
+
+#: templates/about.html:521 templates/index.html:199
+msgid "Dating density"
+msgstr "Dating density"
+
+#: templates/about.html:522 templates/index.html:200 utils/view_util.py:17
+msgid "entities"
+msgstr "entities"
+
+#: templates/about.html:532 templates/index.html:210
+msgid "Typological Breakdown"
+msgstr "Typological Breakdown"
+
+#: templates/about.html:539 templates/index.html:217
+msgid "Finds"
+msgstr "Finds"
+
+#: templates/about.html:544 templates/index.html:222
+msgid "Breakdown by the most documented classifications."
+msgstr "Breakdown by the most documented classifications."
+
+#: templates/about.html:561 templates/index.html:239
+msgid "Geography"
+msgstr "Geography"
+
+#: templates/about.html:562 templates/index.html:240
+msgid "Spatial Distribution of Sites"
+msgstr "Spatial Distribution of Sites"
+
+#: templates/about.html:565 templates/index.html:243
+msgid "Full Map View"
+msgstr "Full Map View"
+
+#: templates/about.html:574 templates/about.html:734 templates/index.html:253
+msgid "Loading..."
+msgstr "Loading..."
+
+#: templates/about.html:576 templates/index.html:255
+msgid "Loading spatial data..."
+msgstr "Loading spatial data..."
+
+#: templates/about.html:585 templates/index.html:262
+msgid "View details"
+msgstr "View details"
+
+#: templates/about.html:590 templates/index.html:268
+msgid "Activate map"
+msgstr "Activate map"
+
+#: templates/about.html:604 templates/index.html:105
+msgid "Research Projects"
+msgstr "Research Projects"
+
+#: templates/about.html:608 templates/index.html:107
+msgid "Active Case Studies & Corpora"
+msgstr "Active Case Studies & Corpora"
+
+#: templates/about.html:610
+msgid "Further Projects in the Network"
+msgstr "Further Projects in the Network"
+
+#: templates/about.html:616 templates/admin/projects_content.html:38
+msgid "Main Project"
+msgstr "Main Project"
+
+#: templates/about.html:641 templates/publications.html:40
+msgid "Project"
+msgstr "Project"
+
+#: templates/about.html:673 templates/index.html:338
+#: templates/util/cite/modal.html:12
+msgid "Recommended Citation"
+msgstr "Recommended Citation"
+
+#: templates/about.html:681 templates/index.html:346
+msgid ""
+"Please use the following reference when citing this repository in academic "
+"work:"
+msgstr ""
+"Please use the following reference when citing this repository in academic "
+"work:"
+
+#: templates/about.html:692 templates/index.html:357
+msgid "Copied!"
+msgstr "Copied!"
+
+#: templates/about.html:693 templates/index.html:358
+msgid "Copy citation"
+msgstr "Copy citation"
+
+#: templates/about.html:704 templates/admin.html:43
+msgid "Legal Notice"
+msgstr "Legal Notice"
+
+#: templates/about.html:727
+msgid "ORCID"
+msgstr "ORCID"
+
+#: templates/about.html:729
+msgid "Relations & Roles"
+msgstr "Relations & Roles"
+
+#: templates/about.html:741 templates/admin/partials/modal_add_entry.html:10
+#: templates/admin/partials/modal_delete_confirm.html:7
+#: templates/admin/partials/modal_image_selector.html:9
+#: templates/publications.html:153 templates/util/cite/modal.html:84
+msgid "Close"
+msgstr "Close"
 
 #: templates/admin.html:13
 msgid "admin options"
@@ -247,16 +680,13 @@ msgstr "Publications"
 msgid "Outcome"
 msgstr "Outcome"
 
-#: templates/admin.html:43
-msgid "Legal Notice"
-msgstr "Legal Notice"
-
 #: templates/admin.html:44
 msgid "Footer"
 msgstr "Footer"
 
-#: templates/admin.html:45 templates/publications.html:13
-#: templates/search.html:108 templates/search.html:110
+#: templates/admin.html:45 templates/index.html:57 templates/index.html:61
+#: templates/publications.html:13 templates/search.html:108
+#: templates/search.html:110
 msgid "Search"
 msgstr "Search"
 
@@ -338,273 +768,45 @@ msgstr "Select a file management section from the sidebar to start editing."
 msgid "maps"
 msgstr "maps"
 
-#: templates/index.html:26
-msgid "Open Science"
-msgstr ""
+#: templates/index.html:36
+msgid "Scientific research platform for archaeological burial and settlement data."
+msgstr "Scientific research platform for archaeological burial and settlement data."
 
-#: templates/index.html:27
-msgid "FAIR Archaeological Research Repository"
-msgstr ""
-
-#: templates/index.html:43
-msgid ""
-"Wissenschaftliche Forschungsplattform für archäologische Bestattungs- und"
-" Siedlungsdaten."
-msgstr ""
+#: templates/index.html:56
+msgid "Search sites, features, finds, or literature..."
+msgstr "Search sites, features, finds, or literature..."
 
 #: templates/index.html:58
-msgid "Fundorte, Befunde, Funde oder Literatur durchsuchen..."
-msgstr ""
+msgid "Searching..."
+msgstr "Searching..."
 
 #: templates/index.html:59
-#, fuzzy
-msgid "Suche"
-msgstr "Source"
-
-#: templates/index.html:61
-#, fuzzy
-msgid "Suchen"
-msgstr "Source"
-
-#: templates/index.html:71
-msgid "Forschungsdaten erkunden"
-msgstr ""
-
-#: templates/index.html:74
-msgid "Interaktive Karte"
-msgstr ""
+msgid "No results found"
+msgstr "No results found"
 
 #: templates/index.html:77
-msgid "Erweiterte Suche"
-msgstr ""
+msgid "Interactive Map"
+msgstr "Interactive Map"
 
-#: templates/index.html:102
-msgid "Forschungsprojekte"
-msgstr ""
+#: templates/index.html:80
+msgid "Advanced Search"
+msgstr "Advanced Search"
 
-#: templates/index.html:104
-msgid "Aktive Fallstudien & Korpora"
-msgstr ""
+#: templates/index.html:110
+msgid "Show all"
+msgstr "Show all"
 
-#: templates/index.html:107
-msgid "Alle anzeigen"
-msgstr ""
+#: templates/index.html:280
+msgid "Systematics"
+msgstr "Systematics"
 
-#: templates/index.html:145
-msgid "Datenbestand"
-msgstr ""
+#: templates/index.html:281
+msgid "Thematic Exploration"
+msgstr "Thematic Exploration"
 
-#: templates/index.html:146
-msgid "Forschung in Zahlen"
-msgstr ""
-
-#: templates/index.html:147
-msgid "Verifizierte wissenschaftliche Entitäten der integrierten Datenbanken."
-msgstr ""
-
-#: templates/index.html:157
-msgid "Fundorte"
-msgstr ""
-
-#: templates/index.html:166
-msgid "Befunde & Gräber"
-msgstr ""
-
-#: templates/index.html:175
-msgid "Fundobjekte"
-msgstr ""
-
-#: templates/index.html:182
-msgid "Anthropologie"
-msgstr ""
-
-#: templates/index.html:189 templates/index.html:385
-msgid "Quellen & Literatur"
-msgstr ""
-
-#: templates/index.html:196
-msgid "Medien & 3D"
-msgstr ""
-
-#: templates/index.html:209
-msgid "Analysen"
-msgstr ""
-
-#: templates/index.html:210
-msgid "Wissenschaftliche Datenverteilung"
-msgstr ""
-
-#: templates/index.html:213
-msgid "Interaktive Histogramme"
-msgstr ""
-
-#: templates/index.html:223
-msgid "Chronologische Verteilung"
-msgstr ""
-
-#: templates/index.html:225
-msgid "Datiert n. Chr."
-msgstr ""
-
-#: templates/index.html:228
-msgid ""
-"Verteilung der archäologischen Datierungen nach Jahrhunderten (Spätantike"
-" bis Mittelalter)."
-msgstr ""
-
-#: templates/index.html:241
-msgid "Typologische Gliederung"
-msgstr ""
-
-#: templates/index.html:245
-#, fuzzy
-msgid "Orte"
-msgstr "other"
-
-#: templates/index.html:248
-msgid "Funde"
-msgstr ""
-
-#: templates/index.html:253
-msgid "Aufschlüsselung nach den meistdokumentierten Klassifikationen."
-msgstr ""
-
-#: templates/index.html:270
-msgid "Geographie"
-msgstr ""
-
-#: templates/index.html:271
-msgid "Räumliche Verteilung der Fundplätze"
-msgstr ""
-
-#: templates/index.html:273
-msgid "Interaktive Fundstellenkarte mit ressourcenschonendem Clustering."
-msgstr ""
-
-#: templates/index.html:277
-msgid "Vollständige Kartenansicht"
-msgstr ""
-
-#: templates/index.html:287
-msgid "Laden..."
-msgstr ""
-
-#: templates/index.html:289
-msgid "Lade Geodaten..."
-msgstr ""
-
-#: templates/index.html:301
-msgid "Karte aktivieren"
-msgstr ""
-
-#: templates/index.html:312
-msgid "Systematik"
-msgstr ""
-
-#: templates/index.html:313
-msgid "Thematische Erkundung"
-msgstr ""
-
-#: templates/index.html:314
-msgid "Wählen Sie einen thematischen Zugang zu den Forschungsbeständen."
-msgstr ""
-
-#: templates/index.html:327
-msgid "Fundorte & Gräberfelder"
-msgstr ""
-
-#: templates/index.html:329
-msgid ""
-"Archäologische Fundstellen, Gräberfelder, Kirchen und Siedlungsstrukturen"
-" mit Koordinaten."
-msgstr ""
-
-#: templates/index.html:332
-msgid "Orte durchsuchen"
-msgstr ""
-
-#: templates/index.html:347
-msgid "Befunde & Strukturen"
-msgstr ""
-
-#: templates/index.html:349
-msgid ""
-"Grabkonstruktionen, Bestattungen, anthropologische Befunde und "
-"stratigraphische Einheiten."
-msgstr ""
-
-#: templates/index.html:352
-msgid "Befunde durchsuchen"
-msgstr ""
-
-#: templates/index.html:365
-msgid "Materielle Kultur"
-msgstr ""
-
-#: templates/index.html:367
-msgid ""
-"Archäologische Artefakte, Schmuck, Keramik, Waffen, Trachtbestandteile "
-"und Skelettreste."
-msgstr ""
-
-#: templates/index.html:370
-msgid "Objekte durchsuchen"
-msgstr ""
-
-#: templates/index.html:387
-msgid ""
-"Fachbibliographie, Primärquellen und Verknüpfungen zu externen "
-"Fachnormdaten."
-msgstr ""
-
-#: templates/index.html:390
-msgid "Quellen ansehen"
-msgstr ""
-
-#: templates/index.html:408
-msgid "Zitierempfehlung"
-msgstr ""
-
-#: templates/index.html:416
-msgid ""
-"Bitte zitieren Sie bei wissenschaftlicher Nutzung dieses Repositoriums "
-"folgenden Nachweis:"
-msgstr ""
-
-#: templates/index.html:425
-msgid "Zitation kopieren"
-msgstr ""
-
-#: templates/index.html:435
-msgid "Offene Schnittstellen & Standards"
-msgstr ""
-
-#: templates/index.html:438
-msgid ""
-"Forschungsdaten nach FAIR-Kriterien (Findable, Accessible, Interoperable,"
-" Reusable):"
-msgstr ""
-
-#: templates/index.html:443
-msgid "Ontologische Datenmodellierung"
-msgstr ""
-
-#: templates/index.html:447
-msgid "Verlinkt mit Wikidata, PeriodO, GeoNames & GND"
-msgstr ""
-
-#: templates/index.html:451
-msgid "Maschinenlesbarer Zugriff via JSON/GeoJSON"
-msgstr ""
-
-#: templates/index.html:456
-#, fuzzy
-msgid "Vokabular"
-msgstr "Vocabulary"
-
-#: templates/index.html:461
-msgid "API Endpunkt"
-msgstr ""
+#: templates/index.html:282
+msgid "Choose a thematic entry point to the research collections."
+msgstr "Choose a thematic entry point to the research collections."
 
 #: templates/login.html:6
 msgid "Login"
@@ -641,21 +843,10 @@ msgstr "search"
 msgid "All Years"
 msgstr ""
 
-#: templates/admin/cache.html:59 templates/admin/manage_publications.html:47
-#: templates/admin/manage_publications.html:164 templates/publications.html:29
-#, fuzzy
-msgid "Type"
-msgstr "Page Type"
-
 #: templates/publications.html:31
 #, fuzzy
 msgid "All Types"
 msgstr "Page Type"
-
-#: templates/publications.html:40
-#, fuzzy
-msgid "Project"
-msgstr "projects"
 
 #: templates/publications.html:42
 #, fuzzy
@@ -697,13 +888,6 @@ msgstr "publications"
 msgid "APA Style"
 msgstr "Page Type"
 
-#: templates/admin/partials/modal_add_entry.html:10
-#: templates/admin/partials/modal_delete_confirm.html:7
-#: templates/admin/partials/modal_image_selector.html:9
-#: templates/publications.html:153 templates/util/cite/modal.html:84
-msgid "Close"
-msgstr "Close"
-
 #: templates/publications.html:161
 #, fuzzy
 msgid "Linked Projects:"
@@ -716,106 +900,6 @@ msgstr ""
 #: templates/search.html:11
 msgid "Filter by Type"
 msgstr "Filter by Type"
-
-#: templates/search.html:14
-msgid "Actors"
-msgstr "Actors"
-
-#: templates/search.html:17
-msgid "Person"
-msgstr "Person"
-
-#: templates/search.html:21
-msgid "Group"
-msgstr "Group"
-
-#: templates/search.html:24
-msgid "Items"
-msgstr "Items"
-
-#: templates/search.html:27
-msgid "Artifact"
-msgstr "Artifact"
-
-#: templates/search.html:31
-msgid "Human Remains"
-msgstr "Human Remains"
-
-#: templates/search.html:34
-msgid "Events"
-msgstr "Events"
-
-#: templates/search.html:37
-msgid "Acquisition"
-msgstr "Acquisition"
-
-#: templates/search.html:41
-msgid "Event"
-msgstr "Event"
-
-#: templates/search.html:45
-msgid "Activity"
-msgstr "Activity"
-
-#: templates/search.html:49
-msgid "Creation"
-msgstr "Creation"
-
-#: templates/search.html:53
-msgid "Move"
-msgstr "Move"
-
-#: templates/search.html:57
-msgid "Production"
-msgstr "Production"
-
-#: templates/search.html:61
-msgid "Modification"
-msgstr "Modification"
-
-#: templates/search.html:64
-msgid "Places"
-msgstr "Places"
-
-#: templates/search.html:67
-msgid "Place"
-msgstr "Place"
-
-#: templates/search.html:71
-msgid "Stratigraphic Unit"
-msgstr "Stratigraphic Unit"
-
-#: templates/search.html:75
-msgid "Feature"
-msgstr "Feature"
-
-#: templates/search.html:78
-msgid "Sources"
-msgstr "Sources"
-
-#: templates/search.html:81
-msgid "Source"
-msgstr "Source"
-
-#: templates/search.html:85
-msgid "Bibliography"
-msgstr "Bibliography"
-
-#: templates/search.html:89
-msgid "External Reference"
-msgstr "External Reference"
-
-#: templates/search.html:93
-msgid "Edition"
-msgstr "Edition"
-
-#: templates/search.html:96
-msgid "Files"
-msgstr "Files"
-
-#: templates/search.html:99
-msgid "File"
-msgstr "File"
 
 #: templates/search.html:120
 msgid "Start typing above to see live results or press enter to run a search."
@@ -882,21 +966,20 @@ msgstr "Asset Management"
 
 #: templates/admin/assets_management.html:5
 msgid ""
-"The assets are general files, which can be used in individual pages. "
-"These can be all data types; some can be displayed, while some can only "
-"be downloaded."
+"The assets are general files, which can be used in individual pages. These "
+"can be all data types; some can be displayed, while some can only be "
+"downloaded."
 msgstr ""
-"The assets are general files, which can be used in individual pages. "
-"These can be all data types; some can be displayed, while some can only "
-"be downloaded."
+"The assets are general files, which can be used in individual pages. These "
+"can be all data types; some can be displayed, while some can only be "
+"downloaded."
 
 #: templates/admin/assets_management.html:13
 msgid "Upload New Asset"
 msgstr "Upload New Asset"
 
 #: templates/admin/assets_management.html:21
-#: templates/admin/icon_management.html:21
-#: templates/admin/logo_management.html:21
+#: templates/admin/icon_management.html:21 templates/admin/logo_management.html:21
 #: templates/admin/team_management.html:21
 msgid "Upload"
 msgstr "Upload"
@@ -910,33 +993,28 @@ msgid "Existing Assets"
 msgstr "Existing Assets"
 
 #: templates/admin/assets_management.html:60
-#: templates/admin/logo_management.html:52
-#: templates/admin/team_management.html:54 views/admin.py:177
-#: views/admin.py:802 views/admin.py:1775
+#: templates/admin/logo_management.html:52 templates/admin/team_management.html:54
+#: views/admin.py:177 views/admin.py:802 views/admin.py:1775
 msgid "Select License..."
 msgstr "Select License..."
 
 #: templates/admin/assets_management.html:69
-#: templates/admin/logo_management.html:61
-#: templates/admin/team_management.html:65
+#: templates/admin/logo_management.html:61 templates/admin/team_management.html:65
 msgid "Attribution (if any)..."
 msgstr "Attribution (if any)..."
 
 #: templates/admin/assets_management.html:71
-#: templates/admin/logo_management.html:63
-#: templates/admin/team_management.html:68
+#: templates/admin/logo_management.html:63 templates/admin/team_management.html:68
 msgid "Save License"
 msgstr "Save License"
 
 #: templates/admin/assets_management.html:80
-#: templates/admin/logo_management.html:94
-#: templates/admin/team_management.html:77
+#: templates/admin/logo_management.html:94 templates/admin/team_management.html:77
 msgid "New name..."
 msgstr "New name..."
 
 #: templates/admin/assets_management.html:81
-#: templates/admin/logo_management.html:95
-#: templates/admin/team_management.html:78
+#: templates/admin/logo_management.html:95 templates/admin/team_management.html:78
 msgid "Rename"
 msgstr "Rename"
 
@@ -1172,11 +1250,11 @@ msgstr "Warning:"
 
 #: templates/admin/database.html:18
 msgid ""
-"Restoring a database will overwrite all current data. This action cannot "
-"be undone."
+"Restoring a database will overwrite all current data. This action cannot be "
+"undone."
 msgstr ""
-"Restoring a database will overwrite all current data. This action cannot "
-"be undone."
+"Restoring a database will overwrite all current data. This action cannot be "
+"undone."
 
 #: templates/admin/database.html:24
 msgid "Select SQL Dump File"
@@ -1196,11 +1274,11 @@ msgstr "Database Reset"
 
 #: templates/admin/database.html:39
 msgid ""
-"This will reset the entire database to the initial sample data. All "
-"custom data will be lost!"
+"This will reset the entire database to the initial sample data. All custom "
+"data will be lost!"
 msgstr ""
-"This will reset the entire database to the initial sample data. All "
-"custom data will be lost!"
+"This will reset the entire database to the initial sample data. All custom "
+"data will be lost!"
 
 #: templates/admin/database.html:42
 msgid "Resets the entire database"
@@ -1268,37 +1346,32 @@ msgstr "data overview"
 
 #: templates/admin/external_identifiers.html:92
 #: templates/admin/predefined_filter.html:160
-#: templates/admin/type_divisions.html:21
-#: templates/admin/type_divisions.html:202
+#: templates/admin/type_divisions.html:21 templates/admin/type_divisions.html:202
 msgid "Icon Type"
 msgstr "Icon Type"
 
 #: templates/admin/external_identifiers.html:105
 #: templates/admin/predefined_filter.html:163
-#: templates/admin/type_divisions.html:34
-#: templates/admin/type_divisions.html:215
+#: templates/admin/type_divisions.html:34 templates/admin/type_divisions.html:215
 msgid "Bootstrap Icon Class"
 msgstr ""
 
 #: templates/admin/external_identifiers.html:116
 #: templates/admin/predefined_filter.html:164
-#: templates/admin/type_divisions.html:45
-#: templates/admin/type_divisions.html:225
+#: templates/admin/type_divisions.html:45 templates/admin/type_divisions.html:225
 #, fuzzy
 msgid "SVG Icon File"
 msgstr "Icon Value"
 
 #: templates/admin/external_identifiers.html:122
 #: templates/admin/predefined_filter.html:171
-#: templates/admin/type_divisions.html:51
-#: templates/admin/type_divisions.html:108
+#: templates/admin/type_divisions.html:51 templates/admin/type_divisions.html:108
 #, fuzzy
 msgid "Select Icon..."
 msgstr "Select License..."
 
 #: templates/admin/external_identifiers.html:138
-#: templates/admin/type_divisions.html:67
-#: templates/admin/type_divisions.html:239
+#: templates/admin/type_divisions.html:67 templates/admin/type_divisions.html:239
 msgid "Preview:"
 msgstr ""
 
@@ -1424,9 +1497,7 @@ msgid "choose index background"
 msgstr "choose index background"
 
 #: templates/admin/index_page_options.html:32
-msgid ""
-"Select whether to use a map or a static image as the landing page "
-"background."
+msgid "Select whether to use a map or a static image as the landing page background."
 msgstr ""
 
 #: templates/admin/index_page_options.html:44
@@ -1457,6 +1528,10 @@ msgstr "define default background image"
 msgid "Select an image from the uploaded assets to be used as background."
 msgstr ""
 
+#: templates/admin/legal_notice.html:2 templates/admin/legal_notice.html:21
+msgid "legal notice"
+msgstr "legal notice"
+
 #: templates/admin/license_management.html:3
 msgid "Add New License"
 msgstr "Add New License"
@@ -1486,19 +1561,16 @@ msgstr "Are you sure?"
 #: templates/admin/logo_management.html:5
 msgid ""
 "The logo section is only for logos and can be used for the footer, site "
-"logo, project logos, and institution logos, as well as for individual "
-"pages."
+"logo, project logos, and institution logos, as well as for individual pages."
 msgstr ""
 "The logo section is only for logos and can be used for the footer, site "
-"logo, project logos, and institution logos, as well as for individual "
-"pages."
+"logo, project logos, and institution logos, as well as for individual pages."
 
 #: templates/admin/logo_management.html:13
 msgid "Upload New Logo"
 msgstr "Upload New Logo"
 
-#: templates/admin/logo_management.html:25
-#: templates/admin/team_management.html:25
+#: templates/admin/logo_management.html:25 templates/admin/team_management.html:25
 msgid "Accepted formats: PNG, JPG, SVG, GIF."
 msgstr "Accepted formats: PNG, JPG, SVG, GIF."
 
@@ -1672,8 +1744,7 @@ msgid "cancel"
 msgstr "cancel"
 
 #: templates/admin/maps.html:106 templates/admin/maps.html:116
-#: templates/admin/maps.html:150
-#: templates/admin/partials/modal_add_entry.html:8
+#: templates/admin/maps.html:150 templates/admin/partials/modal_add_entry.html:8
 #: templates/admin/partials/modal_add_entry.html:223
 #: templates/admin/projects_content.html:78
 #: templates/admin/stakeholders_content.html:67
@@ -1704,13 +1775,11 @@ msgstr "Show"
 msgid "Page Type"
 msgstr "Page Type"
 
-#: templates/admin/menu_management.html:36
-#: templates/admin/menu_management.html:72
+#: templates/admin/menu_management.html:36 templates/admin/menu_management.html:72
 msgid "Default"
 msgstr "Default"
 
-#: templates/admin/menu_management.html:45
-#: templates/admin/menu_management.html:81
+#: templates/admin/menu_management.html:45 templates/admin/menu_management.html:81
 msgid "Individual"
 msgstr "Individual"
 
@@ -1733,9 +1802,8 @@ msgid "Delete this predefined filter?"
 msgstr ""
 
 #: templates/admin/predefined_filter.html:81
-#, fuzzy
 msgid "All tabs"
-msgstr "Page Type"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:91
 msgid "Add predefined filter"
@@ -1747,9 +1815,8 @@ msgstr ""
 
 #: templates/admin/predefined_filter.html:109
 #: templates/admin/predefined_filter.html:135
-#, fuzzy
 msgid "Language selector"
-msgstr "Deactivate Language Selector"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:132
 #, fuzzy
@@ -1757,9 +1824,8 @@ msgid "Description"
 msgstr "description"
 
 #: templates/admin/predefined_filter.html:167
-#, fuzzy
 msgid "Icon Value"
-msgstr "Icon Type"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:178
 msgid "Preview"
@@ -1778,14 +1844,12 @@ msgid "Include entities without begin date"
 msgstr ""
 
 #: templates/admin/predefined_filter.html:208
-#, fuzzy
 msgid "End from"
-msgstr "Retrieved from"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:213
-#, fuzzy
 msgid "End to"
-msgstr "Edition"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:222
 msgid "Include entities without end date"
@@ -1797,13 +1861,11 @@ msgid "Case studies"
 msgstr "Select a value"
 
 #: templates/admin/predefined_filter.html:230
-#, fuzzy
 msgid "Select case studies"
-msgstr "Select a value"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:249
-#: templates/admin/type_divisions.html:75
-#: templates/admin/type_divisions.html:247
+#: templates/admin/type_divisions.html:75 templates/admin/type_divisions.html:247
 msgid "Type IDs (comma-separated)"
 msgstr ""
 
@@ -1817,9 +1879,8 @@ msgid "Tabs"
 msgstr ""
 
 #: templates/admin/predefined_filter.html:257
-#, fuzzy
 msgid "Select tabs"
-msgstr "select role"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:261
 msgid "Leave empty to show all tabs."
@@ -1831,9 +1892,8 @@ msgid "Classes"
 msgstr "Assets"
 
 #: templates/admin/predefined_filter.html:265
-#, fuzzy
 msgid "Select classes"
-msgstr "Select a value"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:277
 #, fuzzy
@@ -1844,11 +1904,6 @@ msgstr "save"
 #, fuzzy
 msgid "projects section content"
 msgstr "about section content"
-
-#: templates/admin/projects_content.html:38
-#, fuzzy
-msgid "Main Project"
-msgstr "main-project"
 
 #: templates/admin/stakeholders_content.html:3
 #, fuzzy
@@ -1883,8 +1938,7 @@ msgstr "Are you sure you want to delete this image?"
 msgid "No team images have been uploaded yet."
 msgstr "No team images have been uploaded yet."
 
-#: templates/admin/type_divisions.html:11
-#: templates/admin/type_divisions.html:192
+#: templates/admin/type_divisions.html:11 templates/admin/type_divisions.html:192
 #, fuzzy
 msgid "Division Label"
 msgstr "Add Division"
@@ -1972,19 +2026,19 @@ msgstr "Viewer title"
 
 #: templates/admin/vocabulary_settings.html:15
 msgid ""
-"Leave empty to use the default title in the widget language. This does "
-"not change the menu label."
+"Leave empty to use the default title in the widget language. This does not "
+"change the menu label."
 msgstr ""
-"Leave empty to use the default title in the widget language. This does "
-"not change the menu label."
+"Leave empty to use the default title in the widget language. This does not "
+"change the menu label."
 
 #: templates/admin/vocabulary_settings.html:19
 msgid ""
-"Leave both lists empty to show the entire vocabulary. Use only one filter"
-" list."
+"Leave both lists empty to show the entire vocabulary. Use only one filter "
+"list."
 msgstr ""
-"Leave both lists empty to show the entire vocabulary. Use only one filter"
-" list."
+"Leave both lists empty to show the entire vocabulary. Use only one filter "
+"list."
 
 #: templates/admin/vocabulary_settings.html:20
 msgid "These filters affect only the viewer, not access to the vocabulary API."
@@ -1995,12 +2049,8 @@ msgid "Included Type IDs"
 msgstr "Included Type IDs"
 
 #: templates/admin/vocabulary_settings.html:29
-msgid ""
-"Comma-separated positive IDs. Include their subtrees and necessary "
-"ancestors."
-msgstr ""
-"Comma-separated positive IDs. Include their subtrees and necessary "
-"ancestors."
+msgid "Comma-separated positive IDs. Include their subtrees and necessary ancestors."
+msgstr "Comma-separated positive IDs. Include their subtrees and necessary ancestors."
 
 #: templates/admin/vocabulary_settings.html:41
 msgid "Excluded Type IDs"
@@ -2092,7 +2142,7 @@ msgstr "Confirm Delete"
 msgid "Are you sure you want to delete"
 msgstr "Are you sure you want to delete"
 
-#: templates/tabs/catalog.html:117
+#: templates/tabs/catalog.html:116
 msgid "Catalogue"
 msgstr ""
 
@@ -2109,7 +2159,12 @@ msgstr "License holder"
 msgid "Show image information"
 msgstr "general settings"
 
-#: templates/tabs/feature.html:130 templates/tabs/overview.html:15
+#: templates/tabs/feature.html:122 templates/tabs/feature.html:123
+msgid "Open in IIIF viewer"
+msgstr ""
+
+#: templates/tabs/feature.html:139 templates/tabs/feature.html:140
+#: templates/tabs/overview.html:15
 msgid "Open full view"
 msgstr "Open full view"
 
@@ -2147,10 +2202,6 @@ msgstr "Close"
 msgid "Cite this Entry"
 msgstr "Cite this Entry"
 
-#: templates/util/cite/modal.html:12
-msgid "Recommended Citation"
-msgstr "Recommended Citation"
-
 #: templates/util/cite/modal.html:17
 msgid "Copy to clipboard"
 msgstr "Copy to clipboard"
@@ -2170,10 +2221,6 @@ msgstr "No specific license information available for this entity."
 #: templates/util/cite/modal.html:54
 msgid "Export Formats (BibTeX, RIS)"
 msgstr "Export Formats (BibTeX, RIS)"
-
-#: utils/view_util.py:17
-msgid "entities"
-msgstr "entities"
 
 #: utils/view_util.py:18
 msgid "search"
@@ -2229,9 +2276,21 @@ msgstr "Unknown"
 msgid "Retrieved from"
 msgstr "Retrieved from"
 
+#: views/about.py:121
+msgid "Partner"
+msgstr "Partner"
+
 #: views/admin.py:72
 msgid "main-project"
 msgstr "main-project"
+
+#: views/admin.py:74
+msgid "projects"
+msgstr "projects"
+
+#: views/admin.py:78
+msgid "persons"
+msgstr "persons"
 
 #: views/admin.py:80
 msgid "institutions"
@@ -2569,11 +2628,11 @@ msgstr "Updated case study ID successfully"
 
 #: views/admin.py:1315
 msgid ""
-"Invalid Case Study ID. Must be a positive integer and its entity type "
-"must be \"type\"."
+"Invalid Case Study ID. Must be a positive integer and its entity type must "
+"be \"type\"."
 msgstr ""
-"Invalid Case Study ID. Must be a positive integer and its entity type "
-"must be \"type\"."
+"Invalid Case Study ID. Must be a positive integer and its entity type must "
+"be \"type\"."
 
 #: views/admin.py:1337
 msgid "Reset is only allowed in debug or testing mode."
@@ -2722,7 +2781,7 @@ msgstr "Incorrect password."
 msgid "User not found."
 msgstr "User not found."
 
-#: views/views.py:179
+#: views/views.py:189
 #, python-format
 msgid "Failed to clear cache: %(error)s"
 msgstr "Failed to clear cache: %(error)s"
@@ -2773,14 +2832,17 @@ msgstr "Failed to clear cache: %(error)s"
 #~ msgstr "Page Type"
 
 #~ msgid ""
-#~ "%(project_name)s (%(year)s). %(title)s. Retrieved"
-#~ " from %(url)s (Accessed: %(date)s)"
+#~ "%(project_name)s (%(year)s). %(title)s. Retrieved "
+#~ "from %(url)s (Accessed: %(date)s)"
 #~ msgstr ""
-#~ "%(project_name)s (%(year)s). %(title)s. Retrieved"
-#~ " from %(url)s (Accessed: %(date)s)"
+#~ "%(project_name)s (%(year)s). %(title)s. Retrieved "
+#~ "from %(url)s (Accessed: %(date)s)"
 
 #~ msgid "Save Footer Order"
 #~ msgstr "Save Footer Order"
+
+#~ msgid "Icon value"
+#~ msgstr "Icon Type"
 
 #~ msgid "Cache warmup started in background (refresh mode)"
 #~ msgstr "Cache warmup started in background (refresh mode)"
@@ -2804,11 +2866,63 @@ msgstr "Failed to clear cache: %(error)s"
 #~ msgstr "Last update"
 
 #~ msgid ""
-#~ "System refresh preloads the full "
-#~ "vocabulary independently of viewer filters."
-#~ " Reload to see progress."
+#~ "System refresh preloads the full vocabulary"
+#~ " independently of viewer filters. Reload "
+#~ "to see progress."
 #~ msgstr ""
-#~ "System refresh preloads the full "
-#~ "vocabulary independently of viewer filters."
-#~ " Reload to see progress."
+#~ "System refresh preloads the full vocabulary"
+#~ " independently of viewer filters. Reload "
+#~ "to see progress."
+
+#~ msgid "Sites"
+#~ msgstr "Sites"
+
+#~ msgid "Artifacts"
+#~ msgstr "Artifacts"
+
+#~ msgid "Anthropology"
+#~ msgstr "Anthropology"
+
+#~ msgid "Verified scientific entities from the integrated databases."
+#~ msgstr "Verified scientific entities from the integrated databases."
+
+#~ msgid "Interactive site map with resource-efficient clustering."
+#~ msgstr "Interactive site map with resource-efficient clustering."
+
+#~ msgid "Open Interfaces & Standards"
+#~ msgstr "Open Interfaces & Standards"
+
+#~ msgid ""
+#~ "Research data following FAIR principles "
+#~ "(Findable, Accessible, Interoperable, Reusable):"
+#~ msgstr ""
+#~ "Research data following FAIR principles "
+#~ "(Findable, Accessible, Interoperable, Reusable):"
+
+#~ msgid "Ontological data modeling"
+#~ msgstr "Ontological data modeling"
+
+#~ msgid "Linked with Wikidata, PeriodO, GeoNames & GND"
+#~ msgstr "Linked with Wikidata, PeriodO, GeoNames & GND"
+
+#~ msgid "Machine-readable access via JSON/GeoJSON"
+#~ msgstr "Machine-readable access via JSON/GeoJSON"
+
+#~ msgid "API Endpoint"
+#~ msgstr "API Endpoint"
+
+#~ msgid "Show details"
+#~ msgstr "Show details"
+
+#~ msgid "data overview"
+#~ msgstr "data overview"
+
+#~ msgid "close"
+#~ msgstr "close"
+
+#~ msgid "Open Science"
+#~ msgstr "Open Science"
+
+#~ msgid "FAIR Archaeological Research Repository"
+#~ msgstr "FAIR Archaeological Research Repository"
 

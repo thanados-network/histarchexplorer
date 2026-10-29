@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-22 17:01+0200\n"
+"POT-Creation-Date: 2026-10-29 16:00+0100\n"
 "PO-Revision-Date: 2026-05-22 14:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: cs\n"
@@ -92,7 +92,7 @@ msgstr "Kategorie"
 msgid "file"
 msgstr "Soubor"
 
-#: forms/admin.py:52 templates/tabs/feature.html:100
+#: forms/admin.py:52 templates/about.html:216 templates/tabs/feature.html:100
 #: templates/tabs/overview.html:12 templates/util/cite/modal.html:37
 msgid "License"
 msgstr "Licence"
@@ -123,67 +123,492 @@ msgstr "zobrazit heslo"
 msgid "login"
 msgstr "přihlášení"
 
+#: services/statistics.py:11 templates/search.html:67
+msgid "Place"
+msgstr "Místo"
+
+#: services/statistics.py:17 templates/search.html:75
+msgid "Feature"
+msgstr "Befund"
+
+#: services/statistics.py:23 templates/search.html:71
+msgid "Stratigraphic Unit"
+msgstr "Stratigrafická jednotka"
+
+#: services/statistics.py:29 templates/search.html:27
+msgid "Artifact"
+msgstr "Artefakt"
+
+#: services/statistics.py:35 templates/search.html:31
+msgid "Human Remains"
+msgstr "Lidské pozůstatky"
+
+#: services/statistics.py:41 templates/search.html:17
+msgid "Person"
+msgstr "Osoba"
+
+#: services/statistics.py:47 templates/search.html:21
+msgid "Group"
+msgstr "Skupina"
+
+#: services/statistics.py:53 templates/search.html:37
+msgid "Acquisition"
+msgstr "Akvizice"
+
+#: services/statistics.py:59 templates/search.html:41
+msgid "Event"
+msgstr "Událost"
+
+#: services/statistics.py:65 templates/search.html:45
+msgid "Activity"
+msgstr "Aktivita"
+
+#: services/statistics.py:71 templates/search.html:49
+msgid "Creation"
+msgstr "Vytvoření"
+
+#: services/statistics.py:77 templates/search.html:53
+msgid "Move"
+msgstr "Přesun"
+
+#: services/statistics.py:83 templates/search.html:57
+msgid "Production"
+msgstr "Produkce"
+
+#: services/statistics.py:89 templates/search.html:61
+msgid "Modification"
+msgstr "Úprava"
+
+#: services/statistics.py:95 templates/search.html:81
+msgid "Source"
+msgstr "Zdroj"
+
+#: services/statistics.py:101 templates/search.html:85
+msgid "Bibliography"
+msgstr "Bibliografie"
+
+#: services/statistics.py:107 templates/search.html:89
+msgid "External Reference"
+msgstr "Externí odkaz"
+
+#: services/statistics.py:113 templates/search.html:93
+msgid "Edition"
+msgstr "Edice"
+
+#: services/statistics.py:119 templates/search.html:99
+msgid "File"
+msgstr "Soubor"
+
+#: services/statistics.py:125 templates/admin/cache.html:59
+#: templates/admin/manage_publications.html:47
+#: templates/admin/manage_publications.html:164 templates/publications.html:29
+msgid "Type"
+msgstr "Typ"
+
+#: services/statistics.py:133 templates/about.html:536 templates/index.html:214
+#: templates/search.html:64
+msgid "Places"
+msgstr "Místa"
+
+#: services/statistics.py:134
+msgid "Sites & Cemeteries"
+msgstr "Lokality a pohřebiště"
+
+#: services/statistics.py:136
+msgid ""
+"Archaeological sites, cemeteries, churches, and settlement structures with "
+"coordinates."
+msgstr ""
+"Archeologické lokality, pohřebiště, kostely a sídlištní struktury se "
+"souřadnicemi."
+
+#: services/statistics.py:138
+msgid "Browse places"
+msgstr "Procházet místa"
+
+#: services/statistics.py:143
+msgid "Features"
+msgstr "Kontexty"
+
+#: services/statistics.py:144
+msgid "Features & Structures"
+msgstr "Objekty a struktury"
+
+#: services/statistics.py:146
+msgid ""
+"Grave constructions, burials, anthropological features, and stratigraphic "
+"units."
+msgstr "Hrobové konstrukce, pohřby, antropologické nálezy a stratigrafické jednotky."
+
+#: services/statistics.py:148
+msgid "Browse features"
+msgstr "Procházet objekty"
+
+#: services/statistics.py:153 templates/search.html:24
+msgid "Items"
+msgstr "Předměty"
+
+#: services/statistics.py:154
+msgid "Material Culture"
+msgstr "Materiální kultura"
+
+#: services/statistics.py:156
+msgid ""
+"Archaeological artifacts, jewelry, ceramics, weapons, dress accessories, and"
+" skeletal remains."
+msgstr ""
+"Archeologické artefakty, šperky, keramika, zbraně, součásti oděvu a kosterní"
+" pozůstatky."
+
+#: services/statistics.py:158
+msgid "Browse items"
+msgstr "Procházet předměty"
+
+#: services/statistics.py:163 templates/search.html:14
+msgid "Actors"
+msgstr "Aktéři"
+
+#: services/statistics.py:164
+msgid "Actors & Groups"
+msgstr "Aktéři a skupiny"
+
+#: services/statistics.py:166
+msgid "Historical persons, individuals, institutions, and social groups."
+msgstr "Historické osoby, jednotlivci, instituce a sociální skupiny."
+
+#: services/statistics.py:168
+msgid "Browse actors"
+msgstr "Procházet aktéry"
+
+#: services/statistics.py:173 templates/search.html:34
+msgid "Events"
+msgstr "Události"
+
+#: services/statistics.py:174
+msgid "Events & Activities"
+msgstr "Události a aktivity"
+
+#: services/statistics.py:176
+msgid ""
+"Historical events, archaeological activities, productions, movements, and "
+"acquisitions."
+msgstr "Historické události, archeologické aktivity, produkce, přesuny a akvizice."
+
+#: services/statistics.py:178
+msgid "Browse events"
+msgstr "Procházet události"
+
+#: services/statistics.py:183 templates/search.html:78
+msgid "Sources"
+msgstr "Zdroje"
+
+#: services/statistics.py:184
+msgid "Sources & Literature"
+msgstr "Prameny a literatura"
+
+#: services/statistics.py:186
+msgid ""
+"Specialized bibliography, primary sources, and links to external authority "
+"files."
+msgstr ""
+"Odborná bibliografie, primární prameny a odkazy na externí autoritní "
+"databáze."
+
+#: services/statistics.py:188
+msgid "View sources"
+msgstr "Zobrazit prameny"
+
+#: services/statistics.py:193 templates/search.html:96
+msgid "Files"
+msgstr "Soubory"
+
+#: services/statistics.py:194
+msgid "Media & 3D"
+msgstr "Média a 3D"
+
+#: services/statistics.py:196
+msgid "Digital media assets, photographs, drawings, and 3D models of entities."
+msgstr "Digitální média, fotografie, kresby a 3D modely entit."
+
+#: services/statistics.py:198
+msgid "Browse media"
+msgstr "Procházet média"
+
+#: services/statistics.py:203
+msgid "Types"
+msgstr "Typy"
+
+#: services/statistics.py:204
+msgid "Typology & Vocabulary"
+msgstr "Typologie a slovník"
+
+#: services/statistics.py:206
+msgid ""
+"Controlled vocabularies, typological classifications, and hierarchical "
+"concepts."
+msgstr "Řízené slovníky, typologické klasifikace a hierarchické pojmy."
+
+#: services/statistics.py:208
+msgid "Browse types"
+msgstr "Procházet typy"
+
+#: services/statistics.py:510
+msgid "Explore topic"
+msgstr "Prozkoumat téma"
+
 #: templates/_macros.html:11
 msgid "Back to the entity"
 msgstr "Zpět k entitě"
 
-#: templates/_macros.html:59 templates/about.html:215 templates/entity.html:96
-#: templates/entity.html:116
+#: templates/_macros.html:59 templates/entity.html:95 templates/entity.html:115
 msgid "Loading"
 msgstr "Načítání"
 
-#: templates/about.html:57
-msgid "Show details"
-msgstr "Zobrazit podrobnosti"
+#: templates/about.html:27
+msgid "Project navigation"
+msgstr "Navigace projektů"
 
-#: templates/about.html:66 views/admin.py:78
-msgid "persons"
-msgstr "osoby"
+#: templates/about.html:56
+msgid "Research Network"
+msgstr "Výzkumná síť"
 
-#: templates/about.html:126
-msgid "data overview"
-msgstr "přehled dat"
+#: templates/about.html:58
+msgid "Case Study & Project"
+msgstr "Případová studie a projekt"
 
-#: templates/about.html:128
-msgid "project data overview"
-msgstr "přehled projektových dat"
+#: templates/about.html:84 templates/index.html:74
+msgid "Explore Research Data"
+msgstr "Prozkoumat výzkumná data"
 
-#: templates/about.html:153 views/admin.py:74
-msgid "projects"
-msgstr "projekty"
+#: templates/about.html:88 templates/about.html:283
+msgid "Research Team"
+msgstr "Výzkumný tým"
 
-#: templates/about.html:178
-msgid "Details"
-msgstr "Podrobnosti"
+#: templates/about.html:93 templates/about.html:247 templates/index.html:149
+msgid "Dataset"
+msgstr "Datový soubor"
 
-#: templates/about.html:194 templates/admin/legal_notice.html:2
-#: templates/admin/legal_notice.html:21
-msgid "legal notice"
-msgstr "právní upozornění"
+#: templates/about.html:97
+msgid "Cite Project"
+msgstr "Citovat projekt"
 
-#: templates/about.html:217
-msgid "close"
-msgstr "zavřít"
+#: templates/about.html:127
+msgid "Project Profile"
+msgstr "Profil projektu"
 
-#: templates/about.html:283
+#: templates/about.html:129
+msgid "About the Project"
+msgstr "O projektu"
+
+#: templates/about.html:138
+msgid "Scientific research project within the Histarchexplorer repository."
+msgstr "Vědecký výzkumný projekt v repozitáři Histarchexplorer."
+
+#: templates/about.html:149
+msgid "Key Facts"
+msgstr "Klíčové údaje"
+
+#: templates/about.html:156
+msgid "Acronym"
+msgstr "Zkratka"
+
+#: templates/about.html:166
+msgid "Contributors"
+msgstr "Spolupracovníci"
+
+#: templates/about.html:172
+msgid "Institutions"
+msgstr "Instituce"
+
+#: templates/about.html:180 templates/about.html:725
 msgid "Website"
 msgstr "Webové stránky"
 
-#: templates/about.html:284
+#: templates/about.html:195 templates/about.html:726
 msgid "Email"
 msgstr "E-mail"
 
-#: templates/about.html:287
-msgid "ORCID"
-msgstr "ORCID"
-
-#: templates/about.html:290
+#: templates/about.html:207 templates/about.html:728
 msgid "Address"
 msgstr "Adresa"
 
-#: templates/about.html:299
-msgid "relations"
-msgstr "vztahy"
+#: templates/about.html:251 templates/index.html:150
+msgid "Research in Numbers"
+msgstr "Výzkum v číslech"
+
+#: templates/about.html:253
+msgid "Project Data Overview"
+msgstr "Přehled dat projektu"
+
+#: templates/about.html:285
+msgid "Contributors & Specialists"
+msgstr "Spolupracovníci a specialisté"
+
+#: templates/about.html:297 templates/about.html:298
+msgid "Filter team members..."
+msgstr "Filtrovat členy týmu..."
+
+#: templates/about.html:305
+msgid "Filter by role"
+msgstr "Filtrovat podle role"
+
+#: templates/about.html:309
+msgid "All Roles"
+msgstr "Všechny role"
+
+#: templates/about.html:393
+msgid "Profile"
+msgstr "Profil"
+
+#: templates/about.html:403
+msgid "No team members match the selected filter."
+msgstr "Zvolenému filtru neodpovídají žádní členové týmu."
+
+#: templates/about.html:415
+msgid "Governance & Partners"
+msgstr "Partneři a instituce"
+
+#: templates/about.html:417
+msgid "Participating Institutions & Sponsors"
+msgstr "Zapojené instituce a sponzoři"
+
+#: templates/about.html:481 templates/about.html:652
+msgid "Details"
+msgstr "Podrobnosti"
+
+#: templates/about.html:498 templates/index.html:176
+msgid "Analyses"
+msgstr "Analýzy"
+
+#: templates/about.html:499 templates/index.html:177
+msgid "Scientific Data Distribution"
+msgstr "Rozložení vědeckých dat"
+
+#: templates/about.html:502 templates/index.html:180
+msgid "Interactive Histograms"
+msgstr "Interaktivní histogramy"
+
+#: templates/about.html:512 templates/index.html:190
+msgid "Chronological Distribution"
+msgstr "Chronologické rozložení"
+
+#: templates/about.html:514 templates/index.html:192
+msgid "Dated AD"
+msgstr "Datováno n. l."
+
+#: templates/about.html:517 templates/index.html:195
+msgid ""
+"Distribution of archaeological datings by century (Late Antiquity to Middle "
+"Ages)."
+msgstr ""
+"Rozložení archeologického datování podle století (pozdní antika až "
+"středověk)."
+
+#: templates/about.html:521 templates/index.html:199
+msgid "Dating density"
+msgstr "Hustota datování"
+
+#: templates/about.html:522 templates/index.html:200 utils/view_util.py:17
+msgid "entities"
+msgstr "entity"
+
+#: templates/about.html:532 templates/index.html:210
+msgid "Typological Breakdown"
+msgstr "Typologické členění"
+
+#: templates/about.html:539 templates/index.html:217
+msgid "Finds"
+msgstr "Nálezy"
+
+#: templates/about.html:544 templates/index.html:222
+msgid "Breakdown by the most documented classifications."
+msgstr "Rozdělení podle nejčastěji dokumentovaných klasifikací."
+
+#: templates/about.html:561 templates/index.html:239
+msgid "Geography"
+msgstr "Geografie"
+
+#: templates/about.html:562 templates/index.html:240
+msgid "Spatial Distribution of Sites"
+msgstr "Prostorové rozložení lokalit"
+
+#: templates/about.html:565 templates/index.html:243
+msgid "Full Map View"
+msgstr "Zobrazení celé mapy"
+
+#: templates/about.html:574 templates/about.html:734 templates/index.html:253
+msgid "Loading..."
+msgstr "Načítání..."
+
+#: templates/about.html:576 templates/index.html:255
+msgid "Loading spatial data..."
+msgstr "Načítání prostorových dat..."
+
+#: templates/about.html:585 templates/index.html:262
+msgid "View details"
+msgstr "Zobrazit podrobnosti"
+
+#: templates/about.html:590 templates/index.html:268
+msgid "Activate map"
+msgstr "Aktivovat mapu"
+
+#: templates/about.html:604 templates/index.html:105
+msgid "Research Projects"
+msgstr "Výzkumné projekty"
+
+#: templates/about.html:608 templates/index.html:107
+msgid "Active Case Studies & Corpora"
+msgstr "Aktivní případové studie a korpusy"
+
+#: templates/about.html:610
+msgid "Further Projects in the Network"
+msgstr "Další projekty v síti"
+
+#: templates/about.html:616 templates/admin/projects_content.html:38
+msgid "Main Project"
+msgstr "Hlavní projekt"
+
+#: templates/about.html:641 templates/publications.html:40
+msgid "Project"
+msgstr "Projekt"
+
+#: templates/about.html:673 templates/index.html:338
+#: templates/util/cite/modal.html:12
+msgid "Recommended Citation"
+msgstr "Doporučená citace"
+
+#: templates/about.html:681 templates/index.html:346
+msgid ""
+"Please use the following reference when citing this repository in academic "
+"work:"
+msgstr "Při vědeckém využití tohoto repozitáře prosím uvádějte následující citaci:"
+
+#: templates/about.html:692 templates/index.html:357
+msgid "Copied!"
+msgstr "Zkopírováno!"
+
+#: templates/about.html:693 templates/index.html:358
+msgid "Copy citation"
+msgstr "Kopírovat citaci"
+
+#: templates/about.html:704 templates/admin.html:43
+msgid "Legal Notice"
+msgstr "Právní upozornění"
+
+#: templates/about.html:727
+msgid "ORCID"
+msgstr "ORCID"
+
+#: templates/about.html:729
+msgid "Relations & Roles"
+msgstr "Vztahy a role"
+
+#: templates/about.html:741 templates/admin/partials/modal_add_entry.html:10
+#: templates/admin/partials/modal_delete_confirm.html:7
+#: templates/admin/partials/modal_image_selector.html:9
+#: templates/publications.html:153 templates/util/cite/modal.html:84
+msgid "Close"
+msgstr "Zavřít"
 
 #: templates/admin.html:13
 msgid "admin options"
@@ -247,23 +672,20 @@ msgstr "Publikace"
 msgid "Outcome"
 msgstr "Výsledek"
 
-#: templates/admin.html:43
-msgid "Legal Notice"
-msgstr "Právní upozornění"
-
 #: templates/admin.html:44
 msgid "Footer"
 msgstr "Zápatí"
 
-#: templates/admin.html:45 templates/publications.html:13
-#: templates/search.html:108 templates/search.html:110
+#: templates/admin.html:45 templates/index.html:57 templates/index.html:61
+#: templates/publications.html:13 templates/search.html:108
+#: templates/search.html:110
 msgid "Search"
 msgstr "Hledat"
 
 #: templates/admin.html:46 templates/admin/vocabulary_settings.html:4
 #: utils/view_util.py:59
 msgid "Vocabulary"
-msgstr ""
+msgstr "Slovník"
 
 #: templates/admin.html:47
 msgid "File Management"
@@ -332,280 +754,51 @@ msgstr "Přehled správy souborů"
 
 #: templates/admin.html:279
 msgid "Select a file management section from the sidebar to start editing."
-msgstr ""
-"Chcete-li začít s úpravami, vyberte v postranním panelu sekci správy "
-"souborů."
+msgstr "Chcete-li začít s úpravami, vyberte v postranním panelu sekci správy souborů."
 
 #: templates/admin.html:331
 msgid "maps"
 msgstr "mapy"
 
-#: templates/index.html:26
-msgid "Open Science"
-msgstr ""
+#: templates/index.html:36
+msgid "Scientific research platform for archaeological burial and settlement data."
+msgstr "Vědecká výzkumná platforma pro archeologická pohřební a sídlištní data."
 
-#: templates/index.html:27
-msgid "FAIR Archaeological Research Repository"
-msgstr ""
-
-#: templates/index.html:43
-msgid ""
-"Wissenschaftliche Forschungsplattform für archäologische Bestattungs- und"
-" Siedlungsdaten."
-msgstr ""
+#: templates/index.html:56
+msgid "Search sites, features, finds, or literature..."
+msgstr "Hledat lokality, objekty, nálezy nebo literaturu..."
 
 #: templates/index.html:58
-msgid "Fundorte, Befunde, Funde oder Literatur durchsuchen..."
-msgstr ""
+msgid "Searching..."
+msgstr "Vyhledávání..."
 
 #: templates/index.html:59
-#, fuzzy
-msgid "Suche"
-msgstr "Zdroj"
-
-#: templates/index.html:61
-#, fuzzy
-msgid "Suchen"
-msgstr "Zdroj"
-
-#: templates/index.html:71
-msgid "Forschungsdaten erkunden"
-msgstr ""
-
-#: templates/index.html:74
-msgid "Interaktive Karte"
-msgstr ""
+msgid "No results found"
+msgstr "Nebyly nalezeny žádné výsledky"
 
 #: templates/index.html:77
-msgid "Erweiterte Suche"
-msgstr ""
+msgid "Interactive Map"
+msgstr "Interaktivní mapa"
 
-#: templates/index.html:102
-msgid "Forschungsprojekte"
-msgstr ""
+#: templates/index.html:80
+msgid "Advanced Search"
+msgstr "Pokročilé vyhledávání"
 
-#: templates/index.html:104
-msgid "Aktive Fallstudien & Korpora"
-msgstr ""
+#: templates/index.html:110
+msgid "Show all"
+msgstr "Zobrazit vše"
 
-#: templates/index.html:107
-msgid "Alle anzeigen"
-msgstr ""
+#: templates/index.html:280
+msgid "Systematics"
+msgstr "Systematika"
 
-#: templates/index.html:145
-msgid "Datenbestand"
-msgstr ""
+#: templates/index.html:281
+msgid "Thematic Exploration"
+msgstr "Tematický průzkum"
 
-#: templates/index.html:146
-msgid "Forschung in Zahlen"
-msgstr ""
-
-#: templates/index.html:147
-msgid "Verifizierte wissenschaftliche Entitäten der integrierten Datenbanken."
-msgstr ""
-
-#: templates/index.html:157
-msgid "Fundorte"
-msgstr ""
-
-#: templates/index.html:166
-msgid "Befunde & Gräber"
-msgstr ""
-
-#: templates/index.html:175
-msgid "Fundobjekte"
-msgstr ""
-
-#: templates/index.html:182
-msgid "Anthropologie"
-msgstr ""
-
-#: templates/index.html:189 templates/index.html:385
-msgid "Quellen & Literatur"
-msgstr ""
-
-#: templates/index.html:196
-msgid "Medien & 3D"
-msgstr ""
-
-#: templates/index.html:209
-msgid "Analysen"
-msgstr ""
-
-#: templates/index.html:210
-msgid "Wissenschaftliche Datenverteilung"
-msgstr ""
-
-#: templates/index.html:213
-msgid "Interaktive Histogramme"
-msgstr ""
-
-#: templates/index.html:223
-msgid "Chronologische Verteilung"
-msgstr ""
-
-#: templates/index.html:225
-msgid "Datiert n. Chr."
-msgstr ""
-
-#: templates/index.html:228
-msgid ""
-"Verteilung der archäologischen Datierungen nach Jahrhunderten (Spätantike"
-" bis Mittelalter)."
-msgstr ""
-
-#: templates/index.html:241
-msgid "Typologische Gliederung"
-msgstr ""
-
-#: templates/index.html:245
-#, fuzzy
-msgid "Orte"
-msgstr "jiné"
-
-#: templates/index.html:248
-msgid "Funde"
-msgstr ""
-
-#: templates/index.html:253
-msgid "Aufschlüsselung nach den meistdokumentierten Klassifikationen."
-msgstr ""
-
-#: templates/index.html:270
-msgid "Geographie"
-msgstr ""
-
-#: templates/index.html:271
-msgid "Räumliche Verteilung der Fundplätze"
-msgstr ""
-
-#: templates/index.html:273
-msgid "Interaktive Fundstellenkarte mit ressourcenschonendem Clustering."
-msgstr ""
-
-#: templates/index.html:277
-msgid "Vollständige Kartenansicht"
-msgstr ""
-
-#: templates/index.html:287
-msgid "Laden..."
-msgstr ""
-
-#: templates/index.html:289
-msgid "Lade Geodaten..."
-msgstr ""
-
-#: templates/index.html:301
-msgid "Karte aktivieren"
-msgstr ""
-
-#: templates/index.html:312
-msgid "Systematik"
-msgstr ""
-
-#: templates/index.html:313
-msgid "Thematische Erkundung"
-msgstr ""
-
-#: templates/index.html:314
-msgid "Wählen Sie einen thematischen Zugang zu den Forschungsbeständen."
-msgstr ""
-
-#: templates/index.html:327
-msgid "Fundorte & Gräberfelder"
-msgstr ""
-
-#: templates/index.html:329
-msgid ""
-"Archäologische Fundstellen, Gräberfelder, Kirchen und Siedlungsstrukturen"
-" mit Koordinaten."
-msgstr ""
-
-#: templates/index.html:332
-msgid "Orte durchsuchen"
-msgstr ""
-
-#: templates/index.html:347
-msgid "Befunde & Strukturen"
-msgstr ""
-
-#: templates/index.html:349
-msgid ""
-"Grabkonstruktionen, Bestattungen, anthropologische Befunde und "
-"stratigraphische Einheiten."
-msgstr ""
-
-#: templates/index.html:352
-msgid "Befunde durchsuchen"
-msgstr ""
-
-#: templates/index.html:365
-msgid "Materielle Kultur"
-msgstr ""
-
-#: templates/index.html:367
-msgid ""
-"Archäologische Artefakte, Schmuck, Keramik, Waffen, Trachtbestandteile "
-"und Skelettreste."
-msgstr ""
-
-#: templates/index.html:370
-msgid "Objekte durchsuchen"
-msgstr ""
-
-#: templates/index.html:387
-msgid ""
-"Fachbibliographie, Primärquellen und Verknüpfungen zu externen "
-"Fachnormdaten."
-msgstr ""
-
-#: templates/index.html:390
-msgid "Quellen ansehen"
-msgstr ""
-
-#: templates/index.html:408
-msgid "Zitierempfehlung"
-msgstr ""
-
-#: templates/index.html:416
-msgid ""
-"Bitte zitieren Sie bei wissenschaftlicher Nutzung dieses Repositoriums "
-"folgenden Nachweis:"
-msgstr ""
-
-#: templates/index.html:425
-msgid "Zitation kopieren"
-msgstr ""
-
-#: templates/index.html:435
-msgid "Offene Schnittstellen & Standards"
-msgstr ""
-
-#: templates/index.html:438
-msgid ""
-"Forschungsdaten nach FAIR-Kriterien (Findable, Accessible, Interoperable,"
-" Reusable):"
-msgstr ""
-
-#: templates/index.html:443
-msgid "Ontologische Datenmodellierung"
-msgstr ""
-
-#: templates/index.html:447
-msgid "Verlinkt mit Wikidata, PeriodO, GeoNames & GND"
-msgstr ""
-
-#: templates/index.html:451
-msgid "Maschinenlesbarer Zugriff via JSON/GeoJSON"
-msgstr ""
-
-#: templates/index.html:456
-msgid "Vokabular"
-msgstr ""
-
-#: templates/index.html:461
-msgid "API Endpunkt"
-msgstr ""
+#: templates/index.html:282
+msgid "Choose a thematic entry point to the research collections."
+msgstr "Zvolte tematický přístup k výzkumným sbírkám."
 
 #: templates/login.html:6
 msgid "Login"
@@ -642,21 +835,10 @@ msgstr "hledat"
 msgid "All Years"
 msgstr ""
 
-#: templates/admin/cache.html:59 templates/admin/manage_publications.html:47
-#: templates/admin/manage_publications.html:164 templates/publications.html:29
-#, fuzzy
-msgid "Type"
-msgstr "Typ stránky"
-
 #: templates/publications.html:31
 #, fuzzy
 msgid "All Types"
 msgstr "Typ stránky"
-
-#: templates/publications.html:40
-#, fuzzy
-msgid "Project"
-msgstr "projekty"
 
 #: templates/publications.html:42
 #, fuzzy
@@ -698,13 +880,6 @@ msgstr "publikace"
 msgid "APA Style"
 msgstr "Typ stránky"
 
-#: templates/admin/partials/modal_add_entry.html:10
-#: templates/admin/partials/modal_delete_confirm.html:7
-#: templates/admin/partials/modal_image_selector.html:9
-#: templates/publications.html:153 templates/util/cite/modal.html:84
-msgid "Close"
-msgstr "Zavřít"
-
 #: templates/publications.html:161
 #, fuzzy
 msgid "Linked Projects:"
@@ -717,106 +892,6 @@ msgstr ""
 #: templates/search.html:11
 msgid "Filter by Type"
 msgstr "Filtrovat podle typu"
-
-#: templates/search.html:14
-msgid "Actors"
-msgstr "Aktéři"
-
-#: templates/search.html:17
-msgid "Person"
-msgstr "Osoba"
-
-#: templates/search.html:21
-msgid "Group"
-msgstr "Skupina"
-
-#: templates/search.html:24
-msgid "Items"
-msgstr "Předměty"
-
-#: templates/search.html:27
-msgid "Artifact"
-msgstr "Artefakt"
-
-#: templates/search.html:31
-msgid "Human Remains"
-msgstr "Lidské pozůstatky"
-
-#: templates/search.html:34
-msgid "Events"
-msgstr "Události"
-
-#: templates/search.html:37
-msgid "Acquisition"
-msgstr "Akvizice"
-
-#: templates/search.html:41
-msgid "Event"
-msgstr "Událost"
-
-#: templates/search.html:45
-msgid "Activity"
-msgstr "Aktivita"
-
-#: templates/search.html:49
-msgid "Creation"
-msgstr "Vytvoření"
-
-#: templates/search.html:53
-msgid "Move"
-msgstr "Přesun"
-
-#: templates/search.html:57
-msgid "Production"
-msgstr "Produkce"
-
-#: templates/search.html:61
-msgid "Modification"
-msgstr "Úprava"
-
-#: templates/search.html:64
-msgid "Places"
-msgstr "Místa"
-
-#: templates/search.html:67
-msgid "Place"
-msgstr "Místo"
-
-#: templates/search.html:71
-msgid "Stratigraphic Unit"
-msgstr "Stratigrafická jednotka"
-
-#: templates/search.html:75
-msgid "Feature"
-msgstr "Befund"
-
-#: templates/search.html:78
-msgid "Sources"
-msgstr "Zdroje"
-
-#: templates/search.html:81
-msgid "Source"
-msgstr "Zdroj"
-
-#: templates/search.html:85
-msgid "Bibliography"
-msgstr "Bibliografie"
-
-#: templates/search.html:89
-msgid "External Reference"
-msgstr "Externí odkaz"
-
-#: templates/search.html:93
-msgid "Edition"
-msgstr "Edice"
-
-#: templates/search.html:96
-msgid "Files"
-msgstr "Soubory"
-
-#: templates/search.html:99
-msgid "File"
-msgstr "Soubor"
 
 #: templates/search.html:120
 msgid "Start typing above to see live results or press enter to run a search."
@@ -885,21 +960,20 @@ msgstr "Správa souborů"
 
 #: templates/admin/assets_management.html:5
 msgid ""
-"The assets are general files, which can be used in individual pages. "
-"These can be all data types; some can be displayed, while some can only "
-"be downloaded."
+"The assets are general files, which can be used in individual pages. These "
+"can be all data types; some can be displayed, while some can only be "
+"downloaded."
 msgstr ""
 "Soubory jsou obecné soubory, které lze použít na jednotlivých stránkách. "
-"Mohou to být všechny typy dat; některé lze zobrazit, zatímco jiné lze "
-"pouze stáhnout."
+"Mohou to být všechny typy dat; některé lze zobrazit, zatímco jiné lze pouze "
+"stáhnout."
 
 #: templates/admin/assets_management.html:13
 msgid "Upload New Asset"
 msgstr "Nahrát nový soubor"
 
 #: templates/admin/assets_management.html:21
-#: templates/admin/icon_management.html:21
-#: templates/admin/logo_management.html:21
+#: templates/admin/icon_management.html:21 templates/admin/logo_management.html:21
 #: templates/admin/team_management.html:21
 msgid "Upload"
 msgstr "Nahrát"
@@ -913,33 +987,28 @@ msgid "Existing Assets"
 msgstr "Existující soubory"
 
 #: templates/admin/assets_management.html:60
-#: templates/admin/logo_management.html:52
-#: templates/admin/team_management.html:54 views/admin.py:177
-#: views/admin.py:802 views/admin.py:1775
+#: templates/admin/logo_management.html:52 templates/admin/team_management.html:54
+#: views/admin.py:177 views/admin.py:802 views/admin.py:1775
 msgid "Select License..."
 msgstr "Vybrat licenci..."
 
 #: templates/admin/assets_management.html:69
-#: templates/admin/logo_management.html:61
-#: templates/admin/team_management.html:65
+#: templates/admin/logo_management.html:61 templates/admin/team_management.html:65
 msgid "Attribution (if any)..."
 msgstr "Uvedení autora (pokud existuje)..."
 
 #: templates/admin/assets_management.html:71
-#: templates/admin/logo_management.html:63
-#: templates/admin/team_management.html:68
+#: templates/admin/logo_management.html:63 templates/admin/team_management.html:68
 msgid "Save License"
 msgstr "Uložit licenci"
 
 #: templates/admin/assets_management.html:80
-#: templates/admin/logo_management.html:94
-#: templates/admin/team_management.html:77
+#: templates/admin/logo_management.html:94 templates/admin/team_management.html:77
 msgid "New name..."
 msgstr "Nový název..."
 
 #: templates/admin/assets_management.html:81
-#: templates/admin/logo_management.html:95
-#: templates/admin/team_management.html:78
+#: templates/admin/logo_management.html:95 templates/admin/team_management.html:78
 msgid "Rename"
 msgstr "Přejmenovat"
 
@@ -970,14 +1039,12 @@ msgid "Queued"
 msgstr ""
 
 #: templates/admin/cache.html:2
-#, fuzzy
 msgid "Running"
-msgstr "Varování:"
+msgstr ""
 
 #: templates/admin/cache.html:3
-#, fuzzy
 msgid "Completed"
-msgstr "Potvrdit smazání"
+msgstr ""
 
 #: templates/admin/cache.html:3
 msgid "Completed with errors"
@@ -985,9 +1052,8 @@ msgstr ""
 
 #: templates/admin/cache.html:4 templates/admin/cache.html:95
 #: templates/admin/cache.html:99
-#, fuzzy
 msgid "Failed"
-msgstr "Soubor"
+msgstr ""
 
 #: templates/admin/cache.html:4
 msgid "Interrupted"
@@ -1010,14 +1076,12 @@ msgid "older than 7 days"
 msgstr ""
 
 #: templates/admin/cache.html:25
-#, fuzzy
 msgid "Processed"
-msgstr "Zpřístupněno"
+msgstr ""
 
 #: templates/admin/cache.html:31
-#, fuzzy
 msgid "Started"
-msgstr "Úvodní stránka"
+msgstr ""
 
 #: templates/admin/cache.html:33
 msgid "Finished"
@@ -1028,14 +1092,12 @@ msgid "Recent errors"
 msgstr ""
 
 #: templates/admin/cache.html:55
-#, fuzzy
 msgid "Cache backend"
-msgstr "mezipaměť vymazána"
+msgstr ""
 
 #: templates/admin/cache.html:57
-#, fuzzy
 msgid "cached entries"
-msgstr "entity"
+msgstr ""
 
 #: templates/admin/cache.html:61
 msgid "Size"
@@ -1054,9 +1116,8 @@ msgid "days"
 msgstr ""
 
 #: templates/admin/cache.html:74
-#, fuzzy
 msgid "Entity cache"
-msgstr "zahřát mezipaměť entit"
+msgstr ""
 
 #: templates/admin/cache.html:76
 msgid "entities cached (last warm-up list)"
@@ -1068,23 +1129,20 @@ msgid "Entities are refetched after %(days)s days on access or by the warm-up."
 msgstr ""
 
 #: templates/admin/cache.html:94
-#, fuzzy
 msgid "Entity warm-up"
-msgstr "Typy entit"
+msgstr ""
 
 #: templates/admin/cache.html:95
 msgid "Fetched"
 msgstr ""
 
 #: templates/admin/cache.html:95
-#, fuzzy
 msgid "Already cached"
-msgstr "vymazat mezipaměť"
+msgstr ""
 
 #: templates/admin/cache.html:98
-#, fuzzy
 msgid "Vocabulary cache"
-msgstr "vymazat mezipaměť"
+msgstr ""
 
 #: templates/admin/cache.html:103
 msgid ""
@@ -1117,9 +1175,8 @@ msgid "Refetches entities older than the maximum age and caches new ones."
 msgstr ""
 
 #: templates/admin/cache.html:118
-#, fuzzy
 msgid "refresh outdated entities"
-msgstr "obnovit mezipaměť entit"
+msgstr ""
 
 #: templates/admin/cache.html:121
 msgid "This completely refreshes the cache."
@@ -1185,11 +1242,9 @@ msgstr "Varování:"
 
 #: templates/admin/database.html:18
 msgid ""
-"Restoring a database will overwrite all current data. This action cannot "
-"be undone."
-msgstr ""
-"Obnovení databáze přepíše všechna aktuální data. Tuto akci nelze vzít "
-"zpět."
+"Restoring a database will overwrite all current data. This action cannot be "
+"undone."
+msgstr "Obnovení databáze přepíše všechna aktuální data. Tuto akci nelze vzít zpět."
 
 #: templates/admin/database.html:24
 msgid "Select SQL Dump File"
@@ -1209,8 +1264,8 @@ msgstr "Reset databáze"
 
 #: templates/admin/database.html:39
 msgid ""
-"This will reset the entire database to the initial sample data. All "
-"custom data will be lost!"
+"This will reset the entire database to the initial sample data. All custom "
+"data will be lost!"
 msgstr ""
 "Tímto se celá databáze resetuje na výchozí ukázková data. Všechna "
 "uživatelská data budou ztracena!"
@@ -1281,37 +1336,32 @@ msgstr "přehled dat"
 
 #: templates/admin/external_identifiers.html:92
 #: templates/admin/predefined_filter.html:160
-#: templates/admin/type_divisions.html:21
-#: templates/admin/type_divisions.html:202
+#: templates/admin/type_divisions.html:21 templates/admin/type_divisions.html:202
 msgid "Icon Type"
 msgstr "Typ ikony"
 
 #: templates/admin/external_identifiers.html:105
 #: templates/admin/predefined_filter.html:163
-#: templates/admin/type_divisions.html:34
-#: templates/admin/type_divisions.html:215
+#: templates/admin/type_divisions.html:34 templates/admin/type_divisions.html:215
 msgid "Bootstrap Icon Class"
 msgstr ""
 
 #: templates/admin/external_identifiers.html:116
 #: templates/admin/predefined_filter.html:164
-#: templates/admin/type_divisions.html:45
-#: templates/admin/type_divisions.html:225
+#: templates/admin/type_divisions.html:45 templates/admin/type_divisions.html:225
 #, fuzzy
 msgid "SVG Icon File"
 msgstr "Hodnota ikony"
 
 #: templates/admin/external_identifiers.html:122
 #: templates/admin/predefined_filter.html:171
-#: templates/admin/type_divisions.html:51
-#: templates/admin/type_divisions.html:108
+#: templates/admin/type_divisions.html:51 templates/admin/type_divisions.html:108
 #, fuzzy
 msgid "Select Icon..."
 msgstr "Vybrat licenci..."
 
 #: templates/admin/external_identifiers.html:138
-#: templates/admin/type_divisions.html:67
-#: templates/admin/type_divisions.html:239
+#: templates/admin/type_divisions.html:67 templates/admin/type_divisions.html:239
 msgid "Preview:"
 msgstr ""
 
@@ -1435,9 +1485,7 @@ msgid "choose index background"
 msgstr "vybrat pozadí úvodní stránky"
 
 #: templates/admin/index_page_options.html:32
-msgid ""
-"Select whether to use a map or a static image as the landing page "
-"background."
+msgid "Select whether to use a map or a static image as the landing page background."
 msgstr ""
 
 #: templates/admin/index_page_options.html:44
@@ -1468,6 +1516,10 @@ msgstr "definovat výchozí obrázek pozadí"
 msgid "Select an image from the uploaded assets to be used as background."
 msgstr ""
 
+#: templates/admin/legal_notice.html:2 templates/admin/legal_notice.html:21
+msgid "legal notice"
+msgstr "právní upozornění"
+
 #: templates/admin/license_management.html:3
 msgid "Add New License"
 msgstr "Přidat novou licenci"
@@ -1497,18 +1549,16 @@ msgstr "Jste si jisti?"
 #: templates/admin/logo_management.html:5
 msgid ""
 "The logo section is only for logos and can be used for the footer, site "
-"logo, project logos, and institution logos, as well as for individual "
-"pages."
+"logo, project logos, and institution logos, as well as for individual pages."
 msgstr ""
-"Sekce log je určena pouze pro loga a lze ji použít pro zápatí, logo webu,"
-" loga projektů a loga institucí, stejně jako pro jednotlivé stránky."
+"Sekce log je určena pouze pro loga a lze ji použít pro zápatí, logo webu, "
+"loga projektů a loga institucí, stejně jako pro jednotlivé stránky."
 
 #: templates/admin/logo_management.html:13
 msgid "Upload New Logo"
 msgstr "Nahrát nové logo"
 
-#: templates/admin/logo_management.html:25
-#: templates/admin/team_management.html:25
+#: templates/admin/logo_management.html:25 templates/admin/team_management.html:25
 msgid "Accepted formats: PNG, JPG, SVG, GIF."
 msgstr "Přijímané formáty: PNG, JPG, SVG, GIF."
 
@@ -1682,8 +1732,7 @@ msgid "cancel"
 msgstr "zrušit"
 
 #: templates/admin/maps.html:106 templates/admin/maps.html:116
-#: templates/admin/maps.html:150
-#: templates/admin/partials/modal_add_entry.html:8
+#: templates/admin/maps.html:150 templates/admin/partials/modal_add_entry.html:8
 #: templates/admin/partials/modal_add_entry.html:223
 #: templates/admin/projects_content.html:78
 #: templates/admin/stakeholders_content.html:67
@@ -1714,13 +1763,11 @@ msgstr "Zobrazit"
 msgid "Page Type"
 msgstr "Typ stránky"
 
-#: templates/admin/menu_management.html:36
-#: templates/admin/menu_management.html:72
+#: templates/admin/menu_management.html:36 templates/admin/menu_management.html:72
 msgid "Default"
 msgstr "Výchozí"
 
-#: templates/admin/menu_management.html:45
-#: templates/admin/menu_management.html:81
+#: templates/admin/menu_management.html:45 templates/admin/menu_management.html:81
 msgid "Individual"
 msgstr "Individuální"
 
@@ -1743,9 +1790,8 @@ msgid "Delete this predefined filter?"
 msgstr ""
 
 #: templates/admin/predefined_filter.html:81
-#, fuzzy
 msgid "All tabs"
-msgstr "Typ stránky"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:91
 msgid "Add predefined filter"
@@ -1757,9 +1803,8 @@ msgstr ""
 
 #: templates/admin/predefined_filter.html:109
 #: templates/admin/predefined_filter.html:135
-#, fuzzy
 msgid "Language selector"
-msgstr "Deaktivovat výběr jazyka"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:132
 #, fuzzy
@@ -1767,9 +1812,8 @@ msgid "Description"
 msgstr "popis"
 
 #: templates/admin/predefined_filter.html:167
-#, fuzzy
 msgid "Icon Value"
-msgstr "Typ ikony"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:178
 msgid "Preview"
@@ -1788,14 +1832,12 @@ msgid "Include entities without begin date"
 msgstr ""
 
 #: templates/admin/predefined_filter.html:208
-#, fuzzy
 msgid "End from"
-msgstr "Získáno z"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:213
-#, fuzzy
 msgid "End to"
-msgstr "Edice"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:222
 msgid "Include entities without end date"
@@ -1807,13 +1849,11 @@ msgid "Case studies"
 msgstr "Vyberte hodnotu"
 
 #: templates/admin/predefined_filter.html:230
-#, fuzzy
 msgid "Select case studies"
-msgstr "Vyberte hodnotu"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:249
-#: templates/admin/type_divisions.html:75
-#: templates/admin/type_divisions.html:247
+#: templates/admin/type_divisions.html:75 templates/admin/type_divisions.html:247
 msgid "Type IDs (comma-separated)"
 msgstr ""
 
@@ -1827,9 +1867,8 @@ msgid "Tabs"
 msgstr ""
 
 #: templates/admin/predefined_filter.html:257
-#, fuzzy
 msgid "Select tabs"
-msgstr "vybrat roli"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:261
 msgid "Leave empty to show all tabs."
@@ -1841,9 +1880,8 @@ msgid "Classes"
 msgstr "Sady"
 
 #: templates/admin/predefined_filter.html:265
-#, fuzzy
 msgid "Select classes"
-msgstr "Vyberte hodnotu"
+msgstr ""
 
 #: templates/admin/predefined_filter.html:277
 #, fuzzy
@@ -1854,11 +1892,6 @@ msgstr "uložit"
 #, fuzzy
 msgid "projects section content"
 msgstr "obsah sekce o aplikaci"
-
-#: templates/admin/projects_content.html:38
-#, fuzzy
-msgid "Main Project"
-msgstr "hlavní projekt"
 
 #: templates/admin/stakeholders_content.html:3
 #, fuzzy
@@ -1874,8 +1907,8 @@ msgid ""
 "The team section only includes person photos, which can be used in the "
 "person management and for individual pages."
 msgstr ""
-"Sekce týmu obsahuje pouze fotografie osob, které lze použít při správě "
-"osob a na jednotlivých stránkách."
+"Sekce týmu obsahuje pouze fotografie osob, které lze použít při správě osob "
+"a na jednotlivých stránkách."
 
 #: templates/admin/team_management.html:13
 msgid "Upload New Team Image"
@@ -1893,8 +1926,7 @@ msgstr "Opravdu chcete smazat tento obrázek?"
 msgid "No team images have been uploaded yet."
 msgstr "Dosud nebyly nahrány žádné týmové obrázky."
 
-#: templates/admin/type_divisions.html:11
-#: templates/admin/type_divisions.html:192
+#: templates/admin/type_divisions.html:11 templates/admin/type_divisions.html:192
 #, fuzzy
 msgid "Division Label"
 msgstr "Přidat oddíl"
@@ -1982,14 +2014,14 @@ msgstr ""
 
 #: templates/admin/vocabulary_settings.html:15
 msgid ""
-"Leave empty to use the default title in the widget language. This does "
-"not change the menu label."
+"Leave empty to use the default title in the widget language. This does not "
+"change the menu label."
 msgstr ""
 
 #: templates/admin/vocabulary_settings.html:19
 msgid ""
-"Leave both lists empty to show the entire vocabulary. Use only one filter"
-" list."
+"Leave both lists empty to show the entire vocabulary. Use only one filter "
+"list."
 msgstr ""
 
 #: templates/admin/vocabulary_settings.html:20
@@ -1997,20 +2029,16 @@ msgid "These filters affect only the viewer, not access to the vocabulary API."
 msgstr ""
 
 #: templates/admin/vocabulary_settings.html:26
-#, fuzzy
 msgid "Included Type IDs"
-msgstr "Typ stránky"
+msgstr ""
 
 #: templates/admin/vocabulary_settings.html:29
-msgid ""
-"Comma-separated positive IDs. Include their subtrees and necessary "
-"ancestors."
+msgid "Comma-separated positive IDs. Include their subtrees and necessary ancestors."
 msgstr ""
 
 #: templates/admin/vocabulary_settings.html:41
-#, fuzzy
 msgid "Excluded Type IDs"
-msgstr "Skrytá ID typů"
+msgstr ""
 
 #: templates/admin/vocabulary_settings.html:44
 msgid "Comma-separated positive IDs. Hide these types and all their descendants."
@@ -2098,7 +2126,7 @@ msgstr "Potvrdit smazání"
 msgid "Are you sure you want to delete"
 msgstr "Opravdu chcete smazat"
 
-#: templates/tabs/catalog.html:117
+#: templates/tabs/catalog.html:116
 msgid "Catalogue"
 msgstr ""
 
@@ -2115,7 +2143,12 @@ msgstr "Držitel licence"
 msgid "Show image information"
 msgstr "obecná nastavení"
 
-#: templates/tabs/feature.html:130 templates/tabs/overview.html:15
+#: templates/tabs/feature.html:122 templates/tabs/feature.html:123
+msgid "Open in IIIF viewer"
+msgstr ""
+
+#: templates/tabs/feature.html:139 templates/tabs/feature.html:140
+#: templates/tabs/overview.html:15
 msgid "Open full view"
 msgstr "Otevřít plné zobrazení"
 
@@ -2153,10 +2186,6 @@ msgstr "Zavřít"
 msgid "Cite this Entry"
 msgstr "Citovat tento záznam"
 
-#: templates/util/cite/modal.html:12
-msgid "Recommended Citation"
-msgstr "Doporučená citace"
-
 #: templates/util/cite/modal.html:17
 msgid "Copy to clipboard"
 msgstr "Kopírovat do schránky"
@@ -2176,10 +2205,6 @@ msgstr "Pro tuto entitu nejsou k dispozici žádné konkrétní informace o lice
 #: templates/util/cite/modal.html:54
 msgid "Export Formats (BibTeX, RIS)"
 msgstr "Exportní formáty (BibTeX, RIS)"
-
-#: utils/view_util.py:17
-msgid "entities"
-msgstr "entity"
 
 #: utils/view_util.py:18
 msgid "search"
@@ -2235,9 +2260,21 @@ msgstr "Neznámý"
 msgid "Retrieved from"
 msgstr "Získáno z"
 
+#: views/about.py:121
+msgid "Partner"
+msgstr "Partner"
+
 #: views/admin.py:72
 msgid "main-project"
 msgstr "hlavní projekt"
+
+#: views/admin.py:74
+msgid "projects"
+msgstr "projekty"
+
+#: views/admin.py:78
+msgid "persons"
+msgstr "osoby"
 
 #: views/admin.py:80
 msgid "institutions"
@@ -2347,9 +2384,8 @@ msgid "Use positive, comma-separated IDs in only one filter list."
 msgstr ""
 
 #: views/admin.py:553
-#, fuzzy
 msgid "Vocabulary settings updated successfully."
-msgstr "Nastavení menu bylo úspěšně aktualizováno."
+msgstr ""
 
 #: views/admin.py:556 views/admin.py:577 views/admin.py:694 views/admin.py:1215
 msgid "Error updating settings"
@@ -2493,9 +2529,7 @@ msgstr "Záznam byl úspěšně přidán!"
 #: views/admin.py:1035
 #, python-format
 msgid "Error adding entry %(name)s: Only one main project allowed"
-msgstr ""
-"Chyba při přidávání záznamu %(name)s: Je povolen pouze jeden hlavní "
-"projekt"
+msgstr "Chyba při přidávání záznamu %(name)s: Je povolen pouze jeden hlavní projekt"
 
 #: views/admin.py:1040
 #, python-format
@@ -2578,8 +2612,8 @@ msgstr "ID případové studie bylo úspěšně aktualizováno"
 
 #: views/admin.py:1315
 msgid ""
-"Invalid Case Study ID. Must be a positive integer and its entity type "
-"must be \"type\"."
+"Invalid Case Study ID. Must be a positive integer and its entity type must "
+"be \"type\"."
 msgstr ""
 "Neplatné ID případové studie. Musí to být kladné celé číslo a jeho typ "
 "entity musí být \"Case Study\"."
@@ -2597,9 +2631,8 @@ msgid "cache cleared"
 msgstr "mezipaměť vymazána"
 
 #: views/admin.py:1413
-#, fuzzy
 msgid "Entity cache warm-up started in background."
-msgstr "Zahřívání mezipaměti spuštěno na pozadí."
+msgstr ""
 
 #: views/admin.py:1416
 msgid "An entity cache warm-up is already running."
@@ -2614,9 +2647,8 @@ msgid "system cache refreshed"
 msgstr "systémová mezipaměť obnovena"
 
 #: views/admin.py:1441
-#, fuzzy
 msgid "Vocabulary cache preload started in background."
-msgstr "Zahřívání mezipaměti spuštěno na pozadí."
+msgstr ""
 
 #: views/admin.py:1444
 msgid "Vocabulary cache preload is already running."
@@ -2733,7 +2765,7 @@ msgstr "Nesprávné heslo."
 msgid "User not found."
 msgstr "Uživatel nebyl nalezen."
 
-#: views/views.py:179
+#: views/views.py:189
 #, python-format
 msgid "Failed to clear cache: %(error)s"
 msgstr "Nepodařilo se vymazat mezipaměť: %(error)s"
@@ -2741,24 +2773,21 @@ msgstr "Nepodařilo se vymazat mezipaměť: %(error)s"
 #~ msgid ""
 #~ "The assets are general files, which "
 #~ "can be used in individual pages, "
-#~ "these can bne all datatypes, some "
-#~ "can be displayed some only be "
-#~ "downloaded."
+#~ "these can bne all datatypes, some can"
+#~ " be displayed some only be downloaded."
 #~ msgstr ""
 
 #~ msgid ""
-#~ "The logo sections is only for "
-#~ "logos and can be used for footer,"
-#~ " site logo, project logos and "
-#~ "institution logos, and also for "
-#~ "indiviual pages."
+#~ "The logo sections is only for logos"
+#~ " and can be used for footer, site"
+#~ " logo, project logos and institution "
+#~ "logos, and also for indiviual pages."
 #~ msgstr ""
 
 #~ msgid ""
 #~ "The team section only include person "
-#~ "fotos, which can be used at the"
-#~ " person management and for individual "
-#~ "pages."
+#~ "fotos, which can be used at the "
+#~ "person management and for individual pages."
 #~ msgstr ""
 
 #~ msgid "Save"
@@ -2807,18 +2836,76 @@ msgstr "Nepodařilo se vymazat mezipaměť: %(error)s"
 #~ msgstr "Typ stránky"
 
 #~ msgid ""
-#~ "%(project_name)s (%(year)s). %(title)s. Retrieved"
-#~ " from %(url)s (Accessed: %(date)s)"
+#~ "%(project_name)s (%(year)s). %(title)s. Retrieved "
+#~ "from %(url)s (Accessed: %(date)s)"
 #~ msgstr ""
-#~ "%(project_name)s (%(year)s). %(title)s. Získáno "
-#~ "z %(url)s (Datum přístupu: %(date)s)"
+#~ "%(project_name)s (%(year)s). %(title)s. Získáno z"
+#~ " %(url)s (Datum přístupu: %(date)s)"
 
 #~ msgid "Save Footer Order"
 #~ msgstr "Uložit pořadí zápatí"
 
+#~ msgid "Icon value"
+#~ msgstr "Typ ikony"
+
 #~ msgid "Cache warmup started in background (refresh mode)"
 #~ msgstr "Zahřívání mezipaměti spuštěno na pozadí (režim obnovení)"
 
+#~ msgid "Cache warmup started in background."
+#~ msgstr "Zahřívání mezipaměti spuštěno na pozadí."
+
 #~ msgid "Error warming cache: %(error)s"
 #~ msgstr "Chyba při zahřívání mezipaměti: %(error)s"
+
+#~ msgid "Sites"
+#~ msgstr "Lokality"
+
+#~ msgid "Artifacts"
+#~ msgstr "Artefakty"
+
+#~ msgid "Anthropology"
+#~ msgstr "Antropologie"
+
+#~ msgid "Verified scientific entities from the integrated databases."
+#~ msgstr "Ověřené vědecké entity z integrovaných databází."
+
+#~ msgid "Interactive site map with resource-efficient clustering."
+#~ msgstr "Interaktivní mapa lokalit s efektivním shlukováním."
+
+#~ msgid "Open Interfaces & Standards"
+#~ msgstr "Otevřená rozhraní a standardy"
+
+#~ msgid ""
+#~ "Research data following FAIR principles "
+#~ "(Findable, Accessible, Interoperable, Reusable):"
+#~ msgstr ""
+#~ "Výzkumná data podle principů FAIR "
+#~ "(Findable, Accessible, Interoperable, Reusable):"
+
+#~ msgid "Ontological data modeling"
+#~ msgstr "Ontologické modelování dat"
+
+#~ msgid "Linked with Wikidata, PeriodO, GeoNames & GND"
+#~ msgstr "Propojeno s Wikidata, PeriodO, GeoNames a GND"
+
+#~ msgid "Machine-readable access via JSON/GeoJSON"
+#~ msgstr "Strojově čitelný přístup přes JSON/GeoJSON"
+
+#~ msgid "API Endpoint"
+#~ msgstr "Koncový bod API"
+
+#~ msgid "Show details"
+#~ msgstr "Zobrazit podrobnosti"
+
+#~ msgid "data overview"
+#~ msgstr "přehled dat"
+
+#~ msgid "close"
+#~ msgstr "zavřít"
+
+#~ msgid "Open Science"
+#~ msgstr "Otevřená věda"
+
+#~ msgid "FAIR Archaeological Research Repository"
+#~ msgstr "Archeologický výzkumný repozitář FAIR"
 

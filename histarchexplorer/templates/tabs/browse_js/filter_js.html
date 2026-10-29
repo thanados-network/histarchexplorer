@@ -345,6 +345,9 @@ function findNearestSliderValue(isoString, timeline) {
 
 // Apply a predefined filter preset programmatically
 function applyPreset{{ tab_name }}(preset) {
+    if (!window.{{ tab_name }}TableBuilt) {
+        window.{{ tab_name }}PendingPreset = preset;
+    }
     const fp = preset.filter_parameters || {};
 
     // --- Reset all filters first ---

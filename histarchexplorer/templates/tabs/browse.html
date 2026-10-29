@@ -119,6 +119,49 @@
 
     window.hideBadgeFns = window.hideBadgeFns || {};
     window.hideBadgeFns['{{ tab_name }}'] = hideBadge;
+    window.showBadgeFns = window.showBadgeFns || {};
+    window.showBadgeFns['{{ tab_name }}'] = showBadge;
+
+    function applyPresetSelection(preset) {
+        if (!preset) return;
+        const tabsInPreset = Array.isArray(preset.tabs) && preset.tabs.length > 0
+            ? preset.tabs
+            : tabsToLoad;
+
+        // Apply tab visibility
+        tabsToLoad.forEach(tab => {
+            const isVisible = tabsInPreset.includes(tab);
+            document.querySelectorAll(`.to-remove-${tab}`).forEach(el => {
+                el.classList.toggle('d-none', !isVisible);
+            });
+        });
+
+        // Apply filters on every tab that is part of this preset
+        const fns = window.applyPresetFns || {};
+        tabsInPreset.forEach(tab => {
+            if (typeof fns[tab] === 'function') fns[tab](preset);
+        });
+
+        // If the currently active tab is now hidden, switch to the first
+        // visible tab from the preset
+        const activeLink = document.querySelector('#nav-sidebar .nav-link.active');
+        const activeTab = activeLink
+            ? activeLink.id.replace(/^tab-/, '')
+            : null;
+        if (activeTab && !tabsInPreset.includes(activeTab)) {
+            const firstLink = document.getElementById(`tab-${tabsInPreset[0]}`);
+            if (firstLink) firstLink.click();
+        }
+
+        const showFns = window.showBadgeFns || {};
+        Object.values(showFns).forEach(fn => fn(preset.label));
+    }
+
+    window.activatePresetById = function (presetId) {
+        const preset = predefinedFilters.find(
+            p => String(p.id) === String(presetId));
+        if (preset) applyPresetSelection(preset);
+    };
 
     window.resetAllToInitial = function resetAllToInitial() {
         // Restore all tabs
@@ -167,36 +210,7 @@
         btn.appendChild(label);
 
         btn.addEventListener('click', () => {
-            const tabsInPreset = Array.isArray(preset.tabs) && preset.tabs.length > 0
-                ? preset.tabs
-                : tabsToLoad;
-
-            // Apply tab visibility
-            tabsToLoad.forEach(tab => {
-                const isVisible = tabsInPreset.includes(tab);
-                document.querySelectorAll(`.to-remove-${tab}`).forEach(el => {
-                    el.classList.toggle('d-none', !isVisible);
-                });
-            });
-
-            // Apply filters on every tab that is part of this preset
-            const fns = window.applyPresetFns || {};
-            tabsInPreset.forEach(tab => {
-                if (typeof fns[tab] === 'function') fns[tab](preset);
-            });
-
-            // If the currently active tab is now hidden, switch to the first
-            // visible tab from the preset
-            const activeLink = document.querySelector('#nav-sidebar .nav-link.active');
-            const activeTab = activeLink
-                ? activeLink.id.replace(/^tab-/, '')
-                : null;
-            if (activeTab && !tabsInPreset.includes(activeTab)) {
-                const firstLink = document.getElementById(`tab-${tabsInPreset[0]}`);
-                if (firstLink) firstLink.click();
-            }
-
-            showBadge(preset.label);
+            applyPresetSelection(preset);
         });
 
         li.appendChild(btn);

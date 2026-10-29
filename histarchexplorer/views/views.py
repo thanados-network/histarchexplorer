@@ -13,7 +13,8 @@ from histarchexplorer.database.map import get_map_tilestring
 from histarchexplorer.models.config import ConfigEntity
 from histarchexplorer.services.entity_cache import forget_entity
 from histarchexplorer.services.statistics import (
-    get_landing_sites_geojson, get_landing_statistics)
+    build_dynamic_landing_sections, get_landing_sites_geojson,
+    get_landing_statistics)
 from histarchexplorer.utils.view_util import (get_view_class_count,
                                               render_page_template, slugify)
 
@@ -65,6 +66,9 @@ def index() -> str:
 
     case_study_tuple = tuple(g.case_study_ids)
     landing_stats = get_landing_statistics(case_study_tuple)
+    view_class_count = get_view_class_count()
+    kpi_cards, thematic_cards = build_dynamic_landing_sections(
+        landing_stats, view_class_count)
 
     # Portal citation metadata
     current_year = datetime.datetime.now().year
@@ -87,7 +91,9 @@ def index() -> str:
         'index',
         map=map_,
         map_data=map_data,
-        view_class_count=get_view_class_count(),
+        view_class_count=view_class_count,
+        kpi_cards=kpi_cards,
+        thematic_cards=thematic_cards,
         project_cards=project_cards,
         main_project=main_project,
         landing_stats=landing_stats,
@@ -97,8 +103,12 @@ def index() -> str:
 
 @app.route('/api/landing/sites-geojson')
 def landing_sites_geojson() -> Response:
-    """Return compact clustered sites GeoJSON for the landing page."""
-    case_study_tuple = tuple(g.case_study_ids)
+    """Return compact clustered sites GeoJSON for landing and about pages."""
+    case_study_id = request.args.get('case_study', type=int)
+    if case_study_id and case_study_id > 0:
+        case_study_tuple = (case_study_id,)
+    else:
+        case_study_tuple = tuple(g.case_study_ids)
     data = get_landing_sites_geojson(case_study_tuple)
     return jsonify(data)
 

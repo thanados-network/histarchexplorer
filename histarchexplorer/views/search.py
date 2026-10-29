@@ -22,7 +22,13 @@ def search() -> str:
         query = request.form.get('query', '').strip()
         category = request.form.get('category', 'all').strip()
         system_classes = request.form.getlist('system_class[]')
+    else:
+        query = (
+            request.args.get('q') or request.args.get('query') or '').strip()
+        category = request.args.get('category', 'all').strip()
+        system_classes = request.args.getlist('system_class')
 
+    if query:
         results = search_service.perform_search(
             query,
             category,

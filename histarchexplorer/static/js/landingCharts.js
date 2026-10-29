@@ -37,12 +37,14 @@ function renderChronologyChart(containerId, data) {
   }
 
   const ctx = canvas.getContext('2d');
+  const densityLabel = canvas.getAttribute('data-label-density') || 'Dating density';
+  const entitiesLabel = canvas.getAttribute('data-label-entities') || 'entities';
   chronoChartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: labels,
       datasets: [{
-        label: 'Dating density',
+        label: densityLabel,
         data: counts,
         backgroundColor: colors.primaryColorSoft,
         borderColor: colors.primaryColor,
@@ -64,7 +66,7 @@ function renderChronologyChart(containerId, data) {
           borderWidth: 1,
           padding: 10,
           callbacks: {
-            label: context => ` ${context.parsed.y.toLocaleString()} entities`
+            label: context => ` ${context.parsed.y.toLocaleString()} ${entitiesLabel}`
           }
         }
       },

@@ -215,7 +215,17 @@
     table{{ tab_name }}.on("dataFiltered", update{{ tab_name }}Counter);
     table{{ tab_name }}.on("dataSorted", update{{ tab_name }}Counter);
     table{{ tab_name }}.on("pageLoaded", update{{ tab_name }}Counter);
-    table{{ tab_name }}.on("tableBuilt", update{{ tab_name }}Counter);
+    table{{ tab_name }}.on("tableBuilt", function () {
+        window.{{ tab_name }}TableBuilt = true;
+        if (window.{{ tab_name }}PendingPreset) {
+            const pending = window.{{ tab_name }}PendingPreset;
+            window.{{ tab_name }}PendingPreset = null;
+            if (typeof applyPreset{{ tab_name }} === 'function') {
+                applyPreset{{ tab_name }}(pending);
+            }
+        }
+        update{{ tab_name }}Counter();
+    });
 
     table{{ tab_name }}.on("rowClick", function (e, row) {
         if (e.target.closest('a')) return; // native link handles it

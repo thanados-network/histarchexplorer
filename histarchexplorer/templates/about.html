@@ -1,336 +1,745 @@
 {% extends "layout.html" %}
+
 {% block content %}
-  {% set icons = {
-  'places': 'bi-geo-alt',
-  'features': 'bi-layers',
-  'items': 'bi-box',
-  'events': 'bi-calendar-event',
-  'sources': 'bi-book',
-  'files': 'bi-file-earmark'
-} %}
+  {% macro best_label(obj) -%}
+    {{- obj.display.label if obj and obj.display and obj.display.label else '' -}}
+  {%- endmacro %}
 
-  <div class="page-wrapper">
+  <script>
+    window.landingMapStyle = '{{ map | safe if map else "" }}';
+    window.landingStats = {{ landing_stats | tojson | safe }};
+    window.ENTITY_DATA = {{ config_entities_mapped | tojson | safe }};
+    window.PROJECT_SLUGS = {{ project_slugs | tojson | safe }};
+  </script>
 
-    <div class="about-page">
-      <div class="scrollable-container">
-        <div class="container my-4">
+  <div class="page-wrapper landing-page-wrapper about-page-wrapper">
+    <!-- Hero Section -->
+    <header
+      class="hero-section about-hero-section text-white position-relative
+             {% if map_data and map_data.img_map == 'image' %}hero-with-bg{% endif %}"
+      {% if map_data and map_data.img_map == 'image' and map_data.index_img %}
+      style="background-image: linear-gradient(rgba(15, 23, 42, 0.80),
+             rgba(15, 23, 42, 0.90)), url('{{ map_data.index_img }}');"
+      {% endif %}>
+      <div class="container py-5 position-relative hero-content">
+        <!-- Project Switcher Bar -->
+        {% if all_projects and all_projects | length > 1 %}
+        <nav aria-label="{{ _('Project navigation') }}" class="mb-4 pb-2">
+          <div class="about-project-switcher">
+            {% for p in all_projects %}
+              {% set p_url = url_for('about') if p.main_project
+                 else url_for('about', slug=slugify(p.acronym)) %}
+              <a href="{{ p_url }}"
+                 class="about-project-pill {% if p.id == active.id %}active{% endif %}">
+                <i class="bi {% if p.main_project %}bi-diagram-3{% else %}bi-folder2-open{% endif %}"></i>
+                <span>{{ p.acronym or best_label(p.name) }}</span>
+              </a>
+            {% endfor %}
+          </div>
+        </nav>
+        {% endif %}
 
-          {% macro best_label(obj) %}
-            {{ obj.display.label }}
-          {% endmacro %}
-          <div class="row">
-            <div class="col">
-              <h1 class="h3 about-title">{{ best_label(active.name) }}</h1>
+        <div class="row justify-content-center text-center">
+          <div class="col-lg-10 col-xl-9">
+            {% if active.image %}
+              <div class="mb-4">
+                <div class="about-hero-logo-box">
+                  <img src="{{ active.image }}" alt="{{ best_label(active.name) }}">
+                </div>
+              </div>
+            {% endif %}
 
+            <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 mb-3">
+              <span class="badge bg-primary bg-opacity-25 text-white border border-light
+                           border-opacity-25 rounded-pill px-3 py-2">
+                {% if active.main_project %}
+                  <i class="bi bi-globe2 me-1"></i>{{ _('Research Network') }}
+                {% else %}
+                  <i class="bi bi-journal-bookmark me-1"></i>{{ _('Case Study & Project') }}
+                {% endif %}
+              </span>
+              {% if active.acronym %}
+                <span class="badge bg-light text-dark rounded-pill px-3 py-2 fw-bold">
+                  {{ active.acronym }}
+                </span>
+              {% endif %}
             </div>
-            <div class="col-3 ">
+
+            <h1 class="display-5 fw-bold mb-3 tracking-tight text-white">
+              {{ best_label(active.name) }}
+            </h1>
+
+            <!-- Hero Action CTAs -->
+            <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
               {% if active.website %}
                 <a href="{{ active.website }}"
                    target="_blank"
                    rel="noopener"
-                   class="about-website-pill">
-                  {{ active.website | domain }}
-                  <i class="bi bi-box-arrow-up-right ms-1"></i>
+                   class="btn btn-primary rounded-pill px-4 py-2 fw-semibold">
+                  <i class="bi bi-globe2 me-2"></i>{{ active.website | domain }}
+                  <i class="bi bi-box-arrow-up-right ms-1 small"></i>
                 </a>
               {% endif %}
-            </div>
-
-          </div>
-
-          <div class="row">
-            <div class="col-9">
-              {% if active.image %}
-                <div class="mb-3 p-5">
-                  <img src="{{ active.image }}"
-                       alt="{{ best_label(active.name) }}" class="img-fluid"
-                       style="max-height:140px;">
-                </div>
+              <a href="{{ url_for('entities') }}" class="btn btn-outline-light rounded-pill px-4 py-2">
+                <i class="bi bi-collection me-2"></i>{{ _('Explore Research Data') }}
+              </a>
+              {% if people %}
+                <a href="#team-section" class="btn btn-outline-light rounded-pill px-4 py-2">
+                  <i class="bi bi-people me-2"></i>{{ _('Research Team') }}
+                </a>
               {% endif %}
+              {% if kpi_cards %}
+                <a href="#dataset-section" class="btn btn-outline-light rounded-pill px-4 py-2">
+                  <i class="bi bi-bar-chart-line me-2"></i>{{ _('Dataset') }}
+                </a>
+              {% endif %}
+              <a href="#citation-section" class="btn btn-outline-light rounded-pill px-4 py-2">
+                <i class="bi bi-quote me-2"></i>{{ _('Cite Project') }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Project Overview & Key Facts Section -->
+    <section class="py-5 border-bottom">
+      <div class="container">
+        <div class="row g-4 align-items-start">
+          <!-- Main Description Column -->
+          <div class="col-lg-8">
+            <div class="card border-0 shadow-sm p-4 p-lg-5 about-description-card h-100">
+              <div class="mb-3">
+                <span class="text-primary text-uppercase fw-bold small tracking-wider">
+                  {{ _('Project Profile') }}
+                </span>
+                <h3 class="fw-bold text-body mb-0">{{ _('About the Project') }}</h3>
+              </div>
               {% set desc = best_label(active.description) %}
               {% if desc %}
-                <p>{{ active.description.display.label | safe }}</p>
+                <div class="about-description-content text-body">
+                  {{ active.description.display.label | safe }}
+                </div>
+              {% else %}
+                <p class="text-muted mb-0">
+                  {{ _('Scientific research project within the Histarchexplorer repository.') }}
+                </p>
               {% endif %}
             </div>
-            <button class="btn btn-outline-secondary d-lg-none mb-3"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#aboutSidebar">
-              {{ _('Show details') }}
-            </button>
-            <div class="col-3 about-sidebar collapse show" id="aboutSidebar">
-              {% if active.acronym %}
-                <h5 class="about-section-title">{{ active.acronym }}</h5>
-                <hr class="my-3">
-              {% endif %}
-              {% if people %}
-                <h5
-                    class="about-section-title">{{ _('persons') | capitalize }}</h5>
-                <ul class="list-unstyled">
-                  {% for person in people %}
-                    <li class="about-person"
-                        data-id="{{ person.entity.id }}"
-                        data-type="person"
-                        data-bs-toggle="modal"
-                        data-bs-target="#entityModal">
-                      {# Todo: delete "or True" if placeholder are unwanted #}
-                      {% if person.entity.image or True %}
-                        <img src="{{ person.entity.image
-                        or url_for('static', filename='images/team/cool_chick1.jpg') }}"
-                             class="about-avatar"
-                             alt="{{ best_label(person.entity.name) }}">
-                      {% endif %}
-                      <div>
-                        {{ best_label(person.entity.name) }}
-                        {% if person.roles %}
-                          {% for r in person.roles %}
-                            <div class="text-muted small">{{ r }}</div>
-                          {% endfor %}
-                        {% endif %}
-                      </div>
-                    </li>
-                  {% endfor %}
-                </ul>
-                <hr class="my-3">
-              {% endif %}
+          </div>
 
-              {% if institutions_by_role %}
-                {% for role, institutions in institutions_by_role.items() %}
-                  <h5 class="about-section-title">{{ role | capitalize }}</h5>
-                  <ul class="list-unstyled">
-                    {% for inst in institutions %}
-                      <li class="about-person"
+          <!-- Project Key Facts Sidebar -->
+          <div class="col-lg-4">
+            <div class="card border-0 shadow-sm p-4 about-facts-card">
+              <h5 class="fw-bold text-body mb-3 d-flex align-items-center gap-2">
+                <i class="bi bi-info-circle text-primary"></i>
+                {{ _('Key Facts') }}
+              </h5>
+
+              <div class="d-flex flex-column gap-3">
+                {% if active.acronym %}
+                  <div class="p-3 rounded-3 bg-body-tertiary">
+                    <div class="text-muted small fw-semibold text-uppercase tracking-wider mb-1">
+                      {{ _('Acronym') }}
+                    </div>
+                    <div class="fw-bold text-body fs-6">{{ active.acronym }}</div>
+                  </div>
+                {% endif %}
+
+                <div class="row g-2">
+                  <div class="col-6">
+                    <div class="p-3 rounded-3 bg-body-tertiary text-center h-100">
+                      <div class="fs-4 fw-bold text-primary">{{ people | length }}</div>
+                      <div class="text-muted small">{{ _('Contributors') }}</div>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="p-3 rounded-3 bg-body-tertiary text-center h-100">
+                      <div class="fs-4 fw-bold text-primary">{{ institutions | length }}</div>
+                      <div class="text-muted small">{{ _('Institutions') }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {% if active.website %}
+                  <div class="p-3 rounded-3 bg-body-tertiary">
+                    <div class="text-muted small fw-semibold text-uppercase tracking-wider mb-1">
+                      {{ _('Website') }}
+                    </div>
+                    <a href="{{ active.website }}"
+                       target="_blank"
+                       rel="noopener"
+                       class="fw-medium text-decoration-none text-break d-inline-flex align-items-center gap-1">
+                      {{ active.website | domain }}
+                      <i class="bi bi-box-arrow-up-right small"></i>
+                    </a>
+                  </div>
+                {% endif %}
+
+                {% if active.email %}
+                  <div class="p-3 rounded-3 bg-body-tertiary">
+                    <div class="text-muted small fw-semibold text-uppercase tracking-wider mb-1">
+                      {{ _('Email') }}
+                    </div>
+                    <a href="mailto:{{ active.email }}" class="fw-medium text-decoration-none text-break">
+                      {{ active.email }}
+                    </a>
+                  </div>
+                {% endif %}
+
+                {% set active_addr = best_label(active.address) %}
+                {% if active_addr %}
+                  <div class="p-3 rounded-3 bg-body-tertiary">
+                    <div class="text-muted small fw-semibold text-uppercase tracking-wider mb-1">
+                      {{ _('Address') }}
+                    </div>
+                    <div class="small text-body">{{ active_addr }}</div>
+                  </div>
+                {% endif %}
+
+                {% if license_info %}
+                  <div class="p-3 rounded-3 bg-body-tertiary">
+                    <div class="text-muted small fw-semibold text-uppercase tracking-wider mb-1">
+                      {{ _('License') }}
+                    </div>
+                    {% if license_info.uri %}
+                      <a href="{{ license_info.uri }}"
+                         target="_blank"
+                         rel="noopener"
+                         class="fw-medium text-decoration-none d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-shield-check text-success"></i>
+                        {{ license_info.label or license_info.spdx_id }}
+                        <i class="bi bi-box-arrow-up-right small"></i>
+                      </a>
+                    {% else %}
+                      <span class="fw-medium text-body">
+                        {{ license_info.label or license_info.spdx_id }}
+                      </span>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Research Metrics / KPI Dashboard -->
+    {% if kpi_cards %}
+    <section id="dataset-section" class="py-5 bg-body-tertiary border-bottom">
+      <div class="container">
+        <div class="text-center mb-5">
+          <span class="text-primary text-uppercase fw-bold small tracking-wider">
+            {{ _('Dataset') }}
+          </span>
+          <h2 class="fw-bold text-body">
+            {% if active.main_project %}
+              {{ _('Research in Numbers') }}
+            {% else %}
+              {{ _('Project Data Overview') }}
+            {% endif %}
+          </h2>
+        </div>
+
+        <div class="row g-3 g-md-4 text-center justify-content-center">
+          {% for card in kpi_cards %}
+          <div class="col-6 col-md-4 col-lg-2">
+            <a href="{{ url_for('entities', tab_name=card.tab) }}" class="text-decoration-none">
+              <div class="card h-100 border-0 shadow-sm p-3 kpi-metric-card kpi-metric--{{ card.color_key }}">
+                <div class="kpi-metric__icon mb-2"><i class="bi {{ card.icon }}"></i></div>
+                <h3 class="fw-bold mb-0 text-body vcounter-number"
+                    data-target="{{ card.count }}">{{ card.count }}</h3>
+                <p class="text-muted small mb-0">{{ card.label }}</p>
+              </div>
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Research Team & Contributors Section -->
+    {% if people %}
+    <section id="team-section" class="py-5 border-bottom">
+      <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+          <div>
+            <span class="text-primary text-uppercase fw-bold small tracking-wider">
+              {{ _('Research Team') }}
+            </span>
+            <h3 class="fw-bold mb-0 text-body">{{ _('Contributors & Specialists') }}</h3>
+          </div>
+
+          <!-- Search Input for Team -->
+          <div class="col-12 col-md-4 col-lg-3">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-body-tertiary border-end-0 text-muted">
+                <i class="bi bi-search"></i>
+              </span>
+              <input type="text"
+                     id="teamSearchInput"
+                     class="form-control bg-body-tertiary border-start-0 shadow-none"
+                     placeholder="{{ _('Filter team members...') }}"
+                     aria-label="{{ _('Filter team members...') }}">
+            </div>
+          </div>
+        </div>
+
+        <!-- Role Filter Pills -->
+        {% if team_roles | length > 1 %}
+        <div class="d-flex flex-wrap gap-2 mb-4" role="group" aria-label="{{ _('Filter by role') }}">
+          <button type="button"
+                  class="btn btn-sm btn-outline-primary rounded-pill active team-role-filter-btn"
+                  data-role="all">
+            {{ _('All Roles') }}
+          </button>
+          {% for role in team_roles %}
+            <button type="button"
+                    class="btn btn-sm btn-outline-primary rounded-pill team-role-filter-btn"
+                    data-role="{{ role }}">
+              {{ role }}
+            </button>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+          {% for person in people %}
+            {% set p_name = best_label(person.entity.name) %}
+            {% set p_aff_names = person.affiliations | map(attribute='name') | join(' ') %}
+            <div class="col about-team-col"
+                 data-roles="{{ person.roles | join('|') }}"
+                 data-search="{{ p_name }} {{ person.roles | join(' ') }} {{ p_aff_names }}">
+              <div class="card h-100 border-0 shadow-sm p-4 about-team-card d-flex flex-column">
+                <div class="d-flex align-items-center gap-3 mb-3 about-person-trigger"
+                     data-id="{{ person.entity.id }}"
+                     data-type="person"
+                     data-bs-toggle="modal"
+                     data-bs-target="#entityModal">
+                  {% if person.entity.image %}
+                    <img src="{{ person.entity.image }}"
+                         class="about-avatar"
+                         alt="{{ p_name }}">
+                  {% else %}
+                    <div class="about-avatar-placeholder">
+                      {{ person.initials }}
+                    </div>
+                  {% endif %}
+                  <div class="overflow-hidden">
+                    <h5 class="fw-bold text-body mb-1 text-truncate">{{ p_name }}</h5>
+                    {% if person.affiliations %}
+                      <div class="d-flex flex-wrap gap-1">
+                        {% for aff in person.affiliations %}
+                          <span class="badge bg-secondary-subtle text-secondary rounded-pill small"
+                                title="{{ aff.name }}">
+                            <i class="bi bi-building me-1"></i>{{ aff.acronym }}
+                          </span>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                {% if person.roles %}
+                  <div class="d-flex flex-wrap gap-1 mb-3">
+                    {% for r in person.roles %}
+                      <span class="badge bg-primary-subtle text-primary rounded-pill">{{ r }}</span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+
+                <div class="mt-auto pt-2 border-top d-flex flex-wrap justify-content-between align-items-center gap-2">
+                  <div class="d-flex flex-wrap align-items-center gap-2">
+                    {% if person.entity.orcid_id %}
+                      {% set clean_orcid = person.entity.orcid_id | trim | replace(' ', '') %}
+                      <a href="https://orcid.org/{{ clean_orcid }}"
+                         target="_blank"
+                         rel="noopener"
+                         class="badge rounded-pill px-2 py-1 about-orcid-pill"
+                         title="ORCID: {{ clean_orcid }}">
+                        <i class="bi bi-person-badge me-1"></i>ORCID
+                      </a>
+                    {% endif %}
+                    {% if person.entity.email %}
+                      <a href="mailto:{{ person.entity.email }}"
+                         class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2"
+                         title="{{ person.entity.email }}">
+                        <i class="bi bi-envelope"></i>
+                      </a>
+                    {% endif %}
+                  </div>
+
+                  <button type="button"
+                          class="btn btn-sm btn-link text-decoration-none p-0 fw-semibold"
+                          data-id="{{ person.entity.id }}"
+                          data-type="person"
+                          data-bs-toggle="modal"
+                          data-bs-target="#entityModal">
+                    {{ _('Profile') }} <i class="bi bi-arrow-right ms-1"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div id="teamFilterEmpty" class="text-center py-4 text-muted d-none">
+          <i class="bi bi-search fs-4 d-block mb-2"></i>
+          {{ _('No team members match the selected filter.') }}
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Partner Institutions & Sponsors Section -->
+    {% if institutions %}
+    <section id="institutions-section" class="py-5 bg-body-tertiary border-bottom">
+      <div class="container">
+        <div class="mb-4">
+          <span class="text-primary text-uppercase fw-bold small tracking-wider">
+            {{ _('Governance & Partners') }}
+          </span>
+          <h3 class="fw-bold mb-0 text-body">{{ _('Participating Institutions & Sponsors') }}</h3>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+          {% for inst_item in institutions %}
+            {% set inst = inst_item.entity %}
+            {% set inst_name = best_label(inst.name) %}
+            <div class="col">
+              <div class="card h-100 border-0 shadow-sm p-4 about-institution-card d-flex flex-column">
+                <div class="mb-3 about-person-trigger"
+                     data-id="{{ inst.id }}"
+                     data-type="institution"
+                     data-bs-toggle="modal"
+                     data-bs-target="#entityModal">
+                  {% if inst.image %}
+                    <div class="about-institution-logo-wrap">
+                      <img src="{{ inst.image }}" alt="{{ inst_name }}">
+                    </div>
+                  {% else %}
+                    <div class="about-institution-placeholder">
+                      {{ inst.acronym or inst_name[:3] }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="d-flex flex-wrap gap-1 mb-2">
+                  {% if inst.acronym %}
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill">
+                      {{ inst.acronym }}
+                    </span>
+                  {% endif %}
+                  {% for r in inst_item.roles %}
+                    <span class="badge bg-primary-subtle text-primary rounded-pill">{{ r }}</span>
+                  {% endfor %}
+                </div>
+
+                <h5 class="fw-bold text-body fs-6 mb-3 about-person-trigger"
+                    data-id="{{ inst.id }}"
+                    data-type="institution"
+                    data-bs-toggle="modal"
+                    data-bs-target="#entityModal">
+                  {{ inst_name }}
+                </h5>
+
+                <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
+                  {% if inst.website %}
+                    <a href="{{ inst.website }}"
+                       target="_blank"
+                       rel="noopener"
+                       class="small text-muted text-decoration-none d-inline-flex align-items-center gap-1">
+                      <i class="bi bi-globe2"></i>
+                      {{ inst.website | domain }}
+                      <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                  {% else %}
+                    <span></span>
+                  {% endif %}
+
+                  <button type="button"
+                          class="btn btn-sm btn-link text-decoration-none p-0 fw-semibold"
                           data-id="{{ inst.id }}"
                           data-type="institution"
                           data-bs-toggle="modal"
                           data-bs-target="#entityModal">
+                    {{ _('Details') }} <i class="bi bi-arrow-right ms-1"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
 
-                        {% if inst.image %}
-                          <img src="{{ inst.image }}"
-                               class="about-avatar"
-                               alt="{{ best_label(inst.name) }}">
-                        {% endif %}
-                        {{ best_label(inst.name) }}
-                      </li>
-                    {% endfor %}
-                  </ul>
-                {% endfor %}
-                <hr class="my-3">
-              {% endif %}
+    <!-- Scientific Charts Section (Chronology & Typology for Active Project) -->
+    {% if landing_stats and (landing_stats.chronology or landing_stats.site_types) %}
+    <section id="analytics-section" class="py-5 border-bottom">
+      <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+          <div>
+            <span class="text-primary text-uppercase fw-bold small tracking-wider">{{ _('Analyses') }}</span>
+            <h3 class="fw-bold mb-0 text-body">{{ _('Scientific Data Distribution') }}</h3>
+          </div>
+          <div class="text-muted small">
+            <i class="bi bi-bar-chart-line me-1"></i>{{ _('Interactive Histograms') }}
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <!-- Chronology Chart -->
+          <div class="col-lg-7">
+            <div class="card h-100 border-0 shadow-sm p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0 text-body">
+                  <i class="bi bi-calendar-range text-primary me-2"></i>{{ _('Chronological Distribution') }}
+                </h5>
+                <span class="badge bg-secondary-subtle text-secondary">{{ _('Dated AD') }}</span>
+              </div>
+              <p class="text-muted small mb-3">
+                {{ _('Distribution of archaeological datings by century (Late Antiquity to Middle Ages).') }}
+              </p>
+              <div class="chart-container position-relative" style="height: 280px;">
+                <canvas id="chronoChartCanvas"
+                        data-label-density="{{ _('Dating density') }}"
+                        data-label-entities="{{ _('entities') }}"></canvas>
+              </div>
             </div>
           </div>
 
-          {# todo: link with entities browse #}
-          {% if view_class_count %}
-            <hr class="my-5 border-top">
-            <h4 class="mb-4 text-center">
-              {% if active.class_id == 5 %}
-                {{ _('data overview') | capitalize }}
-              {% else %}
-                {{ _('project data overview') | capitalize }}
-              {% endif %}
-            </h4>
-            <div class="row text-center g-4">
-              {% for key, data in view_class_count.items() %}
-                <div class="col-6 col-md-4 col-lg-2">
-                  <div class="vcounter-item">
-                    <div class="vcounter-icon mb-2">
-                      <i class="bi {{ icons.get(key, 'bi-archive') }}"></i>
-                    </div>
-                    <div class="vcounter-number"
-                         data-target="{{ data.count }}">0
-                    </div>
-                    <div class="vcounter-label text-uppercase small mt-1">
-                      {{ _(key) | upper }}
-                    </div>
-                  </div>
+          <!-- Typology Chart -->
+          <div class="col-lg-5">
+            <div class="card h-100 border-0 shadow-sm p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0 text-body">
+                  <i class="bi bi-pie-chart text-primary me-2"></i>{{ _('Typological Breakdown') }}
+                </h5>
+                <div class="btn-group btn-group-sm" role="group">
+                  <button type="button" id="btnShowSiteTypes" class="btn btn-outline-secondary active">
+                    {{ _('Places') }}
+                  </button>
+                  <button type="button" id="btnShowArtifactTypes" class="btn btn-outline-secondary">
+                    {{ _('Finds') }}
+                  </button>
                 </div>
-              {% endfor %}
-            </div>
-          {% endif %}
-
-
-          {% if sub_projects and active.class_id == 5 %}
-            <hr class="my-5">
-            <h4 class="mb-3">{{ _('projects') | capitalize }}</h4>
-
-            <div class="row g-3">
-              {% for p in sub_projects %}
-                <div class="col-md-6 col-xl-4">
-                  <a href="{{ url_for('about', slug=slugify(p.acronym)) }}"
-                     class="text-decoration-none text-dark">
-                    <div class="about-project-card">
-                      {% if p.image %}
-                        <div class="about-project-img-wrapper">
-                          <img src="{{ p.image }}"
-                               class="about-project-img"
-                               alt="{{ best_label(p.name) }} logo">
-                        </div>
-                      {% endif %}
-
-                      <div class="about-project-body pt-2">
-                        <h5
-                            class="about-project-title">{{ best_label(p.name) }}</h5>
-                        {% if p.description %}
-                          <p
-                              class="about-project-text">{{ p.description.display.label | safe |truncate(180) }}</p>
-                        {% endif %}
-                      </div>
-                      <div class="about-project-footer">
-                        {{ _('Details') }} →
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
-          <div class="row">
-            {% if settings.legal_notice.get(current_language) %}
-              <hr class="my-5">
-              <div class="row g-3">
-                {% if settings.legal_notice.get(current_language) %}
-                  <div class="col-12">
-                    <div class="about-imprint-card h-100">
-                      <div class="about-project-body">
-                        <h5 class="about-project-title mb-3">{{ _('legal notice') | capitalize }}</h5>
-                        <div class="about-project-text">
-                          {{ settings.legal_notice[current_language] | safe }}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                {% endif %}
               </div>
-            {% endif %}
+              <p class="text-muted small mb-3">
+                {{ _('Breakdown by the most documented classifications.') }}
+              </p>
+              <div class="chart-container position-relative" style="height: 280px;">
+                <canvas id="typologyChartCanvas"></canvas>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
+    {% endif %}
+
+    <!-- Clustered Spatial Section (Lazy-Loaded Project Map) -->
+    <section id="spatial-section" class="py-5 bg-body-tertiary border-bottom">
+      <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+          <div>
+            <span class="text-primary text-uppercase fw-bold small tracking-wider">{{ _('Geography') }}</span>
+            <h3 class="fw-bold mb-0 text-body">{{ _('Spatial Distribution of Sites') }}</h3>
+          </div>
+          <a href="{{ url_for('entities', tab_name='places') }}" class="btn btn-sm btn-outline-primary rounded-pill">
+            <i class="bi bi-arrows-fullscreen me-1"></i>{{ _('Full Map View') }}
+          </a>
+        </div>
+
+        <div class="card border-0 shadow-sm overflow-hidden position-relative landing-map-card">
+          <div
+            id="map-loading-indicator"
+            class="position-absolute top-50 start-50 translate-middle text-center d-none z-3">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">{{ _('Loading...') }}</span>
+            </div>
+            <p class="small text-muted mt-2 fw-medium">{{ _('Loading spatial data...') }}</p>
+          </div>
+
+          {% set geojson_endpoint = url_for('landing_sites_geojson', case_study=active.case_study)
+             if active.case_study else url_for('landing_sites_geojson') %}
+          <div
+            id="landing-cluster-map"
+            class="w-100 {% if map_data and map_data.greyscale %}map-gray{% endif %}"
+            data-geojson-url="{{ geojson_endpoint }}"
+            data-label-view-details="{{ _('View details') }}"
+            style="height: 440px;"></div>
+
+          <div class="position-absolute bottom-0 start-0 m-3 z-2">
+            <button id="btnActivateMap" type="button" class="btn btn-sm btn-light shadow-sm rounded-pill d-none">
+              <i class="bi bi-geo-alt-fill text-primary me-1"></i>{{ _('Activate map') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Case Studies / Sub-Projects Showcase -->
+    {% if sub_projects %}
+    <section class="py-5 border-bottom">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <span class="text-primary text-uppercase fw-bold small tracking-wider">
+              {{ _('Research Projects') }}
+            </span>
+            <h3 class="fw-bold mb-0 text-body">
+              {% if active.main_project %}
+                {{ _('Active Case Studies & Corpora') }}
+              {% else %}
+                {{ _('Further Projects in the Network') }}
+              {% endif %}
+            </h3>
+          </div>
+          {% if not active.main_project %}
+            <a href="{{ url_for('about') }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+              <i class="bi bi-arrow-left me-1"></i>{{ _('Main Project') }}
+            </a>
+          {% endif %}
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+          {% for p in sub_projects %}
+            {% set p_url = url_for('about') if p.main_project
+               else url_for('about', slug=slugify(p.acronym)) %}
+            {% set p_name = best_label(p.name) %}
+            <div class="col">
+              <a href="{{ p_url }}" class="text-decoration-none">
+                <div class="card h-100 shadow-sm border-0 project-highlight-card d-flex flex-column">
+                  {% if p.image %}
+                    <div class="card-img-top-wrapper">
+                      <img src="{{ p.image }}" class="card-img-top" alt="{{ p_name }}">
+                    </div>
+                  {% else %}
+                    <div class="card-img-placeholder d-flex align-items-center justify-content-center fw-bold">
+                      {{ p.acronym or p_name[:3] }}
+                    </div>
+                  {% endif %}
+                  <div class="card-body d-flex flex-column">
+                    <div class="mb-2">
+                      <span class="badge bg-primary-subtle text-primary">
+                        {{ p.acronym or _('Project') }}
+                      </span>
+                    </div>
+                    <h5 class="card-title text-body fw-bold fs-6">{{ p_name }}</h5>
+                    {% set p_desc = best_label(p.description) %}
+                    {% if p_desc %}
+                      <p class="card-text text-muted small mb-3">
+                        {{ p_desc | striptags | truncate(120) }}
+                      </p>
+                    {% endif %}
+                    <div class="mt-auto pt-2 text-primary small fw-semibold">
+                      {{ _('Details') }} <i class="bi bi-arrow-right ms-1"></i>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- Citation & Legal Notice Section -->
+    <section id="citation-section" class="py-5">
+      <div class="container">
+        <div class="row g-4 justify-content-center">
+          <!-- Citation Module -->
+          <div class="{% if settings.legal_notice.get(current_language) %}col-lg-6{% else %}col-lg-8{% endif %}">
+            <div class="card h-100 border-0 shadow-sm p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0 text-body">
+                  <i class="bi bi-quote text-primary me-2"></i>{{ _('Recommended Citation') }}
+                </h5>
+                <div class="btn-group btn-group-sm" role="group">
+                  <button type="button" id="tabCitationApa" class="btn btn-outline-secondary active">APA</button>
+                  <button type="button" id="tabCitationBibtex" class="btn btn-outline-secondary">BibTeX</button>
+                </div>
+              </div>
+              <p class="text-muted small mb-3">
+                {{ _('Please use the following reference when citing this repository in academic work:') }}
+              </p>
+              <div class="bg-body-secondary p-3 rounded-3 font-monospace small mb-3 overflow-auto"
+                   id="citationContent"
+                   data-apa="{{ citation_apa }}"
+                   data-bibtex="{{ citation_bibtex }}"
+                   style="max-height: 140px; white-space: pre-wrap;">{{ citation_apa }}</div>
+              <div class="d-flex justify-content-end mt-auto">
+                <button type="button"
+                        id="btnCopyCitation"
+                        class="btn btn-sm btn-outline-primary rounded-pill"
+                        data-label-copied="{{ _('Copied!') }}">
+                  <i class="bi bi-clipboard me-1"></i>{{ _('Copy citation') }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Legal Notice / Imprint Card -->
+          {% if settings.legal_notice.get(current_language) %}
+          <div id="imprint-section" class="col-lg-6">
+            <div class="card h-100 border-0 shadow-sm p-4 about-imprint-card">
+              <h5 class="fw-bold mb-3 text-body">
+                <i class="bi bi-shield-lock text-primary me-2"></i>{{ _('Legal Notice') }}
+              </h5>
+              <div class="small text-muted overflow-auto" style="max-height: 240px;">
+                {{ settings.legal_notice[current_language] | safe }}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer inside scrollable page-wrapper -->
+    {% include 'footer.html' %}
   </div>
 
   <!-- Shared Entity Modal -->
-  <div class="modal fade" id="entityModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="entityModalLabel">{{ _('Loading') }}...</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"
-                  aria-label="{{ _('close') | capitalize }}"></button>
+  <div class="modal fade"
+       id="entityModal"
+       tabindex="-1"
+       aria-hidden="true"
+       data-label-website="{{ _('Website') }}"
+       data-label-email="{{ _('Email') }}"
+       data-label-orcid="{{ _('ORCID') }}"
+       data-label-address="{{ _('Address') }}"
+       data-label-relations="{{ _('Relations & Roles') }}">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-bottom-0 pb-0 px-4 pt-4">
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <h5 class="modal-title fw-bold mb-0" id="entityModalLabel">{{ _('Loading...') }}</h5>
+            <span id="entityModalBadge"
+                  class="badge bg-primary-subtle text-primary rounded-pill d-none"></span>
+          </div>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="{{ _('Close') }}"></button>
         </div>
 
-        <div class="modal-body">
-
+        <div class="modal-body px-4 pb-4 pt-3">
           <div id="entityModalImage" class="text-center mb-3"></div>
-
-          <p id="entityModalDescription"></p>
-
+          <div id="entityModalDescription" class="text-body mb-3"></div>
           <div id="entityModalMeta"></div>
-
           <div id="entityModalLinks"></div>
-
         </div>
       </div>
     </div>
   </div>
-  <script>
-    const ENTITY_DATA = {{ config_entities_mapped | tojson }};
-  </script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
 
-      function bestLabel(obj) {
-        if (!obj) return "";
-
-        if (obj.display && typeof obj.display.label === "string") {
-          return obj.display.label;
-        }
-
-        for (const [k, v] of Object.entries(obj)) {
-          if (typeof v === "string") {
-            return v;
-          }
-        }
-
-        return "";
-      }
-
-      const modalLabel = document.getElementById("entityModalLabel");
-      const modalImage = document.getElementById("entityModalImage");
-      const modalDescription = document.getElementById("entityModalDescription");
-      const modalMeta = document.getElementById("entityModalMeta");
-      const modalLinks = document.getElementById("entityModalLinks");
-
-      document.querySelectorAll("[data-bs-target='#entityModal']").forEach(el => {
-        el.addEventListener("click", function () {
-
-          const id = this.dataset.id;
-          const entity = ENTITY_DATA[id];
-
-          modalLabel.textContent = bestLabel(entity.name);
-
-          // Image
-          if (entity.image) {
-            modalImage.innerHTML = `<img src="${entity.image}" class="img-fluid" style="max-height:200px;">`;
-          } else {
-            modalImage.innerHTML = "";
-          }
-
-          // Description
-          const desc = entity.description?.display?.label || "";
-          modalDescription.innerHTML = desc;
-
-          // Meta fields (website, email, address, ORCID…)
-          let metaHtml = "<ul class='list-unstyled'>";
-          if (entity.website) metaHtml += `<li><strong>{{ _('Website') }}:</strong> <a href="${entity.website}" target="_blank">${entity.website}</a></li>`;
-          if (entity.email) metaHtml += `<li><strong>{{ _('Email') }}:</strong> <a href="mailto:${entity.email}">${entity.email}</a></li>`;
-          if (entity.orcid_id) {
-            const cleanOrcid = entity.orcid_id.trim().replace(/\s/g, '');
-            metaHtml += `<li><strong>{{ _('ORCID') }}:</strong> <a href="https://orcid.org/${cleanOrcid}" target="_blank">${entity.orcid_id}</a></li>`;
-          }
-          if (entity.address && entity.address.display && entity.address.display.label) {
-            metaHtml += `<li><strong>{{ _('Address') }}:</strong> ${entity.address.display.label.replace(/\n/g, '<br>')}</li>`;
-          }
-          metaHtml += "</ul>";
-
-          modalMeta.innerHTML = metaHtml;
-
-          // Links (roles / affiliations)
-          let linkHtml = "";
-          if (entity.links && entity.links.length) {
-            linkHtml = "<hr><h6>{{ _('relations') | capitalize }}</h6><ul>";
-            entity.links.forEach(l => {
-              const role = l.role?.display?.label || "";
-              const endName = bestLabel(l.end_name);
-              linkHtml += `<li>${role ? role + " – " : ""}${endName}</li>`;
-            });
-            linkHtml += "</ul>";
-          }
-
-          modalLinks.innerHTML = linkHtml;
-        });
-      });
-    });
-  </script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const counters = document.querySelectorAll(".vcounter-number");
-
-      counters.forEach(counter => {
-        const target = +counter.dataset.target;
-        const duration = 800;
-        const steps = 200;
-        const increment = target / steps;
-        let current = 0;
-
-        const tick = setInterval(() => {
-          current += increment;
-          if (current >= target) {
-            current = target;
-            clearInterval(tick);
-          }
-          counter.textContent = Math.floor(current);
-        }, duration / steps);
-      });
-    });
-  </script>
+  <!-- External JS modules -->
+  <script src="{{ url_for('static', filename='js/landingCharts.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/about.js') }}"></script>
 {% endblock %}

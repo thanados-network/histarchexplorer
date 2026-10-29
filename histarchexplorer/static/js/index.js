@@ -34,7 +34,8 @@ async function initializeClusteredMap(mapElementId, styleUrl) {
 
     landingMap.on('load', async () => {
       try {
-        const response = await fetch('/api/landing/sites-geojson');
+        const geojsonUrl = mapContainer.getAttribute('data-geojson-url') || '/api/landing/sites-geojson';
+        const response = await fetch(geojsonUrl);
         if (!response.ok) {
           throw new Error(`Failed to load sites: ${response.statusText}`);
         }
@@ -127,6 +128,7 @@ async function initializeClusteredMap(mapElementId, styleUrl) {
         landingMap.on('click', 'unclustered-point', e => {
           const coordinates = e.features[0].geometry.coordinates.slice();
           const { id, name, dating } = e.features[0].properties;
+          const detailsLabel = mapContainer.getAttribute('data-label-view-details') || 'View details';
 
           while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
@@ -137,7 +139,7 @@ async function initializeClusteredMap(mapElementId, styleUrl) {
               <h6 class="fw-bold mb-1 text-dark">${name}</h6>
               ${dating ? `<p class="small text-muted mb-2"><i class="bi bi-clock me-1"></i>${dating}</p>` : ''}
               <a href="/entity/${id}" class="btn btn-sm btn-outline-success w-100">
-                <i class="bi bi-arrow-right-circle me-1"></i>Details ansehen
+                <i class="bi bi-arrow-right-circle me-1"></i>${detailsLabel}
               </a>
             </div>
           `;
@@ -148,11 +150,19 @@ async function initializeClusteredMap(mapElementId, styleUrl) {
             .addTo(landingMap);
         });
 
-        // Mouse hover cursor
-        landingMap.on('mouseenter', 'clusters', () => { landingMap.getCanvas().style.cursor = 'pointer'; });
-        landingMap.on('mouseleave', 'clusters', () => { landingMap.getCanvas().style.cursor = ''; });
-        landingMap.on('mouseenter', 'unclustered-point', () => { landingMap.getCanvas().style.cursor = 'pointer'; });
-        landingMap.on('mouseleave', 'unclustered-point', () => { landingMap.getCanvas().style.cursor = ''; });
+    // Mouse hover cursor
+        landingMap.on('mouseenter', 'clusters', () => {
+          landingMap.getCanvas().classList.add('cursor-pointer');
+        });
+        landingMap.on('mouseleave', 'clusters', () => {
+          landingMap.getCanvas().classList.remove('cursor-pointer');
+        });
+        landingMap.on('mouseenter', 'unclustered-point', () => {
+          landingMap.getCanvas().classList.add('cursor-pointer');
+        });
+        landingMap.on('mouseleave', 'unclustered-point', () => {
+          landingMap.getCanvas().classList.remove('cursor-pointer');
+        });
 
         // Adjust bounds if features exist
         if (geojson.features && geojson.features.length > 0) {
@@ -220,7 +230,8 @@ function setupCitationCopy() {
     try {
       await navigator.clipboard.writeText(citationText.textContent.trim());
       const originalText = copyBtn.innerHTML;
-      copyBtn.innerHTML = '<i class="bi bi-check2 me-1"></i>Kopiert!';
+      const copiedLabel = copyBtn.getAttribute('data-label-copied') || 'Copied!';
+      copyBtn.innerHTML = `<i class="bi bi-check2 me-1"></i>${copiedLabel}`;
       copyBtn.classList.remove('btn-outline-primary');
       copyBtn.classList.add('btn-success');
       setTimeout(() => {
@@ -249,10 +260,189 @@ function setupCitationCopy() {
   }
 }
 
+/**
+ * Clean OpenAtlas description strings for compact preview display.
+ */
+function cleanSearchDescription(rawDesc) {
+  if (!rawDesc || typeof rawDesc !== 'string') return '';
+  const withoutMarkers = rawDesc
+    .replace(/##[a-z]{2}_##/gi, '')
+    .replace(/##_[a-z]{2}##/gi, '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (withoutMarkers.length <= 120) return withoutMarkers;
+  return `${withoutMarkers.slice(0, 120)}…`;
+}
+
+/**
+ * Render status message (loading / empty / error) inside the search dropdown.
+ */
+function renderSearchStatus(dropdown, message, isSpinner = false) {
+  dropdown.textContent = '';
+  const wrapper = document.createElement('div');
+  wrapper.className = 'p-3 text-muted small d-flex align-items-center gap-2';
+  if (isSpinner) {
+    const spinner = document.createElement('span');
+    spinner.className = 'spinner-border spinner-border-sm text-primary';
+    spinner.setAttribute('role', 'status');
+    wrapper.appendChild(spinner);
+  }
+  const textSpan = document.createElement('span');
+  textSpan.textContent = message;
+  wrapper.appendChild(textSpan);
+  dropdown.appendChild(wrapper);
+  dropdown.classList.remove('d-none');
+}
+
+/**
+ * Render search result items into the hero dropdown using DocumentFragment.
+ */
+function renderSearchResults(dropdown, results) {
+  dropdown.textContent = '';
+  const fragment = document.createDocumentFragment();
+
+  results.slice(0, 20).forEach(item => {
+    const rawId = String(item.id || '');
+    const entityId = rawId.split('/').pop();
+    if (!entityId) return;
+
+    const link = document.createElement('a');
+    link.href = `/entity/${encodeURIComponent(entityId)}`;
+    link.className = 'hero-search-item d-block text-decoration-none p-3 border-bottom';
+    link.setAttribute('role', 'option');
+
+    const topRow = document.createElement('div');
+    topRow.className = 'd-flex justify-content-between align-items-center gap-2';
+
+    const titleSpan = document.createElement('span');
+    titleSpan.className = 'fw-semibold text-dark text-truncate';
+    titleSpan.textContent = item.name || `#${entityId}`;
+    topRow.appendChild(titleSpan);
+
+    if (item.system_class) {
+      const badge = document.createElement('span');
+      badge.className = 'badge bg-secondary-subtle text-secondary rounded-pill small';
+      badge.textContent = String(item.system_class).replace(/_/g, ' ');
+      topRow.appendChild(badge);
+    }
+
+    link.appendChild(topRow);
+
+    const cleanDesc = cleanSearchDescription(item.description);
+    if (cleanDesc) {
+      const descP = document.createElement('p');
+      descP.className = 'small text-muted mb-0 mt-1 text-truncate';
+      descP.textContent = cleanDesc;
+      link.appendChild(descP);
+    }
+
+    fragment.appendChild(link);
+  });
+
+  dropdown.appendChild(fragment);
+  dropdown.classList.remove('d-none');
+}
+
+/**
+ * Initialize Hero live search autocomplete dropdown against /search_live.
+ */
+function setupHeroSearch() {
+  const searchForm = document.getElementById('heroSearchForm');
+  const searchInput = document.getElementById('heroSearchInput');
+  const dropdown = document.getElementById('heroSearchDropdown');
+  if (!searchForm || !searchInput || !dropdown) return;
+
+  const loadingLabel = searchInput.getAttribute('data-label-loading') || 'Searching...';
+  const noResultsLabel = searchInput.getAttribute('data-label-no-results') || 'No results found';
+
+  let debounceTimer = null;
+  let activeIndex = -1;
+  let requestCounter = 0;
+
+  const updateActiveItem = items => {
+    items.forEach((el, idx) => {
+      el.classList.toggle('active', idx === activeIndex);
+    });
+    if (activeIndex >= 0 && items[activeIndex]) {
+      items[activeIndex].scrollIntoView({ block: 'nearest' });
+    }
+  };
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim();
+    activeIndex = -1;
+    if (debounceTimer) clearTimeout(debounceTimer);
+
+    if (query.length < 2) {
+      dropdown.classList.add('d-none');
+      dropdown.textContent = '';
+      return;
+    }
+
+    debounceTimer = setTimeout(async () => {
+      const currentReq = ++requestCounter;
+      renderSearchStatus(dropdown, loadingLabel, true);
+
+      try {
+        const url = `/search_live?q=${encodeURIComponent(query)}&system_class=all`;
+        const response = await fetch(url);
+        if (currentReq !== requestCounter) return;
+        if (!response.ok) {
+          throw new Error(`Search failed: ${response.status}`);
+        }
+        const results = await response.json();
+        if (currentReq !== requestCounter) return;
+
+        if (!Array.isArray(results) || results.length === 0) {
+          renderSearchStatus(dropdown, noResultsLabel, false);
+        } else {
+          renderSearchResults(dropdown, results);
+        }
+      } catch (err) {
+        console.error('Hero live search error:', err);
+        if (currentReq === requestCounter) {
+          renderSearchStatus(dropdown, noResultsLabel, false);
+        }
+      }
+    }, 250);
+  });
+
+  searchInput.addEventListener('keydown', e => {
+    if (dropdown.classList.contains('d-none')) return;
+    const items = Array.from(dropdown.querySelectorAll('.hero-search-item'));
+    if (!items.length) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIndex = (activeIndex + 1) % items.length;
+      updateActiveItem(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIndex = (activeIndex - 1 + items.length) % items.length;
+      updateActiveItem(items);
+    } else if (e.key === 'Enter' && activeIndex >= 0 && items[activeIndex]) {
+      e.preventDefault();
+      window.location.href = items[activeIndex].href;
+    } else if (e.key === 'Escape') {
+      dropdown.classList.add('d-none');
+      activeIndex = -1;
+    }
+  });
+
+  document.addEventListener('click', e => {
+    if (!searchForm.contains(e.target)) {
+      dropdown.classList.add('d-none');
+      activeIndex = -1;
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const mapStyleUrl = window.landingMapStyle || '';
   setupLazyMap('landing-cluster-map', mapStyleUrl);
   setupCitationCopy();
+  setupHeroSearch();
 
   if (window.landingStats && typeof window.initLandingCharts === 'function') {
     window.initLandingCharts(window.landingStats);

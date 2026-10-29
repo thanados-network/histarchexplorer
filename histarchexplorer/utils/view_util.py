@@ -308,9 +308,10 @@ def get_refresh_button(id_: int) -> str | None:
 
 def get_view_class_count(type_id: Optional[int] = None) -> dict[str, Any]:
     entities_count = ApiAccess.get_entities_count_by_case_studies(type_id)
+    shown = set(g.settings.shown_classes) - set(g.settings.hidden_classes)
 
     for key in entities_count.copy():
-        if key not in g.settings.shown_classes:
+        if key not in shown:
             del entities_count[key]
 
     return_classes: dict[str, dict[str, Any]] = {}

@@ -10,21 +10,22 @@ class SearchService:
 
     def __init__(self, app: Any) -> None:
         self.api_url = app.config['API_URL']
+        proxy = app.config.get('API_PROXY')
+        self.proxies = {'http': proxy, 'https': proxy}
         self.view_classes = g.view_classes
         self.app_logger = app.logger
 
-    def _make_api_call(self, url: str) -> list[str]:
-        """
-        Internal helper to make an API call and handle responses.
-        Args:
-            url (str): The URL to make the GET request to.
-        Returns:
-            list: A list of results from the API, or an empty list on error.
-        """
+    def _make_api_call(
+            self,
+            url: str,
+            params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+        """Make an API call to the OpenAtlas search endpoint."""
         try:
             response = requests.get(
                 url,
+                params=params,
                 headers=g.api_headers,
+                proxies=self.proxies,
                 timeout=10)
             response.raise_for_status()
             data = response.json()
@@ -45,28 +46,20 @@ class SearchService:
             self,
             query: str,
             category: str,
-            system_classes: list[str]) -> list[str]:
-        """
-        Performs a search based on query, category, and system classes.
-        Args:
-            query (str): The search query string.
-            category (str): The selected category (e.g., 'all',
-            'architecture').
-            system_classes (list): A list of specific system classes to
-            search within.
-        Returns:
-            list: A list of aggregated search results.
-        """
-        all_results = []
+            system_classes: list[str]) -> list[dict[str, Any]]:
+        """Perform a search based on query, category, and system classes."""
+        all_results: list[dict[str, Any]] = []
 
         if not system_classes:
             system_class_to_use = self.view_classes.get(category, ['all'])[0]
-            url = f"{self.api_url}search/{system_class_to_use}?term={query}"
-            all_results.extend(self._make_api_call(url))
+            url = f"{self.api_url}search/{system_class_to_use}"
+            all_results.extend(
+                self._make_api_call(url, params={'term': query}))
         else:
             for sc in system_classes:
-                url = f"{self.api_url}search/{sc}?term={query}"
-                all_results.extend(self._make_api_call(url))
+                url = f"{self.api_url}search/{sc}"
+                all_results.extend(
+                    self._make_api_call(url, params={'term': query}))
         return all_results
 
     def get_entity_detail(self, entity_id: int) -> dict[str, str] | None:
@@ -102,30 +95,17 @@ class SearchService:
     def perform_live_search(
             self,
             query: str,
-            system_classes: list[str]) -> list[str]:
-        """Performs a live search (e.g., for autocomplete).
-
-        Args:
-            query (str): The search query.
-            system_classes (list): List of system classes to search within.
-
-        Returns:
-            list[dict[str, Any]]: A list of live search results. Each result
-                dictionary contains:
-                - id (int): Entity ID.
-                - title (str): Main display title.
-                - systemClass (str): System class code.
-                - viewClass (str): UI view styling class.
-                - acronym (str): Abbreviation / identifier acronym.
-        """
-        if len(query) < 3:
+            system_classes: list[str]) -> list[dict[str, Any]]:
+        """Perform a live search against `/search/{system_class}`."""
+        if len(query) < 2:
             return []
 
         if not system_classes:
             system_classes = ['all']
 
-        live_results = []
+        live_results: list[dict[str, Any]] = []
         for sc in system_classes:
-            api_url = f"{self.api_url}search/{sc}?term={query}"
-            live_results.extend(self._make_api_call(api_url))
+            api_url = f"{self.api_url}search/{sc}"
+            live_results.extend(
+                self._make_api_call(api_url, params={'term': query}))
         return live_results

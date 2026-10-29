@@ -1,5 +1,7 @@
 let loadedTabs = []
 let notYetClickedTabs = tabsToLoad
+const initialPresetId = new URLSearchParams(window.location.search).get('preset');
+let initialPresetApplied = false;
 
 function initContentPopovers(container) {
     container.querySelectorAll('[data-bs-toggle="popover"]').forEach(trigger => {
@@ -110,6 +112,18 @@ function checkAndRemoveSpinner(totalTabs) {
             element.remove();
         });
 
+        if (
+            entityId == 0 &&
+            initialPresetId &&
+            !initialPresetApplied &&
+            typeof window.activatePresetById === 'function'
+        ) {
+            initialPresetApplied = true;
+            setTimeout(() => {
+                window.activatePresetById(initialPresetId);
+            }, 50);
+        }
+
         // In production, background caching for related entities (children, super entities, relations)
         // can be enabled here to pre-warm the cache after the entity view is loaded.
         // if (typeof entityId !== 'undefined' && entityId > 0) {
@@ -207,12 +221,20 @@ document.addEventListener('DOMContentLoaded', function () {
     // Extract the tab name from the current URL path.
     function getTabNameFromUrl() {
         const parts = window.location.pathname.split('/');
+        if (entityId === 0) {
+            return parts.length >= 3 && parts[2]
+                ? parts[2]
+                : (tabsToLoad[0] || 'places');
+        }
         return parts.length >= 4 ? parts[3] : 'overview';
     }
 
     // On page load: set initial state and activate the initial tab.
     const initialTab = getTabNameFromUrl();
-    history.replaceState({tab: initialTab}, '', window.location.pathname);
+    history.replaceState(
+        {tab: initialTab},
+        '',
+        window.location.pathname + window.location.search);
     activateTab(initialTab, true);
 
     // Listen for tab changes on any element with data-bs-toggle="tab"

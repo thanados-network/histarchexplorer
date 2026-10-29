@@ -1,166 +1,222 @@
-/* ------------------------------
-   Responsive ABOUT PAGE
---------------------------------*/
+// Modern About Page Styles (aligned with Landing Page design)
 
-.about-page {
-  padding-bottom: 3rem;
+.about-page-wrapper {
+  background-color: var(--bs-body-bg);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
-/* Image at top */
-.about-page img {
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
-  display: block;
-}
-
-/* Title */
-.about-title {
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-/* --- Sidebar layout --- */
-
-.about-sidebar {
-  padding-left: 1.5rem;
-}
-
-/* Persons / institutions list */
-.about-person {
+.about-hero-section {
+  background: linear-gradient(135deg, #091224 0%, #11203b 50%, #0c182c 100%);
+  min-height: 380px;
   display: flex;
   align-items: center;
-  gap: .75rem;
-  padding: .4rem 0;
+}
+
+.about-hero-logo-box {
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 1rem;
+  padding: 1rem 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+
+  img {
+    max-height: 76px;
+    max-width: 220px;
+    width: auto;
+    object-fit: contain;
+  }
+}
+
+.about-project-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.about-project-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 1rem;
+  border-radius: 50rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.16);
+    transform: translateY(-1px);
+  }
+
+  &.active {
+    color: #091224;
+    background: #23cba7;
+    border-color: #23cba7;
+    box-shadow: 0 4px 12px rgba(35, 203, 167, 0.35);
+  }
+}
+
+.about-description-card {
+  border-radius: 0.75rem;
+
+  .about-description-content {
+    line-height: 1.75;
+    font-size: 1.02rem;
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.about-facts-card {
+  border-radius: 0.75rem;
+}
+
+.about-team-card,
+.about-institution-card {
+  border-radius: 0.75rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.12) !important;
+  }
+}
+
+.about-person-trigger {
   cursor: pointer;
 }
 
-.about-person:hover {
-  opacity: .8;
-}
-
-.about-page img.about-avatar {
-  width: 60px;
-  height: 60px;
+.about-avatar {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
   object-fit: cover;
   border-radius: 50%;
-  box-shadow: 0 0 3px rgba(0,0,0,.2);
+  border: 2px solid rgba(35, 203, 167, 0.35);
 }
 
-/* Section title */
-.about-section-title {
-  font-size: 1.05rem;
-  font-weight: 600;
-  margin-bottom: .8rem;
+.about-avatar-placeholder {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #11203b 0%, #1e3a5f 100%);
+  color: #23cba7;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(35, 203, 167, 0.35);
+
+  &.about-avatar-placeholder--lg {
+    width: 96px;
+    height: 96px;
+    min-width: 96px;
+    font-size: 1.75rem;
+  }
 }
 
-/* Meta section on the right */
-.about-sidebar hr {
-  opacity: .2;
-}
+.about-institution-logo-wrap {
+  height: 110px;
+  background-color: #f8fafc;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  overflow: hidden;
 
-
-/* ---------------------------------------------------
-   MOBILE RESPONSIVE BREAKPOINTS
-------------------------------------------------------*/
-
-@media (max-width: 992px) {
-
-  /* Stack main content + sidebar */
-  .about-page .row > .col-9,
-  .about-page .row > .col-3 {
-    width: 100%;
+  img {
+    max-height: 100%;
     max-width: 100%;
-  }
-
-  /* Sidebar spacing */
-  .about-sidebar {
-    margin-top: 2rem;
-    padding-left: 0;
-  }
-
-  /* Persons list becomes grid */
-  .about-person {
-    padding: .6rem 0;
-  }
-
-  /* Slightly larger avatar on mobile for easier tap */
-  .about-avatar {
-    width: 60px;
-    height: 60px;
-  }
-
-  /* Titles centered for mobile friendliness */
-  .about-title,
-  .about-section-title {
-    text-align: center;
-  }
-
-  /* Description text easier to read */
-  .about-page p {
-    font-size: 1rem;
-    line-height: 1.5;
+    object-fit: contain;
   }
 }
 
+.about-institution-placeholder {
+  height: 110px;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  border-radius: 0.5rem;
+  color: #475569;
+  font-size: 1.35rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-/* ---------------------------------------------------
-   EXTRA-SMALL (PHONE) IMPROVEMENTS
-------------------------------------------------------*/
-@media (max-width: 576px) {
+.about-orcid-pill {
+  color: #568203;
+  background-color: rgba(166, 206, 57, 0.18);
+  border: 1px solid rgba(166, 206, 57, 0.4);
+  font-size: 0.75rem;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
 
-  /* Add padding so text isn't edge-to-edge */
-  .about-page .container {
-    padding-left: 1rem;
-    padding-right: 1rem;
+  &:hover {
+    background-color: rgba(166, 206, 57, 0.32);
+    color: #3b5a02;
   }
+}
 
-  /* Persons grid look */
-  .about-person {
-    padding: .8rem 0;
+.about-modal-avatar {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border: 3px solid rgba(35, 203, 167, 0.4);
+}
+
+.about-modal-logo {
+  max-height: 110px;
+  max-width: 260px;
+  object-fit: contain;
+}
+
+.about-modal-entity-link {
+  &:hover {
+    color: #23cba7 !important;
+    text-decoration: underline !important;
   }
-
-  .about-avatar {
-    width: 56px;
-    height: 56px;
-  }
-}
-/* --- Card backgrounds for about page --- */
-
-/* Light page background */
-.about-page {
-  background: #f3f4f6;
-}
-
-/* Main content card: description + sidebar */
-.about-page .container {
-  background: var(--about-bg);
-  border-radius: 1rem;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-  padding: 1.5rem 1.75rem;
-}
-
-/* Sub-project “cards” at the bottom */
-.about-project-card {
-  background: #ffffff;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.03);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.about-project-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10);
 }
 
 .about-imprint-card {
-  background: var(--muuri-tile);
-  padding: 1rem;
   border-radius: 0.75rem;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.03);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-bs-theme="dark"],
+body.dark {
+  .about-institution-logo-wrap {
+    background-color: #1e293b;
+  }
+
+  .about-institution-placeholder {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    color: #94a3b8;
+  }
+
+  .about-orcid-pill {
+    color: #a6ce39;
+    background-color: rgba(166, 206, 57, 0.15);
+
+    &:hover {
+      background-color: rgba(166, 206, 57, 0.28);
+      color: #c4e868;
+    }
+  }
 }
 

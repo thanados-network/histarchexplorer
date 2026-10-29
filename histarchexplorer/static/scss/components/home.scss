@@ -22,6 +22,8 @@
 }
 
 .hero-search-form {
+  z-index: 20;
+
   .input-group {
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -30,6 +32,36 @@
   input::placeholder {
     color: #94a3b8;
   }
+}
+
+.hero-search-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  max-height: 360px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border-radius: 1rem;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  z-index: 1050;
+}
+
+.hero-search-item {
+  transition: background-color 0.15s ease;
+
+  &:last-child {
+    border-bottom: 0 !important;
+  }
+
+  &:hover,
+  &.active {
+    background-color: #f1f5f9;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 
 .tracking-tight {
@@ -94,6 +126,11 @@
     .kpi-metric__icon { color: var(--entity-color-feature, #888888); }
   }
 
+  &.kpi-metric--stratigraphic_unit {
+    border-bottom-color: var(--entity-color-stratigraphic_unit, #64748b);
+    .kpi-metric__icon { color: #64748b; }
+  }
+
   &.kpi-metric--items {
     border-bottom-color: var(--entity-color-items, #fddb6d);
     .kpi-metric__icon { color: #d4a715; }
@@ -104,6 +141,17 @@
     .kpi-metric__icon { color: #ee6677; }
   }
 
+  &.kpi-metric--actors {
+    border-bottom-color: var(--entity-color-actors, #e83e8c);
+    .kpi-metric__icon { color: var(--entity-color-actors, #e83e8c); }
+  }
+
+  &.kpi-metric--events {
+    border-bottom-color: var(--entity-color-events, #2980b9);
+    .kpi-metric__icon { color: var(--entity-color-events, #2980b9); }
+  }
+
+  &.kpi-metric--sources,
   &.kpi-metric--references {
     border-bottom-color: var(--entity-color-sources, #5c2a36);
     .kpi-metric__icon { color: var(--entity-color-sources, #5c2a36); }
@@ -112,6 +160,11 @@
   &.kpi-metric--files {
     border-bottom-color: var(--entity-color-files, #1f253d);
     .kpi-metric__icon { color: #3b82f6; }
+  }
+
+  &.kpi-metric--types {
+    border-bottom-color: var(--entity-color-types, #4477aa);
+    .kpi-metric__icon { color: var(--entity-color-types, #4477aa); }
   }
 
   .kpi-metric__icon {
@@ -163,8 +216,24 @@
     background-color: rgba(253, 219, 109, 0.25);
   }
 
+  &.thematic-entry--actors .thematic-entry__icon {
+    background-color: rgba(232, 62, 140, 0.15);
+  }
+
+  &.thematic-entry--events .thematic-entry__icon {
+    background-color: rgba(41, 128, 185, 0.15);
+  }
+
   &.thematic-entry--sources .thematic-entry__icon {
     background-color: rgba(92, 42, 54, 0.15);
+  }
+
+  &.thematic-entry--files .thematic-entry__icon {
+    background-color: rgba(59, 130, 246, 0.15);
+  }
+
+  &.thematic-entry--types .thematic-entry__icon {
+    background-color: rgba(68, 119, 170, 0.15);
   }
 }
 
