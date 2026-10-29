@@ -103,6 +103,9 @@ def test_get_landing_sites_geojson_mocked(
         feat2 = geo['features'][2]
         assert feat2['properties']['dating'] == '800 BC – 500 BC'
 
+        executed_sql = mock_cursor.execute.call_args.args[0]
+        assert 'tng.getdates' not in executed_sql
+
 
 def test_landing_sites_geojson_endpoint(
         authenticated_client: FlaskClient) -> None:
@@ -124,6 +127,10 @@ def test_index_page_contains_no_lorem_ipsum(
     assert 'landingStats' in html
     assert 'Open Interfaces & Standards' not in html
     assert 'heroSearchDropdown' in html
+    assert (
+        'window.landingMapStyle = '
+        '"https://api.maptiler.com/maps/bright/style.json'
+        '?key=E7Jrgaazm79UlTuEI5f5";') in html
 
 
 def test_build_dynamic_landing_sections_respects_shown_and_predefined_filters(

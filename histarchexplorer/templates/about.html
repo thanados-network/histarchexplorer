@@ -6,7 +6,7 @@
   {%- endmacro %}
 
   <script>
-    window.landingMapStyle = '{{ map | safe if map else "" }}';
+    window.landingMapStyle = {{ (map.strip() if map else "") | tojson | safe }};
     window.landingStats = {{ landing_stats | tojson | safe }};
     window.ENTITY_DATA = {{ config_entities_mapped | tojson | safe }};
     window.PROJECT_SLUGS = {{ project_slugs | tojson | safe }};

@@ -20,7 +20,9 @@ async function initializeClusteredMap(mapElementId, styleUrl) {
   if (loader) loader.classList.remove('d-none');
 
   try {
-    const finalStyle = styleUrl || 'https://api.maptiler.com/maps/bright/style.json';
+    const defaultStyle =
+      'https://api.maptiler.com/maps/bright/style.json?key=E7Jrgaazm79UlTuEI5f5';
+    const finalStyle = (styleUrl || '').trim() || defaultStyle;
     landingMap = new maplibregl.Map({
       container: mapElementId,
       style: finalStyle,
@@ -31,6 +33,10 @@ async function initializeClusteredMap(mapElementId, styleUrl) {
     });
 
     landingMap.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+
+    landingMap.on('error', () => {
+      if (loader) loader.classList.add('d-none');
+    });
 
     landingMap.on('load', async () => {
       try {
@@ -438,8 +444,8 @@ function setupHeroSearch() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const mapStyleUrl = window.landingMapStyle || '';
+function initLandingPage() {
+  const mapStyleUrl = (window.landingMapStyle || '').trim();
   setupLazyMap('landing-cluster-map', mapStyleUrl);
   setupCitationCopy();
   setupHeroSearch();
@@ -447,4 +453,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (window.landingStats && typeof window.initLandingCharts === 'function') {
     window.initLandingCharts(window.landingStats);
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initLandingPage);
+} else {
+  initLandingPage();
+}

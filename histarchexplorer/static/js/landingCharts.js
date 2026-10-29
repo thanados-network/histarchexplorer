@@ -142,7 +142,7 @@ function renderTypologyChart(containerId, siteTypes, artifactTypes, mode = 'site
 }
 
 function initLandingCharts(stats) {
-  if (!stats) return;
+  if (!stats || typeof Chart === 'undefined') return;
 
   renderChronologyChart('chronoChartCanvas', stats.chronology);
   renderTypologyChart('typologyChartCanvas', stats.site_types, stats.artifact_types, 'sites');

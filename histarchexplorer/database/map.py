@@ -9,7 +9,9 @@ def get_map_tilestring(index_map: int) -> str | None:
         'FROM tng.maps '
         'WHERE id = %s', (index_map,))
     row = g.cursor.fetchone()
-    return row['tilestring'] if row else None
+    if row and row['tilestring']:
+        return str(row['tilestring']).strip()
+    return None
 
 
 def get_maps() -> tuple[str]:

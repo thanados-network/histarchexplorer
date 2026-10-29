@@ -231,8 +231,7 @@ INSERT INTO tng.links OVERRIDING SYSTEM VALUE VALUES
 --
 
 INSERT INTO tng.maps VALUES
-	(1, 'OpenStreetMap', 'Open Street Maps', 'https://api.maptiler.com/maps/bright/style.json?key=E7Jrgaazm79UlTuEI5f5
-                    ', 1);
+	(1, 'OpenStreetMap', 'Open Street Maps', 'https://api.maptiler.com/maps/bright/style.json?key=E7Jrgaazm79UlTuEI5f5', 1);
 
 
 --

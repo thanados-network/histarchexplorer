@@ -3,7 +3,7 @@
 {% block content %}
 
   <script>
-    window.landingMapStyle = '{{ map | safe if map else "" }}';
+    window.landingMapStyle = {{ (map.strip() if map else "") | tojson | safe }};
     window.landingStats = {{ landing_stats | tojson | safe }};
   </script>
 

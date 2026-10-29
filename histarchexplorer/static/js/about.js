@@ -386,9 +386,15 @@
     });
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function initAboutPage() {
     setupCounters();
     setupTeamFilter();
     setupEntityModal();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAboutPage);
+  } else {
+    initAboutPage();
+  }
 })();

@@ -222,15 +222,18 @@ def _safe_case_study_tuple(
 
 @cache.memoize(timeout=86400)
 def get_landing_statistics(
-        case_study_ids: tuple[int, ...]) -> dict[str, Any]:
+        case_study_ids: tuple[int, ...],
+        cache_version: int = 2) -> dict[str, Any]:
     """Aggregierte Forschungsdaten für Diagramme und wissenschaftliche KPIs.
 
     Args:
         case_study_ids: Tuple von Fallstudien-IDs zur Filterung.
+        cache_version: Versionsschlüssel zur Cache-Invalidierung.
 
     Returns:
         Dictionary mit Chronologie, Fundplatztypen, Fundkategorien und KPIs.
     """
+    _ = cache_version
     default_stats: dict[str, Any] = {
         'chronology': [],
         'site_types': [],
@@ -559,16 +562,19 @@ def _format_timespan(begin_raw: Any, end_raw: Any) -> str:
 @cache.memoize(timeout=86400)
 def get_landing_sites_geojson(
         case_study_ids: tuple[int, ...],
-        limit: int = 5000) -> dict[str, Any]:
+        limit: int = 5000,
+        cache_version: int = 2) -> dict[str, Any]:
     """Erstellt ein leichtgewichtiges GeoJSON aller Fundorte für die Karte.
 
     Args:
         case_study_ids: Tuple von Fallstudien-IDs zur Filterung.
         limit: Maximale Anzahl von Fundorten.
+        cache_version: Versionsschlüssel zur Cache-Invalidierung.
 
     Returns:
         GeoJSON FeatureCollection Dictionary.
     """
+    _ = cache_version
     empty_fc: dict[str, Any] = {
         'type': 'FeatureCollection',
         'features': []}
@@ -591,10 +597,30 @@ def get_landing_sites_geojson(
                     g.geom_point, ST_Centroid(g.geom_polygon))) AS lng,
                 ST_Y(COALESCE(
                     g.geom_point, ST_Centroid(g.geom_polygon))) AS lat,
-                tng.getdates(
-                    e.begin_from, e.begin_to, e.begin_comment) AS begin,
-                tng.getdates(
-                    e.end_to, e.end_from, e.end_comment) AS end
+                CASE
+                    WHEN e.begin_comment LIKE '-%'
+                    THEN TO_CHAR(e.begin_comment::INTEGER, 'FM000000000')
+                    WHEN EXTRACT(
+                        YEAR FROM LEAST(e.begin_from, e.begin_to)::DATE) < 1
+                    THEN '-' || TO_CHAR(
+                        LEAST(e.begin_from, e.begin_to),
+                        'FM00000YYYY-MM-DD')
+                    ELSE TO_CHAR(
+                        LEAST(e.begin_from, e.begin_to),
+                        'FM00000YYYY-MM-DD')
+                END AS begin,
+                CASE
+                    WHEN e.end_comment LIKE '-%'
+                    THEN TO_CHAR(e.end_comment::INTEGER, 'FM000000000')
+                    WHEN EXTRACT(
+                        YEAR FROM LEAST(e.end_to, e.end_from)::DATE) < 1
+                    THEN '-' || TO_CHAR(
+                        LEAST(e.end_to, e.end_from),
+                        'FM00000YYYY-MM-DD')
+                    ELSE TO_CHAR(
+                        LEAST(e.end_to, e.end_from),
+                        'FM00000YYYY-MM-DD')
+                END AS end
             FROM model.entity e
             JOIN model.link l1 ON l1.domain_id = e.id
                 AND l1.property_code = 'P2'
