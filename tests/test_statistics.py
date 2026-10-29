@@ -104,7 +104,9 @@ def test_get_landing_sites_geojson_mocked(
         assert feat2['properties']['dating'] == '800 BC – 500 BC'
 
         executed_sql = mock_cursor.execute.call_args.args[0]
+        executed_params = mock_cursor.execute.call_args.args[1]
         assert 'tng.getdates' not in executed_sql
+        assert executed_sql % executed_params
 
 
 def test_landing_sites_geojson_endpoint(

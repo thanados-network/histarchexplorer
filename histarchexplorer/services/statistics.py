@@ -563,7 +563,7 @@ def _format_timespan(begin_raw: Any, end_raw: Any) -> str:
 def get_landing_sites_geojson(
         case_study_ids: tuple[int, ...],
         limit: int = 5000,
-        cache_version: int = 2) -> dict[str, Any]:
+        cache_version: int = 3) -> dict[str, Any]:
     """Erstellt ein leichtgewichtiges GeoJSON aller Fundorte für die Karte.
 
     Args:
@@ -598,7 +598,7 @@ def get_landing_sites_geojson(
                 ST_Y(COALESCE(
                     g.geom_point, ST_Centroid(g.geom_polygon))) AS lat,
                 CASE
-                    WHEN e.begin_comment LIKE '-%'
+                    WHEN e.begin_comment ~ '^-[0-9]+$'
                     THEN TO_CHAR(e.begin_comment::INTEGER, 'FM000000000')
                     WHEN EXTRACT(
                         YEAR FROM LEAST(e.begin_from, e.begin_to)::DATE) < 1
@@ -610,7 +610,7 @@ def get_landing_sites_geojson(
                         'FM00000YYYY-MM-DD')
                 END AS begin,
                 CASE
-                    WHEN e.end_comment LIKE '-%'
+                    WHEN e.end_comment ~ '^-[0-9]+$'
                     THEN TO_CHAR(e.end_comment::INTEGER, 'FM000000000')
                     WHEN EXTRACT(
                         YEAR FROM LEAST(e.end_to, e.end_from)::DATE) < 1
