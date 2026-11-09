@@ -1,9 +1,10 @@
+from datetime import datetime
+import io
 import json
 import os
 import re
 import subprocess
-from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 from PIL import Image
 from flask import (abort, current_app, flash, g, jsonify, redirect,
@@ -26,16 +27,15 @@ from histarchexplorer.database.admin import (add_asset_to_db, add_file_to_db,
                                              rename_asset_in_db,
                                              rename_file_in_db,
                                              rename_logo_in_db,
+                                             sanitize_richtext,
                                              update_predefined_filter,
                                              update_predefined_filter_order,
                                              update_sort_order)
 from histarchexplorer.database.map import check_if_map_id_exist
-from histarchexplorer.database.publications import (add_publication,
-                                                    delete_publication,
-                                                    get_all_projects,
-                                                    get_publications,
-                                                    link_publication_to_entities,
-                                                    update_publication)
+from histarchexplorer.database.publications import (
+    add_publication, delete_publication, get_all_projects, get_publications,
+    link_publication_to_entities, update_publication)
+from histarchexplorer.database.settings import save_settings
 from histarchexplorer.forms.admin import (FileDeleteForm, FileLicenseForm,
                                           FileRenameForm, FileUploadForm,
                                           GeneralSettingsForm, LicenseForm,
@@ -50,6 +50,48 @@ from histarchexplorer.services.vocabulary_cache import (
 from histarchexplorer.utils.doi import fetch_doi_metadata
 from histarchexplorer.utils.view_util import find_children_by_id
 from histarchexplorer.views.views import type_tree
+
+ALLOWED_IMAGE_EXTENSIONS = {
+    '.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.ico'}
+BLOCKED_UPLOAD_EXTENSIONS = {
+    '.html', '.htm', '.xhtml', '.js', '.mjs', '.php', '.py', '.sh',
+    '.exe', '.bat', '.cmd', '.dll', '.so', '.jsp', '.asp', '.aspx', '.cgi'}
+
+
+def _sanitize_icon_value(value: Optional[str]) -> str:
+    """Strip unsafe HTML/attribute characters from icon class or filename."""
+    if not value:
+        return ''
+    return re.sub(r'[<>"\']', '', value).strip()
+
+
+def _is_allowed_upload(filename: str, file_type: str) -> bool:
+    """Check whether filename has an allowed extension for file_type."""
+    if not filename:
+        return False
+    ext = os.path.splitext(filename)[1].lower()
+    if ext in BLOCKED_UPLOAD_EXTENSIONS:
+        return False
+    if file_type in {'logo', 'team', 'icon'}:
+        return ext in ALLOWED_IMAGE_EXTENSIONS
+    if file_type == 'asset':
+        return bool(ext) and ext not in BLOCKED_UPLOAD_EXTENSIONS
+    return False
+
+
+def _is_safe_svg(file_storage: Any) -> bool:
+    """Reject SVG uploads containing embedded scripts or event handlers."""
+    pos = file_storage.stream.tell()
+    content = file_storage.stream.read()
+    file_storage.stream.seek(pos)
+    if isinstance(content, str):
+        content = content.encode('utf-8', errors='ignore')
+    lower = content.lower()
+    if b'<script' in lower or b'javascript:' in lower:
+        return False
+    if re.search(rb'\bon\w+\s*=', lower):
+        return False
+    return True
 
 
 def check_manager_user() -> None:
@@ -148,9 +190,9 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             app.logger.error('Error processing case study type ID: %s', e)
 
     admin_instance = Admin()
-    all_logos = admin_instance.get_all_logos_with_ids()
-    all_team = admin_instance.get_all_teams_with_ids()
-    all_assets = admin_instance.get_all_assets_with_ids()
+    all_logos = admin_instance.logos_with_ids
+    all_team = admin_instance.teams_with_ids
+    all_assets = admin_instance.assets_with_ids
     selected_footer_logos = g.settings.footer_logos
 
     all_languages = app.config.get('LANGUAGES', {})
@@ -176,57 +218,65 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
     file_license_form.license_id.choices.insert(
         0, (0, _('Select License...')))
 
-    # Synchronize external identifiers settings with OpenAtlas
-    try:
-        api_res = ApiAccess.get_table_rows(
-            classes=['reference_system'],
-            table_columns=['name', 'description'])
+    # Synchronize external identifiers settings with OpenAtlas when needed
+    if (active_main_sidebar_id == 'sidebar-external-identifiers'
+            or not g.settings.external_identifiers):
+        try:
+            before_sync = json.dumps(
+                g.settings.external_identifiers, sort_keys=True)
+            api_res = ApiAccess.get_table_rows(
+                classes=['reference_system'],
+                table_columns=['name', 'description'])
 
-        g.openatlas_cursor.execute(
-            '''
-            SELECT entity_id, resolver_url, website_url
-            FROM web.reference_system''')
-        db_rows = g.openatlas_cursor.fetchall()
-        url_lookup = {
-            str(r['entity_id']): {
-                'resolver_url': r['resolver_url'],
-                'website_url': r['website_url']}
-            for r in db_rows}
+            g.openatlas_cursor.execute(
+                '''
+                SELECT entity_id, resolver_url, website_url
+                FROM web.reference_system''')
+            db_rows = g.openatlas_cursor.fetchall()
+            url_lookup = {
+                str(r['entity_id']): {
+                    'resolver_url': r['resolver_url'],
+                    'website_url': r['website_url']}
+                for r in db_rows}
 
-        oa_ids = set()
-        for row in api_res.get('results', []):
-            checkbox_str, name, description = row[0], row[1], row[2]
-            match = re.search(r'value="(\d+)"', checkbox_str)
-            if match:
-                sys_id = match.group(1)
-                oa_ids.add(sys_id)
-                urls = url_lookup.get(sys_id, {})
+            oa_ids = set()
+            for row in api_res.get('results', []):
+                checkbox_str, name, _desc = row[0], row[1], row[2]
+                match = re.search(r'value="(\d+)"', checkbox_str)
+                if match:
+                    sys_id = match.group(1)
+                    oa_ids.add(sys_id)
+                    urls = url_lookup.get(sys_id, {})
 
-                if sys_id not in g.settings.external_identifiers:
-                    g.settings.external_identifiers[sys_id] = {
-                        'name': name,
-                        'resolver_url': urls.get('resolver_url') or '',
-                        'website_url': urls.get('website_url') or '',
-                        'description': '',
-                        'disabled': False,
-                        'icon_type': '',
-                        'icon_value': '',
-                        'is_missing': False}
-                else:
-                    g.settings.external_identifiers[sys_id].update({
-                        'name': name,
-                        'resolver_url': urls.get('resolver_url') or '',
-                        'website_url': urls.get('website_url') or '',
-                        'is_missing': False})
+                    if sys_id not in g.settings.external_identifiers:
+                        g.settings.external_identifiers[sys_id] = {
+                            'name': name,
+                            'resolver_url': urls.get('resolver_url') or '',
+                            'website_url': urls.get('website_url') or '',
+                            'description': '',
+                            'disabled': False,
+                            'icon_type': '',
+                            'icon_value': '',
+                            'is_missing': False}
+                    else:
+                        g.settings.external_identifiers[sys_id].update({
+                            'name': name,
+                            'resolver_url': urls.get('resolver_url') or '',
+                            'website_url': urls.get('website_url') or '',
+                            'is_missing': False})
 
-        for sys_id in list(g.settings.external_identifiers.keys()):
-            if sys_id not in oa_ids:
-                g.settings.external_identifiers[sys_id]['is_missing'] = True
+            for sys_id in list(g.settings.external_identifiers.keys()):
+                if sys_id not in oa_ids:
+                    g.settings.external_identifiers[sys_id][
+                        'is_missing'] = True
 
-        from histarchexplorer.database.settings import save_settings
-        save_settings('external_identifiers', g.settings.external_identifiers)
-    except Exception as e:
-        app.logger.error("Failed to sync external identifiers: %s", e)
+            after_sync = json.dumps(
+                g.settings.external_identifiers, sort_keys=True)
+            if after_sync != before_sync:
+                save_settings(
+                    'external_identifiers', g.settings.external_identifiers)
+        except Exception as e:
+            app.logger.error("Failed to sync external identifiers: %s", e)
 
     return render_template(
         "admin.html",
@@ -274,20 +324,23 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         file_delete_form=FileDeleteForm())
 
 
-def _predefined_filter_data() -> dict[str, str]:
+def _predefined_filter_data() -> dict[str, str | None]:
     """Validate and serialize a predefined-filter form submission."""
     type_ids = request.form.get('type_ids', '').strip()
     if type_ids:
         try:
-            type_ids_list = [int(value.strip()) for value in type_ids.split(',')]
+            type_ids_list = [
+                int(value.strip()) for value in type_ids.split(',')]
         except ValueError as error:
-            raise ValueError(_('Type IDs must be comma-separated integers.')) from error
+            raise ValueError(
+                _('Type IDs must be comma-separated integers.')) from error
     else:
         type_ids_list = []
 
     date_keys = ('begin_from', 'begin_to', 'end_from', 'end_to')
     parameters: dict[str, object] = {
-        'case_study_ids': [int(value) for value in request.form.getlist('case_study_ids')],
+        'case_study_ids': [
+            int(value) for value in request.form.getlist('case_study_ids')],
         'type_ids': type_ids_list,
         'include_subtypes': request.form.get('include_subtypes') == 'on',
         'classes': request.form.getlist('classes'),
@@ -310,15 +363,17 @@ def _predefined_filter_data() -> dict[str, str]:
         raise ValueError(_('A label is required in at least one language.'))
 
     icon_type = request.form.get('icon_type', '')
-    icon_value = request.form.get('icon_value', '').strip()
+    icon_value = _sanitize_icon_value(request.form.get('icon_value', ''))
     icon = None
     if icon_type == 'css' and icon_value:
         icon = {'type': 'css', 'value': icon_value}
     elif icon_type == 'img' and icon_value:
         icon = {'type': 'img', 'value': icon_value}
     return {
-        'label': json.dumps({key: value for key, value in label.items() if value}),
-        'description': json.dumps({key: value for key, value in description.items() if value}),
+        'label': json.dumps(
+            {key: value for key, value in label.items() if value}),
+        'description': json.dumps(
+            {key: value for key, value in description.items() if value}),
         'icon': json.dumps(icon) if icon else None,
         'tabs': json.dumps(request.form.getlist('tabs')),
         'filter_parameters': json.dumps(parameters)}
@@ -348,7 +403,8 @@ def edit_predefined_filter(filter_id: int) -> Response:
     return _redirect_to_admin_tab('sidebar-predefined-filters')
 
 
-@app.route('/admin/predefined_filters/<int:filter_id>/delete', methods=['POST'])
+@app.route(
+    '/admin/predefined_filters/<int:filter_id>/delete', methods=['POST'])
 @login_required
 def remove_predefined_filter(filter_id: int) -> Response:
     check_manager_user()
@@ -397,9 +453,9 @@ def update_type_divisions() -> Response:
 
         new_type_divisions[label] = {
             'icon_type': request.form.get(f'icon_type_{index}'),
-            'icon_value': request.form.get(f'icon_value_{index}'),
-            'ids': ids
-        }
+            'icon_value': _sanitize_icon_value(
+                request.form.get(f'icon_value_{index}')),
+            'ids': ids}
 
     g.settings.type_divisions = new_type_divisions
     try:
@@ -426,7 +482,8 @@ def update_external_identifiers() -> Response:
 
         disabled = request.form.get(f'disabled_{sys_id}') == 'on'
         icon_type = request.form.get(f'icon_type_{sys_id}', '')
-        icon_value = request.form.get(f'icon_value_{sys_id}', '')
+        icon_value = _sanitize_icon_value(
+            request.form.get(f'icon_value_{sys_id}', ''))
         description = request.form.get(f'description_{sys_id}', '').strip()
 
         new_external_identifiers[sys_id] = {
@@ -564,8 +621,9 @@ def update_legal_notice() -> Response:
     legal_notice_data = {}
 
     for lang_code in g.available_languages.keys():
-        legal_notice_data[lang_code] = request.form.get(
-            f'legal_notice_{lang_code}', '')
+        raw_html = request.form.get(f'legal_notice_{lang_code}', '')
+        legal_notice_data[lang_code] = (
+            sanitize_richtext(raw_html) if raw_html else '')
 
     g.settings.legal_notice = legal_notice_data
 
@@ -581,19 +639,26 @@ def update_legal_notice() -> Response:
 
 @app.route('/admin/upload_logo', methods=['POST'])
 @login_required
-def upload_logo():
+def upload_logo() -> Response:
     check_manager_user()
     if 'logo_file' not in request.files:
         flash(_('No file part'), 'danger')
         return _redirect_to_admin_tab('sidebar-logo-management')
 
     file = request.files['logo_file']
-    if file.filename == '':
+    if not file.filename:
         flash(_('No selected file'), 'danger')
         return _redirect_to_admin_tab('sidebar-logo-management')
 
-    if file:
+    if file and file.filename:
         filename = secure_filename(file.filename)
+        if not _is_allowed_upload(filename, 'logo'):
+            flash(_('Invalid file type for logo.'), 'danger')
+            return _redirect_to_admin_tab('sidebar-logo-management')
+        if filename.lower().endswith('.svg') and not _is_safe_svg(file):
+            flash(_('Unsafe SVG content detected.'), 'danger')
+            return _redirect_to_admin_tab('sidebar-logo-management')
+
         upload_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
         os.makedirs(upload_path, exist_ok=True)
         file.save(os.path.join(upload_path, filename))
@@ -606,7 +671,7 @@ def upload_logo():
 
 @app.route('/admin/rename_logo', methods=['POST'])
 @login_required
-def rename_logo():
+def rename_logo() -> Response:
     check_manager_user()
     old_name = request.form.get('old_name')
     new_name = request.form.get('new_name')
@@ -615,19 +680,26 @@ def rename_logo():
         flash(_('Invalid request for renaming.'), 'danger')
         return _redirect_to_admin_tab('sidebar-logo-management')
 
-    static_path = os.path.join(app.static_folder, 'images', 'logos')
+    safe_old = secure_filename(old_name)
+    safe_new = secure_filename(new_name)
+    if not safe_old or not safe_new or not _is_allowed_upload(
+            safe_new, 'logo'):
+        flash(_('Invalid filename or extension.'), 'danger')
+        return _redirect_to_admin_tab('sidebar-logo-management')
+
+    static_folder = app.static_folder or ''
+    static_path = os.path.join(static_folder, 'images', 'logos')
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
 
-    old_filepath_static = os.path.join(static_path, secure_filename(old_name))
-    old_filepath_uploads = os.path.join(
-        uploads_path, secure_filename(old_name))
+    old_filepath_static = os.path.join(static_path, safe_old)
+    old_filepath_uploads = os.path.join(uploads_path, safe_old)
 
     if os.path.exists(old_filepath_static):
         flash(_('Cannot rename default logos.'), 'danger')
         return _redirect_to_admin_tab('sidebar-logo-management')
-    elif os.path.exists(old_filepath_uploads):
+    if os.path.exists(old_filepath_uploads):
         old_filepath = old_filepath_uploads
-        new_filepath = os.path.join(uploads_path, secure_filename(new_name))
+        new_filepath = os.path.join(uploads_path, safe_new)
     else:
         flash(_('Original file not found.'), 'danger')
         return _redirect_to_admin_tab('sidebar-logo-management')
@@ -638,9 +710,9 @@ def rename_logo():
 
     try:
         os.rename(old_filepath, new_filepath)
-        rename_logo_in_db(old_name, new_name)
-        flash(_('Logo renamed from "%(old)s" to "%(new)s".', old=old_name,
-                new=new_name), 'success')
+        rename_logo_in_db(safe_old, safe_new)
+        flash(_('Logo renamed from "%(old)s" to "%(new)s".', old=safe_old,
+                new=safe_new), 'success')
     except OSError as e:
         flash(_('Error renaming file: %(error)s', error=e), 'danger')
 
@@ -649,28 +721,29 @@ def rename_logo():
 
 @app.route('/admin/delete_logo', methods=['POST'])
 @login_required
-def delete_logo():
+def delete_logo() -> Response:
     check_manager_user()
     filename = request.form.get('filename')
     if not filename:
         flash(_('No filename specified for deletion.'), 'danger')
         return _redirect_to_admin_tab('sidebar-logo-management')
 
+    safe_name = secure_filename(filename)
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
-    filepath_uploads = os.path.join(uploads_path, secure_filename(filename))
+    filepath_uploads = os.path.join(uploads_path, safe_name)
 
     if os.path.exists(filepath_uploads):
         try:
             os.remove(filepath_uploads)
-            delete_logo_from_db(filename) # This will delete the row
-            flash(_('Logo "%(name)s" deleted successfully.', name=filename),
+            delete_logo_from_db(safe_name)
+            flash(_('Logo "%(name)s" deleted successfully.', name=safe_name),
                   'success')
         except OSError as e:
             flash(_('Error deleting file: %(error)s', error=e), 'danger')
     else:
-        delete_logo_from_db(filename) # This will set is_active = FALSE
+        delete_logo_from_db(safe_name)
         flash(
-            _('Default logo "%(name)s" deactivated.', name=filename),
+            _('Default logo "%(name)s" deactivated.', name=safe_name),
             'success')
 
     return _redirect_to_admin_tab('sidebar-logo-management')
@@ -685,7 +758,7 @@ def set_main_logo() -> Response:
         flash(_('No filename specified.'), 'danger')
         return _redirect_to_admin_tab('sidebar-logo-management')
 
-    g.settings.nav_logo = filename
+    g.settings.nav_logo = secure_filename(filename)
     try:
         g.settings.save_to_db()
         flash(_('Main logo updated successfully.'), 'success')
@@ -700,14 +773,19 @@ def set_main_logo() -> Response:
 @login_required
 def set_favicon() -> Response:
     check_manager_user()
-    filename = request.form.get('filename')
-    if not filename:
+    raw_filename = request.form.get('filename')
+    if not raw_filename:
         flash(_('No filename specified.'), 'danger')
         return _redirect_to_admin_tab('sidebar-logo-management')
 
-    # Check uploads first, then static
+    filename = secure_filename(raw_filename)
+    if not filename:
+        flash(_('Invalid filename specified.'), 'danger')
+        return _redirect_to_admin_tab('sidebar-logo-management')
+
+    static_folder = app.static_folder or ''
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'logos')
-    static_path = os.path.join(app.static_folder, 'images', 'logos')
+    static_path = os.path.join(static_folder, 'images', 'logos')
 
     logo_path = os.path.join(uploads_path, filename)
     if not os.path.exists(logo_path):
@@ -722,7 +800,7 @@ def set_favicon() -> Response:
             img.save(favicon_path, 'ICO', sizes=[(32, 32)])
         flash(_('Favicon updated successfully.'), 'success')
     except Exception as e:
-        app.logger.error(f"Failed to set favicon: {e}")
+        app.logger.error("Failed to set favicon: %s", e)
         flash(_('Error creating favicon: %(error)s', error=str(e)), 'danger')
 
     return _redirect_to_admin_tab('sidebar-logo-management')
@@ -783,7 +861,7 @@ def add_license() -> Response:
 
 @app.route('/admin/delete_license/<int:license_id>', methods=['POST'])
 @login_required
-def delete_license(license_id):
+def delete_license(license_id: int) -> Response:
     check_manager_user()
     Admin.delete_license(license_id)
     flash(_('License deleted successfully.'), 'success')
@@ -807,7 +885,7 @@ def update_logo_license() -> Response:
                 flash(f"{getattr(form, field).label.text}: {error}", 'danger')
         return _redirect_to_admin_tab('sidebar-logo-management')
 
-    filename = form.filename.data
+    filename = form.filename.data or ''
     license_id = form.license_id.data
     attribution = form.attribution.data
 
@@ -821,6 +899,7 @@ def update_logo_license() -> Response:
 @login_required
 def backup_db() -> Response:
     check_manager_user()
+    filepath = ''
     try:
         db_name = current_app.config['DATABASE_NAME']
         db_user = current_app.config['DATABASE_USER']
@@ -841,11 +920,10 @@ def backup_db() -> Response:
             '-h', db_host,
             '-p', db_port,
             '-d', db_name,
-            '-n', 'tng',  # Todo: find better name
+            '-n', 'tng',
             '-f', filepath,
             '--clean',
-            '--if-exists',
-            '--create']
+            '--if-exists']
 
         subprocess.run(
             command,
@@ -854,15 +932,23 @@ def backup_db() -> Response:
             capture_output=True,
             text=True)
 
-        return send_file(filepath, as_attachment=True)
+        with open(filepath, 'rb') as dump_file:
+            buf = io.BytesIO(dump_file.read())
+        return send_file(buf, as_attachment=True, download_name=filename)
 
     except subprocess.CalledProcessError as e:
-        app.logger.error(f"Database backup failed: {e.stderr}")
+        app.logger.error("Database backup failed: %s", e.stderr)
         flash(_('Database backup failed. Check logs for details.'), 'danger')
     except Exception as e:
-        app.logger.error(f"An unexpected error occurred during backup: {e}")
+        app.logger.error("An unexpected error occurred during backup: %s", e)
         flash(_('An unexpected error occurred. Check logs for details.'),
               'danger')
+    finally:
+        if filepath and os.path.exists(filepath):
+            try:
+                os.remove(filepath)
+            except OSError:
+                pass
 
     return _redirect_to_admin_tab('sidebar-database')
 
@@ -876,34 +962,46 @@ def restore_db() -> Response:
         return _redirect_to_admin_tab('sidebar-database')
 
     file = request.files['sql_file']
-    if file.filename == '':
+    if not file.filename:
         flash(_('No selected file'), 'danger')
         return _redirect_to_admin_tab('sidebar-database')
 
     if file and file.filename.endswith('.sql'):
+        filepath = ''
         try:
             db_name = current_app.config['DATABASE_NAME']
             db_user = current_app.config['DATABASE_USER']
             db_pass = current_app.config['DATABASE_PASS']
             db_host = current_app.config['DATABASE_HOST']
             db_port = str(current_app.config['DATABASE_PORT'])
+            if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_$]*', str(db_user)):
+                raise ValueError('Invalid database user identifier')
 
             filename = secure_filename(file.filename)
             filepath = os.path.join('/tmp', filename)
             file.save(filepath)
+
+            with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
+                sql_content = f.read()
+            if re.search(
+                    r'(?m)^\s*\\(?:!|copy\b|include\b|i\b|ir\b|o\b)',
+                    sql_content):
+                flash(_('Unsafe SQL meta-commands detected.'), 'danger')
+                return _redirect_to_admin_tab('sidebar-database')
 
             env = os.environ.copy()
             env['PGPASSWORD'] = db_pass
 
             psql_command = [
                 'psql',
+                '-v', 'ON_ERROR_STOP=1',
                 '-U', db_user,
                 '-h', db_host,
                 '-p', db_port,
                 '-d', db_name,
                 '-c', 'DROP SCHEMA IF EXISTS tng CASCADE;',
                 '-c', 'CREATE SCHEMA tng;',
-                '-c', f'ALTER SCHEMA tng OWNER TO {db_user};']
+                '-c', f'ALTER SCHEMA tng OWNER TO "{db_user}";']
 
             subprocess.run(
                 psql_command,
@@ -914,6 +1012,8 @@ def restore_db() -> Response:
 
             restore_command = [
                 'psql',
+                '-v', 'ON_ERROR_STOP=1',
+                '--single-transaction',
                 '-U', db_user,
                 '-h', db_host,
                 '-p', db_port,
@@ -927,25 +1027,32 @@ def restore_db() -> Response:
                 capture_output=True,
                 text=True)
 
-            os.remove(filepath)
             flash(_('Database restored successfully.'), 'success')
 
         except subprocess.CalledProcessError as e:
-            app.logger.error(f"Database restore failed: {e.stderr}")
+            app.logger.error("Database restore failed: %s", e.stderr)
             flash(_('Database restore failed. Check logs for details.'),
                   'danger')
         except Exception as e:
             app.logger.error(
-                f"An unexpected error occurred during restore: {e}")
+                "An unexpected error occurred during restore: %s", e)
             flash(_('An unexpected error occurred. Check logs for details.'),
                   'danger')
+        finally:
+            if filepath and os.path.exists(filepath):
+                try:
+                    os.remove(filepath)
+                except OSError:
+                    pass
     else:
         flash(_('Invalid file type. Please upload a .sql file.'), 'danger')
 
     return _redirect_to_admin_tab('sidebar-database')
 
 
-@app.route('/admin/delete_link/<int:link_id>/<tab>/<entry>', methods=['GET'])
+@app.route(
+    '/admin/delete_link/<int:link_id>/<tab>/<entry>',
+    methods=['POST', 'GET'])
 @login_required
 def delete_link(link_id: int, tab: str, entry: str) -> Response:
     check_manager_user()
@@ -954,19 +1061,18 @@ def delete_link(link_id: int, tab: str, entry: str) -> Response:
     return redirect(url_for('admin', tab=tab, entry=entry))
 
 
-@app.route('/admin/add_link/', methods=['GET'])
+@app.route('/admin/add_link/', methods=['POST', 'GET'])
 @login_required
 def add_link() -> Response:
     check_manager_user()
 
     try:
         params = {
-            'domain': request.args.get('domain', type=int),
-            'range': request.args.get('range', type=int),
-            'prop': request.args.get('property', type=int),
-            'role': request.args.get('role', default=0, type=int),
-            'sortorder': Admin.check_sortorder()
-        }
+            'domain': request.values.get('domain', type=int),
+            'range': request.values.get('range', type=int),
+            'prop': request.values.get('property', type=int),
+            'role': request.values.get('role', default=0, type=int),
+            'sortorder': Admin.check_sortorder()}
 
         if all(v is not None for v in [
                 params['domain'], params['range'], params['prop']]):
@@ -982,15 +1088,14 @@ def add_link() -> Response:
     return redirect(
         url_for(
             'admin',
-            tab=request.args.get('tab', ''),
-            entry=request.args.get('entry', '')))
+            tab=request.values.get('tab', ''),
+            entry=request.values.get('entry', '')))
 
 
-def _extract_fields_from_request(fields: list) -> dict:
-    """
-    Extract fields from request.form dynamically based on the configuration.
-    """
-    data = {}
+def _extract_fields_from_request(
+        fields: list[dict[str, Any]]) -> dict[str, Any]:
+    """Extract fields from request.form dynamically based on config."""
+    data: dict[str, Any] = {}
     for field in fields:
         key = field['key']
         if field.get('translatable'):
@@ -1003,7 +1108,8 @@ def _extract_fields_from_request(fields: list) -> dict:
                 data[key] = request.form.get(key, '')
         else:
             if field.get('type') == 'select':
-                data[key] = request.form.get(key, type=int)
+                raw_val = request.form.get(key, '')
+                data[key] = int(raw_val) if raw_val.isdigit() else None
             else:
                 data[key] = request.form.get(key, '')
     return data
@@ -1022,7 +1128,7 @@ def add_entry() -> Response:
 
     fields_for_category = g.admin_fields.get(current_tab, [])
 
-    form_data = {'category': category}
+    form_data: dict[str, Any] = {'category': category}
     form_data.update(_extract_fields_from_request(fields_for_category))
 
     redirect_base = url_for('admin') + current_tab
@@ -1043,7 +1149,7 @@ def add_entry() -> Response:
     return redirect(redirect_base)
 
 
-@app.route('/admin/delete_entry/<int:id_>/<tab>')
+@app.route('/admin/delete_entry/<int:id_>/<tab>', methods=['POST', 'GET'])
 @login_required
 def delete_entry(id_: int, tab: str) -> Response:
     check_manager_user()
@@ -1072,7 +1178,7 @@ def edit_entry() -> Response:
     current_tab = request.form.get('current_tab', '')
     if not current_tab:
         class_id = Admin.get_config_class_by_id(config_id)
-        class_to_target = {
+        class_to_target: dict[int | None, str] = {
             g.config_classes.get('main-project'): 'nav-main-project',
             g.config_classes.get('project'): 'nav-projects',
             g.config_classes.get('person'): 'nav-persons',
@@ -1082,7 +1188,7 @@ def edit_entry() -> Response:
 
     fields_for_category = g.admin_fields.get(current_tab, [])
 
-    form_data = {'config_id': config_id}
+    form_data: dict[str, Any] = {'config_id': config_id}
     form_data.update(_extract_fields_from_request(fields_for_category))
 
     name = form_data.get('name', '')
@@ -1116,10 +1222,10 @@ def edit_map() -> Response:
         return _redirect_to_admin_tab('sidebar-maps')
 
     raw_map_id = form.map_id.data
-    name = form.name.data
-    display_name = form.displayname.data
+    name = form.name.data or ''
+    display_name = form.displayname.data or ''
     sort_order = str(form.inputorder.data or 0)
-    tile_string = form.description.data
+    tile_string = form.description.data or ''
 
     if not raw_map_id:
         flash(_('Map ID is required'), 'danger')
@@ -1162,10 +1268,10 @@ def add_map() -> Response:
                 flash(f"{getattr(form, field).label.text}: {error}", 'danger')
         return _redirect_to_admin_tab('sidebar-maps')
 
-    name = form.name.data
-    display_name = form.displayname.data
+    name = form.name.data or ''
+    display_name = form.displayname.data or ''
     sort_order = str(form.inputorder.data or 0)
-    tile_string = form.description.data
+    tile_string = form.description.data or ''
 
     data: dict[str, str] = {
         'name': name,
@@ -1187,7 +1293,7 @@ def add_map() -> Response:
     return _redirect_to_admin_tab('sidebar-maps')
 
 
-@app.route('/admin/delete_map/<int:map_id>')
+@app.route('/admin/delete_map/<int:map_id>', methods=['POST', 'GET'])
 @login_required
 def delete_map(map_id: int) -> Response:
     check_manager_user()
@@ -1203,7 +1309,9 @@ def delete_map(map_id: int) -> Response:
 @login_required
 def choose_index_background() -> Response:
     check_manager_user()
-    g.settings.index_map = request.form.get('mapselection', '')
+    map_sel = request.form.get('mapselection', '').strip()
+    if map_sel.isdigit():
+        g.settings.index_map = int(map_sel)
     g.settings.index_img = request.form.get('default_img', '')
     g.settings.img_map = request.form.get('imgmap', '')
     g.settings.greyscale = request.form.get('greyscale') == 'on'
@@ -1300,14 +1408,17 @@ def update_general_settings(ignore_id: Optional[int] = None) -> Response:
         return _redirect_to_admin_tab('sidebar-general-settings-group')
 
     case_study_id = form.case_study_id.data
+    if case_study_id is None:
+        flash(_('Invalid Case Study ID.'), 'error')
+        return _redirect_to_admin_tab('sidebar-general-settings-group')
     validation_result = Admin.check_case_study_type_id(case_study_id)
     if validation_result['is_valid']:
         g.settings.case_study_type_id = case_study_id
-        g.settings.darkmode = form.darkMode.data
-        g.settings.access_restriction = form.accessRestriction.data
-        g.settings.language_selector = form.languageSelection.data
-        g.settings.selected_languages = form.selectedLanguages.data
-        g.settings.preferred_language = form.preferredLanguage.data
+        g.settings.darkmode = bool(form.darkMode.data)
+        g.settings.access_restriction = bool(form.accessRestriction.data)
+        g.settings.language_selector = bool(form.languageSelection.data)
+        g.settings.selected_languages = form.selectedLanguages.data or ['en']
+        g.settings.preferred_language = form.preferredLanguage.data or 'en'
         g.settings.save_to_db()
         flash(_('Updated case study ID successfully'), 'info')
     else:
@@ -1327,7 +1438,7 @@ def check_case_study_id_ajax(entity_id: int) -> Response:
 
 
 # Todo: remove for production
-@app.route('/reset')
+@app.route('/reset', methods=['POST', 'GET'])
 @login_required
 def reset() -> Response:
     check_manager_user()
@@ -1361,7 +1472,7 @@ def make_reset() -> None:
         check=True)
 
 
-@app.route('/admin/clear-cache')
+@app.route('/admin/clear-cache', methods=['POST', 'GET'])
 @login_required
 def clear_cache() -> Response:
     check_manager_user()
@@ -1370,7 +1481,7 @@ def clear_cache() -> Response:
     return _redirect_to_admin_tab('sidebar-cache-options')
 
 
-@app.route("/admin/warm-entity-cache")
+@app.route("/admin/warm-entity-cache", methods=['POST', 'GET'])
 @login_required
 def warm_entity_cache() -> Response:
     """Cache all entities that are not cached yet."""
@@ -1378,7 +1489,7 @@ def warm_entity_cache() -> Response:
     return _redirect_to_admin_tab('sidebar-cache-options')
 
 
-@app.route("/admin/refresh-stale-entities")
+@app.route("/admin/refresh-stale-entities", methods=['POST', 'GET'])
 @login_required
 def refresh_stale_entities() -> Response:
     """Refetch entities older than the maximum age and cache new ones."""
@@ -1386,7 +1497,7 @@ def refresh_stale_entities() -> Response:
     return _redirect_to_admin_tab('sidebar-cache-options')
 
 
-@app.route("/admin/refresh-entity-cache")
+@app.route("/admin/refresh-entity-cache", methods=['POST', 'GET'])
 @login_required
 def refresh_entity_cache() -> Response:
     """Refetch every entity regardless of its age."""
@@ -1419,7 +1530,7 @@ def trigger_cache_warmup(mode: str = 'warm') -> None:
         flash(_('Could not start entity cache warm-up.'), 'danger')
 
 
-@app.route('/admin/refresh-system-cache')
+@app.route('/admin/refresh-system-cache', methods=['POST', 'GET'])
 @login_required
 def refresh_system_cache() -> Response:
     """Refresh general API caches and start full vocabulary preloading."""
@@ -1449,43 +1560,39 @@ def refresh_system_cache() -> Response:
 
 
 @app.route('/uploads/logos/<filename>')
-def uploaded_logo(filename):
+def uploaded_logo(filename: str) -> Response:
     return send_from_directory(
         os.path.join(app.root_path, '..', 'uploads', 'logos'), filename)
 
 
 @app.route('/uploads/assets/<filename>')
-def uploaded_asset(filename):
+def uploaded_asset(filename: str) -> Response:
     return send_from_directory(
         os.path.join(app.root_path, '..', 'uploads', 'assets'), filename)
 
 
-@app.context_processor
-def utility_processor():
-    def get_icon_url(filename):
-        uploads_path = os.path.join(app.root_path, '..', 'uploads', 'icons')
-        if os.path.exists(os.path.join(uploads_path, filename)):
-            return url_for('uploaded_icon', filename=filename)
-        return url_for('static', filename=f'images/icons/{filename}')
-
-    return dict(get_icon_url=get_icon_url)
-
-
 @app.route('/admin/upload_asset', methods=['POST'])
 @login_required
-def upload_asset():
+def upload_asset() -> Response:
     check_manager_user()
     if 'asset_file' not in request.files:
         flash(_('No file part'), 'danger')
         return _redirect_to_admin_tab('sidebar-assets')
 
     file = request.files['asset_file']
-    if file.filename == '':
+    if not file.filename:
         flash(_('No selected file'), 'danger')
         return _redirect_to_admin_tab('sidebar-assets')
 
-    if file:
+    if file and file.filename:
         filename = secure_filename(file.filename)
+        if not _is_allowed_upload(filename, 'asset'):
+            flash(_('Invalid file type for asset.'), 'danger')
+            return _redirect_to_admin_tab('sidebar-assets')
+        if filename.lower().endswith('.svg') and not _is_safe_svg(file):
+            flash(_('Unsafe SVG content detected.'), 'danger')
+            return _redirect_to_admin_tab('sidebar-assets')
+
         upload_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
         os.makedirs(upload_path, exist_ok=True)
         file.save(os.path.join(upload_path, filename))
@@ -1498,7 +1605,7 @@ def upload_asset():
 
 @app.route('/admin/rename_asset', methods=['POST'])
 @login_required
-def rename_asset():
+def rename_asset() -> Response:
     check_manager_user()
     old_name = request.form.get('old_name')
     new_name = request.form.get('new_name')
@@ -1507,19 +1614,26 @@ def rename_asset():
         flash(_('Invalid request for renaming.'), 'danger')
         return _redirect_to_admin_tab('sidebar-assets')
 
-    static_path = os.path.join(app.static_folder, 'assets')
+    safe_old = secure_filename(old_name)
+    safe_new = secure_filename(new_name)
+    new_ext = os.path.splitext(safe_new)[1].lower()
+    if not safe_old or not safe_new or new_ext in BLOCKED_UPLOAD_EXTENSIONS:
+        flash(_('Invalid filename or extension.'), 'danger')
+        return _redirect_to_admin_tab('sidebar-assets')
+
+    static_folder = app.static_folder or ''
+    static_path = os.path.join(static_folder, 'assets')
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
 
-    old_filepath_static = os.path.join(static_path, secure_filename(old_name))
-    old_filepath_uploads = os.path.join(
-        uploads_path, secure_filename(old_name))
+    old_filepath_static = os.path.join(static_path, safe_old)
+    old_filepath_uploads = os.path.join(uploads_path, safe_old)
 
     if os.path.exists(old_filepath_static):
         flash(_('Cannot rename default assets.'), 'danger')
         return _redirect_to_admin_tab('sidebar-assets')
-    elif os.path.exists(old_filepath_uploads):
+    if os.path.exists(old_filepath_uploads):
         old_filepath = old_filepath_uploads
-        new_filepath = os.path.join(uploads_path, secure_filename(new_name))
+        new_filepath = os.path.join(uploads_path, safe_new)
     else:
         flash(_('Original file not found.'), 'danger')
         return _redirect_to_admin_tab('sidebar-assets')
@@ -1530,9 +1644,9 @@ def rename_asset():
 
     try:
         os.rename(old_filepath, new_filepath)
-        rename_asset_in_db(old_name, new_name)
-        flash(_('Asset renamed from "%(old)s" to "%(new)s".', old=old_name,
-                new=new_name), 'success')
+        rename_asset_in_db(safe_old, safe_new)
+        flash(_('Asset renamed from "%(old)s" to "%(new)s".', old=safe_old,
+                new=safe_new), 'success')
     except OSError as e:
         flash(_('Error renaming file: %(error)s', error=e), 'danger')
 
@@ -1541,29 +1655,30 @@ def rename_asset():
 
 @app.route('/admin/delete_asset', methods=['POST'])
 @login_required
-def delete_asset():
+def delete_asset() -> Response:
     check_manager_user()
     filename = request.form.get('filename')
     if not filename:
         flash(_('No filename specified for deletion.'), 'danger')
         return _redirect_to_admin_tab('sidebar-assets')
 
+    safe_name = secure_filename(filename)
     uploads_path = os.path.join(app.root_path, '..', 'uploads', 'assets')
-    filepath_uploads = os.path.join(uploads_path, secure_filename(filename))
+    filepath_uploads = os.path.join(uploads_path, safe_name)
 
     if os.path.exists(filepath_uploads):
         try:
             os.remove(filepath_uploads)
-            delete_asset_from_db(filename)
-            flash(_('Asset "%(name)s" deleted successfully.', name=filename),
+            delete_asset_from_db(safe_name)
+            flash(_('Asset "%(name)s" deleted successfully.', name=safe_name),
                   'success')
         except OSError as e:
             flash(_('Error deleting file: %(error)s', error=e), 'danger')
     else:
-        delete_asset_from_db(filename)
+        delete_asset_from_db(safe_name)
         flash(_(
             'Default asset "%(name)s" deactivated.',
-            name=filename), 'success')
+            name=safe_name), 'success')
 
     return _redirect_to_admin_tab('sidebar-assets')
 
@@ -1584,22 +1699,20 @@ def update_asset_license() -> Response:
     return _redirect_to_admin_tab('sidebar-assets')
 
 
-
-
 @app.route('/uploads/team/<filename>')
-def uploaded_team(filename):
+def uploaded_team(filename: str) -> Response:
     return send_from_directory(
         os.path.join(app.root_path, '..', 'uploads', 'team'), filename)
 
 
 @app.route('/uploads/icons/<filename>')
-def uploaded_icon(filename):
+def uploaded_icon(filename: str) -> Response:
     return send_from_directory(
         os.path.join(app.root_path, '..', 'uploads', 'icons'), filename)
 
 
 @app.route('/uploads/favicon.ico')
-def uploaded_favicon():
+def uploaded_favicon() -> Response:
     return send_from_directory(
         os.path.join(app.root_path, '..', 'uploads'), 'favicon.ico')
 
@@ -1609,7 +1722,6 @@ def uploaded_favicon():
 def upload_file() -> Response:
     check_manager_user()
     form = FileUploadForm()
-    # file_type and active_sidebar are in the form but we might use defaults
     file_type = request.form.get('file_type', 'logo')
 
     if not form.validate_on_submit():
@@ -1619,7 +1731,7 @@ def upload_file() -> Response:
         return _redirect_to_admin_tab(f'sidebar-{file_type}')
 
     file = form.file.data
-    if file:
+    if file and file.filename:
         filename = secure_filename(file.filename)
         match file_type:
             case 'logo':
@@ -1633,6 +1745,13 @@ def upload_file() -> Response:
             case _:
                 flash(_('Invalid file type.'), 'danger')
                 return _redirect_to_admin_tab('sidebar-file-management-group')
+
+        if not _is_allowed_upload(filename, file_type):
+            flash(_('Invalid file extension.'), 'danger')
+            return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
+        if filename.lower().endswith('.svg') and not _is_safe_svg(file):
+            flash(_('Unsafe SVG content detected.'), 'danger')
+            return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
         upload_path = os.path.join(
             app.root_path, '..', 'uploads', upload_folder)
@@ -1659,8 +1778,8 @@ def rename_file() -> Response:
                 flash(f"{getattr(form, field).label.text}: {error}", 'danger')
         return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
-    old_name = form.old_name.data
-    new_name = form.new_name.data
+    old_name = form.old_name.data or ''
+    new_name = form.new_name.data or ''
 
     match file_type:
         case 'logo':
@@ -1672,24 +1791,34 @@ def rename_file() -> Response:
         case 'team':
             upload_folder = 'team'
             static_folder = 'images/team'
+        case 'icon':
+            upload_folder = 'icons'
+            static_folder = 'images/icons'
         case _:
             flash(_('Invalid file type.'), 'danger')
             return _redirect_to_admin_tab('sidebar-file-management-group')
 
-    static_path = os.path.join(app.static_folder, static_folder)
+    safe_old = secure_filename(old_name)
+    safe_new = secure_filename(new_name)
+    if not safe_old or not safe_new or not _is_allowed_upload(
+            safe_new, file_type):
+        flash(_('Invalid filename or extension.'), 'danger')
+        return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
+
+    app_static = app.static_folder or ''
+    static_path = os.path.join(app_static, static_folder)
     uploads_path = os.path.join(
         app.root_path, '..', 'uploads', upload_folder)
 
-    old_filepath_static = os.path.join(static_path, secure_filename(old_name))
-    old_filepath_uploads = os.path.join(
-        uploads_path, secure_filename(old_name))
+    old_filepath_static = os.path.join(static_path, safe_old)
+    old_filepath_uploads = os.path.join(uploads_path, safe_old)
 
     if os.path.exists(old_filepath_static):
         flash(_('Cannot rename default files.'), 'danger')
         return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
-    elif os.path.exists(old_filepath_uploads):
+    if os.path.exists(old_filepath_uploads):
         old_filepath = old_filepath_uploads
-        new_filepath = os.path.join(uploads_path, secure_filename(new_name))
+        new_filepath = os.path.join(uploads_path, safe_new)
     else:
         flash(_('Original file not found.'), 'danger')
         return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
@@ -1700,12 +1829,12 @@ def rename_file() -> Response:
 
     try:
         os.rename(old_filepath, new_filepath)
-        rename_file_in_db(old_name, new_name, file_type)
+        rename_file_in_db(safe_old, safe_new, file_type)
         flash(_(
             '%(type)s renamed from "%(old)s" to "%(new)s".',
             type=file_type.capitalize(),
-            old=old_name,
-            new=new_name), 'success')
+            old=safe_old,
+            new=safe_new), 'success')
     except OSError as e:
         flash(_('Error renaming file: %(error)s', error=e), 'danger')
 
@@ -1725,7 +1854,7 @@ def delete_file() -> Response:
                 flash(f"{getattr(form, field).label.text}: {error}", 'danger')
         return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
-    filename = form.filename.data
+    filename = secure_filename(form.filename.data or '')
 
     match file_type:
         case 'logo':
@@ -1742,8 +1871,7 @@ def delete_file() -> Response:
 
     uploads_path = os.path.join(
         app.root_path, '..', 'uploads', upload_folder)
-    filepath_uploads = os.path.join(
-        uploads_path, secure_filename(filename))
+    filepath_uploads = os.path.join(uploads_path, filename)
 
     if os.path.exists(filepath_uploads):
         try:
@@ -1782,7 +1910,7 @@ def update_file_license() -> Response:
                 flash(f"{getattr(form, field).label.text}: {error}", 'danger')
         return _redirect_to_admin_tab(f'sidebar-{file_type}-management')
 
-    filename = form.filename.data
+    filename = form.filename.data or ''
     license_id = form.license_id.data
     attribution = form.attribution.data
 
@@ -1839,7 +1967,7 @@ def delete_pub(pub_id: int) -> Response:
 
 @app.route('/admin/import_doi', methods=['POST'])
 @login_required
-def import_doi() -> Response:
+def import_doi() -> tuple[Response, int] | Response:
     check_manager_user()
     doi = request.form.get('doi', '')
     metadata = fetch_doi_metadata(doi)

@@ -121,7 +121,9 @@
       preview.appendChild(icon);
     } else if (iconType.value === 'img' && iconValue.value) {
       const image = document.createElement('img');
-      image.src = `/static/images/icons/${iconValue.value}`;
+      const selectedOpt = iconFile.selectedOptions[0];
+      image.src = (selectedOpt && selectedOpt.dataset.url) ||
+        `/static/images/icons/${iconValue.value}`;
       image.alt = '';
       image.className = 'w-100 h-100';
       preview.appendChild(image);
@@ -186,8 +188,14 @@
     const criteria = getCriteria();
     if (!criteria.length) return;
     try {
+      const csrfToken =
+        document.querySelector('meta[name="csrf-token"]')?.content || '';
       const response = await fetch('/admin/predefined_filters/order', {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
         body: JSON.stringify({criteria})
       });
       if (!response.ok) throw new Error('Unable to save filter order.');

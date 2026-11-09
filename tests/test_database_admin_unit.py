@@ -50,8 +50,49 @@ def test_add_new_map(app_instance):
 def test_update_sort_order(app_instance):
     with app_instance.test_request_context():
         g.cursor = MagicMock()
-        # Just ensure it doesn't crash for now
         update_sort_order('tng.entities', [{'id': 1, 'order': 1}])
+        with pytest.raises(ValueError, match='Invalid table for sort order'):
+            update_sort_order('tng.users', [{'id': 1, 'order': 1}])
+
+
+def test_update_file_license_zero_clears_or_uses_null(app_instance):
+    from histarchexplorer.database.admin import update_file_license
+    with app_instance.test_request_context():
+        g.cursor = MagicMock()
+        g.cursor.fetchone.return_value = {'id': 42}
+        # license_id=0 and empty attribution -> deletes license entry
+        update_file_license('logo.png', 0, '')
+        assert any(
+            'DELETE FROM tng.file_licenses' in str(call.args[0])
+            for call in g.cursor.execute.call_args_list)
+
+        g.cursor.reset_mock()
+        g.cursor.fetchone.return_value = {'id': 42}
+        # license_id=0 with attribution -> inserts None for license_id
+        update_file_license('logo.png', 0, 'CC Author')
+        last_args = g.cursor.execute.call_args[0][1]
+        assert last_args['license_id'] is None
+        assert last_args['attribution'] == 'CC Author'
+
+
+def test_fetch_doi_metadata_rejects_invalid_doi():
+    from histarchexplorer.utils.doi import fetch_doi_metadata
+    assert fetch_doi_metadata('../../etc/passwd') is None
+    assert fetch_doi_metadata('10.1000/../secret') is None
+    assert fetch_doi_metadata('not-a-doi') is None
+
+
+def test_load_or_generate_secret_key(tmp_path):
+    from histarchexplorer import _load_or_generate_secret_key
+    dummy_app = Flask(__name__, instance_path=str(tmp_path))
+    dummy_app.config['SECRET_KEY'] = 'CHANGE ME'
+
+    generated = _load_or_generate_secret_key(dummy_app)
+    assert len(generated) == 64
+    key_file = tmp_path / '.secret_key'
+    assert key_file.exists()
+    assert (key_file.stat().st_mode & 0o777) == 0o600
+    assert _load_or_generate_secret_key(dummy_app) == generated
 
 def test_get_licenses(app_instance):
     with app_instance.test_request_context():

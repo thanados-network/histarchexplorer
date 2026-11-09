@@ -17,7 +17,7 @@
             {{ general_settings_form.case_study_id(
                 class="form-control form-control-lg",
                 id="caseStudyHierarchyID",
-                pattern="^\d+$",
+                pattern="^\\d+$",
                 required=True) }}
             <div class="invalid-feedback" id="caseStudyIDFeedback">
               {{ _('Please enter a positive integer for the Case Study Hierarchy ID.') }}

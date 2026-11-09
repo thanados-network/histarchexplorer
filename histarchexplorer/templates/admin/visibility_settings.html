@@ -1,4 +1,5 @@
 <form method="post" action="{{ url_for('update_class_visibility') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <input type="hidden" name="active_sidebar" value="sidebar-visibility-settings">
 
   <div class="d-flex justify-content-between align-items-center mb-4">

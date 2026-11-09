@@ -30,7 +30,7 @@ def parse_vocabulary_ids(value: str) -> list[int]:
 
 
 def validate_vocabulary_filters(
-        include: list, exclude: list) -> tuple[list[int], list[int]]:
+        include: list[Any], exclude: list[Any]) -> tuple[list[int], list[int]]:
     """Validate raw ID lists and enforce mutually exclusive filter modes."""
     normalized = []
     for ids in (include, exclude):
@@ -59,18 +59,22 @@ def _migrate_type_divisions(
     # Check if migration is needed by inspecting the first key
     first_key = next(iter(data))
     if first_key.isdigit():
-        new_data = {}
+        new_data: Dict[str, Dict[str, Union[str, List[int], None]]] = {}
         for id_str, values in data.items():
-            if not isinstance(values, dict): continue
+            if not isinstance(values, dict):
+                continue
             label = values.get('label')
-            if not label: continue
+            if not label:
+                continue
 
             if label not in new_data:
                 new_data[label] = {
                     'icon_type': values.get('icon_type'),
                     'icon_value': values.get('icon_value'),
                     'ids': []}
-            new_data[label]['ids'].append(int(id_str))
+            ids_list = new_data[label].get('ids')
+            if isinstance(ids_list, list):
+                ids_list.append(int(id_str))
         return new_data
     return data
 
@@ -130,7 +134,7 @@ class Settings(BaseModel):
         '#2E4053', '#5D6D7E', '#85929E', '#AEB6BF', '#D6DBDF',
         '#1A5276', '#1D8348', '#9A7D0A', '#922B21', '#633974',
         '#7E5109', '#1C2833', '#99A3A4', '#515A5A']
-    menu_management: dict = {
+    menu_management: dict[str, dict[str, Any]] = {
         'start_page': {'show': True, 'page_type': 'default'},
         'legal_notice': {'show': True, 'page_type': 'default'},
         'about': {'show': True, 'page_type': 'default'},
@@ -139,7 +143,7 @@ class Settings(BaseModel):
         'search': {'show': True, 'page_type': 'default'},
         'vocabulary': {'show': True, 'page_type': 'default'},
         'footer': {'show': True, 'page_type': 'default'}}
-    type_divisions: Dict[str, Dict[str, Union[str, List[int], None]]] = Field(
+    type_divisions: dict[str, Any] = Field(
         default_factory=lambda: {
             'administrative unit': {'icon_type': 'css',
                                     'icon_value': 'bi bi-map',
@@ -181,7 +185,8 @@ class Settings(BaseModel):
 
     @field_validator('menu_management')
     @classmethod
-    def normalize_vocabulary_menu(cls, menu: dict) -> dict:
+    def normalize_vocabulary_menu(
+            cls, menu: dict[str, Any]) -> dict[str, Any]:
         """Preserve vocabulary visibility and supported page types."""
         menu = menu.copy()
         vocabulary = menu.get('vocabulary', {})
@@ -241,7 +246,9 @@ class Settings(BaseModel):
             merged_settings_data)
 
         instance = cls(**merged_settings_data)
-        instance.save_to_db()
+        for key, value in instance.model_dump().items():
+            if key not in db_settings_raw or db_settings_raw[key] != value:
+                save_settings(key, value)
         return instance
 
     def save_to_db(self) -> None:
@@ -284,7 +291,7 @@ def _validate_and_sanitize_settings(
         if field.default is not PydanticUndefined:
             default_val = field.default
         elif field.default_factory is not None:
-            default_val = field.default_factory()
+            default_val = field.default_factory()  # type: ignore[call-arg]
         else:
             default_val = None
 
@@ -311,7 +318,7 @@ def _validate_and_sanitize_settings(
             v = [v]
 
         try:
-            adapter = TypeAdapter(field.annotation)
+            adapter: TypeAdapter[Any] = TypeAdapter(field.annotation)
             validated_val = adapter.validate_python(v)
             sanitized[name] = validated_val
         except Exception:

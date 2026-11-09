@@ -2,6 +2,7 @@
   <div class="card-body">
     <h5 class="card-title">{{ _('menu management') | upper }}</h5>
     <form id="menuManagementForm" action="{{ url_for('update_menu_management') }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <input type="hidden" name="active_sidebar" value="sidebar-content-group">
       <table class="table">
         <thead>

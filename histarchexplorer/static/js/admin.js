@@ -456,40 +456,67 @@ function addEntry(category) {
   }
 })();
 
+function submitPostAction(url, params = {}) {
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = url;
+
+  const csrfToken =
+    document.querySelector('meta[name="csrf-token"]')?.content || '';
+  if (csrfToken) {
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrf_token';
+    csrfInput.value = csrfToken;
+    form.appendChild(csrfInput);
+  }
+
+  Object.entries(params).forEach(([key, value]) => {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = key;
+    input.value = value;
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+}
+
 document.getElementById('resetButton')?.addEventListener('click', function () {
   if (confirm('Are you sure you want to reset the settings?')) {
-    window.location.href = '/reset';
+    submitPostAction('/reset');
   }
 });
 
 document.getElementById('clearCacheButton')?.addEventListener('click', function () {
   if (confirm('Are you sure you want to clear the cache?')) {
-    window.location.href = '/admin/clear-cache';
+    submitPostAction('/admin/clear-cache');
   }
 });
 
 
 document.getElementById('warmEntityCache')?.addEventListener('click', function () {
   if (confirm('Are you sure you want to warm entity cache? This will take some time.')) {
-    window.location.href = '/admin/warm-entity-cache';
+    submitPostAction('/admin/warm-entity-cache');
   }
 });
 
 document.getElementById('refreshStaleEntities')?.addEventListener('click', function () {
   if (confirm('Refetch all entities older than the maximum age? This will take some time.')) {
-    window.location.href = '/admin/refresh-stale-entities';
+    submitPostAction('/admin/refresh-stale-entities');
   }
 });
 
 document.getElementById('refreshEntityCache')?.addEventListener('click', function () {
   if (confirm('Are you sure you want to refresh the whole entity cache? This will take some time.')) {
-    window.location.href = '/admin/refresh-entity-cache';
+    submitPostAction('/admin/refresh-entity-cache');
   }
 });
 
 document.getElementById('refreshSystemCache')?.addEventListener('click', function () {
   if (confirm('Are you sure you want to refresh the system cache?')) {
-    window.location.href = '/admin/refresh-system-cache';
+    submitPostAction('/admin/refresh-system-cache');
   }
 });
 
@@ -652,6 +679,14 @@ function deleteLink(linkId, startName, configProperty, endName, tab, entry) {
   myModal.show();
 }
 
+document.getElementById('confirmedDelete')?.addEventListener('click', event => {
+  const targetUrl = event.currentTarget.getAttribute('href');
+  if (targetUrl && targetUrl !== '#') {
+    event.preventDefault();
+    submitPostAction(targetUrl);
+  }
+});
+
 
 const connectionSelects = document.querySelectorAll('.connection-select');
 
@@ -740,7 +775,7 @@ function saveLinkValues(button) {
 
   const {property, role, tab, entry} = button.dataset;
 
-  const params = new URLSearchParams({
+  submitPostAction('/admin/add_link/', {
     domain,
     range,
     property,
@@ -748,8 +783,6 @@ function saveLinkValues(button) {
     tab,
     entry
   });
-
-  window.location.href = `/admin/add_link/?${params.toString()}`;
 }
 
 
@@ -804,10 +837,13 @@ function makeSortables(containerDiv) {
 }
 
 function saveSortOrder(items, table) {
+  const csrfToken =
+    document.querySelector('meta[name="csrf-token"]')?.content || '';
   fetch('/sortlinks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken
     },
     body: JSON.stringify({criteria: items, table: table}),
   })
@@ -822,23 +858,440 @@ function saveSortOrder(items, table) {
 }
 
 
+function updateColorPreview(color) {
+  const preview = document.getElementById('new-color-preview');
+  if (!preview) return;
+  const isValid = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
+  preview.style.backgroundColor = isValid ? color : 'transparent';
+}
+
+function toggleIconType(id) {
+  const typeSelect = document.getElementById(`icon_type_${id}`);
+  const cssContainer = document.getElementById(`css_container_${id}`);
+  const imgContainer = document.getElementById(`img_container_${id}`);
+  const cssInput = document.getElementById(`css_input_${id}`);
+  const imgSelect = document.getElementById(`img_select_${id}`);
+  const previewContainer = document.getElementById(`preview_container_${id}`);
+  if (!typeSelect) return;
+
+  if (typeSelect.value === 'css') {
+    cssContainer.classList.remove('d-none');
+    imgContainer.classList.add('d-none');
+    cssInput.setAttribute('name', `icon_value_${id}`);
+    imgSelect.removeAttribute('name');
+    updatePreview(id);
+  } else if (typeSelect.value === 'img') {
+    cssContainer.classList.add('d-none');
+    imgContainer.classList.remove('d-none');
+    imgSelect.setAttribute('name', `icon_value_${id}`);
+    cssInput.removeAttribute('name');
+    updatePreview(id);
+  } else {
+    cssContainer.classList.add('d-none');
+    imgContainer.classList.add('d-none');
+    cssInput.removeAttribute('name');
+    imgSelect.removeAttribute('name');
+    if (previewContainer) previewContainer.replaceChildren();
+  }
+}
+
+function updatePreview(id) {
+  const typeSelect = document.getElementById(`icon_type_${id}`);
+  const previewContainer = document.getElementById(`preview_container_${id}`);
+  if (!typeSelect || !previewContainer) return;
+
+  previewContainer.replaceChildren();
+  if (typeSelect.value === 'css') {
+    const cssInput = document.getElementById(`css_input_${id}`);
+    const val = cssInput ? cssInput.value.trim() : '';
+    if (val) {
+      let classes = val;
+      if (!val.startsWith('bi ') && !val.split(' ').includes('bi')) {
+        classes = 'bi ' + val;
+      }
+      const span = document.createElement('span');
+      span.className = 'fs-4';
+      const iconEl = document.createElement('i');
+      iconEl.className = classes;
+      span.appendChild(iconEl);
+      previewContainer.appendChild(span);
+    }
+  } else if (typeSelect.value === 'img') {
+    const imgSelect = document.getElementById(`img_select_${id}`);
+    const selectedOpt = imgSelect ? imgSelect.selectedOptions[0] : null;
+    const iconUrl = selectedOpt ? selectedOpt.dataset.url : '';
+    if (iconUrl) {
+      const imgEl = document.createElement('img');
+      imgEl.src = iconUrl;
+      imgEl.className = 'w-100 h-100 object-fit-contain';
+      imgEl.alt = 'preview';
+      previewContainer.appendChild(imgEl);
+    }
+  }
+}
+
+function addDivision() {
+  const container = document.getElementById('type-divisions-container');
+  const tpl = document.getElementById('type-division-icon-options');
+  if (!container || !tpl) return;
+
+  const index = parseInt(container.dataset.divisionCounter || '0', 10);
+  container.dataset.divisionCounter = String(index + 1);
+  const ds = container.dataset;
+
+  const col = document.createElement('div');
+  col.className = 'col';
+  col.setAttribute('data-label', '');
+  col.setAttribute('data-division-index', String(index));
+  col.innerHTML = `
+    <div class="card h-100 shadow-sm border rounded">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+        <div class="input-group input-group-sm w-75">
+          <span class="input-group-text bg-white"><i class="bi bi-tag-fill text-muted"></i></span>
+          <input type="text" class="form-control fw-bold"
+                 name="label_${index}" required placeholder="${ds.labelPlaceholder || ''}">
+        </div>
+        <button type="button" class="btn btn-outline-danger btn-sm"
+                onclick="removeDivision(this)">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+      <div class="card-body p-3">
+        <div class="row g-2 align-items-end mb-3">
+          <div class="col-md-5">
+            <label class="form-label text-muted small fw-bold mb-1">${ds.iconTypeLabel || ''}</label>
+            <select class="form-select form-select-sm"
+                    name="icon_type_${index}"
+                    id="icon_type_${index}"
+                    onchange="toggleIconType(${index})">
+              <option value="css">CSS Class</option>
+              <option value="img">SVG Icon</option>
+              <option value="" selected>None</option>
+            </select>
+          </div>
+          <div class="col-md-7">
+            <div id="css_container_${index}" class="d-none">
+              <label class="form-label text-muted small fw-bold mb-1">
+                ${ds.bootstrapIconLabel || ''}
+              </label>
+              <input type="text" class="form-control form-select-sm"
+                     id="css_input_${index}"
+                     name="icon_value_${index}"
+                     oninput="updatePreview(${index})"
+                     placeholder="e.g. bi-tags">
+            </div>
+            <div id="img_container_${index}" class="d-none">
+              <label class="form-label text-muted small fw-bold mb-1">
+                ${ds.svgIconLabel || ''}
+              </label>
+              <select class="form-select form-select-sm"
+                      id="img_select_${index}"
+                      name="icon_value_${index}"
+                      onchange="updatePreview(${index})">
+                ${tpl.innerHTML}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-3 mb-3 p-2 bg-light rounded border"
+             style="min-height: 48px;">
+          <span class="text-muted small fw-bold">${ds.previewLabel || ''}</span>
+          <div id="preview_container_${index}"
+               class="d-flex align-items-center justify-content-center text-primary"
+               style="width: 32px; height: 32px;"></div>
+        </div>
+        <div class="mb-0">
+          <label class="form-label text-muted small fw-bold mb-1">
+            ${ds.typeIdsLabel || ''}
+          </label>
+          <input type="text" class="form-control form-select-sm"
+                 name="ids_${index}" placeholder="e.g. 101, 102">
+        </div>
+      </div>
+    </div>`;
+  container.appendChild(col);
+  toggleIconType(index);
+}
+
+function removeDivision(button) {
+  button.closest('.col')?.remove();
+}
+
+function purgeIdentifier(sysId) {
+  if (confirm('Are you sure you want to purge this external identifier from the system?')) {
+    document.getElementById(`accordion-item-${sysId}`)?.remove();
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
-  let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  let tooltipTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="tooltip"]'))
   tooltipTriggerList.forEach(function (tooltipTriggerEl) {
     new bootstrap.Tooltip(tooltipTriggerEl)
   })
 
+  // Colors popover initialization
+  const colorsForm = document.getElementById('entity-colors-form');
+  if (colorsForm && colorsForm.dataset.availableColors) {
+    const availableColors = JSON.parse(colorsForm.dataset.availableColors);
+    document.querySelectorAll('[data-bs-toggle="popover"]').forEach(popoverTriggerEl => {
+      const entityType = popoverTriggerEl.id.replace('display-', '');
+      const input = document.getElementById('selected-color-' + entityType);
+      const colorGrid = document.createElement('div');
+      colorGrid.className = 'color-grid-popover';
+
+      availableColors.forEach(col => {
+        const swatch = document.createElement('div');
+        swatch.className = 'swatch';
+        swatch.style.backgroundColor = col;
+        swatch.onclick = (e) => {
+          e.stopPropagation();
+          input.value = col;
+          popoverTriggerEl.style.backgroundColor = col;
+          bootstrap.Popover.getInstance(popoverTriggerEl).hide();
+        };
+        colorGrid.appendChild(swatch);
+      });
+
+      new bootstrap.Popover(popoverTriggerEl, {
+        content: colorGrid,
+        sanitize: false});
+    });
+  }
+
+  // Legal Notice TinyMCE initialization
+  if (typeof tinymce !== 'undefined' && document.querySelector('.tinymce-editor')) {
+    tinymce.init({
+      selector: '.tinymce-editor',
+      license_key: 'gpl',
+      menubar: false,
+      branding: false,
+      height: 300,
+      plugins: 'link lists image table code',
+      toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
+        'superscript subscript | alignleft aligncenter alignright alignjustify | ' +
+        'bullist numlist | table link image | removeformat code',
+      convert_urls: false,
+      default_link_target: '_blank',
+      rel_list: [{title: 'No referrer', value: 'noreferrer noopener'}],
+      image_advtab: true,
+      paste_as_text: false,
+      setup: function (editor) {
+        editor.on('change keyup', function () {
+          editor.save();
+        });
+      }});
+  }
+
+  // Footer Content Management initialization
+  const sortableLogosContainer = document.getElementById('sortable-logos');
+  const footerForm = document.getElementById('footer-logos-form');
+  if (sortableLogosContainer && footerForm) {
+    const orderInput = document.getElementById('footer-logo-order-input');
+    const checkboxes = document.querySelectorAll('.logo-checkbox');
+    const orderedLogoIds = JSON.parse(
+      sortableLogosContainer.dataset.selectedLogos || '[]');
+    let isSavingOrder = false;
+
+    const getSelectedLogoIds = () => Array.from(
+      document.querySelectorAll('.logo-checkbox:checked')).map(cb => cb.value);
+
+    const updatePositions = () => {
+      sortableLogosContainer.querySelectorAll('.card').forEach((el, index) => {
+        el.querySelector('.position').textContent = index + 1;
+      });
+    };
+
+    const updateOrderInput = () => {
+      const logoIds = Array.from(
+        sortableLogosContainer.querySelectorAll('.card')).map(
+          el => el.getAttribute('data-id'));
+      if (orderInput) orderInput.value = JSON.stringify(logoIds);
+    };
+
+    const saveOrderOnTheFly = async () => {
+      if (isSavingOrder) return;
+      const currentOrder = Array.from(
+        sortableLogosContainer.querySelectorAll('.card')).map(
+          el => el.getAttribute('data-id'));
+      if (!currentOrder.length) return;
+
+      isSavingOrder = true;
+      const formData = new FormData();
+      formData.append('active_sidebar', 'sidebar-footer-content');
+      formData.append('footer_logo_order', JSON.stringify(currentOrder));
+      getSelectedLogoIds().forEach(logoId => {
+        formData.append('footer_logos', logoId);
+      });
+
+      try {
+        const csrfToken =
+          document.querySelector('meta[name="csrf-token"]')?.content || '';
+        const response = await fetch(footerForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrfToken}});
+        if (!response.ok) console.error('Unable to save footer order.');
+      } catch (error) {
+        console.error('Unable to save footer order.', error);
+      } finally {
+        isSavingOrder = false;
+      }
+    };
+
+    const updateSortableList = () => {
+      sortableLogosContainer.replaceChildren();
+      const checkedLogoIds = getSelectedLogoIds();
+      const finalLogoIds = orderedLogoIds.filter(
+        id => checkedLogoIds.includes(String(id)));
+      checkedLogoIds.forEach(id => {
+        if (!finalLogoIds.includes(Number(id))) finalLogoIds.push(Number(id));
+      });
+
+      let position = 1;
+      finalLogoIds.forEach(logoId => {
+        const checkbox = document.getElementById('checkbox-' + logoId);
+        if (checkbox) {
+          const filename = checkbox.getAttribute('data-filename') || '';
+          const url = checkbox.getAttribute('data-url') || '';
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.dataset.id = String(logoId);
+          card.style.width = '120px';
+
+          const header = document.createElement('div');
+          header.className = 'card-header text-center fw-bold';
+          header.innerHTML = `#<span class="position">${position++}</span>`;
+
+          const img = document.createElement('img');
+          img.src = url;
+          img.className = 'card-img-top p-2';
+          img.alt = filename;
+          img.style.objectFit = 'contain';
+          img.style.height = '80px';
+
+          card.appendChild(header);
+          card.appendChild(img);
+          sortableLogosContainer.appendChild(card);
+        }
+      });
+      updatePositions();
+      updateOrderInput();
+    };
+
+    new Sortable(sortableLogosContainer, {
+      animation: 150,
+      ghostClass: 'blue-background-class',
+      onEnd: async function () {
+        updatePositions();
+        updateOrderInput();
+        await saveOrderOnTheFly();
+      }});
+
+    checkboxes.forEach(cb => cb.addEventListener('change', updateSortableList));
+    footerForm.addEventListener('submit', updateOrderInput);
+    updateSortableList();
+  }
+
+  // Publications DOI Import & Edit Modal initialization
+  const btnImportDoi = document.getElementById('btn_import_doi');
+  if (btnImportDoi) {
+    const doiInput = document.getElementById('doi_import');
+    const doiStatus = document.getElementById('doi_status');
+    btnImportDoi.addEventListener('click', function () {
+      const doi = doiInput ? doiInput.value.trim() : '';
+      if (!doi || !doiStatus) return;
+
+      const fetchingText = btnImportDoi.dataset.fetchingText || 'Fetching data...';
+      doiStatus.innerHTML =
+        `<span class="text-info"><i class="bi bi-hourglass-split"></i> ${fetchingText}</span>`;
+
+      const formData = new FormData();
+      formData.append('doi', doi);
+      const csrfToken =
+        document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+      fetch(btnImportDoi.dataset.importUrl || '/admin/publications/import_doi', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': csrfToken}})
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            const span = document.createElement('span');
+            span.className = 'text-danger';
+            span.textContent = data.error;
+            doiStatus.replaceChildren(span);
+          } else {
+            document.getElementById('pub_title').value = data.title || '';
+            document.getElementById('pub_authors').value = data.authors || '';
+            document.getElementById('pub_year').value = data.year || '';
+            document.getElementById('pub_doi').value = data.doi || '';
+            document.getElementById('pub_url').value = data.url || '';
+            const span = document.createElement('span');
+            span.className = 'text-success';
+            span.textContent = btnImportDoi.dataset.successText || 'Imported!';
+            doiStatus.replaceChildren(span);
+          }
+        })
+        .catch(error => {
+          const span = document.createElement('span');
+          span.className = 'text-danger';
+          span.textContent = btnImportDoi.dataset.errorText || 'Error.';
+          doiStatus.replaceChildren(span);
+          console.error('Error:', error);
+        });
+    });
+  }
+
+  const editPubModalEl = document.getElementById('editPubModal');
+  if (editPubModalEl) {
+    const editPubModal = new bootstrap.Modal(editPubModalEl);
+    document.querySelectorAll('.btn-edit-pub').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const pub = JSON.parse(this.dataset.pub);
+        document.getElementById('edit_pub_id').value = pub.id;
+        document.getElementById('edit_pub_title').value = pub.title;
+        document.getElementById('edit_pub_authors').value = pub.authors || '';
+        document.getElementById('edit_pub_year').value = pub.year || '';
+        document.getElementById('edit_pub_type').value = pub.publication_type || '';
+        document.getElementById('edit_pub_doi').value = pub.doi || '';
+        document.getElementById('edit_pub_url').value = pub.url || '';
+        document.getElementById('edit_pub_file').value = pub.file_id || '';
+
+        document.querySelectorAll('#edit_pub_projects input[type="checkbox"]').forEach(
+          cb => { cb.checked = false; });
+        if (pub.entities) {
+          pub.entities.forEach(ent => {
+            const cb = document.getElementById('edit_proj_' + ent.id);
+            if (cb) cb.checked = true;
+          });
+        }
+        editPubModal.show();
+      });
+    });
+  }
+
+  // Type Divisions & External Identifiers preview initialization
+  document.querySelectorAll('[data-division-index]').forEach(el => {
+    toggleIconType(el.dataset.divisionIndex);
+  });
+  document.querySelectorAll('#external-identifiers-accordion [data-sys-id]').forEach(el => {
+    toggleIconType(el.dataset.sysId);
+  });
+
   // Update URL in address bar when tabs are switched without page reload
   document.addEventListener('shown.bs.tab', function (event) {
     const target = event.target;
-    const targetId = target.getAttribute('aria-controls') || 
+    const targetId = target.getAttribute('aria-controls') ||
                      target.getAttribute('data-bs-target')?.replace('#', '');
-    
+
     if (targetId) {
       const newUrl = `/admin/${targetId}`;
-      // Use pushState to update URL without reload. 
-      // This maintains the same behavior as the previous server-side links
-      // but is much faster.
       if (window.location.pathname !== newUrl) {
         window.history.pushState({ tab: targetId }, '', newUrl);
       }

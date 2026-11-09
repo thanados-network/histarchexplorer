@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any, Mapping, Optional
 
 from flask import g
 
@@ -32,21 +32,24 @@ class EntryNotFound(Exception):
 class Admin:
     TooManyMainProjects = TooManyMainProjects
 
-    def __init__(self, fields=None) -> None:
+    def __init__(self, fields: Optional[dict[str, Any]] = None) -> None:
+        synchronize_teams_with_db()
+        synchronize_icons_with_db()
         self.config_entities = g.config_entities
         self.config_links = g.config_links
         self.config_properties = g.config_properties
         self.config_classes = g.config_classes
         self.admin_fields = fields if fields is not None else g.admin_fields
         self.language = g.language
-        self.logos = self.get_all_logo_filenames()
-        self.assets = self.get_all_asset_filenames()
-        self.teams = self.get_all_team_filenames()
+        self.logos_with_ids = self.get_all_logos_with_ids()
+        self.assets_with_ids = self.get_all_assets_with_ids()
+        self.teams_with_ids = self.get_all_teams_with_ids()
+        self.logos = [logo['filename'] for logo in self.logos_with_ids]
+        self.assets = [asset['filename'] for asset in self.assets_with_ids]
+        self.teams = [team['filename'] for team in self.teams_with_ids]
         self.icons = self.get_files_by_type('icon')
         self.licenses = self.get_licenses()
         self.file_licenses = self.get_file_licenses()
-        synchronize_teams_with_db()
-        synchronize_icons_with_db()
 
     @staticmethod
     def get_files_by_type(file_type: str) -> list[dict[str, Any]]:
@@ -69,11 +72,11 @@ class Admin:
         return update_map(data)
 
     @staticmethod
-    def add_entry(data: dict[str, str | int]) -> int:
+    def add_entry(data: Mapping[str, Any]) -> int:
         return add_entry(data)
 
     @staticmethod
-    def edit_entry(data: dict[str, str | int | None]) -> None:
+    def edit_entry(data: Mapping[str, Any]) -> None:
         return update_config_entry(data)
 
     @staticmethod
@@ -119,8 +122,8 @@ class Admin:
     @staticmethod
     def update_file_license(
             filename: str,
-            license_id: int,
-            attribution: str) -> None:
+            license_id: Optional[int],
+            attribution: Optional[str]) -> None:
         return update_file_license(filename, license_id, attribution)
 
     @staticmethod

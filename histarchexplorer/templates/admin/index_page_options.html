@@ -5,6 +5,7 @@
 </div>
 
 <form method="POST" action="{{ url_for('choose_index_background') }}" class="needs-validation" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <input type="hidden" name="active_sidebar" value="sidebar-index-page-options">
 
   <div class="row mb-4">

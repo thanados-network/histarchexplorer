@@ -2,21 +2,28 @@ from typing import Any, List, Optional
 
 from flask import g
 
+from histarchexplorer.database.admin import transaction
+
 
 def get_publications() -> List[dict[str, Any]]:
     sql = """
-        SELECT p.*, f.filename
+        SELECT p.*,
+               f.filename,
+               COALESCE(
+                   json_agg(
+                       json_build_object('id', e.id, 'name', e.name)
+                   ) FILTER (WHERE e.id IS NOT NULL),
+                   '[]'::json
+               ) AS entities
         FROM tng.publications p
         LEFT JOIN tng.files f ON p.file_id = f.id
+        LEFT JOIN tng.publication_entities pe ON p.id = pe.publication_id
+        LEFT JOIN tng.entities e ON pe.entity_id = e.id
+        GROUP BY p.id, f.filename
         ORDER BY p.year DESC, p.title ASC
     """
     g.cursor.execute(sql)
-    publications = g.cursor.fetchall()
-
-    for pub in publications:
-        pub['entities'] = get_linked_entities(pub['id'])
-
-    return publications
+    return g.cursor.fetchall()
 
 
 def get_publication_by_id(pub_id: int) -> Optional[dict[str, Any]]:
@@ -81,18 +88,20 @@ def delete_publication(pub_id: int) -> None:
 
 
 def link_publication_to_entities(pub_id: int, entity_ids: List[int]) -> None:
-    # First, delete existing links
-    g.cursor.execute(
-        "DELETE FROM tng.publication_entities WHERE publication_id = %s",
-        (pub_id,))
+    with transaction():
+        g.cursor.execute(
+            "DELETE FROM tng.publication_entities WHERE publication_id = %s",
+            (pub_id,))
 
-    # Then insert new ones
-    if entity_ids:
-        params = [{'pub_id': pub_id, 'ent_id': ent_id} for ent_id in entity_ids]
-        g.cursor.executemany(
-            """INSERT INTO tng.publication_entities (publication_id, entity_id) 
-               VALUES (%(pub_id)s, %(ent_id)s)""",
-            params)
+        if entity_ids:
+            params = [
+                {'pub_id': pub_id, 'ent_id': ent_id}
+                for ent_id in entity_ids]
+            g.cursor.executemany(
+                "INSERT INTO tng.publication_entities "
+                "(publication_id, entity_id) "
+                "VALUES (%(pub_id)s, %(ent_id)s)",
+                params)
 
 
 def get_linked_entities(pub_id: int) -> List[dict[str, Any]]:

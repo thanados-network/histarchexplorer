@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <script
     src="{{ url_for('static', filename='node_modules/sortablejs/Sortable.min.js') }}"></script>
   <script

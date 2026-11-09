@@ -65,6 +65,7 @@
                 <hr>
                 {# Set as Main Logo Form #}
                 <form action="{{ url_for('set_main_logo') }}" method="post" class="d-grid mb-2">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="active_sidebar" value="sidebar-logo-management">
                     <input type="hidden" name="filename" value="{{ logo.filename }}">
                     {% if settings.nav_logo == logo.filename %}
@@ -79,6 +80,7 @@
                 </form>
                 {# Set as Favicon Form #}
                 <form action="{{ url_for('set_favicon') }}" method="post" class="d-grid mb-2">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="active_sidebar" value="sidebar-logo-management">
                     <input type="hidden" name="filename" value="{{ logo.filename }}">
                     <button type="submit" class="btn btn-sm btn-outline-info">

@@ -1,7 +1,10 @@
 <form action="{{ url_for('update_external_identifiers') }}" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <div class="accordion mb-4" id="external-identifiers-accordion">
     {% for sys_id, data in settings.external_identifiers.items() %}
-      <div class="accordion-item shadow-sm mb-3 border rounded" id="accordion-item-{{ sys_id }}">
+      <div class="accordion-item shadow-sm mb-3 border rounded"
+           id="accordion-item-{{ sys_id }}"
+           data-sys-id="{{ sys_id }}">
         <h2 class="accordion-header" id="heading-{{ sys_id }}">
           <button class="accordion-button collapsed fw-bold d-flex justify-content-between align-items-center"
                   type="button" data-bs-toggle="collapse"
@@ -122,6 +125,7 @@
                         <option value="">{{ _('Select Icon...') }}</option>
                         {% for icon in admin_instance.icons %}
                           <option value="{{ icon.filename }}"
+                                  data-url="{{ get_icon_url(icon.filename) }}"
                                   {% if data.icon_type == 'img' and data.icon_value == icon.filename %}
                                     selected
                                   {% endif %}>
@@ -165,90 +169,3 @@
     </button>
   </div>
 </form>
-
-<script>
-  const externalIdentifierIconUrls = {
-    {% for icon in admin_instance.icons %}
-      "{{ icon.filename }}": "{{ get_icon_url(icon.filename) }}",
-    {% endfor %}
-  };
-
-  function toggleIconType(sysId) {
-    const typeSelect = document.getElementById(`icon_type_${sysId}`);
-    const cssContainer = document.getElementById(`css_container_${sysId}`);
-    const imgContainer = document.getElementById(`img_container_${sysId}`);
-    const cssInput = document.getElementById(`css_input_${sysId}`);
-    const imgSelect = document.getElementById(`img_select_${sysId}`);
-    const previewContainer = document.getElementById(`preview_container_${sysId}`);
-
-    if (!typeSelect) return;
-
-    if (typeSelect.value === 'css') {
-      cssContainer.classList.remove('d-none');
-      imgContainer.classList.add('d-none');
-      cssInput.setAttribute('name', `icon_value_${sysId}`);
-      imgSelect.removeAttribute('name');
-      updatePreview(sysId);
-    } else if (typeSelect.value === 'img') {
-      cssContainer.classList.add('d-none');
-      imgContainer.classList.remove('d-none');
-      imgSelect.setAttribute('name', `icon_value_${sysId}`);
-      cssInput.removeAttribute('name');
-      updatePreview(sysId);
-    } else {
-      cssContainer.classList.add('d-none');
-      imgContainer.classList.add('d-none');
-      cssInput.removeAttribute('name');
-      imgSelect.removeAttribute('name');
-      if (previewContainer) {
-        previewContainer.innerHTML = '';
-      }
-    }
-  }
-
-  function updatePreview(sysId) {
-    const typeSelect = document.getElementById(`icon_type_${sysId}`);
-    const previewContainer = document.getElementById(`preview_container_${sysId}`);
-    if (!typeSelect || !previewContainer) return;
-
-    if (typeSelect.value === 'css') {
-      const cssInput = document.getElementById(`css_input_${sysId}`);
-      const val = cssInput ? cssInput.value.trim() : '';
-      if (val) {
-        let classes = val;
-        if (!val.startsWith('bi ') && !val.split(' ').includes('bi')) {
-          classes = 'bi ' + val;
-        }
-        previewContainer.innerHTML = `<span class="fs-4"><i class="${classes}"></i></span>`;
-      } else {
-        previewContainer.innerHTML = '';
-      }
-    } else if (typeSelect.value === 'img') {
-      const imgSelect = document.getElementById(`img_select_${sysId}`);
-      const selectedIcon = imgSelect ? imgSelect.value : '';
-      if (selectedIcon && externalIdentifierIconUrls[selectedIcon]) {
-        previewContainer.innerHTML = `<img src="${externalIdentifierIconUrls[selectedIcon]}" ` +
-          `style="max-height: 32px; max-width: 32px; object-fit: contain;" alt="preview">`;
-      } else {
-        previewContainer.innerHTML = '';
-      }
-    } else {
-      previewContainer.innerHTML = '';
-    }
-  }
-
-  function purgeIdentifier(sysId) {
-    if (confirm("Are you sure you want to purge this external identifier from the system?")) {
-      const el = document.getElementById(`accordion-item-${sysId}`);
-      if (el) {
-        el.remove();
-      }
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    {% for sys_id, data in settings.external_identifiers.items() %}
-      toggleIconType('{{ sys_id }}');
-    {% endfor %}
-  });
-</script>

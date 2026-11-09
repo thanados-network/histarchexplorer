@@ -37,8 +37,10 @@ def test_admin_additional_routes(authenticated_client: FlaskClient):
     assert rv.status_code == 200
     
     # Test delete_map
-    rv = authenticated_client.get('/admin/delete_map/1', follow_redirects=True)
-    assert rv.status_code == 200
+    with patch('histarchexplorer.models.admin.Admin.delete_map'):
+        rv = authenticated_client.get(
+            '/admin/delete_map/1', follow_redirects=True)
+        assert rv.status_code == 200
     
     # Test sortlinks
     rv = authenticated_client.post('/sortlinks', json={

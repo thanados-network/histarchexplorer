@@ -19,6 +19,7 @@
     </p>
 
     <form action="{{ url_for('restore_db') }}" method="post" enctype="multipart/form-data" class="mt-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <input type="hidden" name="active_sidebar" value="sidebar-database">
       <div class="mb-3">
         <label for="sqlFile" class="form-label">{{ _('Select SQL Dump File') }}</label>

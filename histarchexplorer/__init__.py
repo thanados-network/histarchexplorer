@@ -1,4 +1,7 @@
+import html
 import os
+from pathlib import Path
+import secrets
 import time
 from typing import Any
 
@@ -7,6 +10,7 @@ from flask import Flask, g, redirect, request, session, url_for
 from flask_babel import Babel
 from flask_caching import Cache
 from flask_login import current_user
+from flask_wtf.csrf import CSRFProtect
 from psycopg2 import DatabaseError
 from psycopg2.extensions import connection
 from werkzeug import Response
@@ -21,10 +25,53 @@ from histarchexplorer.models.config import (
 from histarchexplorer.models.search import SearchService
 from histarchexplorer.models.settings import Settings
 
+_PLACEHOLDER_KEYS = {'', 'secretkey', 'CHANGE ME'}
+
+
+def _load_or_generate_secret_key(flask_app: Flask) -> str:
+    """Return a valid SECRET_KEY from ENV, config, or instance/.secret_key."""
+    env_key = os.environ.get('SECRET_KEY', '').strip()
+    if env_key and env_key not in _PLACEHOLDER_KEYS:
+        return env_key
+
+    configured = str(flask_app.config.get('SECRET_KEY') or '').strip()
+    if configured and configured not in _PLACEHOLDER_KEYS:
+        return configured
+
+    instance_dir = Path(flask_app.instance_path)
+    instance_dir.mkdir(parents=True, exist_ok=True)
+    key_file = instance_dir / '.secret_key'
+
+    if key_file.exists():
+        stored = key_file.read_text(encoding='utf-8').strip()
+        if stored and stored not in _PLACEHOLDER_KEYS:
+            return stored
+
+    new_key = secrets.token_hex(32)
+    try:
+        fd = os.open(
+            str(key_file),
+            os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+            0o600)
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            handle.write(new_key)
+        return new_key
+    except FileExistsError:
+        stored = key_file.read_text(encoding='utf-8').strip()
+        if stored and stored not in _PLACEHOLDER_KEYS:
+            return stored
+        key_file.write_text(new_key, encoding='utf-8')
+        os.chmod(key_file, 0o600)
+        return new_key
+
+
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object('config.default')
 app.config.from_object('config.admin_fields')
 app.config.from_pyfile('production.py')
+app.config['SECRET_KEY'] = _load_or_generate_secret_key(app)
+
+
 def get_locale() -> str:
     if 'language' in session:
         return session['language']
@@ -39,12 +86,17 @@ def get_locale() -> str:
 
 babel = Babel(app, locale_selector=get_locale)
 cache = Cache(app)
+csrf = CSRFProtect(app)
+_INITIAL_SYNC_DONE = False
 
 # pylint: disable=cyclic-import, import-outside-toplevel, wrong-import-position
 from histarchexplorer.views import (
     admin, login, views, about, entity, entities, search, media, publication,
     outcome, vocabulary)
 from histarchexplorer.api.api_access import ApiAccess
+
+csrf.exempt(app.view_functions['search'])
+csrf.exempt(app.view_functions['get_rastermaps'])
 
 
 def connect(db_name: str) -> connection:
@@ -64,20 +116,24 @@ def connect(db_name: str) -> connection:
 
 
 def create_icon(css_class: str) -> str:
-    return f'<i class="{css_class}"></i>'
+    return f'<i class="{html.escape(css_class, quote=True)}"></i>'
+
+
+def get_icon_url(filename: str) -> str:
+    uploads_path = os.path.join(app.root_path, '..', 'uploads', 'icons')
+    entity_icon_path = os.path.join(
+        app.static_folder or '', 'images', 'entity_icons', filename)
+    if os.path.exists(os.path.join(uploads_path, filename)):
+        return url_for('uploaded_icon', filename=filename)
+    if os.path.exists(entity_icon_path):
+        return url_for('static', filename=f'images/entity_icons/{filename}')
+    return url_for('static', filename=f'images/icons/{filename}')
 
 
 def create_image_icon(file_name: str) -> str:
-    uploads_path = os.path.join(
-        app.root_path, "..", "uploads", "icons")
-    if os.path.exists(os.path.join(uploads_path, file_name)):
-        url = url_for("uploaded_icon", filename=file_name)
-    else:
-        url = url_for(
-            "static", filename=f"images/entity_icons/{file_name}")
-    return (
-        f'<img src="{url}" width="16" height="16" '
-        f'alt="{file_name}"/>')
+    url = get_icon_url(file_name)
+    safe_alt = html.escape(file_name, quote=True)
+    return f'<img src="{url}" width="16" height="16" alt="{safe_alt}"/>'
 
 
 def get_sidebar_icons() -> dict[int, str]:
@@ -122,9 +178,12 @@ def before_request() -> Response | None:
         return None
 
     g.settings = Settings.load_from_db()
-    synchronize_logos_with_db()
-    synchronize_assets_with_db()
-    synchronize_teams_with_db()
+    global _INITIAL_SYNC_DONE  # pylint: disable=global-statement
+    if not _INITIAL_SYNC_DONE or request.path.startswith('/admin'):
+        synchronize_logos_with_db()
+        synchronize_assets_with_db()
+        synchronize_teams_with_db()
+        _INITIAL_SYNC_DONE = True
 
     # Todo: move somewhere else but be aware of circular imports
     if g.settings.access_restriction:
@@ -178,7 +237,8 @@ def before_request() -> Response | None:
     g.pending_upgrades = []
     if current_user.is_authenticated:
         try:
-            from install.upgrade import get_pending_migrations
+            from install.upgrade import (  # type: ignore[attr-defined]
+                get_pending_migrations)
             with g.db.cursor() as cur:
                 g.pending_upgrades = get_pending_migrations(cur)
         except Exception:
@@ -245,6 +305,7 @@ def inject_globals() -> dict[str, Any]:
         'get_logo_url': get_logo_url,
         'get_asset_url': get_asset_url,
         'get_team_url': get_team_url,
+        'get_icon_url': get_icon_url,
         'has_uploaded_favicon': os.path.exists(
             os.path.join(app.root_path, '..', 'uploads', 'favicon.ico'))}
 
@@ -260,7 +321,7 @@ def apply_caching(response: Response) -> Response:
 
 
 @app.teardown_request
-def teardown_request(exception: Exception | None) -> None:
+def teardown_request(exception: BaseException | None) -> None:
     db = getattr(g, 'db', None)
     if db is not None:
         db.close()

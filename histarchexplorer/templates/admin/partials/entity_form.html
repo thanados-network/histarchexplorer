@@ -3,6 +3,7 @@
       class="projectForm needs-validation"
       id="form{{ entity.id }}"
       novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <input type="hidden" name="active_sidebar" value="{{ active_main_sidebar_id }}">
   <input type="hidden" name="config_id" value="{{ entity.id }}">
   <input type="hidden" name="current_tab" value="{{ tab_item.target }}">
@@ -44,9 +45,11 @@
           {% include 'admin/partials/image_field.html' %}
         {% elif field.type == 'textarea' %}
           {% if field.translatable %}
+            {% set rt_cls = 'js-richtext-rich' if field.key == 'description' else '' %}
             {% for lang_code in available_languages.keys() %}
+              {% set hide_cls = 'd-none' if lang_code != current_language else '' %}
               <textarea
-                class="form-control lang-input-{{ field.key }}-{{ entity.id }} {% if field.key in ['description', 'address'] %}js-richtext-rich{% endif %} {% if lang_code != current_language %}d-none{% endif %}"
+                class="form-control lang-input-{{ field.key }}-{{ entity.id }} {{ rt_cls }} {{ hide_cls }}"
                 id="Input{{ field.key | capitalize }}{{ entity.id }}_{{ lang_code }}"
                 name="{{ field.key }}_{{ lang_code }}"
                 data-lang="{{ lang_code }}"
@@ -58,7 +61,7 @@
             {% endfor %}
           {% else %}
             <textarea
-              class="form-control {% if field.key in ['description', 'address'] %}js-richtext-rich{% endif %}"
+              class="form-control {% if field.key == 'description' %}js-richtext-rich{% endif %}"
               id="Input{{ field.key | capitalize }}{{ entity.id }}"
               name="{{ field.key }}"
               rows="{% if field.key == 'description' %}5{% else %}2{% endif %}"

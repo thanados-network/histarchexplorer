@@ -80,3 +80,6 @@ cache_ids.txt
 
 
 .junie
+backup_*.sql
+*.dump
+

@@ -47,3 +47,4 @@ def test_case_study_type_id_list_reproduction():
         assert settings.shown_types == [1234]
         assert settings.index_map == 5
         assert settings.legal_notice == {}
+        Settings().save_to_db()

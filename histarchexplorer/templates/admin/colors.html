@@ -48,7 +48,10 @@
   }
 </style>
 
-<form method="POST" action="{{ url_for('update_entity_colors') }}">
+<form id="entity-colors-form" method="POST"
+      action="{{ url_for('update_entity_colors') }}"
+      data-available-colors='{{ settings.available_colors | tojson }}'>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <div class="row">
     {% for entity_type in ['places', 'actors', 'events', 'items', 'sources', 'files', 'feature', 'stratigraphic_unit', 'types'] %}
       <div class="col-md-3 mb-4">
@@ -80,6 +83,7 @@
     {% for color in settings.available_colors %}
       <div class="color-management-item">
         <form method="POST" action="{{ url_for('delete_available_color') }}" >
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <input type="hidden" name="color_to_delete" value="{{ color }}">
           <button type="submit" class="btn btn-sm btn-danger"
                   onclick="return confirm('{{ _('are you sure you want to delete this color?') }}')">
@@ -93,6 +97,7 @@
   </div>
 
   <form method="POST" action="{{ url_for('add_available_color') }}" class="row g-3 align-items-end">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="col-auto">
       <label for="new_hex_color" class="form-label">{{ _('add new hex color') }}</label>
       <input type="text" class="form-control" id="new_hex_color" name="new_color"
@@ -107,41 +112,3 @@
     </div>
   </form>
 </div>
-
-<script>
-  function updateColorPreview(color) {
-    const preview = document.getElementById('new-color-preview');
-    const isValid = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
-    preview.style.backgroundColor = isValid ? color : 'transparent';
-  }
-
-  document.addEventListener('DOMContentLoaded', function () {
-    const availableColors = {{ settings.available_colors | tojson }};
-
-    document.querySelectorAll('[data-bs-toggle="popover"]').forEach(popoverTriggerEl => {
-      const entity_type = popoverTriggerEl.id.replace('display-', '');
-      const input = document.getElementById('selected-color-' + entity_type);
-
-      const colorGrid = document.createElement('div');
-      colorGrid.className = 'color-grid-popover';
-
-      availableColors.forEach(col => {
-        const swatch = document.createElement('div');
-        swatch.className = 'swatch';
-        swatch.style.backgroundColor = col;
-        swatch.onclick = (e) => {
-          e.stopPropagation();
-          input.value = col;
-          popoverTriggerEl.style.backgroundColor = col;
-          bootstrap.Popover.getInstance(popoverTriggerEl).hide();
-        };
-        colorGrid.appendChild(swatch);
-      });
-
-      const popover = new bootstrap.Popover(popoverTriggerEl, {
-        content: colorGrid,
-        sanitize: false
-      });
-    });
-  });
-</script>

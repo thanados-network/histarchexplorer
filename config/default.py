@@ -18,7 +18,7 @@ LANGUAGES = {
     'sr': 'Srpski'}  # Supported languages
 PREFERRED_LANGUAGE = 'en'  # Default language
 DEBUG = False  # Debug mode toggle
-SECRET_KEY = 'secretkey'  # Secret key for sessions and security
+SECRET_KEY = ''  # Auto-generated in instance/.secret_key if left empty
 
 # Database configuration
 DATABASE_NAME = 'tng'  # todo: create better name

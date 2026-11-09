@@ -52,6 +52,7 @@
             <td><span class="badge bg-secondary">{{ license.category }}</span></td>
             <td>
               <form action="{{ url_for('delete_license', license_id=license.id) }}" method="post" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="active_sidebar" value="sidebar-licenses">
                 <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('{{ _('Are you sure?') }}')">
                   <i class="bi bi-trash"></i>

@@ -1,4 +1,5 @@
 import html
+from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any
 
@@ -92,6 +93,9 @@ class ConfigEntity:
 
     @classmethod
     def get_all_localized(cls) -> list['ConfigEntity']:
+        links_by_start: dict[int, list[Link]] = defaultdict(list)
+        for link in getattr(g, 'config_links', None) or []:
+            links_by_start[link.start_id].append(link)
         return [
             ConfigEntity(
                 id=entry['id'],
@@ -107,11 +111,9 @@ class ConfigEntity:
                 class_name=entry['class_name'],
                 case_study=entry['case_study_type_id'],
                 main_project=(entry['class_name'] == 'main-project'),
-                links=[l for l in g.config_links if l.start_id == entry['id']]
-                if g.config_links else [],
-                license_id=entry['license_id']
-            ) for entry in get_config_entities()
-        ]
+                links=links_by_start[entry['id']],
+                license_id=entry['license_id'])
+            for entry in get_config_entities()]
 
     @classmethod
     def group_by_class_name(

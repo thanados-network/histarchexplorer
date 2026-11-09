@@ -12,6 +12,7 @@
         <div class="modal-body bg-light">
           <form method="POST" action="{{ url_for('add_entry') }}"
                 class="needs-validation" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="category" id="currentTab">
 
             {# Dynamically render fields based on admin_fields for each tab #}
@@ -127,19 +128,29 @@
                                   </div>
                                 {% endif %}
                               </div>
+                              {% set rt_cls = 'js-richtext-rich' if field.key == 'description' else '' %}
+                              {% set modal_target = tab_item.target | replace('-', '') ~ 'Modal' %}
                               {% if field.translatable %}
                                 {% for lang_code in available_languages.keys() %}
-                                  <textarea class="form-control shadow-sm lang-input-{{ field.key }}-{{ tab_item.target | replace('-', '') }}Modal {% if field.key in ['description', 'address'] %}js-richtext-rich{% endif %} {% if lang_code != current_language %}d-none{% endif %}"
-                                            id="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal_{{ lang_code }}"
-                                            name="{{ field.key }}_{{ lang_code }}"
-                                            data-lang="{{ lang_code }}"
-                                            rows="{% if field.key == 'description' %}5{% else %}2{% endif %}"
-                                            {% if field.placeholder %}placeholder="{{ _(field.placeholder) }} ({{ lang_code | upper }})"{% endif %}
-                                            {% if field.required and lang_code == current_language %}required data-required-field{% endif %}></textarea>
+                                  {% set hide_cls = 'd-none' if lang_code != current_language else '' %}
+                                  {% set lang_cls = 'lang-input-' ~ field.key ~ '-' ~ modal_target %}
+                                  {% set is_req = field.required and lang_code == current_language %}
+                                  {% set req_attr = 'required data-required-field' if is_req else '' %}
+                                  <textarea
+                                    class="form-control shadow-sm {{ lang_cls }} {{ rt_cls }} {{ hide_cls }}"
+                                    id="Input{{ field.key | capitalize }}{{ modal_target }}_{{ lang_code }}"
+                                    name="{{ field.key }}_{{ lang_code }}"
+                                    data-lang="{{ lang_code }}"
+                                    rows="{% if field.key == 'description' %}5{% else %}2{% endif %}"
+                                    {% if field.placeholder %}
+                                      placeholder="{{ _(field.placeholder) }} ({{ lang_code | upper }})"
+                                    {% endif %}
+                                    {{ req_attr }}></textarea>
                                 {% endfor %}
                               {% else %}
-                                <textarea class="form-control shadow-sm {% if field.key in ['description', 'address'] %}js-richtext-rich{% endif %}"
-                                          id="Input{{ field.key | capitalize }}{{ tab_item.target | replace('-', '') }}Modal"
+                                <textarea
+                                  class="form-control shadow-sm {{ rt_cls }}"
+                                  id="Input{{ field.key | capitalize }}{{ modal_target }}"
                                           name="{{ field.key }}"
                                           rows="{% if field.key == 'description' %}5{% else %}2{% endif %}"
                                           {% if field.placeholder %}placeholder="{{ _(field.placeholder) }}"{% endif %}

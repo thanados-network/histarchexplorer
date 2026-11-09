@@ -1,8 +1,10 @@
 <form id="footer-logos-form" action="{{ url_for('update_footer_content') }}" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <div class="card mt-3">
     <div class="card-body">
       <h5 class="card-title">{{ _('Footer Order') | upper }}</h5>
-      <div id="sortable-logos" class="d-flex flex-wrap gap-3">
+      <div id="sortable-logos" class="d-flex flex-wrap gap-3"
+           data-selected-logos='{{ selected_footer_logos | tojson }}'>
         {% for logo_id in selected_footer_logos %}
           {% set logo = all_logos | selectattr('id', 'equalto', logo_id) | first %}
           {% if logo %}
@@ -50,122 +52,3 @@
     </div>
   </div>
 </form>
-
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const sortableLogosContainer = document.getElementById('sortable-logos');
-  const orderInput = document.getElementById('footer-logo-order-input');
-  const form = document.getElementById('footer-logos-form');
-  const checkboxes = document.querySelectorAll('.logo-checkbox');
-  let isSavingOrder = false;
-
-  function getSelectedLogoIds() {
-    const checkedCheckboxes = document.querySelectorAll('.logo-checkbox:checked');
-    return Array.from(checkedCheckboxes).map(cb => cb.value);
-  }
-
-  function updateOrderInput() {
-    const logoElements = sortableLogosContainer.querySelectorAll('.card');
-    const logoIds = Array.from(logoElements).map(el => el.getAttribute('data-id'));
-    orderInput.value = JSON.stringify(logoIds);
-  }
-
-  async function saveOrderOnTheFly() {
-    if (!form || isSavingOrder) return;
-
-    const currentOrder = Array.from(
-      sortableLogosContainer.querySelectorAll('.card')).map(
-      el => el.getAttribute('data-id'));
-    if (!currentOrder.length) return;
-
-    isSavingOrder = true;
-    const formData = new FormData();
-    formData.append('active_sidebar', 'sidebar-footer-content');
-    formData.append('footer_logo_order', JSON.stringify(currentOrder));
-    getSelectedLogoIds().forEach(logoId => {
-      formData.append('footer_logos', logoId);
-    });
-
-    try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: {'X-Requested-With': 'XMLHttpRequest'}
-      });
-
-      if (!response.ok) {
-        console.error('Unable to save footer order.');
-      }
-    } catch (error) {
-      console.error('Unable to save footer order.', error);
-    } finally {
-      isSavingOrder = false;
-    }
-  }
-
-  function updateSortableList() {
-    sortableLogosContainer.innerHTML = '';
-    const orderedLogoIds = {{ selected_footer_logos | tojson }};
-    const checkedCheckboxes = document.querySelectorAll('.logo-checkbox:checked');
-    const checkedLogoIds = Array.from(checkedCheckboxes).map(cb => cb.value);
-
-    let finalLogoIds = orderedLogoIds.filter(id => checkedLogoIds.includes(String(id)));
-
-    checkedLogoIds.forEach(id => {
-      if (!finalLogoIds.includes(Number(id))) {
-        finalLogoIds.push(Number(id));
-      }
-    });
-
-    let position = 1;
-    finalLogoIds.forEach(logoId => {
-        const checkbox = document.getElementById('checkbox-' + logoId);
-        if (checkbox) {
-            const filename = checkbox.getAttribute('data-filename');
-            const url = checkbox.getAttribute('data-url');
-            const logoElement = `
-              <div class="card" data-id="${logoId}" style="width: 120px;">
-                <div class="card-header text-center fw-bold">#<span class="position">${position++}</span></div>
-                <img src="${url}" class="card-img-top p-2" alt="${filename}" style="object-fit: contain; height: 80px;">
-              </div>
-            `;
-            sortableLogosContainer.insertAdjacentHTML('beforeend', logoElement);
-        }
-    });
-    updatePositions();
-    updateOrderInput();
-  }
-
-  function updatePositions() {
-    const logoElements = sortableLogosContainer.querySelectorAll('.card');
-    logoElements.forEach((el, index) => {
-      el.querySelector('.position').textContent = index + 1;
-    });
-  }
-
-  if (sortableLogosContainer) {
-    new Sortable(sortableLogosContainer, {
-      animation: 150,
-      ghostClass: 'blue-background-class',
-      onEnd: async function () {
-        updatePositions();
-        updateOrderInput();
-        await saveOrderOnTheFly();
-      }
-    });
-  }
-
-  checkboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', updateSortableList);
-  });
-
-  if (form) {
-    form.addEventListener('submit', function() {
-      updateOrderInput();
-    });
-  }
-
-  updateSortableList();
-});
-</script>

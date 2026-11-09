@@ -12,6 +12,7 @@
     </div>
     <div class="card-body">
         <form method="post" action="{{ url_for('update_legal_notice') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="active_sidebar" value="sidebar-legal-notice">
             <div class="tab-content" id="legal-notice-tab-content">
                 {% for lang_code, lang_name in available_languages.items() %}
@@ -30,29 +31,3 @@
         </form>
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        tinymce.init({
-            selector: '.tinymce-editor',
-            license_key: 'gpl',
-            menubar: false,
-            branding: false,
-            height: 300,
-            plugins: 'link lists image table code',
-            toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
-                     'superscript subscript | alignleft aligncenter alignright alignjustify | ' +
-                     'bullist numlist | table link image | removeformat code',
-            convert_urls: false,
-            default_link_target: '_blank',
-            rel_list: [{title: 'No referrer', value: 'noreferrer noopener'}],
-            image_advtab: true,
-            paste_as_text: false,
-            setup: function (editor) {
-                editor.on('change keyup', function () {
-                    editor.save();
-                });
-            }
-        });
-    });
-</script>

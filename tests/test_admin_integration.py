@@ -20,10 +20,11 @@ def test_admin_tabs(authenticated_client: FlaskClient) -> None:
 
 def test_update_legal_notice(authenticated_client: FlaskClient) -> None:
     rv = authenticated_client.post('/admin/update_legal_notice', data={
-        'legal_notice_de': 'German notice',
+        'legal_notice_de': '<p>German notice</p><script>alert(1)</script>',
         'legal_notice_en': 'English notice'
     }, follow_redirects=True)
     assert rv.status_code == 200
+    assert b'<script>alert(1)</script>' not in rv.data
 
 def test_add_delete_color(authenticated_client: FlaskClient) -> None:
     # Add color

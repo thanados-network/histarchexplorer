@@ -12,6 +12,7 @@
   <div class="card-body">
     <h5 class="card-title">{{ _('Upload New Icon') | upper }}</h5>
     <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <input type="hidden" name="active_sidebar" value="sidebar-icon-management">
       <input type="hidden" name="file_type" value="icon">
       <div class="input-group">
@@ -45,6 +46,7 @@
               <div class="card-footer bg-transparent border-top-0">
                 {# Delete Form #}
                 <form action="{{ url_for('delete_file') }}" method="post" class="d-grid">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <input type="hidden" name="active_sidebar" value="sidebar-icon-management">
                   <input type="hidden" name="filename" value="{{ icon.filename }}">
                   <input type="hidden" name="file_type" value="icon">
