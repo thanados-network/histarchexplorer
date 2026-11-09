@@ -1,3 +1,52 @@
+const _entityPageConfigEl = document.getElementById('entity-page-data');
+const _entityPageConfig = _entityPageConfigEl
+    ? JSON.parse(_entityPageConfigEl.textContent || '{}')
+    : {};
+
+var tabsToLoad = _entityPageConfig.tabsToLoad || [];
+var entityId = _entityPageConfig.entityId ?? 0;
+
+if (entityId === 0) {
+    window.data = _entityPageConfig.data || {entities: []};
+    window.typeTreeData = _entityPageConfig.typeTreeData || {};
+    window.viewClasses = _entityPageConfig.viewClasses || {};
+    window.getEntitiesForTab = function (tabName) {
+        const validClasses = (window.viewClasses && window.viewClasses[tabName]) || [];
+        if (!window.data || !Array.isArray(window.data.entities)) return [];
+        return window.data.entities.filter(entity => validClasses.includes(entity.class));
+    };
+
+    if (Array.isArray(window.data.entities)) {
+        window.data.entities.forEach(entity => {
+            entity.beginDBP = calculateTimeBP(entity.begin);
+            entity.endDBP = calculateTimeBP(entity.end);
+            if (entity.begin) entity.beginString = makeLocalDate(entity.begin).localdate;
+            if (entity.end) entity.endString = makeLocalDate(entity.end).localdate;
+
+            entity.all = [entity.description, entity.class, entity.type, entity.name]
+                .filter(v => v !== null && v !== undefined && v !== '')
+                .map(v => String(v).replace(/[\r\n]+/g, ' '))
+                .join(' ');
+        });
+    }
+} else {
+    const initialEntityData = _entityPageConfig.data || null;
+    window.entityData = initialEntityData
+        ? Promise.resolve(initialEntityData)
+        : fetchEntityData(entityId);
+    (async function initializeEntity() {
+        const resolvedData = await window.entityData;
+        if (!resolvedData) {
+            console.error("❌ Failed to load entityData.");
+            return;
+        }
+        window.entityResolved = resolvedData;
+        renderAllBreadcrumbs(resolvedData);
+        document.dispatchEvent(
+            new CustomEvent("entityReady", {detail: resolvedData}));
+    })();
+}
+
 let loadedTabs = []
 let notYetClickedTabs = tabsToLoad
 const initialPresetId = new URLSearchParams(window.location.search).get('preset');
@@ -7,7 +56,6 @@ function initContentPopovers(container) {
     container.querySelectorAll('[data-bs-toggle="popover"]').forEach(trigger => {
         bootstrap.Popover.getOrCreateInstance(trigger, {
             html: true,
-            sanitize: false,
             trigger: 'click',
             placement: 'bottom',
             container: 'body'});
@@ -98,6 +146,15 @@ async function loadHTML(id, tab, index, totalTabs) {
 
     initContentPopovers(targetElement);
 
+    if (tab === 'catalogue') {
+        const cataloguePane = document.getElementById('tab-pane-catalogue');
+        if (cataloguePane && cataloguePane.classList.contains('active')) {
+            const anchor = `#entity-${entityId}`;
+            window.location.href = anchor;
+            window.location.hash = anchor;
+        }
+    }
+
     loadedTabs.push(tab);
 
 
@@ -135,12 +192,18 @@ function checkAndRemoveSpinner(totalTabs) {
 
 // Load a script dynamically and wait for it to finish loading
 function loadScript(script) {
+    if (script.type &&
+        script.type !== 'text/javascript' &&
+        script.type !== 'application/javascript') {
+        return Promise.resolve();
+    }
     return new Promise(resolve => {
         const newScript = document.createElement('script');
 
         if (script.src) {
             newScript.src = script.src;
             newScript.onload = resolve;
+            newScript.onerror = resolve;
         } else {
             newScript.textContent = script.textContent;
             resolve();
@@ -278,7 +341,7 @@ let rightSidebarcontent = {};
 if (Array.isArray(tabsToLoad)) {
     tabsToLoad.forEach(tab => {
         rightSidebarcontent[tab] = {
-            content: `${tab} Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor Lorem ipsum dolor`,
+            content: '',
             opened: false
         };
     });
@@ -351,7 +414,7 @@ document.querySelectorAll('#nav-sidebar .nav-link').forEach(button => {
         if (!shouldBeOpen && isCurrentlyOpen) {
             toggleRightSidebar(tabName, 'toggle');
         } else if (shouldBeOpen && !isCurrentlyOpen) {
-            toggleRightSidebar(tabName, 'toogle');
+            toggleRightSidebar(tabName, 'toggle');
         }
     });
 });
@@ -363,19 +426,31 @@ if (tabsToLoad?.length > 0 && rightSidebarcontent[tabsToLoad[0]]?.content) {
 
 // ===== Breadcrumbs (global renderer) =====
 document.addEventListener("DOMContentLoaded", () => {
-    // === Initial render for the first visible tab ===
-    if (window.entityData) renderAllBreadcrumbs(window.entityData);
+    const initialData = window.entityResolved || window.entityData;
+    if (initialData) renderAllBreadcrumbs(initialData);
 
     // === Re-render whenever a Bootstrap tab becomes visible ===
     document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
         tab.addEventListener("shown.bs.tab", () => {
-            if (window.entityData) renderAllBreadcrumbs(window.entityData);
+            const currentData = window.entityResolved || window.entityData;
+            if (currentData) renderAllBreadcrumbs(currentData);
         });
     });
 
     // === Optional: also re-render when custom events fire (e.g., AJAX reloads) ===
     document.addEventListener("entityUpdated", e => {
-        const data = e.detail?.entityData || window.entityData;
-        if (data) renderAllBreadcrumbs(data);
+        const updatedData = e.detail?.entityData || window.entityResolved || window.entityData;
+        if (updatedData) renderAllBreadcrumbs(updatedData);
     });
+});
+
+document.addEventListener('shown.bs.tab', function (event) {
+    const tab = event.target;
+    const scrollTarget = tab.getAttribute('data-scroll-target');
+    if (!scrollTarget) {
+        window.location.hash = '';
+        return;
+    }
+    const targetAnchor = '#' + scrollTarget;
+    setTimeout(() => { window.location.href = targetAnchor; }, 500);
 });

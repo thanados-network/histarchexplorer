@@ -9,7 +9,7 @@ from histarchexplorer.views.views import type_tree
 
 # pylint: disable=too-many-locals
 def get_browse_list_entities(
-        id_: int) -> dict[str, str | int | list[Any] | dict[str, Any]] | None:
+        id_: int | None = None) -> dict[str, Any] | None:
     """Compile a list of entities and their geometries for browsing.
 
     Processes visible/hidden classes, types, and case studies to construct
@@ -168,13 +168,16 @@ def get_browse_list_entities(
 
 
 # get entities and return the template
-def return_entities(tab_name: str, id_: int) -> str:
+def return_entities(
+        tab_name: str | None = None,
+        id_: int | None = None) -> str:
     """Helper function to load entities and render the browsing layout.
 
     Retrieves the browse list entities, configures sidebar tabs with
     updated item counts, and renders the central entity template.
     """
-    data = get_browse_list_entities(id_)
+    data = get_browse_list_entities(id_) or {
+        'entities': [], 'counts': {}, 'totals': {}}
 
     filtered_view_classes = {
         key: tuple(list(d.keys())[0] for d in value)
@@ -188,7 +191,7 @@ def return_entities(tab_name: str, id_: int) -> str:
         for i, key in enumerate(data['counts'].keys())]
 
     if not tab_name and sidebar_elements:
-        tab_name = sidebar_elements[0]['route']
+        tab_name = str(sidebar_elements[0]['route'])
 
     return render_template(
         'entity.html',

@@ -49,9 +49,12 @@ def cached_at(entity_id: int) -> Optional[float]:
 
 def record_entity_cached(entity_id: int) -> None:
     """Remember when the entity was last fetched from the API."""
+    already_seen = cache.get(_stamp_key(entity_id)) is not None
     cache.set(_stamp_key(entity_id), time.time())
+    if already_seen:
+        return
     try:
-        with open(_seen_path(), 'a') as seen:
+        with open(_seen_path(), 'a', encoding='utf-8') as seen:
             seen.write(f'{entity_id}\n')
     except OSError:
         current_app.logger.warning('Entity registry not writable')
@@ -222,7 +225,8 @@ def _entity_age_stats() -> dict[str, Any]:
             int(line) for line in _seen_path().read_text().split()})
     except (OSError, ValueError):
         pass
-    stamps = cache.get_many(*[_stamp_key(i) for i in ids]) if ids else []
+    get_many: Any = cache.get_many
+    stamps = get_many(*[_stamp_key(i) for i in ids]) if ids else []
     now = time.time()
     buckets = {name: 0 for name, _ in AGE_BUCKETS}
     buckets.update(older=0)

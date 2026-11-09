@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import g
 
 
@@ -51,29 +53,32 @@ def check_if_place_hierarchy(id_: int) -> bool:
         """, {"id": id_})
     return g.openatlas_cursor.fetchone() is not None
 
-# def get_entity_by_id(id_):
-#     g.cursor.execute(
-#         """
-#         SELECT e.id,
-#                e.cidoc_class_code,
-#                e.name,
-#                e.description,
-#                e.created,
-#                e.modified,
-#                e.openatlas_class_name,
-#                COALESCE(
-#                        to_char(e.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-#                    AS begin_from,
-#                e.begin_comment,
-#                COALESCE(to_char(e.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-#                    AS begin_to,
-#                COALESCE(to_char(e.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-#                    AS end_from,
-#                e.end_comment,
-#                COALESCE(to_char(e.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-#                    AS end_to
-#         FROM model.entity e
-#         WHERE e.id = %(id)s
-#         GROUP BY e.id;
-#         """, {'id': id_})
-#     return g.cursor.fetchone()
+
+def get_files_for_ids(
+        ids: list[int]) -> dict[str, list[dict[str, Any]]] | None:
+    sql = """
+          SELECT JSONB_AGG(
+                         jsonb_build_object(
+                                 'id', a.id,
+                                 'name', a.name,
+                                 'description', a.description,
+                                 'bbox', a.bounding_box::JSONB
+                         )
+                 ) AS images
+          FROM (SELECT e.id,
+                       e.name,
+                       e.description,
+                       o.image_id,
+                       o.bounding_box
+                FROM model.entity e
+                         JOIN model.link l ON e.id = l.domain_id
+                         JOIN web.map_overlay o ON o.image_id = e.id
+                WHERE e.openatlas_class_name = 'file'
+                  AND l.range_id = ANY(%(ids)s)
+                  AND l.property_code = 'P67') a;
+          """
+    g.openatlas_cursor.execute(sql, {'ids': ids})
+    result = g.openatlas_cursor.fetchone()
+    if result:
+        return dict(result)
+    return None

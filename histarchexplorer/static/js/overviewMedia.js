@@ -93,11 +93,18 @@ if (file.description || file.license || file.creator || file.license_holder) {
   const hiddenDiv = document.createElement("div");
   hiddenDiv.id = popoverId;
   hiddenDiv.className = "d-none";
+  const safeDesc = escapeHtml(file.description || "");
+  const safeLic = escapeHtml(file.license || "");
+  const safeCreator = escapeHtml(file.creator || "");
+  const safeHolder = escapeHtml(file.license_holder || "");
+  const licLabel = escapeHtml(window.overviewTranslations?.license || 'License');
+  const creatorLabel = escapeHtml(window.overviewTranslations?.creator || 'Creator');
+  const holderLabel = escapeHtml(window.overviewTranslations?.licenseHolder || 'License holder');
   hiddenDiv.innerHTML = `
-    ${file.description ? `<div class="mb-2">${file.description}</div>` : ""}
-    ${file.license ? `<div><b>${window.overviewTranslations?.license || 'License'}:</b> ${file.license}</div>` : ""}
-    ${file.creator ? `<div><b>${window.overviewTranslations?.creator || 'Creator'}:</b> ${file.creator}</div>` : ""}
-    ${file.license_holder ? `<div><b>${window.overviewTranslations?.licenseHolder || 'License holder'}:</b> ${file.license_holder}</div>` : ""}
+    ${file.description ? `<div class="mb-2">${safeDesc}</div>` : ""}
+    ${file.license ? `<div><b>${licLabel}:</b> ${safeLic}</div>` : ""}
+    ${file.creator ? `<div><b>${creatorLabel}:</b> ${safeCreator}</div>` : ""}
+    ${file.license_holder ? `<div><b>${holderLabel}:</b> ${safeHolder}</div>` : ""}
   `;
   caption.appendChild(hiddenDiv);
 
@@ -142,8 +149,8 @@ function createModelViewer(file, alt) {
   wrapper.style = "height:300px;position:relative;";
   wrapper.innerHTML = `
       <model-viewer
-        src="${file.url}"
-        alt="${alt}"
+        src="${escapeHtml(file.url)}"
+        alt="${escapeHtml(alt)}"
         camera-controls
         ar
         ar-modes="webxr scene-viewer quick-look"
@@ -160,7 +167,7 @@ function createVideo(file) {
   wrapper.className = "video-wrapper position-relative";
   wrapper.style = "height:300px;overflow:hidden;";
   wrapper.innerHTML = `
-      <video class="w-100 h-100 rounded shadow-sm" src="${file.url}" controls preload="metadata"></video>
+      <video class="w-100 h-100 rounded shadow-sm" src="${escapeHtml(file.url)}" controls preload="metadata"></video>
     `;
   return wrapper;
 }

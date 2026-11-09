@@ -39,6 +39,7 @@ ROOT_PATH = Path(__file__).parent.parent
 API_URL = 'https://thanados.openatlas.eu/api/'
 API_PROXY = ''  # Optional proxy for API requests
 API_TOKEN = ''
+MAPTILER_API_KEY = 'E7Jrgaazm79UlTuEI5f5'
 
 CACHE_DEFAULT_TIMEOUT = 360000
 

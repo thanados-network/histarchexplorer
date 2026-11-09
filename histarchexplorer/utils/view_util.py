@@ -31,7 +31,9 @@ def render_page_template(page_name: str, **context: Any) -> str:
     menu_settings = g.settings.menu_management.get(key, {})
 
     if menu_settings.get('page_type') == 'individual':
-        page_path = Path(app.root_path)/'..'/'uploads'/'templates'/template_name
+        page_path = (
+            Path(app.root_path) / '..' / 'uploads' / 'templates'
+            / template_name)
         if page_path.is_file():
             template_content = page_path.read_text(encoding='utf-8')
             return render_template_string(template_content, **context)
@@ -72,8 +74,8 @@ def inject_menu() -> dict[str, Any]:
 
 def find_children_by_id(
         data: dict[str, Any],
-        target_id: Optional[int]) -> list[dict[str, str]] | None:
-    result: list[dict[str, str]] = []
+        target_id: Optional[int]) -> list[dict[str, Any]] | None:
+    result: list[dict[str, Any]] = []
 
     if target_id is None:
         return result
@@ -134,9 +136,9 @@ def get_license_info(case_studies: list[Any]) -> dict[str, Any] | None:
 
 def generate_bibtex(
         entity: Any,
-        project_name: str = None,
-        url: str = None,
-        date: str = None,
+        project_name: Optional[str] = None,
+        url: Optional[str] = None,
+        date: Optional[str] = None,
         main_reference: Any = None) -> str:
     if hasattr(entity, 'id'):  # PresentationView
         year = date.split('-')[0] if date else datetime.date.today().year
@@ -175,9 +177,9 @@ def generate_bibtex(
 
 def generate_ris(
         entity: Any,
-        project_name: str = None,
-        url: str = None,
-        date: str = None,
+        project_name: Optional[str] = None,
+        url: Optional[str] = None,
+        date: Optional[str] = None,
         main_reference: Any = None) -> str:
     """Generates a RIS citation string."""
     note = ""

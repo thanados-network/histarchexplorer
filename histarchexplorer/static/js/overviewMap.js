@@ -39,10 +39,10 @@
     }
 
     // === MapLibre setup ===
+    const maptilerKey = encodeURIComponent(window.maptilerApiKey || "");
     const overviewMap = new maplibregl.Map({
         container,
-        style:
-            "https://api.maptiler.com/maps/topo-v2/style.json?key=E7Jrgaazm79UlTuEI5f5",
+        style: `https://api.maptiler.com/maps/topo-v2/style.json?key=${maptilerKey}`,
         center: [0, 0],
         zoom: 5,
         attributionControl: true,
@@ -149,11 +149,13 @@
             .filter(f => f.geometry?.type === "Point")
             .forEach(f => {
                 const [lng, lat] = f.geometry.coordinates;
+                const safeTitle = escapeHtml(f.properties?.title || name || "");
+                const safeDesc = escapeHtml(f.properties?.description || "");
                 new maplibregl.Marker({color: "#007cbf"})
                     .setLngLat([lng, lat])
                     .setPopup(
                         new maplibregl.Popup().setHTML(
-                            `<b>${f.properties?.title || name}</b><br>${f.properties?.description || ""}`
+                            `<b>${safeTitle}</b><br>${safeDesc}`
                         )
                     )
                     .addTo(overviewMap);

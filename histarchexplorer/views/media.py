@@ -1,4 +1,5 @@
 from flask import render_template
+from markupsafe import escape
 
 from histarchexplorer import app
 
@@ -22,5 +23,5 @@ def view_media(render_type: str, id_: int) -> str:
         case 'svg':
             template = render_template("viewer/svg.html", file_id=id_)
         case _:
-            template = f"Unsupported render type: {render_type}"
+            template = f"Unsupported render type: {escape(render_type)}"
     return template

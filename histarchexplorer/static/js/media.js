@@ -148,10 +148,10 @@ function createMediaItem(image, posterMap) {
       hiddenDiv.id = popoverId;
       hiddenDiv.className = "d-none";
       hiddenDiv.innerHTML = `
-        ${image.description ? `<div class="mb-2">${image.description}</div>` : ""}
-        ${image.license ? `<div><b>License:</b> ${image.license}</div>` : ""}
-        ${image.creator ? `<div><b>Creator:</b> ${image.creator}</div>` : ""}
-        ${image.license_holder ? `<div><b>License holder:</b> ${image.license_holder}</div>` : ""}
+        ${image.description ? `<div class="mb-2">${escapeHtml(image.description)}</div>` : ""}
+        ${image.license ? `<div><b>License:</b> ${escapeHtml(image.license)}</div>` : ""}
+        ${image.creator ? `<div><b>Creator:</b> ${escapeHtml(image.creator)}</div>` : ""}
+        ${image.license_holder ? `<div><b>License holder:</b> ${escapeHtml(image.license_holder)}</div>` : ""}
       `;
       caption.appendChild(hiddenDiv);
 
@@ -167,7 +167,7 @@ function createMediaItem(image, posterMap) {
 
     if (hasIiif) caption.appendChild(createIiifLink(image));
 
-    imageDiv.appendChild(caption);
+    muuri.appendChild(caption);
   }
 // --- Add "resize" / full-view button ---
   const viewBtn = document.createElement("button");
@@ -201,9 +201,9 @@ function create3DModel(image, alt, posterMap = {}) {
   wrapper.innerHTML = `
     <div class="spinner"></div>
     <model-viewer
-      src="${image.url}"
-      alt="${alt}"
-      ${poster ? `poster="${poster}"` : ""}
+      src="${escapeHtml(image.url)}"
+      alt="${escapeHtml(alt)}"
+      ${poster ? `poster="${escapeHtml(poster)}"` : ""}
       camera-controls
       ar
       ar-modes="webxr scene-viewer quick-look"
@@ -222,7 +222,7 @@ function createVideo(image) {
   wrapper.className = "video-wrapper position-relative";
   wrapper.style = "height:300px;overflow:hidden;";
   wrapper.innerHTML = `
-    <video class="w-100 h-100 rounded shadow-sm" src="${image.url}" controls preload="metadata">
+    <video class="w-100 h-100 rounded shadow-sm" src="${escapeHtml(image.url)}" controls preload="metadata">
       Your browser does not support the video tag.
     </video>
     <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2" type="button">
@@ -313,7 +313,6 @@ function initPopovers() {
     container: "body",
     trigger: "focus",
     placement: "top",
-    sanitize: false,
     content: function () {
       const sel = this.getAttribute("data-popover-content");
       const node = sel ? document.querySelector(sel) : null;

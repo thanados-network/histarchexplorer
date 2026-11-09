@@ -1,4 +1,5 @@
 <form method="post" action="{{ url_for('refresh_cache', id_=id_) }}" class="d-inline">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <button type="submit" class="btn btn-warning btn-sm" title="Refresh cache">
     <i class="bi bi-arrow-clockwise"></i>
   </button>

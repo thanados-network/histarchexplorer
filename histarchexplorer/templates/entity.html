@@ -3,57 +3,15 @@
 
 {% block content %}
     <script src="{{ url_for('static', filename='js/breadcrumbs.js') }}"></script>
-
-    <script
-            src="{{ url_for('static', filename='js/entityfunctions.js') }}"></script>
-
-    <script>
-
-        let tabsToLoad = {{ sidebar_elements | sort(attribute='order') | map(attribute='route') | list | tojson }};
-        const entityId = {{ entity_id }};
-
-        {% if entity_id == 0 %}
-            const data = {{ data | tojson }};
-            //const entityData = data
-            const typeTreeData = {{ typetree_data|tojson}};
-            const viewClasses = {{ filtered_view_classes|tojson }};
-
-            function getEntitiesForTab(tabName) {
-                const validClasses = viewClasses[tabName] || [];
-                return data.entities.filter(entity => validClasses.includes(entity.class));
-            }
-
-            data.entities.forEach(entity => {
-                entity.beginDBP = calculateTimeBP(entity.begin);
-                entity.endDBP = calculateTimeBP(entity.end);
-                if (entity.begin) entity.beginString = makeLocalDate(entity.begin).localdate;
-                if (entity.end) entity.endString = makeLocalDate(entity.end).localdate;
-
-                entity.all = [entity.description, entity.class, entity.type, entity.name]
-                    .filter(v => v !== null && v !== undefined && v !== '')
-                    .map(v => v.replace(/[\r\n]+/g, ' '))  // <- Replace line breaks with spaces
-                    .join(' ');
-            });
-
-        {% else %}
-            window.entityData = fetchEntityData({{ entity_id }});
-            (async function initializeEntity() {
-                // Wait until the entity data is fetched
-                const data = await window.entityData;
-                if (!data) {
-                    console.error("❌ Failed to load entityData.");
-                    return;
-                }
-
-                // Make it globally available
-                window.entityResolved = data;
-
-                // Continue normal initialization logic that depends on entity data
-                renderAllBreadcrumbs(data);
-                // You could dispatch a custom event so other modules can hook in:
-                document.dispatchEvent(new CustomEvent("entityReady", {detail: data}));
-            })();
-        {% endif %}
+    <script src="{{ url_for('static', filename='js/entityfunctions.js') }}"></script>
+    <script id="entity-page-data" type="application/json">
+        {{ {
+            "tabsToLoad": sidebar_elements | sort(attribute='order') | map(attribute='route') | list,
+            "entityId": entity_id,
+            "data": data,
+            "typeTreeData": typetree_data if entity_id == 0 else None,
+            "viewClasses": filtered_view_classes if entity_id == 0 else None
+        } | tojson }}
     </script>
 
     <div class="entity-container">
@@ -121,42 +79,10 @@
                 </div>
             </div>
             <div class="col flex-column grid">
-                <div id="right-sidebar" class="bg-body-secondary">
-                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum
-                    dolor sit amet lorem ipsum dolor
-                    sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem
-                    ipsum dolor sit amet lorem
-                    ipsum dolor sit amet
-                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum
-                    dolor sit amet lorem ipsum dolor
-                    sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem
-                    ipsum dolor sit amet lorem
-                    ipsum dolor sit amet
-                    lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem ipsum
-                    dolor sit amet lorem ipsum dolor
-                    sit amet lorem ipsum dolor sit amet lorem ipsum dolor sit amet lorem
-                    ipsum dolor sit amet lorem
-                    ipsum dolor sit amet
-                </div>
+                <div id="right-sidebar" class="bg-body-secondary"></div>
             </div>
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/entity.js') }}"></script>
-    <script>
-        document.addEventListener('shown.bs.tab', function (event) {
-            const tab = event.target;
-
-            const scrollTarget = tab.getAttribute('data-scroll-target');
-            if (!scrollTarget) {
-                window.location.hash = '';
-                return;
-            }
-            const targetAnchor = '#' + scrollTarget;
-            //window.location.hash = '#' + scrollTarget;
-            setTimeout(() => {window.location.href = targetAnchor;},500)
-
-
-        });
-    </script>
 {% endblock %}
 

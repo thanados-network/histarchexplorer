@@ -344,3 +344,66 @@ def test_catalogue_tab_no_features(
 
         rv = authenticated_client.get('/get_entity/3/catalogue')
         assert rv.status_code == 404
+
+
+def test_get_entity_subunits_when_none(
+        authenticated_client: FlaskClient) -> None:
+    with patch(
+        'histarchexplorer.views.entity.get_browse_list_entities',
+        return_value=None
+    ):
+        rv = authenticated_client.get('/get_entity/999/subunits')
+        assert rv.status_code == 200
+
+
+def test_adapt_map_dict_no_inplace_mutation() -> None:
+    from histarchexplorer.views.entity import adapt_map_dict
+    original_geom = {
+        'type': 'FeatureCollection',
+        'features': [{
+            'type': 'Feature',
+            'geometry': {'type': 'Point', 'coordinates': [16.0, 48.0]},
+            'properties': {'title': 'Original Title'}}]}
+    result = adapt_map_dict(original_geom, 'Entity Name', 42, 'place', 42)
+    assert len(result) == 1
+    assert result[0]['properties']['label'] == 'Entity Name'
+    assert result[0]['properties']['main'] is True
+    assert 'label' not in original_geom['features'][0]['properties']
+    assert 'main' not in original_geom['features'][0]['properties']
+
+
+def test_cache_related_protection_and_deduplication(
+        authenticated_client: FlaskClient) -> None:
+    from histarchexplorer import app
+    from histarchexplorer.views import entity as entity_view_mod
+
+    app.config['CACHE_PROTECTION'] = True
+    try:
+        rv = authenticated_client.get('/api/cache-related/77')
+        assert rv.status_code == 200
+        assert b'skipped' in rv.data
+    finally:
+        app.config['CACHE_PROTECTION'] = False
+
+    entity_view_mod._CACHING_IN_PROGRESS.add(88)
+    try:
+        rv2 = authenticated_client.get('/api/cache-related/88')
+        assert rv2.status_code == 200
+        assert b'already_queued' in rv2.data
+    finally:
+        entity_view_mod._CACHING_IN_PROGRESS.discard(88)
+
+
+def test_parse_file_missing_iiif_manifest(
+        authenticated_client: FlaskClient) -> None:
+    from histarchexplorer import app
+    with app.test_request_context():
+        files = PresentationView.parse_file([{
+            'id': 10,
+            'title': 'No IIIF',
+            'publicShareable': True,
+            'license': 'CC-BY',
+            'url': 'https://example.org/file.pdf',
+            'mimetype': 'application/pdf'}])
+        assert len(files) == 1
+        assert files[0].iiif_manifest is None

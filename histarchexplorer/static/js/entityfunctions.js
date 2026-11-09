@@ -1,3 +1,35 @@
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function sanitizeUrl(url, fallback = '#') {
+    if (!url || typeof url !== 'string') return fallback;
+    const trimmed = url.trim();
+    if (trimmed.startsWith('/') && !trimmed.startsWith('//')) {
+        return trimmed;
+    }
+    try {
+        const parsed = new URL(
+            trimmed.startsWith('www.') ? `https://${trimmed}` : trimmed,
+            window.location.origin);
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+            return parsed.href;
+        }
+    } catch (_e) {
+        return fallback;
+    }
+    return fallback;
+}
+
+window.escapeHtml = escapeHtml;
+window.sanitizeUrl = sanitizeUrl;
+
 function makeLocalDate(dateString) {
 
     let result = {'datestring': dateString, 'localdate': ''}

@@ -78,7 +78,7 @@
   overflow: hidden;
 }
 
-.grid-media .image img,
+.grid-media .image img:not(.iiif-icon),
 .grid-media .image video,
 .grid-media .image object {
   display: block;
@@ -180,7 +180,9 @@ body.dark .grid-media .text-muted {
 }
 
 /* IIIF logo inside the IIIF viewer button */
-.iiif-icon {
+.iiif-icon,
+.grid-media .image img.iiif-icon {
+  display: inline-block;
   height: 1rem;
   width: auto;
   vertical-align: text-bottom;

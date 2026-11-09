@@ -2,7 +2,7 @@ import json
 from dataclasses import asdict, dataclass, field
 from typing import Any, Optional
 
-import requests
+import requests  # type: ignore[import-untyped]
 from flask import g, url_for
 
 from histarchexplorer import app, cache
@@ -129,7 +129,7 @@ class ExternalReferenceModel:
 
     Attributes:
         id (str): Unique identifier of the reference.
-        type (str): Type of the reference system, e.g. 'closeMatch', 'exactMatch'.
+        type (str): Reference system type (e.g. 'closeMatch', 'exactMatch').
         identifier (str): External ID or key (e.g., Wikidata ID).
         reference_system (str): Name of the external system.
         resolver_url (str | None): URL pattern to resolve the identifier.
@@ -143,12 +143,12 @@ class ExternalReferenceModel:
     reference_url: Optional[str]
 
     @classmethod
-    def from_dict(cls, data: dict[str, str]):
+    def from_dict(cls, data: dict[str, Any]) -> 'ExternalReferenceModel':
         return cls(
-            id=data["id"],
-            type=data.get("type"),
-            identifier=data.get("identifier"),
-            reference_system=data.get("referenceSystem"),
+            id=str(data["id"]),
+            type=str(data.get("type") or ""),
+            identifier=str(data.get("identifier") or ""),
+            reference_system=str(data.get("referenceSystem") or ""),
             resolver_url=data.get("resolverURL"),
             reference_url=data.get("referenceURL"))
 
@@ -175,13 +175,15 @@ class Reference:
     pages: Optional[str] = None
 
     @classmethod
-    def from_dict(cls, data: dict[str, str]) -> 'Reference':
+    def from_dict(cls, data: dict[str, Any]) -> 'Reference':
+        raw_type_id = data.get("typeId")
+        type_id = int(raw_type_id) if raw_type_id is not None else None
         return cls(
-            id=data["id"],
-            title=data.get("title"),
-            system_class=data.get("systemClass"),
+            id=str(data["id"]),
+            title=str(data.get("title") or ""),
+            system_class=str(data.get("systemClass") or ""),
             type=data.get("type"),
-            type_id=data.get("typeId"),
+            type_id=type_id,
             citation=data.get("citation"),
             pages=data.get("pages"))
 
@@ -247,7 +249,7 @@ class Relation:
     aliases: Optional[list[str]] = None
     time_range: Optional[TimeRangeModel] = None
     geometries: list[FeatureModel] = field(default_factory=list)
-    geometry_json: dict[str, Any] = None
+    geometry_json: Optional[dict[str, Any]] = None
     types: list[EntityTypeModel] = field(default_factory=list)
 
 
@@ -288,7 +290,7 @@ class PresentationView:
     start: Optional[str]
     end: Optional[str]
     geometries: list[FeatureModel] = field(default_factory=list)
-    geometry_json: dict[str, Any] = None
+    geometry_json: Optional[dict[str, Any]] = None
     when: Optional[TimeRangeModel] = None
     types: list[EntityTypeModel] = field(default_factory=list)
     external_reference_systems: list[ExternalReferenceModel] = field(
@@ -311,7 +313,7 @@ class PresentationView:
         if not geometry_data:
             return []
 
-        def parse_single(data: dict) -> "FeatureModel":
+        def parse_single(data: dict[str, Any]) -> "FeatureModel":
             geometry_model = GeometryModel(
                 type=data['geometry']["type"],
                 coordinates=data["geometry"]["coordinates"])
@@ -335,7 +337,7 @@ class PresentationView:
         return geometries
 
     @staticmethod
-    def parse_time_range(when: dict) -> Optional[TimeRangeModel]:
+    def parse_time_range(when: dict[str, Any]) -> Optional[TimeRangeModel]:
         if not when:
             return None
         return TimeRangeModel(
@@ -346,32 +348,34 @@ class PresentationView:
 
     @staticmethod
     def parse_types(
-            types_data: list[dict[str, str | int | list[dict[str, str]]]]) \
-            -> list[EntityTypeModel]:
+            types_data: list[dict[str, Any]]) -> list[EntityTypeModel]:
         types = []
         for type_ in types_data:
-            hierarchy = []
-            if type_.get("typeHierarchy"):
-                hierarchy = [
-                    TypeHierarchyEntry(**th)
-                    for th in type_.get("typeHierarchy", [])]
+            raw_hierarchy = type_.get("typeHierarchy")
+            hierarchy_dicts: list[dict[str, str]] = (
+                raw_hierarchy if isinstance(raw_hierarchy, list) else [])
+            hierarchy = [
+                TypeHierarchyEntry(**th)
+                for th in hierarchy_dicts if isinstance(th, dict)]
             id_str = str(type_["id"])
             id_ = int(id_str) if id_str.isdigit() else 0
+            raw_desc = type_.get("descriptions")
+            raw_val = type_.get("value")
+            raw_unit = type_.get("unit")
             types.append(EntityTypeModel(
                 id=id_,
-                title=type_.get("title", ""),
-                descriptions=type_.get("descriptions"),
-                is_standard=type_.get("isStandard"),
+                title=str(type_.get("title") or ""),
+                descriptions=str(raw_desc) if raw_desc is not None else None,
+                is_standard=bool(type_.get("isStandard")),
                 type_hierarchy=hierarchy,
-                value=type_.get("value"),
-                unit=type_.get("unit"),
-                division=get_divisions(
-                    id_,
-                    type_.get("typeHierarchy"))))
+                value=str(raw_val) if raw_val is not None else None,
+                unit=str(raw_unit) if raw_unit is not None else None,
+                division=get_divisions(id_, hierarchy_dicts)))
         return types
 
     @staticmethod
-    def parse_relations(raw_relations: dict) -> dict[str, list[Relation]]:
+    def parse_relations(
+            raw_relations: dict[str, Any]) -> dict[str, list[Relation]]:
         grouped_relations: dict[str, list[Relation]] = {}
         for system_class, relation_list in raw_relations.items():
             relations = []
@@ -379,14 +383,15 @@ class PresentationView:
                 rel_geometries = PresentationView.parse_geometries(
                     rel.get("geometries"),
                     system_class)
-                time_range = PresentationView.parse_time_range(rel.get("when"))
+                time_range = PresentationView.parse_time_range(
+                    rel.get("when") or {})
                 rel_types = []
 
                 standard_type = rel.get("standardType")
                 if isinstance(standard_type, dict):
                     rel_types.append(EntityTypeModel(
-                        id=standard_type.get("id", 0),
-                        title=standard_type.get("title", ""),
+                        id=int(standard_type.get("id", 0)),
+                        title=str(standard_type.get("title") or ""),
                         descriptions=None,
                         is_standard=True,
                         type_hierarchy=[],
@@ -395,12 +400,12 @@ class PresentationView:
                         division=None))
 
                 relation = Relation(
-                    id=rel["id"],
-                    name=rel.get("title"),
-                    system_class=rel.get("systemClass", system_class),
+                    id=int(rel["id"]),
+                    name=str(rel.get("title") or ""),
+                    system_class=str(rel.get("systemClass") or system_class),
                     relation_types=rel.get("relationTypes"),
                     description=get_description_translated(
-                        rel.get("description")),
+                        rel.get("description") or ""),
                     aliases=rel.get("aliases", []),
                     time_range=time_range,
                     geometries=rel_geometries,
@@ -414,29 +419,32 @@ class PresentationView:
         return grouped_relations
 
     @staticmethod
-    def parse_file(
-            raw_file: list[dict[str, str | int | bool | None]]) -> list[File]:
+    def parse_file(raw_file: list[dict[str, Any]]) -> list[File]:
         files = []
         for f in raw_file:
             if not f.get("publicShareable") or not f.get("license"):
                 continue
+            iiif_base = f.get('IIIFManifest')
+            iiif_manifest = (
+                f"{iiif_base}?url={url_for('index', _external=True)}entity/"
+                if iiif_base else None)
+            mimetype = f.get("mimetype")
             files.append(File(
-                id=f.get("id"),
-                title=f.get("title"),
+                id=int(f.get("id") or 0),
+                title=str(f.get("title") or ""),
                 license=f.get("license"),
                 creator=f.get("creator"),
                 license_holder=f.get("licenseHolder"),
-                public=f.get("publicShareable"),
+                public=bool(f.get("publicShareable")),
                 url=f.get("url"),
-                mime_type=f.get("mimetype"),
-                iiif_manifest=(
-                    f"{f.get('IIIFManifest')}"
-                    f"?url={url_for('index', _external=True)}entity/"),
+                mime_type=mimetype,
+                iiif_manifest=iiif_manifest,
                 iiif_base_path=f.get("IIIFBasePath"),
                 overlay=f.get('overlay'),
-                from_super_entity=f.get('fromSuperEntity'),
+                from_super_entity=bool(f.get('fromSuperEntity')),
                 main_image=f.get('mainImage'),
-                render_type=get_render_type(f.get("mimetype"))))
+                render_type=get_render_type(
+                    str(mimetype) if mimetype is not None else "")))
         return files
 
     @classmethod

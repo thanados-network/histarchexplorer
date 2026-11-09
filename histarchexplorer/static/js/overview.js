@@ -179,27 +179,35 @@ function renderEntityCard(entity, mainImage) {
 
     let avatar = "";
     const sysClass = (entity.system_class || "").toLowerCase();
+    const safeTitle = escapeHtml(entity.title || "");
+    const safeSysClass = escapeHtml(entity.system_class || "");
     if (["group", "person"].includes(sysClass) && (mainImage?.iiif_base_path || mainImage?.url)) {
         const primary = mainImage.iiif_base_path
             ? `${mainImage.iiif_base_path}/full/400,/0/default.jpg`
             : mainImage.url;
-        avatar = `<img src="${primary}" alt="${entity.title}" onerror="this.onerror=null;this.src='${mainImage.url || systemIconPath(sysClass)}';"/>`;
+        const safePrimary = escapeHtml(primary);
+        const safeFallback = escapeHtml(mainImage.url || systemIconPath(sysClass));
+        avatar = `<img src="${safePrimary}" alt="${safeTitle}" data-fallback-src="${safeFallback}"/>`;
     } else {
-        avatar = `<img src="${systemIconPath(
-            entity.system_class
-        )}" alt="${entity.system_class}">`;
+        avatar = `<img src="${escapeHtml(systemIconPath(entity.system_class))}" alt="${safeSysClass}">`;
     }
 
-    const types = formatTypeTitles(entity.types);
-    const dateStr = dateTemplate(entity.start, entity.end);
+    const types = escapeHtml(formatTypeTitles(entity.types));
+    const dateStr = escapeHtml(dateTemplate(entity.start, entity.end));
 
     host.innerHTML = `
     <div class="text-center">
       <div class="entity-card__icon mb-2">${avatar}</div>
-      <h5 class="mb-0">${entity.title || ""}</h5>
+      <h5 class="mb-0">${safeTitle}</h5>
       ${types ? `<div class="entity-type"><p>${types}</p></div>` : ""}
       ${dateStr ? `<div class="entity-date"><p>${dateStr}</p></div>` : ""}
     </div>`;
+    const imgEl = host.querySelector('img[data-fallback-src]');
+    if (imgEl) {
+        imgEl.addEventListener('error', function () {
+            this.src = this.dataset.fallbackSrc;
+        }, {once: true});
+    }
     relayout(10);
 }
 
@@ -207,14 +215,16 @@ function renderDescription(entity) {
     const el = document.getElementById("js-description");
     if (!el) return;
     const text = pickDescription(entity?.description);
-    if (text) el.innerHTML = text;
+    if (text) el.textContent = text;
     relayout(10);
 }
 
 function renderMapTile(entity) {
     const tile = document.getElementById("tile-map");
     if (!tile) return;
-    if (!entity?.geometries?.length && !entity?.overviewMap.features?.length) ;
+    if (!entity?.geometries?.length && !entity?.overviewMap?.features?.length) {
+        return;
+    }
     tile.hidden = false;
     relayout(10);
 }
@@ -387,7 +397,7 @@ function renderAttributes(categorizedTypes) {
         let iconHtml = '';
         if (division) {
             if (division.iconUrl) {
-                iconHtml = `<img src="${division.iconUrl}" ` +
+                iconHtml = `<img src="${escapeHtml(division.iconUrl)}" ` +
                     `class="attribute-icon">`;
             } else if (division.icon) {
                 iconHtml = division.icon;
@@ -396,7 +406,7 @@ function renderAttributes(categorizedTypes) {
 
         const label = h("p", {
             class: "tile-sub-label text-uppercase mt-3",
-            html: `${iconHtml} ${capitalizeWords(bucket.replaceAll("_", " "))}`
+            html: `${iconHtml} ${escapeHtml(capitalizeWords(bucket.replaceAll("_", " ")))}`
         });
         host.appendChild(label);
         items.forEach((entry) => {
@@ -432,14 +442,15 @@ function renderAttributes(categorizedTypes) {
                 return null;
             };
 
+            const safeTypeId = encodeURIComponent(t.id || "");
             let popoverHtml = `<div class="popover-content text-start">`;
-            popoverHtml += `<div><a href="/entity/${t.id}" ` +
+            popoverHtml += `<div><a href="/entity/${safeTypeId}" ` +
                 `style="color: var(--entity-color-types); text-decoration: none;">` +
-                `<strong>${t.title || ""}</strong></a></div>`;
+                `<strong>${escapeHtml(t.title || "")}</strong></a></div>`;
             const desc = getTranslatedDescription(t.descriptions);
             if (desc) {
                 popoverHtml += `<div class="text-muted mt-1 small">` +
-                    `${desc}</div>`;
+                    `${escapeHtml(desc)}</div>`;
             }
 
             const hierarchy = t.typeHierarchy || t.type_hierarchy || [];
@@ -454,20 +465,20 @@ function renderAttributes(categorizedTypes) {
                 const root = ancestors[0];
                 const rootId = getEntryId(root);
 
-                const parentLink = `/entity/${parentId}`;
+                const parentLink = `/entity/${encodeURIComponent(parentId)}`;
                 popoverHtml += `<div class="mt-2 small">` +
                     `<strong>Subcategorie of:</strong> ` +
                     `<a href="${parentLink}" ` +
                     `style="color: var(--entity-color-types); text-decoration: none;">` +
-                    `${parent.label || ""}</a>` +
+                    `${escapeHtml(parent.label || "")}</a>` +
                     `</div>`;
 
-                const rootLink = `/entity/${rootId}`;
+                const rootLink = `/entity/${encodeURIComponent(rootId)}`;
                 popoverHtml += `<div class="mt-1 small">` +
                     `<strong>Hierarchy:</strong> ` +
                     `<a href="${rootLink}" ` +
                     `style="color: var(--entity-color-types); text-decoration: none;">` +
-                    `${root.label || ""}</a>` +
+                    `${escapeHtml(root.label || "")}</a>` +
                     `</div>`;
             }
             popoverHtml += `</div>`;
@@ -475,7 +486,6 @@ function renderAttributes(categorizedTypes) {
             new bootstrap.Popover(badge, {
                 content: popoverHtml,
                 html: true,
-                sanitize: false,
                 trigger: 'click',
                 placement: 'bottom',
                 container: 'body'});
@@ -537,9 +547,14 @@ function renderReferences(entity) {
         if (!["bibliography", "external_reference"].includes(ref.system_class)) return;
         const isBibl = ref.system_class === "bibliography";
         const icon = isBibl ? "bi-book" : "bi-box-arrow-up-right";
+        const safeRefTitle = escapeHtml(ref.title || "");
+        const safeShortUrl = escapeHtml((ref.title || "").split("/").slice(0, 3).join("/"));
+        const safeHref = isBibl
+            ? `/entity/${encodeURIComponent(ref.id)}`
+            : escapeHtml(sanitizeUrl(ref.title, "#"));
         const name = isBibl
-            ? `<a href="/entity/${ref.id}" class="reference-name">${ref.title || ""}</a>`
-            : `<a href="${ref.title}" class="reference-name">${(ref.title || "").split("/").slice(0, 3).join("/")}</a>`;
+            ? `<a href="${safeHref}" class="reference-name">${safeRefTitle}</a>`
+            : `<a href="${safeHref}" class="reference-name" target="_blank" rel="noopener noreferrer">${safeShortUrl}</a>`;
         const li = h("li", {}, h("div", {class: "reference-content"}, [
             h("div", {
                 class: "reference-header",
@@ -572,9 +587,14 @@ function renderExternalReferences(entity, settings = {}) {
         if (sysSettings.disabled) return;
 
         renderedCount++;
-        const linkUrl = ref.identifier || (ref.resolver_url
-            ? ref.resolver_url.replace("$1", ref.identifier)
-            : "#");
+        const rawUrl = ref.identifier?.startsWith("http")
+            ? ref.identifier
+            : (ref.resolver_url && (ref.id || ref.identifier)
+                ? (ref.resolver_url.includes("$1")
+                    ? ref.resolver_url.replace("$1", ref.id || ref.identifier)
+                    : `${ref.resolver_url}${ref.id || ref.identifier}`)
+                : (ref.reference_url || "#"));
+        const linkUrl = sanitizeUrl(rawUrl, "#");
 
         let matchBadge = null;
         const typeNorm = (ref.type || "").toLowerCase().replace(/[^a-z]/g, "");
@@ -679,13 +699,27 @@ function renderExternalReferences(entity, settings = {}) {
     }
 
 
+    const overviewRootEl = document.getElementById("overview-root");
+    if (overviewRootEl) {
+        if (overviewRootEl.dataset.additionalFiles && window.additionalFilesOverview === undefined) {
+            window.additionalFilesOverview = parseInt(overviewRootEl.dataset.additionalFiles, 10) || 0;
+        }
+        if (overviewRootEl.dataset.translations && !window.overviewTranslations) {
+            try {
+                window.overviewTranslations = JSON.parse(overviewRootEl.dataset.translations);
+            } catch (_e) {
+                window.overviewTranslations = {};
+            }
+        }
+    }
+
     const entity = data.entity || {};
     entity.overviewMap = data.overviewMap || {};
     const categorizedTypes = data.categorizedTypes || {};
     const citeButton = data.citeButton || {};
     const refreshButton = data.refreshButton || {};
     const mainImage = data.mainImage;
-    const initialImages = data.initialImages;
+    const initialImages = data.initialImages || data.initialImage;
     const allImages = (data.images || []).filter(img => img?.from_super_entity === false);
     const additionalFilesOverview = window.additionalFilesOverview || 0;
     const externalIdentifiersSettings = data.externalIdentifiersSettings || {};
@@ -719,7 +753,10 @@ function renderExternalReferences(entity, settings = {}) {
         h("div", {class: "entity-toolbox", id: "js-entity-toolbox"}),
         (() => {
             const sc = (entity.system_class || "").toLowerCase();
-            const section = systemClassMap[sc] || "";
+            const safeSc = escapeHtml(sc);
+            const safeTitle = escapeHtml(entity.title || "");
+            const safeDate = escapeHtml(dateTemplate(entity.start, entity.end));
+            const section = escapeHtml(systemClassMap[sc] || "");
             const isPersonOrGroup = ["group", "person"].includes(sc);
             const cardInner = isPersonOrGroup
                 ? (() => {
@@ -727,40 +764,31 @@ function renderExternalReferences(entity, settings = {}) {
                         ? `${mainImage.iiif_base_path}/full/400,/0/default.jpg`
                         : mainImage?.url;
                     const imgHtml = (mainImage?.iiif_base_path || mainImage?.url)
-                        ? `<img src="${primary}" alt="${entity.title}" onerror="this.onerror=null;this.src='${mainImage?.url || systemIconPath(sc)}';"/>`
+                        ? `<img src="${escapeHtml(primary)}" alt="${safeTitle}"/>`
                         : "";
                     return `
         <div class="entity-card__icon">
           ${imgHtml}
         </div>
-        <div class="hierarchy-card-label" data-system-class="${sc}">${entity.title || ""}</div>
-        <div class="entity-date"><p>${dateTemplate(entity.start, entity.end)}</p></div>
+        <div class="hierarchy-card-label" data-system-class="${safeSc}">${safeTitle}</div>
+        <div class="entity-date"><p>${safeDate}</p></div>
       `;
                 })()
                 : `
         <div class="main-entity-ellipse main-entity-ellipse--${section}">
-           <!-- <div class="entity-card__icon">
-            ${
-                    ["feature", "stratigraphic unit"].includes(sc)
-                        ? `<img src="/static/images/entity_icons/place.png" alt="${entity.system_class}">`
-                        : ["move", "acquisition", "modification", "activity"].includes(sc)
-                            ? `<img src="/static/images/entity_icons/event.png" alt="${entity.system_class}">`
-                            : `<img src="/static/images/entity_icons/${sc}.png" alt="${entity.system_class}">`
-                }
-          </div> -->
-          <div class="hierarchy-card-label mb-0">${entity.title || ""}</div>
+          <div class="hierarchy-card-label mb-0">${safeTitle}</div>
           <div class="entity-type mb-0">
             ${
                     (entity.types || [])
                         .filter(t => t?.is_standard)
-                        .map(t => `<p>${(t.title || "").toUpperCase()}</p>`)
+                        .map(t => `<p>${escapeHtml((t.title || "").toUpperCase())}</p>`)
                         .join("")
                 }
           </div>
           <div class="entity-date">
             ${
                     (entity.start || entity.end)
-                        ? `<p>${dateTemplate(entity.start, entity.end)}</p>`
+                        ? `<p>${safeDate}</p>`
                         : ""
                 }
           </div>

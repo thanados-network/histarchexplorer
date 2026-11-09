@@ -1,9 +1,10 @@
-import re
+import html
 import os
+import re
 from datetime import datetime
 from typing import Any, Optional
 
-from flask import g, url_for, current_app
+from flask import current_app, g, url_for
 from flask_babel import gettext as _
 
 
@@ -73,9 +74,14 @@ def get_render_type(mime_type: str) -> str:
 
 
 def get_icon_url(filename: str) -> str:
-    uploads_path = os.path.join(current_app.root_path, '..', 'uploads', 'icons')
+    uploads_path = os.path.join(
+        current_app.root_path, '..', 'uploads', 'icons')
+    entity_icon_path = os.path.join(
+        current_app.static_folder or '', 'images', 'entity_icons', filename)
     if os.path.exists(os.path.join(uploads_path, filename)):
         return url_for('uploaded_icon', filename=filename)
+    if os.path.exists(entity_icon_path):
+        return url_for('static', filename=f'images/entity_icons/{filename}')
     return url_for('static', filename=f'images/icons/{filename}')
 
 
@@ -106,22 +112,20 @@ def get_divisions(
                     return {
                         'label': label,
                         'icon_url': url,
-                        'iconUrl': url
-                    }
+                        'iconUrl': url}
                 elif icon_type in ('bootstrap', 'css') and icon_value:
                     css_class = icon_value
                     if (not icon_value.startswith('bi ')
                             and not icon_value.split(' ').count('bi')):
                         css_class = f"bi {icon_value}"
-                    icon_html = f'<i class="{css_class}"></i>'
+                    safe_css = html.escape(css_class, quote=True)
+                    icon_html = f'<i class="{safe_css}"></i>'
                     return {
                         'label': label,
-                        'icon': icon_html
-                    }
+                        'icon': icon_html}
                 return {
                     'label': label,
-                    'icon': '<i class="bi bi-box"></i>'
-                }
+                    'icon': '<i class="bi bi-box"></i>'}
     else:
         if hasattr(g, 'type_divisions') and g.type_divisions:
             for check_id in [id_] + [
@@ -138,13 +142,11 @@ def get_divisions(
                             'label': div['label'],
                             'icon': icon_html,
                             'icon_url': icon_url,
-                            'iconUrl': icon_url
-                        }
+                            'iconUrl': icon_url}
                     else:
                         return {
                             'label': div['label'],
-                            'icon': icon_html or '<i class="bi bi-box"></i>'
-                        }
+                            'icon': icon_html or '<i class="bi bi-box"></i>'}
 
     return {'label': _('other'), 'icon': '<i class="bi bi-boxes"></i>'}
 

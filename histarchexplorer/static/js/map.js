@@ -45,10 +45,11 @@
 
     const center = bounds.getCenter();
 
+    const maptilerKey = encodeURIComponent(window.maptilerApiKey || '');
     const map = new maplibregl.Map({
         container: 'mymap',
         center: [center.lng, center.lat],
-        style: 'https://api.maptiler.com/maps/topo-v2/style.json?key=E7Jrgaazm79UlTuEI5f5',
+        style: `https://api.maptiler.com/maps/topo-v2/style.json?key=${maptilerKey}`,
         zoom: 17,
         maxPitch: 85,
         maxZoom: 25,
@@ -73,8 +74,8 @@
 
     function addTerrain() {
         const terrainUrl =
-        'https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json' +
-        '?key=E7Jrgaazm79UlTuEI5f5';
+            'https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json' +
+            `?key=${maptilerKey}`;
 
     // Nur EINE Quelle für beides registrieren
     map.addSource('sharedTerrainSource', {
@@ -415,9 +416,12 @@
 
         if (!clickedFeatures.length) return;
 
-        const featureNames = clickedFeatures.map(f =>
-            `<button class="map-popup-hoverlink" onclick="setSidebarContent(${f.properties.id})" data-id="${f.properties.id}">${f.properties.label} (${f.properties.class})</button>`
-        );
+        const featureNames = clickedFeatures.map(f => {
+            const safeId = parseInt(f.properties.id, 10) || 0;
+            const safeLabel = escapeHtml(f.properties.label || '');
+            const safeClass = escapeHtml(f.properties.class || '');
+            return `<button class="map-popup-hoverlink" data-id="${safeId}">${safeLabel} (${safeClass})</button>`;
+        });
         featureIds = clickedFeatures.map(f => f.properties.id);
 
         highlightFeatures(featureIds);
@@ -455,6 +459,10 @@
             .setHTML(featureNames.join('<br>'))
             .addTo(map);
         document.querySelectorAll(".map-popup-hoverlink").forEach(button => {
+            button.addEventListener("click", () => {
+                const featureId = parseInt(button.getAttribute("data-id"), 10);
+                if (!isNaN(featureId)) setSidebarContent(featureId);
+            });
             button.addEventListener("mouseenter", () => {
                 const featureId = parseInt(button.getAttribute("data-id"));
                 highlightFeatures([featureId]);
@@ -1229,7 +1237,6 @@
         triggers.forEach(trigger => {
             new bootstrap.Popover(trigger, {
                 html: true,
-                sanitize: false,
                 trigger: 'click',
                 placement: 'bottom',
                 container: 'body'});
@@ -1370,7 +1377,8 @@
         const coords = img.bbox;
         const name = img.name;
         const description = img.description;
-        const manifestUrl = `https://thanados.openatlas.eu/api/iiif_manifest/2/${id}`;
+        const apiBase = (window.openatlasApiUrl || 'https://thanados.openatlas.eu/api/').replace(/\/?$/, '/');
+        const manifestUrl = `${apiBase}iiif_manifest/2/${encodeURIComponent(id)}`;
         const imageUrl = await getIiifImageUrl(manifestUrl, 2048);
 
         if (!imageUrl || !coords) return;
@@ -1435,10 +1443,12 @@
         if (ids.length === 0) return;
 
         try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
             const response = await fetch('/get_rastermaps', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
                 },
                 body: JSON.stringify({ ids: ids })
             });
@@ -1455,13 +1465,13 @@
                 await Promise.all(images.map(async (img) => {
                     await addImageToMap(map, img);
 
-                    const layerId = `image_layer_${img.id}`;
+                    const layerId = `image_layer_${encodeURIComponent(img.id)}`;
                     const item = document.createElement('div');
                     item.className = 'image-legend-item';
                     item.innerHTML = `
                         <label>
                             <input type="checkbox" checked data-layer="${layerId}">
-                            ${img.name}
+                            ${escapeHtml(img.name || '')}
                         </label> <br>
                         Opacity: 
                         <input type="range" min="0" max="1" step="0.1" value="0.9" data-layer="${layerId}" title="Opacity">

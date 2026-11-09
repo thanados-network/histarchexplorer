@@ -1,3 +1,13 @@
+function escapeViewerHtml(value) {
+  if (value === null || value === undefined) return "";
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /**
  * Creates a Bootstrap modal overlay for media viewers.
  * @param {Object} viewEntity - The PresentationView JSON.
@@ -20,14 +30,14 @@ function createInfoOverlay(viewEntity, file_data) {
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="viewerInfoLabel">${file_data.title || "Untitled file"}</h5>
+          <h5 class="modal-title" id="viewerInfoLabel">${escapeViewerHtml(file_data.title || "Untitled file")}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <p><strong>Creator:</strong> ${file_data.creator || "Unknown"}</p>
-            <p><strong>License:</strong> ${file_data.license || "—"}</p>
-            <p><strong>License holder:</strong> ${file_data.license_holder || "—"}</p>
+            <p><strong>Creator:</strong> ${escapeViewerHtml(file_data.creator || "Unknown")}</p>
+            <p><strong>License:</strong> ${escapeViewerHtml(file_data.license || "—")}</p>
+            <p><strong>License holder:</strong> ${escapeViewerHtml(file_data.license_holder || "—")}</p>
           </div>
           <hr>
           ${buildRelationsSection(viewEntity.relations)}
@@ -56,7 +66,7 @@ function buildRelationsSection(relations) {
 
   let html = `<h4 class="mt-2">Related Entities</h4>`;
   for (const [systemClass, relationList] of Object.entries(relations)) {
-    html += `<h5 class="mt-3 text-capitalize">${systemClass.replace(/_/g, " ")}</h5><ul class="list-unstyled">`;
+    html += `<h5 class="mt-3 text-capitalize">${escapeViewerHtml(systemClass.replace(/_/g, " "))}</h5><ul class="list-unstyled">`;
 
     relationList.forEach(rel => {
       const desc =
@@ -65,16 +75,19 @@ function buildRelationsSection(relations) {
       const truncated = desc.split(/\s+/).slice(0, 100).join(" ");
       const stdType =
         rel.types && rel.types.length
-          ? ` (${rel.types[0].title})`
+          ? ` (${escapeViewerHtml(rel.types[0].title)})`
           : "";
+      const safeRelId = encodeURIComponent(rel.id || "");
+      const safeRelName = escapeViewerHtml(rel.name || "Unnamed Entity");
+      const safeTruncated = escapeViewerHtml(truncated);
 
       html += `
         <li class="mb-3">
-          <a href="/entity/${rel.id}" target="_blank" class="fw-semibold text-decoration-none">
-            ${rel.name || "Unnamed Entity"}${stdType}
+          <a href="/entity/${safeRelId}" target="_blank" class="fw-semibold text-decoration-none">
+            ${safeRelName}${stdType}
           </a>
           <p class="text-muted small mt-1">
-            ${truncated}${desc.split(/\s+/).length > 100 ? "..." : ""}
+            ${safeTruncated}${desc.split(/\s+/).length > 100 ? "..." : ""}
           </p>
         </li>
       `;

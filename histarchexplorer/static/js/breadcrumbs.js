@@ -1,4 +1,8 @@
 function renderAllBreadcrumbs(entityData, show = true) {
+  if (entityData && typeof entityData.then === "function") {
+    entityData.then(resolved => renderAllBreadcrumbs(resolved, show));
+    return;
+  }
   if (!show || !entityData?.entity || !entityData?.hierarchy?.root) {return;}
 
   const entity = entityData.entity;
@@ -54,10 +58,12 @@ function renderAllBreadcrumbs(entityData, show = true) {
 
 // Auto render
 document.addEventListener("DOMContentLoaded", () => {
-  if (window.entityData) renderAllBreadcrumbs(window.entityData);
+  const data = window.entityResolved || window.entityData;
+  if (data) renderAllBreadcrumbs(data);
 });
 
 // Re-render on tab change
 document.addEventListener("shown.bs.tab", () => {
-  if (window.entityData) renderAllBreadcrumbs(window.entityData);
+  const data = window.entityResolved || window.entityData;
+  if (data) renderAllBreadcrumbs(data);
 });

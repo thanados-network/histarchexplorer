@@ -9,7 +9,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     const file_data = viewEntity.files[0];
 
     const response = await fetch(file_data.url);
-    container.innerHTML = await response.text();
+    const rawSvgText = await response.text();
+    const parser = new DOMParser();
+    const parsedDoc = parser.parseFromString(rawSvgText, "image/svg+xml");
+    const parsedSvg = parsedDoc.querySelector("svg");
+    if (!parsedSvg) {
+      throw new Error("Invalid SVG document");
+    }
+    parsedSvg.querySelectorAll(
+      "script, foreignObject, iframe, object, embed"
+    ).forEach(el => el.remove());
+    parsedSvg.querySelectorAll("*").forEach(el => {
+      Array.from(el.attributes).forEach(attr => {
+        const name = attr.name.toLowerCase();
+        const val = attr.value.trim().toLowerCase();
+        if (name.startsWith("on") || val.startsWith("javascript:")) {
+          el.removeAttribute(attr.name);
+        }
+      });
+    });
+    container.replaceChildren(document.importNode(parsedSvg, true));
 
     const svgEl = container.querySelector("svg");
     svgEl.setAttribute("width", "100%");

@@ -2,6 +2,7 @@ import json
 import threading
 import time
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict
 from typing import Any, Optional
 
@@ -10,13 +11,18 @@ from flask import abort, g, render_template, request
 from histarchexplorer import app
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.presentation_view import (
-    EntityTypeModel, File, PresentationView, Relation)
+    EntityTypeModel, File, PresentationView, Relation, TimeRangeModel)
 from histarchexplorer.api.util import get_description_translated
+from histarchexplorer.database.entity import get_files_for_ids
 from histarchexplorer.services.entity_cache import ensure_entity_fresh
 from histarchexplorer.utils.view_util import (
     get_cite_button, get_refresh_button)
 from histarchexplorer.views.entities import get_browse_list_entities
 from histarchexplorer.views.views import type_tree
+
+_CACHE_EXECUTOR = ThreadPoolExecutor(max_workers=2)
+_CACHING_IN_PROGRESS: set[int] = set()
+_CACHE_LOCK = threading.Lock()
 
 
 @app.route('/entity/<int:id_>')
@@ -48,9 +54,9 @@ def entity_view(id_: int, tab_name: str = "overview") -> str:
 
 def get_entity_images(
         files: list[File]) \
-        -> tuple[File | None, list[File | None], list[File | None]]:
-    images = []
-    main_image = None
+        -> tuple[File | None, list[File], list[File]]:
+    images: list[File] = []
+    main_image: File | None = None
     for image in files:
         if image.render_type in ['unknown', 'webp']:
             continue
@@ -98,17 +104,19 @@ def extract_year(date_str: Optional[str]) -> Optional[int]:
     return -year if is_bc else year
 
 
-def compact_year_span(view: PresentationView) -> Optional[str]:
+def compact_year_span(
+        view: PresentationView | TimeRangeModel | None) -> Optional[str]:
     """Build a shortened time span from earliest begin to latest end.
 
     Only the year is kept; BC/AD eras are appended.
     """
+    when = view.when if isinstance(view, PresentationView) else view
     begin = None
     end = None
-    if view.when and view.when.start:
-        begin = view.when.start.earliest or view.when.start.latest
-    if view.when and view.when.end:
-        end = view.when.end.latest or view.when.end.earliest
+    if when and when.start:
+        begin = when.start.earliest or when.start.latest
+    if when and when.end:
+        end = when.end.latest or when.end.earliest
 
     def fmt(year: Optional[int]) -> Optional[str]:
         if year is None:
@@ -124,15 +132,16 @@ def compact_year_span(view: PresentationView) -> Optional[str]:
     return year_from or year_to
 
 
-def get_valid_images(view: PresentationView) -> list[File]:
+def get_valid_images(view: PresentationView | list[File]) -> list[File]:
     """Collect displayable images for an entity.
 
     Excludes inherited (`from_super_entity`) files and non-image
     render types. No placeholder fallback is added.
     """
+    files = view.files if isinstance(view, PresentationView) else view
     images = []
     main_image = None
-    for image in view.files:
+    for image in files:
         if image.from_super_entity:
             continue
         if image.render_type not in ('image', 'svg'):
@@ -216,26 +225,18 @@ def _subunit_block(entity: dict[str, Any]) -> dict[str, Any] | None:
         app.logger.warning('Ignoring unsupported subunits class: %s',
                            system_class)
         return None
-    when = PresentationView.parse_time_range(entity.get('when'))
+    when = PresentationView.parse_time_range(entity.get('when') or {})
     files = PresentationView.parse_file(entity.get('files', []))
     types = _subunit_types(entity.get('types'))
     return {
         'id': id_,
         'title': title,
         'system_class': system_class,
-        'year_span': compact_year_span(
-            PresentationView(
-                id=id_, system_class=system_class, view_class='', title=title,
-                description=None, aliases=None, start=None, end=None,
-                when=when)),
+        'year_span': compact_year_span(when),
         'main_types': [type_ for type_ in types if type_.is_standard],
         'categorized_types': get_categorized_types(types),
         'description': _subunit_description(entity.get('description')),
-        'images': get_valid_images(
-            PresentationView(
-                id=id_, system_class=system_class, view_class='', title=title,
-                description=None, aliases=None, start=None, end=None,
-                files=files))}
+        'images': get_valid_images(files)}
 
 
 def _subunits_graph_nodes(data: dict[str, Any]) -> dict[int, dict[str, Any]]:
@@ -328,7 +329,7 @@ def _graph_children(
         nodes: dict[int, dict[str, Any]],
         system_class: str) -> list[dict[str, Any]]:
     """Return ordered children of one class from a flat subunits graph."""
-    children = []
+    children: list[dict[str, Any]] = []
     child_ids = node.get('children')
     if not isinstance(child_ids, list):
         return children
@@ -439,7 +440,7 @@ def normalize_subunits_data(data: dict[str, Any]) -> list[dict[str, Any]]:
 def get_subunits_root_id(id_: int) -> int:
     """Return the place ID required by the subunits endpoint."""
     hierarchy = get_hierarchy(PresentationView.from_api(id_))
-    if len(hierarchy) >= 1:
+    if hierarchy and hierarchy[0] is not None:
         return hierarchy[0].id
     return id_
 
@@ -476,7 +477,8 @@ def get_entity(id_: int, tab_name: str) -> str:
     or general overview sections of an archaeological item.
     """
     if tab_name == 'subunits':
-        subunit_data = get_browse_list_entities(id_)
+        subunit_data = get_browse_list_entities(id_) or {
+            'entities': [], 'counts': {}, 'totals': {}}
         filtered_view_classes = {
             key: tuple(list(d.keys())[0] for d in value)
             for key, value in subunit_data['counts'].items()}
@@ -520,13 +522,13 @@ def get_entity(id_: int, tab_name: str) -> str:
 def get_features_for_map(
         e: PresentationView,
         hierarchy: Optional[dict[str, Any]] = None) \
-        -> list[dict[str, str | int] | None]:
+        -> list[dict[str, Any] | None]:
     """Extract map features of an entity and its relations.
 
     Collects geometries from the entity and related child items,
     formatting them for map visualization in the frontend.
     """
-    map_data: list[Optional[dict[str, str | int]]] = []
+    map_data: list[Optional[dict[str, Any]]] = []
     first_geom = None
     if e.geometry_json:
         map_data.extend(
@@ -555,7 +557,7 @@ def get_features_for_map(
 
 def get_parent_geometry(hierarchy: list[Relation]) -> dict[str, Any]:
     for root_element in reversed(hierarchy):
-        if root_element.geometries:
+        if root_element.geometries and root_element.geometry_json:
             return root_element.geometry_json
     return {}
 
@@ -574,7 +576,7 @@ def adapt_map_dict(
         name: str,
         id_: int,
         system_class: str,
-        first_geom: Optional[int] = None) -> list[dict[str, str | int]]:
+        first_geom: Optional[int] = None) -> list[dict[str, Any]]:
     features = []
     if geom.get('type') == 'FeatureCollection':
         features.extend(geom['features'])
@@ -582,21 +584,22 @@ def adapt_map_dict(
         features.append(geom)
     output = []
     for feature in features:
-        if '(autogenerated)' in feature['properties']['title']:
+        props = dict(feature.get('properties', {}))
+        if '(autogenerated)' in props.get('title', ''):
             continue
         if first_geom == int(id_):
-            feature['properties']['main'] = True
-        feature['properties']['class'] = system_class
-        feature['properties']['label'] = name
-        feature['properties']['id'] = int(id_)
-        output.append(feature)
+            props['main'] = True
+        props['class'] = system_class
+        props['label'] = name
+        props['id'] = int(id_)
+        output.append({**feature, 'properties': props})
 
     return output
 
 
 def get_categorized_types(
-        types: list[EntityTypeModel]) -> dict[str, list[EntityTypeModel]]:
-    def sort_key(item: tuple[str, list]) -> tuple[int, str]:
+        types: list[EntityTypeModel]) -> dict[str, list[dict[str, Any]]]:
+    def sort_key(item: tuple[str, list[dict[str, Any]]]) -> tuple[int, str]:
         key = item[0]
         match key:
             case 'case_study':
@@ -606,9 +609,9 @@ def get_categorized_types(
             case _:
                 return 1, key
 
-    divisions = defaultdict(list)
+    divisions: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for type_ in types:
-        if type_.is_standard:
+        if type_.is_standard or not type_.division:
             continue
         label = type_.division['label'].replace(' ', '_')
         divisions[label].append(
@@ -617,13 +620,13 @@ def get_categorized_types(
     return sorted_divisions
 
 
-def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
+def get_hierarchy(main_entity: PresentationView) -> list[Relation]:
     """Determine the administrative hierarchy of an entity.
 
     Walks relationships to identify parent units (e.g., matching
     stratigraphic units, features, and places) in reversed order.
     """
-    root: list[Optional[Relation]] = []
+    root: list[Relation] = []
     match main_entity.system_class:
         case 'feature':
             if ('place' in main_entity.relations
@@ -631,7 +634,7 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
                 root.append(main_entity.relations['place'][0])
         case 'stratigraphic_unit':
             for feature in main_entity.relations.get('feature', []):
-                for relation in feature.relation_types:
+                for relation in feature.relation_types or []:
                     if relation['relationTo'] == main_entity.id:
                         root.append(feature)
             if ('place' in main_entity.relations
@@ -640,12 +643,12 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
         case 'artifact' | 'human_remains':
             stratigraphic_unit_id = None
             for feature in main_entity.relations.get('stratigraphic_unit', []):
-                for relation in feature.relation_types:
+                for relation in feature.relation_types or []:
                     if relation['relationTo'] == main_entity.id:
                         root.append(feature)
                         stratigraphic_unit_id = feature.id
             for feature in main_entity.relations.get('feature', []):
-                for relation in feature.relation_types:
+                for relation in feature.relation_types or []:
                     if relation['relationTo'] == stratigraphic_unit_id:
                         root.append(feature)
             if ('place' in main_entity.relations
@@ -655,7 +658,7 @@ def get_hierarchy(main_entity: PresentationView) -> list[Relation | None]:
     return root
 
 
-def get_sub_count(main_entity: PresentationView) -> dict[str, int | list[int]]:
+def get_sub_count(main_entity: PresentationView) -> dict[str, Any]:
     """Count and gather IDs of sub-elements within an entity.
 
     Finds forms-part-of (crm:P46) relationship types, returning
@@ -671,47 +674,17 @@ def get_sub_count(main_entity: PresentationView) -> dict[str, int | list[int]]:
     ids = []
     for rel_type in sub_relations_map.get(main_entity.system_class, []):
         for rel in main_entity.relations.get(rel_type, []):
+            rel_types = rel.relation_types or []
             count += sum(
                 1
-                for rt in rel.relation_types
+                for rt in rel_types
                 if rt.get("relationTo") == main_entity.id
                 and rt.get("property") == "crm:P46i_forms_part_of")
-            for rt in rel.relation_types:
+            for rt in rel_types:
                 if rt.get("relationTo") == main_entity.id \
                         and rt.get("property") == "crm:P46i_forms_part_of":
                     ids.append(rel.id)
     return {'count': count, 'ids': ids}
-
-
-def get_files_for_ids(
-        ids: list[int]) -> dict[str, list[dict[str, Any]]] | None:
-    sql = """
-          SELECT JSONB_AGG(
-                         jsonb_build_object(
-                                 'id', a.id,
-                                 'name', a.name,
-                                 'description', a.description,
-                                 'bbox', a.bounding_box::JSONB
-                         )
-                 ) AS images
-          FROM (SELECT e.id,
-                       e.name,
-                       e.description,
-                       o.image_id,
-                       o.bounding_box
-                FROM model.entity e
-                         JOIN model.link l ON e.id = l.domain_id
-                         JOIN web.map_overlay o ON o.image_id = e.id
-                WHERE e.openatlas_class_name = 'file'
-                  AND l.range_id = ANY(%(ids)s)
-                  AND l.property_code = 'P67') a;
-          """
-
-    g.openatlas_cursor.execute(sql, {'ids': ids})
-    result = g.openatlas_cursor.fetchone()
-    if result:
-        return result
-    return None
 
 
 @app.route('/get_rastermaps', methods=['POST'])
@@ -831,24 +804,25 @@ def entity_data(id_: int) -> dict[str, Any]:
         'refreshButton': get_refresh_button(entity.id) or "",
         'mainImage': main_image,
         'initialImage': initial_images,
+        'initialImages': initial_images,
         'images': images,
         'externalIdentifiersSettings': external_identifiers_settings}
 
 
 def background_cache_relations(
-        app_, entity_id: int, headers: dict, base_url: str) -> None:
+        app_: Any, entity_id: int, headers: dict[str, Any],
+        base_url: str) -> None:
     """Fetch and cache all related entities in the background.
 
     Iterates through semantic relations and triggers a full API fetch for
     each, memoizing them in Redis. Adds a 0.5s delay between requests.
     """
-    print(f"DEBUG: Entering background_cache_relations for {entity_id}")
     try:
         with app_.test_request_context(base_url=base_url):
-            print(f"DEBUG: Context established for {entity_id}")
             g.api_headers = headers
             try:
-                print(entity_id, "background caching relations")
+                app_.logger.debug(
+                    "Background caching relations for %s", entity_id)
                 entity = PresentationView.from_api(entity_id)
                 related_ids = set()
                 for relations in entity.relations.values():
@@ -862,27 +836,33 @@ def background_cache_relations(
                         time.sleep(0.5)
                     except Exception as e:
                         app_.logger.error(
-                            f"Failed to cache related entity {rid}: {e}")
+                            "Failed to cache related entity %s: %s", rid, e)
             except Exception as e:
                 app_.logger.error(
-                    f"Background caching failed for {entity_id}: {e}")
+                    "Background caching failed for %s: %s", entity_id, e)
     except Exception as e:
-        print(f"DEBUG: Failed to start background task for {entity_id}: {e}")
+        app_.logger.error(
+            "Failed to start background task for %s: %s", entity_id, e)
+    finally:
+        with _CACHE_LOCK:
+            _CACHING_IN_PROGRESS.discard(entity_id)
 
 
 @app.route('/api/cache-related/<int:id_>')
 def cache_related(id_: int) -> str:
     """Initiate background caching for an entity's relations.
 
-    Spawns a daemon thread to pre-fetch related entity data without
-    blocking the current request.
+    Submits a bounded task to pre-fetch related entity data without
+    blocking the current request or allowing unbounded thread creation.
     """
-    print(f"API call received: /api/cache-related/{id_}")
+    if app.config.get("CACHE_PROTECTION"):
+        return json.dumps({"status": "skipped"})
+    with _CACHE_LOCK:
+        if id_ in _CACHING_IN_PROGRESS or len(_CACHING_IN_PROGRESS) >= 32:
+            return json.dumps({"status": "already_queued"})
+        _CACHING_IN_PROGRESS.add(id_)
     headers = getattr(g, 'api_headers', {})
     base_url = request.base_url
-    thread = threading.Thread(
-        target=background_cache_relations,
-        args=(app, id_, headers, base_url))
-    thread.daemon = True
-    thread.start()
+    _CACHE_EXECUTOR.submit(
+        background_cache_relations, app, id_, headers, base_url)
     return json.dumps({"status": "success"})

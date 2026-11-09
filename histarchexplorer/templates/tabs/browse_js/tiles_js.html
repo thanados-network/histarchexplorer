@@ -2,6 +2,7 @@
     let filteredData{{ tab_name }} = [];
     // Declare the grid variable with template
     let grid{{ tab_name }} = null;
+    let tileContainer{{tab_name}} = null;
 
 
     // how sharp you want the image vs bandwidth (2 = good, 3 = very sharp)
@@ -434,7 +435,7 @@
     });
 
     // If we're currently viewing tiles, rebuild the grid properly
-    let tileContainer{{tab_name}} = document.getElementById('tile-{{ tab_name }}');
+    tileContainer{{tab_name}} = document.getElementById('tile-{{ tab_name }}');
     if (grid{{ tab_name }} && tileContainer{{tab_name}} && !tileContainer{{tab_name}}.classList.contains('d-none')) {
 
         grid{{ tab_name }}.destroy();
