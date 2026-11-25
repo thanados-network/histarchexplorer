@@ -260,3 +260,18 @@
     color: #4f46e5;
   }
 }
+
+.search-pagination {
+  flex-wrap: wrap;
+  gap: 0.2rem;
+
+  .page-link {
+    min-width: 2.25rem;
+    border-radius: 0.5rem;
+    text-align: center;
+  }
+
+  .page-item.active .page-link {
+    font-weight: 600;
+  }
+}

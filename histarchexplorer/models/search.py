@@ -1,11 +1,11 @@
 """Search service layer communicating with the OpenAtlas v1 search API."""
-from concurrent.futures import ThreadPoolExecutor
 import json
 import re
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
-from flask import g
 import requests
+from flask import g
 
 OPENATLAS_SEARCH_CLASSES: tuple[str, ...] = (
     'acquisition',
@@ -143,6 +143,99 @@ class SearchService:
             return 2, name_lower
         return 3, name_lower
 
+    @staticmethod
+    def _deduplicate_items(
+            items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Remove duplicate entities while preserving their first position."""
+        seen_ids: set[str] = set()
+        unique_items: list[dict[str, Any]] = []
+        for item in items:
+            item_id = str(item.get('id') or '')
+            if item_id and item_id in seen_ids:
+                continue
+            if item_id:
+                seen_ids.add(item_id)
+            unique_items.append(item)
+        return unique_items
+
+    @staticmethod
+    def _sort_value(item: dict[str, Any], sort_by: str) -> Any:
+        """Get a sortable name or date value from a search result item."""
+        if sort_by == 'name':
+            return item.get('name')
+
+        camel_key = 'startDate' if sort_by == 'start_date' else 'endDate'
+        value = item.get(sort_by, item.get(camel_key))
+        if value is not None:
+            if isinstance(value, dict):
+                return value.get('earliest') or value.get('latest')
+            return value
+
+        timespan = item.get('timespan')
+        if not isinstance(timespan, dict):
+            return None
+        bound = timespan.get(
+            'start' if sort_by == 'start_date' else 'end')
+        if not isinstance(bound, dict):
+            return None
+        return bound.get('earliest') or bound.get('latest')
+
+    def _sort_merged_items(
+            self,
+            items: list[dict[str, Any]],
+            query: str,
+            sort_by: str,
+            sort_order: str) -> list[dict[str, Any]]:
+        """Sort merged results globally, keeping missing dates at the end."""
+        if query:
+            query_lower = query.lower()
+            return sorted(
+                items,
+                key=lambda candidate: self._rank_key(
+                    query_lower, candidate))
+
+        valued_items: list[tuple[Any, dict[str, Any]]] = []
+        missing_items: list[dict[str, Any]] = []
+        for item in items:
+            value = self._sort_value(item, sort_by)
+            if value is None or value == '':
+                missing_items.append(item)
+                continue
+            if sort_by == 'name':
+                sort_key: Any = str(value).casefold()
+            else:
+                date_match = re.match(r'^(-?\d{1,5})(.*)$', str(value))
+                if date_match:
+                    sort_key = (
+                        0,
+                        int(date_match.group(1)),
+                        date_match.group(2).casefold())
+                else:
+                    sort_key = (1, 0, str(value).casefold())
+            valued_items.append((sort_key, item))
+
+        valued_items.sort(
+            key=lambda entry: entry[0], reverse=sort_order == 'desc')
+        return [item for _, item in valued_items] + missing_items
+
+    def _fetch_pages(
+            self,
+            call_specs: list[tuple[dict[str, Any], int | None]],
+            headers: dict[str, str]) -> list[dict[str, Any]]:
+        """Fetch several search pages concurrently, preserving spec order."""
+        if not call_specs:
+            return []
+        with ThreadPoolExecutor(
+                max_workers=min(8, len(call_specs))) as executor:
+            futures = [
+                executor.submit(
+                    self._fetch_page,
+                    params,
+                    headers,
+                    case_study_id)
+                for params, case_study_id in call_specs]
+            return [future.result() for future in futures]
+
     def _fetch_page(
             self,
             params: dict[str, Any],
@@ -249,47 +342,119 @@ class SearchService:
                     params['endDate'] = clean_end
                 call_specs.append((params, cs_id))
 
-        responses: list[dict[str, Any]] = []
         if len(call_specs) == 1:
             params, cs_id = call_specs[0]
-            responses.append(self._fetch_page(params, headers, cs_id))
-        else:
-            with ThreadPoolExecutor(
-                    max_workers=min(8, len(call_specs))) as executor:
-                futures = [
-                    executor.submit(
-                        self._fetch_page,
-                        params,
-                        headers,
-                        cs_id)
-                    for params, cs_id in call_specs]
-                for future in futures:
-                    responses.append(future.result())
+            response = self._fetch_page(params, headers, cs_id)
+            items = self._deduplicate_items(response.get('items', []))
+            total_items = int(response.get('total_items', 0))
+            return {
+                'items': items[:clean_limit],
+                'total_items': max(total_items, len(items)),
+                'page': clean_page,
+                'limit': clean_limit,
+                'has_more': total_items > clean_page * clean_limit}
 
-        seen_ids: set[str] = set()
-        merged_items: list[dict[str, Any]] = []
-        total_items = 0
-        for res in responses:
-            total_items += int(res.get('total_items', 0))
-            for item in res.get('items', []):
-                item_id = str(item.get('id') or '')
-                if item_id and item_id in seen_ids:
-                    continue
-                if item_id:
-                    seen_ids.add(item_id)
-                merged_items.append(item)
+        first_page_specs: list[tuple[dict[str, Any], int | None]] = []
+        for params, cs_id in call_specs:
+            first_page_params = dict(params)
+            first_page_params['limit'] = 100
+            first_page_params['page'] = 1
+            first_page_specs.append((first_page_params, cs_id))
+        first_page_responses = self._fetch_pages(first_page_specs, headers)
+        source_totals = [
+            max(0, int(response.get('total_items', 0)))
+            for response in first_page_responses]
+        summed_total = sum(source_totals)
 
-        if len(call_specs) > 1 and clean_query and clean_sort_by == 'name':
-            query_lower = clean_query.lower()
-            merged_items.sort(
-                key=lambda item: self._rank_key(query_lower, item))
+        if summed_total <= 1000:
+            additional_specs: list[tuple[dict[str, Any], int | None]] = []
+            for source_index, total in enumerate(source_totals):
+                page_count = (total + 99) // 100
+                params, cs_id = call_specs[source_index]
+                for page_number in range(2, page_count + 1):
+                    page_params = dict(params)
+                    page_params['limit'] = 100
+                    page_params['page'] = page_number
+                    additional_specs.append((page_params, cs_id))
+            additional_responses = self._fetch_pages(
+                additional_specs, headers)
+            all_items = [
+                item
+                for response in first_page_responses
+                for item in response.get('items', [])]
+            all_items.extend(
+                item
+                for response in additional_responses
+                for item in response.get('items', []))
+            merged_items = self._deduplicate_items(all_items)
+            merged_items = self._sort_merged_items(
+                merged_items,
+                clean_query,
+                clean_sort_by,
+                clean_sort)
+            total_items = len(merged_items)
+            start_index = (clean_page - 1) * clean_limit
+            return {
+                'items': merged_items[
+                    start_index:start_index + clean_limit],
+                'total_items': total_items,
+                'page': clean_page,
+                'limit': clean_limit,
+                'has_more': clean_page * clean_limit < total_items}
 
+        page_cache: list[dict[int, dict[str, Any]]] = [
+            {1: response} for response in first_page_responses]
+        global_start = (clean_page - 1) * clean_limit
+        global_end = global_start + clean_limit
+        source_offset = 0
+        source_ranges: list[tuple[int, int, int]] = []
+        additional_specs = []
+        additional_page_keys: list[tuple[int, int]] = []
+
+        for source_index, source_total in enumerate(source_totals):
+            local_start = max(0, global_start - source_offset)
+            local_end = min(source_total, global_end - source_offset)
+            if local_start < local_end:
+                source_ranges.append((source_index, local_start, local_end))
+                first_page = local_start // 100 + 1
+                last_page = (local_end - 1) // 100 + 1
+                params, cs_id = call_specs[source_index]
+                for page_number in range(first_page, last_page + 1):
+                    if page_number == 1:
+                        continue
+                    page_params = dict(params)
+                    page_params['limit'] = 100
+                    page_params['page'] = page_number
+                    additional_specs.append((page_params, cs_id))
+                    additional_page_keys.append((source_index, page_number))
+            source_offset += source_total
+
+        additional_responses = self._fetch_pages(
+            additional_specs, headers)
+        for page_key, response in zip(
+                additional_page_keys, additional_responses):
+            source_index, page_number = page_key
+            page_cache[source_index][page_number] = response
+
+        page_items: list[dict[str, Any]] = []
+        for source_index, local_start, local_end in source_ranges:
+            first_page = local_start // 100 + 1
+            last_page = (local_end - 1) // 100 + 1
+            for page_number in range(first_page, last_page + 1):
+                response = page_cache[source_index].get(page_number, {})
+                items = response.get('items', [])
+                page_start = (page_number - 1) * 100
+                item_start = max(0, local_start - page_start)
+                item_end = min(len(items), local_end - page_start)
+                page_items.extend(items[item_start:item_end])
+
+        page_items = self._deduplicate_items(page_items)
         return {
-            'items': merged_items[:clean_limit],
-            'total_items': max(total_items, len(merged_items)),
+            'items': page_items,
+            'total_items': summed_total,
             'page': clean_page,
             'limit': clean_limit,
-            'has_more': total_items > clean_page * clean_limit}
+            'has_more': clean_page * clean_limit < summed_total}
 
     def perform_live_search(
             self,

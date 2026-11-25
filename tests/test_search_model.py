@@ -1,8 +1,9 @@
 import json
-from unittest.mock import patch
+from typing import Any
+from unittest.mock import Mock, patch
 
-from flask import g
 import requests
+from flask import g
 
 from histarchexplorer.models.search import (
     SearchService, format_search_timespan, sanitize_date_param)
@@ -98,6 +99,83 @@ def test_execute_search_with_filters(app_instance) -> None:
             assert res['items'][0]['id'] == '119152'
             assert res['items'][0]['timespanDisplay'] == '800 – 850'
             assert res['items'][0]['caseStudyId'] == 221174
+
+
+def test_execute_search_large_multiple_sources_uses_global_offset(
+        app_instance: Any) -> None:
+    with app_instance.test_request_context():
+        g.case_study_ids = [221174, 198155]
+        g.api_headers = {}
+        ss = SearchService(app_instance)
+
+        def make_response(case_study_id: int, page: int) -> Mock:
+            response = Mock()
+            response.raise_for_status.return_value = None
+            start = (page - 1) * 100
+            response.json.return_value = {
+                'data': ([
+                    {
+                        'id': f'{case_study_id}-{idx}',
+                        'name': f'{idx:03}'}
+                    for idx in range(start, start + 100)]
+                    if page in (1, 15) else []),
+                'totalItems': 1500}
+            return response
+
+        with patch('requests.get') as mock_get:
+            mock_get.side_effect = lambda _url, params, **_kwargs: (
+                make_response(
+                    params['caseStudy'], int(params['page'])))
+            res = ss.execute_search(limit=100, page=30)
+
+        assert res['total_items'] == 3000
+        assert len(res['items']) == 100
+        assert all(item['caseStudyId'] == 198155 for item in res['items'])
+        assert res['items'][0]['id'] == '198155-1400'
+        assert res['has_more'] is False
+        assert sorted(
+            int(call.kwargs['params']['page'])
+            for call in mock_get.call_args_list) == [1, 1, 15]
+
+
+def test_execute_search_small_multiple_sources_sorts_and_slices_page(
+        app_instance: Any) -> None:
+    with app_instance.test_request_context():
+        g.case_study_ids = [221174, 198155]
+        g.api_headers = {}
+        ss = SearchService(app_instance)
+        source_items = {
+            221174: [
+                {'id': 'a1', 'name': 'Archaeology'},
+                {'id': 'a2', 'name': 'Archon'},
+                {'id': 'a3', 'name': 'Zeta'}],
+            198155: [
+                {'id': 'b1', 'name': 'Archive'},
+                {'id': 'b2', 'name': 'Beta'},
+                {'id': 'b3', 'name': 'Alpha'}]}
+
+        def make_response(case_study_id: int) -> Mock:
+            response = Mock()
+            response.raise_for_status.return_value = None
+            response.json.return_value = {
+                'data': source_items[case_study_id],
+                'totalItems': 3}
+            return response
+
+        with patch('requests.get') as mock_get:
+            mock_get.side_effect = lambda _url, params, **_kwargs: (
+                make_response(params['caseStudy']))
+            res = ss.execute_search(
+                query='arch',
+                case_study_ids=[221174, 198155],
+                limit=2,
+                page=2)
+
+        assert [item['name'] for item in res['items']] == [
+            'Archon', 'Alpha']
+        assert res['total_items'] == 6
+        assert res['has_more'] is True
+        assert mock_get.call_count == 2
 
 
 def test_perform_live_search_short_query(app_instance) -> None:

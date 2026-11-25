@@ -8,6 +8,31 @@
   const SLIDER_MIN = -2000;
   const SLIDER_MAX = 2000;
 
+  function buildPageList(currentPage, totalPages) {
+    const lastPage = Math.floor(totalPages);
+    if (!Number.isFinite(lastPage) || lastPage < 1) return [];
+
+    const current = Math.min(Math.max(1, Math.floor(currentPage)), lastPage);
+    const pages = new Set([1, lastPage]);
+    for (let page = Math.max(2, current - 1);
+      page <= Math.min(lastPage - 1, current + 1); page += 1) {
+      pages.add(page);
+    }
+
+    const sortedPages = Array.from(pages).sort((a, b) => a - b);
+    const pageList = [];
+    sortedPages.forEach((page, index) => {
+      if (index > 0) {
+        const previousPage = sortedPages[index - 1];
+        const gap = page - previousPage;
+        if (gap === 2) pageList.push(previousPage + 1);
+        if (gap > 2) pageList.push(null);
+      }
+      pageList.push(page);
+    });
+    return pageList;
+  }
+
   /**
    * Extract localized description text and strip HTML/language markers.
    */
@@ -256,6 +281,9 @@
       view: root.dataset.labelView || 'View',
       bc: root.dataset.labelBc || 'BC',
       ad: root.dataset.labelAd || 'AD',
+      page: root.dataset.labelPage || 'Page',
+      previous: root.dataset.labelPrevious || 'Previous',
+      next: root.dataset.labelNext || 'Next',
       anyTime: root.dataset.labelAnyTime || 'Any period',
       from: root.dataset.labelFrom || 'from',
       until: root.dataset.labelUntil || 'until',
@@ -293,10 +321,11 @@
       emptyState: document.getElementById('searchEmptyState'),
       tableWrapper: document.getElementById('searchTableWrapper'),
       tbody: document.getElementById('searchResultsTbody'),
-      prevPageBtn: document.getElementById('prevPageBtn'),
-      nextPageBtn: document.getElementById('nextPageBtn'),
-      pageIndicator: document.getElementById('currentPageIndicator'),
-      paginationSummary: document.getElementById('paginationSummaryText'),
+      paginationRegions: Array.from(
+        document.querySelectorAll('[data-pagination-region]')),
+      paginationBars: Array.from(document.querySelectorAll('[data-pagination]')),
+      paginationSummaries: Array.from(
+        document.querySelectorAll('[data-pagination-summary]')),
       sortableHeaders: Array.from(document.querySelectorAll('.sortable-th')),
     };
 
@@ -311,7 +340,7 @@
       limit: Number(initial.limit) || 50,
       page: Number(initial.page) || 1,
       currentItems: [],
-      totalItems: 0,
+      totalItems: null,
       hasMore: false,
       requestToken: 0,
     };
@@ -462,6 +491,85 @@
       dom.tableWrapper.classList.toggle('d-none', mode !== 'table');
     }
 
+    function renderPagination() {
+      const totalPages = state.totalItems === null
+        ? null
+        : Math.ceil(state.totalItems / state.limit);
+      const canGoPrevious = state.page > 1;
+      const canGoNext = totalPages === null
+        ? state.hasMore
+        : state.page < totalPages;
+      const visible = totalPages === null
+        ? canGoPrevious || canGoNext
+        : totalPages > 1;
+
+      dom.paginationRegions.forEach((region) => {
+        region.classList.toggle('d-none', !visible);
+      });
+
+      const pages = totalPages === null
+        ? [state.page]
+        : buildPageList(state.page, totalPages);
+
+      dom.paginationBars.forEach((bar) => {
+        const list = bar.querySelector('.pagination');
+        if (!list) return;
+        list.replaceChildren();
+
+        const addButton = (page, text, label, active = false, disabled = false) => {
+          const item = document.createElement('li');
+          item.className = `page-item${active ? ' active' : ''}`;
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'page-link';
+          button.dataset.page = String(page);
+          button.setAttribute('aria-label', label);
+          if (active) button.setAttribute('aria-current', 'page');
+          button.disabled = disabled;
+          button.textContent = text;
+          item.appendChild(button);
+          list.appendChild(item);
+        };
+
+        const addArrowButton = (page, direction, label, disabled) => {
+          const item = document.createElement('li');
+          item.className = `page-item${disabled ? ' disabled' : ''}`;
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'page-link';
+          button.dataset.page = String(page);
+          button.setAttribute('aria-label', label);
+          button.disabled = disabled;
+          const icon = document.createElement('i');
+          icon.className = `bi bi-chevron-${direction}`;
+          button.appendChild(icon);
+          item.appendChild(button);
+          list.appendChild(item);
+        };
+
+        addArrowButton(state.page - 1, 'left', labels.previous, !canGoPrevious);
+        pages.forEach((page) => {
+          if (page === null) {
+            const item = document.createElement('li');
+            item.className = 'page-item disabled';
+            item.setAttribute('aria-hidden', 'true');
+            const gap = document.createElement('span');
+            gap.className = 'page-link';
+            gap.textContent = '…';
+            item.appendChild(gap);
+            list.appendChild(item);
+          } else {
+            addButton(
+              page,
+              String(page),
+              `${labels.page} ${page}`,
+              page === state.page);
+          }
+        });
+        addArrowButton(state.page + 1, 'right', labels.next, !canGoNext);
+      });
+    }
+
     async function runSearch() {
       state.requestToken += 1;
       const currentToken = state.requestToken;
@@ -486,28 +594,34 @@
         if (currentToken !== state.requestToken) return;
 
         state.currentItems = Array.isArray(data.items) ? data.items : [];
-        state.totalItems = Number(data.total_items) || 0;
-        state.hasMore = Boolean(data.has_more);
+        state.totalItems = data.total_items == null
+          ? null
+          : Number(data.total_items);
+        if (!Number.isFinite(state.totalItems) || state.totalItems < 0) {
+          state.totalItems = null;
+        }
+        state.hasMore = data.has_more == null
+          ? state.totalItems !== null && state.page * state.limit < state.totalItems
+          : Boolean(data.has_more);
 
         if (dom.totalBadge) {
-          dom.totalBadge.textContent = state.totalItems.toLocaleString();
+          dom.totalBadge.textContent = state.totalItems === null
+            ? '—'
+            : state.totalItems.toLocaleString();
         }
-        if (dom.pageIndicator) {
-          dom.pageIndicator.textContent = String(state.page);
-        }
-        if (dom.prevPageBtn) {
-          dom.prevPageBtn.disabled = state.page <= 1;
-        }
-        if (dom.nextPageBtn) {
-          dom.nextPageBtn.disabled = !state.hasMore;
-        }
-        if (dom.paginationSummary) {
-          const startIdx = state.currentItems.length ? (state.page - 1) * state.limit + 1 : 0;
-          const endIdx = (state.page - 1) * state.limit + state.currentItems.length;
-          dom.paginationSummary.textContent = state.currentItems.length
-            ? `${startIdx}–${endIdx} / ${state.totalItems.toLocaleString()} ${labels.results}`
-            : `0 ${labels.results}`;
-        }
+        const startIdx = state.currentItems.length
+          ? (state.page - 1) * state.limit + 1
+          : 0;
+        const endIdx = (state.page - 1) * state.limit + state.currentItems.length;
+        const summary = state.currentItems.length
+          ? state.totalItems === null
+            ? `${startIdx}–${endIdx} ${labels.results}`
+            : `${startIdx}–${endIdx} / ${state.totalItems.toLocaleString()} ${labels.results}`
+          : `0 ${labels.results}`;
+        dom.paginationSummaries.forEach((element) => {
+          element.textContent = summary;
+        });
+        renderPagination();
 
         if (state.currentItems.length === 0) {
           setViewState('empty');
@@ -736,23 +850,22 @@
       dom.quickFilterInput.addEventListener('input', applyTableQuickFilter);
     }
 
-    if (dom.prevPageBtn) {
-      dom.prevPageBtn.addEventListener('click', () => {
-        if (state.page > 1) {
-          state.page -= 1;
-          runSearch();
-        }
-      });
-    }
+    dom.paginationBars.forEach((bar) => {
+      bar.addEventListener('click', (event) => {
+        const pageButton = event.target.closest('button[data-page]');
+        if (!pageButton || !bar.contains(pageButton) || pageButton.disabled) return;
 
-    if (dom.nextPageBtn) {
-      dom.nextPageBtn.addEventListener('click', () => {
-        if (state.hasMore) {
-          state.page += 1;
-          runSearch();
+        const page = Number(pageButton.dataset.page);
+        if (!Number.isInteger(page) || page < 1 || page === state.page) return;
+        if (page > state.page && state.totalItems === null && !state.hasMore) return;
+
+        state.page = page;
+        if (bar.closest('[data-pagination-bottom]')) {
+          root.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+        runSearch();
       });
-    }
+    });
 
     if (dom.exportCsvBtn) {
       dom.exportCsvBtn.addEventListener('click', () => {

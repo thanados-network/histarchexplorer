@@ -1166,6 +1166,14 @@ msgstr "Zurück"
 msgid "Next"
 msgstr "Weiter"
 
+#: templates/search.html:26
+msgid "Page"
+msgstr "Seite"
+
+#: templates/search.html:397 templates/search.html:477
+msgid "Search result pages"
+msgstr "Suchergebnisseiten"
+
 #: templates/admin/about_content.html:3
 msgid "about section content"
 msgstr "Inhalt des Über-Abschnitts"
