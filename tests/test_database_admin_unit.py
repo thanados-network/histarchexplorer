@@ -4,7 +4,7 @@ from histarchexplorer.database.admin import (
     sanitize_richtext, get_config_links, get_config_properties,
     get_config_class_by_id, add_new_map, update_sort_order,
     get_licenses, get_file_licenses,
-    get_all_logos_from_db, get_all_assets_from_db, get_openatlas_entity)
+    get_all_logos_from_db, get_all_assets_from_db)
 from histarchexplorer.database.admin import update_predefined_filter_order
 from histarchexplorer.models.config import get_config_classes
 from histarchexplorer import get_sidebar_icons, get_type_divisions
@@ -125,12 +125,6 @@ def test_get_config_classes(app_instance):
         g.cursor = MagicMock()
         g.cursor.fetchall.return_value = [{'id': 1, 'name': 'N'}]
         assert get_config_classes() == {'N': 1}
-
-def test_get_openatlas_entity(app_instance):
-    with app_instance.test_request_context():
-        g.openatlas_cursor = MagicMock()
-        g.openatlas_cursor.fetchone.return_value = {'id': 1}
-        assert get_openatlas_entity(1) == {'id': 1}
 
 
 def test_update_predefined_filter_order_uses_two_phase_update(app_instance):

@@ -72,45 +72,25 @@ def inject_menu() -> dict[str, Any]:
     return {'navbar': navbar}
 
 
-def find_children_by_id(
-        data: dict[str, Any],
-        target_id: Optional[int]) -> list[dict[str, Any]] | None:
+def flatten_case_studies(
+        case_studies: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Flatten nested API v1 case studies into dropdown options."""
     result: list[dict[str, Any]] = []
 
-    if target_id is None:
-        return result
+    def collect(items: list[dict[str, Any]], depth: int = 0) -> None:
+        for item in items:
+            if not isinstance(item, dict) or item.get('id') is None:
+                continue
+            prefix = f"{'-' * depth} " if depth else ''
+            name = item.get('name') or _('Unknown')
+            result.append({
+                'id': int(item['id']),
+                'name': f'{prefix}{name}'})
+            sub_items = item.get('subCaseStudies')
+            if isinstance(sub_items, list) and sub_items:
+                collect(sub_items, depth + 1)
 
-    def collect_descendants(
-            children: list[dict[str, Any]],
-            depth: int = 1) -> None:
-        for child in children:
-            prefix = '-' * depth
-            name = child.get('name', _('Unknown'))
-            result.append({'id': int(child['id']), 'name': f"{prefix}{name}"})
-            sub_children = child.get('children')
-            if isinstance(sub_children, list) and sub_children:
-                collect_descendants(sub_children, depth + 1)
-
-    def recursive_search(node: Any) -> bool:
-        if isinstance(node, dict):
-            node_id = node.get('id')
-            if node_id is not None and int(node_id) == target_id:
-                children = node.get('children')
-                if isinstance(children, list):
-                    collect_descendants(children)
-                return True
-
-            for value in node.values():
-                if recursive_search(value):
-                    return True
-
-        elif isinstance(node, list):
-            for item in node:
-                if recursive_search(item):
-                    return True
-        return False
-
-    recursive_search(data)
+    collect(case_studies)
     return result
 
 
@@ -309,7 +289,8 @@ def get_refresh_button(id_: int) -> str | None:
 
 
 def get_view_class_count(type_id: Optional[int] = None) -> dict[str, Any]:
-    entities_count = ApiAccess.get_entities_count_by_case_studies(type_id)
+    entities_count = dict(
+        ApiAccess.get_entities_count_by_case_studies(type_id))
     shown = set(g.settings.shown_classes) - set(g.settings.hidden_classes)
 
     for key in entities_count.copy():

@@ -24,23 +24,29 @@ def test_get_landing_statistics_empty(
 
 def test_get_landing_statistics_mocked(
         app_instance) -> None:
-    """Test landing statistics calculation with mocked openatlas cursor."""
+    """Test landing statistics with API counts and mocked SQL charts."""
     with app_instance.test_request_context('/'):
         cache.delete_memoized(get_landing_statistics)
         mock_cursor = MagicMock()
         mock_cursor.fetchall.side_effect = [
             [{'century': 600, 'count': 42}],
             [{'name': 'Church', 'count': 10}],
-            [{'name': 'vessel', 'count': 15}],
-            [{'openatlas_class_name': 'place', 'count': 100},
-             {'openatlas_class_name': 'feature', 'count': 250}]]
+            [{'name': 'vessel', 'count': 15}]]
         g.openatlas_cursor = mock_cursor
 
-        stats = get_landing_statistics((123,))
+        with patch(
+                'histarchexplorer.api.api_access.ApiAccess.'
+                'get_entities_count_by_case_studies',
+                return_value={'place': 100, 'feature': 250}) as mock_counts:
+            stats = get_landing_statistics((123,))
+
+        mock_counts.assert_called_once_with((123,))
+        assert mock_cursor.execute.call_count == 3
         assert len(stats['chronology']) == 1
         assert stats['chronology'][0]['century'] == '600 CE'
         assert len(stats['site_types']) == 1
         assert len(stats['artifact_types']) == 1
+        assert stats['class_counts'] == {'place': 100, 'feature': 250}
         assert stats['kpis']['places'] == 100
         assert stats['kpis']['features'] == 250
 
@@ -48,6 +54,26 @@ def test_get_landing_statistics_mocked(
             call.args[0] for call in mock_cursor.execute.call_args_list]
         assert "h.category = 'standard'" in executed_queries[1]
         assert "h.category = 'standard'" in executed_queries[2]
+
+
+def test_get_landing_statistics_uses_api_without_openatlas_cursor(
+        app_instance) -> None:
+    """API KPI counts still work when g.openatlas_cursor is unavailable."""
+    with app_instance.test_request_context('/'):
+        cache.delete_memoized(get_landing_statistics)
+        g.openatlas_cursor = None
+        with patch(
+                'histarchexplorer.api.api_access.ApiAccess.'
+                'get_entities_count_by_case_studies',
+                return_value={'place': 12, 'artifact': 34}):
+            stats = get_landing_statistics((123,))
+
+        assert stats['chronology'] == []
+        assert stats['site_types'] == []
+        assert stats['artifact_types'] == []
+        assert stats['class_counts'] == {'place': 12, 'artifact': 34}
+        assert stats['kpis']['places'] == 12
+        assert stats['kpis']['artifacts'] == 34
 
 
 def test_get_landing_sites_geojson_empty(

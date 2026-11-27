@@ -10,7 +10,6 @@ from histarchexplorer.database.admin import (
     delete_link, delete_map,
     get_config_class_by_id,
     get_file_licenses, get_licenses,
-    get_openatlas_entity,
     update_config_entry,
     update_file_license, update_map,
     update_sort_order,
@@ -274,22 +273,3 @@ class Admin:
             {**entity.__dict__,
              'name_display_label': entity.name['display']['label']}
             for entity in self.config_entities]
-
-    @staticmethod
-    def check_case_study_type_id(entity_id: int) -> dict[str, Any]:
-        details = Admin.get_openatlas_entity(entity_id)
-        if details:
-            is_valid = details['openatlas_class_name'] == 'type'
-            return {
-                'is_valid': is_valid,
-                'name': details['name'],
-                'class_name': details['openatlas_class_name']}
-        return {
-            'is_valid': False,
-            'name': None,
-            'class_name': None}
-
-    # Todo: replace with API call
-    @staticmethod
-    def get_openatlas_entity(entity_id: int) -> Any:
-        return get_openatlas_entity(entity_id)

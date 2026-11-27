@@ -132,7 +132,9 @@ def test_admin_more_tabs(authenticated_client: FlaskClient):
 
 def test_update_general_settings_with_id(authenticated_client: FlaskClient):
     rv = authenticated_client.post('/admin/update_general_settings/1', data={
-        'site_title': 'T', 'contact_email': 'e@e.com', 'case_study_id': '0'
+        'accessRestriction': 'y',
+        'selectedLanguages': ['en'],
+        'preferredLanguage': 'en'
     }, follow_redirects=True)
     assert rv.status_code == 200
 

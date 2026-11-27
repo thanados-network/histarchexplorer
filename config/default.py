@@ -29,6 +29,8 @@ DATABASE_PORT = 5432
 DATABASE_PASS = 'CHANGE ME'  # Must be changed in production
 
 # Security settings
+SESSION_COOKIE_NAME = 'histarchexplorer_session'
+REMEMBER_COOKIE_NAME = 'histarchexplorer_remember'
 SESSION_COOKIE_SECURE = False  # Use HTTPS for session cookie
 REMEMBER_COOKIE_SECURE = True  # Use HTTPS for "remember me" cookie
 SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection mode

@@ -3,6 +3,7 @@ from typing import Any
 from flask import g, render_template
 
 from histarchexplorer import app
+from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.database import entities as db_entities
 from histarchexplorer.views.views import type_tree
 
@@ -64,16 +65,16 @@ def get_browse_list_entities(
 
     if id_:
         # Get p46 children if id is provided
-        shown_ids = db_entities.get_p46_range_ids(id_)
+        shown_ids = ApiAccess.get_p46_child_ids(id_)
         if not shown_ids:
             return None
 
     data = {
         'shown classes': g.settings.shown_classes,
         'hidden classes': g.settings.hidden_classes,
-        'shown types': db_entities.build_id_collection(
+        'shown types': ApiAccess.get_type_descendant_ids(
             g.settings.shown_types),
-        'hidden types': db_entities.build_id_collection(
+        'hidden types': ApiAccess.get_type_descendant_ids(
             g.settings.hidden_types),
         'shown case studies': g.case_study_ids,
         'shown ids': shown_ids,

@@ -110,7 +110,6 @@ class Settings(BaseModel):
     vocabulary_include_ids: list[Annotated[int, Field(strict=True, gt=0)]] = []
     vocabulary_exclude_ids: list[Annotated[int, Field(strict=True, gt=0)]] = []
     vocabulary_title: str = ''
-    case_study_type_id: int = 8240
     nav_logo: str = 'thanados_light.svg'
     footer_logos: list[int] = []
     publication_types: list[str] = [

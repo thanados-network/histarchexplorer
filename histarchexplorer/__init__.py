@@ -96,7 +96,6 @@ from histarchexplorer.views import (
 from histarchexplorer.api.api_access import ApiAccess
 
 csrf.exempt(app.view_functions['search'])
-csrf.exempt(app.view_functions['get_rastermaps'])
 
 
 def connect(db_name: str) -> connection:

@@ -295,165 +295,18 @@ function addEntry(category) {
       }
 
       const saveButton = form.querySelector('button[type="submit"]');
-      if (saveButton && !saveButton.classList.contains('d-none') && form.id !== 'caseStudyForm') {
+      if (saveButton && !saveButton.classList.contains('d-none')) {
         if (!form.checkValidity()) {
           event.preventDefault();
           event.stopPropagation();
         }
         form.classList.add('was-validated');
-      } else if (form.id !== 'caseStudyForm') {
+      } else {
         event.preventDefault();
         event.stopPropagation();
       }
     });
   });
-
-
-  const caseStudyForm = document.getElementById('caseStudyForm');
-  const caseStudyInputField = document.getElementById('caseStudyHierarchyID');
-  const caseStudyIDFeedback = document.getElementById('caseStudyIDFeedback');
-  const caseStudyTypeNameSpan = document.getElementById('caseStudyTypeName');
-
-  function updateCaseStudyTypeName(name) {
-    if (caseStudyTypeNameSpan) {
-      caseStudyTypeNameSpan.textContent = name ? `(${name})` : '';
-    }
-  }
-
-  function clearCaseStudyIDValidation() {
-    if (caseStudyInputField) {
-      caseStudyInputField.classList.remove('is-invalid');
-      caseStudyInputField.classList.remove('is-valid');
-    }
-    if (caseStudyForm) {
-      caseStudyForm.classList.remove('was-validated');
-    }
-    if (caseStudyIDFeedback) {
-      caseStudyIDFeedback.textContent = 'Please enter a positive integer for the Case Study Hierarchy ID.';
-    }
-  }
-
-  if (caseStudyInputField) {
-    caseStudyInputField.addEventListener('input', async () => {
-      const inputValue = caseStudyInputField.value.trim();
-      clearCaseStudyIDValidation();
-
-      if (inputValue === '') {
-        updateCaseStudyTypeName('');
-        return;
-      }
-
-      const parsedValue = parseInt(inputValue, 10);
-
-      if (isNaN(parsedValue) || parsedValue <= 0) {
-        caseStudyInputField.classList.add('is-invalid');
-        if (caseStudyIDFeedback) {
-          caseStudyIDFeedback.textContent = 'Please enter a positive integer.';
-        }
-        updateCaseStudyTypeName('');
-        return;
-      }
-
-      try {
-        const response = await fetch(`/admin/check_case_study_id_ajax/${parsedValue}`);
-        const data = await response.json();
-
-        if (data.is_valid) {
-          caseStudyInputField.classList.add('is-valid');
-          updateCaseStudyTypeName(data.name);
-        } else {
-          caseStudyInputField.classList.add('is-invalid');
-          if (caseStudyIDFeedback) {
-            caseStudyIDFeedback.textContent = data.name ?
-              `ID ${parsedValue} (${data.name}) is not of type "type".` :
-              `ID ${parsedValue} not found or is not of type "type".`;
-          }
-          updateCaseStudyTypeName('');
-        }
-      } catch (error) {
-        console.error('Error checking Case Study ID:', error);
-        caseStudyInputField.classList.add('is-invalid');
-        if (caseStudyIDFeedback) {
-          caseStudyIDFeedback.textContent = 'An error occurred while validating the ID. Please try again.';
-        }
-        updateCaseStudyTypeName('');
-      }
-    });
-  }
-
-
-  if (caseStudyForm) {
-    caseStudyForm.addEventListener('submit', async function (event) {
-      event.preventDefault();
-
-      const inputValue = caseStudyInputField.value.trim();
-      const actionTemplate = caseStudyForm.dataset.actionTemplate;
-
-      clearCaseStudyIDValidation();
-
-      const parsedValue = parseInt(inputValue, 10);
-
-      if (inputValue === '' || isNaN(parsedValue) || parsedValue <= 0) {
-        caseStudyInputField.classList.add('is-invalid');
-        if (caseStudyIDFeedback) {
-          caseStudyIDFeedback.textContent = 'Please enter a positive integer.';
-        }
-        caseStudyForm.classList.add('was-validated');
-        event.stopPropagation();
-        return;
-      }
-
-      try {
-        const validationResponse = await fetch(`/admin/check_case_study_id_ajax/${parsedValue}`);
-        const validationData = await validationResponse.json();
-
-        if (validationData.is_valid) {
-          const finalActionUrl = actionTemplate + parsedValue;
-          const formData = new FormData(this);
-
-          const submitResponse = await fetch(finalActionUrl, {
-            method: 'POST',
-            body: formData
-          });
-
-          if (submitResponse.ok) {
-            // Server will redirect on success, so we just force a page reload
-            // to ensure flash messages are displayed.
-            window.location.href = '/admin';
-          } else {
-            // This handles HTTP errors (e.g., 400, 500) from the POST request
-            console.error('Form submission failed with HTTP status:', submitResponse.status, submitResponse.statusText);
-            const errorText = await submitResponse.text();
-            console.error('Server response:', errorText);
-
-            caseStudyInputField.classList.add('is-invalid');
-            if (caseStudyIDFeedback) {
-              caseStudyIDFeedback.textContent = `Failed to save ID. Server responded with ${submitResponse.status}.`;
-            }
-            caseStudyForm.classList.add('was-validated');
-          }
-
-        } else {
-          caseStudyInputField.classList.add('is-invalid');
-          if (caseStudyIDFeedback) {
-            caseStudyIDFeedback.textContent = validationData.name ?
-              `ID ${parsedValue} (${validationData.name}) is not of type "type".` :
-              `ID ${parsedValue} not found or is not of type "type".`;
-          }
-          caseStudyForm.classList.add('was-validated');
-          event.stopPropagation();
-        }
-      } catch (error) {
-        console.error('Error during final Case Study ID validation or submission:', error);
-        caseStudyInputField.classList.add('is-invalid');
-        if (caseStudyIDFeedback) {
-          caseStudyIDFeedback.textContent = 'An error occurred during validation/submission. Please try again.';
-        }
-        caseStudyForm.classList.add('was-validated');
-        event.stopPropagation();
-      }
-    });
-  }
 })();
 
 function submitPostAction(url, params = {}) {

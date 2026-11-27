@@ -386,15 +386,6 @@ def check_sortorder() -> int:
     return g.cursor.fetchone()['next_order']
 
 
-def get_openatlas_entity(id_: int) -> dict[str, Any]:
-    g.openatlas_cursor.execute(
-        '''
-        SELECT id, name, openatlas_class_name
-        FROM model.entity
-        WHERE id = %(id)s''', {'id': id_})
-    return g.openatlas_cursor.fetchone()
-
-
 def add_link(data: dict[str, Any]) -> None:
     g.cursor.execute(
         '''

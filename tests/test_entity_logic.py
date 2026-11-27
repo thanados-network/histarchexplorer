@@ -117,9 +117,3 @@ def test_entity_data_route(authenticated_client: FlaskClient):
         mock_from.return_value = pv
         rv = authenticated_client.get('/entity-data/1')
         assert rv.status_code == 200
-
-def test_get_rastermaps_invalid(authenticated_client: FlaskClient):
-    rv = authenticated_client.post('/get_rastermaps', json={})
-    assert rv.status_code == 400
-    rv = authenticated_client.post('/get_rastermaps', json={'ids': 'not a list'})
-    assert rv.status_code == 400

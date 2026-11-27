@@ -21,13 +21,14 @@ def mock_api_calls():
     with patch('requests.get') as mock_get:
         # Default mock response
         mock_get.return_value.status_code = 200
-        mock_get.return_value.json.return_value = {
+        mock_get.return_value.json.side_effect = lambda: {
+            'data': [],
+            'counts': {},
             'results': [],
             'files': [],
             'case_study': [{'id': 1, 'title': 'Test Study'}],
             'view_class': [],
-            'features': [{'properties': {}}]
-        }
+            'features': [{'properties': {}}]}
         yield mock_get
 
 

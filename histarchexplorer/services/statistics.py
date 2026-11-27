@@ -3,8 +3,10 @@ from typing import Any
 
 from flask import g
 from flask_babel import lazy_gettext as _l
+import requests
 
 from histarchexplorer import app, cache
+from histarchexplorer.api.api_access import ApiAccess
 
 CLASS_KPI_META: dict[str, dict[str, str]] = {
     'place': {
@@ -223,7 +225,7 @@ def _safe_case_study_tuple(
 @cache.memoize(timeout=86400)
 def get_landing_statistics(
         case_study_ids: tuple[int, ...],
-        cache_version: int = 2) -> dict[str, Any]:
+        cache_version: int = 3) -> dict[str, Any]:
     """Aggregierte Forschungsdaten für Diagramme und wissenschaftliche KPIs.
 
     Args:
@@ -243,8 +245,6 @@ def get_landing_statistics(
             'places': 0, 'features': 0, 'artifacts': 0,
             'human_remains': 0, 'references': 0, 'files': 0}}
 
-    if not hasattr(g, 'openatlas_cursor') or g.openatlas_cursor is None:
-        return default_stats
     if not case_study_ids:
         return default_stats
 
@@ -253,118 +253,116 @@ def get_landing_statistics(
         return default_stats
 
     try:
-        # 1. Chronologische Verteilung (nach Jahrhunderten 300 - 1500 n. Chr.)
-        chrono_sql = """
-            SELECT
-                (FLOOR(EXTRACT(YEAR FROM e.begin_from) / 100) * 100)::int
-                    AS century,
-                COUNT(*) AS count
-            FROM model.entity e
-            JOIN model.link l1 ON l1.domain_id = e.id
-                AND l1.property_code = 'P2'
-            WHERE l1.range_id IN %s
-              AND e.begin_from IS NOT NULL
-              AND EXTRACT(YEAR FROM e.begin_from) BETWEEN 300 AND 1500
-            GROUP BY century
-            ORDER BY century
-        """
-        g.openatlas_cursor.execute(chrono_sql, (cs_tuple,))
-        chronology = [
-            {'century': f"{row['century']} CE",
-             'year': row['century'],
-             'count': row['count']}
-            for row in g.openatlas_cursor.fetchall()]
+        kpi_counts = ApiAccess.get_entities_count_by_case_studies(cs_tuple)
+    except (requests.RequestException, ValueError):
+        kpi_counts = {}
 
-        # 2. Fundplatztypen (Top 6 Standard-Typen)
-        st_sql = """
-            WITH RECURSIVE standard_types AS (
-                SELECT h.id AS id
-                FROM web.hierarchy h
-                WHERE h.category = 'standard'
-                UNION ALL
-                SELECT l.domain_id AS id
-                FROM model.link l
-                JOIN standard_types st ON l.range_id = st.id
-                WHERE l.property_code = 'P127'
-            )
-            SELECT c.name AS name, COUNT(DISTINCT a.id) AS count
-            FROM model.entity a
-            JOIN model.link l1 ON l1.domain_id = a.id
-                AND l1.property_code = 'P2'
-            JOIN model.link l2 ON l2.domain_id = a.id
-                AND l2.property_code = 'P2'
-            JOIN standard_types st ON st.id = l2.range_id
-            JOIN model.entity c ON c.id = st.id
-            WHERE l1.range_id IN %s
-              AND a.openatlas_class_name = 'place'
-            GROUP BY c.name
-            ORDER BY count DESC
-            LIMIT 6
-        """
-        g.openatlas_cursor.execute(st_sql, (cs_tuple,))
-        site_types = [
-            {'name': row['name'], 'count': row['count']}
-            for row in g.openatlas_cursor.fetchall()]
+    chronology: list[dict[str, Any]] = []
+    site_types: list[dict[str, Any]] = []
+    artifact_types: list[dict[str, Any]] = []
 
-        # 3. Fundkategorien (Top 6 Standard-Typen)
-        art_sql = """
-            WITH RECURSIVE standard_types AS (
-                SELECT h.id AS id
-                FROM web.hierarchy h
-                WHERE h.category = 'standard'
-                UNION ALL
-                SELECT l.domain_id AS id
-                FROM model.link l
-                JOIN standard_types st ON l.range_id = st.id
-                WHERE l.property_code = 'P127'
-            )
-            SELECT c.name AS name, COUNT(DISTINCT a.id) AS count
-            FROM model.entity a
-            JOIN model.link l1 ON l1.domain_id = a.id
-                AND l1.property_code = 'P2'
-            JOIN model.link l2 ON l2.domain_id = a.id
-                AND l2.property_code = 'P2'
-            JOIN standard_types st ON st.id = l2.range_id
-            JOIN model.entity c ON c.id = st.id
-            WHERE l1.range_id IN %s
-              AND a.openatlas_class_name = 'artifact'
-            GROUP BY c.name
-            ORDER BY count DESC
-            LIMIT 6
-        """
-        g.openatlas_cursor.execute(art_sql, (cs_tuple,))
-        artifact_types = [
-            {'name': row['name'], 'count': row['count']}
-            for row in g.openatlas_cursor.fetchall()]
+    if hasattr(g, 'openatlas_cursor') and g.openatlas_cursor is not None:
+        try:
+            # 1. Chronologische Verteilung (300 - 1500 n. Chr.)
+            chrono_sql = """
+                SELECT
+                    (FLOOR(EXTRACT(YEAR FROM e.begin_from) / 100) * 100)::int
+                        AS century,
+                    COUNT(*) AS count
+                FROM model.entity e
+                JOIN model.link l1 ON l1.domain_id = e.id
+                    AND l1.property_code = 'P2'
+                WHERE l1.range_id IN %s
+                  AND e.begin_from IS NOT NULL
+                  AND EXTRACT(YEAR FROM e.begin_from) BETWEEN 300 AND 1500
+                GROUP BY century
+                ORDER BY century
+            """
+            g.openatlas_cursor.execute(chrono_sql, (cs_tuple,))
+            chronology = [
+                {'century': f"{row['century']} CE",
+                 'year': row['century'],
+                 'count': row['count']}
+                for row in g.openatlas_cursor.fetchall()]
 
-        # 4. Klassen-Zählung für alle OpenAtlas-Klassen
-        kpi_sql = """
-            SELECT e.openatlas_class_name, COUNT(*) AS count
-            FROM model.entity e
-            JOIN model.link l1 ON l1.domain_id = e.id
-                AND l1.property_code = 'P2'
-            WHERE l1.range_id IN %s
-            GROUP BY e.openatlas_class_name
-        """
-        g.openatlas_cursor.execute(kpi_sql, (cs_tuple,))
-        kpi_counts = {
-            row['openatlas_class_name']: row['count']
-            for row in g.openatlas_cursor.fetchall()}
+            # 2. Fundplatztypen (Top 6 Standard-Typen)
+            st_sql = """
+                WITH RECURSIVE standard_types AS (
+                    SELECT h.id AS id
+                    FROM web.hierarchy h
+                    WHERE h.category = 'standard'
+                    UNION ALL
+                    SELECT l.domain_id AS id
+                    FROM model.link l
+                    JOIN standard_types st ON l.range_id = st.id
+                    WHERE l.property_code = 'P127'
+                )
+                SELECT c.name AS name, COUNT(DISTINCT a.id) AS count
+                FROM model.entity a
+                JOIN model.link l1 ON l1.domain_id = a.id
+                    AND l1.property_code = 'P2'
+                JOIN model.link l2 ON l2.domain_id = a.id
+                    AND l2.property_code = 'P2'
+                JOIN standard_types st ON st.id = l2.range_id
+                JOIN model.entity c ON c.id = st.id
+                WHERE l1.range_id IN %s
+                  AND a.openatlas_class_name = 'place'
+                GROUP BY c.name
+                ORDER BY count DESC
+                LIMIT 6
+            """
+            g.openatlas_cursor.execute(st_sql, (cs_tuple,))
+            site_types = [
+                {'name': row['name'], 'count': row['count']}
+                for row in g.openatlas_cursor.fetchall()]
 
-        return {
-            'chronology': chronology,
-            'site_types': site_types,
-            'artifact_types': artifact_types,
-            'class_counts': kpi_counts,
-            'kpis': {
-                'places': kpi_counts.get('place', 0),
-                'features': kpi_counts.get('feature', 0),
-                'artifacts': kpi_counts.get('artifact', 0),
-                'human_remains': kpi_counts.get('human_remains', 0),
-                'references': kpi_counts.get('bibliography', 0),
-                'files': kpi_counts.get('file', 0)}}
-    except Exception:
-        return default_stats
+            # 3. Fundkategorien (Top 6 Standard-Typen)
+            art_sql = """
+                WITH RECURSIVE standard_types AS (
+                    SELECT h.id AS id
+                    FROM web.hierarchy h
+                    WHERE h.category = 'standard'
+                    UNION ALL
+                    SELECT l.domain_id AS id
+                    FROM model.link l
+                    JOIN standard_types st ON l.range_id = st.id
+                    WHERE l.property_code = 'P127'
+                )
+                SELECT c.name AS name, COUNT(DISTINCT a.id) AS count
+                FROM model.entity a
+                JOIN model.link l1 ON l1.domain_id = a.id
+                    AND l1.property_code = 'P2'
+                JOIN model.link l2 ON l2.domain_id = a.id
+                    AND l2.property_code = 'P2'
+                JOIN standard_types st ON st.id = l2.range_id
+                JOIN model.entity c ON c.id = st.id
+                WHERE l1.range_id IN %s
+                  AND a.openatlas_class_name = 'artifact'
+                GROUP BY c.name
+                ORDER BY count DESC
+                LIMIT 6
+            """
+            g.openatlas_cursor.execute(art_sql, (cs_tuple,))
+            artifact_types = [
+                {'name': row['name'], 'count': row['count']}
+                for row in g.openatlas_cursor.fetchall()]
+        except Exception:
+            chronology = []
+            site_types = []
+            artifact_types = []
+
+    return {
+        'chronology': chronology,
+        'site_types': site_types,
+        'artifact_types': artifact_types,
+        'class_counts': kpi_counts,
+        'kpis': {
+            'places': kpi_counts.get('place', 0),
+            'features': kpi_counts.get('feature', 0),
+            'artifacts': kpi_counts.get('artifact', 0),
+            'human_remains': kpi_counts.get('human_remains', 0),
+            'references': kpi_counts.get('bibliography', 0),
+            'files': kpi_counts.get('file', 0)}}
 
 
 def _resolve_localized_text(value: Any) -> str:

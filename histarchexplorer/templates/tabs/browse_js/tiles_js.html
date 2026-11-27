@@ -19,13 +19,12 @@
     // Cache: entityId -> IIIFBasePath (string) or null
     const iiifMap{{ tab_name }} = new Map();
 
-    // Build a sized IIIF image URL from the IIIFBasePath we get in LPX
+    // Build a sized IIIF image URL from the IIIFBasePath we get in LPX (with display URL fallback)
     function buildIiifSizedUrl{{ tab_name }}(iiifObjOrBase, w = 200, h = 360) {
-        // accept the old string OR the new {base, ext} object
+        // accept the old string OR the new {base, ext, url} object
         const base = typeof iiifObjOrBase === 'string' ? iiifObjOrBase : (iiifObjOrBase?.base || null);
-        if (!base) return null;
-        // request JPG as the rendered output format
-        return `${base}/full/!${w},${h}/0/default.jpg`;
+        if (base) return `${base}/full/!${w},${h}/0/default.jpg`;
+        return typeof iiifObjOrBase === 'object' ? (iiifObjOrBase?.url || null) : null;
     }
 
 
@@ -41,10 +40,12 @@
         params.set('format', 'lpx');
         params.set('limit', '0');
 
-        // If your app runs on thanados.openatlas.eu, this relative path works.
-        // If not, switch to the absolute origin:
-        // const url = `https://thanados.openatlas.eu/api/query/?${params.toString()}`;
-        const url = `https://thanados.openatlas.eu/api/query/?${params.toString()}`;
+        const apiBase = (window.openatlasApiUrl || '').replace(/\/?$/, '/');
+        if (!apiBase || apiBase === '/') {
+            need.forEach(id => iiifMap{{ tab_name }}.set(id, null));
+            return;
+        }
+        const url = `${apiBase}query/?${params.toString()}`;
 
 
 
@@ -61,8 +62,9 @@
                 // Extract numeric entity id from "@id": ".../api/entity/276875"
                 const idStr = (feature['@id'] || '').split('/').pop();
                 const entityId = Number(idStr);
-                const dep = feature.depictions?.[0];
+                const dep = feature.depictions?.find(d => d.mainImage) || feature.depictions?.[0];
                 const iiifBase = dep?.IIIFBasePath || null;
+                const fileUrl = dep?.url || null;
                 const mime = (dep?.mimetype || '').toLowerCase();
 
 // map mimetype → extension used in the IIIF request format segment
@@ -74,8 +76,10 @@
 // (jpeg/default → 'jpg')
 
                 if (!Number.isNaN(entityId)) {
-                    // store BOTH the base and the ext
-                    iiifMap{{ tab_name }}.set(entityId, {base: iiifBase, ext});
+                    // store base, ext, and fallback display URL
+                    iiifMap{{ tab_name }}.set(
+                        entityId,
+                        (iiifBase || fileUrl) ? {base: iiifBase, ext, url: fileUrl} : null);
                 }
 
             }
@@ -118,9 +122,10 @@
             if (!url) return;
 
             const img = new Image();
+            let usedFallback = false;
             img.onload = () => {
                 // 1) paint the background
-                bg.style.backgroundImage = `url('${url}')`;
+                bg.style.backgroundImage = `url('${img.src}')`;
 
                 // 2) compute cover/contain width % based on aspect ratios
                 const imgW = img.naturalWidth || 1;
@@ -144,7 +149,11 @@
                 // 4) fade in
                 el.classList.add('has-bg');
             };
-            img.onerror = () => { /* leave grey on failure */
+            img.onerror = () => {
+                if (!usedFallback && iiifObj.url && img.src !== iiifObj.url) {
+                    usedFallback = true;
+                    img.src = iiifObj.url;
+                }
             };
             img.src = url;
         });

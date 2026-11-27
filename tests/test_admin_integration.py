@@ -48,9 +48,9 @@ def test_update_menu_management(authenticated_client: FlaskClient) -> None:
 
 def test_update_general_settings(authenticated_client: FlaskClient) -> None:
     rv = authenticated_client.post('/admin/update_general_settings', data={
-        'site_title': 'New Title',
-        'contact_email': 'test@example.com',
-        'case_study_id': '0'
+        'accessRestriction': 'y',
+        'selectedLanguages': ['en'],
+        'preferredLanguage': 'en'
     }, follow_redirects=True)
     assert rv.status_code == 200
 
@@ -115,10 +115,6 @@ def test_admin_misc_routes(authenticated_client: FlaskClient) -> None:
         'mapselection': '1',
         'imgmap': 'map'
     }, follow_redirects=True)
-    assert rv.status_code == 200
-    
-    # Test check_case_study_id_ajax
-    rv = authenticated_client.get('/admin/check_case_study_id_ajax/8240')
     assert rv.status_code == 200
 
 def test_delete_entry(authenticated_client: FlaskClient) -> None:

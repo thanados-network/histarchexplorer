@@ -7,6 +7,7 @@ import subprocess
 from typing import Any, Optional
 
 from PIL import Image
+import requests
 from flask import (abort, current_app, flash, g, jsonify, redirect,
                    render_template, request, send_file, send_from_directory,
                    url_for)
@@ -48,8 +49,7 @@ from histarchexplorer.services.entity_cache import (
 from histarchexplorer.services.vocabulary_cache import (
     get_vocabulary_cache_status, start_vocabulary_refresh)
 from histarchexplorer.utils.doi import fetch_doi_metadata
-from histarchexplorer.utils.view_util import find_children_by_id
-from histarchexplorer.views.views import type_tree
+from histarchexplorer.utils.view_util import flatten_case_studies
 
 ALLOWED_IMAGE_EXTENSIONS = {
     '.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.ico'}
@@ -172,22 +172,12 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         elif active_main_sidebar_id == 'sidebar-stakeholders-content':
             stakeholder_tabs[0]['is_active'] = True
 
-    cs_type_id: Optional[int] = None
-    cs_type_name: Optional[str] = None
-    case_study_children: list[dict[str, str]] | None = []
-
-    if g.settings.case_study_type_id:
-        try:
-            cs_type_id = int(g.settings.case_study_type_id)
-            details = Admin.get_openatlas_entity(cs_type_id)
-            if details:
-                cs_type_name = details['name']
-
-            case_study_children = find_children_by_id(
-                type_tree().get_json(),
-                cs_type_id)
-        except (ValueError, TypeError) as e:
-            app.logger.error('Error processing case study type ID: %s', e)
+    case_study_children: list[dict[str, Any]] = []
+    try:
+        case_study_children = flatten_case_studies(
+            ApiAccess.get_case_studies())
+    except (requests.RequestException, ValueError) as e:
+        app.logger.error('Error loading case studies from API: %s', e)
 
     admin_instance = Admin()
     all_logos = admin_instance.logos_with_ids
@@ -204,7 +194,6 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
         if code in g.settings.selected_languages]
 
     # Pre-fill
-    gen_form.case_study_id.data = cs_type_id
     gen_form.darkMode.data = g.settings.darkmode
     gen_form.languageSelection.data = g.settings.language_selector
     gen_form.accessRestriction.data = g.settings.access_restriction
@@ -304,8 +293,6 @@ def admin(tab: Optional[str] = None, entry: Optional[str] = None) -> str:
             if k not in app.config['CLASSES_TO_SKIP']},
         shown_classes=g.settings.shown_classes,
         hidden_classes=g.settings.hidden_classes,
-        initial_case_study_type_id=cs_type_id,
-        initial_case_study_type_name=cs_type_name,
         case_study_children=case_study_children,
         active_main_sidebar_id=active_main_sidebar_id,
         licenses=admin_instance.licenses,
@@ -1407,34 +1394,14 @@ def update_general_settings(ignore_id: Optional[int] = None) -> Response:
                 flash(f"{getattr(form, field).label.text}: {error}", 'danger')
         return _redirect_to_admin_tab('sidebar-general-settings-group')
 
-    case_study_id = form.case_study_id.data
-    if case_study_id is None:
-        flash(_('Invalid Case Study ID.'), 'error')
-        return _redirect_to_admin_tab('sidebar-general-settings-group')
-    validation_result = Admin.check_case_study_type_id(case_study_id)
-    if validation_result['is_valid']:
-        g.settings.case_study_type_id = case_study_id
-        g.settings.darkmode = bool(form.darkMode.data)
-        g.settings.access_restriction = bool(form.accessRestriction.data)
-        g.settings.language_selector = bool(form.languageSelection.data)
-        g.settings.selected_languages = form.selectedLanguages.data or ['en']
-        g.settings.preferred_language = form.preferredLanguage.data or 'en'
-        g.settings.save_to_db()
-        flash(_('Updated case study ID successfully'), 'info')
-    else:
-        message = _(
-            'Invalid Case Study ID. Must be a positive integer '
-            'and its entity type must be "type".')
-        flash(message, 'error')
+    g.settings.darkmode = bool(form.darkMode.data)
+    g.settings.access_restriction = bool(form.accessRestriction.data)
+    g.settings.language_selector = bool(form.languageSelection.data)
+    g.settings.selected_languages = form.selectedLanguages.data or ['en']
+    g.settings.preferred_language = form.preferredLanguage.data or 'en'
+    g.settings.save_to_db()
+    flash(_('General settings updated successfully'), 'info')
     return _redirect_to_admin_tab('sidebar-general-settings-group')
-
-
-@app.route('/admin/check_case_study_id_ajax/<int:entity_id>', methods=['GET'])
-@login_required
-def check_case_study_id_ajax(entity_id: int) -> Response:
-    check_manager_user()
-    result = Admin.check_case_study_type_id(entity_id)
-    return jsonify(result)
 
 
 # Todo: remove for production
@@ -1536,12 +1503,15 @@ def refresh_system_cache() -> Response:
     """Refresh general API caches and start full vocabulary preloading."""
     check_manager_user()
     cache.delete_memoized(ApiAccess.get_type_tree)
+    cache.delete_memoized(ApiAccess.get_case_studies)
     cache.delete_memoized(ApiAccess.get_files_of_entities)
+    cache.delete_memoized(ApiAccess.get_map_overlays)
     cache.delete_memoized(ApiAccess.get_system_class_count)
-    cache.delete_memoized(ApiAccess.get_entities_count_by_case_studies)
 
     ApiAccess.get_type_tree()
+    ApiAccess.get_case_studies()
     ApiAccess.get_files_of_entities()
+    ApiAccess.get_map_overlays()
     ApiAccess.get_entities_count_by_case_studies()
     for case_study in g.case_study_ids:
         ApiAccess.get_entities_count_by_case_studies(case_study)

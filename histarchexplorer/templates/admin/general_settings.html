@@ -1,40 +1,8 @@
-<form id="caseStudyForm" method="POST" class="needs-validation"
-      novalidate
-      data-action-template="/admin/update_general_settings/">
+<form id="generalSettingsForm" method="POST"
+      action="{{ url_for('update_general_settings') }}"
+      class="needs-validation" novalidate>
   {{ general_settings_form.csrf_token }}
   <input type="hidden" name="active_sidebar" value="sidebar-general-settings-group">
-
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="bg-light p-3 rounded-3 border">
-        <h6 class="fw-bold mb-3 text-secondary">
-          <i class="bi bi-gear-wide-connected me-2"></i>{{ _('project configuration') | upper }}
-        </h6>
-        <div class="mb-0">
-          {{ general_settings_form.case_study_id.label(class="form-label fw-semibold") }}
-          <div class="input-group">
-            <span class="input-group-text bg-white"><i class="bi bi-hash"></i></span>
-            {{ general_settings_form.case_study_id(
-                class="form-control form-control-lg",
-                id="caseStudyHierarchyID",
-                pattern="^\\d+$",
-                required=True) }}
-            <div class="invalid-feedback" id="caseStudyIDFeedback">
-              {{ _('Please enter a positive integer for the Case Study Hierarchy ID.') }}
-            </div>
-          </div>
-          <div class="form-text mt-2">
-            <span id="caseStudyTypeName" class="fw-bold text-info">
-              {% if initial_case_study_type_name %}
-                ({{ initial_case_study_type_name }})
-              {% endif %}
-            </span>
-            <span class="ms-1 text-muted">{{ _('This ID links your project to the central hierarchy.') }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div class="row">
     <div class="col-md-6 mb-4">

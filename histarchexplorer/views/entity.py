@@ -6,14 +6,15 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict
 from typing import Any, Optional
 
-from flask import abort, g, render_template, request
+import requests
+from flask import abort, g, jsonify, render_template, request
+from werkzeug import Response
 
 from histarchexplorer import app
 from histarchexplorer.api.api_access import ApiAccess
 from histarchexplorer.api.presentation_view import (
     EntityTypeModel, File, PresentationView, Relation, TimeRangeModel)
 from histarchexplorer.api.util import get_description_translated
-from histarchexplorer.database.entity import get_files_for_ids
 from histarchexplorer.services.entity_cache import ensure_entity_fresh
 from histarchexplorer.utils.view_util import (
     get_cite_button, get_refresh_button)
@@ -687,40 +688,14 @@ def get_sub_count(main_entity: PresentationView) -> dict[str, Any]:
     return {'count': count, 'ids': ids}
 
 
-@app.route('/get_rastermaps', methods=['POST'])
-def get_rastermaps() -> str:
-    """Retrieve raster overlay maps for the requested entity IDs.
-
-    Expects a JSON body containing a list of IDs and returns the
-    associated map details.
-
-    Input format:
-        {
-            "ids": [int, ...]
-        }
-
-    Output format:
-        {
-            "images": [
-                {
-                    "id": int,
-                    "name": str,
-                    "description": str,
-                    "bbox": [
-                        [float, float],
-                        [float, float]
-                    ]
-                }
-            ]
-        }
-    """
-    data = request.get_json()
-    if not data or 'ids' not in data:
-        abort(400, "Missing 'ids' in request body")
-    ids = data['ids']
-    if not isinstance(ids, list):
-        abort(400, "'ids' must be a list")
-    return json.dumps(get_files_for_ids(ids))
+@app.route('/api/map-overlays', methods=['GET'])
+def get_map_overlays() -> Response:
+    """Return all cached map overlays from OpenAtlas API v1."""
+    try:
+        overlays = ApiAccess.get_map_overlays()
+    except (requests.RequestException, ValueError):
+        overlays = []
+    return jsonify({'images': overlays})
 
 
 @app.route('/presentation-view/<int:id_>')

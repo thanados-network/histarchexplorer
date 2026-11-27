@@ -239,11 +239,25 @@ def test_get_entity_tabs(authenticated_client: FlaskClient) -> None:
                 assert 'iiif.example.org/901' in body
                 assert 'iiif.example.org/902' not in body
 
-def test_get_rastermaps(authenticated_client: FlaskClient) -> None:
-    with patch('histarchexplorer.views.entity.get_files_for_ids') as mock_get:
-        mock_get.return_value = {'images': []}
-        rv = authenticated_client.post('/get_rastermaps', json={'ids': [1, 2]})
+def test_get_map_overlays(authenticated_client: FlaskClient) -> None:
+    payload = [{
+        'id': 112757,
+        'name': 'Plan',
+        'bbox': [[49.0, 14.0], [49.1, 14.1]]}]
+    with patch(
+            'histarchexplorer.api.api_access.ApiAccess.get_map_overlays',
+            return_value=payload):
+        rv = authenticated_client.get('/api/map-overlays')
         assert rv.status_code == 200
+        assert rv.get_json() == {'images': payload}
+
+    import requests
+    with patch(
+            'histarchexplorer.api.api_access.ApiAccess.get_map_overlays',
+            side_effect=requests.RequestException('down')):
+        rv = authenticated_client.get('/api/map-overlays')
+        assert rv.status_code == 200
+        assert rv.get_json() == {'images': []}
 
 
 def test_catalogue_tab(authenticated_client: FlaskClient) -> None:

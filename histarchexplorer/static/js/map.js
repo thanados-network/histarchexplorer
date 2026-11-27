@@ -66,10 +66,10 @@
         map.setFilter('this-linestring', ['all', ['==', 'main', true], ['==', '$type', 'LineString']]);
         map.setFilter('this-points', ['all', ['==', 'main', true], ['==', '$type', 'Point']]);
         setPointer(mapVectorLayers)
-        addRasterMaps(map, geomFeatureIds);
         const layerControl = new LayerControl();
         map.addControl(layerControl, 'top-left');
         map.layerControl = layerControl;
+        addRasterMaps(map);
     });
 
     function addTerrain() {
@@ -523,7 +523,11 @@
                 button.style.display = 'none';
             };
 
-            map.once('styledata', () => this._buildPanel(panel));
+            if (map.isStyleLoaded() || map.getStyle()?.layers?.length) {
+                this._buildPanel(panel);
+            } else {
+                map.once('styledata', () => this._buildPanel(panel));
+            }
 
             return this.container;
         }
@@ -1372,14 +1376,169 @@
         return [tl[0] + dx1 + dx2, tl[1] + dy1 + dy2];
     }
 
+    function getOverlayBoundsBox(coords) {
+        if (!Array.isArray(coords) || coords.length < 2) return null;
+        const points = coords
+            .filter(pt => Array.isArray(pt) && pt.length >= 2)
+            .map(pt => [Number(pt[0]), Number(pt[1])])
+            .filter(([lat, lon]) => !Number.isNaN(lat) && !Number.isNaN(lon));
+        if (points.length < 2) return null;
+
+        if (points.length === 3) {
+            const [tl, tr, bl] = points;
+            points.push([tr[0] + bl[0] - tl[0], tr[1] + bl[1] - tl[1]]);
+        }
+
+        const lats = points.map(([lat]) => lat);
+        const lons = points.map(([, lon]) => lon);
+        return {
+            minLat: Math.min(...lats),
+            maxLat: Math.max(...lats),
+            minLon: Math.min(...lons),
+            maxLon: Math.max(...lons)
+        };
+    }
+
+    function getFeatureBoundsBox(feature) {
+        const rawCoords = feature?.geometry?.coordinates;
+        if (!rawCoords) return null;
+
+        let minLon = Infinity;
+        let maxLon = -Infinity;
+        let minLat = Infinity;
+        let maxLat = -Infinity;
+
+        function walk(item) {
+            if (!Array.isArray(item) || item.length === 0) return;
+            if (typeof item[0] === 'number' && typeof item[1] === 'number') {
+                minLon = Math.min(minLon, item[0]);
+                maxLon = Math.max(maxLon, item[0]);
+                minLat = Math.min(minLat, item[1]);
+                maxLat = Math.max(maxLat, item[1]);
+                return;
+            }
+            item.forEach(walk);
+        }
+
+        walk(rawCoords);
+        if (!Number.isFinite(minLon)) return null;
+        return { minLon, maxLon, minLat, maxLat };
+    }
+
+    function boxesIntersect(a, b) {
+        return (
+            a.maxLon >= b.minLon &&
+            a.minLon <= b.maxLon &&
+            a.maxLat >= b.minLat &&
+            a.minLat <= b.maxLat
+        );
+    }
+
+    function selectMatchingOverlays(overlays) {
+        if (!Array.isArray(overlays) || overlays.length === 0) return [];
+        const directFileIds = new Set(
+            (entityData?.entity?.files || []).map(f => Number(f.id))
+        );
+        const featureBoxes = (mapData?.features || [])
+            .map(getFeatureBoundsBox)
+            .filter(Boolean);
+
+        return overlays.filter(img => {
+            if (directFileIds.has(Number(img.id))) return true;
+            const overlayBox = getOverlayBoundsBox(img.bbox);
+            if (!overlayBox || featureBoxes.length === 0) return false;
+            return featureBoxes.some(box => boxesIntersect(overlayBox, box));
+        });
+    }
+
+    function loadImageElement(url, timeoutMs = 4000) {
+        return new Promise(resolve => {
+            const probe = new Image();
+            let settled = false;
+            const finish = result => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timer);
+                resolve(result);
+            };
+            const timer = setTimeout(() => {
+                probe.onload = null;
+                probe.onerror = null;
+                probe.src = '';
+                finish(null);
+            }, timeoutMs);
+            probe.crossOrigin = 'anonymous';
+            probe.onload = () => finish(probe);
+            probe.onerror = () => finish(null);
+            probe.src = url;
+        });
+    }
+
+    async function downscaleImageIfNeeded(probe, maxSize = 2048, extension = '') {
+        const w = probe.naturalWidth || 0;
+        const h = probe.naturalHeight || 0;
+        if (!w || !h || (w <= maxSize && h <= maxSize)) {
+            return probe.src;
+        }
+        const scale = maxSize / Math.max(w, h);
+        const targetW = Math.max(1, Math.round(w * scale));
+        const targetH = Math.max(1, Math.round(h * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = targetW;
+        canvas.height = targetH;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return probe.src;
+        ctx.drawImage(probe, 0, 0, targetW, targetH);
+
+        const mimeType = String(extension).toLowerCase() === 'png'
+            ? 'image/png'
+            : 'image/jpeg';
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType, 0.9));
+        return blob ? URL.createObjectURL(blob) : canvas.toDataURL(mimeType);
+    }
+
+    async function resolveOverlayImageUrl(img, maxSize = 2048) {
+        const candidates = [];
+        if (img.iiif_base_url) {
+            const base = String(img.iiif_base_url).replace(/\/+$/, '');
+            const ext = String(img.extension || '').toLowerCase();
+            if (ext === 'png') {
+                candidates.push({
+                    url: `${base}/full/!${maxSize},${maxSize}/0/default.png`,
+                    timeoutMs: 4000
+                });
+            }
+            candidates.push({
+                url: `${base}/full/!${maxSize},${maxSize}/0/default.jpg`,
+                timeoutMs: 4000
+            });
+        }
+        if (img.file_url) {
+            candidates.push({url: img.file_url, timeoutMs: 15000});
+        }
+
+        for (const candidate of candidates) {
+            const probe = await loadImageElement(candidate.url, candidate.timeoutMs);
+            if (probe) {
+                return downscaleImageIfNeeded(probe, maxSize, img.extension);
+            }
+        }
+
+        console.warn('Could not load overlay image from candidates:', img.id, candidates);
+        if ((img.iiif_base_url || candidates.length === 0) && window.openatlasApiUrl) {
+            const apiBase = window.openatlasApiUrl.replace(/\/?$/, '/');
+            const manifestUrl = `${apiBase}iiif_manifest/2/${encodeURIComponent(img.id)}`;
+            return getIiifImageUrl(manifestUrl, maxSize);
+        }
+        return null;
+    }
+
     async function addImageToMap(map, img, maxSize = 2048) {
         const id = img.id;
         const coords = img.bbox;
         const name = img.name;
-        const description = img.description;
-        const apiBase = (window.openatlasApiUrl || 'https://thanados.openatlas.eu/api/').replace(/\/?$/, '/');
-        const manifestUrl = `${apiBase}iiif_manifest/2/${encodeURIComponent(id)}`;
-        const imageUrl = await getIiifImageUrl(manifestUrl, 2048);
+        const description = img.description || '';
+        const imageUrl = await resolveOverlayImageUrl(img, maxSize);
 
         if (!imageUrl || !coords) return;
         if (!coords || coords.length < 2) return;
@@ -1412,7 +1571,7 @@
             id: layerId,
             type: 'raster',
             source: sourceId,
-            properties: {name: name, description: description},
+            metadata: {name: name, description: description},
             paint: {
                 'raster-opacity': 0.9
             }
@@ -1424,13 +1583,12 @@
             const currentCount = map.getStyle().layers.filter(l => l.id.startsWith('image_layer_')).length;
             imageCountElement.innerHTML = `(${currentCount})`;
             if (currentCount > 0) imagesHeader.classList.remove('d-none');
-            map.layerControl._updateMapLayerOrder()
         }
     }
 
-    async function addRasterMaps(map, ids) {
+    async function addRasterMaps(map) {
         await new Promise(resolve => {
-            if (map._isStyleLoaded) return resolve();
+            if (map.isStyleLoaded() || map.getStyle()?.layers?.length) return resolve();
             map.once('styledata', resolve);
         });
 
@@ -1440,32 +1598,23 @@
             return;
         }
 
-        if (ids.length === 0) return;
-
         try {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
-            const response = await fetch('/get_rastermaps', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({ ids: ids })
-            });
+            const response = await fetch('/api/map-overlays');
             if (!response.ok) {
-                console.warn(`Error with IDs ${ids}: ${response.status}`);
+                console.warn(`Error loading map overlays: ${response.status}`);
                 return;
             }
 
             const data = await response.json();
-            if (data && data.images) {
-                const images = data.images;
+            const images = selectMatchingOverlays(data?.images);
+            if (images.length > 0) {
 
                 // Process images concurrently
                 await Promise.all(images.map(async (img) => {
                     await addImageToMap(map, img);
 
                     const layerId = `image_layer_${encodeURIComponent(img.id)}`;
+                    if (!map.getLayer(layerId)) return;
                     const item = document.createElement('div');
                     item.className = 'image-legend-item';
                     item.innerHTML = `
@@ -1488,9 +1637,10 @@
                         if (map.getLayer(layerId)) map.setPaintProperty(layerId, 'raster-opacity', opacity);
                     });
                 }));
+                if (map.layerControl) map.layerControl._updateMapLayerOrder();
             }
         } catch (err) {
-            console.error(`Fehler beim Laden von IDs ${ids}:`, err);
+            console.error('Fehler beim Laden der Map-Overlays:', err);
         }
     }
 

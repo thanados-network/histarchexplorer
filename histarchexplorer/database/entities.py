@@ -4,50 +4,6 @@ from typing import Any
 from flask import g
 
 
-def get_recursive_type_ids(id_: int) -> list[dict[str, Any]]:
-    sql = """
-            (WITH RECURSIVE children_chain AS (
-            -- Anchor: start with the given id as the root
-            SELECT
-                 %(id)s AS id,   -- your starting ID here
-                0 AS level
-            UNION ALL
-            -- Recursive: find children where the domain_id = parent's id
-            SELECT
-                l.domain_id AS id,
-                cc.level + 1
-            FROM model.link l
-            JOIN children_chain cc ON l.range_id = cc.id
-            WHERE l.property_code = 'P127'
-        )
-        SELECT id
-        FROM children_chain
-        ORDER BY level, id)
-    """
-    g.openatlas_cursor.execute(sql, {'id': id_})
-    return g.openatlas_cursor.fetchall()
-
-
-def build_id_collection(ids: list[int]) -> list[str]:
-    if not ids:
-        return []
-
-    return [
-        row['id']
-        for id_ in ids
-        for row in get_recursive_type_ids(id_)
-    ]
-
-
-def get_p46_range_ids(id_: int) -> list[int]:
-    sql = """
-    SELECT range_id from model.link 
-    WHERE property_code = 'P46'  AND domain_id = %(id)s
-    """
-    g.openatlas_cursor.execute(sql, {'id': id_})
-    return [row['range_id'] for row in g.openatlas_cursor.fetchall()]
-
-
 def get_entities_list(where_sql: str, params: tuple) -> list[dict[str, Any]]:
     query = f"""
         SELECT jsonb_agg(

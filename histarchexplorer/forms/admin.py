@@ -18,9 +18,6 @@ class MapForm(FlaskForm):
 
 
 class GeneralSettingsForm(FlaskForm):
-    case_study_id = IntegerField(
-        _('case study hierarchy ID'),
-        validators=[DataRequired()])
     darkMode = BooleanField(_('Deactivate Darkmode'))
     languageSelection = BooleanField(_('Deactivate Language Selector'))
     accessRestriction = BooleanField(_('Activate Access Restriction'))
